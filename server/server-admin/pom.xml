@@ -2,69 +2,93 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.wl4g</groupId>
 	<artifactId>rengine-server-admin</artifactId>
 	<name>Rengine Server Admin</name>
 	<description>Rengine Server Admin.</description>
 	<organization>
-	    <name>wl4g</name>
-	    <url>https://rengine.wl4g.com</url>
-    </organization>
-    <licenses>
-      <license>
-        <name>Apache License Version 2.0</name>
-        <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        <distribution>repo</distribution>
-      </license>
-    </licenses>
-    <scm>
-      <connection>scm:git:git@github.com:wl4g/rengine.git</connection>
-      <developerConnection>scm:git:git@github.com:wl4g/rengine.git</developerConnection>
-      <url>https://github.com/wl4g/rengine</url>
-      <tag>HEAD</tag>
-    </scm>
-    <issueManagement>
-      <system>github</system>
-      <url>https://github.com/wl4g/rengine/issues</url>
-    </issueManagement>
+		<name>wl4g</name>
+		<url>https://rengine.wl4g.com</url>
+	</organization>
+	<licenses>
+		<license>
+			<name>Apache License Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<scm>
+		<connection>scm:git:git@github.com:wl4g/rengine.git</connection>
+		<developerConnection>scm:git:git@github.com:wl4g/rengine.git</developerConnection>
+		<url>https://github.com/wl4g/rengine</url>
+		<tag>HEAD</tag>
+	</scm>
+	<issueManagement>
+		<system>github</system>
+		<url>https://github.com/wl4g/rengine/issues</url>
+	</issueManagement>
 	<developers>
-	  <developer>
-	    <id>James Wong</id>
-	    <name>jameswong1376</name>
-	    <email>jameswong1376@gmail.com</email>
-	    <roles>
-	      <role>owner</role>
-	      <role>maintainer</role>
-	      <role>developer</role>
-	    </roles>
-	    <timezone>+8</timezone>
-	  </developer>
-	  <developer>
-	    <id>xburnerair00</id>
-	    <name>xburnerair00</name>
-	    <email>xburnerair00@163.com</email>
-	    <roles>
-	      <role>maintainer</role>
-	      <role>developer</role>
-	    </roles>
-	    <timezone>+8</timezone>
-	  </developer>
+		<developer>
+			<id>James Wong</id>
+			<name>jameswong1376</name>
+			<email>jameswong1376@gmail.com</email>
+			<roles>
+				<role>owner</role>
+				<role>maintainer</role>
+				<role>developer</role>
+			</roles>
+			<timezone>+8</timezone>
+		</developer>
+		<developer>
+			<id>xburnerair00</id>
+			<name>xburnerair00</name>
+			<email>xburnerair00@163.com</email>
+			<roles>
+				<role>maintainer</role>
+				<role>developer</role>
+			</roles>
+			<timezone>+8</timezone>
+		</developer>
 	</developers>
 	<properties>
 		<java.version>11</java.version>
-		<repackage.classifier/>
+		<repackage.classifier />
 		<spring-native.version>0.12.1</spring-native.version>
+		<spring-cloud.version>2021.0.3</spring-cloud.version>
 	</properties>
 	<parent>
 		<groupId>com.wl4g</groupId>
 		<artifactId>rengine-server</artifactId>
 		<version>1.0.0</version>
 	</parent>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<dependencies>
 		<dependency>
 			<groupId>com.wl4g</groupId>
 			<artifactId>rengine-common</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-mongodb</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-sleuth</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -97,82 +121,93 @@
 	</dependencies>
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
-					<classifier>${repackage.classifier}</classifier>
-					<image>
-						<builder>paketobuildpacks/builder:tiny</builder>
-						<env>
-							<BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
-						</env>
-					</image>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.springframework.experimental</groupId>
-				<artifactId>spring-aot-maven-plugin</artifactId>
-				<version>${spring-native.version}</version>
-				<executions>
-					<execution>
-						<id>test-generate</id>
-						<goals>
-							<goal>test-generate</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>generate</id>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+			
 		</plugins>
 	</build>
-	<repositories>
-		<repository>
-			<id>spring-releases</id>
-			<name>Spring Releases</name>
-			<url>https://repo.spring.io/release</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>spring-releases</id>
-			<name>Spring Releases</name>
-			<url>https://repo.spring.io/release</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</pluginRepository>
-	</pluginRepositories>
 	<profiles>
 		<profile>
-			<id>native</id>
+			<id>build:tar</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<configuration>
+							<finalName>rengine-${project.version}-bin</finalName>
+							<appendAssemblyId>false</appendAssemblyId>
+							<descriptors>
+								<descriptor>src/main/assemble/package.xml</descriptor>
+							</descriptors>
+						</configuration>
+						<executions>
+							<execution>
+								<id>make-assembly</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>build:native</id>
 			<properties>
 				<repackage.classifier>exec</repackage.classifier>
 				<native-buildtools.version>0.9.13</native-buildtools.version>
 			</properties>
-      <dependencies>
+			<dependencies>
 				<dependency>
 					<groupId>org.junit.platform</groupId>
 					<artifactId>junit-platform-launcher</artifactId>
 					<scope>test</scope>
 				</dependency>
-      </dependencies>
+			</dependencies>
 			<build>
 				<plugins>
+					<plugin>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-maven-plugin</artifactId>
+						<configuration>
+							<excludes>
+								<exclude>
+									<groupId>org.projectlombok</groupId>
+									<artifactId>lombok</artifactId>
+								</exclude>
+							</excludes>
+							<classifier>${repackage.classifier}</classifier>
+							<image>
+								<builder>paketobuildpacks/builder:tiny</builder>
+								<env>
+									<BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
+								</env>
+							</image>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.springframework.experimental</groupId>
+						<artifactId>spring-aot-maven-plugin</artifactId>
+						<version>${spring-native.version}</version>
+						<executions>
+							<execution>
+								<id>test-generate</id>
+								<goals>
+									<goal>test-generate</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>generate</id>
+								<goals>
+									<goal>generate</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
 					<plugin>
 						<groupId>org.graalvm.buildtools</groupId>
 						<artifactId>native-maven-plugin</artifactId>
@@ -196,7 +231,174 @@
 						</executions>
 					</plugin>
 				</plugins>
-      </build>
+			</build>
+		</profile>
+		<profile>
+			<id>build:tar:docker</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<configuration>
+							<finalName>rengine-${project.version}-bin</finalName>
+							<appendAssemblyId>false</appendAssemblyId>
+							<descriptors>
+								<descriptor>src/main/assemble/package.xml</descriptor>
+							</descriptors>
+						</configuration>
+						<executions>
+							<execution>
+								<id>make-assembly</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- Usages examples: -->
+					<!-- export DOCKER_HOST=tcp://localhost:2375 -->
+					<!-- [build]: mvn -Pbuild:tar:docker -->
+					<!-- [push]: mvn -Pbuild:tar:docker -->
+					<!-- [push]: mvn -Pbuild:tar:docker dockerfile:build dockerfile:push -Ddockerfile.username=wl4g -Ddockerfile.password=xxx -->
+					<plugin>
+						<groupId>com.spotify</groupId>
+						<artifactId>dockerfile-maven-plugin</artifactId>
+						<version>1.4.13</version>
+						<executions>
+							<execution>
+								<id>default</id>
+								<goals>
+									<goal>build</goal>
+									<!-- <goal>push</goal> -->
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<!-- see:https://github.com/spotify/dockerfile-maven/issues/154 -->
+							<contextDirectory>${project.basedir}</contextDirectory>
+							<dockerfile>${project.basedir}/build/docker/Dockerfile</dockerfile>
+							<repository>wl4g/${project.build.finalName}</repository>
+							<useMavenSettingsForAuth>true</useMavenSettingsForAuth>
+							<tag>${project.version}</tag>
+							<readTimeoutMillis>60000</readTimeoutMillis>
+							<connectTimeoutMillis>20000</connectTimeoutMillis>
+							<buildArgs>
+								<!-- Addidtion librarys. -->
+								<!-- <ADD_LIBRARY></ADD_LIBRARY> -->
+								<APP_NAME>${project.build.finalName}</APP_NAME>
+								<APP_VERSION>${project.version}</APP_VERSION>
+								<APP_MAINCLASS>${bootstrap-classname}</APP_MAINCLASS>
+							</buildArgs>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<!-- TODO 暂时 Dockerfile 还不支持 native 执行文件 -->
+		<profile>
+			<id>build:native:docker</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-maven-plugin</artifactId>
+						<configuration>
+							<excludes>
+								<exclude>
+									<groupId>org.projectlombok</groupId>
+									<artifactId>lombok</artifactId>
+								</exclude>
+							</excludes>
+							<classifier>${repackage.classifier}</classifier>
+							<image>
+								<builder>paketobuildpacks/builder:tiny</builder>
+								<env>
+									<BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
+								</env>
+							</image>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.springframework.experimental</groupId>
+						<artifactId>spring-aot-maven-plugin</artifactId>
+						<version>${spring-native.version}</version>
+						<executions>
+							<execution>
+								<id>test-generate</id>
+								<goals>
+									<goal>test-generate</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>generate</id>
+								<goals>
+									<goal>generate</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.graalvm.buildtools</groupId>
+						<artifactId>native-maven-plugin</artifactId>
+						<version>${native-buildtools.version}</version>
+						<extensions>true</extensions>
+						<executions>
+							<execution>
+								<id>test-native</id>
+								<phase>test</phase>
+								<goals>
+									<goal>test</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>build-native</id>
+								<phase>package</phase>
+								<goals>
+									<goal>build</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- Usages examples: -->
+					<!-- export DOCKER_HOST=tcp://localhost:2375 -->
+					<!-- [build]: mvn -Pbuild:tar:docker -->
+					<!-- [push]: mvn -Pbuild:tar:docker -->
+					<!-- [push]: mvn -Pbuild:tar:docker dockerfile:build dockerfile:push -Ddockerfile.username=wl4g -Ddockerfile.password=xxx -->
+					<plugin>
+						<groupId>com.spotify</groupId>
+						<artifactId>dockerfile-maven-plugin</artifactId>
+						<version>1.4.13</version>
+						<executions>
+							<execution>
+								<id>default</id>
+								<goals>
+									<goal>build</goal>
+									<!-- <goal>push</goal> -->
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<!-- see:https://github.com/spotify/dockerfile-maven/issues/154 -->
+							<contextDirectory>${project.basedir}</contextDirectory>
+							<dockerfile>${project.basedir}/build/docker/Dockerfile</dockerfile>
+							<repository>wl4g/${project.build.finalName}</repository>
+							<useMavenSettingsForAuth>true</useMavenSettingsForAuth>
+							<tag>${project.version}</tag>
+							<readTimeoutMillis>60000</readTimeoutMillis>
+							<connectTimeoutMillis>20000</connectTimeoutMillis>
+							<buildArgs>
+								<!-- Addidtion librarys. -->
+								<!-- <ADD_LIBRARY></ADD_LIBRARY> -->
+								<APP_NAME>${project.build.finalName}</APP_NAME>
+								<APP_VERSION>${project.version}</APP_VERSION>
+								<APP_MAINCLASS>${bootstrap-classname}</APP_MAINCLASS>
+							</buildArgs>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 	</profiles>
 </project>

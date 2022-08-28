@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+	<classPathEntry location="/home/wanglsir/.m2/repository/mysql/mysql-connector-java/8.0.24/mysql-connector-java-8.0.24.jar" />
+	<context id="defaultContext" targetRuntime="MyBatis3">
+		<!-- see:https://mybatis.org/generator/configreference/commentGenerator.html -->
+		<commentGenerator>
+			<property name="suppressDate" value="true" />
+			<property name="addRemarkComments" value="true" />
+			<property name="suppressAllComments" value="true" />
+		</commentGenerator>
+		<jdbcConnection driverClass="com.mysql.cj.jdbc.Driver" userId="rengine" password="rengine"
+			connectionURL="jdbc:mysql://localhost:3306/rengine?characterEncoding=utf-8&amp;useSSL=false">
+		</jdbcConnection>
+		<javaTypeResolver>
+			<property name="forceBigDecimals" value="false" />
+		</javaTypeResolver>
+		<javaModelGenerator targetPackage="com.wl4g.rengine.common.bean" targetProject="rengine-server-admin">
+			<property name="enableSubPackages" value="true" />
+			<property name="trimStrings" value="true" />
+		</javaModelGenerator>
+		<sqlMapGenerator targetPackage="mybatis.rengine" targetProject="rengine-server-admin">
+			<property name="enableSubPackages" value="true" />
+		</sqlMapGenerator>
+		<javaClientGenerator type="XMLMAPPER" targetPackage="com.wl4g.rengine.admin.data" targetProject="rengine-server-admin">
+			<property name="enableSubPackages" value="true" />
+		</javaClientGenerator>
+		<!-- see:https://mybatis.org/generator/configreference/table.html -->
+		<table tableName="user" domainObjectName="User" enableCountByExample="false" enableUpdateByExample="false"
+			enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+			<property name="useActualColumnNames" value="false" />
+		</table>
+	</context>
+</generatorConfiguration>

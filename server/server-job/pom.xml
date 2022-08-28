@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>rengine-job</artifactId>
 	<packaging>pom</packaging>
-	<name>Rengine Jobs</name>
+	<name>Rengine Job</name>
 	<url>http://iam.wl4g.com</url>
 	<description>Rengine Jobs.</description>
 	<organization>
