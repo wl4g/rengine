@@ -1,10 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>rengine-job</artifactId>
+	<artifactId>rengine-server-job</artifactId>
 	<packaging>pom</packaging>
-	<name>Rengine Job</name>
-	<url>http://iam.wl4g.com</url>
+	<name>Rengine Server Job</name>
+	<url>http://rengine.wl4g.com</url>
 	<description>Rengine Jobs.</description>
 	<organization>
 	    <name>wl4g</name>
@@ -52,22 +52,20 @@
 	</developers>
 	<parent>
 		<groupId>com.wl4g</groupId>
-		<artifactId>rengine-server</artifactId>
+		<artifactId>rengine-parent</artifactId>
 		<version>1.0.0</version>
 	</parent>
 	<modules>
-		<!--
-		<module>job-core</module>
-		<module>job-hbase-kafka</module>
-		<module>job-hbase-pulsar</module>
-		<module>job-hbase-rabbitmq</module>
-		<module>job-elasticsearch7-kafka</module>
-		<module>job-elasticsearch7-pulsar</module>
-		<module>job-elasticsearch7-rabbitmq</module>
-		<module>job-hive-kafka</module>
-		<module>job-hive-pulsar</module>
-		<module>job-hive-rabbitmq</module>
-	-->
+		<module>server-job-core</module>
+		<module>server-job-kafka-elasticsearch</module>
+		<module>server-job-kafka-hbase</module>
+		<module>server-job-kafka-hive</module>
+		<module>server-job-pulsar-elasticsearch</module>
+		<module>server-job-pulsar-hbase</module>
+		<module>server-job-pulsar-hive</module>
+		<module>server-job-rabbitmq-elasticsearch</module>
+		<module>server-job-rabbitmq-hbase</module>
+		<module>server-job-rabbitmq-hive</module>
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -115,7 +113,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
 				<configuration>
-					<configLocation>/../checkstyle/google_checks.xml</configLocation>
+					<configLocation>/../tools/checkstyle/google_checks.xml</configLocation>
 				</configuration>
 				<executions>
 					<!-- Solutions to maven checkstyle errors in Eclipse: https://gitee.com/wl4g/blogs/blob/master/articles/maven.checkstyle-eclipse-error/README_CN.md -->

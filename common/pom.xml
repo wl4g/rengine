@@ -1,159 +1,165 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>rengine-common</artifactId>
-	<name>Rengine Common</name>
-	<description>Rengine Common.</description>
-	<organization>
-	    <name>wl4g</name>
-	    <url>https://rengine.wl4g.com</url>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>rengine-common</artifactId>
+    <name>Rengine Common</name>
+    <description>Rengine Common.</description>
+    <organization>
+        <name>wl4g</name>
+        <url>https://rengine.wl4g.com</url>
     </organization>
     <licenses>
-      <license>
-        <name>Apache License Version 2.0</name>
-        <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        <distribution>repo</distribution>
-      </license>
+        <license>
+            <name>Apache License Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
     </licenses>
     <scm>
-      <connection>scm:git:git@github.com:wl4g/rengine.git</connection>
-      <developerConnection>scm:git:git@github.com:wl4g/rengine.git</developerConnection>
-      <url>https://github.com/wl4g/rengine</url>
-      <tag>HEAD</tag>
+        <connection>scm:git:git@github.com:wl4g/rengine.git</connection>
+        <developerConnection>scm:git:git@github.com:wl4g/rengine.git</developerConnection>
+        <url>https://github.com/wl4g/rengine</url>
+        <tag>HEAD</tag>
     </scm>
     <issueManagement>
-      <system>github</system>
-      <url>https://github.com/wl4g/rengine/issues</url>
+        <system>github</system>
+        <url>https://github.com/wl4g/rengine/issues</url>
     </issueManagement>
-	<developers>
-	  <developer>
-	    <id>James Wong</id>
-	    <name>jameswong1376</name>
-	    <email>jameswong1376@gmail.com</email>
-	    <roles>
-	      <role>owner</role>
-	      <role>maintainer</role>
-	      <role>developer</role>
-	    </roles>
-	    <timezone>+8</timezone>
-	  </developer>
-	  <developer>
-	    <id>xburnerair00</id>
-	    <name>xburnerair00</name>
-	    <email>xburnerair00@163.com</email>
-	    <roles>
-	      <role>maintainer</role>
-	      <role>developer</role>
-	    </roles>
-	    <timezone>+8</timezone>
-	  </developer>
-	</developers>
-	<properties>
-		<repackage.classifier/>
-		<java.version>11</java.version>
-		<guava.version>28.1-jre</guava.version>
-		<commons-io.version>2.6</commons-io.version>
-	</properties>
-	<parent>
-		<groupId>com.wl4g</groupId>
-		<artifactId>rengine-parent</artifactId>
-		<version>1.0.0</version>
-	</parent>
-	<dependencies>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>${guava.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>${commons-io.version}</version>
-		</dependency>
-		<dependency>
-		    <groupId>io.grpc</groupId>
-		    <artifactId>grpc-context</artifactId>
-		    <version>1.49.0</version>
-		</dependency>
-		<dependency>
-		    <groupId>io.grpc</groupId>
-		    <artifactId>grpc-stub</artifactId>
-		    <version>1.49.0</version>
-		</dependency>
-		<dependency>
-		    <groupId>io.grpc</groupId>
-		    <artifactId>grpc-core</artifactId>
-		    <version>1.49.0</version>
-		</dependency>
-		<dependency>
-		    <groupId>io.grpc</groupId>
-		    <artifactId>grpc-api</artifactId>
-		    <version>1.49.0</version>
-		</dependency>
-		<dependency>
-		    <groupId>io.grpc</groupId>
-		    <artifactId>grpc-netty-shaded</artifactId>
-		    <version>1.49.0</version>
-		</dependency>
-		<dependency>
-		    <groupId>io.grpc</groupId>
-		    <artifactId>grpc-protobuf</artifactId>
-		    <version>1.49.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-		</dependency>
-	</dependencies>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>jar-no-fork</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive><!-- Nutrition for package. implementation - version -->
-						<manifestEntries>
-							<Bundle-Version>${parsedVersion.osgiVersion}</Bundle-Version>
-							<Bundle-Description>${project.description}</Bundle-Description>
-							<Implementation-Version>${project.version}</Implementation-Version>
-						</manifestEntries>
-					</archive>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+    <developers>
+        <developer>
+            <id>James Wong</id>
+            <name>jameswong1376</name>
+            <email>jameswong1376@gmail.com</email>
+            <roles>
+                <role>owner</role>
+                <role>maintainer</role>
+                <role>developer</role>
+            </roles>
+            <timezone>+8</timezone>
+        </developer>
+        <developer>
+            <id>xburnerair00</id>
+            <name>xburnerair00</name>
+            <email>xburnerair00@163.com</email>
+            <roles>
+                <role>maintainer</role>
+                <role>developer</role>
+            </roles>
+            <timezone>+8</timezone>
+        </developer>
+    </developers>
+    <parent>
+        <groupId>com.wl4g</groupId>
+        <artifactId>rengine-parent</artifactId>
+        <version>1.0.0</version>
+    </parent>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.wl4g</groupId>
+                <artifactId>rengine-bom</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>com.wl4g</groupId>
+            <artifactId>infra-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>io.grpc</groupId>-->
+        <!--            <artifactId>grpc-context</artifactId>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>io.grpc</groupId>-->
+        <!--            <artifactId>grpc-stub</artifactId>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>io.grpc</groupId>-->
+        <!--            <artifactId>grpc-core</artifactId>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>io.grpc</groupId>-->
+        <!--            <artifactId>grpc-api</artifactId>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>io.grpc</groupId>-->
+        <!--            <artifactId>grpc-netty-shaded</artifactId>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>io.grpc</groupId>-->
+        <!--            <artifactId>grpc-protobuf</artifactId>-->
+        <!--        </dependency>-->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <!-- Nutrition for package. implementation - version -->
+                        <manifestEntries>
+                            <Bundle-Version>${parsedVersion.osgiVersion}</Bundle-Version>
+                            <Bundle-Description>${project.description}</Bundle-Description>
+                            <Implementation-Version>${project.version}</Implementation-Version>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

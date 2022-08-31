@@ -71,8 +71,6 @@
 		</pluginRepository>
 	</pluginRepositories>
 	<properties>
-		<java.version>11</java.version>
-		<repackage.classifier/>
 	</properties>
 	<parent>
 		<groupId>com.wl4g</groupId>
@@ -80,8 +78,8 @@
 		<version>1.0.0</version>
 	</parent>
 	<modules>
-		<module>server-starter</module>
 		<module>server-job</module>
+		<module>server-web</module>
 	</modules>
 	<dependencies>
 		<dependency>

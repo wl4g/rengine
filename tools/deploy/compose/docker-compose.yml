@@ -20,7 +20,7 @@ services:
   #minio:
   #redis:
   rengine:
-    image: wl4g/rengine:latest
+    image: wl4g/rengine-web:latest
     container_name: rengine
     environment:
       ## Please your modify by actual.
