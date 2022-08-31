@@ -15,6 +15,8 @@
  */
 package com.wl4g.rengine.server.admin.service.impl;
 
+import java.security.NoSuchAlgorithmException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.security.core.Authentication;
@@ -22,14 +24,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.wl4g.rengine.common.bean.mongo.AppLibrary;
-import com.wl4g.rengine.server.admin.model.UploadApplyModel;
-import com.wl4g.rengine.server.admin.model.UploadApplyResultModel;
-import com.wl4g.rengine.server.admin.model.UploadApplyModel.Metadata;
+import com.wl4g.rengine.server.admin.model.UploadApply;
+import com.wl4g.rengine.server.admin.model.UploadApplyResult;
+import com.wl4g.rengine.server.admin.model.UploadApplyResult.STSInfo;
 import com.wl4g.rengine.server.admin.service.AppLibraryService;
+import com.wl4g.rengine.server.minio.MinioClientManager;
 
-import io.minio.MinioClient;
-import io.minio.credentials.Provider;
-import io.minio.credentials.WebIdentityProvider;
+import io.minio.credentials.Credentials;
 
 /**
  * {@link AppLibraryServiceImpl}
@@ -42,25 +43,28 @@ import io.minio.credentials.WebIdentityProvider;
 public class AppLibraryServiceImpl implements AppLibraryService {
 
     private @Autowired MongoTemplate mongoTemplate;
+    private @Autowired MinioClientManager minioManager;
 
-    // see:http://docs.minio.org.cn/docs/master/minio-sts-quickstart-guide
-    // see:https://github.com/minio/minio/blob/master/docs/sts/keycloak.md
-    private @Autowired MinioClient minioClient;
-
-    public UploadApplyResultModel apply(UploadApplyModel model) {
+    public UploadApplyResult apply(UploadApply model) {
         // TODO
         AppLibrary applib = AppLibrary.builder().url("").accessMode("").extension("").owner("").group("").filename("").build();
-        mongoTemplate.insert(applib, "app_library");
+//        mongoTemplate.insert(applib, "app_library");
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         System.out.println(authentication);
 
-        // new WebIdentityProvider(supplier, "stsEndpoint", durationSeconds,
-        // policy, roleArn, roleSessionName, customHttpClient);
-
-        return UploadApplyResultModel.builder()
-                .metadata(Metadata.builder().accessMode("").extension("").owner("").group("").filename("").build())
-                .build();
+        try {
+            Credentials credentials = minioManager.createUploadingLibrarySTSWithAssumeRole();
+            return UploadApplyResult.builder()
+                    .sts(STSInfo.builder()
+                            .accessKey(credentials.accessKey())
+                            .secretKey(credentials.secretKey())
+                            .sessionToken(credentials.sessionToken())
+                            .build())
+                    .build();
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("Failed to create STS with assumeRole grant", e);
+        }
     }
 
 }

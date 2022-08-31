@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.wl4g.rengine.server.admin.model.UploadApplyModel;
+import com.wl4g.rengine.server.admin.model.UploadApply;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -65,7 +65,7 @@ public class HelloController {
 
     @Operation(description = "Hello echo")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful", content = {
-            @Content(mediaType = "application/json", schema = @Schema(implementation = UploadApplyModel.class)) }) })
+            @Content(mediaType = "application/json", schema = @Schema(implementation = UploadApply.class)) }) })
     @RequestMapping(path = "echo", method = { GET, POST, PUT, DELETE, PATCH })
     public EchoResultModel echo(HttpServletRequest request, @RequestBody(required = false) String body) throws Exception {
         log.info("[{}:called:echo()] appversion={}, uri={}, body={}", appversion, request.getRequestURI(), body);

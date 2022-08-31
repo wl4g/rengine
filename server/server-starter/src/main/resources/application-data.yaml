@@ -33,9 +33,20 @@ spring:
       uri: mongodb://localhost:27017/rengine
     minio:
       endpoint: http://localhost:9000
+      accessKey: minioadmin
+      secretKey: minioadmin
       #region:
-      accessKey: rengine
-      secretKey: rengine
-      buckets:
-      - name: rengine-applib
-        #policy: {}
+      bucket: rengine
+      httpClient:
+        connectTimeout: 5s
+        readTimeout: 5s
+        writeTimeout: 5s
+      userUpload:
+        assumeAccessKey: rengine_library
+        assumeSecretKey: 12345678
+        objectPrefix: /library
+        expiredDuration: 5m
+        assumePolicyName: rengine_library_policy
+        assumePolicyActions:
+          - 's3:PutObject'
+

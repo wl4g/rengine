@@ -15,6 +15,13 @@
  */
 package com.wl4g.rengine.server.admin.model;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
+import com.wl4g.rengine.common.bean.mongo.AppLibrary;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -33,6 +40,25 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class QueryRuleTemplateModel {
+public class UploadApply {
+
+    private Metadata metadata;
+
+    @Getter
+    @Setter
+    @SuperBuilder
+    @ToString
+    @NoArgsConstructor
+    public static class Metadata {
+        private @NotBlank String projectId;// TODO 公共库？项目的私有库？
+        private @NotBlank String filename;
+        private @NotBlank String extension;
+        private @NotNull @Min(1) Long size;
+        private @NotNull @Min(0) @Max(1) Integer status;
+        private String owner;
+        private String group;
+        private String accessMode;
+        private String sha1sum;
+    }
 
 }

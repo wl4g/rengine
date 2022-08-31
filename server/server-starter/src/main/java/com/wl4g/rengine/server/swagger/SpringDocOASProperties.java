@@ -54,23 +54,23 @@ public class SpringDocOASProperties {
         private License license = new License().name("Apache 2.0").url("http://www.apache.org/licenses/LICENSE-2.0");
         private Contact contact = new Contact();
         private Map<Class<?>, Class<?>> replaceClassConfig = new HashMap<>();
-        private Map<String, SecurityScheme> securitySchemes = new HashMap<>() {
+        private Map<String, CustomSecurityScheme> securitySchemes = new HashMap<>() {
             private static final long serialVersionUID = 1L;
             {
-                put("security_auth",
-                        new SecurityScheme().type(SecurityScheme.Type.OAUTH2)
-                                .in(SecurityScheme.In.HEADER)
-                                .flows(new OAuthFlows().authorizationCode(new OAuthFlow()
-                                        .authorizationUrl("https://iam.example.com/realms/master/protocol/openid-connect/auth")
-                                        .tokenUrl("https://iam.example.com/realms/master/protocol/openid-connect/token")
-                                        .refreshUrl("https://iam.example.com/realms/master/protocol/openid-connect/refresh")
-                                        .scopes(new Scopes() {
-                                            private static final long serialVersionUID = 1L;
-                                            {
-                                                put("read", "read scope");
-                                                put("write", "write scope");
-                                            }
-                                        }))));
+                SecurityScheme defaultScheme = new CustomSecurityScheme().type(SecurityScheme.Type.OAUTH2)
+                        .in(SecurityScheme.In.HEADER)
+                        .flows(new OAuthFlows().authorizationCode(new OAuthFlow()
+                                .authorizationUrl("https://iam.example.com/realms/master/protocol/openid-connect/auth")
+                                .tokenUrl("https://iam.example.com/realms/master/protocol/openid-connect/token")
+                                .refreshUrl("https://iam.example.com/realms/master/protocol/openid-connect/refresh")
+                                .scopes(new Scopes() {
+                                    private static final long serialVersionUID = 1L;
+                                    {
+                                        put("read", "read scope");
+                                        put("write", "write scope");
+                                    }
+                                })));
+                put("security_auth", (CustomSecurityScheme) defaultScheme);
             }
         };
     }
@@ -85,6 +85,14 @@ public class SpringDocOASProperties {
         private String version = "0.0.1";
         private String encoding = "UTF-8";
         private String termsOfService = "http://swagger.io/terms/";
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    @NoArgsConstructor
+    public static class CustomSecurityScheme extends SecurityScheme {
+        private boolean enabled = true;
     }
 
 }

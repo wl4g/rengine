@@ -33,23 +33,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class UploadApplyModel {
-
-    private Metadata metadata;
-
-    @Getter
-    @Setter
-    @SuperBuilder
-    @ToString
-    @NoArgsConstructor
-    public static class Metadata {
-        private String filename;
-        private String extension;
-        private String owner;
-        private String group;
-        private String accessMode;
-        private long size;
-        private String sha1sum;
-    }
+public class QueryRuleTemplateResult {
 
 }

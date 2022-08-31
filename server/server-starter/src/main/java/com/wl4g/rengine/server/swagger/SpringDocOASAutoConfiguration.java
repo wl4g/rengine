@@ -65,7 +65,12 @@ public class SpringDocOASAutoConfiguration {
                 .termsOfService(project.getTermsOfService())
                 .license(customConfig.getLicense())
                 .contact(customConfig.getContact());
-        return openAPI.info(info).components(new Components().securitySchemes(customConfig.getSecuritySchemes()));
+
+        Components securitySchemes = new Components();
+        customConfig.getSecuritySchemes().entrySet().stream().filter(e -> e.getValue().isEnabled()).forEach(
+                e -> securitySchemes.addSecuritySchemes(e.getKey(), e.getValue()));
+
+        return openAPI.info(info).components(securitySchemes);
     }
 
 }

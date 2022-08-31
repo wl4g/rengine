@@ -15,19 +15,18 @@
  */
 package com.wl4g.rengine.server.admin.controller;
 
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import javax.servlet.http.HttpServletRequest;
-
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.server.admin.model.UploadApplyModel;
-import com.wl4g.rengine.server.admin.model.UploadApplyResultModel;
+import com.wl4g.rengine.server.admin.model.UploadApply;
+import com.wl4g.rengine.server.admin.model.UploadApplyResult;
 import com.wl4g.rengine.server.admin.service.AppLibraryService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,7 +34,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,20 +47,20 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "ApplicationLibraryAPI", description = "The application library management API")
 @Slf4j
 @RestController
-@RequestMapping("/admin/applib")
+@RequestMapping("/admin/library")
 public class AppLibraryController {
 
-    private @Autowired AppLibraryService applibService;
+    private @Autowired AppLibraryService libraryService;
 
-    @SecurityRequirement(name = "security_auth")
+    // @SecurityRequirement(name = "default_oauth")
     @Operation(summary = "Preparing to upload the user app-library file.")
-    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful", content = {
-            @Content(mediaType = "application/json", schema = @Schema(implementation = UploadApplyModel.class)) }) })
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful",
+            content = { @Content(mediaType = "application/json", schema = @Schema(implementation = UploadApply.class)) }) })
     @RequestMapping(path = { "apply" }, method = { GET, POST })
-    public RespBase<UploadApplyResultModel> apply(HttpServletRequest request, UploadApplyModel model) {
+    public RespBase<UploadApplyResult> apply(HttpServletRequest request, UploadApply model) {
         log.info("[{}:called:apply()] uri={}, model={}", request.getRequestURI(), model);
-        RespBase<UploadApplyResultModel> resp = RespBase.create();
-        resp.setData(applibService.apply(model));
+        RespBase<UploadApplyResult> resp = RespBase.create();
+        resp.setData(libraryService.apply(model));
         return resp;
     }
 

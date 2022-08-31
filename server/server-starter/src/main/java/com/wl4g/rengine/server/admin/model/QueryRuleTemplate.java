@@ -33,6 +33,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class QueryRuleTemplateResultModel {
+public class QueryRuleTemplate {
 
 }

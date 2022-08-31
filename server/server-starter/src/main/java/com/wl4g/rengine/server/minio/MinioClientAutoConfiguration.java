@@ -17,9 +17,12 @@ package com.wl4g.rengine.server.minio;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
+import com.wl4g.infra.common.minio.v8_4.MinioAdminClient;
 import com.wl4g.rengine.server.minio.MinioClientProperties.HttpClientConfig;
 
 import io.minio.MinioClient;
@@ -43,13 +46,17 @@ public class MinioClientAutoConfiguration {
         return new MinioClientProperties();
     }
 
-    @Bean
-    public MinioClient minioClient(MinioClientProperties config) {
+    @Bean(BEAN_MINIO_OKHTTPCLIENT)
+    @ConditionalOnMissingBean
+    public OkHttpClient defaultMinioOkHttpClient(MinioClientProperties config) {
         // see to: io.minio.MinioAsyncClient.Builder.build()#L3318
         HttpClientConfig hcc = config.getHttpClient();
-        OkHttpClient httpClient = HttpUtils.newDefaultHttpClient(hcc.getConnectTimeout().toMillis(),
-                hcc.getReadTimeout().toMillis(), hcc.getWriteTimeout().toMillis());
+        return HttpUtils.newDefaultHttpClient(hcc.getConnectTimeout().toMillis(), hcc.getReadTimeout().toMillis(),
+                hcc.getWriteTimeout().toMillis());
+    }
 
+    @Bean
+    public MinioClient minioClient(MinioClientProperties config, @Qualifier(BEAN_MINIO_OKHTTPCLIENT) OkHttpClient httpClient) {
         Builder builder = MinioClient.builder()
                 .endpoint(config.getEndpoint())
                 /* .credentialsProvider(provider) */.credentials(config.getAccessKey(), config.getSecretKey())
@@ -60,5 +67,31 @@ public class MinioClientAutoConfiguration {
 
         return builder.build();
     }
+
+    @Bean
+    public MinioAdminClient minioAdminClient(
+            MinioClientProperties config,
+            @Qualifier(BEAN_MINIO_OKHTTPCLIENT) OkHttpClient httpClient) {
+        MinioAdminClient.Builder builder = MinioAdminClient.builder()
+                .endpoint(config.getEndpoint())
+                /* .credentialsProvider(provider) */.credentials(config.getAccessKey(), config.getSecretKey())
+                .httpClient(httpClient);
+        if (isBlank(config.getRegion())) {
+            builder.region(config.getRegion());
+        }
+
+        return builder.build();
+    }
+
+    @Bean
+    public MinioClientManager minioClientManager(
+            MinioClientProperties config,
+            @Qualifier(BEAN_MINIO_OKHTTPCLIENT) OkHttpClient httpClient,
+            MinioClient minioClient,
+            MinioAdminClient minioAdminClient) {
+        return new MinioClientManager(config, httpClient, minioClient, minioAdminClient);
+    }
+
+    public final static String BEAN_MINIO_OKHTTPCLIENT = "defaultMinioOkHttpClient";
 
 }

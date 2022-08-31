@@ -15,7 +15,7 @@
  */
 package com.wl4g.rengine.server.admin.model;
 
-import com.wl4g.rengine.server.admin.model.UploadApplyModel.Metadata;
+import javax.validation.constraints.NotBlank;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,7 +24,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link UploadApplyResultModel}
+ * {@link UploadApplyResult}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -35,6 +35,19 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class UploadApplyResultModel {
-    private Metadata metadata;
+public class UploadApplyResult {
+
+    private STSInfo sts;
+
+    @Getter
+    @Setter
+    @SuperBuilder
+    @ToString
+    @NoArgsConstructor
+    public static class STSInfo {
+        private @NotBlank String accessKey;
+        private @NotBlank String secretKey;
+        private @NotBlank String sessionToken;
+    }
+
 }

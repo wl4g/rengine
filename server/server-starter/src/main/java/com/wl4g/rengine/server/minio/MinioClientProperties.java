@@ -19,6 +19,8 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.wl4g.rengine.server.swagger.SpringDocOASProperties;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -40,15 +42,17 @@ public class MinioClientProperties {
 
     private String endpoint = "http://localhost:9000";
 
-    private String region;
+    private String accessKey = "minioadmin";
 
-    private String accessKey = "rengine";
+    private String secretKey = "minioadmin";
 
-    private String secretKey = "rengine";
+    private String region = "us-east-1";
+
+    private String bucket = "rengine";
 
     private HttpClientConfig httpClient = new HttpClientConfig();
 
-    private List<BucketConfig> buckets = new ArrayList<BucketConfig>();
+    private UserUploadAssumeConfig userUpload = new UserUploadAssumeConfig();
 
     @Getter
     @Setter
@@ -67,8 +71,24 @@ public class MinioClientProperties {
     @Setter
     @ToString
     @NoArgsConstructor
-    public static class BucketConfig {
-        private String name = "rengine-applib";
+    public static class UserUploadAssumeConfig {
+
+        private String assumeAccessKey = "rengine_library";
+
+        private String assumeSecretKey = "12345678";
+
+        private String objectPrefix = "/library";
+
+        private Duration expiredDuration = Duration.ofMinutes(5);
+
+        private String assumePolicyName = "rengine_library_policy";
+
+        private List<String> assumePolicyActions = new ArrayList<>() {
+            private static final long serialVersionUID = 1L;
+            {
+                add("s3:PutObject");
+            }
+        };
     }
 
 }

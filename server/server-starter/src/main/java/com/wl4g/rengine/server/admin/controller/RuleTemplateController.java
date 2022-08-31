@@ -24,16 +24,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.server.admin.model.QueryRuleTemplateModel;
-import com.wl4g.rengine.server.admin.model.QueryRuleTemplateResultModel;
-import com.wl4g.rengine.server.admin.model.UploadApplyModel;
+import com.wl4g.rengine.server.admin.model.QueryRuleTemplate;
+import com.wl4g.rengine.server.admin.model.QueryRuleTemplateResult;
+import com.wl4g.rengine.server.admin.model.UploadApply;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,16 +49,16 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/admin/ruletemplate")
 public class RuleTemplateController {
 
-    @SecurityRequirement(name = "security_auth")
+    // @SecurityRequirement(name = "security_auth")
     @Operation(description = "Query rules templates list.")
-    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful", content = {
-            @Content(mediaType = "application/json", schema = @Schema(implementation = UploadApplyModel.class)) }) })
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful",
+            content = { @Content(mediaType = "application/json", schema = @Schema(implementation = UploadApply.class)) }) })
     @RequestMapping(path = { "apply" }, method = { GET, POST })
-    public RespBase<QueryRuleTemplateResultModel> apply(HttpServletRequest request, QueryRuleTemplateModel model) {
+    public RespBase<QueryRuleTemplateResult> apply(HttpServletRequest request, QueryRuleTemplate model) {
         log.info("[{}:called:apply()] uri={}, model={}", request.getRequestURI(), model);
-        RespBase<QueryRuleTemplateResultModel> resp = RespBase.create();
+        RespBase<QueryRuleTemplateResult> resp = RespBase.create();
         // TODO
-        resp.setData(QueryRuleTemplateResultModel.builder().build());
+        resp.setData(QueryRuleTemplateResult.builder().build());
         return resp;
     }
 

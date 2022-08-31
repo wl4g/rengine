@@ -17,12 +17,10 @@ package com.wl4g.rengine.minio;
 
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
 
-import io.minio.credentials.AssumeRoleProvider;
 import io.minio.credentials.Credentials;
 import io.minio.credentials.Jwt;
 import io.minio.credentials.WebIdentityProvider;
@@ -35,37 +33,30 @@ import okhttp3.OkHttpClient;
  * @author James Wong
  * @version 2022-08-30
  * @since v3.0.0
+ * @see More examples see to:
+ *      {@link com.wl4g.infra.common.minio.MinioClientTests}
  */
 public class MinioIdentityProviderTests {
 
     static OkHttpClient defaultHttpClient = HttpUtils.newDefaultHttpClient(15_000, 15_000, 15_000);
 
     static Supplier<Jwt> jwtSuppiler = () -> new Jwt("access_token1111", 7200);
-    static String stsEndpoint = "https://s3-services.wl4g.com";
-    static String accessKey = "admin";
-    static String secretKey = "zzx!@#$%";
+    static String stsEndpoint = "http://localhost:9000";
+    static String accessKey = "test_tenant1001_user1";
+    static String secretKey = "12345678";
     static int durationSeconds = 5 * 60;
-    static String policy = "";
+    static String policy = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":[\"s3:GetObject\"],\"Resource\":[\"arn:aws:s3:::test_tenant1001/*\"]}]}";
     static String region = "us-east-1";
-    static String roleSessionName = "rengineSession1";
-    static String roleArn = "arn:";
-    static String externalId = "rengine";
+    static String roleSessionName = "anySession";
+    static String roleArn = "arn:aws:s3:::test_tenant1001/*";
+    static String externalId = "rengineApp";
 
     // see:https://github.com/minio/minio/blob/8.4.3/docs/sts/web-identity.md
+    // see:https://github.com/minio/minio/blob/master/docs/sts/keycloak.md
     @Test
-    public void testGetSTSCredentialsWithWebIdentity() {
+    public void testGetSTSWithWebIdentity() {
         WebIdentityProvider provider = new WebIdentityProvider(jwtSuppiler, stsEndpoint, durationSeconds, policy, roleArn,
                 roleSessionName, defaultHttpClient);
-
-        Credentials credentials = provider.fetch();
-        System.out.println(toJSONString(credentials));
-    }
-
-    // see:https://github.com/minio/minio/delete/8.4.3/docs/sts/client-grants.md
-    @Test
-    public void testGetSTSCredentialsWithAssumeRoleWithClientGrants() throws NoSuchAlgorithmException {
-        AssumeRoleProvider provider = new AssumeRoleProvider(stsEndpoint, accessKey, secretKey, durationSeconds, policy, region,
-                roleArn, roleSessionName, externalId, defaultHttpClient);
 
         Credentials credentials = provider.fetch();
         System.out.println(toJSONString(credentials));

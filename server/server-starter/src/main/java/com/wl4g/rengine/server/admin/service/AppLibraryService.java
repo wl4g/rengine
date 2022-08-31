@@ -15,8 +15,8 @@
  */
 package com.wl4g.rengine.server.admin.service;
 
-import com.wl4g.rengine.server.admin.model.UploadApplyModel;
-import com.wl4g.rengine.server.admin.model.UploadApplyResultModel;
+import com.wl4g.rengine.server.admin.model.UploadApply;
+import com.wl4g.rengine.server.admin.model.UploadApplyResult;
 
 /**
  * {@link AppLibraryService}
@@ -27,6 +27,6 @@ import com.wl4g.rengine.server.admin.model.UploadApplyResultModel;
  */
 public interface AppLibraryService {
 
-    UploadApplyResultModel apply(UploadApplyModel model);
+    UploadApplyResult apply(UploadApply model);
 
 }

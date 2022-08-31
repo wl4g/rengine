@@ -88,7 +88,8 @@ springdoc:
     replaceClassConfig: {}
     ## see:io.swagger.v3.oas.annotations.security.SecurityScheme
     securitySchemes:
-      security_auth:
+      default_oauth2:
+        enabled: true
         ## see:io.swagger.v3.oas.annotations.enums.SecuritySchemeType
         type: OAUTH2 ## DEFAULT|HTTP|APIKEY|OAUTH2|OPENIDCONNECT
         ## see:io.swagger.v3.oas.models.security.SecurityScheme
@@ -105,4 +106,3 @@ springdoc:
             scopes:
               read: read scope
               write: write scope
-
