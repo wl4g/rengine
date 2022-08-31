@@ -1,0 +1,110 @@
+# Copyright (c) 2017 ~ 2025, the original authors individual Inc,
+# All rights reserved. Contact us James Wong <jameswong1376@gmail.com>
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# #### Environment base configuration. ####
+#
+
+spring:
+  application.name: rengine
+  profiles:
+    #include: data,telemetry,swagger,security,devtool
+    include: data,telemetry,swagger,security
+    active:
+  banner:
+      location: classpath:META-INF/banner.txt
+  main:
+    allow-circular-references: true
+  #mvc:
+  #  pathmatch:
+  #    matching-strategy: /**/swagger-ui/**
+
+## see:https://docs.spring.io/spring-boot/docs/2.6.7/reference/htmlsingle/#features.logging.custom-log-configuration
+## see:com.wl4g.infra.core.logging.custom.logback.CustomLogbackConfigurer
+logging:
+  register-shutdown-hook: false
+  charset.file: UTF-8
+  ## Log levels belonging to this group will take effect synchronously.(TRACE|DEBUG|INFO|WARN|ERROR|FATAL|OFF)
+  ## see:https://docs.spring.io/spring-boot/docs/2.6.7/reference/htmlsingle/#features.logging.log-groups
+  group:
+    config: "org.springframework.boot.context.config"
+    tomcat: "org.apache.catalina,org.apache.coyote,org.apache.tomcat"
+  file: ## see:org.springframework.boot.logging.LogFile#toString
+    name: /mnt/disk1/log/${spring.application.name}/${spring.application.name}.log
+  pattern:
+    console: '%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} [%clr(${spring.application.name})] [%clr(%-12.12X{principal})] [%clr(%-32.32X{traceId})] [%clr(%-8.8X{spanId})] %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx'
+    file: '%d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${PID:- } [${spring.application.name}] [%-12.12X{principal}] [%-32.32X{traceId}] [%-8.8X{spanId}] --- [%t] %-40.40logger{39} : %m%n%wEx'
+    dateformat: yyyy-MM-dd HH:mm:ss.SSS
+    level: '%5p'
+  logback:
+    rollingpolicy:
+      file-name-pattern: ${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz
+      clean-history-on-start: false ## Default by false
+      max-file-size: 1GB ## Default by 200MB
+      max-history: 30 ## Default by 7
+      total-size-cap: 100GB ## Default by 10GB
+  level:
+    root: INFO
+    tomcat: INFO
+    config: INFO
+    ## The built-in log groups:
+    ## web(org.springframework.core.codec,org.springframework.http,org.springframework.web,org.springframework.boot.actuate.endpoint.web,org.springframework.boot.web.servlet.ServletContextInitializerBeans)
+    ## sql(org.springframework.jdbc.core,org.hibernate.SQL,org.jooq.tools.LoggerListener)
+    web: INFO
+    sql: INFO
+    reactor:
+      netty.http.client: INFO
+    org:
+      springframework: INFO
+      apache: INFO
+    feign: DEBUG
+    com:
+      wl4g.rengine: DEBUG
+
+server: ## see:org.springframework.boot.autoconfigure.web.ServerProperties
+  port: 28001
+  address: 0.0.0.0
+  servlet:
+    #contextPath: /${spring.application.name}
+    ## The spring-cloud-loadbalancer-2.2.6 not support metadata.contextPath
+    contextPath: /
+    session:
+      cookie:
+        name: _R_SID
+  tomcat: # see: org.springframework.boot.autoconfigure.web.ServerProperties.Tomcat
+    basedir: /tmp/${spring.application.name}
+    accesslog:
+      enabled: false
+      directory: ${server.tomcat.basedir}/../log/${spring.application.name}/ # Directory in which log files are created. Can be absolute or relative to the Tomcat base dir.
+      requestAttributesEnabled: false # Set request attributes for the IP address, Hostname, protocol, and port used for the request.
+    backgroundProcessorDelay: 1000 # default: 10s
+    thread:
+      # Maximum amount of worker threads. for example 4C 8G, and the empirical value of thread number is 800. The operating system 
+      # has system overhead for switching and scheduling between threads, so not the more the better. The minimum number of idle working threads
+      # is 10 by default. (increase it appropriately to cope with the sudden increase of visits). default: 200
+      max: 50
+      min-spare: 5 # Minimum amount of worker threads. default: 10
+    # Maximum number of connections that the server accepts and processes at any given time. Once the limit has been reached, the
+    # operating system may still accept connections based on the "acceptCount" property. default: 8192
+    maxConnections: 8192
+    # Maximum queue length for incoming connection requests when all possible request processing threads are in use. defualt: 100
+    accept-count: 100
+    # Maximum number of idle processors that will be retained in the cache and reused with a subsequent request. When set to -1 
+    # the cache will be unlimited with a theoretical maximum size equal to the maximum number of connections. default: 200
+    processorCache: 200
+    maxHttpFormPostSize: 2MB # Maximum size of the form content in any HTTP post request.
+    maxSwallowSize: 2MB # Maximum amount of request body to swallow.
+    uri-encoding: UTF-8
+    mbeanregistry:
+      enable: true
+    remoteip:
+      remoteIpHeader: X-Forwarded-For
+      protocolHeader: X-Forwarded-Proto
+      hostHeader: X-Forwarded-Host
+      portHeader: X-Forwarded-Port
