@@ -15,10 +15,10 @@
  */
 package com.wl4g.rengine.common.bean.mongo;
 
+import java.util.List;
+
 import javax.annotation.Nullable;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,7 +27,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link UserLibrary}
+ * {@link Workflow}
  * 
  * @author James Wong
  * @version 2022-08-29
@@ -38,13 +38,11 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class UserLibrary extends BeanBase {
-    private @NotBlank String objectPrefix;
-    private @NotBlank String extension;
-    private @NotNull @Min(1) Long size;
-    // private @Nullable String owner;
-    // private @NotBlank String group;
-    // private @Nullable String accessMode;
-    private @Nullable String md5sum;
-    private @Nullable String sha1sum;
+public class Workflow extends BeanBase {
+    private @NotBlank String workflowId;
+    private @NotBlank String projectId;
+    // 需新建专用 tree 对象？
+    // private @NotBlank List<String> ruleIds;
+    private @NotBlank String name;
+    private @Nullable List<String> labels;
 }

@@ -110,7 +110,8 @@
 		<module>bom</module>
 		<module>client</module>
 		<module>common</module>
-		<module>server</module>
+		<module>job</module>
+		<module>web</module>
 	</modules>
 	<build>
 		<pluginManagement>

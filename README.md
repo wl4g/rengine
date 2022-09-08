@@ -2,6 +2,10 @@
 
 A generic real-time rule engine, such as bank transfer real-time risk control, temperature real-time alarm.
 
+## Architectures
+
+- ![Global](docs/shots/rengine_architecture.png)
+
 ## Requirements
 
 - JDK 11.x +

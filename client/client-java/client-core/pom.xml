@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>rengine-client</artifactId>
-	<packaging>pom</packaging>
-	<name>Rengine Client</name>
-	<description>Rengine Client.</description>
+	<artifactId>rengine-client-core</artifactId>
+	<name>Rengine Client Core</name>
+	<description>Rengine Client Core.</description>
 	<organization>
 		<name>wl4g</name>
 		<url>https://rengine.wl4g.com</url>
@@ -50,37 +49,13 @@
 			<timezone>+8</timezone>
 		</developer>
 	</developers>
-	<repositories>
-		<repository>
-			<id>spring-releases</id>
-			<name>Spring Releases</name>
-			<url>https://repo.spring.io/release</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>spring-releases</id>
-			<name>Spring Releases</name>
-			<url>https://repo.spring.io/release</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</pluginRepository>
-	</pluginRepositories>
 	<properties>
 	</properties>
 	<parent>
 		<groupId>com.wl4g</groupId>
-		<artifactId>rengine-parent</artifactId>
+		<artifactId>rengine-client-java</artifactId>
 		<version>1.0.0</version>
 	</parent>
-	<modules>
-    <module>client-java</module>
-    <module>client-collector</module>
-	</modules>
 	<dependencies>
 		<dependency>
 			<groupId>com.wl4g</groupId>

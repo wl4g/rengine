@@ -15,7 +15,9 @@
  */
 package com.wl4g.rengine.common.bean.mongo;
 
-import javax.annotation.Nullable;
+import java.util.Date;
+
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -27,7 +29,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link UserLibrary}
+ * {@link BeanBase}
  * 
  * @author James Wong
  * @version 2022-08-29
@@ -38,13 +40,9 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class UserLibrary extends BeanBase {
-    private @NotBlank String objectPrefix;
-    private @NotBlank String extension;
-    private @NotNull @Min(1) Long size;
-    // private @Nullable String owner;
-    // private @NotBlank String group;
-    // private @Nullable String accessMode;
-    private @Nullable String md5sum;
-    private @Nullable String sha1sum;
+public abstract class BeanBase {
+    private @NotNull @Min(0) @Max(1) Integer status;
+    private @NotBlank String updateBy;
+    private @NotNull String remark;
+    private @NotNull Date updateDate;
 }

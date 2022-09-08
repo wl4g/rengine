@@ -133,7 +133,32 @@
             </dependency>
             <dependency>
                 <groupId>com.wl4g</groupId>
-                <artifactId>rengine-client-eventbus-core</artifactId>
+                <artifactId>rengine-client-java</artifactId>
+                <version>${project.parent.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.wl4g</groupId>
+                <artifactId>rengine-client-collector</artifactId>
+                <version>${project.parent.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.wl4g</groupId>
+                <artifactId>rengine-client-core</artifactId>
+                <version>${project.parent.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.wl4g</groupId>
+                <artifactId>rengine-client-springboot</artifactId>
+                <version>${project.parent.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.wl4g</groupId>
+                <artifactId>rengine-client-eventbus</artifactId>
+                <version>${project.parent.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.wl4g</groupId>
+                <artifactId>rengine-client-eventbus-base</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>
@@ -153,67 +178,62 @@
             </dependency>
             <dependency>
                 <groupId>com.wl4g</groupId>
-                <artifactId>rengine-server-job</artifactId>
+                <artifactId>rengine-job</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wl4g</groupId>
-                <artifactId>rengine-server-job-core</artifactId>
+                <artifactId>rengine-job-base</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wl4g</groupId>
-                <artifactId>rengine-server-job-kafka-elasticsearch</artifactId>
+                <artifactId>rengine-job-kafka-elasticsearch</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wl4g</groupId>
-                <artifactId>rengine-server-job-kafka-hbase</artifactId>
+                <artifactId>rengine-job-kafka-hbase</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wl4g</groupId>
-                <artifactId>rengine-server-job-kafka-hive</artifactId>
+                <artifactId>rengine-job-kafka-hive</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wl4g</groupId>
-                <artifactId>rengine-server-job-pulsar-elasticsearch</artifactId>
+                <artifactId>rengine-job-pulsar-elasticsearch</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wl4g</groupId>
-                <artifactId>rengine-server-job-pulsar-hbase</artifactId>
+                <artifactId>rengine-job-pulsar-hbase</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wl4g</groupId>
-                <artifactId>rengine-server-job-pulsar-hive</artifactId>
+                <artifactId>rengine-job-pulsar-hive</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wl4g</groupId>
-                <artifactId>rengine-server-job-rabbitmq-elasticsearch</artifactId>
+                <artifactId>rengine-job-rabbitmq-elasticsearch</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wl4g</groupId>
-                <artifactId>rengine-server-job-rabbitmq-hbase</artifactId>
+                <artifactId>rengine-job-rabbitmq-hbase</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wl4g</groupId>
-                <artifactId>rengine-server-job-rabbitmq-hive</artifactId>
+                <artifactId>rengine-job-rabbitmq-hive</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wl4g</groupId>
-                <artifactId>rengine-server</artifactId>
-                <version>${project.parent.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wl4g</groupId>
-                <artifactId>rengine-server-web</artifactId>
+                <artifactId>rengine-web</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <!-- Spring Cloud -->

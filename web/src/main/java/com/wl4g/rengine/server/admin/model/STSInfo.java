@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.common.bean.mongo;
+package com.wl4g.rengine.server.admin.model;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.Min;
+import java.util.List;
+
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,10 +27,10 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link UserLibrary}
+ * {@link STSInfo}
  * 
  * @author James Wong
- * @version 2022-08-29
+ * @version 2022-09-15
  * @since v3.0.0
  */
 @Getter
@@ -38,13 +38,12 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class UserLibrary extends BeanBase {
-    private @NotBlank String objectPrefix;
-    private @NotBlank String extension;
-    private @NotNull @Min(1) Long size;
-    // private @Nullable String owner;
-    // private @NotBlank String group;
-    // private @Nullable String accessMode;
-    private @Nullable String md5sum;
-    private @Nullable String sha1sum;
+public class STSInfo {
+    private @NotBlank String accessKey;
+    private @NotBlank String secretKey;
+    private @NotBlank String sessionToken;
+    private @NotBlank String region;
+    private @NotBlank long partSize;
+    private @NotBlank long fileLimitSize;
+    private @NotEmpty List<String> extension;
 }
