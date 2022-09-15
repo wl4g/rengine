@@ -22,6 +22,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -44,5 +46,8 @@ public abstract class BeanBase {
     private @NotNull @Min(0) @Max(1) Integer status;
     private @NotBlank String updateBy;
     private @NotNull String remark;
+    // @Schema(type = "string", format = "updateDate", example = "2022-09-15
+    // 10:23:43")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private @NotNull Date updateDate;
 }

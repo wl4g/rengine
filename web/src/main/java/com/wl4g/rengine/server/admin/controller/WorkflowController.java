@@ -21,10 +21,13 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.web.rest.RespBase;
+import com.wl4g.rengine.server.admin.model.AddWorkflow;
+import com.wl4g.rengine.server.admin.model.AddWorkflowResult;
 import com.wl4g.rengine.server.admin.model.QueryWorkflow;
 import com.wl4g.rengine.server.admin.model.QueryWorkflowResult;
 import com.wl4g.rengine.server.admin.service.WorkflowService;
@@ -55,10 +58,22 @@ public class WorkflowController {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET, POST })
     public RespBase<QueryWorkflowResult> query(HttpServletRequest request, QueryWorkflow model) {
-        log.info("[{}:called:apply()] uri={}, model={}", request.getRequestURI(), model);
+        log.info("called: uri={}, model={}", request.getRequestURI(), model);
 
         RespBase<QueryWorkflowResult> resp = RespBase.create();
         resp.setData(workflowService.query(model));
+        return resp;
+    }
+
+    // @SecurityRequirement(name = "default_oauth")
+    @Operation(description = "Add workflows model.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
+    @RequestMapping(path = { "create" }, consumes = "application/json", produces = "application/json", method = { POST })
+    public RespBase<AddWorkflowResult> create(HttpServletRequest request, @RequestBody AddWorkflow model) {
+        log.info("called: uri={}, model={}", request.getRequestURI(), model);
+
+        RespBase<AddWorkflowResult> resp = RespBase.create();
+        resp.setData(workflowService.save(model));
         return resp;
     }
 

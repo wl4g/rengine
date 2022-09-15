@@ -15,9 +15,12 @@
  */
 package com.wl4g.rengine.server.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.web.SecurityFilterChain;
 
 /**
  * {@link DefaultWebSecurityConfigure}
@@ -30,8 +33,15 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @Configuration
 public class DefaultWebSecurityConfigure implements WebSecurityCustomizer {
 
+    @Override
     public void customize(WebSecurity web) {
-        web.ignoring().antMatchers("/hello/**", "/public/**", "/actuator/**");
+        web.ignoring().antMatchers("/hello/**", "/swagger-ui/**", "/public/**", "/actuator/**");
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.csrf().disable().cors().disable();
+        return http.build();
     }
 
 }

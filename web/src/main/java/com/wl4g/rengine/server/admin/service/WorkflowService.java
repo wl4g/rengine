@@ -16,6 +16,7 @@
 package com.wl4g.rengine.server.admin.service;
 
 import com.wl4g.rengine.server.admin.model.AddWorkflow;
+import com.wl4g.rengine.server.admin.model.AddWorkflowResult;
 import com.wl4g.rengine.server.admin.model.QueryWorkflow;
 import com.wl4g.rengine.server.admin.model.QueryWorkflowResult;
 
@@ -30,6 +31,6 @@ public interface WorkflowService {
 
     QueryWorkflowResult query(QueryWorkflow model);
 
-    String save(AddWorkflow model);
+    AddWorkflowResult save(AddWorkflow model);
 
 }

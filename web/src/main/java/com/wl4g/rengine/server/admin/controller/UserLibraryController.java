@@ -30,7 +30,6 @@ import com.wl4g.rengine.server.admin.service.UserLibraryService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -54,10 +53,11 @@ public class UserLibraryController {
     // @SecurityRequirement(name = "default_oauth")
     @Operation(summary = "Preparing to upload the user library file.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful",
-            content = { @Content(mediaType = "application/json", schema = @Schema(implementation = UploadApplyResult.class)) }) })
+            content = { @Content(mediaType = "application/json") }) })
     @RequestMapping(path = { "apply" }, method = { GET })
     public RespBase<UploadApplyResult> apply(HttpServletRequest request, UploadApply model) {
-        log.info("[{}:called:apply()] uri={}, model={}", request.getRequestURI(), model);
+        log.info("called: uri={}, model={}", request.getRequestURI(), model);
+
         RespBase<UploadApplyResult> resp = RespBase.create();
         resp.setData(libraryService.apply(model));
         return resp;

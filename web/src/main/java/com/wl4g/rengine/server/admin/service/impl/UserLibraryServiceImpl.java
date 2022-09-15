@@ -52,7 +52,7 @@ public class UserLibraryServiceImpl implements UserLibraryService {
         // System.out.println(authentication);
 
         // Save metadata to mongo table.
-        String objectPrefix = config.getUserUpload().getLibraryObjectPrefix() + "/*";
+        String objectPrefix = config.getUserUpload().getLibraryObjectPrefix() + "/" + model.getFilename();
         UserLibrary userlib = UserLibrary.builder()
                 .objectPrefix(objectPrefix)
                 .extension(model.getExtension())

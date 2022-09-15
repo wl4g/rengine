@@ -21,10 +21,13 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.web.rest.RespBase;
+import com.wl4g.rengine.server.admin.model.AddProject;
+import com.wl4g.rengine.server.admin.model.AddProjectResult;
 import com.wl4g.rengine.server.admin.model.QueryProject;
 import com.wl4g.rengine.server.admin.model.QueryProjectResult;
 import com.wl4g.rengine.server.admin.service.ProjectService;
@@ -53,12 +56,24 @@ public class ProjectController {
     // @SecurityRequirement(name = "default_oauth")
     @Operation(description = "Query project list.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
-    @RequestMapping(path = { "query" }, produces = "application/json", method = { GET, POST })
+    @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
     public RespBase<QueryProjectResult> query(HttpServletRequest request, QueryProject model) {
-        log.info("[{}:called:apply()] uri={}, model={}", request.getRequestURI(), model);
+        log.info("called: uri={}, model={}", request.getRequestURI(), model);
 
         RespBase<QueryProjectResult> resp = RespBase.create();
         resp.setData(projectService.query(model));
+        return resp;
+    }
+
+    // @SecurityRequirement(name = "default_oauth")
+    @Operation(description = "Add project model.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
+    @RequestMapping(path = { "create" }, consumes = "application/json", produces = "application/json", method = { POST })
+    public RespBase<AddProjectResult> create(HttpServletRequest request, @RequestBody AddProject model) {
+        log.info("called: uri={}, model={}", request.getRequestURI(), model);
+
+        RespBase<AddProjectResult> resp = RespBase.create();
+        resp.setData(projectService.save(model));
         return resp;
     }
 

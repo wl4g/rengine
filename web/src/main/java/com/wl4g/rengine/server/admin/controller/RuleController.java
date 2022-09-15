@@ -20,24 +20,27 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.web.rest.RespBase;
+import com.wl4g.rengine.server.admin.model.AddRule;
+import com.wl4g.rengine.server.admin.model.AddRuleResult;
 import com.wl4g.rengine.server.admin.model.QueryRule;
 import com.wl4g.rengine.server.admin.model.QueryRuleResult;
-import com.wl4g.rengine.server.admin.model.UploadApply;
+import com.wl4g.rengine.server.admin.service.RuleService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link RuleModelController}
+ * {@link RuleController}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -47,18 +50,32 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequestMapping("/admin/rulemodel")
-public class RuleModelController {
+public class RuleController {
+
+    private @Autowired RuleService ruleService;
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Query rules templates list.")
+    @Operation(description = "Query rules model list.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful",
-            content = { @Content(mediaType = "application/json", schema = @Schema(implementation = UploadApply.class)) }) })
-    @RequestMapping(path = { "list" }, method = { GET, POST })
-    public RespBase<QueryRuleResult> list(HttpServletRequest request, QueryRule model) {
-        log.info("[{}:called:apply()] uri={}, model={}", request.getRequestURI(), model);
+            content = { @Content(mediaType = "application/json") }) })
+    @RequestMapping(path = { "query" }, method = { GET })
+    public RespBase<QueryRuleResult> query(HttpServletRequest request, QueryRule model) {
+        log.info("called: uri={}, model={}", request.getRequestURI(), model);
+
         RespBase<QueryRuleResult> resp = RespBase.create();
-        // TODO
-        resp.setData(QueryRuleResult.builder().build());
+        resp.setData(ruleService.query(model));
+        return resp;
+    }
+
+    // @SecurityRequirement(name = "default_oauth")
+    @Operation(description = "Add rules model.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
+    @RequestMapping(path = { "create" }, consumes = "application/json", produces = "application/json", method = { POST })
+    public RespBase<AddRuleResult> create(HttpServletRequest request, @RequestBody AddRule model) {
+        log.info("called: uri={}, model={}", request.getRequestURI(), model);
+
+        RespBase<AddRuleResult> resp = RespBase.create();
+        resp.setData(ruleService.save(model));
         return resp;
     }
 

@@ -42,7 +42,6 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @NoArgsConstructor
 public class UploadApply {
-
     private @NotBlank String projectId;
     private @NotBlank String filename;
     private @NotBlank String extension;
@@ -53,5 +52,4 @@ public class UploadApply {
     // private @Nullable String accessMode;
     private @Nullable String md5sum;
     private @Nullable String sha1sum;
-
 }

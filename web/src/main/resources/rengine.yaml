@@ -21,6 +21,9 @@ spring:
       location: classpath:META-INF/banner.txt
   main:
     allow-circular-references: true
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
   #mvc:
   #  pathmatch:
   #    matching-strategy: /**/swagger-ui/**

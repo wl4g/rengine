@@ -52,7 +52,7 @@ public class UserTestsetServiceImpl implements UserTestsetService {
         // System.out.println(authentication);
 
         // Save metadata to mongo table.
-        String objectPrefix = config.getUserUpload().getTestsetObjectPrefix() + "/*";
+        String objectPrefix = config.getUserUpload().getTestsetObjectPrefix() + "/" + model.getFilename();
         UserLibrary userlib = UserLibrary.builder()
                 .objectPrefix(objectPrefix)
                 .extension(model.getExtension())

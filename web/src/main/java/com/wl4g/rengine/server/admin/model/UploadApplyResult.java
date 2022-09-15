@@ -34,7 +34,5 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @NoArgsConstructor
 public class UploadApplyResult {
-
     private STSInfo sts;
-
 }
