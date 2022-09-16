@@ -178,6 +178,11 @@
             </dependency>
             <dependency>
                 <groupId>com.wl4g</groupId>
+                <artifactId>rengine-evaluator</artifactId>
+                <version>${project.parent.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.wl4g</groupId>
                 <artifactId>rengine-job</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
@@ -233,7 +238,7 @@
             </dependency>
             <dependency>
                 <groupId>com.wl4g</groupId>
-                <artifactId>rengine-web</artifactId>
+                <artifactId>rengine-manager</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <!-- Spring Cloud -->

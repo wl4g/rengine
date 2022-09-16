@@ -42,7 +42,7 @@ A generic real-time rule engine, such as bank transfer real-time risk control, t
 
 ## Quick Start
 
-- Deploy on Docker
+### Deploy on Docker compose
 
 ```bash
 git clone https://github.com/wl4g/rengine.git
@@ -58,11 +58,47 @@ docker-compose up -d
 
 ## Development Guide
 
-TODO
+- Rengine Manager build
+
+```bash
+git clone git@github.com/wl4g/rengine.git
+cd rengine
+./mvnw clean install -DskipTests -Dmaven.test.skip=true -T 2C
+```
+
+- [Rengine Evaluator build here](evaluator/README.md)
 
 ## Operation Guide
 
-TODO
+### Manual Telemetry Troubleshooting
+
+- Health
+
+```bash
+curl -v localhost:28001/actuator/health
+```
+
+- Metrics
+
+```bash
+curl -v localhost:28001/actuator/prometheus
+```
+
+### Deploy OTel collector
+
+```bash
+# Download collector configuration.
+sudo mkdir -p /etc/otel
+curl -L -o /etc/otel/collector.yaml 'https://raw.githubusercontent.com/wl4g/rengine/master/tools/operation/otel/collector.yaml'
+
+# Run OTel collector.
+docker run -d \
+--name=otel-collector1 \
+--network=host \
+--restart=no \
+-v /etc/otel/collector.yaml:/etc/otelcol/config.yaml \
+otel/opentelemetry-collector:0.60.0
+```
 
 ## FAQ
 

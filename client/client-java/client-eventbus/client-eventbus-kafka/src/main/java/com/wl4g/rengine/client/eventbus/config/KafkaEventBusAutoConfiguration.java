@@ -21,7 +21,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 import com.wl4g.rengine.client.eventbus.KafkaIamEventBusService;
 import com.wl4g.rengine.client.eventbus.RengineEventBusService;
-import com.wl4g.rengine.common.constant.RengineConstants;
+import com.wl4g.rengine.common.constants.RengineConstants;
 
 /**
  * {@link KafkaEventBusAutoConfiguration}

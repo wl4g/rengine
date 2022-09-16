@@ -1,0 +1,131 @@
+# Copyright (c) 2017 ~ 2025, the original authors individual Inc,
+# All rights reserved. Contact us James Wong <jameswong1376@gmail.com>
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# see: https://opentelemetry.io/docs/collector/configuration/#proxy-support
+#
+## Define the receivers component.
+receivers:
+  # Data sources: traces, metrics, logs
+  otlp/1:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:55690
+      http:
+  # Data sources: traces
+  jaeger/1:
+    protocols:
+      grpc:
+      thrift_binary:
+      thrift_compact:
+      thrift_http:
+  # Data sources: metrics
+  prometheus/1:
+    config:
+      scrape_configs:
+        - job_name: "node-job"
+          scrape_interval: 5s
+          static_configs:
+            - targets: ["localhost:9100"]
+        - job_name: "haproxy-job"
+          scrape_interval: 5s
+          static_configs:
+            - targets: ["localhost:9101"]
+  # Data sources: metrics
+  hostmetrics:
+    scrapers:
+      cpu:
+      disk:
+      filesystem:
+      load:
+      memory:
+      network:
+      process:
+      processes:
+      # in 0.60.0 unknown type?
+      #swap:
+  # in 0.60.0 unknown type?
+  # Data sources: logs
+  #fluentforward/1:
+  #  endpoint: 0.0.0.0:8006
+
+## Define the processors component.
+processors:
+  batch/1:
+
+## Define the exporters component.
+exporters:
+  # Data sources: traces, metrics, logs
+  otlp/1:
+    endpoint: localhost:4317
+    #tls:
+    #  cert_file: cert.pem
+    #  key_file: cert-key.pem
+  # Data sources: traces, metrics
+  otlphttp/1:
+    endpoint: "http://localhost:4318/v1/traces"
+  # Data sources: traces
+  jaeger/1:
+    endpoint: "localhost:14250"
+    #tls:
+    #  cert_file: cert.pem
+    #  key_file: cert-key.pem
+  # Data sources: traces
+  zipkin/1:
+    endpoint: "http://localhost:9411/api/v2/spans"
+  # Data sources: traces
+  kafka/1:
+    protocol_version: 2.0.0
+  # Data sources: metrics
+  prometheus/1:
+    endpoint: "prometheus:8889"
+    namespace: "default"
+  # Data sources: metrics
+  prometheusremotewrite/1:
+    endpoint: "http://localhost:9411/api/prom/push"
+    # For offical Prometheus (e.g. running via Docker)
+    # endpoint: 'http://prometheus:9090/api/v1/write'
+    # tls:
+    #   insecure: true
+  # Data sources: traces, metrics, logs
+  file/1:
+    path: /tmp/otel_collector_generated.json
+  # Data sources: traces, metrics, logs
+  logging/1:
+    loglevel: debug
+
+## Define the extension configuration.
+extensions:
+  health_check:
+  pprof:
+  zpages:
+  memory_ballast:
+    size_mib: 512
+  # 在 agent 端，这是一个让 OTLP exporter 获取 OIDC 令牌的示例，将它们添加到发送到远程收集器的每个 RPC 中
+  #oauth2client:
+  #  client_id: agent
+  #  client_secret: some-secret
+  #  token_url: http://localhost:8080/auth/realms/opentelemetry/protocol/openid-connect/token
+
+## Actual startup services.
+service:
+  extensions: [health_check, pprof, zpages] # oidc: in 0.60.0 unknown type?
+  pipelines:
+    traces:
+      receivers: ["otlp/1", "jaeger/1"]
+      processors: ["batch/1"]
+      exporters: ["otlp/1", "logging/1"]
+    metrics:
+      receivers: ["prometheus/1"]
+      processors: ["batch/1"]
+      exporters: ["otlp/1", "logging/1"]
+    logs:
+      #receivers: ["fluentforward/1"]
+      receivers: ["otlp/1"]
+      processors: ["batch/1"]
+      exporters: ["otlp/1", "logging/1"]
