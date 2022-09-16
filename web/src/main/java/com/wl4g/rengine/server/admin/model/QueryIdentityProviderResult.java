@@ -15,7 +15,11 @@
  */
 package com.wl4g.rengine.server.admin.model;
 
-import com.wl4g.rengine.common.bean.mongo.IdentityProviderConfig;
+import java.util.List;
+
+import javax.annotation.Nullable;
+
+import com.wl4g.rengine.common.bean.mongo.IdentityProvider;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,5 +39,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class QueryIdentityProviderResult extends IdentityProviderConfig {
+public class QueryIdentityProviderResult {
+    private @Nullable List<IdentityProvider> providers;
 }

@@ -45,9 +45,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class UploadObject extends BeanBase {
 
-    @EnumValue(enumCls = UploadObject.BizType.class)
     @Schema(implementation = UploadObject.BizType.class)
-    private @NotBlank String bizType;
+    private @NotBlank @EnumValue(enumCls = UploadObject.BizType.class) String bizType;
     private @NotBlank String prefix;
     private @NotBlank String filename;
     private @NotBlank String extension;

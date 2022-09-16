@@ -15,7 +15,7 @@
  */
 package com.wl4g.rengine.server.admin.model;
 
-import com.wl4g.rengine.common.bean.mongo.IdentityProviderConfig;
+import com.wl4g.rengine.common.bean.mongo.IdentityProvider;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,5 +35,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class AddIdentityProvider extends IdentityProviderConfig {
+public class AddIdentityProvider {
+    private IdentityProvider provider;
 }

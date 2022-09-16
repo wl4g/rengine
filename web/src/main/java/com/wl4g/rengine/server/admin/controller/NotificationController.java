@@ -55,8 +55,8 @@ public class NotificationController {
     // @SecurityRequirement(name = "default_oauth")
     @Operation(description = "Query notification setting.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
-    @RequestMapping(path = { "get" }, produces = "application/json", method = { GET })
-    public RespBase<QueryNotificationResult> get(@Validated QueryNotification model) {
+    @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
+    public RespBase<QueryNotificationResult> query(@Validated QueryNotification model) {
         log.info("called: model={}", model);
         RespBase<QueryNotificationResult> resp = RespBase.create();
         resp.setData(notificationService.query(model));
