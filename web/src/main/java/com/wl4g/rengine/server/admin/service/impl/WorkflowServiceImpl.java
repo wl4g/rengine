@@ -20,6 +20,7 @@ import static com.wl4g.infra.common.lang.TypeConverts.safeLongToInt;
 import static java.util.stream.Collectors.toList;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +29,17 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import com.mongodb.client.result.DeleteResult;
 import com.wl4g.rengine.common.bean.mongo.Workflow;
 import com.wl4g.rengine.server.admin.model.AddWorkflow;
 import com.wl4g.rengine.server.admin.model.AddWorkflowResult;
+import com.wl4g.rengine.server.admin.model.DeleteWorkflow;
+import com.wl4g.rengine.server.admin.model.DeleteWorkflowResult;
 import com.wl4g.rengine.server.admin.model.QueryWorkflow;
 import com.wl4g.rengine.server.admin.model.QueryWorkflowResult;
 import com.wl4g.rengine.server.admin.service.WorkflowService;
 import com.wl4g.rengine.server.constants.RengineWebConstants.MongoCollectionDefinition;
+import com.wl4g.rengine.server.util.IdGenUtil;
 
 /**
  * {@link WorkflowServiceImpl}
@@ -53,21 +58,21 @@ public class WorkflowServiceImpl implements WorkflowService {
         // TODO use pagination
 
         Criteria criteria = new Criteria().orOperator(Criteria.where("name").is(model.getName()),
-                Criteria.where("workflowId").is(model.getWorkflowId()), Criteria.where("projectId").is(model.getProjectId()),
+                Criteria.where("_id").is(model.getWorkflowId()), Criteria.where("projectId").is(model.getWorkflowId()),
                 Criteria.where("labels").in(model.getLabels()));
 
         List<Workflow> workflows = mongoTemplate.find(new Query(criteria), Workflow.class,
-                MongoCollectionDefinition.WORKFLOW.getName());
+                MongoCollectionDefinition.WORKFLOWS.getName());
 
         Collections.sort(workflows, (o1, o2) -> safeLongToInt(o2.getUpdateDate().getTime() - o1.getUpdateDate().getTime()));
 
         return QueryWorkflowResult.builder()
                 .workflows(safeList(workflows).stream()
                         .map(p -> Workflow.builder()
-                                .workflowId(p.getWorkflowId())
+                                .id(p.getId())
                                 .name(p.getName())
                                 .labels(p.getLabels())
-                                .status(p.getStatus())
+                                .enabled(p.getEnabled())
                                 .remark(p.getRemark())
                                 .updateBy(p.getUpdateBy())
                                 .updateDate(p.getUpdateDate())
@@ -79,16 +84,24 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     public AddWorkflowResult save(AddWorkflow model) {
         Workflow workflow = Workflow.builder()
-                .workflowId(model.getWorkflowId())
+                .id(IdGenUtil.next())
                 .name(model.getName())
                 .labels(model.getLabels())
-                .status(model.getStatus())
+                .enabled(model.getEnabled())
                 .remark(model.getRemark())
-                .updateBy(model.getUpdateBy())
-                .updateDate(model.getUpdateDate())
+                .updateBy("admin")
+                .updateDate(new Date())
                 .build();
-        Workflow saved = mongoTemplate.insert(workflow, MongoCollectionDefinition.WORKFLOW.getName());
-        return AddWorkflowResult.builder().workflowId(saved.getWorkflowId()).build();
+        Workflow saved = mongoTemplate.insert(workflow, MongoCollectionDefinition.WORKFLOWS.getName());
+        return AddWorkflowResult.builder().id(saved.getId()).build();
+    }
+
+    @Override
+    public DeleteWorkflowResult delete(DeleteWorkflow model) {
+        // 'id' is a keyword, it will be automatically converted to '_id'
+        DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
+                MongoCollectionDefinition.WORKFLOWS.getName());
+        return DeleteWorkflowResult.builder().deletedCount(result.getDeletedCount()).build();
     }
 
 }

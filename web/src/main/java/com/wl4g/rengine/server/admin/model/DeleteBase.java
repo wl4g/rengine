@@ -22,7 +22,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link UploadApplyResult}
+ * {@link DeleteBase}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -33,6 +33,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class UploadApplyResult {
-    private STSInfo sts;
+public class DeleteBase {
+    // 请求有值，但校验不通过?
+    private /* @NotNull */ Long id;
 }

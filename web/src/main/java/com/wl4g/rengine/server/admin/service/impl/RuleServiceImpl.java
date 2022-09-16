@@ -20,6 +20,7 @@ import static com.wl4g.infra.common.lang.TypeConverts.safeLongToInt;
 import static java.util.stream.Collectors.toList;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +29,17 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import com.mongodb.client.result.DeleteResult;
 import com.wl4g.rengine.common.bean.mongo.Rule;
 import com.wl4g.rengine.server.admin.model.AddRule;
 import com.wl4g.rengine.server.admin.model.AddRuleResult;
+import com.wl4g.rengine.server.admin.model.DeleteRule;
+import com.wl4g.rengine.server.admin.model.DeleteRuleResult;
 import com.wl4g.rengine.server.admin.model.QueryRule;
 import com.wl4g.rengine.server.admin.model.QueryRuleResult;
 import com.wl4g.rengine.server.admin.service.RuleService;
 import com.wl4g.rengine.server.constants.RengineWebConstants.MongoCollectionDefinition;
+import com.wl4g.rengine.server.util.IdGenUtil;
 
 /**
  * {@link RuleServiceImpl}
@@ -53,19 +58,19 @@ public class RuleServiceImpl implements RuleService {
         // TODO use pagination
 
         Criteria criteria = new Criteria().orOperator(Criteria.where("name").is(model.getName()),
-                Criteria.where("ruleId").is(model.getRuleId()), Criteria.where("labels").in(model.getLabels()));
+                Criteria.where("_id").is(model.getRuleId()), Criteria.where("labels").in(model.getLabels()));
 
-        List<Rule> rules = mongoTemplate.find(new Query(criteria), Rule.class, MongoCollectionDefinition.RULE.getName());
+        List<Rule> rules = mongoTemplate.find(new Query(criteria), Rule.class, MongoCollectionDefinition.RULES.getName());
 
         Collections.sort(rules, (o1, o2) -> safeLongToInt(o2.getUpdateDate().getTime() - o1.getUpdateDate().getTime()));
 
         return QueryRuleResult.builder()
                 .rules(safeList(rules).stream()
                         .map(p -> Rule.builder()
-                                .ruleId(p.getRuleId())
+                                .id(p.getId())
                                 .name(p.getName())
                                 .labels(p.getLabels())
-                                .status(p.getStatus())
+                                .enabled(p.getEnabled())
                                 .remark(p.getRemark())
                                 .updateBy(p.getUpdateBy())
                                 .updateDate(p.getUpdateDate())
@@ -77,16 +82,24 @@ public class RuleServiceImpl implements RuleService {
     @Override
     public AddRuleResult save(AddRule model) {
         Rule rule = Rule.builder()
-                .ruleId(model.getRuleId())
+                .id(IdGenUtil.next())
                 .name(model.getName())
                 .labels(model.getLabels())
-                .status(model.getStatus())
+                .enabled(model.getEnabled())
                 .remark(model.getRemark())
-                .updateBy(model.getUpdateBy())
-                .updateDate(model.getUpdateDate())
+                .updateBy("admin")
+                .updateDate(new Date())
                 .build();
-        Rule saved = mongoTemplate.insert(rule, MongoCollectionDefinition.RULE.getName());
-        return AddRuleResult.builder().ruleId(saved.getRuleId()).build();
+        Rule saved = mongoTemplate.insert(rule, MongoCollectionDefinition.RULES.getName());
+        return AddRuleResult.builder().id(saved.getId()).build();
+    }
+
+    @Override
+    public DeleteRuleResult delete(DeleteRule model) {
+        // 'id' is a keyword, it will be automatically converted to '_id'
+        DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
+                MongoCollectionDefinition.RULES.getName());
+        return DeleteRuleResult.builder().deletedCount(result.getDeletedCount()).build();
     }
 
 }

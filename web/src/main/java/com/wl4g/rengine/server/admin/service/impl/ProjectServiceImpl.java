@@ -20,6 +20,7 @@ import static com.wl4g.infra.common.lang.TypeConverts.safeLongToInt;
 import static java.util.stream.Collectors.toList;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +29,17 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import com.mongodb.client.result.DeleteResult;
 import com.wl4g.rengine.common.bean.mongo.Project;
 import com.wl4g.rengine.server.admin.model.AddProject;
 import com.wl4g.rengine.server.admin.model.AddProjectResult;
+import com.wl4g.rengine.server.admin.model.DeleteProject;
+import com.wl4g.rengine.server.admin.model.DeleteProjectResult;
 import com.wl4g.rengine.server.admin.model.QueryProject;
 import com.wl4g.rengine.server.admin.model.QueryProjectResult;
 import com.wl4g.rengine.server.admin.service.ProjectService;
 import com.wl4g.rengine.server.constants.RengineWebConstants.MongoCollectionDefinition;
+import com.wl4g.rengine.server.util.IdGenUtil;
 
 /**
  * {@link ProjectServiceImpl}
@@ -53,22 +58,22 @@ public class ProjectServiceImpl implements ProjectService {
         // TODO use pagination
 
         Criteria criteria = new Criteria().orOperator(Criteria.where("name").is(model.getName()),
-                Criteria.where("projectId").is(model.getProjectId()), Criteria.where("labels").in(model.getLabels()),
+                Criteria.where("_id").is(model.getProjectId()), Criteria.where("labels").in(model.getLabels()),
                 Criteria.where("owner").is(model.getOwner()));
 
         List<Project> projects = mongoTemplate.find(new Query(criteria), Project.class,
-                MongoCollectionDefinition.PROJECT.getName());
+                MongoCollectionDefinition.PROJECTS.getName());
 
         Collections.sort(projects, (o1, o2) -> safeLongToInt(o2.getUpdateDate().getTime() - o1.getUpdateDate().getTime()));
 
         return QueryProjectResult.builder()
                 .projects(safeList(projects).stream()
                         .map(p -> Project.builder()
-                                .projectId(p.getProjectId())
+                                .id(p.getId())
                                 .name(p.getName())
                                 .owner(p.getOwner())
                                 .labels(p.getLabels())
-                                .status(p.getStatus())
+                                .enabled(p.getEnabled())
                                 .remark(p.getRemark())
                                 .updateBy(p.getUpdateBy())
                                 .updateDate(p.getUpdateDate())
@@ -80,17 +85,25 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public AddProjectResult save(AddProject model) {
         Project project = Project.builder()
-                .projectId(model.getProjectId())
+                .id(IdGenUtil.next())
                 .name(model.getName())
                 .owner(model.getOwner())
                 .labels(model.getLabels())
-                .status(model.getStatus())
+                .enabled(model.getEnabled())
                 .remark(model.getRemark())
-                .updateBy(model.getUpdateBy())
-                .updateDate(model.getUpdateDate())
+                .updateBy("admin")
+                .updateDate(new Date())
                 .build();
-        Project saved = mongoTemplate.insert(project, MongoCollectionDefinition.PROJECT.getName());
-        return AddProjectResult.builder().projectId(saved.getProjectId()).build();
+        Project saved = mongoTemplate.insert(project, MongoCollectionDefinition.PROJECTS.getName());
+        return AddProjectResult.builder().id(saved.getId()).build();
+    }
+
+    @Override
+    public DeleteProjectResult delete(DeleteProject model) {
+        // 'id' is a keyword, it will be automatically converted to '_id'
+        DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
+                MongoCollectionDefinition.PROJECTS.getName());
+        return DeleteProjectResult.builder().deletedCount(result.getDeletedCount()).build();
     }
 
 }

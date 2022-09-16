@@ -13,27 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.server.admin.model;
+package com.wl4g.rengine.server.admin.service;
 
-import com.wl4g.rengine.common.bean.mongo.Project;
-
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.SuperBuilder;
+import com.wl4g.rengine.server.admin.model.AddNotification;
+import com.wl4g.rengine.server.admin.model.AddNotificationResult;
+import com.wl4g.rengine.server.admin.model.QueryNotification;
+import com.wl4g.rengine.server.admin.model.QueryNotificationResult;
 
 /**
- * {@link AddProject}
+ * {@link NotificationService}
  * 
  * @author James Wong
- * @version 2022-08-28
+ * @version 2022-08-29
  * @since v3.0.0
  */
-@Getter
-@Setter
-@SuperBuilder
-@ToString
-@NoArgsConstructor
-public class AddProject extends Project {
+public interface NotificationService {
+
+    QueryNotificationResult query(QueryNotification model);
+
+    AddNotificationResult save(AddNotification model);
+
 }

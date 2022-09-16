@@ -25,12 +25,12 @@ springdoc:
   show-actuator: false ## Default by false
   use-management-port: false ## Default by false
   group-configs:
-    - group: api
-      pathsToMatch: /api/**
-      packagesToScan: com.wl4g.rengine.server.api
     - group: admin
       pathsToMatch: /admin/**
       packagesToScan: com.wl4g.rengine.server.admin
+    - group: api
+      pathsToMatch: /api/**
+      packagesToScan: com.wl4g.rengine.server.api
   swagger-ui:
     enabled: true ## Default by true
     path: /swagger-ui.html
@@ -66,7 +66,7 @@ springdoc:
     syntaxHighlight:
       activated: true
       theme: agate ## Default by 'agate', Options: agate|arta|monokai|nord|obsidian|tomorrow-night
-    urlsPrimaryName: ${springdoc.group-configsp[0].group:api}
+    urlsPrimaryName: ${springdoc.group-configs[0].group:api}
     #urls:
     #  - name: local
     #    url: http://localhost:${server.port}${server.servlet.contextPath:/}v3/api-docs

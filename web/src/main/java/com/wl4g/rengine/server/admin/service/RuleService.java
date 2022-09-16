@@ -17,6 +17,8 @@ package com.wl4g.rengine.server.admin.service;
 
 import com.wl4g.rengine.server.admin.model.AddRule;
 import com.wl4g.rengine.server.admin.model.AddRuleResult;
+import com.wl4g.rengine.server.admin.model.DeleteRule;
+import com.wl4g.rengine.server.admin.model.DeleteRuleResult;
 import com.wl4g.rengine.server.admin.model.QueryRule;
 import com.wl4g.rengine.server.admin.model.QueryRuleResult;
 
@@ -32,5 +34,7 @@ public interface RuleService {
     QueryRuleResult query(QueryRule model);
 
     AddRuleResult save(AddRule model);
+
+    DeleteRuleResult delete(DeleteRule model);
 
 }

@@ -30,7 +30,7 @@ spring:
   infra:
     core:
       logging:
-        enabled: false
+        enabled: true
 
 ## see:https://docs.spring.io/spring-boot/docs/2.6.7/reference/htmlsingle/#features.logging.custom-log-configuration
 ## see:com.wl4g.infra.core.logging.custom.logback.CustomLogbackConfigurer

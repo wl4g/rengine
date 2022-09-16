@@ -19,6 +19,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,8 +40,7 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @NoArgsConstructor
 public class Workflow extends BeanBase {
-    private @NotBlank String workflowId;
-    private @NotBlank String projectId;
+    private @NotNull Long projectId;
     // 需新建专用 tree 对象？
     // private @NotBlank List<String> ruleIds;
     private @NotBlank String name;

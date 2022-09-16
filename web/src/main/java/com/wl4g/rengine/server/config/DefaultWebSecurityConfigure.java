@@ -35,7 +35,8 @@ public class DefaultWebSecurityConfigure implements WebSecurityCustomizer {
 
     @Override
     public void customize(WebSecurity web) {
-        web.ignoring().antMatchers("/hello/**", "/swagger-ui/**", "/public/**", "/actuator/**");
+        // "/swagger-ui/**"
+        web.ignoring().antMatchers("/hello/**", "/public/**", "/actuator/**");
     }
 
     @Bean

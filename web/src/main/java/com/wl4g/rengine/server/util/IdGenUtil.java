@@ -13,27 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.server.admin.model;
+package com.wl4g.rengine.server.util;
 
-import com.wl4g.rengine.common.bean.mongo.Project;
-
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.SuperBuilder;
+import com.wl4g.infra.common.id.SnowflakeIdGenerator;
 
 /**
- * {@link AddProject}
+ * {@link IdGenUtil}
  * 
  * @author James Wong
- * @version 2022-08-28
+ * @version 2022-09-16
  * @since v3.0.0
  */
-@Getter
-@Setter
-@SuperBuilder
-@ToString
-@NoArgsConstructor
-public class AddProject extends Project {
+public abstract class IdGenUtil {
+
+    public static long next() {
+        return SnowflakeIdGenerator.getDefault().nextId();
+    }
+
 }

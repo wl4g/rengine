@@ -15,12 +15,12 @@
  */
 package com.wl4g.rengine.server.admin.controller;
 
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,6 +28,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.server.admin.model.AddRule;
 import com.wl4g.rengine.server.admin.model.AddRuleResult;
+import com.wl4g.rengine.server.admin.model.DeleteRule;
+import com.wl4g.rengine.server.admin.model.DeleteRuleResult;
 import com.wl4g.rengine.server.admin.model.QueryRule;
 import com.wl4g.rengine.server.admin.model.QueryRuleResult;
 import com.wl4g.rengine.server.admin.service.RuleService;
@@ -46,10 +48,10 @@ import lombok.extern.slf4j.Slf4j;
  * @version 2022-08-28
  * @since v3.0.0
  */
-@Tag(name = "RuleModelAPI", description = "The rule models management API")
+@Tag(name = "RuleAPI", description = "The rule models management API")
 @Slf4j
 @RestController
-@RequestMapping("/admin/rulemodel")
+@RequestMapping("/admin/rule")
 public class RuleController {
 
     private @Autowired RuleService ruleService;
@@ -59,23 +61,32 @@ public class RuleController {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful",
             content = { @Content(mediaType = "application/json") }) })
     @RequestMapping(path = { "query" }, method = { GET })
-    public RespBase<QueryRuleResult> query(HttpServletRequest request, QueryRule model) {
-        log.info("called: uri={}, model={}", request.getRequestURI(), model);
-
+    public RespBase<QueryRuleResult> query(@Validated QueryRule model) {
+        log.info("called: model={}", model);
         RespBase<QueryRuleResult> resp = RespBase.create();
         resp.setData(ruleService.query(model));
         return resp;
     }
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Add rules model.")
+    @Operation(description = "Save rules model.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
-    @RequestMapping(path = { "create" }, consumes = "application/json", produces = "application/json", method = { POST })
-    public RespBase<AddRuleResult> create(HttpServletRequest request, @RequestBody AddRule model) {
-        log.info("called: uri={}, model={}", request.getRequestURI(), model);
-
+    @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
+    public RespBase<AddRuleResult> save(@Validated @RequestBody AddRule model) {
+        log.info("called: model={}", model);
         RespBase<AddRuleResult> resp = RespBase.create();
         resp.setData(ruleService.save(model));
+        return resp;
+    }
+
+    // @SecurityRequirement(name = "default_oauth")
+    @Operation(description = "Delete project.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
+    @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
+    public RespBase<DeleteRuleResult> delete(@Validated DeleteRule model) {
+        log.info("called: model={}", model);
+        RespBase<DeleteRuleResult> resp = RespBase.create();
+        resp.setData(ruleService.delete(model));
         return resp;
     }
 

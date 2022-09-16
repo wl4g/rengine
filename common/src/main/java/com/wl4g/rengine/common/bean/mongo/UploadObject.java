@@ -15,17 +15,16 @@
  */
 package com.wl4g.rengine.common.bean.mongo;
 
-import java.util.Date;
+import java.util.List;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.wl4g.infra.common.validation.EnumValue;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -33,7 +32,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link BeanBase}
+ * {@link UploadObject}
  * 
  * @author James Wong
  * @version 2022-08-29
@@ -42,23 +41,26 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
-@NoArgsConstructor
 @ToString
-public abstract class BeanBase {
+@NoArgsConstructor
+public class UploadObject extends BeanBase {
 
-    // 当作为输入参数时(即添加操作)隐藏，当作为返回参数时(即查询操作)不隐藏
-    @Schema(hidden = false, accessMode = AccessMode.READ_ONLY)
-    private Long id;
+    @EnumValue(enumCls = UploadObject.BizType.class)
+    @Schema(implementation = UploadObject.BizType.class)
+    private @NotBlank String bizType;
+    private @NotBlank String prefix;
+    private @NotBlank String filename;
+    private @NotBlank String extension;
+    private @Nullable List<String> labels;
+    private @NotNull @Min(1) Long size;
+    // private @Nullable String owner;
+    // private @NotBlank String group;
+    // private @Nullable String accessMode;
+    private @Nullable String md5sum;
+    private @Nullable String sha1sum;
 
-    private @NotNull @Min(0) @Max(1) Integer enabled;
-
-    private @Nullable String remark;
-
-    @Schema(hidden = false, accessMode = AccessMode.READ_ONLY)
-    private String updateBy;
-
-    @Schema(hidden = false, accessMode = AccessMode.READ_ONLY, example = "2022-09-15 10:23:43")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date updateDate;
+    public static enum BizType {
+        USER_LIBRARY, TEST_DATASET
+    }
 
 }

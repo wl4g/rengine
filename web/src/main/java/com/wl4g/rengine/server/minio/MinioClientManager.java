@@ -20,27 +20,18 @@ import static com.wl4g.infra.common.lang.FastTimeClock.currentTimeMillis;
 import static com.wl4g.infra.common.lang.TypeConverts.safeLongToInt;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
-import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 
 import com.wl4g.infra.common.minio.S3Policy;
 import com.wl4g.infra.common.minio.S3Policy.EffectType;
 import com.wl4g.infra.common.minio.S3Policy.Statement;
-import com.wl4g.infra.common.minio.v8_4.MinioAdminClient;
-import com.wl4g.infra.common.minio.v8_4.UserInfo.Status;
 import com.wl4g.rengine.server.minio.MinioClientProperties.UserUploadAssumeConfig;
 
-import io.minio.BucketExistsArgs;
-import io.minio.MakeBucketArgs;
-import io.minio.MinioClient;
 import io.minio.credentials.AssumeRoleProvider;
 import io.minio.credentials.Credentials;
 import lombok.AllArgsConstructor;
@@ -60,77 +51,58 @@ public class MinioClientManager implements ApplicationRunner {
 
     private final MinioClientProperties config;
     private final OkHttpClient httpClient;
-    private final MinioClient minioClient;
-    private final MinioAdminClient adminClient;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        initSTSPolicy();
-        initSTSUser();
-        initBucket();
+        log.info("Initialization ...");
     }
 
     public Credentials createSTSCredentials(String prefix) throws NoSuchAlgorithmException {
         hasTextOf(prefix, "objectPrefix");
 
         // e.g: bucket01//sub01/1.txt => bucket1/sub01/1.txt
-        String applyRoleArn = format("arn:aws:s3:::%s", prefix).replaceAll("\\/\\/", "\\/");
+        String stsRoleArn = format("arn:aws:s3:::%s", prefix).replaceAll("\\/\\/", "\\/");
         UserUploadAssumeConfig uploadConfig = config.getUserUpload();
         String roleSessionName = "rengine-" + currentTimeMillis();
 
-        return createSTSCredentialsWithAssumeRole(config.getEndpoint(), uploadConfig.getAssumeAccessKey(),
-                uploadConfig.getAssumeSecretKey(), config.getRegion(), applyRoleArn,
-                safeLongToInt(uploadConfig.getExpiredDuration().getSeconds()), roleSessionName, null);
+        return createSTSCredentialsWithAssumeRole(config.getEndpoint(), config.getTenantAccessKey(), config.getTenantSecretKey(),
+                config.getRegion(), stsRoleArn, safeLongToInt(uploadConfig.getExpiredDuration().getSeconds()), roleSessionName,
+                null);
     }
 
+    /**
+     * Create STS credentials via assumeRole provider.
+     * 
+     * @param stsEndpoint
+     * @param tenantAccessKey
+     * @param tenantSecretKey
+     * @param region
+     * @param stsRoleArn
+     * @param durationSeconds
+     * @param roleSessionName
+     * @param externalId
+     * @return
+     * @throws NoSuchAlgorithmException
+     */
     public Credentials createSTSCredentialsWithAssumeRole(
             String stsEndpoint,
             String tenantAccessKey,
             String tenantSecretKey,
             String region,
-            String roleArn,
+            String stsRoleArn,
             int durationSeconds,
             String roleSessionName,
             String externalId) throws NoSuchAlgorithmException {
-        S3Policy applyPolicy = S3Policy.builder()
-                .version(S3Policy.DEFAULT_POLICY_VERSION)
-                .statement(singletonList(Statement.builder()
-                        .effect(EffectType.Allow)
-                        .action(config.getUserUpload().getAssumePolicyActions())
-                        .resource(singletonList(roleArn))
-                        .build()))
-                .build();
-        return new AssumeRoleProvider(stsEndpoint, tenantAccessKey, tenantSecretKey, durationSeconds, toJSONString(applyPolicy),
+        return new AssumeRoleProvider(stsEndpoint, tenantAccessKey, tenantSecretKey, durationSeconds,
+                toJSONString(S3Policy.builder()
+                        .version(S3Policy.DEFAULT_POLICY_VERSION)
+                        .statement(singletonList(Statement.builder()
+                                .effect(EffectType.Allow)
+                                .action(config.getUserUpload().getStsPolicyActions())
+                                .resource(singletonList(stsRoleArn))
+                                .build()))
+                        .build()),
                 region, null, null, null, httpClient).fetch();
-    }
-
-    private void initSTSPolicy() throws InvalidKeyException, NoSuchAlgorithmException, InvalidCipherTextException, IOException {
-        String initRoleArn = format("arn:aws:s3:::%s/*", config.getBucket());
-        S3Policy assumePolicy = S3Policy.builder()
-                .version(S3Policy.DEFAULT_POLICY_VERSION)
-                .statement(singletonList(Statement.builder()
-                        .effect(EffectType.Allow)
-                        .action(config.getUserUpload().getAssumePolicyActions())
-                        .resource(singletonList(initRoleArn))
-                        .build()))
-                .build();
-        adminClient.addCannedPolicy(config.getUserUpload().getAssumePolicyName(), toJSONString(assumePolicy));
-        log.info("Initialization created assume policy for: {}", toJSONString(config.getUserUpload()));
-    }
-
-    private void initSTSUser() throws InvalidKeyException, NoSuchAlgorithmException, InvalidCipherTextException, IOException {
-        adminClient.addUser(config.getUserUpload().getAssumeAccessKey(), Status.ENABLED,
-                config.getUserUpload().getAssumeSecretKey(), config.getUserUpload().getAssumePolicyName(), emptyList());
-        log.info("Initialization created assume user: {}", config.getUserUpload().getAssumeAccessKey());
-    }
-
-    private void initBucket() throws Exception {
-        if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(config.getBucket()).build())) {
-            minioClient.makeBucket(MakeBucketArgs.builder().bucket(config.getBucket()).build());
-            log.info("Initialization created bucket: {}", config.getBucket());
-        } else {
-            log.info("Initialization already bucket: {}", config.getBucket());
-        }
     }
 
 }

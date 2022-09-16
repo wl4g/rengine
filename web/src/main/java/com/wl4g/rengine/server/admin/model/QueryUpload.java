@@ -15,13 +15,15 @@
  */
 package com.wl4g.rengine.server.admin.model;
 
+import java.util.List;
+
 import javax.annotation.Nullable;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import com.wl4g.rengine.common.bean.mongo.UserLibrary;
+import com.wl4g.rengine.common.bean.mongo.UploadObject;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,7 +32,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link UserLibrary}
+ * {@link QueryUpload}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -41,15 +43,10 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class UploadApply {
-    private @NotBlank String projectId;
+public class QueryUpload {
+    private @NotBlank UploadObject.BizType bizType;
     private @NotBlank String filename;
     private @NotBlank String extension;
-    private @NotNull @Min(1) Long size;
+    private @Nullable List<String> labels;
     private @NotNull @Min(0) @Max(1) Integer status;
-    // private @Nullable String owner;
-    // private @NotBlank String group;
-    // private @Nullable String accessMode;
-    private @Nullable String md5sum;
-    private @Nullable String sha1sum;
 }

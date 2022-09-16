@@ -36,15 +36,17 @@ public abstract class RengineWebConstants extends RengineConstants {
     @AllArgsConstructor
     public static enum MongoCollectionDefinition {
 
-        PROJECT("project"),
+        PROJECTS("projects"),
 
-        WORKFLOW("workflow"),
+        WORKFLOWS("workflows"),
 
-        RULE("rule"),
+        RULES("rules"),
 
-        USER_LIBRARY("user_library"),
+        UPLOADS("uploads"),
 
-        TEST_DATASET("test_dataset");
+        SYS_NOTIFICATION_CONFIG("sys_notification_config"),
+
+        SYS_IDP_CONFIG("sys_idp_config");
 
         private final String name;
     }

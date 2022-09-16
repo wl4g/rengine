@@ -15,7 +15,6 @@
  */
 package com.wl4g.rengine.server.admin.controller;
 
-import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -26,13 +25,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.server.admin.model.AddProject;
-import com.wl4g.rengine.server.admin.model.AddProjectResult;
-import com.wl4g.rengine.server.admin.model.DeleteProject;
-import com.wl4g.rengine.server.admin.model.DeleteProjectResult;
-import com.wl4g.rengine.server.admin.model.QueryProject;
-import com.wl4g.rengine.server.admin.model.QueryProjectResult;
-import com.wl4g.rengine.server.admin.service.ProjectService;
+import com.wl4g.rengine.server.admin.model.AddNotification;
+import com.wl4g.rengine.server.admin.model.AddNotificationResult;
+import com.wl4g.rengine.server.admin.model.QueryNotification;
+import com.wl4g.rengine.server.admin.model.QueryNotificationResult;
+import com.wl4g.rengine.server.admin.service.NotificationService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -41,50 +38,39 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link ProjectController}
+ * {@link NotificationController}
  * 
  * @author James Wong
  * @version 2022-08-28
  * @since v3.0.0
  */
-@Tag(name = "ProjectAPI", description = "The project management API")
+@Tag(name = "NotificationAPI", description = "The notification setting management API")
 @Slf4j
 @RestController
-@RequestMapping("/admin/project")
-public class ProjectController {
+@RequestMapping("/admin/notification")
+public class NotificationController {
 
-    private @Autowired ProjectService projectService;
+    private @Autowired NotificationService notificationService;
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Query project list.")
+    @Operation(description = "Query notification setting.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
-    @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
-    public RespBase<QueryProjectResult> query(@Validated QueryProject model) {
+    @RequestMapping(path = { "get" }, produces = "application/json", method = { GET })
+    public RespBase<QueryNotificationResult> get(@Validated QueryNotification model) {
         log.info("called: model={}", model);
-        RespBase<QueryProjectResult> resp = RespBase.create();
-        resp.setData(projectService.query(model));
+        RespBase<QueryNotificationResult> resp = RespBase.create();
+        resp.setData(notificationService.query(model));
         return resp;
     }
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Save project model.")
+    @Operation(description = "Save notification model.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    public RespBase<AddProjectResult> save(@Validated @RequestBody AddProject model) {
+    public RespBase<AddNotificationResult> save(@Validated @RequestBody AddNotification model) {
         log.info("called: model={}", model);
-        RespBase<AddProjectResult> resp = RespBase.create();
-        resp.setData(projectService.save(model));
-        return resp;
-    }
-
-    // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Delete project.")
-    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
-    @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
-    public RespBase<DeleteProjectResult> delete(@Validated DeleteProject model) {
-        log.info("called: model={}", model);
-        RespBase<DeleteProjectResult> resp = RespBase.create();
-        resp.setData(projectService.delete(model));
+        RespBase<AddNotificationResult> resp = RespBase.create();
+        resp.setData(notificationService.save(model));
         return resp;
     }
 

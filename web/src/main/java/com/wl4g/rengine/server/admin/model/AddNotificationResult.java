@@ -15,11 +15,6 @@
  */
 package com.wl4g.rengine.server.admin.model;
 
-import java.util.List;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,10 +22,10 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link STSInfo}
+ * {@link AddNotificationResult}
  * 
  * @author James Wong
- * @version 2022-09-15
+ * @version 2022-08-28
  * @since v3.0.0
  */
 @Getter
@@ -38,12 +33,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class STSInfo {
-    private @NotBlank String accessKey;
-    private @NotBlank String secretKey;
-    private @NotBlank String sessionToken;
-    private @NotBlank String region;
-    private @NotBlank long partSize;
-    private @NotBlank long fileLimitSize;
-    private @NotEmpty List<String> extension;
+public class AddNotificationResult extends AddResultBase {
 }
