@@ -63,17 +63,17 @@ import lombok.ToString;
 @Validated
 public class MinioClientProperties implements InitializingBean {
 
+    private HttpClientConfig httpClient = new HttpClientConfig();
+
     private @NotBlank String endpoint = "http://localhost:9000";
-
-    private @NotBlank String accessKey = "rengine";
-
-    private @NotBlank String secretKey = "rengine";
 
     private @Nullable String region = "us-east-1";
 
-    private @NotBlank String bucket = "rengine";
+    private @NotBlank String tenantAccessKey = "rengine";
 
-    private HttpClientConfig httpClient = new HttpClientConfig();
+    private @NotBlank String tenantSecretKey = "12345678";
+
+    private @NotBlank String bucket = "rengine";
 
     private UserUploadAssumeConfig userUpload = new UserUploadAssumeConfig();
 
@@ -126,13 +126,7 @@ public class MinioClientProperties implements InitializingBean {
     @NoArgsConstructor
     public static class UserUploadAssumeConfig {
 
-        private @NotBlank String assumeAccessKey = "rengine_assume";
-
-        private @NotBlank String assumeSecretKey = "12345678";
-
-        private @NotBlank String assumePolicyName = "rengine_assume_policy";
-
-        private @NotEmpty List<S3Policy.Action> assumePolicyActions = asList(GetBucketLocationAction, GetBucketPolicyStatusAction,
+        private @NotEmpty List<S3Policy.Action> stsPolicyActions = asList(GetBucketLocationAction, GetBucketPolicyStatusAction,
                 ListBucketAction, ListAllMyBucketsAction, ListBucketMultipartUploadsAction, ListMultipartUploadPartsAction,
                 PutObjectAction, PutObjectLegalHoldAction, GetObjectAction, GetObjectLegalHoldAction);
 
@@ -144,12 +138,43 @@ public class MinioClientProperties implements InitializingBean {
 
         private @NotEmpty List<String> testsetExtensions = asList(".csv");
 
-        // TODO 根据 minio-js 的 pubObject() 不调用 listMultipart 方法为依据设置
-        private DataSize libraryPartSize = ofMegabytes(5);
+        /**
+         * The adjusting partSize will affect whether the pubObject() of the
+         * minio-js SDK enables multipart upload, that is, the interface
+         * corresponding to s3:ListBucketMultipartUploads will be called, but
+         * this interface must have read permission of the bucket root
+         * directory? See the source codes:
+         * 
+         * @see https://github.com/minio/minio-js/blob/7.0.32/src/main/minio.js#L1212
+         * @see https://github.com/minio/minio-js/blob/7.0.32/src/main/object-uploader.js#L75
+         * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/router.go#L95
+         * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/object-handler.go#L345
+         * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/auth-handler.go#L391
+         * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1754
+         * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1680
+         * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1723
+         */
+        private DataSize libraryPartSize = ofMegabytes(10);
 
         private DataSize libraryFileLimitSize = ofMegabytes(10);
 
-        private DataSize testsetPartSize = ofMegabytes(5);
+        /**
+         * The adjusting partSize will affect whether the pubObject() of the
+         * minio-js SDK enables multipart upload, that is, the interface
+         * corresponding to s3:ListBucketMultipartUploads will be called, but
+         * this interface must have read permission of the bucket root
+         * directory? See the source codes:
+         * 
+         * @see https://github.com/minio/minio-js/blob/7.0.32/src/main/minio.js#L1212
+         * @see https://github.com/minio/minio-js/blob/7.0.32/src/main/object-uploader.js#L75
+         * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/router.go#L95
+         * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/object-handler.go#L345
+         * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/auth-handler.go#L391
+         * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1754
+         * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1680
+         * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1723
+         */
+        private DataSize testsetPartSize = ofMegabytes(10);
 
         private DataSize testsetFileLimitSize = ofMegabytes(10);
 

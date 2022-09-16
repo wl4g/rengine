@@ -36,5 +36,4 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @NoArgsConstructor
 public class AddRule extends Rule {
-
 }

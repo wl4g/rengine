@@ -13,27 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.server.admin.model;
+package com.wl4g.rengine.server.admin.service;
 
-import com.wl4g.rengine.common.bean.mongo.Project;
-
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.SuperBuilder;
+import com.wl4g.rengine.server.admin.model.AddUpload;
+import com.wl4g.rengine.server.admin.model.DeleteUpload;
+import com.wl4g.rengine.server.admin.model.DeleteUploadResult;
+import com.wl4g.rengine.server.admin.model.QueryUpload;
+import com.wl4g.rengine.server.admin.model.QueryUploadResult;
+import com.wl4g.rengine.server.admin.model.AddUploadResult;
 
 /**
- * {@link AddProject}
+ * {@link UploadService}
  * 
  * @author James Wong
- * @version 2022-08-28
+ * @version 2022-08-29
  * @since v3.0.0
  */
-@Getter
-@Setter
-@SuperBuilder
-@ToString
-@NoArgsConstructor
-public class AddProject extends Project {
+public interface UploadService {
+
+    QueryUploadResult query(QueryUpload model);
+
+    AddUploadResult apply(AddUpload model);
+
+    DeleteUploadResult delete(DeleteUpload model);
 }

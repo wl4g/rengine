@@ -15,8 +15,6 @@
  */
 package com.wl4g.rengine.server.admin.model;
 
-import com.wl4g.rengine.common.bean.mongo.Project;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,7 +22,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link AddProject}
+ * {@link AddIdentityProviderResult}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -35,5 +33,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class AddProject extends Project {
+public class AddIdentityProviderResult extends AddResultBase {
 }

@@ -15,16 +15,21 @@
  */
 package com.wl4g.rengine.server.admin.controller;
 
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.web.rest.RespBase;
+import com.wl4g.rengine.server.admin.model.AddWorkflow;
+import com.wl4g.rengine.server.admin.model.AddWorkflowResult;
+import com.wl4g.rengine.server.admin.model.DeleteWorkflow;
+import com.wl4g.rengine.server.admin.model.DeleteWorkflowResult;
 import com.wl4g.rengine.server.admin.model.QueryWorkflow;
 import com.wl4g.rengine.server.admin.model.QueryWorkflowResult;
 import com.wl4g.rengine.server.admin.service.WorkflowService;
@@ -53,12 +58,33 @@ public class WorkflowController {
     // @SecurityRequirement(name = "default_oauth")
     @Operation(description = "Query workflow list.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
-    @RequestMapping(path = { "query" }, produces = "application/json", method = { GET, POST })
-    public RespBase<QueryWorkflowResult> query(HttpServletRequest request, QueryWorkflow model) {
-        log.info("[{}:called:apply()] uri={}, model={}", request.getRequestURI(), model);
-
+    @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
+    public RespBase<QueryWorkflowResult> query(@Validated QueryWorkflow model) {
+        log.info("called: model={}", model);
         RespBase<QueryWorkflowResult> resp = RespBase.create();
         resp.setData(workflowService.query(model));
+        return resp;
+    }
+
+    // @SecurityRequirement(name = "default_oauth")
+    @Operation(description = "Save workflows model.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
+    @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
+    public RespBase<AddWorkflowResult> save(@Validated @RequestBody AddWorkflow model) {
+        log.info("called: model={}", model);
+        RespBase<AddWorkflowResult> resp = RespBase.create();
+        resp.setData(workflowService.save(model));
+        return resp;
+    }
+
+    // @SecurityRequirement(name = "default_oauth")
+    @Operation(description = "Delete project.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
+    @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
+    public RespBase<DeleteWorkflowResult> delete(@Validated DeleteWorkflow model) {
+        log.info("called: model={}", model);
+        RespBase<DeleteWorkflowResult> resp = RespBase.create();
+        resp.setData(workflowService.delete(model));
         return resp;
     }
 

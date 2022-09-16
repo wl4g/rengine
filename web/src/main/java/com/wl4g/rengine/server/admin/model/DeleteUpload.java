@@ -13,20 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.server.admin.service;
+package com.wl4g.rengine.server.admin.model;
 
-import com.wl4g.rengine.server.admin.model.UploadApply;
-import com.wl4g.rengine.server.admin.model.UploadApplyResult;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 /**
- * {@link UserLibraryService}
+ * {@link DeleteUpload}
  * 
  * @author James Wong
- * @version 2022-08-29
+ * @version 2022-08-28
  * @since v3.0.0
  */
-public interface UserLibraryService {
-
-    UploadApplyResult apply(UploadApply model);
-
+@Getter
+@Setter
+@SuperBuilder
+@ToString
+@NoArgsConstructor
+public class DeleteUpload extends DeleteBase {
 }

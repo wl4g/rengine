@@ -26,54 +26,56 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.server.admin.model.AddProject;
-import com.wl4g.rengine.server.admin.model.AddProjectResult;
-import com.wl4g.rengine.server.admin.model.DeleteProject;
-import com.wl4g.rengine.server.admin.model.DeleteProjectResult;
-import com.wl4g.rengine.server.admin.model.QueryProject;
-import com.wl4g.rengine.server.admin.model.QueryProjectResult;
-import com.wl4g.rengine.server.admin.service.ProjectService;
+import com.wl4g.rengine.server.admin.model.AddRule;
+import com.wl4g.rengine.server.admin.model.AddRuleResult;
+import com.wl4g.rengine.server.admin.model.DeleteRule;
+import com.wl4g.rengine.server.admin.model.DeleteRuleResult;
+import com.wl4g.rengine.server.admin.model.QueryRule;
+import com.wl4g.rengine.server.admin.model.QueryRuleResult;
+import com.wl4g.rengine.server.admin.service.RuleService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link ProjectController}
+ * {@link RuleController}
  * 
  * @author James Wong
  * @version 2022-08-28
  * @since v3.0.0
  */
-@Tag(name = "ProjectAPI", description = "The project management API")
+@Tag(name = "RuleAPI", description = "The rule models management API")
 @Slf4j
 @RestController
-@RequestMapping("/admin/project")
-public class ProjectController {
+@RequestMapping("/admin/rule")
+public class RuleController {
 
-    private @Autowired ProjectService projectService;
+    private @Autowired RuleService ruleService;
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Query project list.")
-    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
-    @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
-    public RespBase<QueryProjectResult> query(@Validated QueryProject model) {
+    @Operation(description = "Query rules model list.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful",
+            content = { @Content(mediaType = "application/json") }) })
+    @RequestMapping(path = { "query" }, method = { GET })
+    public RespBase<QueryRuleResult> query(@Validated QueryRule model) {
         log.info("called: model={}", model);
-        RespBase<QueryProjectResult> resp = RespBase.create();
-        resp.setData(projectService.query(model));
+        RespBase<QueryRuleResult> resp = RespBase.create();
+        resp.setData(ruleService.query(model));
         return resp;
     }
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Save project model.")
+    @Operation(description = "Save rules model.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    public RespBase<AddProjectResult> save(@Validated @RequestBody AddProject model) {
+    public RespBase<AddRuleResult> save(@Validated @RequestBody AddRule model) {
         log.info("called: model={}", model);
-        RespBase<AddProjectResult> resp = RespBase.create();
-        resp.setData(projectService.save(model));
+        RespBase<AddRuleResult> resp = RespBase.create();
+        resp.setData(ruleService.save(model));
         return resp;
     }
 
@@ -81,10 +83,10 @@ public class ProjectController {
     @Operation(description = "Delete project.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
-    public RespBase<DeleteProjectResult> delete(@Validated DeleteProject model) {
+    public RespBase<DeleteRuleResult> delete(@Validated DeleteRule model) {
         log.info("called: model={}", model);
-        RespBase<DeleteProjectResult> resp = RespBase.create();
-        resp.setData(projectService.delete(model));
+        RespBase<DeleteRuleResult> resp = RespBase.create();
+        resp.setData(ruleService.delete(model));
         return resp;
     }
 

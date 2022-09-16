@@ -39,7 +39,6 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @NoArgsConstructor
 public class Project extends BeanBase {
-    private @NotBlank String projectId;
     private @NotBlank String name;
     private @Nullable String owner;
     private @Nullable List<String> labels;

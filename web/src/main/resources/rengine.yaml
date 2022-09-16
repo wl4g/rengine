@@ -21,13 +21,16 @@ spring:
       location: classpath:META-INF/banner.txt
   main:
     allow-circular-references: true
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
   #mvc:
   #  pathmatch:
   #    matching-strategy: /**/swagger-ui/**
   infra:
     core:
       logging:
-        enabled: false
+        enabled: true
 
 ## see:https://docs.spring.io/spring-boot/docs/2.6.7/reference/htmlsingle/#features.logging.custom-log-configuration
 ## see:com.wl4g.infra.core.logging.custom.logback.CustomLogbackConfigurer

@@ -15,8 +15,6 @@
  */
 package com.wl4g.rengine.server.admin.model;
 
-import javax.validation.constraints.NotBlank;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -35,6 +33,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class AddRuleResult {
-    private @NotBlank String ruleId;
+public class AddRuleResult extends AddResultBase {
 }

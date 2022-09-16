@@ -16,6 +16,9 @@
 package com.wl4g.rengine.server.admin.service;
 
 import com.wl4g.rengine.server.admin.model.AddProject;
+import com.wl4g.rengine.server.admin.model.AddProjectResult;
+import com.wl4g.rengine.server.admin.model.DeleteProject;
+import com.wl4g.rengine.server.admin.model.DeleteProjectResult;
 import com.wl4g.rengine.server.admin.model.QueryProject;
 import com.wl4g.rengine.server.admin.model.QueryProjectResult;
 
@@ -30,6 +33,8 @@ public interface ProjectService {
 
     QueryProjectResult query(QueryProject model);
 
-    String save(AddProject model);
+    AddProjectResult save(AddProject model);
+
+    DeleteProjectResult delete(DeleteProject model);
 
 }

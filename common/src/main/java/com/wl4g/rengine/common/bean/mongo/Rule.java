@@ -39,7 +39,7 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @NoArgsConstructor
 public class Rule extends BeanBase {
-    private @NotBlank String ruleId;
+    private @Nullable Long projectId;
     private @NotBlank String name;
     private @Nullable List<String> labels;
 }
