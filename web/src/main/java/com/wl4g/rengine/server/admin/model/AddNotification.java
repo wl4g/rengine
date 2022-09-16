@@ -15,7 +15,7 @@
  */
 package com.wl4g.rengine.server.admin.model;
 
-import com.wl4g.rengine.common.bean.mongo.NotificationConfig;
+import com.wl4g.rengine.common.bean.mongo.Notification;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,5 +35,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class AddNotification extends NotificationConfig {
+public class AddNotification {
+    private Notification provider;
 }

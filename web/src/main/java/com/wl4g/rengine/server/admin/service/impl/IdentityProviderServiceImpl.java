@@ -15,21 +15,28 @@
  */
 package com.wl4g.rengine.server.admin.service.impl;
 
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static com.wl4g.infra.common.lang.TypeConverts.safeLongToInt;
+import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import com.wl4g.rengine.common.bean.mongo.IdentityProviderConfig;
+import com.wl4g.rengine.common.bean.mongo.IdentityProvider;
 import com.wl4g.rengine.server.admin.model.AddIdentityProvider;
 import com.wl4g.rengine.server.admin.model.AddIdentityProviderResult;
 import com.wl4g.rengine.server.admin.model.QueryIdentityProvider;
 import com.wl4g.rengine.server.admin.model.QueryIdentityProviderResult;
 import com.wl4g.rengine.server.admin.service.IdentityProviderService;
 import com.wl4g.rengine.server.constants.RengineWebConstants.MongoCollectionDefinition;
+import com.wl4g.rengine.server.util.IdGenUtil;
 
 /**
  * {@link IdentityProviderServiceImpl}
@@ -45,22 +52,28 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
 
     @Override
     public QueryIdentityProviderResult query(QueryIdentityProvider model) {
-        List<IdentityProviderConfig> idpConfigs = mongoTemplate.findAll(IdentityProviderConfig.class,
-                MongoCollectionDefinition.SYS_IDP_CONFIG.getName());
-        if (isEmpty(idpConfigs)) {
-            IdentityProviderConfig idpConfig = idpConfigs.get(0);
-            return QueryIdentityProviderResult.builder().oauth2(idpConfig.getOauth2()).saml2(idpConfig.getSaml2()).build();
+        List<IdentityProvider> idpConfigs = null;
+        if (!isBlank(model.getKind())) {
+            Criteria criteria = new Criteria().orOperator(Criteria.where("kind").is(model.getKind()));
+            idpConfigs = mongoTemplate.find(new Query(criteria), IdentityProvider.class,
+                    MongoCollectionDefinition.SYS_IDP_CONFIG.getName());
+        } else {
+            idpConfigs = mongoTemplate.findAll(IdentityProvider.class, MongoCollectionDefinition.SYS_IDP_CONFIG.getName());
         }
-        return QueryIdentityProviderResult.builder().build();
+
+        Collections.sort(idpConfigs, (o1, o2) -> safeLongToInt(o2.getUpdateDate().getTime() - o1.getUpdateDate().getTime()));
+        return QueryIdentityProviderResult.builder().providers(idpConfigs).build();
     }
 
     @Override
     public AddIdentityProviderResult save(AddIdentityProvider model) {
-        IdentityProviderConfig idpConfig = IdentityProviderConfig.builder()
-                .oauth2(model.getOauth2())
-                .saml2(model.getSaml2())
-                .build();
-        IdentityProviderConfig saved = mongoTemplate.insert(idpConfig, MongoCollectionDefinition.SYS_IDP_CONFIG.getName());
+        IdentityProvider provider = model.getProvider();
+        if (isNull(provider.getId())) {
+            provider.setId(IdGenUtil.next());
+        }
+        provider.setUpdateBy("admin");
+        provider.setUpdateDate(new Date());
+        IdentityProvider saved = mongoTemplate.insert(provider, MongoCollectionDefinition.SYS_IDP_CONFIG.getName());
         return AddIdentityProviderResult.builder().id(saved.getId()).build();
     }
 

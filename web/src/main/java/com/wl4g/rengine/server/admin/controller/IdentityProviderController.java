@@ -55,8 +55,8 @@ public class IdentityProviderController {
     // @SecurityRequirement(name = "default_oauth")
     @Operation(description = "Query Identity Provider setting.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
-    @RequestMapping(path = { "get" }, produces = "application/json", method = { GET })
-    public RespBase<QueryIdentityProviderResult> get(@Validated QueryIdentityProvider model) {
+    @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
+    public RespBase<QueryIdentityProviderResult> query(@Validated QueryIdentityProvider model) {
         log.info("called: model={}", model);
         RespBase<QueryIdentityProviderResult> resp = RespBase.create();
         resp.setData(identityProviderService.query(model));

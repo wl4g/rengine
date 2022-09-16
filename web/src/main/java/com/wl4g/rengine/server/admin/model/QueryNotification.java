@@ -15,6 +15,12 @@
  */
 package com.wl4g.rengine.server.admin.model;
 
+import javax.annotation.Nullable;
+
+import com.wl4g.infra.common.validation.EnumValue;
+import com.wl4g.rengine.common.bean.mongo.Notification.NotificationKind;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -34,4 +40,6 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @NoArgsConstructor
 public class QueryNotification {
+    @Schema(implementation = NotificationKind.class)
+    private @Nullable @EnumValue(enumCls = NotificationKind.class) String kind;
 }

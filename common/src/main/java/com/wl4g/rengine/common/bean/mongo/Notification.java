@@ -21,6 +21,19 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.wl4g.infra.common.validation.EnumValue;
+import com.wl4g.rengine.common.bean.mongo.Notification.AliyunSmsConfig;
+import com.wl4g.rengine.common.bean.mongo.Notification.AliyunVmsConfig;
+import com.wl4g.rengine.common.bean.mongo.Notification.DingtalkConfig;
+import com.wl4g.rengine.common.bean.mongo.Notification.EmailConfig;
+import com.wl4g.rengine.common.bean.mongo.Notification.WeComConfig;
+import com.wl4g.rengine.common.bean.mongo.Notification.WebhookConfig;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,31 +41,37 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link NotificationConfig}
+ * {@link Notification}
  * 
  * @author James Wong
  * @version 2022-08-29
  * @since v3.0.0
  */
+// 1.多态参见:https://swagger.io/docs/specification/data-models/inheritance-and-polymorphism/
+// 2.对于swagger3注解,父类必须是抽象的，否则swagger3页面请求参数schemas展开后会以父类名重复展示3个.
+@Schema(oneOf = { EmailConfig.class, DingtalkConfig.class, WeComConfig.class, AliyunSmsConfig.class, AliyunVmsConfig.class,
+        WebhookConfig.class }, discriminatorProperty = "@kind")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@kind", visible = true)
+@JsonSubTypes({ @Type(value = EmailConfig.class, name = "email"), @Type(value = DingtalkConfig.class, name = "dingtalk"),
+        @Type(value = WeComConfig.class, name = "wecom"), @Type(value = AliyunSmsConfig.class, name = "aliyunSms"),
+        @Type(value = AliyunVmsConfig.class, name = "aliyunVms"), @Type(value = WebhookConfig.class, name = "webhook") })
 @Getter
 @Setter
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class NotificationConfig extends BeanBase {
-    private EmailConfig email;
-    private DingtalkConfig dingtalk;
-    private WeComConfig wecom;
-    private AliyunSmsConfig aliyunSms;
-    private AliyunVmsConfig aliyunVms;
-    private WebhookConfig webhook;
+public abstract class Notification extends BeanBase {
+
+    @Schema(name = "@kind", implementation = NotificationKind.class)
+    @JsonProperty(value = "@kind")
+    private @NotBlank @EnumValue(enumCls = NotificationKind.class) String kind;
 
     @Getter
     @Setter
     @SuperBuilder
     @ToString
     @NoArgsConstructor
-    public static class EmailConfig {
+    public static class EmailConfig extends Notification {
         private @NotBlank String smtpHost;
         private @NotNull @Min(0) Integer smtpPort;
         private @NotBlank String sendMail;
@@ -66,7 +85,7 @@ public class NotificationConfig extends BeanBase {
     @SuperBuilder
     @ToString
     @NoArgsConstructor
-    public static class DingtalkConfig {
+    public static class DingtalkConfig extends Notification {
         private @NotBlank String appKey;
         private @NotBlank String appSecret;
     }
@@ -76,7 +95,7 @@ public class NotificationConfig extends BeanBase {
     @SuperBuilder
     @ToString
     @NoArgsConstructor
-    public static class WeComConfig {
+    public static class WeComConfig extends Notification {
     }
 
     @Getter
@@ -84,7 +103,7 @@ public class NotificationConfig extends BeanBase {
     @SuperBuilder
     @ToString
     @NoArgsConstructor
-    public static class AliyunSmsConfig {
+    public static class AliyunSmsConfig extends Notification {
         private @NotBlank String accessKey;
         private @NotBlank String accessSecret;
         private @NotBlank String regionId;
@@ -96,7 +115,7 @@ public class NotificationConfig extends BeanBase {
     @SuperBuilder
     @ToString
     @NoArgsConstructor
-    public static class AliyunVmsConfig {
+    public static class AliyunVmsConfig extends Notification {
         private @NotBlank String accessKey;
         private @NotBlank String accessSecret;
         private @NotBlank String regionId;
@@ -108,8 +127,12 @@ public class NotificationConfig extends BeanBase {
     @SuperBuilder
     @ToString
     @NoArgsConstructor
-    public static class WebhookConfig {
+    public static class WebhookConfig extends Notification {
         private List<String> urls;
+    }
+
+    public static enum NotificationKind {
+        email, dingtalk, wecom, aliyunSms, aliyunVms, webhook
     }
 
 }

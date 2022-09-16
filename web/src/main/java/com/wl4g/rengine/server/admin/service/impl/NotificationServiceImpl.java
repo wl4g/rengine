@@ -15,21 +15,28 @@
  */
 package com.wl4g.rengine.server.admin.service.impl;
 
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static com.wl4g.infra.common.lang.TypeConverts.safeLongToInt;
+import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import com.wl4g.rengine.common.bean.mongo.NotificationConfig;
+import com.wl4g.rengine.common.bean.mongo.Notification;
 import com.wl4g.rengine.server.admin.model.AddNotification;
 import com.wl4g.rengine.server.admin.model.AddNotificationResult;
 import com.wl4g.rengine.server.admin.model.QueryNotification;
 import com.wl4g.rengine.server.admin.model.QueryNotificationResult;
 import com.wl4g.rengine.server.admin.service.NotificationService;
 import com.wl4g.rengine.server.constants.RengineWebConstants.MongoCollectionDefinition;
+import com.wl4g.rengine.server.util.IdGenUtil;
 
 /**
  * {@link NotificationServiceImpl}
@@ -45,33 +52,29 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public QueryNotificationResult query(QueryNotification model) {
-        List<NotificationConfig> notificationConfigs = mongoTemplate.findAll(NotificationConfig.class,
-                MongoCollectionDefinition.SYS_NOTIFICATION_CONFIG.getName());
-        if (isEmpty(notificationConfigs)) {
-            NotificationConfig notificationConfig = notificationConfigs.get(0);
-            return QueryNotificationResult.builder()
-                    .email(notificationConfig.getEmail())
-                    .dingtalk(notificationConfig.getDingtalk())
-                    .wecom(notificationConfig.getWecom())
-                    .aliyunSms(notificationConfig.getAliyunSms())
-                    .aliyunVms(notificationConfig.getAliyunVms())
-                    .webhook(notificationConfig.getWebhook())
-                    .build();
+        List<Notification> notifications = null;
+        if (!isBlank(model.getKind())) {
+            Criteria criteria = new Criteria().orOperator(Criteria.where("kind").is(model.getKind()));
+            notifications = mongoTemplate.find(new Query(criteria), Notification.class,
+                    MongoCollectionDefinition.SYS_NOTIFICATION_CONFIG.getName());
+        } else {
+            notifications = mongoTemplate.findAll(Notification.class,
+                    MongoCollectionDefinition.SYS_NOTIFICATION_CONFIG.getName());
         }
-        return QueryNotificationResult.builder().build();
+
+        Collections.sort(notifications, (o1, o2) -> safeLongToInt(o2.getUpdateDate().getTime() - o1.getUpdateDate().getTime()));
+        return QueryNotificationResult.builder().providers(notifications).build();
     }
 
     @Override
     public AddNotificationResult save(AddNotification model) {
-        NotificationConfig notificationConfig = NotificationConfig.builder()
-                .email(model.getEmail())
-                .dingtalk(model.getDingtalk())
-                .wecom(model.getWecom())
-                .aliyunSms(model.getAliyunSms())
-                .aliyunVms(model.getAliyunVms())
-                .webhook(model.getWebhook())
-                .build();
-        NotificationConfig saved = mongoTemplate.insert(notificationConfig, MongoCollectionDefinition.SYS_NOTIFICATION_CONFIG.getName());
+        Notification provider = model.getProvider();
+        if (isNull(provider.getId())) {
+            provider.setId(IdGenUtil.next());
+        }
+        provider.setUpdateBy("admin");
+        provider.setUpdateDate(new Date());
+        Notification saved = mongoTemplate.insert(provider, MongoCollectionDefinition.SYS_NOTIFICATION_CONFIG.getName());
         return AddNotificationResult.builder().id(saved.getId()).build();
     }
 

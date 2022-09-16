@@ -15,7 +15,11 @@
  */
 package com.wl4g.rengine.server.admin.model;
 
-import com.wl4g.rengine.common.bean.mongo.NotificationConfig;
+import java.util.List;
+
+import javax.annotation.Nullable;
+
+import com.wl4g.rengine.common.bean.mongo.Notification;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,5 +39,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class QueryNotificationResult extends NotificationConfig {
+public class QueryNotificationResult {
+    private @Nullable List<Notification> providers;
 }
