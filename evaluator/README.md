@@ -74,3 +74,7 @@ curl -v localhost:28002/healthz/started
 ```bash
 curl -v localhost:28002/metrics
 ```
+
+### Native dump
+
+TODO

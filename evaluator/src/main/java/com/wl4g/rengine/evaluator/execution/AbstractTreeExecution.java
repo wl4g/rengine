@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.evaluator.executor;
+package com.wl4g.rengine.evaluator.execution;
 
 /**
- * {@link DefaultWorkflowExecutor}
+ * {@link AbstractTreeExecution}
  * 
  * @author James Wong
  * @version 2022-09-17
  * @since v3.0.0
  */
-public class DefaultWorkflowExecutor extends AbstractTreeExecutor {
+public class AbstractTreeExecution implements IExecution {
 
 }

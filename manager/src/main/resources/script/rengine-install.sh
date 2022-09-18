@@ -15,8 +15,8 @@
 #
 
 # Depending on scripts.
-CURR_DIR="$(cd "`dirname "$0"`"/.; pwd)"
-VAR_PATH=$CURR_DIR"/*-env.sh"
+BASE_DIR="$(cd "`dirname "$0"`"/.; pwd)"
+VAR_PATH=$BASE_DIR"/*-env.sh"
 . $VAR_PATH
 
 # SC control script.
@@ -104,7 +104,7 @@ chmod -R 750 $DEFAULT_JVM_HSPERFDATA_HOME
 # Execution command
 EXEC_CMD="$JAVA -server $DEBUG_OPTS $HEAP_OPTS $JVM_PERFORMANCE_OPTS $GC_LOG_OPTS $JMX_OPTS $JAVA_OPTS -cp $APP_CLASSPATH $MAIN_CLASS $APP_OPTS"
 
-SERVICE_FILE=$CURR_DIR/$SERVICE_FILE_NAME
+SERVICE_FILE=$BASE_DIR/$SERVICE_FILE_NAME
 cat<<EOF>$SERVICE_FILE
 #!/bin/bash
 # chkconfig: - 85 15
@@ -252,7 +252,7 @@ chmod 750 $SERVICE_FILE && chown -R $APP_USER:$APP_GROUP $SERVICE_FILE && mv $SE
 
 if [ -f "/bin/systemctl" ]; then
   # Systemd service filename.
-  SERVICE_FILE=$CURR_DIR/$SERVICE_FILE_NAME
+  SERVICE_FILE=$BASE_DIR/$SERVICE_FILE_NAME
   # Application environment.
   APP_ENV=". /etc/bashrc && . /etc/profile &&"
   if [ "$APP_USER" == 'root' ]; then

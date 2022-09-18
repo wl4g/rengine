@@ -13,30 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.evaluator;
-
-import javax.inject.Inject;
-
-import com.wl4g.rengine.evaluator.executor.IExecutor;
-
-import lombok.AllArgsConstructor;
+package com.wl4g.rengine.evaluator.execution;
 
 /**
- * {@link DefaultExecutorFactory}
+ * {@link IExecution}
  * 
  * @author James Wong
  * @version 2022-09-17
  * @since v3.0.0
- * @see https://github.com/google/guice/wiki/Motivation
  */
-@AllArgsConstructor
-public class DefaultExecutorFactory implements ExecutorFactory {
-
-    private @Inject IExecutor executor;
-
-    @Override
-    public IExecutor getExecutor() {
-        return executor;
-    }
+public interface IExecution {
 
 }

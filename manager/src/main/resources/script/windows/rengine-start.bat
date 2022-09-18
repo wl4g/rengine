@@ -22,8 +22,8 @@ popd
 rem
 rem Global define.
 rem
-set MAIN_JAR_NAME=transport
-set MAIN_CLASS=io.transport.Transport
+set MAIN_JAR_NAME=rengine-manager
+set MAIN_CLASS=com.wl4g.RengineManager
 
 set DATA_DIR=%BASE_DIR%
 set CONF_DIR=%BASE_DIR%\conf

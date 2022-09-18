@@ -15,15 +15,22 @@
  */
 package com.wl4g.rengine.evaluator.context;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
+import javax.inject.Singleton;
+
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
+import com.wl4g.infra.common.web.rest.RespBase;
 
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link ApplicationListener}
+ * {@linkplain @ApplicationScoped} vs {@linkplain @Singleton} see:
+ * https://quarkus.io/guides/cdi#applicationscoped-and-singleton-look-very-similar-which-one-should-i-choose-for-my-quarkus-application
+ * 
+ * {@linkplain @Singleton}: Better performance because there is no client proxy.
  * 
  * @author James Wong
  * @version 2022-09-18
@@ -31,11 +38,14 @@ import lombok.extern.slf4j.Slf4j;
  * @see https://quarkus.io/guides/lifecycle#listening-for-startup-and-shutdown-events
  */
 @Slf4j
-@ApplicationScoped
+// @ApplicationScoped
+@Singleton
 public class ApplicationListener {
 
-    void onStart(@Observes StartupEvent event) {
+    void onStart(@Observes StartupEvent event, @ConfigProperty(name = "quarkus.application.name") String appName) {
         log.info("The application is starting...");
+        // RespBase.ErrorPromptMessageBuilder.setPrompt(appName);
+        RespBase.ErrorPromptMessageBuilder.setPrompt("EVALUATOR");
     }
 
     void onStop(@Observes ShutdownEvent event) {

@@ -13,15 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.evaluator.executor;
+package com.wl4g.rengine.evaluator.execution;
 
 /**
- * {@link AbstractTreeExecutor}
+ * {@link ExecutionFactory}
  * 
  * @author James Wong
  * @version 2022-09-17
  * @since v3.0.0
  */
-public class AbstractTreeExecutor implements IExecutor {
+public interface ExecutionFactory {
+
+    IExecution getExecutor();
 
 }
