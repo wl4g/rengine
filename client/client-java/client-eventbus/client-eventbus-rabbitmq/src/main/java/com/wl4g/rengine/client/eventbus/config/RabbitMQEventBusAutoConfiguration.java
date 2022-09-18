@@ -20,7 +20,7 @@ import org.springframework.context.annotation.Bean;
 
 import com.wl4g.rengine.client.eventbus.RabbitmqEventBusService;
 import com.wl4g.rengine.client.eventbus.RengineEventBusService;
-import com.wl4g.rengine.common.constant.RengineConstants;
+import com.wl4g.rengine.common.constants.RengineConstants;
 
 /**
  * {@link RabbitMQEventBusAutoConfiguration}

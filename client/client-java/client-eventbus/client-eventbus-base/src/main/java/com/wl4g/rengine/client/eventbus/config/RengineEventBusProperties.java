@@ -15,7 +15,7 @@
  */
 package com.wl4g.rengine.client.eventbus.config;
 
-import com.wl4g.rengine.common.constant.RengineConstants;
+import com.wl4g.rengine.common.constants.RengineConstants;
 
 import lombok.Getter;
 import lombok.Setter;

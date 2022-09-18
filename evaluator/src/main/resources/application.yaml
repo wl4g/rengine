@@ -1,0 +1,171 @@
+# Copyright (c) 2017 ~ 2025, the original authors individual Inc,
+# All rights reserved. Contact us James Wong <jameswong1376@gmail.com>
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# see: https://quarkus.io/guides/all-config
+# see: https://quarkus.io/guides/config-yaml
+#
+quarkus:
+  application:
+    name: rengine-evaluator
+  banner:
+    enabled: true
+    path: META-INF/banner.txt
+  ## see:https://quarkus.io/guides/lifecycle#listening-for-startup-and-shutdown-events
+  shutdown:
+    timeout: 60s
+  http:
+    host: 0.0.0.0
+    port: 28002
+    root-path: /
+    cors: false
+  log:
+    level: INFO
+    min-level: TRACE
+    #handler:
+    #  console:
+    #    STRUCTURED_LOGGING:
+    #      enable: false
+    #  file:
+    #    STRUCTURED_LOGGING_FILE:
+    #      enable: true
+    #      format: '%e%n'
+    ## see:https://quarkus.io/guides/logging#logging-categories
+    category:
+      io.quarkus:
+        level: INFO
+        min-level: DEBUG
+        handlers: STRUCTURED_LOGGING,STRUCTURED_LOGGING_FILE
+      com.wl4g:
+        level: INFO
+        min-level: DEBUG
+        handlers: STRUCTURED_LOGGING,STRUCTURED_LOGGING_FILE
+    #handlers:
+    console:
+      format: '%d{HH:mm:ss} %-5p [%c{2.}] (%t) %s%e%n'
+      json:
+        date-format: yyyy-MM-dd HH:mm:ss.SSS
+        pretty-print: false
+        zone-id: default
+        print-details: true
+      color: false
+    file:
+      format: '%d{HH:mm:ss} %-5p [%c{2.}] (%t) %s%e%n'
+      path: /tmp/rengine/evaluator.log
+      async: false
+        #queue-length: 128
+        #overflow: block # block,discard
+      json:
+        date-format: yyyy-MM-dd HH:mm:ss.SSS
+        pretty-print: false
+        zone-id: default
+        print-details: true
+      exception-output-type: formatted
+      #key-overrides: []
+      #excluded-keys: []
+      additional-field:
+        logger_group: main
+      rotation:
+        max-file-size: 200M
+        max-backup-index: 100
+        file-suffix: yyyy-MM-dd
+        rotate-on-boot: true
+  #health:
+  #  extensions:
+  #    enabled: true
+  #  openapi:
+  #    included: true
+  ## see:https://quarkus.io/guides/smallrye-health
+  smallrye-health:
+    root-path: /healthz
+    liveness-path: /live
+    readiness-path: /ready
+    startup-path: /started
+  micrometer:
+    registry-enabled-default: true
+    binder-enabled-default: true
+    binder:
+      #http-client.enabled: false
+      #http-server.enabled: true
+      jvm: true
+      system: true
+    export:
+      json:
+        path: /metrics
+      prometheus:
+        enabled: true
+        path: /metrics
+  opentelemetry:
+    propagators: [tracecontext,baggage]
+    tracer:
+      resource-attributes: {}
+      sampler:
+        ratio: 0.99
+        parent-based: true
+      exporter:
+        otlp:
+          endpoint: http://localhost:4317
+          headers: {}
+          export-timeout: 10s
+          compression: gzip
+        #jaeger:
+        #  endpoint: http://localhost:14250
+        #  export-timeout: 10s
+  ## see:https://quarkus.io/guides/all-config#quarkus-core_quarkus.native.inline-before-analysis
+  native:
+    file-encoding: UTF-8
+    inline-before-analysis: true
+    debug:
+      enabled: true
+      enable-dashboard-dump: true
+  ## We do not want running dev services in distribution
+  devservices:
+    enabled: false
+  ## Default transaction timeout
+  transaction-manager:
+    default-transaction-timeout: 300
+  ## see:https://quarkus.io/guides/security-keycloak-authorization
+  oidc:
+    connection-timeout: 10s
+    max-pool-size: 10
+    auth-server-url: http://localhost:8080/realms/rengine
+    client-id: ${quarkus.application.name}
+    credentials:
+      secret: abcdefghijklmnopqrstuvwzyx
+    tls:
+      verification: none
+  ## see:https://github.com/quarkusio/quarkus-quickstarts/blob/main/mongodb-quickstart/src/main/resources/application.properties
+  mongodb:
+    connection-string: mongodb://localhost:27017
+    health:
+      enabled: true
+    metrics:
+      enabled: true
+    tracing:
+      enabled: true
+    connect-timeout: 10s
+    read-timeout: 20s
+    max-pool-size: 50
+    min-pool-size: 10
+    max-connection-idle-time: 10m
+    #max-connection-life-time: 30m
+
+## MinIO configuration.
+minio:
+  endpoint: http://localhost:9000
+  region: us-east-1
+  tenant-access-key: rengine
+  tenant-secret-key: 12345678
+  http-client:
+    connect-timeout: 10s
+    write-timeout: 5m
+    read-timeout: 5m
+    proxy:
+      type: DIRECT
+      address: 127.0.0.1
+      port: 8118

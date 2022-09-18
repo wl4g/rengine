@@ -1,0 +1,68 @@
+/*
+ * logback-1.2.9 放弃了对 groovy 支持? see:https://stackoverflow.com/questions/70755879/contextinitializer-in-logback-classic-version-1-2-9-does-not-support-groovy-conf
+ *
+ *
+ * Copyright (C) 2017 ~ 2025 the original author or authors.
+ * James Wong<jameswong1376@gmail.com> Technology CO.LTD.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Reference to website: http://wl4g.com
+ */
+
+import ch.qos.logback.classic.AsyncAppender
+import ch.qos.logback.classic.PatternLayout
+import static ch.qos.logback.classic.Level.INFO
+
+scan("30 seconds")
+def LOG_PATH = "logs222"
+def LOG_ARCHIVE = "${LOG_PATH}/archive"
+
+appender("Console-Appender", ConsoleAppender) {
+    encoder(PatternLayoutEncoder) {
+        pattern = "%msg%n"
+    }
+}
+
+appender("File-Appender", FileAppender) {
+    file = "${LOG_PATH}/logfile.log"
+    encoder(PatternLayoutEncoder) {
+        pattern = "%msg%n"
+        outputPatternAsHeader = true
+    }
+}
+
+appender("RollingFile-Appender", RollingFileAppender) {
+    file = "${LOG_PATH}/rollingfile.log"
+    rollingPolicy(TimeBasedRollingPolicy) {
+        fileNamePattern = "${LOG_ARCHIVE}/rollingfile.log%d{yyyy-MM-dd}.log"
+        maxHistory = 30
+        totalSizeCap = "1KB"
+    }
+    encoder(PatternLayoutEncoder) {
+        pattern = "%msg%n"
+    }
+}
+
+appender("Async-Appender", AsyncAppender) {
+    appenderRef("RollingFile-Appender")
+}
+
+logger("guru.springframework.blog.logbackgroovy", INFO, [
+    "Console-Appender",
+    "File-Appender",
+    "Async-Appender"
+], false)
+
+root(INFO, ["Console-Appender"])
