@@ -16,17 +16,21 @@
 package com.wl4g.rengine.evaluator.rest.exception;
 
 import static java.lang.String.format;
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ExceptionMapper;
 
+import com.wl4g.infra.common.lang.StringUtils2;
+import com.wl4g.infra.common.runtime.JvmRuntimeTool;
 import com.wl4g.infra.common.web.rest.RespBase;
 
+import io.vertx.core.http.HttpServerRequest;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -36,15 +40,22 @@ import lombok.extern.slf4j.Slf4j;
  * @version 2022-09-19
  * @since v3.0.0
  * @see https://developers.redhat.com/articles/2022/03/03/rest-api-error-modeling-quarkus-20#model_the_error_response
+ * @see https://quarkus.io/guides/resteasy-reactive#accessing-request-parameters
  */
 @Slf4j
 @javax.ws.rs.ext.Provider
-// @ApplicationScoped
-@Singleton
+@ApplicationScoped
+// @Singleton
 public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
 
-    @Inject
-    Provider<ContainerRequestContext> requestContextProvider;
+    @Context
+    UriInfo uriInfo;
+
+    @Context
+    HttpServerRequest request;
+
+    // @Inject
+    // Provider<ContainerRequestContext> requestContextProvider;
 
     @Override
     public Response toResponse(Throwable th) {
@@ -52,22 +63,40 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
     }
 
     private Response wrapExceptionToResponse(Throwable th) {
+        loggingException(th);
+
         // Use response from WebApplicationException as they are
         if (th instanceof WebApplicationException) {
             // Overwrite error message
-            Response originalErrorResponse = ((WebApplicationException) th).getResponse();
-            return Response.fromResponse(originalErrorResponse)
-                    .entity(RespBase.create().withMessage(originalErrorResponse.getStatusInfo().getReasonPhrase()))
+            Response origErrorResponse = ((WebApplicationException) th).getResponse();
+            return Response.status(200)/* .fromResponse(origErrorResponse) */
+                    .entity(RespBase.create().withCode(500).withMessage(origErrorResponse.getStatusInfo().getReasonPhrase()))
                     .build();
         }
         // Special mappings
         else if (th instanceof IllegalArgumentException) {
-            return Response.status(400).entity(RespBase.create().withMessage(th.getMessage())).build();
+            return Response.status(200)
+                    ./* status(400). */entity(RespBase.create().withCode(400).withMessage(th.getMessage()))
+                    .build();
         }
         // Use 500 (Internal Server Error) for all other
         else {
-            log.error(format("Failed to process request to: {}", requestContextProvider.get().getUriInfo()), th);
-            return Response.serverError().entity(RespBase.create().withMessage("Internal Server Error")).build();
+            return Response.status(200)
+                    ./* serverError(). */entity(RespBase.create().withCode(500).withMessage("Internal Server Error"))
+                    .build();
+        }
+    }
+
+    private void loggingException(Throwable th) {
+        String _stacktrace = request.getHeader("_stacktrace");
+        if (isBlank(_stacktrace)) {
+            final var c = request.getCookie("_stacktrace");
+            if (nonNull(c)) {
+                _stacktrace = c.getValue();
+            }
+        }
+        if (StringUtils2.isTrue(_stacktrace, false) || JvmRuntimeTool.isJvmInDebugging) {
+            log.error(format("Processing failed exception for request: %s", uriInfo.getRequestUri()), th);
         }
     }
 
