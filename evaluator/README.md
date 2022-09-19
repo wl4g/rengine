@@ -17,6 +17,18 @@ docker run -d \
 wl4g/rengine-evaluator
 ```
 
+- Manual evaluating testing
+
+```bash
+curl -v -XPOST \
+-H 'Content-Type: application/json' \
+'localhost:28002/evaluator/evaluate' \
+-d '{
+  "scenes": "iot_warn",
+  "service": "collector"
+}'
+```
+
 - [More Configuration: quarkus.io/guides/all-config](https://quarkus.io/guides/all-config)
 
 ## Development Guide
