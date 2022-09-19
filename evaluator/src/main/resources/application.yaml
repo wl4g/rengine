@@ -128,6 +128,36 @@ quarkus:
         #jaeger:
         #  endpoint: http://localhost:14250
         #  export-timeout: 10s
+  ## see:https://quarkus.io/guides/openapi-swaggerui#quarkus-smallrye-openapi_configuration
+  swagger-ui:
+    enable: true
+    path: /swagger-ui
+    always-include: true
+    title: Rengine Evaluator APIs
+    #layout:
+    theme: original # original, feeling-blue, flattop, material, monokai, muted, newspaper, outline
+    supported-submit-methods: [PUT, POST]
+    #with-credentials:
+    #urls:
+    #  local: http://localhost:${quarkus.http.port}${quarkus.http.root-apth}/openapi
+    #oauth2-redirect-url:
+    #oauth-client-id:
+    #oauth-client-secret:
+    #oauth-realm:
+    #oauth-scope-separator: ','
+    #oauth-scopes: 'profile,openid,read,write'
+    #oauth-additional-query-string-params:
+  smallrye-openapi:
+    path: /openapi
+    info-title: "Rengine Evaluator APIs"
+    info-version: 1.0.0
+    info-description: "Rengine Evaluator APIs Documention"
+    info-terms-of-service: http://swagger.io/terms/
+    info-contact-name: "James Wong"
+    info-contact-email: "rengine@wl4g.com"
+    info-contact-url: "http://rengine.wl4g.com/contact"
+    info-license-name: Apache 2.0
+    info-license-url: "http://www.apache.org/licenses/LICENSE-2.0"
   ## see:https://quarkus.io/guides/all-config#quarkus-core_quarkus.native.inline-before-analysis
   native:
     file-encoding: UTF-8
