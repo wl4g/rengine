@@ -158,12 +158,19 @@ quarkus:
     info-contact-url: "http://rengine.wl4g.com/contact"
     info-license-name: Apache 2.0
     info-license-url: "http://www.apache.org/licenses/LICENSE-2.0"
-  ## see:https://quarkus.io/guides/all-config#quarkus-core_quarkus.native.inline-before-analysis
+  ## see:https://quarkus.io/guides/writing-native-applications-tips#supporting-native-in-your-application
   native:
     file-encoding: UTF-8
     inline-before-analysis: true
     ## see:https://quarkus.io/guides/native-reference#i-get-an-outofmemoryerror-oome-building-native-executables-what-can-i-do
     native-image-xmx: 6g
+    #resources:
+    #  includes: foo/**,bar/**/*.txt
+    #  excludes: foo/private/**
+    ## see:https://quarkus.io/guides/writing-native-applications-tips#delay-class-init-in-your-app
+    additional-build-args: "--initialize-at-run-time=com.wl4g.infra.common.web.rest.RespBase$RetCode\\,\
+com.wl4g.infra.common.lang.Assert2\\,\
+com.wl4g.infra.common.net.InetUtils"
     debug:
       enabled: true
       enable-dashboard-dump: true
