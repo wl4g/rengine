@@ -21,8 +21,8 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
@@ -43,7 +43,8 @@ import io.minio.BucketExistsArgs;
  * @see https://quarkus.io/guides/smallrye-health
  */
 @Readiness
-@ApplicationScoped
+// @ApplicationScoped
+@Singleton
 public class MinioReadyHealthCheck implements HealthCheck {
 
     /**

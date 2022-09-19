@@ -36,6 +36,7 @@
 				<include>static/**</include>
 				<include>*.yml</include>
 				<include>*.yaml</include>
+				<include>*.xml</include>
 				<include>*.json</include>
 				<include>*.conf</include>
 				<include>*.tom</include>

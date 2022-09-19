@@ -23,8 +23,8 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.rengine.evaluator.minio.MinioConfig.IOkHttpClientConfig;
@@ -45,7 +45,8 @@ import okhttp3.Protocol;
  */
 @Slf4j
 @Getter
-@ApplicationScoped
+// @ApplicationScoped
+@Singleton
 public class MinioManager {
 
     private @Inject MinioConfig config;

@@ -8,6 +8,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+set -e
 
 # Load the user environment, e.g. get the secret key of decrypting database password.
 if [ -f "/etc/profile" ]; then # e.g. CentOS.x, Ubuntu.x
@@ -19,27 +20,26 @@ fi
 if [ -f "/etc/bash.bashrc" ]; then # e.g. Ubuntu.x
   . /etc/bash.bashrc
 fi
-if [ -f "~/.bashrc" ]; then # e.g. CentOS.x, Ubuntu.x
+if [ -f "$HOME/.bashrc" ]; then # e.g. CentOS.x, Ubuntu.x
   . ~/.bashrc
 fi
-if [ -f "~/.bash_profile" ]; then # e.g. CentOS.x
+if [ -f "$HOME/.bash_profile" ]; then # e.g. CentOS.x
   . ~/.bash_profile
 fi
-if [ -f "~/.profile" ]; then # e.g. Ubuntu.x
+if [ -f "$HOME/.profile" ]; then # e.g. Ubuntu.x
   . ~/.profile
 fi
 
-
 # Current directory.
-CURR_DIR="$(cd "`dirname "$0"`"/..; pwd)"
+BASE_DIR="$(cd "`dirname "$0"`"/..; pwd)"
 
 #
 # --- Global define ---
 #
 
 # Note that the application name must be the same as the boot jar file name. (Short name is recommended)
-APP_NAME="rengine"
-MAIN_CLASS="com.wl4g.Rengine"
+APP_NAME="rengine-manager"
+MAIN_CLASS="com.wl4g.RengineManager"
 APP_VERSION="1.0.0"
 APP_PROFILE="pro"
 
@@ -47,8 +47,10 @@ APP_PROFILE="pro"
 # When enabled, the generated startup script will contain wildcard loads e.g. "java -cp /usr/local/myapp1/lib/*"
 ENABLE_WILDCARD_CLASSPATH="1"
 
+DAEMON_MODE='true'
+
 # App home and config directory define.
-APP_HOME=$CURR_DIR
+APP_HOME=$BASE_DIR
 PARENT_APP_HOME=$(dirname "$APP_HOME")
 
 CONF_HOME="${APP_HOME}/conf"
@@ -157,8 +159,9 @@ if [ -z "$GC_LOG_OPTS" ]; then # Enable default loggc args
   GC_LOG_FILE_NAME="${APP_NAME}-gc.log"
 
   # the first segment of the version number, which is '1' for releases before Java 9
-  # it then becomes '9', '10', ...
-  JAVA_MAJOR_VERSION=$($JAVA -version 2>&1 | sed -E -n 's/.* version "([^.-]*).*"/\1/p')
+  # it then becomes '9', '10' etc.
+  # e.g: openjdk version "11.0.10" 2021-01-19
+  JAVA_MAJOR_VERSION=$($JAVA -version 2>&1 | sed -E -n 's/.* version "([^.-]*).*"/\1/p' | awk -F ' ' '{print $1}')
   if [[ "$JAVA_MAJOR_VERSION" -ge "9" ]] ; then
     GC_LOG_OPTS="-Xlog:gc*:file=$LOG_DIR/$GC_LOG_FILE_NAME:time,tags:filecount=10,filesize=102400"
   else
@@ -195,7 +198,7 @@ CLASSPATH_ORDERED_LEN=${#CLASSPATH_ORDERED_ARR[@]}
 # The problem of the order of "java -cp" loading. See: https://www.jianshu.com/p/23e0517d76f7
 # You also use the way "sort -k 1" and so on to generate the desired order.
 
-LIB_DIR="$CURR_DIR/$LIB_DIR_NAME"
+LIB_DIR="$BASE_DIR/$LIB_DIR_NAME"
 if [ -d "$LIB_DIR" ]; then
   for file in `ls -a "$LIB_DIR"/* | sort`;
   do

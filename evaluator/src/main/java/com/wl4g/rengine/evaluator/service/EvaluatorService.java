@@ -13,15 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.evaluator.executor;
+package com.wl4g.rengine.evaluator.service;
+
+import javax.validation.Valid;
+
+import com.wl4g.infra.common.web.rest.RespBase;
+import com.wl4g.rengine.common.model.Evaluation;
+import com.wl4g.rengine.common.model.EvaluationResult;
+
+import io.smallrye.mutiny.Uni;
 
 /**
- * {@link IExecutor}
+ * {@link EvaluatorService}
  * 
  * @author James Wong
  * @version 2022-09-17
  * @since v3.0.0
  */
-public interface IExecutor {
+public interface EvaluatorService {
+
+    Uni<RespBase<EvaluationResult>> evaluate(@Valid Evaluation model);
 
 }

@@ -25,10 +25,10 @@ if [ -z "${JAVA_HOME}" ]; then
 fi
 
 # Current directory.
-CURR_DIR="$(cd "`dirname "$0"`"/.; pwd)"
+BASE_DIR="$(cd "`dirname "$0"`"/; pwd)"
 
 # Reference external env definition.
-VAR_PATH=$CURR_DIR"/*-env.sh"
+VAR_PATH=$BASE_DIR"/*-env.sh"
 . $VAR_PATH
 
 # Get the execution command, last arguments.

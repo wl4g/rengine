@@ -16,6 +16,8 @@ quarkus:
   banner:
     enabled: true
     path: META-INF/banner.txt
+  default-locale: zh_CN
+  locales: en-US,zh_CN
   ## see:https://quarkus.io/guides/lifecycle#listening-for-startup-and-shutdown-events
   shutdown:
     timeout: 60s
@@ -35,17 +37,25 @@ quarkus:
     #    STRUCTURED_LOGGING_FILE:
     #      enable: true
     #      format: '%e%n'
+    #handlers:
     ## see:https://quarkus.io/guides/logging#logging-categories
     category:
       io.quarkus:
         level: INFO
         min-level: DEBUG
         handlers: STRUCTURED_LOGGING,STRUCTURED_LOGGING_FILE
+      ## When an exception occurs in the RESTEasy Reactive request parameter handling code, the exception
+      ## is not printed to the log by default (for security reasons). This can sometimes make it difficult
+      ## to understand why certain HTTP status codes are being returned (as JAX-RS requires non-intuitive
+      ## error codes in various situations). In this case the user is encouraged to set the log level to debug.
+      ## see:https://quarkus.io/guides/resteasy-reactive#declaring-endpoints-representation-content-types
+      org.jboss.resteasy.reactive.server.handlers.ParameterHandler:
+        level: DEBUG
+        handlers: STRUCTURED_LOGGING,STRUCTURED_LOGGING_FILE
       com.wl4g:
         level: INFO
         min-level: DEBUG
         handlers: STRUCTURED_LOGGING,STRUCTURED_LOGGING_FILE
-    #handlers:
     console:
       format: '%d{HH:mm:ss} %-5p [%c{2.}] (%t) %s%e%n'
       json:

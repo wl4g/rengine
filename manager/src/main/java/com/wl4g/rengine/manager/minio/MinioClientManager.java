@@ -35,7 +35,6 @@ import com.wl4g.rengine.manager.minio.MinioClientProperties.UserUploadAssumeConf
 import io.minio.credentials.AssumeRoleProvider;
 import io.minio.credentials.Credentials;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 
 /**
@@ -45,7 +44,7 @@ import okhttp3.OkHttpClient;
  * @version 2022-08-31
  * @since v3.0.0
  */
-@Slf4j
+// @Slf4j
 @AllArgsConstructor
 public class MinioClientManager implements ApplicationRunner {
 
@@ -54,7 +53,7 @@ public class MinioClientManager implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        log.info("Initialization ...");
+        // log.info("Initialization ...");
     }
 
     public Credentials createSTSCredentials(String prefix) throws NoSuchAlgorithmException {

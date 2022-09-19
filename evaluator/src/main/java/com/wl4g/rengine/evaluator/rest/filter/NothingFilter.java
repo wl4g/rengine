@@ -13,19 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.evaluator;
+package com.wl4g.rengine.evaluator.rest.filter;
 
-import com.wl4g.rengine.evaluator.executor.IExecutor;
+import java.io.IOException;
+
+import javax.inject.Singleton;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link ExecutorFactory}
+ * {@link NothingFilter}
  * 
  * @author James Wong
- * @version 2022-09-17
+ * @version 2022-09-19
  * @since v3.0.0
  */
-public interface ExecutorFactory {
+@Slf4j
+@Singleton
+public class NothingFilter implements ContainerRequestFilter {
 
-    IExecutor getExecutor();
+    @Override
+    public void filter(ContainerRequestContext requestContext) throws IOException {
+        // TODO Auto-generated method stub
+        log.info("into nothing filter ...");
+    }
 
 }

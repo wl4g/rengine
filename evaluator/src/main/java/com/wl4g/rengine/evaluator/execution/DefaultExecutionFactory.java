@@ -13,25 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.evaluator.util;
+package com.wl4g.rengine.evaluator.execution;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.inject.Inject;
+
+import lombok.AllArgsConstructor;
 
 /**
- * {@link LogUncaughtExceptionHandler}
+ * {@link DefaultExecutionFactory}
  * 
  * @author James Wong
  * @version 2022-09-17
  * @since v3.0.0
+ * @see https://github.com/google/guice/wiki/Motivation
  */
-public class LogUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
+@AllArgsConstructor
+public class DefaultExecutionFactory implements ExecutionFactory {
 
-    private static final Logger log = LoggerFactory.getLogger(LogUncaughtExceptionHandler.class);
+    private @Inject IExecution execution;
 
     @Override
-    public void uncaughtException(final Thread thread, final Throwable throwable) {
-        log.error("Uncaught exception in thread '{}'.", thread.getName(), throwable);
+    public IExecution getExecutor() {
+        return execution;
     }
 
 }

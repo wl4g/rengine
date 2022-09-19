@@ -14,11 +14,11 @@ A generic real-time rule engine, such as bank transfer real-time risk control, t
 
 - GraalVM-java11-22.1.0 + (If Necessary)
 
-- MySQL 5.7 + (If Necessary)
+- MySQL 5.7 +
 
-- MongoDB 4.x + (If Necessary)
+- MongoDB 4.x +
 
-- MinIO 2021.x + (If Necessary)
+- MinIO 2021.x +
 
 - Flink 1.14.4 + (If Necessary)
 
@@ -99,6 +99,20 @@ docker run -d \
 -v /etc/otel/collector.yaml:/etc/otelcol/config.yaml \
 otel/opentelemetry-collector:0.60.0
 ```
+
+## TODO
+
+- Integrate Arthas (proxy/tunnel) with Rengine Manager for easy troubleshooting by sysadmins
+
+- Improve the Rengine Evaluator(quarkus native) runtime debugging toolchain and documentation, including memory snapshot dumps, real-time thread status dumps
+
+- Add the rengine-operator module to make it auto management to the cloud-native environment?
+
+- Add built-in core metrics (prometheus) and write official metrics alert rules and grafana view rules.
+
+- Supported to Flink CEP(Real-time compute) or Flink SQL(Offline compute)
+
+- Improve Rengine Manager configuration management/UI, friendly to user configuration rules, support online simulation of test data sets
 
 ## FAQ
 

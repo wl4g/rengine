@@ -23,6 +23,7 @@ import javax.validation.constraints.NotNull;
 
 import com.wl4g.rengine.common.constants.RengineConstants;
 
+import io.quarkus.runtime.annotations.StaticInitSafe;
 import io.smallrye.config.ConfigMapping;
 import io.smallrye.config.ConfigMapping.NamingStrategy;
 import io.smallrye.config.WithDefault;
@@ -36,7 +37,7 @@ import io.smallrye.config.WithDefault;
  * @see https://quarkus.io/guides/config-mappings
  * @see https://quarkus.io/guides/config-extending-support#custom-config-source
  */
-// @StaticInitSafe
+@StaticInitSafe
 @ConfigMapping(prefix = "minio", namingStrategy = NamingStrategy.KEBAB_CASE)
 public interface MinioConfig {
 
