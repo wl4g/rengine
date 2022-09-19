@@ -158,6 +158,10 @@ quarkus:
     info-contact-url: "http://rengine.wl4g.com/contact"
     info-license-name: Apache 2.0
     info-license-url: "http://www.apache.org/licenses/LICENSE-2.0"
+  package:
+    type: jar
+    runner-suffix: -runner
+    add-runner-suffix: true
   ## see:https://quarkus.io/guides/writing-native-applications-tips#supporting-native-in-your-application
   native:
     file-encoding: UTF-8
@@ -168,9 +172,10 @@ quarkus:
     #  includes: foo/**,bar/**/*.txt
     #  excludes: foo/private/**
     ## see:https://quarkus.io/guides/writing-native-applications-tips#delay-class-init-in-your-app
-    additional-build-args: "--initialize-at-run-time=com.wl4g.infra.common.web.rest.RespBase$RetCode\\,\
-com.wl4g.infra.common.lang.Assert2\\,\
-com.wl4g.infra.common.net.InetUtils"
+    #additional-build-args: "--initialize-at-run-time=com.wl4g.infra.common.web.rest.RespBase$RetCode\\,com.wl4g.infra.common.lang.Assert2\\,com.wl4g.infra.common.net.InetUtils"
+    #compression:
+    #  level: 5 # 1-10 The larger the higher the compression ratio, the longer the build time.
+    #  additional-args: --ultra-brute,-v
     debug:
       enabled: true
       enable-dashboard-dump: true

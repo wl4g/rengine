@@ -268,6 +268,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <!-- <version>${surefire-plugin.version}</version>-->
                 <configuration>
+                    <!-- see:https://stackoverflow.com/questions/69631653/quarkus-optaplanner-illegal-reflective-call -->
+                    <argLine>--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.text=ALL-UNNAMED --add-opens java.desktop/java.awt.font=ALL-UNNAMED</argLine>
                     <systemPropertyVariables>
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                         <maven.home>${maven.home}</maven.home>
@@ -278,6 +280,14 @@
                 <groupId>${quarkus.platform.group-id}</groupId>
                 <artifactId>quarkus-maven-plugin</artifactId>
                 <version>${quarkus.platform.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <!-- see:https://stackoverflow.com/questions/69631653/quarkus-optaplanner-illegal-reflective-call -->
+                    <compilerArgs>
+                        <arg>--enable-preview --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.text=ALL-UNNAMED --add-opens java.desktop/java.awt.font=ALL-UNNAMED</arg>
+                    </compilerArgs>
+                    <jvmArgs>--enable-preview --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.text=ALL-UNNAMED --add-opens java.desktop/java.awt.font=ALL-UNNAMED</jvmArgs>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
@@ -311,6 +321,8 @@
                                     <goal>verify</goal>
                                 </goals>
                                 <configuration>
+                                    <!-- see:https://stackoverflow.com/questions/69631653/quarkus-optaplanner-illegal-reflective-call -->
+                                    <argLine>--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.text=ALL-UNNAMED --add-opens java.desktop/java.awt.font=ALL-UNNAMED</argLine>
                                     <systemPropertyVariables>
                                         <native.image.path>${project.build.directory}/${project.build.finalName}-runner</native.image.path>
                                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>

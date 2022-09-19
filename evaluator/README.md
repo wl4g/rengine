@@ -53,9 +53,9 @@ cd rengine
 - [Quarkus building-native-image#container-runtime](https://quarkus.io/guides/building-native-image#container-runtime)
 
 ```bash
-cd evaluator
 export JAVA_HOME=/usr/local/jdk-11.0.10/
-../mvnw package -Dnative \
+../mvnw package -f evaluator/pom.xml \
+-Dnative \
 -Dquarkus.native.container-build=true \
 -Dquarkus.native.container-runtime=docker
 ```
@@ -98,4 +98,3 @@ curl -v localhost:28002/metrics
 - Yes, but please notice: that the dependent **groovy-4.0.5** only supports **jdk8/9/10/16**, so you must use a version-compatible quarkus-graalvm build environment, which currently passes the tested The build images are: **quay.io/quarkus/ubi-quarkus-native-image:22.2-java17**
 
 - Refer source code: [github.com/apache/groovy/blob/GROOVY_4_0_5/src/main/java/org/codehaus/groovy/vmplugin/VMPluginFactory.java#L39](https://github.com/apache/groovy/blob/GROOVY_4_0_5/src/main/java/org/codehaus/groovy/vmplugin/VMPluginFactory.java#L39)
-
