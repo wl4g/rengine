@@ -156,14 +156,18 @@ quarkus:
     info-contact-name: "James Wong"
     info-contact-email: "rengine@wl4g.com"
     info-contact-url: "http://rengine.wl4g.com/contact"
-    info-license-name: Apache 2.0
+    info-license-name: "Apache 2.0"
     info-license-url: "http://www.apache.org/licenses/LICENSE-2.0"
   package:
     type: jar
-    runner-suffix: -runner
+    runner-suffix: "-native"
     add-runner-suffix: true
   ## see:https://quarkus.io/guides/writing-native-applications-tips#supporting-native-in-your-application
   native:
+    ## Notice: The dependent groovy-4.0.5(current latest) only supports jdk1.8/9/10/16, so you must use a version-compatible quarkus-graalvm build
+    ## environment, which currently passes the tested The build images are: quay.io/quarkus/ubi-quarkus-native-image:22.2-java11
+    ## see:https://github.com/apache/groovy/blob/GROOVY_4_0_5/src/main/java/org/codehaus/groovy/vmplugin/VMPluginFactory.java#L39
+    builder-image: quay.io/quarkus/ubi-quarkus-native-image:22.2-java11 # 21.2-java16,22.2-java11,22.2-java17
     file-encoding: UTF-8
     inline-before-analysis: true
     ## see:https://quarkus.io/guides/native-reference#i-get-an-outofmemoryerror-oome-building-native-executables-what-can-i-do
@@ -173,9 +177,16 @@ quarkus:
     #  excludes: foo/private/**
     ## see:https://quarkus.io/guides/writing-native-applications-tips#delay-class-init-in-your-app
     #additional-build-args: "--initialize-at-run-time=com.wl4g.infra.common.web.rest.RespBase$RetCode\\,com.wl4g.infra.common.lang.Assert2\\,com.wl4g.infra.common.net.InetUtils"
+    #additional-build-args: "--link-at-build-time=org.codehaus.groovy.control.XStreamUtils"
+    additional-build-args: "--report-unsupported-elements-at-runtime,--no-fallback"
     #compression:
     #  level: 5 # 1-10 The larger the higher the compression ratio, the longer the build time.
     #  additional-args: --ultra-brute,-v
+    #auto-service-loader-registration: true
+    enable-fallback-images: false
+    #enable-reports: true
+    #debug-build-process: true
+    #publish-debug-build-process-port: 38002
     debug:
       enabled: true
       enable-dashboard-dump: true

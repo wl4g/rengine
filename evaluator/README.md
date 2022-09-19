@@ -53,11 +53,40 @@ cd rengine
 - [Quarkus building-native-image#container-runtime](https://quarkus.io/guides/building-native-image#container-runtime)
 
 ```bash
+# Should use java11+
 export JAVA_HOME=/usr/local/jdk-11.0.10/
-../mvnw package -f evaluator/pom.xml \
--Dnative \
+./mvnw package -f evaluator/pom.xml \
+-Dmaven.test.skip=true -DskipTests -Dnative \
 -Dquarkus.native.container-build=true \
--Dquarkus.native.container-runtime=docker
+-Dquarkus.native.container-runtime=docker \
+-Dquarkus.native.builder-image=quay.io/quarkus/ubi-quarkus-native-image:21.2-java16
+```
+
+### testing run native groovy
+
+- Generate groovy script to server local path.
+
+```bash
+cat <<'EOF' >/tmp/TestFunction.groovy
+import java.util.List;
+import java.util.function.Function;
+class TestFunction implements Function<List<String>, String> {
+    @Override
+    String apply(List<String> args) {
+        System.out.println("Input args: "+ args);
+        return "ok, This is the result of the function executed ..";
+    }
+}
+EOF
+```
+
+- Execution grovvy script
+
+```bash
+curl -v -XPOST -H 'Content-Type: application/json' 'http://localhost:28002/test/groovy/execution' -d '{
+    "scriptPath": "file:///tmp/TestFunction.groovy",
+    "args": ["jack01", "66"]
+}'
 ```
 
 ### build for container image
@@ -93,8 +122,7 @@ curl -v localhost:28002/metrics
 
 ## FAQ
 
-### If you are a developer who wants to change the JDK and other dependencies versions?
+### Groovy+Quarkus support build native-image mode?
 
-- Yes, but please notice: that the dependent **groovy-4.0.5** only supports **jdk8/9/10/16**, so you must use a version-compatible quarkus-graalvm build environment, which currently passes the tested The build images are: **quay.io/quarkus/ubi-quarkus-native-image:22.2-java17**
+- The attempted support but unfortunately failed, see: [github.com/quarkusio/quarkus/issues/2720](https://github.com/quarkusio/quarkus/issues/2720)
 
-- Refer source code: [github.com/apache/groovy/blob/GROOVY_4_0_5/src/main/java/org/codehaus/groovy/vmplugin/VMPluginFactory.java#L39](https://github.com/apache/groovy/blob/GROOVY_4_0_5/src/main/java/org/codehaus/groovy/vmplugin/VMPluginFactory.java#L39)
