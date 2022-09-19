@@ -57,6 +57,7 @@ quarkus:
         min-level: DEBUG
         handlers: STRUCTURED_LOGGING,STRUCTURED_LOGGING_FILE
     console:
+      enable: true
       format: '%d{HH:mm:ss} %-5p [%c{2.}] (%t) %s%e%n'
       json:
         date-format: yyyy-MM-dd HH:mm:ss.SSS
@@ -65,6 +66,7 @@ quarkus:
         print-details: true
       color: false
     file:
+      enable: true
       format: '%d{HH:mm:ss} %-5p [%c{2.}] (%t) %s%e%n'
       path: /tmp/rengine/evaluator.log
       async: false
