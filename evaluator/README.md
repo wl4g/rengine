@@ -87,6 +87,15 @@ curl -v localhost:28002/healthz/started
 curl -v localhost:28002/metrics
 ```
 
-### Native dump
+### Native Troubleshooting
 
-TODO
+- https://quarkus.io/guides/native-reference#profiling
+
+## FAQ
+
+### If you are a developer who wants to change the JDK and other dependencies versions?
+
+- Yes, but please notice: that the dependent **groovy-4.0.5** only supports **jdk8/9/10/16**, so you must use a version-compatible quarkus-graalvm build environment, which currently passes the tested The build images are: **quay.io/quarkus/ubi-quarkus-native-image:22.2-java17**
+
+- Refer source code: [github.com/apache/groovy/blob/GROOVY_4_0_5/src/main/java/org/codehaus/groovy/vmplugin/VMPluginFactory.java#L39](https://github.com/apache/groovy/blob/GROOVY_4_0_5/src/main/java/org/codehaus/groovy/vmplugin/VMPluginFactory.java#L39)
+

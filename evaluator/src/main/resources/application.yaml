@@ -162,6 +162,8 @@ quarkus:
   native:
     file-encoding: UTF-8
     inline-before-analysis: true
+    ## see:https://quarkus.io/guides/native-reference#i-get-an-outofmemoryerror-oome-building-native-executables-what-can-i-do
+    native-image-xmx: 6g
     debug:
       enabled: true
       enable-dashboard-dump: true
