@@ -59,40 +59,7 @@ export JAVA_HOME=/usr/local/jdk-11.0.10/
 -Dmaven.test.skip=true -DskipTests -Dnative \
 -Dquarkus.native.container-build=true \
 -Dquarkus.native.container-runtime=docker \
--Dquarkus.native.builder-image=quay.io/quarkus/ubi-quarkus-native-image:21.2-java16
-```
-
-### Testing request groovy api with run native image
-
-- Generate groovy script to server local path.
-
-```bash
-cat <<'EOF' >/tmp/TestFunction.groovy
-import java.util.List;
-import java.util.function.Function;
-class TestFunction implements Function<List<String>, String> {
-    @Override
-    String apply(List<String> args) {
-        System.out.println("Input args: "+ args);
-        return "ok, This is the result of the function executed ..";
-    }
-}
-EOF
-```
-
-- Request execution grovvy script
-
-```bash
-curl -v -XPOST -H 'Content-Type: application/json' 'http://localhost:28002/test/groovy/execution' -d '{
-    "scriptPath": "file:///tmp/TestFunction.groovy",
-    "args": ["jack01", "66"]
-}'
-```
-
-- Tail logs
-
-```bash
-tail -f /tmp/rengine/evaluator.log | jq -r '.message'
+-Dquarkus.native.builder-image=quay.io/quarkus/ubi-quarkus-native-image:22.2-java11
 ```
 
 ### Build for container image
@@ -128,7 +95,106 @@ curl -v localhost:28002/metrics
 
 ## FAQ
 
-### Quarkus+Groovy support build native-image mode?
+### Want to try integrating groovy as a dynamic script execution engine?
 
-- After a lot of hardships and N times of failed test configuration and construction, I finally successfully built a native image that integrates groovy and can run normally (currently only recommended to run in the test environment), related difficult questions see: [github.com/quarkusio/quarkus/issues/2720](https://github.com/quarkusio/quarkus/issues/2720)
+- Open [./pom.xml](./pom.xml) groovy dependencies.
+
+```xml
+<!-- START: Integration for Groovy -->
+<dependency>
+    <groupId>org.apache.groovy</groupId>
+    <artifactId>groovy</artifactId>
+</dependency>
+<!-- fix: native build error of: org.codehaus.groovy.control.SourceUnit is registered for linking at image build time by command line ...
+caused by: org.codehaus.groovy.control.XStreamUtils.serialze(String,Object) not found? see:https://github.com/quarkusio/quarkus/issues/2720
+and see:https://github.com/apache/groovy/blob/GROOVY_4_0_5/build.gradle#L98 -->
+<dependency>
+    <groupId>com.thoughtworks.xstream</groupId>
+    <artifactId>xstream</artifactId>
+    <version>1.4.19</version>
+    <exclusions>
+        <exclusion>
+            <groupId>xpp3</groupId>
+            <artifactId>xpp3_min</artifactId>
+        </exclusion>
+        <exclusion>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </exclusion>
+        <exclusion>
+            <groupId>jmock</groupId>
+            <artifactId>jmock</artifactId>
+        </exclusion>
+        <exclusion>
+            <groupId>xmlpull</groupId>
+            <artifactId>xmlpull</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+<!-- fix: native build error of: NoClassDefFoundError: jnr/unixsocket/Unix Socket -->
+<dependency>
+    <groupId>com.github.jnr</groupId>
+    <artifactId>jnr-unixsocket</artifactId>
+    <version>0.18</version>
+    <scope>runtime</scope>
+    <optional>true</optional>
+</dependency>
+<!-- END: Integration for Groovy -->
+```
+
+- Open [TestGroovyResource.java](src/main/java/com/wl4g/rengine/evaluator/rest/TestGroovyResource.java) restful type.
+
+- Build to native image.
+
+```bash
+# Should use java11+
+export JAVA_HOME=/usr/local/jdk-11.0.10/
+./mvnw package -f evaluator/pom.xml \
+-Dmaven.test.skip=true -DskipTests -Dnative \
+-Dquarkus.native.container-build=true \
+-Dquarkus.native.container-runtime=docker \
+-Dquarkus.native.builder-image=quay.io/quarkus/ubi-quarkus-native-image:21.2-java16
+```
+
+- Run native image.
+
+```bash
+./target/rengine-evaluator-native
+```
+
+- Generate testing groovy script to local path.
+
+```bash
+cat <<'EOF' >/tmp/TestFunction.groovy
+import java.util.List;
+import java.util.function.Function;
+class TestFunction implements Function<List<String>, String> {
+    String apply(List<String> args) {
+        System.out.println("Input args: "+ args);
+        return "ok, This is the result of the function executed ..";
+    }
+}
+EOF
+```
+
+- Mocking request execution
+
+```bash
+curl -v -XPOST -H 'Content-Type: application/json' 'http://localhost:28002/test/groovy/execution' -d '{
+    "scriptPath": "file:///tmp/TestFunction.groovy",
+    "args": ["jack01", "66"]
+}'
+```
+
+- Tail logs
+
+```bash
+tail -f /tmp/rengine/evaluator.log | jq -r '.message'
+```
+
+### What are the problems if I want to integrate quarkus+groovy and build a native image?
+
+- ***Limitations***: Groovy is not a first class citizen for GraalVM’s ahead-of-time compilation by design, and that is why you can’t expect that your Groovy program will compile to the native image successfully. Below is the list of the major limitations that cannot be avoided: GraalVM’s SubstrateVM does not support dynamic class loading, dynamic class generation, and bytecode InvokeDynamic. This limitation makes dynamic Groovy scripts and classes almost 99% incompatible with building native images, So if you want to run on the native image, you can only open the static compilation mode of groovy. see: [https://e.printstacktrace.blog/graalvm-and-groovy-how-to-start/](https://e.printstacktrace.blog/graalvm-and-groovy-how-to-start/)
+
+- Related difficult refer to see: [github.com/quarkusio/quarkus/issues/2720](https://github.com/quarkusio/quarkus/issues/2720)
 
