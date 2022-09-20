@@ -97,6 +97,8 @@
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
         <!-- see:https://github.com/quarkusio/quarkus-quickstarts/blob/2.12.2.Final/getting-started/pom.xml -->
         <quarkus.platform.version>2.12.2.Final</quarkus.platform.version>
+        <!-- <groovy.version>4.0.4</groovy.version>-->
+        <graalvm.version>22.2.0</graalvm.version>
         <compiler-plugin.version>3.8.1</compiler-plugin.version>
         <surefire-plugin.version>3.0.0-M7</surefire-plugin.version>
         <maven.compiler.source>11</maven.compiler.source>
@@ -132,7 +134,7 @@
             <groupId>com.wl4g</groupId>
             <artifactId>rengine-common</artifactId>
         </dependency>
-
+        <!-- Bridge with spring -->
         <!-- <dependency>-->
         <!--     <groupId>io.quarkus</groupId>-->
         <!--     <artifactId>quarkus-spring-web</artifactId>-->
@@ -230,53 +232,84 @@
         <!--     <groupId>com.acme</groupId>-->
         <!--     <artifactId>custom-micrometer-registry</artifactId>-->
         <!-- </dependency>-->
-
-        <!-- START: Integration for Groovy -->
-        <!-- <dependency>-->
-        <!--     <groupId>org.apache.groovy</groupId>-->
-        <!--     <artifactId>groovy</artifactId>-->
-        <!-- </dependency>-->
-        <!-- fix: native build error of: org.codehaus.groovy.control.SourceUnit is registered for linking at image build time by command line ...
-caused by: org.codehaus.groovy.control.XStreamUtils.serialze(String,Object) not found? see:https://github.com/quarkusio/quarkus/issues/2720
-and see:https://github.com/apache/groovy/blob/GROOVY_4_0_5/build.gradle#L98 -->
-        <!-- <dependency>-->
-        <!--     <groupId>com.thoughtworks.xstream</groupId>-->
-        <!--     <artifactId>xstream</artifactId>-->
-        <!--     <version>1.4.19</version>-->
-        <!--     <exclusions>-->
-        <!--         <exclusion>-->
-        <!--             <groupId>xpp3</groupId>-->
-        <!--             <artifactId>xpp3_min</artifactId>-->
-        <!--         </exclusion>-->
-        <!--         <exclusion>-->
-        <!--             <groupId>junit</groupId>-->
-        <!--             <artifactId>junit</artifactId>-->
-        <!--         </exclusion>-->
-        <!--         <exclusion>-->
-        <!--             <groupId>jmock</groupId>-->
-        <!--             <artifactId>jmock</artifactId>-->
-        <!--         </exclusion>-->
-        <!--         <exclusion>-->
-        <!--             <groupId>xmlpull</groupId>-->
-        <!--             <artifactId>xmlpull</artifactId>-->
-        <!--         </exclusion>-->
-        <!--     </exclusions>-->
-        <!-- </dependency>-->
-        <!-- fix: native build error of: NoClassDefFoundError: jnr/unixsocket/Unix Socket -->
-        <!-- <dependency>-->
-        <!--     <groupId>com.github.jnr</groupId>-->
-        <!--     <artifactId>jnr-unixsocket</artifactId>-->
-        <!--     <version>0.18</version>-->
-        <!--     <scope>runtime</scope>-->
-        <!--     <optional>true</optional>-->
-        <!-- </dependency>-->
-        <!-- END: Integration for Groovy -->
-
         <!-- OSS -->
         <dependency>
             <groupId>io.minio</groupId>
             <artifactId>minio</artifactId>
         </dependency>
+
+        <!-- START: Integration for Groovy script engine -->
+        <dependency>
+            <groupId>org.apache.groovy</groupId>
+            <artifactId>groovy</artifactId>
+        </dependency>
+        <!-- fix: native build error of: org.codehaus.groovy.control.SourceUnit is registered for linking at image build time by command line ...
+caused by: org.codehaus.groovy.control.XStreamUtils.serialze(String,Object) not found? see:https://github.com/quarkusio/quarkus/issues/2720
+and see:https://github.com/apache/groovy/blob/GROOVY_4_0_5/build.gradle#L98 -->
+        <dependency>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.4.19</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>xpp3</groupId>
+                    <artifactId>xpp3_min</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jmock</groupId>
+                    <artifactId>jmock</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xmlpull</groupId>
+                    <artifactId>xmlpull</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- fix: native build error of: NoClassDefFoundError: jnr/unixsocket/Unix Socket -->
+        <dependency>
+            <groupId>com.github.jnr</groupId>
+            <artifactId>jnr-unixsocket</artifactId>
+            <version>0.18</version>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <!-- END: Integration for Groovy script engine -->
+
+        <!-- START: Integration for Javascript(graal.js/nashorn) script engine -->
+        <!-- see: https://github.com/graalvm/graal-js-jdk11-maven-demo/blob/master/pom.xml -->
+        <dependency>
+            <groupId>org.graalvm.sdk</groupId>
+            <artifactId>graal-sdk</artifactId>
+            <!-- <version>${graalvm.version}</version>-->
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.js</groupId>
+            <artifactId>js</artifactId>
+            <version>${graalvm.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.js</groupId>
+            <artifactId>js-scriptengine</artifactId>
+            <version>${graalvm.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.tools</groupId>
+            <artifactId>profiler</artifactId>
+            <version>${graalvm.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.tools</groupId>
+            <artifactId>chromeinspector</artifactId>
+            <version>${graalvm.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- END: Integration for Javascript(graal.js/nashorn) script engine -->
 
         <dependency>
             <groupId>io.quarkus</groupId>
