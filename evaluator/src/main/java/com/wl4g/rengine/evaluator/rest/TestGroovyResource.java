@@ -83,7 +83,7 @@ public class TestGroovyResource {
 
     @POST
     @Path("/execution")
-    public RespBase<Object> execution(GroovyExecution model) throws Exception {
+    public RespBase<Object> execution(GroovyExecution model) throws Throwable {
         log.info("called: groovy execution ...");
 
         try (GroovyClassLoader gcl = new GroovyClassLoader()) {
@@ -103,7 +103,7 @@ public class TestGroovyResource {
             log.info("Groovy execution result: {}", result);
 
             return RespBase.create().withData(result);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             log.error("Failed to excution groovy script.", e);
             throw e;
         }

@@ -33,7 +33,7 @@ curl -v -XPOST \
 
 ## Development Guide
 
-### build for JVM
+### Build for JVM
 
 - First fully build the dependent modules.
 
@@ -44,7 +44,7 @@ cd rengine
 ./mvnw clean install -DskipTests -Dmaven.test.skip=true -T 2C
 ```
 
-### build for native image
+### Build for native image
 
 - Then build as a native image.
 
@@ -62,7 +62,7 @@ export JAVA_HOME=/usr/local/jdk-11.0.10/
 -Dquarkus.native.builder-image=quay.io/quarkus/ubi-quarkus-native-image:21.2-java16
 ```
 
-### testing run native groovy
+### Testing request groovy api with run native image
 
 - Generate groovy script to server local path.
 
@@ -80,7 +80,7 @@ class TestFunction implements Function<List<String>, String> {
 EOF
 ```
 
-- Execution grovvy script
+- Request execution grovvy script
 
 ```bash
 curl -v -XPOST -H 'Content-Type: application/json' 'http://localhost:28002/test/groovy/execution' -d '{
@@ -89,7 +89,13 @@ curl -v -XPOST -H 'Content-Type: application/json' 'http://localhost:28002/test/
 }'
 ```
 
-### build for container image
+- Tail logs
+
+```bash
+tail -f /tmp/rengine/evaluator.log | jq -r '.message'
+```
+
+### Build for container image
 
 - Then build as a container image.
 
@@ -122,7 +128,7 @@ curl -v localhost:28002/metrics
 
 ## FAQ
 
-### Groovy+Quarkus support build native-image mode?
+### Quarkus+Groovy support build native-image mode?
 
-- The attempted support but unfortunately failed, see: [github.com/quarkusio/quarkus/issues/2720](https://github.com/quarkusio/quarkus/issues/2720)
+- After a lot of hardships and N times of failed test configuration and construction, I finally successfully built a native image that integrates groovy and can run normally (currently only recommended to run in the test environment), related difficult questions see: [github.com/quarkusio/quarkus/issues/2720](https://github.com/quarkusio/quarkus/issues/2720)
 
