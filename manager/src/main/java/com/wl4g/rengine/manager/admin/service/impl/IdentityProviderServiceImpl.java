@@ -30,8 +30,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import com.wl4g.rengine.common.bean.IdentityProvider;
-import com.wl4g.rengine.manager.admin.model.AddIdentityProvider;
-import com.wl4g.rengine.manager.admin.model.AddIdentityProviderResult;
+import com.wl4g.rengine.manager.admin.model.SaveIdentityProvider;
+import com.wl4g.rengine.manager.admin.model.SaveIdentityProviderResult;
 import com.wl4g.rengine.manager.admin.model.QueryIdentityProvider;
 import com.wl4g.rengine.manager.admin.model.QueryIdentityProviderResult;
 import com.wl4g.rengine.manager.admin.service.IdentityProviderService;
@@ -66,7 +66,7 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
     }
 
     @Override
-    public AddIdentityProviderResult save(AddIdentityProvider model) {
+    public SaveIdentityProviderResult save(SaveIdentityProvider model) {
         IdentityProvider provider = model.getProvider();
         if (isNull(provider.getId())) {
             provider.setId(IdGenUtil.next());
@@ -74,7 +74,7 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
         provider.setUpdateBy("admin");
         provider.setUpdateDate(new Date());
         IdentityProvider saved = mongoTemplate.insert(provider, MongoCollectionDefinition.SYS_IDP_CONFIG.getName());
-        return AddIdentityProviderResult.builder().id(saved.getId()).build();
+        return SaveIdentityProviderResult.builder().id(saved.getId()).build();
     }
 
 }

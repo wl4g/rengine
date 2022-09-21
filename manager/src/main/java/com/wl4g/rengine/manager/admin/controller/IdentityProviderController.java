@@ -25,8 +25,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.manager.admin.model.AddIdentityProvider;
-import com.wl4g.rengine.manager.admin.model.AddIdentityProviderResult;
+import com.wl4g.rengine.manager.admin.model.SaveIdentityProvider;
+import com.wl4g.rengine.manager.admin.model.SaveIdentityProviderResult;
 import com.wl4g.rengine.manager.admin.model.QueryIdentityProvider;
 import com.wl4g.rengine.manager.admin.model.QueryIdentityProviderResult;
 import com.wl4g.rengine.manager.admin.service.IdentityProviderService;
@@ -67,9 +67,9 @@ public class IdentityProviderController {
     @Operation(description = "Save Identity Provider model.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    public RespBase<AddIdentityProviderResult> save(@Validated @RequestBody AddIdentityProvider model) {
+    public RespBase<SaveIdentityProviderResult> save(@Validated @RequestBody SaveIdentityProvider model) {
         log.info("called: model={}", model);
-        RespBase<AddIdentityProviderResult> resp = RespBase.create();
+        RespBase<SaveIdentityProviderResult> resp = RespBase.create();
         resp.setData(identityProviderService.save(model));
         return resp;
     }

@@ -31,8 +31,8 @@ import org.springframework.stereotype.Service;
 
 import com.mongodb.client.result.DeleteResult;
 import com.wl4g.rengine.common.bean.Workflow;
-import com.wl4g.rengine.manager.admin.model.AddWorkflow;
-import com.wl4g.rengine.manager.admin.model.AddWorkflowResult;
+import com.wl4g.rengine.manager.admin.model.SaveWorkflow;
+import com.wl4g.rengine.manager.admin.model.SaveWorkflowResult;
 import com.wl4g.rengine.manager.admin.model.DeleteWorkflow;
 import com.wl4g.rengine.manager.admin.model.DeleteWorkflowResult;
 import com.wl4g.rengine.manager.admin.model.QueryWorkflow;
@@ -82,7 +82,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    public AddWorkflowResult save(AddWorkflow model) {
+    public SaveWorkflowResult save(SaveWorkflow model) {
         Workflow workflow = Workflow.builder()
                 .id(IdGenUtil.next())
                 .name(model.getName())
@@ -93,7 +93,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .updateDate(new Date())
                 .build();
         Workflow saved = mongoTemplate.insert(workflow, MongoCollectionDefinition.WORKFLOWS.getName());
-        return AddWorkflowResult.builder().id(saved.getId()).build();
+        return SaveWorkflowResult.builder().id(saved.getId()).build();
     }
 
     @Override

@@ -31,8 +31,8 @@ import org.springframework.stereotype.Service;
 
 import com.mongodb.client.result.DeleteResult;
 import com.wl4g.rengine.common.bean.Rule;
-import com.wl4g.rengine.manager.admin.model.AddRule;
-import com.wl4g.rengine.manager.admin.model.AddRuleResult;
+import com.wl4g.rengine.manager.admin.model.SaveRule;
+import com.wl4g.rengine.manager.admin.model.SaveRuleResult;
 import com.wl4g.rengine.manager.admin.model.DeleteRule;
 import com.wl4g.rengine.manager.admin.model.DeleteRuleResult;
 import com.wl4g.rengine.manager.admin.model.QueryRule;
@@ -80,7 +80,7 @@ public class RuleServiceImpl implements RuleService {
     }
 
     @Override
-    public AddRuleResult save(AddRule model) {
+    public SaveRuleResult save(SaveRule model) {
         Rule rule = Rule.builder()
                 .id(IdGenUtil.next())
                 .name(model.getName())
@@ -91,7 +91,7 @@ public class RuleServiceImpl implements RuleService {
                 .updateDate(new Date())
                 .build();
         Rule saved = mongoTemplate.insert(rule, MongoCollectionDefinition.RULES.getName());
-        return AddRuleResult.builder().id(saved.getId()).build();
+        return SaveRuleResult.builder().id(saved.getId()).build();
     }
 
     @Override

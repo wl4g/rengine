@@ -13,17 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.common.model;
+package com.wl4g.rengine.manager.admin.model;
 
-import java.util.Map;
+import com.wl4g.rengine.common.bean.UploadObject;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotBlank;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.wl4g.infra.common.validation.EnumValue;
-
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -31,10 +24,10 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link Evaluation}
+ * {@link UploadObject}
  * 
  * @author James Wong
- * @version 2022-09-18
+ * @version 2022-08-28
  * @since v3.0.0
  */
 @Getter
@@ -42,12 +35,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class Evaluation {
-    @Schema(name = "@kind", implementation = EvaluationKind.class)
-    @JsonProperty(value = "@kind")
-    private @NotBlank @EnumValue(enumCls = EvaluationKind.class) String kind;
-
-    private @NotBlank String service;
-    private @NotBlank String scenes;
-    private @Nullable Map<String, String> attachment;
+public class SaveUpload extends UploadObject {
 }

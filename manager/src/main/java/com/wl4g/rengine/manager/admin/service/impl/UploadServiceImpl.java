@@ -36,8 +36,8 @@ import com.wl4g.rengine.common.bean.UploadObject;
 import com.wl4g.rengine.common.bean.UploadObject.BizType;
 import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
-import com.wl4g.rengine.manager.admin.model.AddUpload;
-import com.wl4g.rengine.manager.admin.model.AddUploadResult;
+import com.wl4g.rengine.manager.admin.model.SaveUpload;
+import com.wl4g.rengine.manager.admin.model.SaveUploadResult;
 import com.wl4g.rengine.manager.admin.model.DeleteUpload;
 import com.wl4g.rengine.manager.admin.model.DeleteUploadResult;
 import com.wl4g.rengine.manager.admin.model.QueryUpload;
@@ -81,7 +81,7 @@ public class UploadServiceImpl implements UploadService {
                         .map(p -> UploadObject.builder()
                                 .bizType(p.getBizType())
                                 .id(p.getId())
-                                .prefix(p.getPrefix())
+                                .objectPrefix(p.getObjectPrefix())
                                 .filename(p.getFilename())
                                 .extension(p.getExtension())
                                 .labels(p.getLabels())
@@ -97,7 +97,7 @@ public class UploadServiceImpl implements UploadService {
                 .build();
     }
 
-    public AddUploadResult apply(AddUpload model) {
+    public SaveUploadResult apply(SaveUpload model) {
         // Authentication authentication =
         // SecurityContextHolder.getContext().getAuthentication();
         // System.out.println(authentication);
@@ -109,7 +109,7 @@ public class UploadServiceImpl implements UploadService {
         UploadObject upload = UploadObject.builder()
                 .bizType(model.getBizType())
                 .id(IdGenUtil.next())
-                .prefix(objectPrefix)
+                .objectPrefix(objectPrefix)
                 .filename(model.getFilename())
                 .extension(model.getExtension())
                 .labels(model.getLabels())
@@ -125,7 +125,7 @@ public class UploadServiceImpl implements UploadService {
         // New create temporary STS credentials.
         try {
             Credentials credentials = minioManager.createSTSCredentials(objectPrefix);
-            return AddUploadResult.builder()
+            return SaveUploadResult.builder()
                     .endpoint(config.getEndpoint())
                     .region(config.getRegion())
                     // .bucket(config.getBucket())
@@ -136,7 +136,7 @@ public class UploadServiceImpl implements UploadService {
                     .partSize(config.getUserUpload().getLibraryPartSize().toBytes())
                     .id(upload.getId())
                     .fileLimitSize(config.getUserUpload().getLibraryFileLimitSize().toBytes())
-                    .prefix(objectPrefix)
+                    .objectPrefix(objectPrefix)
                     .extension(config.getUserUpload().getLibraryExtensions())
                     .build();
         } catch (NoSuchAlgorithmException e) {

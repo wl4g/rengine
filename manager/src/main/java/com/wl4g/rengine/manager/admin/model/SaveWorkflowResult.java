@@ -22,7 +22,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link AddWorkflowResult}
+ * {@link SaveWorkflowResult}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -33,5 +33,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class AddWorkflowResult extends AddResultBase {
+public class SaveWorkflowResult extends SaveResultBase {
 }

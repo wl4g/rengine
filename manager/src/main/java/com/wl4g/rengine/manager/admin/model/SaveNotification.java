@@ -15,7 +15,7 @@
  */
 package com.wl4g.rengine.manager.admin.model;
 
-import com.wl4g.rengine.common.bean.UploadObject;
+import com.wl4g.rengine.common.bean.Notification;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,7 +24,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link UploadObject}
+ * {@link SaveNotification}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -35,5 +35,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class AddUpload extends UploadObject {
+public class SaveNotification {
+    private Notification provider;
 }

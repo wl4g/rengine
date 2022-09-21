@@ -22,7 +22,10 @@ import javax.inject.Singleton;
 
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.common.model.Evaluation;
+import com.wl4g.rengine.common.model.EvaluationKind;
 import com.wl4g.rengine.common.model.EvaluationResult;
+import com.wl4g.rengine.common.model.EvaluationResult.GenericEvaluationResult;
+import com.wl4g.rengine.common.model.EvaluationResult.ScoreEvaluationResult;
 import com.wl4g.rengine.evaluator.metrics.EvaluatorMeterService;
 import com.wl4g.rengine.evaluator.metrics.EvaluatorMeterService.MetricsTag;
 import com.wl4g.rengine.evaluator.service.EvaluatorService;
@@ -54,11 +57,33 @@ public class EvaluatorServiceImpl implements EvaluatorService {
                             MetricsTag.SCENES, model.getScenes())
                     .increment();
 
-            // TODO Auto-generated method stub
-            // ...
-
-            return resp;
+            return resp.withData(doEvaluation(model));
         });
+    }
+
+    private EvaluationResult doEvaluation(Evaluation model) {
+        switch (EvaluationKind.valueOf(model.getKind())) {
+        case GENERIC:
+            return doEvaluationWithGeneric(model);
+        case SCORE:
+            return doEvaluationWithScore(model);
+        default:
+            throw new Error("No should be here");
+        }
+    }
+
+    private EvaluationResult doEvaluationWithGeneric(Evaluation model) {
+        // TODO Auto-generated method stub
+        // ...
+
+        return GenericEvaluationResult.builder().data(null).build();
+    }
+
+    private EvaluationResult doEvaluationWithScore(Evaluation model) {
+        // TODO Auto-generated method stub
+        // ...
+
+        return ScoreEvaluationResult.builder().score(89f).build();
     }
 
 }

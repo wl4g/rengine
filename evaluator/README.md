@@ -25,7 +25,8 @@ curl -v -XPOST \
 'localhost:28002/evaluator/evaluate' \
 -d '{
   "scenes": "iot_warn",
-  "service": "collector"
+  "service": "collector",
+  "attachment": {}
 }'
 ```
 

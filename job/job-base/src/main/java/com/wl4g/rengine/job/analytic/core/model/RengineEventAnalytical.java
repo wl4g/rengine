@@ -13,25 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.common.event;
+package com.wl4g.rengine.job.analytic.core.model;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
+
 import javax.validation.constraints.NotNull;
 
+import com.wl4g.rengine.common.event.RengineEvent;
+import com.wl4g.rengine.common.event.RengineEvent.EventSource;
+
+import lombok.Builder.Default;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
 /**
- * {@link SuccessAuthenticationEvent}
+ * {@link RengineEventAnalytical}
  * 
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
- * @version 2022-05-30 v3.0.0
+ * @version 2022-06-08 v3.0.0
  * @since v3.0.0
  */
-public class SuccessAuthenticationEvent extends RengineEventBase {
-    private static final long serialVersionUID = -8912834545311079238L;
-
-    public SuccessAuthenticationEvent(@NotNull Object source, @NotBlank String remoteIp, @NotBlank String coordinates,
-            @Nullable String message) {
-        super(EventType.AUTHC_SUCCESS, source, remoteIp, coordinates, message);
-    }
-
+@Data
+@SuperBuilder
+@NoArgsConstructor
+public class RengineEventAnalytical implements Serializable {
+    private static final long serialVersionUID = -3297058243453003737L;
+    public static final RengineEvent DEFAULT_EMPTY = new RengineEvent("__default_empty_event", EventSource.builder().build());
+    private @NotNull @Default RengineEvent event = DEFAULT_EMPTY;
 }

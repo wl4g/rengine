@@ -20,7 +20,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import com.wl4g.rengine.common.event.RengineEventBase;
+import com.wl4g.rengine.common.event.RengineEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
@@ -33,7 +33,7 @@ import lombok.CustomLog;
  * @since v3.0.0
  */
 @CustomLog
-public class LoggingRengineEventBusService implements RengineEventBusService<RengineEventBase> {
+public class LoggingRengineEventBusService implements RengineEventBusService<RengineEvent> {
 
     @Override
     public Object getOriginal() {
@@ -41,15 +41,15 @@ public class LoggingRengineEventBusService implements RengineEventBusService<Ren
     }
 
     @Override
-    public Future<RengineEventBase> publish(RengineEventBase event) {
+    public Future<RengineEvent> publish(RengineEvent event) {
         log.info("On event: {}", event);
         return new NoneFuture(event);
     }
 
     @AllArgsConstructor
-    static class NoneFuture implements Future<RengineEventBase> {
+    static class NoneFuture implements Future<RengineEvent> {
 
-        private final RengineEventBase event;
+        private final RengineEvent event;
 
         @Override
         public boolean cancel(boolean mayInterruptIfRunning) {
@@ -67,12 +67,12 @@ public class LoggingRengineEventBusService implements RengineEventBusService<Ren
         }
 
         @Override
-        public RengineEventBase get() throws InterruptedException, ExecutionException {
+        public RengineEvent get() throws InterruptedException, ExecutionException {
             return event;
         }
 
         @Override
-        public RengineEventBase get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+        public RengineEvent get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
             return event;
         }
     }

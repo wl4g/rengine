@@ -15,6 +15,8 @@
  */
 package com.wl4g.rengine.manager.admin.model;
 
+import com.wl4g.rengine.common.bean.Project;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,7 +24,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link AddRuleResult}
+ * {@link SaveProject}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -33,5 +35,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class AddRuleResult extends AddResultBase {
+public class SaveProject extends Project {
 }

@@ -22,7 +22,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link AddIdentityProviderResult}
+ * {@link SaveRuleResult}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -33,5 +33,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class AddIdentityProviderResult extends AddResultBase {
+public class SaveRuleResult extends SaveResultBase {
 }

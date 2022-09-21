@@ -15,8 +15,8 @@
  */
 package com.wl4g.rengine.manager.admin.service;
 
-import com.wl4g.rengine.manager.admin.model.AddWorkflow;
-import com.wl4g.rengine.manager.admin.model.AddWorkflowResult;
+import com.wl4g.rengine.manager.admin.model.SaveWorkflow;
+import com.wl4g.rengine.manager.admin.model.SaveWorkflowResult;
 import com.wl4g.rengine.manager.admin.model.DeleteWorkflow;
 import com.wl4g.rengine.manager.admin.model.DeleteWorkflowResult;
 import com.wl4g.rengine.manager.admin.model.QueryWorkflow;
@@ -33,7 +33,7 @@ public interface WorkflowService {
 
     QueryWorkflowResult query(QueryWorkflow model);
 
-    AddWorkflowResult save(AddWorkflow model);
+    SaveWorkflowResult save(SaveWorkflow model);
 
     DeleteWorkflowResult delete(DeleteWorkflow model);
 

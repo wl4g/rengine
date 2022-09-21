@@ -15,7 +15,10 @@
  */
 package com.wl4g.rengine.manager.admin.model;
 
-import com.wl4g.rengine.common.bean.IdentityProvider;
+import java.util.List;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,7 +27,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link AddIdentityProvider}
+ * {@link SaveUploadResult}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -35,6 +38,20 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class AddIdentityProvider {
-    private IdentityProvider provider;
+public class SaveUploadResult {
+
+    private @NotBlank String endpoint;
+    private @NotBlank int port;
+    private @NotBlank String region;
+    // private @NotBlank String useSSL;
+    private @NotBlank String bucket;
+    private @NotBlank String accessKey;
+    private @NotBlank String secretKey;
+    private @NotBlank String sessionToken;
+    private @NotBlank long partSize;
+
+    private @NotBlank Long id;
+    private @NotBlank long fileLimitSize;
+    private @NotBlank String objectPrefix;
+    private @NotEmpty List<String> extension;
 }

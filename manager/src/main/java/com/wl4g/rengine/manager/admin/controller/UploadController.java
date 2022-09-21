@@ -27,12 +27,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.manager.admin.model.AddUpload;
+import com.wl4g.rengine.manager.admin.model.SaveUpload;
 import com.wl4g.rengine.manager.admin.model.DeleteUpload;
 import com.wl4g.rengine.manager.admin.model.DeleteUploadResult;
 import com.wl4g.rengine.manager.admin.model.QueryUpload;
 import com.wl4g.rengine.manager.admin.model.QueryUploadResult;
-import com.wl4g.rengine.manager.admin.model.AddUploadResult;
+import com.wl4g.rengine.manager.admin.model.SaveUploadResult;
 import com.wl4g.rengine.manager.admin.service.UploadService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -74,9 +74,9 @@ public class UploadController {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful",
             content = { @Content(mediaType = "application/json") }) })
     @RequestMapping(path = { "apply" }, method = { POST })
-    public RespBase<AddUploadResult> apply(@Validated @RequestBody AddUpload model) {
+    public RespBase<SaveUploadResult> apply(@Validated @RequestBody SaveUpload model) {
         log.info("called: model={}", model);
-        RespBase<AddUploadResult> resp = RespBase.create();
+        RespBase<SaveUploadResult> resp = RespBase.create();
         resp.setData(uploadService.apply(model));
         return resp;
     }

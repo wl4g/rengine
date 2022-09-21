@@ -29,6 +29,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.wl4g.infra.common.validation.EnumValue;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -52,7 +53,8 @@ public class UploadObject extends BeanBase {
 
     @Schema(implementation = UploadObject.BizType.class)
     private @NotBlank @EnumValue(enumCls = UploadObject.BizType.class) String bizType;
-    private @NotBlank String prefix;
+    // Save API front-end without objectPrefix.
+    private @NotBlank @Schema(hidden = false, accessMode = AccessMode.READ_ONLY) String objectPrefix;
     private @NotBlank String filename;
     private @NotBlank String extension;
     private @Nullable List<String> labels;

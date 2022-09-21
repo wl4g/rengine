@@ -15,7 +15,7 @@
  */
 package com.wl4g.rengine.manager.admin.model;
 
-import com.wl4g.rengine.common.bean.Rule;
+import com.wl4g.rengine.common.bean.Workflow;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,7 +24,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link AddRule}
+ * {@link SaveWorkflow}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -35,5 +35,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class AddRule extends Rule {
+public class SaveWorkflow extends Workflow {
 }

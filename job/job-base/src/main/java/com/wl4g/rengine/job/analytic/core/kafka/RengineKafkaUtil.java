@@ -24,7 +24,7 @@ import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsIni
 import org.apache.kafka.clients.consumer.OffsetResetStrategy;
 
 import com.wl4g.rengine.job.analytic.core.RengineFlinkStreamingBase;
-import com.wl4g.rengine.job.analytic.core.model.RengineEventAnalyticalModel;
+import com.wl4g.rengine.job.analytic.core.model.RengineEventAnalytical;
 
 /**
  * {@link RenginePulsarUtil}
@@ -52,7 +52,7 @@ public abstract class RengineKafkaUtil {
             // or equals a timestamp.
             offsets = OffsetsInitializer.timestamp(program.getFromOffsetTime());
         }
-        KafkaSource<RengineEventAnalyticalModel> source = KafkaSource.<RengineEventAnalyticalModel> builder()
+        KafkaSource<RengineEventAnalytical> source = KafkaSource.<RengineEventAnalytical> builder()
                 .setBootstrapServers(program.getBrokers())
                 .setGroupId(program.getGroupId())
                 .setTopicPattern(Pattern.compile(program.getTopicPattern()))

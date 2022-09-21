@@ -15,9 +15,16 @@
  */
 package com.wl4g.rengine.common.event;
 
+import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
+import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+import static java.lang.System.currentTimeMillis;
+import static java.util.Collections.singletonList;
+import static org.junit.Assert.assertNotNull;
+
 import org.junit.Test;
 
-import com.wl4g.rengine.common.event.RengineEventBase.EventType;
+import com.wl4g.rengine.common.event.RengineEvent.EventSource;
+import com.wl4g.rengine.common.event.RengineEvent.EventSourceIPLocation;
 
 /**
  * {@link RengineEventTests}
@@ -28,21 +35,38 @@ import com.wl4g.rengine.common.event.RengineEventBase.EventType;
  */
 public class RengineEventTests {
 
-    @SuppressWarnings({ "serial", "deprecation" })
     @Test
-    public void testIamEventTo() {
-        RengineEventBase event = new RengineEventBase(EventType.AUTHC_SUCCESS, "user1", "1.1.1.1", "113.12314,23.234235",
-                "successful") {
-        };
-        System.out.println(RengineEventBase.to(event));
+    public void testEventToJson() {
+        RengineEvent event = new RengineEvent("device_temp_warning",
+                EventSource.builder()
+                        .sourceTime(currentTimeMillis())
+                        .principals(singletonList("admin"))
+                        .ipLocation(EventSourceIPLocation.builder().address("1.1.1.1").zipcode("20500").build())
+                        .build(),
+                "A serious alarm occurs when the device temperature is greater than 52℃");
+        System.out.println(toJSONString(event));
     }
 
-    @SuppressWarnings({ "deprecation" })
     @Test
-    public void testIamEventFrom() {
-        String json = "{\"eventType\":\"UNKNOWN\",\"source\":\"user1\",\"message\":\"successful\",\"timestamp\":1654589341786}";
-        RengineEventBase event = RengineEventBase.from(json);
-        System.out.println(event);
+    public void testEventFromJson() {
+        String json = "{\"source\":{\"sourceTime\":null,\"ipLocation\":{\"ipAddress\":\"1.1.1.1\",\"countryShort\":null,\"countryLong\":null,\"region\":\"Pennsylvania Avenue\",\"city\":\"Washington\",\"isp\":null,\"latitude\":null,\"longitude\":null,\"domain\":null,\"zipcode\":null,\"netspeed\":null,\"timezone\":null,\"iddcode\":null,\"areacode\":\"20500\",\"weatherstationcode\":null,\"weatherstationname\":null,\"mcc\":null,\"mnc\":null,\"mobilebrand\":null,\"elevation\":null,\"usagetype\":null,\"addresstype\":null,\"category\":null}},\"eventType\":\"device_temp_warning\",\"observedTime\":1663744904483,\"body\":\"A serious alarm occurs when the device temperature is greater than 52℃\",\"attributes\":{}}";
+        RengineEvent event = parseJSON(json, RengineEvent.class);
+        System.out.println("   EventType: " + event.getEventType());
+        System.out.println("ObservedTime: " + event.getObservedTime());
+        System.out.println("      Source: " + event.getSource());
+        System.out.println("  Attributes: " + event.getAttributes());
+    }
+
+    @Test
+    public void testNotnullWithDefault() {
+        EventSource source1 = new EventSource();
+        assertNotNull(source1.getIpLocation());
+
+        EventSource source2 = EventSource.builder().build();
+        assertNotNull(source2.getIpLocation());
+
+        RengineEvent event1 = new RengineEvent("test_event", source1);
+        assertNotNull(event1.getSource());
     }
 
 }
