@@ -38,16 +38,17 @@ BASE_DIR="$(cd "`dirname "$0"`"/..; pwd)"
 #
 
 # Note that the application name must be the same as the boot jar file name. (Short name is recommended)
-APP_NAME="rengine-manager"
-MAIN_CLASS="com.wl4g.RengineManager"
-APP_VERSION="1.0.0"
-APP_PROFILE="pro"
+APP_NAME="${APP_NAME:rengine-evaluator}"
+APP_VERSION="${APP_VERSION:1.0.0}"
+APP_PROFILE="${APP_PROFILE:pro}"
+MAIN_CLASS="${MAIN_CLASS:com.wl4g.RengineEvaluator}"
 
 # Need to enable the willcard classpath? (Enable: "1", otherwise not enabled),
 # When enabled, the generated startup script will contain wildcard loads e.g. "java -cp /usr/local/myapp1/lib/*"
-ENABLE_WILDCARD_CLASSPATH="1"
+ENABLE_WILDCARD_CLASSPATH="${ENABLE_WILDCARD_CLASSPATH:1}"
 
-DAEMON_MODE='true'
+# Running in daemon mode?
+DAEMON_MODE="${DAEMON_MODE:true}"
 
 # App home and config directory define.
 APP_HOME=$BASE_DIR
@@ -125,7 +126,8 @@ fi
 if [ -z "$JVM_PERFORMANCE_OPTS" ]; then
   # The `-server` parameter indicates that the current JVM is activated in server or client mode (only the old 32 bit JDK is supported),
   # and is not supported in the current 64 bit JDK. 
-  JVM_PERFORMANCE_OPTS="-XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:+DisableExplicitGC -Djava.awt.headless=true"
+  JVM_PERFORMANCE_OPTS="-Djava.awt.headless=true -XX:MetaspaceSize=64m -XX:MaxMetaspaceSize=128m -XX:PermSize=256m -XX:MaxPermSize=512m \
+-XX:MaxDirectMemorySize=1G -XX:NativeMemoryTracking=off"
 
   # The -XX:HeapDumpOnOutOfMemoryError parameter generates a snapshot under the XX:HeapDumpPath when a memory overflow occurs in JVM,
   # and the default path is user.dir.
@@ -156,6 +158,7 @@ fi
 #
 
 if [ -z "$GC_LOG_OPTS" ]; then # Enable default loggc args
+  GC_LOG_OPTS="-XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:+DisableExplicitGC"
   GC_LOG_FILE_NAME="${APP_NAME}-gc.log"
 
   # the first segment of the version number, which is '1' for releases before Java 9
@@ -163,9 +166,9 @@ if [ -z "$GC_LOG_OPTS" ]; then # Enable default loggc args
   # e.g: openjdk version "11.0.10" 2021-01-19
   JAVA_MAJOR_VERSION=$($JAVA -version 2>&1 | sed -E -n 's/.* version "([^.-]*).*"/\1/p' | awk -F ' ' '{print $1}')
   if [[ "$JAVA_MAJOR_VERSION" -ge "9" ]] ; then
-    GC_LOG_OPTS="-Xlog:gc*:file=$LOG_DIR/$GC_LOG_FILE_NAME:time,tags:filecount=10,filesize=102400"
+    GC_LOG_OPTS="$GC_LOG_OPTS -Xlog:gc*:file=$LOG_DIR/$GC_LOG_FILE_NAME:time,tags:filecount=10,filesize=102400"
   else
-    GC_LOG_OPTS="-Xloggc:${LOG_DIR}/${GC_LOG_FILE_NAME} -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps \
+    GC_LOG_OPTS="$GC_LOG_OPTS -Xloggc:${LOG_DIR}/${GC_LOG_FILE_NAME} -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps \
 -XX:+PrintGCTimeStamps -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=10 -XX:GCLogFileSize=100M"
   fi
 fi
@@ -245,13 +248,20 @@ if [ $CLASSPATH_ORDERED_LEN -gt 1 ]; then
 
 fi
 
-# --- App options settings. ---
+#
+# --- APP options settings. ---
 #
 if [ -z "$APP_OPTS" ]; then
-  APP_OPTS="$APP_OPTS --spring.application.name=${APP_NAME}"
-  APP_OPTS="$APP_OPTS --spring.profiles.active=${APP_PROFILE}"
-  APP_OPTS="$APP_OPTS --server.tomcat.basedir=${DATA_DIR}"
-  APP_OPTS="$APP_OPTS --logging.file.name=${LOG_DIR}/${APP_NAME}_${APP_PROFILE}.log"
+  # Add the core options arguments it supports according to different application types.
+  if [ -n "$(ls lib/* | grep -E lib/spring-boot)" ]; then # This is spring-boot app?
+    APP_OPTS="$APP_OPTS --spring.application.name=${APP_NAME}"
+    APP_OPTS="$APP_OPTS --spring.profiles.active=${APP_PROFILE}"
+    APP_OPTS="$APP_OPTS --server.tomcat.basedir=${DATA_DIR}"
+    APP_OPTS="$APP_OPTS --logging.file.name=${LOG_DIR}/${APP_NAME}_${APP_PROFILE}.log"
+  else if [ -n "$(ls lib/* | grep -E lib/quarkus-core)" ]; then # This is quarkus app?
+    APP_OPTS="$APP_OPTS -Dquarkus.application.name=${APP_NAME}"
+    APP_OPTS="$APP_OPTS -Dquarkus.log.file.path=${LOG_DIR}/${APP_NAME}_${APP_PROFILE}.log"
+  fi
 fi
 
 # Check directory.

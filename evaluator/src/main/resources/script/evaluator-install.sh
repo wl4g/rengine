@@ -8,7 +8,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-#set -e
+set -e
 
 #
 # ===== Global define =====
@@ -264,7 +264,7 @@ if [ -f "/bin/systemctl" ]; then
 cat<<EOF>$SERVICE_FILE
 # See:http://www.ruanyifeng.com/blog/2016/03/systemd-tutorial-commands.html
 [Unit]
-Description=$APP_NAME - lightweight high availability service based on spring cloud
+Description=$APP_NAME - lightweight high availability application server based on JVM
 After=network.target remote-fs.target nss-lookup.target
 
 [Service]

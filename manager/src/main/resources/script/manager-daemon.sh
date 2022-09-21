@@ -8,6 +8,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+set -e
 
 # Source function library.
 . /etc/rc.d/init.d/functions

@@ -99,6 +99,7 @@ quarkus:
     readiness-path: /ready
     startup-path: /started
   micrometer:
+    enabled: true
     registry-enabled-default: true
     binder-enabled-default: true
     binder:
@@ -113,6 +114,7 @@ quarkus:
         enabled: true
         path: /metrics
   opentelemetry:
+    enabled: true
     propagators: [tracecontext,baggage]
     tracer:
       resource-attributes: {}

@@ -290,7 +290,6 @@ and see:https://github.com/apache/groovy/blob/GROOVY_4_0_5/build.gradle#L98 -->
             <groupId>org.graalvm.js</groupId>
             <artifactId>js</artifactId>
             <version>${graalvm.version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.graalvm.js</groupId>
