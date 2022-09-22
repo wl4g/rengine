@@ -53,14 +53,15 @@ cd rengine
 
 - [Quarkus building-native-image#container-runtime](https://quarkus.io/guides/building-native-image#container-runtime)
 
+- **Notice:** As of `GraalVM 22.2` the `language:js` plugin has been removed from the default plugin list, and needs to be installed manually by run `$GRAALVM_HOME/bin/gu install js`
+
 ```bash
 # Should use java11+
 export JAVA_HOME=/usr/local/jdk-11.0.10/
 ./mvnw package -f evaluator/pom.xml \
 -Dmaven.test.skip=true -DskipTests -Dnative \
 -Dquarkus.native.container-build=true \
--Dquarkus.native.container-runtime=docker \
--Dquarkus.native.builder-image=quay.io/quarkus/ubi-quarkus-native-image:22.2-java11
+-Dquarkus.native.container-runtime=docker
 ```
 
 ### Build for container image
@@ -93,6 +94,7 @@ curl -v localhost:28002/metrics
 ### Native Troubleshooting
 
 - https://quarkus.io/guides/native-reference#profiling
+
 
 ## FAQ
 

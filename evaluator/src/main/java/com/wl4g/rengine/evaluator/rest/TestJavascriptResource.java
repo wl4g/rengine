@@ -15,19 +15,15 @@
  */
 package com.wl4g.rengine.evaluator.rest;
 
-import static com.wl4g.infra.common.lang.Assert2.notNull;
-
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.script.Invocable;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
+import javax.enterprise.event.Observes;
+import javax.inject.Singleton;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -38,10 +34,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.Source;
+import org.graalvm.polyglot.Value;
 
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.evaluator.rest.interceptor.CustomValid;
 
+import io.quarkus.runtime.StartupEvent;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -61,60 +60,80 @@ import lombok.extern.slf4j.Slf4j;
 @CustomValid
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+// 注1: 当编译为native运行时, 必须显示指定单例, 否则方法体中使用成员属性会空指针. (但使用JVM运行时却不会?)
+@Singleton
 public class TestJavascriptResource {
 
     @NotNull
-    Context context;
+    Context polyglotContext;
 
-    @NotNull
-    ScriptEngineManager engineManager;
+    // @NotNull
+    // ScriptEngineManager engineManager;
 
-    @PostConstruct
+    void onStart(@Observes StartupEvent event) {
+        init();
+    }
+
+    // @PostConstruct
     void init() {
         try {
-            log.info("Init graalvm context ...");
-            this.context = Context.create();
-            this.engineManager = new ScriptEngineManager();
+            log.info("Initialzing graalvm polyglot context ...");
+            polyglotContext = Context.create();
         } catch (Exception e) {
-            log.error("Failed to init graalvm context.", e);
+            log.error("Failed to init graalvm polyglot context.", e);
         }
+        // try {
+        // log.info("Initialzing script engine manager ...");
+        // engineManager = new ScriptEngineManager();
+        // } catch (Exception e) {
+        // log.error("Failed to init script engine manager.", e);
+        // }
     }
 
     @PreDestroy
     void destroy() {
         try {
-            log.info("Destroy graalvm context ...");
-            this.context.close();
+            log.info("Destroy graalvm polyglot context ...");
+            polyglotContext.close();
         } catch (Exception e) {
-            log.error("Failed to destroy graalvm context.", e);
+            log.error("Failed to destroy graalvm polyglot context.", e);
         }
     }
 
     @POST
     @Path("/execution")
     public RespBase<Object> execution(JavascriptExecution model) throws Throwable {
-        log.info("called: Javascript execution ...");
+        log.info("called: Javascript execution ... {}", model);
 
         try {
-            log.info("Javascript script path: {}", model.getScriptPath());
-
+            log.info("Javascript script ...");
             String codes = Files.readString(Paths.get(URI.create(model.getScriptPath())), Charset.forName("UTF-8"));
-            log.info("Load Javascript codes: {}", codes);
+            log.info("Loaded Javascript codes: {}", codes);
 
-            ScriptEngine engine = engineManager.getEngineByName(model.getScriptEngine());
-            notNull(engine, "Cannot found script engine by %s", model.getScriptEngine());
-            log.info("Load Javascript engine: {}", engine);
+            // log.info("Loading engine by '{}' via {}",
+            // model.getScriptEngine(), engineManager);
+            // ScriptEngine engine=new GraalJSEngineFactory().getScriptEngine();
+            // ScriptEngine
+            // engine=engineManager.getEngineByName(model.getScriptEngine());
+            // notNull(engine,"Cannot found script engine by %s",
+            // model.getScriptEngine());
+            // log.info("Loaded Javascript engine: {}", engine);
 
-            engine.eval(codes);
-            final var result = ((Invocable) engine).invokeFunction(model.getScriptMain());
-            log.info("Javascript execution result: {}", result);
+            log.info("Javascript eval script ...");
+            polyglotContext.eval(Source.newBuilder("js", codes, model.getScriptPath()).build());
 
-            return RespBase.create().withData(result);
+            log.info("Javascript binding script ...");
+            Value primesMain = polyglotContext.getBindings("js").getMember(model.getScriptMain());
+
+            log.info("Javascript execute script ...");
+            Value result = primesMain.execute();
+            log.info("Javascript execution result: {}", result.toString());
+
+            return RespBase.create().withData(result.toString());
         } catch (Throwable e) {
             log.error("Failed to excution Javascript script.", e);
             throw e;
         }
-
     }
 
     @Data
