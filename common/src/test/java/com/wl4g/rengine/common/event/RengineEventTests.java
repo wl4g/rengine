@@ -24,7 +24,7 @@ import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 
 import com.wl4g.rengine.common.event.RengineEvent.EventSource;
-import com.wl4g.rengine.common.event.RengineEvent.EventSourceIPLocation;
+import com.wl4g.rengine.common.event.RengineEvent.EventLocation;
 
 /**
  * {@link RengineEventTests}
@@ -41,7 +41,7 @@ public class RengineEventTests {
                 EventSource.builder()
                         .sourceTime(currentTimeMillis())
                         .principals(singletonList("admin"))
-                        .ipLocation(EventSourceIPLocation.builder().address("1.1.1.1").zipcode("20500").build())
+                        .location(EventLocation.builder().ipAddress("1.1.1.1").zipcode("20500").build())
                         .build(),
                 "A serious alarm occurs when the device temperature is greater than 52℃");
         System.out.println(toJSONString(event));
@@ -60,10 +60,10 @@ public class RengineEventTests {
     @Test
     public void testNotnullWithDefault() {
         EventSource source1 = new EventSource();
-        assertNotNull(source1.getIpLocation());
+        assertNotNull(source1.getLocation());
 
         EventSource source2 = EventSource.builder().build();
-        assertNotNull(source2.getIpLocation());
+        assertNotNull(source2.getLocation());
 
         RengineEvent event1 = new RengineEvent("test_event", source1);
         assertNotNull(event1.getSource());

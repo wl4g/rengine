@@ -23,7 +23,7 @@ import org.junit.Test;
 
 import com.wl4g.rengine.common.event.RengineEvent;
 import com.wl4g.rengine.common.event.RengineEvent.EventSource;
-import com.wl4g.rengine.common.event.RengineEvent.EventSourceIPLocation;
+import com.wl4g.rengine.common.event.RengineEvent.EventLocation;
 import com.wl4g.rengine.job.analytic.core.model.RengineEventAnalytical;
 
 /**
@@ -42,8 +42,8 @@ public class EventToMutationConverterTests {
                         EventSource.builder()
                                 .sourceTime(currentTimeMillis())
                                 .principals(singletonList("admin"))
-                                .ipLocation(EventSourceIPLocation.builder()
-                                        .address("1.1.1.1")
+                                .location(EventLocation.builder()
+                                        .ipAddress("1.1.1.1")
                                         .city("Washington")
                                         .region("Pennsylvania Avenue")
                                         .zipcode("20500")

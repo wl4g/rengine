@@ -113,15 +113,15 @@ public class EventToMutationConverter implements HBaseMutationConverter<RengineE
     }
 
     protected String getGeoCityKey(@NotNull EventSource source) {
-        return fixFieldKey(source.getIpLocation().getCity());
+        return fixFieldKey(source.getLocation().getCity());
     }
 
     protected String getGeoRegionKey(@NotNull EventSource source) {
-        return fixFieldKey(source.getIpLocation().getRegion());
+        return fixFieldKey(source.getLocation().getRegion());
     }
 
     protected String getGeoCountryKey(@NotNull EventSource source) {
-        return fixFieldKey(source.getIpLocation().getCountry());
+        return fixFieldKey(source.getLocation().getCountry());
     }
 
     /**

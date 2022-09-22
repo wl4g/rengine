@@ -76,7 +76,7 @@ public class RengineEvent extends EventObject {
     private @NotNull @Min(0) Long observedTime;
 
     /**
-     * Event message body.
+     * Event body.
      */
     private @Nullable String body;
 
@@ -109,17 +109,19 @@ public class RengineEvent extends EventObject {
 
     @JsonCreator
     public static RengineEvent fromJson(JsonNode node) {
+        notNullOf(node, "node");
+
         String eventType = node.at("/eventType").asText();
         Long observedTime = node.at("/observedTime").asLong();
 
         Long sourceTime = node.at("/source/sourceTime").asLong();
-        EventSourceIPLocation ipLocation = parseFromNode(node, "/source/ipLocation", EventSourceIPLocation.class);
+        EventLocation location = parseFromNode(node, "/source/location", EventLocation.class);
 
         String body = node.at("/body").asText();
         Map<String, String> attributes = parseJSON(node.at("/attributes").asText(), HASHMAP_TYPEREF);
 
-        return new RengineEvent(eventType, observedTime,
-                EventSource.builder().sourceTime(sourceTime).ipLocation(ipLocation).build(), body, attributes);
+        return new RengineEvent(eventType, observedTime, EventSource.builder().sourceTime(sourceTime).location(location).build(),
+                body, attributes);
     }
 
     public static RengineEvent validate(RengineEvent event) {
@@ -141,14 +143,14 @@ public class RengineEvent extends EventObject {
     public static class EventSource {
         private @NotNull @Min(0) Long sourceTime;
         private @NotEmpty @Default List<String> principals = new ArrayList<>();
-        private @Nullable @Default EventSourceIPLocation ipLocation = EventSourceIPLocation.builder().build();
+        private @Nullable @Default EventLocation location = EventLocation.builder().build();
     }
 
     @Data
     @SuperBuilder
     @NoArgsConstructor
-    public static class EventSourceIPLocation {
-        private @Nullable String address;
+    public static class EventLocation {
+        private @Nullable String ipAddress;
         private @Nullable Boolean ipv6;
         private @Nullable String isp;
         private @Nullable String domain;

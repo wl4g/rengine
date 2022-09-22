@@ -24,7 +24,7 @@ import org.junit.Test;
 
 import com.wl4g.rengine.common.event.RengineEvent;
 import com.wl4g.rengine.common.event.RengineEvent.EventSource;
-import com.wl4g.rengine.common.event.RengineEvent.EventSourceIPLocation;
+import com.wl4g.rengine.common.event.RengineEvent.EventLocation;
 
 /**
  * {@link RengineEventAnalyticalTests}
@@ -42,7 +42,7 @@ public class RengineEventAnalyticalTests {
                         EventSource.builder()
                                 .sourceTime(currentTimeMillis())
                                 .principals(singletonList("admin"))
-                                .ipLocation(EventSourceIPLocation.builder().zipcode("20500").build())
+                                .location(EventLocation.builder().zipcode("20500").build())
                                 .build(),
                         "A serious alarm occurs when the device temperature is greater than 52℃"))
                 .build();
