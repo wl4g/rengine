@@ -13,15 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.evaluator.execution;
+package com.wl4g.rengine.evaluator.execution.spi;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import lombok.Getter;
 
 /**
- * {@link AbstractTreeExecution}
+ * {@link RengineContext}
  * 
  * @author James Wong
- * @version 2022-09-17
+ * @version 2022-09-22
  * @since v3.0.0
  */
-public class AbstractTreeExecution implements IExecution {
-
+@Getter
+public class RengineContext {
+    private final List<String> args = new ArrayList<>();
+    private final Map<String, Object> attributes = new HashMap<>();
 }

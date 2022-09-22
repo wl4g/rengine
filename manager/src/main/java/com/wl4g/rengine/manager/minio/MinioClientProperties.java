@@ -75,8 +75,6 @@ public class MinioClientProperties implements InitializingBean {
 
     private @NotBlank String tenantSecretKey = "12345678";
 
-    // private @NotBlank String bucket = "rengine";
-
     private UserUploadAssumeConfig userUpload = new UserUploadAssumeConfig();
 
     @Override
@@ -121,13 +119,6 @@ public class MinioClientProperties implements InitializingBean {
         private @NotEmpty List<S3Policy.Action> stsPolicyActions = asList(GetBucketLocationAction, GetBucketPolicyStatusAction,
                 ListBucketAction, ListAllMyBucketsAction, ListBucketMultipartUploadsAction, ListMultipartUploadPartsAction,
                 PutObjectAction, PutObjectLegalHoldAction, GetObjectAction, GetObjectLegalHoldAction);
-
-        // private @NotBlank String libraryObjectPrefix = "library";
-        // private @NotBlank String testsetObjectPrefix = "testset";
-
-        private @NotEmpty List<String> libraryExtensions = asList(".jar");
-
-        private @NotEmpty List<String> testsetExtensions = asList(".csv");
 
         /**
          * The adjusting partSize will affect whether the pubObject() of the

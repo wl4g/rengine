@@ -33,6 +33,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.google.common.io.Resources;
+import com.wl4g.infra.common.lang.EnvironmentUtil;
+import com.wl4g.infra.common.runtime.JvmRuntimeTool;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.evaluator.rest.interceptor.CustomValid;
 
@@ -84,6 +86,11 @@ public class TestGroovyResource {
     @Path("/execution")
     public RespBase<Object> execution(GroovyExecution model) throws Throwable {
         log.info("called: groovy execution ...");
+
+        // Limiting test process.
+        if (!JvmRuntimeTool.isJvmInDebugging && !EnvironmentUtil.getBooleanProperty("test.rest", false)) {
+            return RespBase.create().withMessage("Limited test process");
+        }
 
         try {
             log.info("Groovy script path: {}", model.getScriptPath());

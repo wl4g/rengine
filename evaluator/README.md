@@ -24,9 +24,13 @@ curl -v -XPOST \
 -H 'Content-Type: application/json' \
 'localhost:28002/evaluator/evaluate' \
 -d '{
-  "scenes": "iot_warn",
+  "scenes": "generic_device_warn",
   "service": "collector",
-  "attachment": {}
+  "attributes": {},
+  "scripting": {
+    "mainFun": "",
+    "args": []
+  }
 }'
 ```
 
@@ -130,16 +134,20 @@ tail -f /tmp/rengine/evaluator.log | jq -r '.message'
 - Generate testing script to local path.
 
 ```bash
-curl -L -o /tmp/test.js 'https://raw.githubusercontent.com/wl4g/rengine/master/evaluator/testdata/test.js'
+curl -L -o /tmp/test-primes.js 'https://raw.githubusercontent.com/wl4g/rengine/master/evaluator/testdata/test-primes.js'
+curl -L -o /tmp/test-js2java.js 'https://raw.githubusercontent.com/wl4g/rengine/master/evaluator/testdata/test-js2java.js'
 ```
 
-- Mocking request execution
+- Mocking request execution1
 
 ```bash
-curl -v -XPOST -H 'Content-Type: application/json' 'http://localhost:28002/test/javascript/execution' -d '{
-    "scriptPath": "file:///tmp/test.js",
-    "scriptMain": "primesMain",
-    "scriptEngine": "graal.js",
+curl -v -XPOST -H 'Content-Type: application/json' 'http://localhost:28002/test/javascript/execution1' -d '{
+    "scriptPath": "file:///tmp/test-primes.js",
+    "args": []
+}'
+
+curl -v -XPOST -H 'Content-Type: application/json' 'http://localhost:28002/test/javascript/execution2' -d '{
+    "scriptPath": "file:///tmp/test-js2java.js",
     "args": []
 }'
 ```
@@ -150,9 +158,20 @@ curl -v -XPOST -H 'Content-Type: application/json' 'http://localhost:28002/test/
 tail -f /tmp/rengine/evaluator.log | jq -r '.message'
 ```
 
-### What are the notice with using the quarkus+groovy scripting engine?
+### Use the Groovy evaluation engine support native executable mode ?
+
+- Currently not supported.
 
 - ***Limitations***: Groovy is not a first class citizen for GraalVM’s ahead-of-time compilation by design, and that is why you can’t expect that your Groovy program will compile to the native image successfully. Below is the list of the major limitations that cannot be avoided: GraalVM’s SubstrateVM does not support dynamic class loading, dynamic class generation, and bytecode InvokeDynamic. This limitation makes dynamic Groovy scripts and classes almost 99% incompatible with building native images, So if you want to run on the native image, you can only open the static compilation mode of groovy. see: [https://e.printstacktrace.blog/graalvm-and-groovy-how-to-start/](https://e.printstacktrace.blog/graalvm-and-groovy-how-to-start/)
 
 - Related difficult refer to see: [github.com/quarkusio/quarkus/issues/2720](https://github.com/quarkusio/quarkus/issues/2720)
+
+
+### Use the JavaScript evaluation engine support JVM mode and native executable mode?
+
+- Yes, both are supported, thanks to GraalVM's multi-language support, but the --language:js option must be added when building native, and the version is best to use `GraalVM 22.1`, because the js plugin has been removed by default from `GraalVM 22.2`
+
+- ***Limitations***:
+  - a. Multiple threads are not allowed to call the same js script context.
+  - b. The native runtime does not support interactive calls to java methods
 

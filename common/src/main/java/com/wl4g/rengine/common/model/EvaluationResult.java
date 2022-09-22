@@ -15,8 +15,7 @@
  */
 package com.wl4g.rengine.common.model;
 
-import java.util.Map;
-
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -64,7 +63,8 @@ public abstract class EvaluationResult {
     @ToString
     @NoArgsConstructor
     public static class GenericEvaluationResult extends EvaluationResult {
-        private @NotBlank Map<String, Object> data;
+        // private @NotBlank Map<String, Object> result;
+        private @Nullable String result;
     }
 
     @Getter

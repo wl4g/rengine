@@ -13,28 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.evaluator.execution;
-
-import javax.inject.Inject;
-
-import lombok.AllArgsConstructor;
+package com.wl4g.rengine.common.exception;
 
 /**
- * {@link DefaultExecutionFactory}
+ * {@link RengineException}
  * 
  * @author James Wong
- * @version 2022-09-17
+ * @version 2022-09-22
  * @since v3.0.0
- * @see https://github.com/google/guice/wiki/Motivation
  */
-@AllArgsConstructor
-public class DefaultExecutionFactory implements ExecutionFactory {
+public class RengineException extends RuntimeException {
+    private static final long serialVersionUID = 5177120828249689148L;
 
-    private @Inject IExecution execution;
-
-    @Override
-    public IExecution getExecutor() {
-        return execution;
+    public RengineException() {
+        super();
     }
 
+    public RengineException(String message) {
+        super(message);
+    }
+
+    public RengineException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public RengineException(Throwable cause) {
+        super(cause);
+    }
+
+    protected RengineException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 }

@@ -15,11 +15,16 @@
  */
 package com.wl4g.rengine.evaluator.rest;
 
+import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+import static java.lang.System.currentTimeMillis;
+
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PreDestroy;
 import javax.enterprise.event.Observes;
@@ -34,9 +39,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.HostAccess;
 import org.graalvm.polyglot.Source;
 import org.graalvm.polyglot.Value;
+import org.graalvm.polyglot.proxy.ProxyObject;
 
+import com.wl4g.infra.common.lang.EnvironmentUtil;
+import com.wl4g.infra.common.remoting.RestClient;
+import com.wl4g.infra.common.runtime.JvmRuntimeTool;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.evaluator.rest.interceptor.CustomValid;
 
@@ -65,8 +75,9 @@ import lombok.extern.slf4j.Slf4j;
 public class TestJavascriptResource {
 
     @NotNull
-    Context polyglotContext;
+    Context singletonContext; // 同一 Context 实例不允许多线程并发调用.
 
+    // graal.js, nashorn
     // @NotNull
     // ScriptEngineManager engineManager;
 
@@ -77,10 +88,10 @@ public class TestJavascriptResource {
     // @PostConstruct
     void init() {
         try {
-            log.info("Initialzing graalvm polyglot context ...");
-            polyglotContext = Context.create();
+            log.info("Initialzing graalvm polyglot singleton context ...");
+            singletonContext = Context.create();
         } catch (Exception e) {
-            log.error("Failed to init graalvm polyglot context.", e);
+            log.error("Failed to init graalvm polyglot singleton context.", e);
         }
         // try {
         // log.info("Initialzing script engine manager ...");
@@ -93,19 +104,24 @@ public class TestJavascriptResource {
     @PreDestroy
     void destroy() {
         try {
-            log.info("Destroy graalvm polyglot context ...");
-            polyglotContext.close();
+            log.info("Destroy graalvm polyglot singleton context ...");
+            singletonContext.close();
         } catch (Exception e) {
             log.error("Failed to destroy graalvm polyglot context.", e);
         }
     }
 
     @POST
-    @Path("/execution")
-    public RespBase<Object> execution(JavascriptExecution model) throws Throwable {
+    @Path("/execution1")
+    public RespBase<Object> execution1(JavascriptExecution model) throws Throwable {
         log.info("called: Javascript execution ... {}", model);
 
-        try {
+        // Limiting test process.
+        if (!JvmRuntimeTool.isJvmInDebugging && !EnvironmentUtil.getBooleanProperty("test.rest", false)) {
+            return RespBase.create().withMessage("Limited test process");
+        }
+
+        try (Context newContext = Context.create();) {
             log.info("Javascript script ...");
             String codes = Files.readString(Paths.get(URI.create(model.getScriptPath())), Charset.forName("UTF-8"));
             log.info("Loaded Javascript codes: {}", codes);
@@ -120,14 +136,64 @@ public class TestJavascriptResource {
             // log.info("Loaded Javascript engine: {}", engine);
 
             log.info("Javascript eval script ...");
-            polyglotContext.eval(Source.newBuilder("js", codes, model.getScriptPath()).build());
+
+            String evalScriptName = "primesMain" + currentTimeMillis();
+            System.out.println(evalScriptName);
+            newContext.eval(Source.newBuilder("js", codes, evalScriptName).build());
 
             log.info("Javascript binding script ...");
-            Value primesMain = polyglotContext.getBindings("js").getMember(model.getScriptMain());
+            Value primesMain = newContext.getBindings("js").getMember("primesMain");
 
             log.info("Javascript execute script ...");
             Value result = primesMain.execute();
             log.info("Javascript execution result: {}", result.toString());
+
+            return RespBase.create().withData(result.toString());
+        } catch (Throwable e) {
+            log.error("Failed to excution Javascript script.", e);
+            throw e;
+        }
+    }
+
+    @POST
+    @Path("/execution2")
+    public RespBase<Object> execution2(JavascriptExecution model) throws Throwable {
+        log.info("called: Javascript execution ... {}", model);
+
+        // Limiting test process.
+        if (!JvmRuntimeTool.isJvmInDebugging && !EnvironmentUtil.getBooleanProperty("test.rest", false)) {
+            return RespBase.create().withMessage("Limited test process");
+        }
+
+        try (Context newContext = Context.create();) {
+            log.info("Javascript script ...");
+            String codes = Files.readString(Paths.get(URI.create(model.getScriptPath())), Charset.forName("UTF-8"));
+            log.info("Loaded Javascript codes: {}", codes);
+
+            Context c = Context.newBuilder("js").allowAllAccess(true).build();
+            Value bindings = c.getBindings("js");
+
+            Map<String, Object> attributes = new HashMap<>();
+            attributes.put("objId", "1010012");
+            attributes.put("args", model.getArgs());
+            MyEventSource eventSource = MyEventSource.builder()
+                    .sourceTime(16182771236L)
+                    .attributes(ProxyObject.fromMap(attributes))
+                    .build();
+            System.out.println(toJSONString(eventSource));
+
+            MyFunctionContext functionContext = MyFunctionContext.builder()
+                    .id("100101")
+                    .type("login")
+                    .eventSource(eventSource)
+                    .build();
+
+            bindings.putMember("httpClient", new MyHttpClient());
+            c.eval(Source.newBuilder("js", codes, "js2java.js").build());
+
+            Value processFunction = c.getBindings("js").getMember("process");
+            Value result = processFunction.execute(functionContext);
+            log.info("Javascript execution result: {}", result);
 
             return RespBase.create().withData(result.toString());
         } catch (Throwable e) {
@@ -142,12 +208,50 @@ public class TestJavascriptResource {
     public static class JavascriptExecution {
         @NotBlank
         String scriptPath;
-        @NotBlank
-        String scriptEngine; // graal.js, nashorn
-        @NotBlank
-        String scriptMain;
         @NotEmpty
         List<String> args;
+    }
+
+    @Data
+    @SuperBuilder
+    public static class MyFunctionContext {
+        private @HostAccess.Export String id;
+        private @HostAccess.Export String type;
+        private @HostAccess.Export MyEventSource eventSource;
+
+        public @HostAccess.Export String getId() {
+            return id;
+        }
+
+        public @HostAccess.Export String getType() {
+            return type;
+        }
+
+        public @HostAccess.Export MyEventSource getEventSource() {
+            return eventSource;
+        }
+    }
+
+    @Data
+    @SuperBuilder
+    public static class MyEventSource {
+        private @HostAccess.Export Long sourceTime;
+        private @HostAccess.Export ProxyObject attributes;
+
+        public @HostAccess.Export Long getSourceTime() {
+            return sourceTime;
+        }
+
+        public @HostAccess.Export ProxyObject getAttributes() {
+            return attributes;
+        }
+    }
+
+    public static class MyHttpClient {
+
+        public @HostAccess.Export String get(String url) {
+            return new RestClient().getForObject(url, String.class);
+        }
     }
 
 }

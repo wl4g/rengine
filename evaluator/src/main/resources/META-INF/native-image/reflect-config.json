@@ -1,0 +1,91 @@
+[
+{
+  "name":"org.graalvm.polyglot.Engine",
+  "methods":[{"name":"getImpl","parameterTypes":[] }]
+},
+{
+  "name":"org.graalvm.polyglot.management.Management"
+},
+{
+  "name":"org.graalvm.polyglot.proxy.Proxy",
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"org.graalvm.polyglot.proxy.ProxyObject",
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"org.graalvm.polyglot.proxy.ProxyObject$1",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getMember","parameterTypes":["java.lang.String"] }, 
+    {"name":"getMemberKeys","parameterTypes":[] },
+    {"name":"hasMember","parameterTypes":["java.lang.String"] }, 
+    {"name":"putMember","parameterTypes":["java.lang.String","org.graalvm.polyglot.Value"] }, 
+    {"name":"removeMember","parameterTypes":["java.lang.String"] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.evaluator.rest.TestGroovyResource$GroovyExecution"
+},
+{
+  "name":"com.wl4g.rengine.evaluator.rest.TestJavascriptResource",
+  "queriedMethods":[
+    {"name":"execution1","parameterTypes":["com.wl4g.rengine.evaluator.rest.TestJavascriptResource$JavascriptExecution"] }, 
+    {"name":"execution2","parameterTypes":["com.wl4g.rengine.evaluator.rest.TestJavascriptResource$JavascriptExecution"] }, 
+    {"name":"init","parameterTypes":[] }, 
+    {"name":"onStart","parameterTypes":["io.quarkus.runtime.StartupEvent"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.evaluator.rest.TestJavascriptResource$JavascriptExecution",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setArgs","parameterTypes":["java.util.List"] }, 
+    {"name":"setScriptPath","parameterTypes":["java.lang.String"] },
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.evaluator.rest.TestJavascriptResource$MyFunctionContext",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getId","parameterTypes":[] }, 
+    {"name":"getType","parameterTypes":[] }, 
+    {"name":"getEventSource","parameterTypes":[] },
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.evaluator.rest.TestJavascriptResource$MyEventSource",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getAttributes","parameterTypes":[] }, 
+    {"name":"getSourceTime","parameterTypes":[] },
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.evaluator.rest.TestJavascriptResource$MyHttpClient",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"get","parameterTypes":["java.lang.String"] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+}
+]

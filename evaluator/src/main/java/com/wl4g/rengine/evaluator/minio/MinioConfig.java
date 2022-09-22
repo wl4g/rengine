@@ -49,6 +49,10 @@ public interface MinioConfig {
     @NotBlank
     String region();
 
+    @WithDefault(RengineConstants.DEF_MINIO_BUCKET)
+    @NotBlank
+    String bucket();
+
     @WithDefault("rengine")
     @NotBlank
     String tenantAccessKey();

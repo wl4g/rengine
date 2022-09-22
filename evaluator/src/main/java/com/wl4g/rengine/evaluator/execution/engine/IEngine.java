@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.evaluator.execution;
+package com.wl4g.rengine.evaluator.execution.engine;
 
 import java.util.function.Function;
 
@@ -21,11 +21,12 @@ import com.wl4g.rengine.common.model.Evaluation;
 import com.wl4g.rengine.common.model.EvaluationResult;
 
 /**
- * {@link IExecution}
+ * {@link IEngine}
  * 
  * @author James Wong
- * @version 2022-09-17
+ * @version 2022-09-22
  * @since v3.0.0
  */
-public interface IExecution extends Function<Evaluation, EvaluationResult> {
+public interface IEngine extends Function<Evaluation, EvaluationResult> {
+
 }

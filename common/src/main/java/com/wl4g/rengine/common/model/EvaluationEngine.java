@@ -13,19 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.evaluator.execution;
-
-import java.util.function.Function;
-
-import com.wl4g.rengine.common.model.Evaluation;
-import com.wl4g.rengine.common.model.EvaluationResult;
+package com.wl4g.rengine.common.model;
 
 /**
- * {@link IExecution}
+ * {@link EvaluationEngine}
  * 
  * @author James Wong
- * @version 2022-09-17
+ * @version 2022-09-21
  * @since v3.0.0
  */
-public interface IExecution extends Function<Evaluation, EvaluationResult> {
+public enum EvaluationEngine {
+    GROOVY, JS
 }

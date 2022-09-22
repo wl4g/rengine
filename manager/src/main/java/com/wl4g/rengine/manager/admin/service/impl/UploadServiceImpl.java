@@ -33,7 +33,7 @@ import org.springframework.stereotype.Service;
 
 import com.mongodb.client.result.DeleteResult;
 import com.wl4g.rengine.common.bean.UploadObject;
-import com.wl4g.rengine.common.bean.UploadObject.BizType;
+import com.wl4g.rengine.common.bean.UploadObject.UploadType;
 import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.manager.admin.model.SaveUpload;
@@ -68,7 +68,7 @@ public class UploadServiceImpl implements UploadService {
         // TODO use pagination
 
         Criteria criteria = new Criteria().orOperator(Criteria.where("name").is(model.getFilename()),
-                Criteria.where("bizType").is(model.getBizType()), Criteria.where("status").is(model.getStatus()),
+                Criteria.where("UploadType").is(model.getUploadType()), Criteria.where("status").is(model.getStatus()),
                 Criteria.where("labels").in(model.getLabels()));
 
         List<UploadObject> uploads = mongoTemplate.find(new Query(criteria), UploadObject.class,
@@ -79,7 +79,7 @@ public class UploadServiceImpl implements UploadService {
         return QueryUploadResult.builder()
                 .uploads(safeList(uploads).stream()
                         .map(p -> UploadObject.builder()
-                                .bizType(p.getBizType())
+                                .UploadType(p.getUploadType())
                                 .id(p.getId())
                                 .objectPrefix(p.getObjectPrefix())
                                 .filename(p.getFilename())
@@ -102,12 +102,12 @@ public class UploadServiceImpl implements UploadService {
         // SecurityContextHolder.getContext().getAuthentication();
         // System.out.println(authentication);
 
+        UploadType uploadType = UploadType.of(model.getUploadType());
         // The precise object prefixes to ensure the creation of STS policy
         // with precise authorized write permissions.
-        String objectPrefix = format("%s/%s/%s", RengineConstants.DEF_MINIO_BUCKET, BizType.of(model.getBizType()).getValue(),
-                model.getFilename());
+        String objectPrefix = format("%s/%s/%s", RengineConstants.DEF_MINIO_BUCKET, uploadType.getPrefix(), model.getFilename());
         UploadObject upload = UploadObject.builder()
-                .bizType(model.getBizType())
+                .UploadType(model.getUploadType())
                 .id(IdGenUtil.next())
                 .objectPrefix(objectPrefix)
                 .filename(model.getFilename())
@@ -137,7 +137,7 @@ public class UploadServiceImpl implements UploadService {
                     .id(upload.getId())
                     .fileLimitSize(config.getUserUpload().getLibraryFileLimitSize().toBytes())
                     .objectPrefix(objectPrefix)
-                    .extension(config.getUserUpload().getLibraryExtensions())
+                    .extension(uploadType.getExtensions())
                     .build();
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException("Failed to create STS with assumeRole grant", e);

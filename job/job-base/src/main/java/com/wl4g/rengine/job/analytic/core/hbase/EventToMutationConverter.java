@@ -86,7 +86,8 @@ public class EventToMutationConverter implements HBaseMutationConverter<RengineE
         EventSource source = (EventSource) model.getEvent().getSource();
 
         // Use reversed time strings to avoid data hotspots.
-        String reverseDate = DateFormatUtils.format(source.getSourceTime(), "SSSssmmHHddMMyy");
+        // Options are: SSSssmmHHddMMyy | SSSyyMMddHHmmss?
+        String reverseDate = DateFormatUtils.format(source.getSourceTime(), "SSSyyMMddHHmmss");
 
         // TODO transform to ZIPCODE-standard city/region/country name.
         return new StringBuilder()

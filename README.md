@@ -32,7 +32,9 @@ A generic real-time rule engine, such as bank transfer real-time risk control, t
 
 ## Features
 
-- Support large-scale MMP parallel computing based on FLINK-CEP.
+- Supports large-scale MMP parallel computing based on FLINK-CEP.
+
+- Supports multi-language scripting engine for `Groovy`, `JS(graal.js)`.
 
 - Supports highly flexible dynamic writing rule templates based on WEBIDE.
 
