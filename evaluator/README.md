@@ -6,14 +6,14 @@
 
 ```bash
 docker run -d \
---name=rengine-evaluator1 \
+--name=rengine-evaluator \
 --network=host \
 --restart=no \
 -e QUARKUS_HTTP_PORT="8080" \
 -e QUARKUS_MONGODB_CONNECTION_STRING="mongodb://localhost:27017" \
--e QUARKUS_EXTENSION_MINIO_ENDPOINT="http://localhost:9000" \
--e QUARKUS_EXTENSION_MINIO_TENANTACCESSKEY="rengine" \
--e QUARKUS_EXTENSION_MINIO_TENANTSECRETKEY="12345678" \
+-e MINIO_ENDPOINT="http://localhost:9000" \
+-e MINIO_TENANTACCESSKEY="rengine" \
+-e MINIO_TENANTSECRETKEY="12345678" \
 wl4g/rengine-evaluator
 ```
 
@@ -58,6 +58,8 @@ cd rengine
 - [Quarkus building-native-image#container-runtime](https://quarkus.io/guides/building-native-image#container-runtime)
 
 - **Notice:** As of `GraalVM 22.2` the `language:js` plugin has been removed from the default plugin list, and needs to be installed manually by run `$GRAALVM_HOME/bin/gu install js`
+
+- **Notice:** It is recommended that the build host has a memory larger than 6G~8G, because building native requires a lot of memory to pre-run analysis methods, and the first build may take 15-20min (due to the need to download the build image), please wait patiently, and the subsequent build will take about 5-10min.
 
 ```bash
 # Should use java11+
@@ -112,6 +114,12 @@ curl -v localhost:28002/metrics
 curl -L -o /tmp/test.groovy 'https://raw.githubusercontent.com/wl4g/rengine/master/evaluator/testdata/test.groovy'
 ```
 
+- Run native
+
+```bash
+./evaluator/target/rengine-evaluator-native -Dtest.rest=true
+```
+
 - Mocking request execution
 
 ```bash
@@ -134,19 +142,19 @@ tail -f /tmp/rengine/evaluator.log | jq -r '.message'
 - Generate testing script to local path.
 
 ```bash
-curl -L -o /tmp/test-primes.js 'https://raw.githubusercontent.com/wl4g/rengine/master/evaluator/testdata/test-primes.js'
 curl -L -o /tmp/test-js2java.js 'https://raw.githubusercontent.com/wl4g/rengine/master/evaluator/testdata/test-js2java.js'
 ```
 
-- Mocking request execution1
+- Run native
 
 ```bash
-curl -v -XPOST -H 'Content-Type: application/json' 'http://localhost:28002/test/javascript/execution1' -d '{
-    "scriptPath": "file:///tmp/test-primes.js",
-    "args": []
-}'
+./evaluator/target/rengine-evaluator-native -Dtest.rest=true
+```
 
-curl -v -XPOST -H 'Content-Type: application/json' 'http://localhost:28002/test/javascript/execution2' -d '{
+- Mocking request execution
+
+```bash
+curl -v -XPOST -H 'Content-Type: application/json' 'http://localhost:28002/test/javascript/execution' -d '{
     "scriptPath": "file:///tmp/test-js2java.js",
     "args": []
 }'

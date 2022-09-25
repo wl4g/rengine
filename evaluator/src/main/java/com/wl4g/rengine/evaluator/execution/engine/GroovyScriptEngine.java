@@ -29,7 +29,7 @@ import com.wl4g.rengine.common.bean.UploadObject.UploadType;
 import com.wl4g.rengine.common.exception.ExecutionException;
 import com.wl4g.rengine.common.model.Evaluation;
 import com.wl4g.rengine.common.model.EvaluationResult;
-import com.wl4g.rengine.evaluator.execution.spi.RengineContext;
+import com.wl4g.rengine.evaluator.execution.sdk.ScriptContext;
 
 import groovy.lang.GroovyClassLoader;
 import io.quarkus.runtime.StartupEvent;
@@ -80,7 +80,7 @@ public class GroovyScriptEngine extends AbstractScriptEngine {
             log.info("Load groovy script class: {}", cls);
 
             log.info("Instantiating groovy script class with {} ...", scriptMain);
-            final Function<RengineContext, String> function = (Function<RengineContext, String>) cls.getConstructor()
+            final Function<ScriptContext, String> function = (Function<ScriptContext, String>) cls.getConstructor()
                     .newInstance();
             log.info("Instantiated script class object: {}, is instance of java.util.function.Function: {}", function,
                     (function instanceof Function));

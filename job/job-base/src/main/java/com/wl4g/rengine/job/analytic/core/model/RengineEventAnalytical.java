@@ -39,6 +39,5 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class RengineEventAnalytical implements Serializable {
     private static final long serialVersionUID = -3297058243453003737L;
-    public static final RengineEvent DEFAULT_EMPTY = new RengineEvent("__default_empty_event", EventSource.builder().build());
-    private @NotNull @Default RengineEvent event = DEFAULT_EMPTY;
+    private @NotNull @Default RengineEvent event = new RengineEvent("__default_empty_event", EventSource.builder().build());
 }

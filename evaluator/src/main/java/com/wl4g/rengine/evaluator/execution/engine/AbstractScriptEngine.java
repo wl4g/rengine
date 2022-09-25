@@ -23,7 +23,7 @@ import javax.validation.constraints.NotNull;
 import com.google.common.collect.Lists;
 import com.wl4g.rengine.common.bean.UploadObject.UploadType;
 import com.wl4g.rengine.common.model.Evaluation;
-import com.wl4g.rengine.evaluator.execution.spi.RengineContext;
+import com.wl4g.rengine.evaluator.execution.sdk.ScriptContext;
 import com.wl4g.rengine.evaluator.minio.MinioManager;
 
 import lombok.extern.slf4j.Slf4j;
@@ -56,8 +56,8 @@ public abstract class AbstractScriptEngine implements IEngine {
         return scripts;
     }
 
-    protected RengineContext newRengineContext(Evaluation model) {
-        final var context = new RengineContext();
+    protected ScriptContext newRengineContext(Evaluation model) {
+        ScriptContext context = ScriptContext.builder().build();
         // TODO add more context parameters
         context.getArgs().addAll(model.getScripting().getArgs());
         return context;

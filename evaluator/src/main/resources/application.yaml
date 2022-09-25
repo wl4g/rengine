@@ -179,7 +179,9 @@ quarkus:
     #additional-build-args: "--link-at-build-time=org.codehaus.groovy.control.XStreamUtils"
     ## [Notice]: As of GraalVM 22.2 the language:js plugin has been removed from the default plugin list, and needs to be installed manually by run $GRAALVM_HOME/bin/gu install js
     ### Run this command to check if the image is supports: docker run --rm quay.io/quarkus/ubi-quarkus-native-image:22.1-java11 --help | grep 'language'
-    additional-build-args: "--language:js,--no-fallback,--report-unsupported-elements-at-runtime,--initialize-at-run-time=groovy.grape.GrapeIvy,-H:ConfigurationFileDirectories=/mnt/disk1/__wanglsir_Documents/java-workspace/wl4g-projects/rengine/evaluator/src/main/resources/META-INF/native-image/"
+    # Equivalent to configuring in reflect-config.json
+    #additional-build-args: "--features=com.wl4g.rengine.evaluator.graalvm.RuntimeReflectionRegistrationFeature"
+    additional-build-args: "--language:js,--no-fallback,--report-unsupported-elements-at-runtime,--initialize-at-run-time=groovy.grape.GrapeIvy\\,org.apache.commons.lang3.RandomUtils"
     #compression:
     #  level: 5 # 1-10 The larger the higher the compression ratio, the longer the build time.
     #  additional-args: --ultra-brute,-v

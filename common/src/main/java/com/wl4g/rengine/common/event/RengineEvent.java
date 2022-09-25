@@ -162,7 +162,6 @@ public class RengineEvent extends EventObject {
         private @Nullable String timezone;
         private @Nullable String zipcode;
         private @Nullable Float elevation;
-        private @Nullable Map<String, String> attributes;
     }
 
 }
