@@ -15,8 +15,8 @@
  */
 package com.wl4g.rengine.manager.admin.service;
 
-import com.wl4g.rengine.manager.admin.model.AddNotification;
-import com.wl4g.rengine.manager.admin.model.AddNotificationResult;
+import com.wl4g.rengine.manager.admin.model.SaveNotification;
+import com.wl4g.rengine.manager.admin.model.SaveNotificationResult;
 import com.wl4g.rengine.manager.admin.model.QueryNotification;
 import com.wl4g.rengine.manager.admin.model.QueryNotificationResult;
 
@@ -31,6 +31,6 @@ public interface NotificationService {
 
     QueryNotificationResult query(QueryNotification model);
 
-    AddNotificationResult save(AddNotification model);
+    SaveNotificationResult save(SaveNotification model);
 
 }

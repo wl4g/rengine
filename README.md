@@ -16,7 +16,7 @@ A generic real-time rule engine, such as bank transfer real-time risk control, t
 
 - MySQL 5.7 +
 
-- MongoDB 4.x +
+- MongoDB 4.6.x +
 
 - MinIO 2021.x +
 
@@ -32,7 +32,9 @@ A generic real-time rule engine, such as bank transfer real-time risk control, t
 
 ## Features
 
-- Support large-scale MMP parallel computing based on FLINK-CEP.
+- Supports large-scale MMP parallel computing based on FLINK-CEP.
+
+- Supports multi-language scripting engine for `Groovy`, `JS(graal.js)`.
 
 - Supports highly flexible dynamic writing rule templates based on WEBIDE.
 
@@ -116,4 +118,8 @@ otel/opentelemetry-collector:0.60.0
 
 ## FAQ
 
-TODO
+### If you use the groovy environment, pay attention to the version situation between the components
+  - 1. The **groovy-4.0.5**(current latest) that the rengine-evaluator module depends on only supports **jdk1.8/9/10/16**
+  - 2. The **spring-native-0.12.1*** (current latest) that the rengine-manager module depends on only supports jdk11+
+  - 3. Refer source code: [github.com/apache/groovy/blob/GROOVY_4_0_5/src/main/java/org/codehaus/groovy/vmplugin/VMPluginFactory.java#L39](https://github.com/apache/groovy/blob/GROOVY_4_0_5/src/main/java/org/codehaus/groovy/vmplugin/VMPluginFactory.java#L39)
+

@@ -44,7 +44,7 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @NoArgsConstructor
 public class QueryUpload {
-    private @NotBlank UploadObject.BizType bizType;
+    private @NotBlank UploadObject.UploadType UploadType;
     private @NotBlank String filename;
     private @NotBlank String extension;
     private @Nullable List<String> labels;

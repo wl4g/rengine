@@ -31,8 +31,8 @@ import org.springframework.stereotype.Service;
 
 import com.mongodb.client.result.DeleteResult;
 import com.wl4g.rengine.common.bean.Project;
-import com.wl4g.rengine.manager.admin.model.AddProject;
-import com.wl4g.rengine.manager.admin.model.AddProjectResult;
+import com.wl4g.rengine.manager.admin.model.SaveProject;
+import com.wl4g.rengine.manager.admin.model.SaveProjectResult;
 import com.wl4g.rengine.manager.admin.model.DeleteProject;
 import com.wl4g.rengine.manager.admin.model.DeleteProjectResult;
 import com.wl4g.rengine.manager.admin.model.QueryProject;
@@ -83,7 +83,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public AddProjectResult save(AddProject model) {
+    public SaveProjectResult save(SaveProject model) {
         Project project = Project.builder()
                 .id(IdGenUtil.next())
                 .name(model.getName())
@@ -95,7 +95,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .updateDate(new Date())
                 .build();
         Project saved = mongoTemplate.insert(project, MongoCollectionDefinition.PROJECTS.getName());
-        return AddProjectResult.builder().id(saved.getId()).build();
+        return SaveProjectResult.builder().id(saved.getId()).build();
     }
 
     @Override

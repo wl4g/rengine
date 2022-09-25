@@ -15,12 +15,12 @@
  */
 package com.wl4g.rengine.manager.admin.service;
 
-import com.wl4g.rengine.manager.admin.model.AddUpload;
+import com.wl4g.rengine.manager.admin.model.SaveUpload;
 import com.wl4g.rengine.manager.admin.model.DeleteUpload;
 import com.wl4g.rengine.manager.admin.model.DeleteUploadResult;
 import com.wl4g.rengine.manager.admin.model.QueryUpload;
 import com.wl4g.rengine.manager.admin.model.QueryUploadResult;
-import com.wl4g.rengine.manager.admin.model.AddUploadResult;
+import com.wl4g.rengine.manager.admin.model.SaveUploadResult;
 
 /**
  * {@link UploadService}
@@ -33,7 +33,7 @@ public interface UploadService {
 
     QueryUploadResult query(QueryUpload model);
 
-    AddUploadResult apply(AddUpload model);
+    SaveUploadResult apply(SaveUpload model);
 
     DeleteUploadResult delete(DeleteUpload model);
 }

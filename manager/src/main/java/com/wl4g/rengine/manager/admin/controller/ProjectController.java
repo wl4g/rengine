@@ -26,8 +26,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.manager.admin.model.AddProject;
-import com.wl4g.rengine.manager.admin.model.AddProjectResult;
+import com.wl4g.rengine.manager.admin.model.SaveProject;
+import com.wl4g.rengine.manager.admin.model.SaveProjectResult;
 import com.wl4g.rengine.manager.admin.model.DeleteProject;
 import com.wl4g.rengine.manager.admin.model.DeleteProjectResult;
 import com.wl4g.rengine.manager.admin.model.QueryProject;
@@ -70,9 +70,9 @@ public class ProjectController {
     @Operation(description = "Save project model.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    public RespBase<AddProjectResult> save(@Validated @RequestBody AddProject model) {
+    public RespBase<SaveProjectResult> save(@Validated @RequestBody SaveProject model) {
         log.info("called: model={}", model);
-        RespBase<AddProjectResult> resp = RespBase.create();
+        RespBase<SaveProjectResult> resp = RespBase.create();
         resp.setData(projectService.save(model));
         return resp;
     }

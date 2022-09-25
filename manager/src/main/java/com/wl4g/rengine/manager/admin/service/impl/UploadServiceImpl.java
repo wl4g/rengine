@@ -33,11 +33,11 @@ import org.springframework.stereotype.Service;
 
 import com.mongodb.client.result.DeleteResult;
 import com.wl4g.rengine.common.bean.UploadObject;
-import com.wl4g.rengine.common.bean.UploadObject.BizType;
+import com.wl4g.rengine.common.bean.UploadObject.UploadType;
 import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
-import com.wl4g.rengine.manager.admin.model.AddUpload;
-import com.wl4g.rengine.manager.admin.model.AddUploadResult;
+import com.wl4g.rengine.manager.admin.model.SaveUpload;
+import com.wl4g.rengine.manager.admin.model.SaveUploadResult;
 import com.wl4g.rengine.manager.admin.model.DeleteUpload;
 import com.wl4g.rengine.manager.admin.model.DeleteUploadResult;
 import com.wl4g.rengine.manager.admin.model.QueryUpload;
@@ -68,7 +68,7 @@ public class UploadServiceImpl implements UploadService {
         // TODO use pagination
 
         Criteria criteria = new Criteria().orOperator(Criteria.where("name").is(model.getFilename()),
-                Criteria.where("bizType").is(model.getBizType()), Criteria.where("status").is(model.getStatus()),
+                Criteria.where("UploadType").is(model.getUploadType()), Criteria.where("status").is(model.getStatus()),
                 Criteria.where("labels").in(model.getLabels()));
 
         List<UploadObject> uploads = mongoTemplate.find(new Query(criteria), UploadObject.class,
@@ -79,9 +79,9 @@ public class UploadServiceImpl implements UploadService {
         return QueryUploadResult.builder()
                 .uploads(safeList(uploads).stream()
                         .map(p -> UploadObject.builder()
-                                .bizType(p.getBizType())
+                                .UploadType(p.getUploadType())
                                 .id(p.getId())
-                                .prefix(p.getPrefix())
+                                .objectPrefix(p.getObjectPrefix())
                                 .filename(p.getFilename())
                                 .extension(p.getExtension())
                                 .labels(p.getLabels())
@@ -97,19 +97,19 @@ public class UploadServiceImpl implements UploadService {
                 .build();
     }
 
-    public AddUploadResult apply(AddUpload model) {
+    public SaveUploadResult apply(SaveUpload model) {
         // Authentication authentication =
         // SecurityContextHolder.getContext().getAuthentication();
         // System.out.println(authentication);
 
+        UploadType uploadType = UploadType.of(model.getUploadType());
         // The precise object prefixes to ensure the creation of STS policy
         // with precise authorized write permissions.
-        String objectPrefix = format("%s/%s/%s", RengineConstants.DEF_MINIO_BUCKET, BizType.of(model.getBizType()).getValue(),
-                model.getFilename());
+        String objectPrefix = format("%s/%s/%s", RengineConstants.DEF_MINIO_BUCKET, uploadType.getPrefix(), model.getFilename());
         UploadObject upload = UploadObject.builder()
-                .bizType(model.getBizType())
+                .UploadType(model.getUploadType())
                 .id(IdGenUtil.next())
-                .prefix(objectPrefix)
+                .objectPrefix(objectPrefix)
                 .filename(model.getFilename())
                 .extension(model.getExtension())
                 .labels(model.getLabels())
@@ -125,7 +125,7 @@ public class UploadServiceImpl implements UploadService {
         // New create temporary STS credentials.
         try {
             Credentials credentials = minioManager.createSTSCredentials(objectPrefix);
-            return AddUploadResult.builder()
+            return SaveUploadResult.builder()
                     .endpoint(config.getEndpoint())
                     .region(config.getRegion())
                     // .bucket(config.getBucket())
@@ -136,8 +136,8 @@ public class UploadServiceImpl implements UploadService {
                     .partSize(config.getUserUpload().getLibraryPartSize().toBytes())
                     .id(upload.getId())
                     .fileLimitSize(config.getUserUpload().getLibraryFileLimitSize().toBytes())
-                    .prefix(objectPrefix)
-                    .extension(config.getUserUpload().getLibraryExtensions())
+                    .objectPrefix(objectPrefix)
+                    .extension(uploadType.getExtensions())
                     .build();
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException("Failed to create STS with assumeRole grant", e);

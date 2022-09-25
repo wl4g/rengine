@@ -48,19 +48,62 @@
             <timezone>+8</timezone>
         </developer>
     </developers>
+    <!-- see:https://swenfang.github.io/2018/06/03/Maven-Priority/ -->
+    <repositories>
+        <repository>
+            <id>public</id>
+            <name>Aliyun maven public</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+        </repository>
+        <repository>
+            <id>grails-core</id>
+            <name>Aliyun maven grails core</name>
+            <url>https://maven.aliyun.com/repository/grails-core</url>
+        </repository>
+        <repository>
+            <id>central</id>
+            <name>Aliyun maven central</name>
+            <url>https://maven.aliyun.com/repository/central</url>
+        </repository>
+        <repository>
+            <id>spring</id>
+            <name>Aliyun maven spring</name>
+            <url>https://maven.aliyun.com/repository/spring</url>
+        </repository>
+        <repository>
+            <id>spring-release</id>
+            <name>Spring release</name>
+            <url>https://repo.spring.io/release</url>
+        </repository>
+        <repository>
+            <id>google</id>
+            <name>Aliyun maven google</name>
+            <url>https://maven.aliyun.com/repository/google</url>
+        </repository>
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring milestone</name>
+            <url>https://repo.spring.io/milestone</url>
+        </repository>
+        <repository>
+            <id>cloudera</id>
+            <name>Cloudera maven</name>
+            <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
+        </repository>
+    </repositories>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
+        <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
+        <!-- see:https://github.com/quarkusio/quarkus-quickstarts/blob/2.12.2.Final/getting-started/pom.xml -->
+        <quarkus.platform.version>2.12.2.Final</quarkus.platform.version>
+        <!-- <groovy.version>4.0.4</groovy.version>-->
+        <!-- <graalvm.version>22.1.0</graalvm.version>-->
+        <compiler-plugin.version>3.8.1</compiler-plugin.version>
+        <surefire-plugin.version>3.0.0-M7</surefire-plugin.version>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.parameters>true</maven.compiler.parameters>
-        <!-- see:https://github.com/quarkusio/quarkus-quickstarts/blob/2.12.2.Final/getting-started/pom.xml -->
-        <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
-        <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
-        <quarkus.platform.version>2.12.2.Final</quarkus.platform.version>
-        <compiler-plugin.version>3.8.1</compiler-plugin.version>
-        <surefire-plugin.version>3.0.0-M7</surefire-plugin.version>
-        <mongodb.version>4.6.1</mongodb.version>
-        <guice.version>5.1.0</guice.version>
         <final.name>rengine-evaluator</final.name>
     </properties>
     <parent>
@@ -91,7 +134,12 @@
             <groupId>com.wl4g</groupId>
             <artifactId>rengine-common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.wl4g</groupId>
+            <artifactId>infra-common-java11</artifactId>
+        </dependency>
 
+        <!-- Bridge with spring -->
         <!-- <dependency>-->
         <!--     <groupId>io.quarkus</groupId>-->
         <!--     <artifactId>quarkus-spring-web</artifactId>-->
@@ -135,6 +183,22 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-resteasy-reactive-jackson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-rest-client-deployment</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-rest-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-rest-client-jackson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-openapi</artifactId>
         </dependency>
         <!-- see:https://github.com/quarkusio/quarkus/issues/8250 -->
         <dependency>
@@ -185,21 +249,89 @@
         <!--     <groupId>com.acme</groupId>-->
         <!--     <artifactId>custom-micrometer-registry</artifactId>-->
         <!-- </dependency>-->
+        <!-- OSS -->
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+        </dependency>
+
+        <!-- START: Integration for Groovy script engine -->
+        <dependency>
+            <groupId>org.apache.groovy</groupId>
+            <artifactId>groovy</artifactId>
+        </dependency>
+        <!-- fix: native build error of: org.codehaus.groovy.control.SourceUnit is registered for linking at image build time by command line ...
+caused by: org.codehaus.groovy.control.XStreamUtils.serialze(String,Object) not found? see:https://github.com/quarkusio/quarkus/issues/2720
+and see:https://github.com/apache/groovy/blob/GROOVY_4_0_5/build.gradle#L98 -->
+        <dependency>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.4.19</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>xpp3</groupId>
+                    <artifactId>xpp3_min</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jmock</groupId>
+                    <artifactId>jmock</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xmlpull</groupId>
+                    <artifactId>xmlpull</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- fix: native build error of: NoClassDefFoundError: jnr/unixsocket/Unix Socket -->
+        <dependency>
+            <groupId>com.github.jnr</groupId>
+            <artifactId>jnr-unixsocket</artifactId>
+            <version>0.18</version>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <!-- END: Integration for Groovy script engine -->
+
+        <!-- START: Integration for Javascript(graal.js/nashorn) script engine -->
+        <!-- see: https://github.com/graalvm/graal-js-jdk11-maven-demo/blob/master/pom.xml -->
+        <dependency>
+            <groupId>org.graalvm.sdk</groupId>
+            <artifactId>graal-sdk</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.js</groupId>
+            <artifactId>js</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.js</groupId>
+            <artifactId>js-scriptengine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.tools</groupId>
+            <artifactId>profiler</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.tools</groupId>
+            <artifactId>chromeinspector</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- END: Integration for Javascript(graal.js/nashorn) script engine -->
+
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-junit5</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>io.rest-assured</groupId>
-            <artifactId>rest-assured</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.rest-assured</groupId>
-            <artifactId>rest-assured</artifactId>
-            <scope>test</scope>
-        </dependency>
+        <!-- <dependency>-->
+        <!--     <groupId>io.rest-assured</groupId>-->
+        <!--     <artifactId>rest-assured</artifactId>-->
+        <!--     <scope>test</scope>-->
+        <!-- </dependency>-->
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
@@ -209,17 +341,6 @@
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
             <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.inject</groupId>
-            <artifactId>guice</artifactId>
-            <version>${guice.version}</version>
-        </dependency>
-        <!-- OSS -->
-        <dependency>
-            <groupId>io.minio</groupId>
-            <artifactId>minio</artifactId>
         </dependency>
         <!-- Devel Tools -->
         <dependency>
@@ -274,6 +395,15 @@
                 <groupId>${quarkus.platform.group-id}</groupId>
                 <artifactId>quarkus-maven-plugin</artifactId>
                 <version>${quarkus.platform.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <!-- invalid? Not really added to the JVM at compile time -->
+                    <!-- see:https://stackoverflow.com/questions/69631653/quarkus-optaplanner-illegal-reflective-call -->
+                    <compilerArgs>
+                        <arg>--enable-preview --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.text=ALL-UNNAMED --add-opens java.desktop/java.awt.font=ALL-UNNAMED</arg>
+                    </compilerArgs>
+                    <jvmArgs>--enable-preview --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.text=ALL-UNNAMED --add-opens java.desktop/java.awt.font=ALL-UNNAMED</jvmArgs>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
@@ -307,6 +437,7 @@
                                     <goal>verify</goal>
                                 </goals>
                                 <configuration>
+                                    <!-- see:https://stackoverflow.com/questions/69631653/quarkus-optaplanner-illegal-reflective-call -->
                                     <systemPropertyVariables>
                                         <native.image.path>${project.build.directory}/${project.build.finalName}-runner</native.image.path>
                                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>

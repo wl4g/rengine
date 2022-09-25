@@ -20,7 +20,7 @@ import org.apache.flink.streaming.api.datastream.DataStreamSource;
 
 import com.wl4g.rengine.job.analytic.core.RengineFlinkStreamingBase;
 import com.wl4g.rengine.job.analytic.core.elasticsearch7.RengineES7StreamingSupport;
-import com.wl4g.rengine.job.analytic.core.model.RengineEventAnalyticalModel;
+import com.wl4g.rengine.job.analytic.core.model.RengineEventAnalytical;
 
 import lombok.Getter;
 
@@ -49,7 +49,7 @@ public abstract class RengineHiveStreamingSupport extends RengineFlinkStreamingB
     }
 
     @Override
-    protected RengineFlinkStreamingBase customStream(DataStreamSource<RengineEventAnalyticalModel> dataStream) {
+    protected RengineFlinkStreamingBase customStream(DataStreamSource<RengineEventAnalytical> dataStream) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException();
     }

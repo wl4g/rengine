@@ -26,8 +26,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.manager.admin.model.AddWorkflow;
-import com.wl4g.rengine.manager.admin.model.AddWorkflowResult;
+import com.wl4g.rengine.manager.admin.model.SaveWorkflow;
+import com.wl4g.rengine.manager.admin.model.SaveWorkflowResult;
 import com.wl4g.rengine.manager.admin.model.DeleteWorkflow;
 import com.wl4g.rengine.manager.admin.model.DeleteWorkflowResult;
 import com.wl4g.rengine.manager.admin.model.QueryWorkflow;
@@ -70,9 +70,9 @@ public class WorkflowController {
     @Operation(description = "Save workflows model.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    public RespBase<AddWorkflowResult> save(@Validated @RequestBody AddWorkflow model) {
+    public RespBase<SaveWorkflowResult> save(@Validated @RequestBody SaveWorkflow model) {
         log.info("called: model={}", model);
-        RespBase<AddWorkflowResult> resp = RespBase.create();
+        RespBase<SaveWorkflowResult> resp = RespBase.create();
         resp.setData(workflowService.save(model));
         return resp;
     }

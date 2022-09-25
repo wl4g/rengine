@@ -25,8 +25,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.manager.admin.model.AddNotification;
-import com.wl4g.rengine.manager.admin.model.AddNotificationResult;
+import com.wl4g.rengine.manager.admin.model.SaveNotification;
+import com.wl4g.rengine.manager.admin.model.SaveNotificationResult;
 import com.wl4g.rengine.manager.admin.model.QueryNotification;
 import com.wl4g.rengine.manager.admin.model.QueryNotificationResult;
 import com.wl4g.rengine.manager.admin.service.NotificationService;
@@ -67,9 +67,9 @@ public class NotificationController {
     @Operation(description = "Save notification model.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    public RespBase<AddNotificationResult> save(@Validated @RequestBody AddNotification model) {
+    public RespBase<SaveNotificationResult> save(@Validated @RequestBody SaveNotification model) {
         log.info("called: model={}", model);
-        RespBase<AddNotificationResult> resp = RespBase.create();
+        RespBase<SaveNotificationResult> resp = RespBase.create();
         resp.setData(notificationService.save(model));
         return resp;
     }

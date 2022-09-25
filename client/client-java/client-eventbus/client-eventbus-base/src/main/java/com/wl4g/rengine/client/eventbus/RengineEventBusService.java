@@ -17,7 +17,7 @@ package com.wl4g.rengine.client.eventbus;
 
 import java.util.concurrent.Future;
 
-import com.wl4g.rengine.common.event.RengineEventBase;
+import com.wl4g.rengine.common.event.RengineEvent;
 
 /**
  * {@link RengineEventBusService}
@@ -30,6 +30,6 @@ public interface RengineEventBusService<R> {
 
     Object getOriginal();
 
-    Future<R> publish(RengineEventBase event);
+    Future<R> publish(RengineEvent event);
 
 }

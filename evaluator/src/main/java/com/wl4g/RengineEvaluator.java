@@ -33,6 +33,7 @@ import io.quarkus.runtime.annotations.QuarkusMain;
 public class RengineEvaluator implements QuarkusApplication {
 
     public static void main(String[] args) {
+        System.setProperty("org.apache.commons.logging.LogFactory", "org.apache.commons.logging.impl.JBossLogFactory");
         Quarkus.run(RengineEvaluator.class, args);
     }
 

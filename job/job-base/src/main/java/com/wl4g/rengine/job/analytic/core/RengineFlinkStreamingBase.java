@@ -31,7 +31,7 @@ import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.sink.PrintSinkFunction;
 
-import com.wl4g.rengine.job.analytic.core.model.RengineEventAnalyticalModel;
+import com.wl4g.rengine.job.analytic.core.model.RengineEventAnalytical;
 import com.wl4g.infra.common.cli.CommandLineTool;
 import com.wl4g.infra.common.cli.CommandLineTool.CommandLineFacade;
 
@@ -154,7 +154,7 @@ public abstract class RengineFlinkStreamingBase implements Runnable {
      * 
      * @return
      */
-    protected abstract RengineFlinkStreamingBase customStream(DataStreamSource<RengineEventAnalyticalModel> dataStream);
+    protected abstract RengineFlinkStreamingBase customStream(DataStreamSource<RengineEventAnalytical> dataStream);
 
     /**
      * Handling job execution result.
@@ -178,7 +178,7 @@ public abstract class RengineFlinkStreamingBase implements Runnable {
         if (nonNull(checkpointMode)) {
             env.enableCheckpointing(checkpointMillis, checkpointMode);
         }
-        DataStreamSource<RengineEventAnalyticalModel> dataStream = env.fromSource(createSource(),
+        DataStreamSource<RengineEventAnalytical> dataStream = env.fromSource(createSource(),
                 RengineEventWatermarks.newWatermarkStrategy(ofMillis(outOfOrdernessMillis), ofMillis(idleTimeoutMillis)),
                 jobName.concat("Source"));
         if (parallelism > 0) {

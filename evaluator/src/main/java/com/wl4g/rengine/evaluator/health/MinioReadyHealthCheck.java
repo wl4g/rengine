@@ -19,7 +19,6 @@ import static java.lang.String.format;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -63,7 +62,7 @@ public class MinioReadyHealthCheck implements HealthCheck {
         try {
             if (minioManager.getMinioClient()
                     .bucketExists(BucketExistsArgs.builder()
-                            .extraHeaders(Collections.emptyMap())
+                            // .extraHeaders(Collections.emptyMap())
                             .bucket(RengineConstants.DEF_MINIO_BUCKET)
                             .build())) {
                 builder.up();

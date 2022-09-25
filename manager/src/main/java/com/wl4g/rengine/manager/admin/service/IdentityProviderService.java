@@ -15,8 +15,8 @@
  */
 package com.wl4g.rengine.manager.admin.service;
 
-import com.wl4g.rengine.manager.admin.model.AddIdentityProvider;
-import com.wl4g.rengine.manager.admin.model.AddIdentityProviderResult;
+import com.wl4g.rengine.manager.admin.model.SaveIdentityProvider;
+import com.wl4g.rengine.manager.admin.model.SaveIdentityProviderResult;
 import com.wl4g.rengine.manager.admin.model.QueryIdentityProvider;
 import com.wl4g.rengine.manager.admin.model.QueryIdentityProviderResult;
 
@@ -31,6 +31,6 @@ public interface IdentityProviderService {
 
     QueryIdentityProviderResult query(QueryIdentityProvider model);
 
-    AddIdentityProviderResult save(AddIdentityProvider model);
+    SaveIdentityProviderResult save(SaveIdentityProvider model);
 
 }

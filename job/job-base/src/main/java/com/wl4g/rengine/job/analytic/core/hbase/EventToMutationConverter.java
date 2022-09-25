@@ -16,14 +16,14 @@
 package com.wl4g.rengine.job.analytic.core.hbase;
 
 import static com.google.common.base.Charsets.UTF_8;
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.StringUtils2.getBytes;
-import static com.wl4g.infra.common.reflect.ReflectionUtils2.getField;
-import static java.util.Objects.nonNull;
+import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 
-import java.lang.reflect.Field;
-
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -31,7 +31,9 @@ import org.apache.flink.connector.hbase.sink.HBaseMutationConverter;
 import org.apache.hadoop.hbase.client.Mutation;
 import org.apache.hadoop.hbase.client.Put;
 
-import com.wl4g.rengine.job.analytic.core.model.RengineEventAnalyticalModel;
+import com.wl4g.rengine.common.event.RengineEvent;
+import com.wl4g.rengine.common.event.RengineEvent.EventSource;
+import com.wl4g.rengine.job.analytic.core.model.RengineEventAnalytical;
 
 /**
  * {@link EventToMutationConverter}
@@ -40,7 +42,7 @@ import com.wl4g.rengine.job.analytic.core.model.RengineEventAnalyticalModel;
  * @version 2022-06-06 v3.0.0
  * @since v3.0.0
  */
-public class EventToMutationConverter implements HBaseMutationConverter<RengineEventAnalyticalModel> {
+public class EventToMutationConverter implements HBaseMutationConverter<RengineEventAnalytical> {
     private static final long serialVersionUID = 1L;
 
     private final byte[] nullStringBytes;
@@ -58,54 +60,69 @@ public class EventToMutationConverter implements HBaseMutationConverter<RengineE
     }
 
     @Override
-    public Mutation convertToMutation(@NotNull RengineEventAnalyticalModel record) {
-        notNullOf(record, "record");
-        Put put = new Put(generateRowkey(record));
-        for (Field f : RengineEventAnalyticalModel.ORDERED_FIELDS) {
-            byte[] value = nullStringBytes;
-            Object v = getField(f, record, true);
-            if (nonNull(v)) {
-                value = getBytes(v.toString());
-            }
-            put.addColumn(getBytes("f1"), getBytes(f.getName()), value);
-        }
+    public Mutation convertToMutation(@NotNull RengineEventAnalytical model) {
+        notNullOf(model, "model");
+        model.getEvent().validate();
+
+        final RengineEvent event = model.getEvent();
+        final Put put = new Put(generateRowkey(model));
+
+        // observedTime
+        addPutColumn(put, "observedTime", DateFormatUtils.format(event.getObservedTime(), "yyyyMMddHHmmss"));
+        // body
+        addPutColumn(put, "body", event.getBody());
+
         return put;
     }
 
-    protected byte[] generateRowkey(@NotNull RengineEventAnalyticalModel record) {
-        // Use reversed time strings to avoid data hotspots.
-        String reverseDate = DateFormatUtils.format(record.getTimestamp(), "SSSssmmHHddMMyy");
+    protected void addPutColumn(@NotNull Put put, @NotBlank String field, @NotNull Object value) {
+        if (isNull(value)) {
+            value = nullStringBytes;
+        }
+        put.addColumn(getBytes("f1"), getBytes(field), getBytes(value.toString()));
+    }
 
-        // TODO transform to standard city/region/country name.
-        //
-        return new StringBuilder().append(reverseDate) // when
+    protected byte[] generateRowkey(@NotNull RengineEventAnalytical model) {
+        EventSource source = (EventSource) model.getEvent().getSource();
+
+        // Use reversed time strings to avoid data hotspots.
+        // Options are: SSSssmmHHddMMyy | SSSyyMMddHHmmss?
+        String reverseDate = DateFormatUtils.format(source.getSourceTime(), "SSSyyMMddHHmmss");
+
+        // TODO transform to ZIPCODE-standard city/region/country name.
+        return new StringBuilder()
+                // when
+                .append(reverseDate)
                 // who
                 .append(",")
-                .append(record.getPrincipal())
+                .append(join(safeList(source.getPrincipals()).toArray(), ","))
                 // what
                 .append(",")
-                .append(record.getEventType().getCode())
+                .append(model.getEvent().getEventType())
                 // where
-                .append(",")
-                .append(getGeoCityKey(record))
-                .append(",")
-                .append(getGeoRegionKey(record))
-                .append(",")
-                .append(getGeoCountryKey(record))
+                // TODO 未拿到准确且完整的区域编码字典，无法约束采集源端传来的值，暂时只能放到非 RowKey，
+                // 但由于管理端 “数据洞察”->“事件分析” 支持查看事件统计/分析，其中 echarts 按照全球地图展示，因此最好还是
+                // 使用一份完整的 Geo-ZipCode 映射字典
+                // .append(",")
+                // .append(getGeoCityKey(source))
+                // .append(",")
+                // .append(getGeoRegionKey(source))
+                // .append(",")
+                // .append(getGeoCountryKey(source))
                 .toString()
                 .getBytes(UTF_8);
     }
 
-    protected String getGeoCityKey(@NotNull RengineEventAnalyticalModel record) {
-        return fixFieldKey(record.getIpGeoInfo().getCity());
+    protected String getGeoCityKey(@NotNull EventSource source) {
+        return fixFieldKey(source.getLocation().getCity());
     }
 
-    protected String getGeoRegionKey(@NotNull RengineEventAnalyticalModel record) {
-        return fixFieldKey(record.getIpGeoInfo().getRegion());
+    protected String getGeoRegionKey(@NotNull EventSource source) {
+        return fixFieldKey(source.getLocation().getRegion());
     }
 
-    protected String getGeoCountryKey(@NotNull RengineEventAnalyticalModel record) {
-        return fixFieldKey(record.getIpGeoInfo().getCountryShort());
+    protected String getGeoCountryKey(@NotNull EventSource source) {
+        return fixFieldKey(source.getLocation().getCountry());
     }
 
     /**
@@ -140,7 +157,6 @@ public class EventToMutationConverter implements HBaseMutationConverter<RengineE
      **/
     protected String fixFieldKey(String field) {
         String cleanFieldKey = trimToEmpty(field).toLowerCase().replace(" ", "_");
-
         // Limit field max length.
         if (cleanFieldKey.length() > DEFAULT_MAX_ROWKEY_FIELD_LENGTH) {
             cleanFieldKey = cleanFieldKey.substring(0, DEFAULT_MAX_ROWKEY_FIELD_LENGTH);

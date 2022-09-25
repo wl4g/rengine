@@ -15,6 +15,7 @@
  */
 package com.wl4g.rengine.evaluator.service.impl;
 
+import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.rengine.evaluator.metrics.EvaluatorMeterService.MetricsName.evaluation_total;
 
 import javax.inject.Inject;
@@ -22,7 +23,10 @@ import javax.inject.Singleton;
 
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.common.model.Evaluation;
+import com.wl4g.rengine.common.model.EvaluationEngine;
 import com.wl4g.rengine.common.model.EvaluationResult;
+import com.wl4g.rengine.evaluator.execution.ExecutionFactory;
+import com.wl4g.rengine.evaluator.execution.IExecution;
 import com.wl4g.rengine.evaluator.metrics.EvaluatorMeterService;
 import com.wl4g.rengine.evaluator.metrics.EvaluatorMeterService.MetricsTag;
 import com.wl4g.rengine.evaluator.service.EvaluatorService;
@@ -41,7 +45,11 @@ import io.smallrye.mutiny.Uni;
 @Singleton
 public class EvaluatorServiceImpl implements EvaluatorService {
 
-    private @Inject EvaluatorMeterService meterService;
+    @Inject
+    EvaluatorMeterService meterService;
+
+    @Inject
+    ExecutionFactory executionFactory;
 
     @Override
     public Uni<RespBase<EvaluationResult>> evaluate(Evaluation model) {
@@ -54,11 +62,14 @@ public class EvaluatorServiceImpl implements EvaluatorService {
                             MetricsTag.SCENES, model.getScenes())
                     .increment();
 
-            // TODO Auto-generated method stub
-            // ...
-
-            return resp;
+            return resp.withData(doEvaluation(model));
         });
+    }
+
+    private EvaluationResult doEvaluation(Evaluation model) {
+        IExecution execution = executionFactory.getExecution(EvaluationEngine.valueOf(model.getEngine()));
+        notNull(execution, "Could not load execution engine via %s", model.getEngine());
+        return execution.apply(model);
     }
 
 }

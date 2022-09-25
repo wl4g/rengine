@@ -30,8 +30,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import com.wl4g.rengine.common.bean.Notification;
-import com.wl4g.rengine.manager.admin.model.AddNotification;
-import com.wl4g.rengine.manager.admin.model.AddNotificationResult;
+import com.wl4g.rengine.manager.admin.model.SaveNotification;
+import com.wl4g.rengine.manager.admin.model.SaveNotificationResult;
 import com.wl4g.rengine.manager.admin.model.QueryNotification;
 import com.wl4g.rengine.manager.admin.model.QueryNotificationResult;
 import com.wl4g.rengine.manager.admin.service.NotificationService;
@@ -67,7 +67,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public AddNotificationResult save(AddNotification model) {
+    public SaveNotificationResult save(SaveNotification model) {
         Notification provider = model.getProvider();
         if (isNull(provider.getId())) {
             provider.setId(IdGenUtil.next());
@@ -75,7 +75,7 @@ public class NotificationServiceImpl implements NotificationService {
         provider.setUpdateBy("admin");
         provider.setUpdateDate(new Date());
         Notification saved = mongoTemplate.insert(provider, MongoCollectionDefinition.SYS_NOTIFICATION_CONFIG.getName());
-        return AddNotificationResult.builder().id(saved.getId()).build();
+        return SaveNotificationResult.builder().id(saved.getId()).build();
     }
 
 }

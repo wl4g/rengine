@@ -1,0 +1,104 @@
+[
+{
+  "name":"com.wl4g.rengine.evaluator.execution.sdk.ScriptContext",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getId","parameterTypes":[] }, 
+    {"name":"getType","parameterTypes":[] }, 
+    {"name":"getArgs","parameterTypes":[] },
+    {"name":"getEvent","parameterTypes":[] },
+    {"name":"getAttributes","parameterTypes":[] },
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.evaluator.execution.sdk.ScriptContext$ScriptRengineEvent",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getEventType","parameterTypes":[] }, 
+    {"name":"getObservedTime","parameterTypes":[] }, 
+    {"name":"getBody","parameterTypes":[] }, 
+    {"name":"getEventSource","parameterTypes":[] },
+    {"name":"getAttributes","parameterTypes":[] },
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.evaluator.execution.sdk.ScriptContext$ScriptEventSource",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getSourceTime","parameterTypes":[] },
+    {"name":"getPrincipals","parameterTypes":[] }, 
+    {"name":"getLocation","parameterTypes":[] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.evaluator.execution.sdk.ScriptContext$ScriptEventLocation",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getIpAddress","parameterTypes":[] }, 
+    {"name":"getIpv6","parameterTypes":[] }, 
+    {"name":"getIsp","parameterTypes":[] }, 
+    {"name":"getDomain","parameterTypes":[] }, 
+    {"name":"getCountry","parameterTypes":[] }, 
+    {"name":"getRegion","parameterTypes":[] }, 
+    {"name":"getCity","parameterTypes":[] }, 
+    {"name":"getLatitude","parameterTypes":[] }, 
+    {"name":"getLongitude","parameterTypes":[] }, 
+    {"name":"getTimezone","parameterTypes":[] }, 
+    {"name":"getZipcode","parameterTypes":[] }, 
+    {"name":"getElevation","parameterTypes":[] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.evaluator.execution.sdk.ScriptHttpClient",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getAsText","parameterTypes":["java.lang.String"] }, 
+    {"name":"postAsText","parameterTypes":["java.lang.String","java.lang.Object"] }, 
+    {"name":"getAsJson","parameterTypes":["java.lang.String"] }, 
+    {"name":"postAsJson","parameterTypes":["java.lang.String","java.lang.Object"] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.evaluator.rest.TestGroovyResource$GroovyExecution"
+},
+{
+  "name":"com.wl4g.rengine.evaluator.rest.TestJavascriptResource",
+  "queriedMethods":[
+    {"name":"execution","parameterTypes":["com.wl4g.rengine.evaluator.rest.TestJavascriptResource$JavascriptExecution"] }, 
+    {"name":"init","parameterTypes":[] }, 
+    {"name":"onStart","parameterTypes":["io.quarkus.runtime.StartupEvent"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.evaluator.rest.TestJavascriptResource$JavascriptExecution",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setArgs","parameterTypes":["java.util.List"] }, 
+    {"name":"setScriptPath","parameterTypes":["java.lang.String"] },
+    {"name":"toString","parameterTypes":[] }
+  ]
+}
+]

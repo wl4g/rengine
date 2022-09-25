@@ -15,14 +15,16 @@
  */
 package com.wl4g.rengine.job.analytic.core.hbase;
 
-import static com.wl4g.infra.common.lang.FastTimeClock.currentTimeMillis;
+import static java.lang.System.currentTimeMillis;
+import static java.util.Collections.singletonList;
 
 import org.apache.hadoop.hbase.client.Mutation;
 import org.junit.Test;
 
-import com.wl4g.rengine.common.event.RengineEventBase.EventType;
-import com.wl4g.rengine.job.analytic.core.model.RengineEventAnalyticalModel;
-import com.wl4g.rengine.job.analytic.core.model.RengineEventAnalyticalModel.IpGeoInformation;
+import com.wl4g.rengine.common.event.RengineEvent;
+import com.wl4g.rengine.common.event.RengineEvent.EventSource;
+import com.wl4g.rengine.common.event.RengineEvent.EventLocation;
+import com.wl4g.rengine.job.analytic.core.model.RengineEventAnalytical;
 
 /**
  * {@link EventToMutationConverterTests}
@@ -35,23 +37,24 @@ public class EventToMutationConverterTests {
 
     @Test
     public void testEventToMutationConverter() {
-        RengineEventAnalyticalModel model = RengineEventAnalyticalModel.builder()
-                .timestamp(currentTimeMillis())
-                .eventType(EventType.AUTHC_SUCCESS)
-                .principal("jack_6")
-                .ipGeoInfo(IpGeoInformation.builder()
-                        .ip("2.2.28.22")
-                        .latitude("111.234235")
-                        .longitude("20.124521")
-                        .countryShort("CN")
-                        .build())
-                .message("my message 6")
+        RengineEventAnalytical model = RengineEventAnalytical.builder()
+                .event(new RengineEvent("device_temp_warning",
+                        EventSource.builder()
+                                .sourceTime(currentTimeMillis())
+                                .principals(singletonList("admin"))
+                                .location(EventLocation.builder()
+                                        .ipAddress("1.1.1.1")
+                                        .city("Washington")
+                                        .region("Pennsylvania Avenue")
+                                        .zipcode("20500")
+                                        .build())
+                                .build(),
+                        "A serious alarm occurs when the device temperature is greater than 52℃"))
                 .build();
 
         EventToMutationConverter converter = new EventToMutationConverter();
         converter.open();
         Mutation mutation = converter.convertToMutation(model);
-
         System.out.println(mutation);
     }
 

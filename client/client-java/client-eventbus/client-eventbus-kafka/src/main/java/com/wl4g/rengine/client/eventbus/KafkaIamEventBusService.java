@@ -29,7 +29,7 @@ import org.springframework.kafka.support.SendResult;
 
 import com.wl4g.rengine.client.eventbus.config.RengineEventBusProperties;
 import com.wl4g.rengine.client.eventbus.config.KafkaEventBusProperties;
-import com.wl4g.rengine.common.event.RengineEventBase;
+import com.wl4g.rengine.common.event.RengineEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
@@ -66,7 +66,7 @@ public class KafkaIamEventBusService implements RengineEventBusService<SendResul
     }
 
     @Override
-    public Future<SendResult<String, String>> publish(RengineEventBase event) {
+    public Future<SendResult<String, String>> publish(RengineEvent event) {
         ProducerRecord<String, String> record = new ProducerRecord<>(eventBusConfig.getEventTopic(), toJSONString(event));
         log.debug("Send: {}", record);
         return kafkaTemplate.send(record);

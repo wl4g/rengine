@@ -44,7 +44,6 @@ spring:
       tenantSecretKey: 12345678
       userUpload:
         #stsPolicyActions: {}
-        libraryExtensions: [".jar"]
         ## The adjusting partSize will affect whether the pubObject() of the
         ## minio-js SDK enables multipart upload, that is, the interface
         ## corresponding to s3:ListBucketMultipartUploads will be called, but
@@ -60,7 +59,6 @@ spring:
         ## @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1723
         libraryPartSize: 10MB
         libraryFileLimitSize: 10MB
-        testsetExtensions: [".csv"]
         testsetPartSize: 10MB
         testsetFileLimitSize: 10MB
         expiredDuration: 5M

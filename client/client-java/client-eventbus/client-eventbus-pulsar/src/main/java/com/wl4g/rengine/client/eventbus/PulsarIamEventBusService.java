@@ -21,7 +21,7 @@ import org.springframework.beans.factory.InitializingBean;
 
 import com.wl4g.rengine.client.eventbus.config.PulsarEventBusProperties;
 import com.wl4g.rengine.client.eventbus.config.RengineEventBusProperties;
-import com.wl4g.rengine.common.event.RengineEventBase;
+import com.wl4g.rengine.common.event.RengineEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
@@ -52,7 +52,7 @@ public class PulsarIamEventBusService implements RengineEventBusService<Void>, I
     }
 
     @Override
-    public Future<Void> publish(RengineEventBase event) {
+    public Future<Void> publish(RengineEvent event) {
         log.debug("Send: {}", event); // TODO
         return null;
     }

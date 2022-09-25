@@ -90,30 +90,30 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
-        <!--        <dependency>-->
-        <!--            <groupId>io.grpc</groupId>-->
-        <!--            <artifactId>grpc-context</artifactId>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>io.grpc</groupId>-->
-        <!--            <artifactId>grpc-stub</artifactId>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>io.grpc</groupId>-->
-        <!--            <artifactId>grpc-core</artifactId>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>io.grpc</groupId>-->
-        <!--            <artifactId>grpc-api</artifactId>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>io.grpc</groupId>-->
-        <!--            <artifactId>grpc-netty-shaded</artifactId>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>io.grpc</groupId>-->
-        <!--            <artifactId>grpc-protobuf</artifactId>-->
-        <!--        </dependency>-->
+        <!-- <dependency>-->
+        <!--     <groupId>io.grpc</groupId>-->
+        <!--     <artifactId>grpc-context</artifactId>-->
+        <!-- </dependency>-->
+        <!-- <dependency>-->
+        <!--     <groupId>io.grpc</groupId>-->
+        <!--     <artifactId>grpc-stub</artifactId>-->
+        <!-- </dependency>-->
+        <!-- <dependency>-->
+        <!--     <groupId>io.grpc</groupId>-->
+        <!--     <artifactId>grpc-core</artifactId>-->
+        <!-- </dependency>-->
+        <!-- <dependency>-->
+        <!--     <groupId>io.grpc</groupId>-->
+        <!--     <artifactId>grpc-api</artifactId>-->
+        <!-- </dependency>-->
+        <!-- <dependency>-->
+        <!--     <groupId>io.grpc</groupId>-->
+        <!--     <artifactId>grpc-netty-shaded</artifactId>-->
+        <!-- </dependency>-->
+        <!-- <dependency>-->
+        <!--     <groupId>io.grpc</groupId>-->
+        <!--     <artifactId>grpc-protobuf</artifactId>-->
+        <!-- </dependency>-->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

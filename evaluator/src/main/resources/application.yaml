@@ -99,6 +99,7 @@ quarkus:
     readiness-path: /ready
     startup-path: /started
   micrometer:
+    enabled: true
     registry-enabled-default: true
     binder-enabled-default: true
     binder:
@@ -113,6 +114,7 @@ quarkus:
         enabled: true
         path: /metrics
   opentelemetry:
+    enabled: true
     propagators: [tracecontext,baggage]
     tracer:
       resource-attributes: {}
@@ -128,10 +130,67 @@ quarkus:
         #jaeger:
         #  endpoint: http://localhost:14250
         #  export-timeout: 10s
-  ## see:https://quarkus.io/guides/all-config#quarkus-core_quarkus.native.inline-before-analysis
+  ## see:https://quarkus.io/guides/openapi-swaggerui#quarkus-smallrye-openapi_configuration
+  swagger-ui:
+    enable: true
+    path: /swagger-ui
+    always-include: true
+    title: Rengine Evaluator APIs
+    #layout:
+    theme: original # original, feeling-blue, flattop, material, monokai, muted, newspaper, outline
+    supported-submit-methods: [PUT, POST]
+    #with-credentials:
+    #urls:
+    #  local: http://localhost:${quarkus.http.port}${quarkus.http.root-apth}/openapi
+    #oauth2-redirect-url:
+    #oauth-client-id:
+    #oauth-client-secret:
+    #oauth-realm:
+    #oauth-scope-separator: ','
+    #oauth-scopes: 'profile,openid,read,write'
+    #oauth-additional-query-string-params:
+  smallrye-openapi:
+    path: /openapi
+    info-title: "Rengine Evaluator APIs"
+    info-version: 1.0.0
+    info-description: "Rengine Evaluator APIs Documention"
+    info-terms-of-service: http://swagger.io/terms/
+    info-contact-name: "James Wong"
+    info-contact-email: "rengine@wl4g.com"
+    info-contact-url: "http://rengine.wl4g.com/contact"
+    info-license-name: "Apache 2.0"
+    info-license-url: "http://www.apache.org/licenses/LICENSE-2.0"
+  package:
+    type: jar
+    runner-suffix: "-native"
+    add-runner-suffix: true
+  ## see:https://quarkus.io/guides/writing-native-applications-tips#supporting-native-in-your-application
   native:
+    builder-image: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image:22.1-java11
     file-encoding: UTF-8
     inline-before-analysis: true
+    ## see:https://quarkus.io/guides/native-reference#i-get-an-outofmemoryerror-oome-building-native-executables-what-can-i-do
+    native-image-xmx: 8g
+    #resources:
+    #  includes: foo/**,bar/**/*.txt
+    #  excludes: foo/private/**
+    ## see:https://quarkus.io/guides/writing-native-applications-tips#delay-class-init-in-your-app
+    #additional-build-args: "--initialize-at-run-time=com.wl4g.infra.common.lang.Assert2\\,org.codehaus.groovy.control.XStreamUtils"
+    #additional-build-args: "--link-at-build-time=org.codehaus.groovy.control.XStreamUtils"
+    ## [Notice]: As of GraalVM 22.2 the language:js plugin has been removed from the default plugin list, and needs to be installed manually by run $GRAALVM_HOME/bin/gu install js
+    ## Run this command to check if the image is supports: docker run --rm quay.io/quarkus/ubi-quarkus-native-image:22.1-java11 --help | grep 'language'
+    ## [Notice]: Required option: "--initialize-at-run-time=org.apache.commons.lang3.RandomUtils" is already set in the (com.wl4g:infra-common-java11) dependency module.
+    additional-build-args: "--language:js,--no-fallback,--report-unsupported-elements-at-runtime,--initialize-at-run-time=groovy.grape.GrapeIvy"
+    #compression:
+    #  level: 5 # 1-10 The larger the higher the compression ratio, the longer the build time.
+    #  additional-args: --ultra-brute,-v
+    ## [Notice]: Tried enabling this option, in order to allow its javax.script.ScriptEngineManager to automatically register such as:
+    ## com.oracle.truffle.js.scriptengine.GraalJSEngineFactory when building the native package, but the result is invalid. We should use --language:js option to support graal.js
+    #auto-service-loader-registration: true
+    enable-fallback-images: false
+    #enable-reports: true
+    #debug-build-process: true
+    #publish-debug-build-process-port: 38002
     debug:
       enabled: true
       enable-dashboard-dump: true
@@ -151,6 +210,7 @@ quarkus:
       secret: abcdefghijklmnopqrstuvwzyx
     tls:
       verification: none
+  #datasource: {}
   ## see:https://github.com/quarkusio/quarkus-quickstarts/blob/main/mongodb-quickstart/src/main/resources/application.properties
   mongodb:
     connection-string: mongodb://localhost:27017
@@ -171,6 +231,7 @@ quarkus:
 minio:
   endpoint: http://localhost:9000
   region: us-east-1
+  bucket: rengine
   tenant-access-key: rengine
   tenant-secret-key: 12345678
   http-client:

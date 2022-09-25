@@ -15,6 +15,11 @@
  */
 package com.wl4g.rengine.evaluator.execution;
 
+import java.util.function.Function;
+
+import com.wl4g.rengine.common.model.Evaluation;
+import com.wl4g.rengine.common.model.EvaluationResult;
+
 /**
  * {@link IExecution}
  * 
@@ -22,6 +27,5 @@ package com.wl4g.rengine.evaluator.execution;
  * @version 2022-09-17
  * @since v3.0.0
  */
-public interface IExecution {
-
+public interface IExecution extends Function<Evaluation, EvaluationResult> {
 }

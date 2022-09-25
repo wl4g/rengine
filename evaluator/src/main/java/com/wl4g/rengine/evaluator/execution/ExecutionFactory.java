@@ -15,15 +15,32 @@
  */
 package com.wl4g.rengine.evaluator.execution;
 
+import javax.enterprise.inject.spi.BeanManager;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import com.wl4g.rengine.common.model.EvaluationEngine;
+
 /**
  * {@link ExecutionFactory}
  * 
  * @author James Wong
  * @version 2022-09-17
  * @since v3.0.0
+ * @see https://github.com/google/guice/wiki/Motivation
  */
-public interface ExecutionFactory {
+@Singleton
+public class ExecutionFactory {
 
-    IExecution getExecutor();
+    @Inject
+    BeanManager beanManager;
+
+    public IExecution getExecution(EvaluationEngine engine) {
+
+        // TODO
+        // beanManager.getPassivationCapableBean(null);
+
+        return null;
+    }
 
 }

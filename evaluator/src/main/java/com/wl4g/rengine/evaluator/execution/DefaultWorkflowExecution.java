@@ -15,6 +15,9 @@
  */
 package com.wl4g.rengine.evaluator.execution;
 
+import com.wl4g.rengine.common.model.Evaluation;
+import com.wl4g.rengine.common.model.EvaluationResult;
+
 /**
  * {@link DefaultWorkflowExecution}
  * 
@@ -22,6 +25,12 @@ package com.wl4g.rengine.evaluator.execution;
  * @version 2022-09-17
  * @since v3.0.0
  */
-public class DefaultWorkflowExecution extends AbstractTreeExecution {
+public class DefaultWorkflowExecution implements IExecution {
+
+    @Override
+    public EvaluationResult apply(Evaluation t) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 }

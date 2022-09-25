@@ -34,8 +34,8 @@ public abstract class RabbitMQUtil {
     // public static <T, S extends SourceSplit, E> Source<T, S, E>
     // createRabbitMQSource(RengineFlinkStreamingBase program) {
     // // TODO
-    // RabbitMQSource<RengineEventAnalyticalModel> source =
-    // RabbitMQSource.<RengineEventAnalyticalModel> builder()
+    // RabbitMQSource<RengineEventAnalytical> source =
+    // RabbitMQSource.<RengineEventAnalytical> builder()
     // .setServiceUrl(program.getBrokers())
     // // .setGroupId(program.getGroupId())
     // .setTopicPattern(Pattern.compile(program.getTopicPattern()))

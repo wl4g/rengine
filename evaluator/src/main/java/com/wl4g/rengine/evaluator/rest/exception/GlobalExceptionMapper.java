@@ -82,7 +82,7 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
         // Use 500 (Internal Server Error) for all other
         else {
             return Response.status(200)
-                    ./* serverError(). */entity(RespBase.create().withCode(500).withMessage("Internal Server Error"))
+                    ./* serverError(). */entity(RespBase.create().withCode(500).withMessage(format("Server Errors")))
                     .build();
         }
     }

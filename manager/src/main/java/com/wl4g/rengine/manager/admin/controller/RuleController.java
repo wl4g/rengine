@@ -26,8 +26,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.manager.admin.model.AddRule;
-import com.wl4g.rengine.manager.admin.model.AddRuleResult;
+import com.wl4g.rengine.manager.admin.model.SaveRule;
+import com.wl4g.rengine.manager.admin.model.SaveRuleResult;
 import com.wl4g.rengine.manager.admin.model.DeleteRule;
 import com.wl4g.rengine.manager.admin.model.DeleteRuleResult;
 import com.wl4g.rengine.manager.admin.model.QueryRule;
@@ -72,9 +72,9 @@ public class RuleController {
     @Operation(description = "Save rules model.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    public RespBase<AddRuleResult> save(@Validated @RequestBody AddRule model) {
+    public RespBase<SaveRuleResult> save(@Validated @RequestBody SaveRule model) {
         log.info("called: model={}", model);
-        RespBase<AddRuleResult> resp = RespBase.create();
+        RespBase<SaveRuleResult> resp = RespBase.create();
         resp.setData(ruleService.save(model));
         return resp;
     }

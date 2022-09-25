@@ -16,6 +16,7 @@
 package com.wl4g.rengine.common.bean;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 
 import java.util.List;
 
@@ -25,10 +26,10 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.wl4g.infra.common.validation.EnumValue;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -50,9 +51,10 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class UploadObject extends BeanBase {
 
-    @Schema(implementation = UploadObject.BizType.class)
-    private @NotBlank @EnumValue(enumCls = UploadObject.BizType.class) String bizType;
-    private @NotBlank String prefix;
+    @Schema(implementation = UploadObject.UploadType.class)
+    private @NotBlank @EnumValue(enumCls = UploadObject.UploadType.class) String UploadType;
+    // Save API front-end without objectPrefix.
+    private @NotBlank @Schema(hidden = false, accessMode = AccessMode.READ_ONLY) String objectPrefix;
     private @NotBlank String filename;
     private @NotBlank String extension;
     private @Nullable List<String> labels;
@@ -65,16 +67,20 @@ public class UploadObject extends BeanBase {
 
     @Getter
     @AllArgsConstructor
-    public static enum BizType {
-        USER_LIBRARY("library"), TEST_DATASET("testset");
+    public static enum UploadType {
+        USER_LIBRARY_WITH_GROOVY("library/groovy", asList(".groovy", ".jar")),
 
-        @JsonValue
-        private final String value;
+        USER_LIBRARY_WITH_JS("library/js", asList(".js")),
+
+        TEST_DATASET("testset/csv", asList(".csv"));
+
+        private final String prefix;
+        private final List<String> extensions;
 
         @JsonCreator
-        public static BizType of(String type) {
-            for (BizType a : values()) {
-                if (a.getValue().equals(type) || a.name().equals(type)) {
+        public static UploadType of(String type) {
+            for (UploadType a : values()) {
+                if (a.name().equalsIgnoreCase(type)) {
                     return a;
                 }
             }
