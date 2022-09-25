@@ -156,7 +156,7 @@ curl -L -o /tmp/test-js2java.js 'https://raw.githubusercontent.com/wl4g/rengine/
 ```bash
 curl -v -XPOST -H 'Content-Type: application/json' 'http://localhost:28002/test/javascript/execution' -d '{
     "scriptPath": "file:///tmp/test-js2java.js",
-    "args": []
+    "args": ["jack01", "66"]
 }'
 ```
 

@@ -4,6 +4,7 @@ function process(context) {
     console.info("context.id:", context.id);
     console.info("context.getId():", context.getId());
     console.info("context.getType():", context.getType());
+    console.info("context.getArgs():", context.getArgs()[0]);
     console.info("context.getAttributes():", context.getAttributes());
     console.info("context.getAttributes()['objId']:", context.getAttributes()["objId"]);
 
