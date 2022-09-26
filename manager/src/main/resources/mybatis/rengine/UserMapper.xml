@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.wl4g.rengine.server.mapper.UserMapper">
+<mapper namespace="com.wl4g.rengine.manager.admin.mapper.UserMapper">
   <resultMap id="BaseResultMap" type="com.wl4g.rengine.common.bean.User">
     <id column="id" jdbcType="BIGINT" property="id" />
     <id column="password" jdbcType="VARCHAR" property="password" />

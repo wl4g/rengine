@@ -15,6 +15,8 @@
  */
 package com.wl4g.rengine.manager.admin.model;
 
+import javax.validation.constraints.NotNull;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -34,6 +36,5 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @NoArgsConstructor
 public class DeleteBase {
-    // 请求有值，但校验不通过?
-    private /* @NotNull */ Long id;
+    private @NotNull Long id;
 }

@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.common.bean;
+package com.wl4g.rengine.manager.admin.model;
 
 import java.util.List;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Min;
 
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,10 +28,10 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link Project}
+ * {@link QueryBase}
  * 
  * @author James Wong
- * @version 2022-08-29
+ * @version 2022-08-28
  * @since v3.0.0
  */
 @Getter
@@ -38,8 +39,11 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class Project extends BeanBase {
-    private @NotBlank String name;
-    private @Nullable String owner;
+public abstract class QueryBase<Q> {
+    private @Nullable String name;
+    private @Nullable String orgCode;
     private @Nullable List<String> labels;
+    private @Nullable Boolean enable;
+    private @Min(0) @Default Integer pageNum = 0;
+    private @Min(1) @Default Integer pageSize = 10;
 }

@@ -15,11 +15,12 @@
  */
 package com.wl4g.rengine.manager.admin.service;
 
-import com.wl4g.rengine.manager.admin.model.SaveUpload;
+import com.wl4g.infra.common.bean.page.PageHolder;
+import com.wl4g.rengine.common.bean.UploadObject;
 import com.wl4g.rengine.manager.admin.model.DeleteUpload;
 import com.wl4g.rengine.manager.admin.model.DeleteUploadResult;
 import com.wl4g.rengine.manager.admin.model.QueryUpload;
-import com.wl4g.rengine.manager.admin.model.QueryUploadResult;
+import com.wl4g.rengine.manager.admin.model.SaveUpload;
 import com.wl4g.rengine.manager.admin.model.SaveUploadResult;
 
 /**
@@ -31,7 +32,7 @@ import com.wl4g.rengine.manager.admin.model.SaveUploadResult;
  */
 public interface UploadService {
 
-    QueryUploadResult query(QueryUpload model);
+    PageHolder<UploadObject> query(QueryUpload model);
 
     SaveUploadResult apply(SaveUpload model);
 

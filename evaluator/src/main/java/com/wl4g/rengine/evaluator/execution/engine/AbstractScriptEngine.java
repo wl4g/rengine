@@ -56,7 +56,7 @@ public abstract class AbstractScriptEngine implements IEngine {
         return scripts;
     }
 
-    protected ScriptContext newRengineContext(Evaluation model) {
+    protected ScriptContext newScriptContext(Evaluation model) {
         ScriptContext context = ScriptContext.builder().build();
         // TODO add more context parameters
         context.getArgs().addAll(model.getScripting().getArgs());

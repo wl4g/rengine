@@ -45,7 +45,7 @@ public abstract class RengineConstants extends EnvironmentUtil {
     @AllArgsConstructor
     public static enum MongoCollectionDefinition {
 
-        PROJECTS("projects"),
+        SCENESES("sceneses"),
 
         WORKFLOWS("workflows"),
 

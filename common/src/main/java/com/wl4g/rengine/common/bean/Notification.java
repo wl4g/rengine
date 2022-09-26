@@ -25,6 +25,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.infra.common.validation.EnumValue;
 import com.wl4g.rengine.common.bean.Notification.AliyunSmsConfig;
 import com.wl4g.rengine.common.bean.Notification.AliyunVmsConfig;
@@ -60,7 +61,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public abstract class Notification extends BeanBase {
+public abstract class Notification extends BaseBean {
+    private static final long serialVersionUID = 1L;
 
     @Schema(name = "@kind", implementation = NotificationKind.class)
     @JsonProperty(value = "@kind")
@@ -72,6 +74,7 @@ public abstract class Notification extends BeanBase {
     @ToString
     @NoArgsConstructor
     public static class EmailConfig extends Notification {
+        private static final long serialVersionUID = 1L;
         private @NotBlank String smtpHost;
         private @NotNull @Min(0) Integer smtpPort;
         private @NotBlank String sendMail;
@@ -86,6 +89,7 @@ public abstract class Notification extends BeanBase {
     @ToString
     @NoArgsConstructor
     public static class DingtalkConfig extends Notification {
+        private static final long serialVersionUID = 1L;
         private @NotBlank String appKey;
         private @NotBlank String appSecret;
     }
@@ -96,6 +100,7 @@ public abstract class Notification extends BeanBase {
     @ToString
     @NoArgsConstructor
     public static class WeComConfig extends Notification {
+        private static final long serialVersionUID = 1L;
     }
 
     @Getter
@@ -104,6 +109,7 @@ public abstract class Notification extends BeanBase {
     @ToString
     @NoArgsConstructor
     public static class AliyunSmsConfig extends Notification {
+        private static final long serialVersionUID = 1L;
         private @NotBlank String accessKey;
         private @NotBlank String accessSecret;
         private @NotBlank String regionId;
@@ -116,6 +122,7 @@ public abstract class Notification extends BeanBase {
     @ToString
     @NoArgsConstructor
     public static class AliyunVmsConfig extends Notification {
+        private static final long serialVersionUID = 1L;
         private @NotBlank String accessKey;
         private @NotBlank String accessSecret;
         private @NotBlank String regionId;
@@ -128,6 +135,7 @@ public abstract class Notification extends BeanBase {
     @ToString
     @NoArgsConstructor
     public static class WebhookConfig extends Notification {
+        private static final long serialVersionUID = 1L;
         private List<String> urls;
     }
 

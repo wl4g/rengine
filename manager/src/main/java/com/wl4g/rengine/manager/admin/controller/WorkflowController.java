@@ -25,13 +25,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.manager.admin.model.SaveWorkflow;
-import com.wl4g.rengine.manager.admin.model.SaveWorkflowResult;
+import com.wl4g.rengine.common.bean.Workflow;
 import com.wl4g.rengine.manager.admin.model.DeleteWorkflow;
 import com.wl4g.rengine.manager.admin.model.DeleteWorkflowResult;
 import com.wl4g.rengine.manager.admin.model.QueryWorkflow;
-import com.wl4g.rengine.manager.admin.model.QueryWorkflowResult;
+import com.wl4g.rengine.manager.admin.model.SaveWorkflow;
+import com.wl4g.rengine.manager.admin.model.SaveWorkflowResult;
 import com.wl4g.rengine.manager.admin.service.WorkflowService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -59,9 +60,9 @@ public class WorkflowController {
     @Operation(description = "Query workflow list.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
-    public RespBase<QueryWorkflowResult> query(@Validated QueryWorkflow model) {
+    public RespBase<PageHolder<Workflow>> query(@Validated QueryWorkflow model) {
         log.info("called: model={}", model);
-        RespBase<QueryWorkflowResult> resp = RespBase.create();
+        RespBase<PageHolder<Workflow>> resp = RespBase.create();
         resp.setData(workflowService.query(model));
         return resp;
     }
@@ -81,7 +82,7 @@ public class WorkflowController {
     @Operation(description = "Delete project.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
-    public RespBase<DeleteWorkflowResult> delete(@Validated DeleteWorkflow model) {
+    public RespBase<DeleteWorkflowResult> delete(@Validated @RequestBody DeleteWorkflow model) {
         log.info("called: model={}", model);
         RespBase<DeleteWorkflowResult> resp = RespBase.create();
         resp.setData(workflowService.delete(model));

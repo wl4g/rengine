@@ -15,10 +15,10 @@
  */
 package com.wl4g.rengine.common.bean;
 
-import java.util.List;
-
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
+import com.wl4g.infra.common.bean.BaseBean;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,8 +38,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class Rule extends BeanBase {
-    private @Nullable Long projectId;
+public class Rule extends BaseBean {
+    private static final long serialVersionUID = 1L;
+    private @NotNull Long scenesId;
     private @NotBlank String name;
-    private @Nullable List<String> labels;
 }

@@ -33,47 +33,46 @@ import org.springframework.stereotype.Service;
 
 import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
-import com.wl4g.rengine.common.bean.Rule;
+import com.wl4g.rengine.common.bean.Scenes;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
-import com.wl4g.rengine.manager.admin.model.DeleteRule;
-import com.wl4g.rengine.manager.admin.model.DeleteRuleResult;
-import com.wl4g.rengine.manager.admin.model.QueryRule;
-import com.wl4g.rengine.manager.admin.model.SaveRule;
-import com.wl4g.rengine.manager.admin.model.SaveRuleResult;
-import com.wl4g.rengine.manager.admin.service.RuleService;
+import com.wl4g.rengine.manager.admin.model.DeleteScenes;
+import com.wl4g.rengine.manager.admin.model.DeleteScenesResult;
+import com.wl4g.rengine.manager.admin.model.QueryScenes;
+import com.wl4g.rengine.manager.admin.model.SaveScenes;
+import com.wl4g.rengine.manager.admin.model.SaveScenesResult;
+import com.wl4g.rengine.manager.admin.service.ScenesService;
 import com.wl4g.rengine.manager.util.IdGenUtil;
 
 /**
- * {@link RuleServiceImpl}
+ * {@link ScenesServiceImpl}
  * 
  * @author James Wong
  * @version 2022-08-29
  * @since v3.0.0
  */
 @Service
-public class RuleServiceImpl implements RuleService {
+public class ScenesServiceImpl implements ScenesService {
 
     private @Autowired MongoTemplate mongoTemplate;
 
     @Override
-    public PageHolder<Rule> query(QueryRule model) {
-        Query query = new Query(new Criteria().orOperator(Criteria.where("_id").is(model.getRuleId()),
-                Criteria.where("scenesId").is(model.getScenesId()),
+    public PageHolder<Scenes> query(QueryScenes model) {
+        Query query = new Query(new Criteria().orOperator(Criteria.where("_id").is(model.getScenesId()),
                 Criteria.where("name").regex(format("(%s)+", model.getName())), Criteria.where("enable").is(model.getEnable()),
-                Criteria.where("labels").in(model.getLabels())));
-        query.with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
+                Criteria.where("labels").in(model.getLabels(), Criteria.where("organizationCode").is(model.getOrgCode()))));
+        query.with(PageRequest.of(model.getPageNum(), model.getPageSize(),
+                Sort.by(Direction.DESC, "updateDate")));
 
-        List<Rule> rules = mongoTemplate.find(query, Rule.class, MongoCollectionDefinition.RULES.getName());
-        // List<Rule> rules = mongoTemplate.findAll(Rule.class,
-        // MongoCollectionDefinition.RULES.getName());
+        List<Scenes> sceneses = mongoTemplate.find(query, Scenes.class, MongoCollectionDefinition.SCENESES.getName());
 
-        Collections.sort(rules, (o1, o2) -> safeLongToInt(o2.getUpdateDate().getTime() - o1.getUpdateDate().getTime()));
+        Collections.sort(sceneses, (o1, o2) -> safeLongToInt(o2.getUpdateDate().getTime() - o1.getUpdateDate().getTime()));
 
-        // QueryRuleResult.builder()
-        // .rules(safeList(rules).stream()
-        // .map(p -> Rule.builder()
+        // QueryScenesResult.builder()
+        // .sceneses(safeList(scenes).stream()
+        // .map(p -> Scenes.builder()
         // .id(p.getId())
         // .name(p.getName())
+        // .organizationCode(p.getOrganizationCode())
         // .labels(p.getLabels())
         // .enable(p.getEnable())
         // .remark(p.getRemark())
@@ -83,13 +82,13 @@ public class RuleServiceImpl implements RuleService {
         // .collect(toList()))
         // .build();
 
-        return new PageHolder<Rule>(model.getPageNum(), model.getPageSize()).withRecords(rules);
+        return new PageHolder<Scenes>(model.getPageNum(), model.getPageSize()).withRecords(sceneses);
     }
 
     @Override
-    public SaveRuleResult save(SaveRule model) {
-        Rule rule = Rule.builder()
-                .id(IdGenUtil.next())
+    public SaveScenesResult save(SaveScenes model) {
+        Scenes scenes = Scenes.builder()
+                .id(model.getId())
                 .name(model.getName())
                 .orgCode(model.getOrgCode())
                 .labels(model.getLabels())
@@ -101,23 +100,23 @@ public class RuleServiceImpl implements RuleService {
                 .createDate(model.getCreateDate())
                 .build();
 
-        if (isNull(rule.getId())) {
-            rule.setId(IdGenUtil.next());
-            rule.preInsert();
+        if (isNull(scenes.getId())) {
+            scenes.setId(IdGenUtil.next());
+            scenes.preInsert();
         } else {
-            rule.preUpdate();
+            scenes.preUpdate();
         }
 
-        Rule saved = mongoTemplate.insert(rule, MongoCollectionDefinition.RULES.getName());
-        return SaveRuleResult.builder().id(saved.getId()).build();
+        Scenes saved = mongoTemplate.insert(scenes, MongoCollectionDefinition.SCENESES.getName());
+        return SaveScenesResult.builder().id(saved.getId()).build();
     }
 
     @Override
-    public DeleteRuleResult delete(DeleteRule model) {
+    public DeleteScenesResult delete(DeleteScenes model) {
         // 'id' is a keyword, it will be automatically converted to '_id'
         DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
-                MongoCollectionDefinition.RULES.getName());
-        return DeleteRuleResult.builder().deletedCount(result.getDeletedCount()).build();
+                MongoCollectionDefinition.SCENESES.getName());
+        return DeleteScenesResult.builder().deletedCount(result.getDeletedCount()).build();
     }
 
 }

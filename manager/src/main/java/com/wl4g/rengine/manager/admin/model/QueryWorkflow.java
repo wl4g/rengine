@@ -15,10 +15,9 @@
  */
 package com.wl4g.rengine.manager.admin.model;
 
-import java.util.List;
-
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotBlank;
+
+import com.wl4g.rengine.common.bean.Workflow;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,9 +37,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class QueryWorkflow {
-    private @NotBlank String workflowId;
-    private @NotBlank String projectId;
-    private @NotBlank String name;
-    private @Nullable List<String> labels;
+public class QueryWorkflow extends QueryBase<Workflow> {
+    private @Nullable String workflowId;
+    private @Nullable String scenesId;
 }

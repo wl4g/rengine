@@ -21,6 +21,8 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.wl4g.infra.common.bean.BaseBean;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -39,8 +41,9 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class Workflow extends BeanBase {
-    private @NotNull Long projectId;
+public class Workflow extends BaseBean {
+    private static final long serialVersionUID = 1L;
+    private @NotNull Long scenesId;
     // 需新建专用 tree 对象？
     // private @NotBlank List<String> ruleIds;
     private @NotBlank String name;

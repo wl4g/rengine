@@ -15,33 +15,34 @@
  */
 package com.wl4g.rengine.manager.admin.service.impl;
 
-import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.TypeConverts.safeLongToInt;
 import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
+import static java.util.Objects.isNull;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import com.mongodb.client.result.DeleteResult;
+import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.bean.UploadObject;
 import com.wl4g.rengine.common.bean.UploadObject.UploadType;
 import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
-import com.wl4g.rengine.manager.admin.model.SaveUpload;
-import com.wl4g.rengine.manager.admin.model.SaveUploadResult;
 import com.wl4g.rengine.manager.admin.model.DeleteUpload;
 import com.wl4g.rengine.manager.admin.model.DeleteUploadResult;
 import com.wl4g.rengine.manager.admin.model.QueryUpload;
-import com.wl4g.rengine.manager.admin.model.QueryUploadResult;
+import com.wl4g.rengine.manager.admin.model.SaveUpload;
+import com.wl4g.rengine.manager.admin.model.SaveUploadResult;
 import com.wl4g.rengine.manager.admin.service.UploadService;
 import com.wl4g.rengine.manager.minio.MinioClientManager;
 import com.wl4g.rengine.manager.minio.MinioClientProperties;
@@ -64,37 +65,43 @@ public class UploadServiceImpl implements UploadService {
     private @Autowired MinioClientManager minioManager;
 
     @Override
-    public QueryUploadResult query(QueryUpload model) {
-        // TODO use pagination
+    public PageHolder<UploadObject> query(QueryUpload model) {
+        Query query = new Query(new Criteria().orOperator(Criteria.where("_id").is(model.getUploadId()),
+                Criteria.where("scenesId").is(model.getScenesId()),
+                Criteria.where("name").regex(format("(%s)+", model.getName())), Criteria.where("enable").is(model.getEnable()),
+                Criteria.where("labels")
+                        .in(model.getLabels(), Criteria.where("organizationCode").is(model.getOrgCode()),
+                                Criteria.where("UploadType").is(model.getUploadType()))));
+        query.with(PageRequest.of(model.getPageNum(), model.getPageSize(),
+                Sort.by(Direction.DESC, "updateDate")));
 
-        Criteria criteria = new Criteria().orOperator(Criteria.where("name").is(model.getFilename()),
-                Criteria.where("UploadType").is(model.getUploadType()), Criteria.where("status").is(model.getStatus()),
-                Criteria.where("labels").in(model.getLabels()));
-
-        List<UploadObject> uploads = mongoTemplate.find(new Query(criteria), UploadObject.class,
-                MongoCollectionDefinition.UPLOADS.getName());
+        List<UploadObject> uploads = mongoTemplate.find(query, UploadObject.class, MongoCollectionDefinition.UPLOADS.getName());
 
         Collections.sort(uploads, (o1, o2) -> safeLongToInt(o2.getUpdateDate().getTime() - o1.getUpdateDate().getTime()));
 
-        return QueryUploadResult.builder()
-                .uploads(safeList(uploads).stream()
-                        .map(p -> UploadObject.builder()
-                                .UploadType(p.getUploadType())
-                                .id(p.getId())
-                                .objectPrefix(p.getObjectPrefix())
-                                .filename(p.getFilename())
-                                .extension(p.getExtension())
-                                .labels(p.getLabels())
-                                .size(p.getSize())
-                                .sha1sum(p.getSha1sum())
-                                .md5sum(p.getMd5sum())
-                                .enabled(p.getEnabled())
-                                .remark(p.getRemark())
-                                .updateBy(p.getUpdateBy())
-                                .updateDate(p.getUpdateDate())
-                                .build())
-                        .collect(toList()))
-                .build();
+        // QueryUploadResult.builder()
+        // .uploads(safeList(uploads).stream()
+        // .map(p -> UploadObject.builder()
+        // .UploadType(p.getUploadType())
+        // .id(p.getId())
+        // .objectPrefix(p.getObjectPrefix())
+        // .filename(p.getFilename())
+        // .extension(p.getExtension())
+        // .labels(p.getLabels())
+        // .size(p.getSize())
+        // .sha1sum(p.getSha1sum())
+        // .md5sum(p.getMd5sum())
+        // .enable(p.getEnable())
+        // .remark(p.getRemark())
+        // .updateBy(p.getUpdateBy())
+        // .updateDate(p.getUpdateDate())
+        // .createBy(p.getCreateBy())
+        // .createDate(p.getCreateDate())
+        // .build())
+        // .collect(toList()))
+        // .build();
+
+        return new PageHolder<UploadObject>(model.getPageNum(), model.getPageSize()).withRecords(uploads);
     }
 
     public SaveUploadResult apply(SaveUpload model) {
@@ -112,13 +119,24 @@ public class UploadServiceImpl implements UploadService {
                 .objectPrefix(objectPrefix)
                 .filename(model.getFilename())
                 .extension(model.getExtension())
+                .orgCode(model.getOrgCode())
                 .labels(model.getLabels())
                 .size(model.getSize())
-                .enabled(model.getEnabled())
+                .enable(model.getEnable())
                 .remark(model.getRemark())
-                .updateBy("admin")
-                .updateDate(new Date())
+                .updateBy(model.getUpdateBy())
+                .updateDate(model.getUpdateDate())
+                .createBy(model.getCreateBy())
+                .createDate(model.getCreateDate())
                 .build();
+
+        if (isNull(upload.getId())) {
+            upload.setId(IdGenUtil.next());
+            upload.preInsert();
+        } else {
+            upload.preUpdate();
+        }
+
         // Save metadata to mongo table.
         mongoTemplate.insert(upload, MongoCollectionDefinition.UPLOADS.getName());
 

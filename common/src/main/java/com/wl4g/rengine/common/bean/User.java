@@ -15,9 +15,10 @@
  */
 package com.wl4g.rengine.common.bean;
 
-import java.util.Date;
+import com.wl4g.infra.common.bean.BaseBean;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -26,19 +27,18 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @SuperBuilder
 @ToString
-public class User extends UserKey {
+@NoArgsConstructor
+public class User extends BaseBean {
+    private static final long serialVersionUID = -5762348176963349685L;
+
     private Integer type;
 
     private String username;
 
+    private String password;
+
     private String email;
 
     private String attrJson;
-
-    private Date updateAt;
-
-    private String updateBy;
-
-    private Integer delFlag;
 
 }

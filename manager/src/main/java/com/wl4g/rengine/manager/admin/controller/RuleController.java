@@ -25,13 +25,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.manager.admin.model.SaveRule;
-import com.wl4g.rengine.manager.admin.model.SaveRuleResult;
+import com.wl4g.rengine.common.bean.Rule;
 import com.wl4g.rengine.manager.admin.model.DeleteRule;
 import com.wl4g.rengine.manager.admin.model.DeleteRuleResult;
 import com.wl4g.rengine.manager.admin.model.QueryRule;
-import com.wl4g.rengine.manager.admin.model.QueryRuleResult;
+import com.wl4g.rengine.manager.admin.model.SaveRule;
+import com.wl4g.rengine.manager.admin.model.SaveRuleResult;
 import com.wl4g.rengine.manager.admin.service.RuleService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -61,9 +62,9 @@ public class RuleController {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful",
             content = { @Content(mediaType = "application/json") }) })
     @RequestMapping(path = { "query" }, method = { GET })
-    public RespBase<QueryRuleResult> query(@Validated QueryRule model) {
+    public RespBase<PageHolder<Rule>> query(@Validated QueryRule model) {
         log.info("called: model={}", model);
-        RespBase<QueryRuleResult> resp = RespBase.create();
+        RespBase<PageHolder<Rule>> resp = RespBase.create();
         resp.setData(ruleService.query(model));
         return resp;
     }
@@ -83,7 +84,7 @@ public class RuleController {
     @Operation(description = "Delete project.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
-    public RespBase<DeleteRuleResult> delete(@Validated DeleteRule model) {
+    public RespBase<DeleteRuleResult> delete(@Validated @RequestBody DeleteRule model) {
         log.info("called: model={}", model);
         RespBase<DeleteRuleResult> resp = RespBase.create();
         resp.setData(ruleService.delete(model));

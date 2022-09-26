@@ -36,4 +36,5 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @NoArgsConstructor
 public class SaveWorkflow extends Workflow {
+    private static final long serialVersionUID = -3757548755594409403L;
 }

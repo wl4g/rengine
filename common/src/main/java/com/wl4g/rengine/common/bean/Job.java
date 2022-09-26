@@ -16,11 +16,11 @@
 package com.wl4g.rengine.common.bean;
 
 import java.util.Date;
-import java.util.List;
 
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+
+import com.wl4g.infra.common.bean.BaseBean;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,10 +40,9 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class Job extends BeanBase {
-    private @NotBlank String jobId;
+public class Job extends BaseBean {
+    private static final long serialVersionUID = 1L;
     private @NotBlank String workflowId;
-    private @Nullable List<String> labels;
     private @NotNull Date startDate;
     private @NotNull Date endDate;
     private @NotBlank String reason;

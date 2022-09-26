@@ -15,12 +15,6 @@
  */
 package com.wl4g.rengine.manager.admin.model;
 
-import java.util.List;
-
-import javax.annotation.Nullable;
-
-import com.wl4g.rengine.common.bean.Project;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,7 +22,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link QueryProjectResult}
+ * {@link DeleteScenes}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -39,6 +33,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class QueryProjectResult {
-    private @Nullable List<Project> projects;
+public class DeleteScenes extends DeleteBase {
 }

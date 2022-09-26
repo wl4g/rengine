@@ -13,20 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.common.bean;
+package com.wl4g.rengine.manager.admin.model;
+
+import java.util.List;
+
+import javax.annotation.Nullable;
+
+import com.wl4g.rengine.common.bean.Scenes;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * {@link QueryScenesResult}
+ * 
+ * @author James Wong
+ * @version 2022-08-28
+ * @since v3.0.0
+ */
 @Getter
 @Setter
 @SuperBuilder
 @ToString
-public class UserKey {
-    private Long id;
-
-    private String password;
-
+@NoArgsConstructor
+public class QueryScenesResult {
+    private @Nullable List<Scenes> sceneses;
 }

@@ -15,12 +15,13 @@
  */
 package com.wl4g.rengine.manager.admin.service;
 
-import com.wl4g.rengine.manager.admin.model.SaveWorkflow;
-import com.wl4g.rengine.manager.admin.model.SaveWorkflowResult;
+import com.wl4g.infra.common.bean.page.PageHolder;
+import com.wl4g.rengine.common.bean.Workflow;
 import com.wl4g.rengine.manager.admin.model.DeleteWorkflow;
 import com.wl4g.rengine.manager.admin.model.DeleteWorkflowResult;
 import com.wl4g.rengine.manager.admin.model.QueryWorkflow;
-import com.wl4g.rengine.manager.admin.model.QueryWorkflowResult;
+import com.wl4g.rengine.manager.admin.model.SaveWorkflow;
+import com.wl4g.rengine.manager.admin.model.SaveWorkflowResult;
 
 /**
  * {@link WorkflowService}
@@ -31,7 +32,7 @@ import com.wl4g.rengine.manager.admin.model.QueryWorkflowResult;
  */
 public interface WorkflowService {
 
-    QueryWorkflowResult query(QueryWorkflow model);
+    PageHolder<Workflow> query(QueryWorkflow model);
 
     SaveWorkflowResult save(SaveWorkflow model);
 
