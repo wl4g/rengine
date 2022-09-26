@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.infra.common.validation.EnumValue;
 import com.wl4g.rengine.common.bean.IdentityProvider.OAuth2Config;
 import com.wl4g.rengine.common.bean.IdentityProvider.Saml2Config;
@@ -49,7 +50,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public abstract class IdentityProvider extends BeanBase {
+public abstract class IdentityProvider extends BaseBean {
+    private static final long serialVersionUID = 1L;
 
     @Schema(name = "@kind", implementation = IdPKind.class)
     @JsonProperty(value = "@kind")
@@ -61,6 +63,7 @@ public abstract class IdentityProvider extends BeanBase {
     @ToString
     @NoArgsConstructor
     public static class OAuth2Config extends IdentityProvider {
+        private static final long serialVersionUID = 1L;
         private @NotBlank String authorizationUrl;
         private @NotBlank String tokenUrl;
         private @NotBlank String userinfoUrl;
@@ -77,6 +80,7 @@ public abstract class IdentityProvider extends BeanBase {
     @ToString
     @NoArgsConstructor
     public static class Saml2Config extends IdentityProvider {
+        private static final long serialVersionUID = 1L;
         private @NotBlank String spMetadataUrl;
     }
 

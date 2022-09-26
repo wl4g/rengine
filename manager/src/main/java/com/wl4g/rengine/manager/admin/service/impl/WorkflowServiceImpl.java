@@ -15,30 +15,32 @@
  */
 package com.wl4g.rengine.manager.admin.service.impl;
 
-import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.TypeConverts.safeLongToInt;
-import static java.util.stream.Collectors.toList;
+import static java.lang.String.format;
+import static java.util.Objects.isNull;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import com.mongodb.client.result.DeleteResult;
+import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.bean.Workflow;
-import com.wl4g.rengine.manager.admin.model.SaveWorkflow;
-import com.wl4g.rengine.manager.admin.model.SaveWorkflowResult;
+import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.manager.admin.model.DeleteWorkflow;
 import com.wl4g.rengine.manager.admin.model.DeleteWorkflowResult;
 import com.wl4g.rengine.manager.admin.model.QueryWorkflow;
-import com.wl4g.rengine.manager.admin.model.QueryWorkflowResult;
+import com.wl4g.rengine.manager.admin.model.SaveWorkflow;
+import com.wl4g.rengine.manager.admin.model.SaveWorkflowResult;
 import com.wl4g.rengine.manager.admin.service.WorkflowService;
-import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.manager.util.IdGenUtil;
 
 /**
@@ -54,31 +56,35 @@ public class WorkflowServiceImpl implements WorkflowService {
     private @Autowired MongoTemplate mongoTemplate;
 
     @Override
-    public QueryWorkflowResult query(QueryWorkflow model) {
-        // TODO use pagination
+    public PageHolder<Workflow> query(QueryWorkflow model) {
+        Query query = new Query(new Criteria().orOperator(Criteria.where("_id").is(model.getWorkflowId()),
+                Criteria.where("scenesId").is(model.getScenesId()),
+                Criteria.where("name").regex(format("(%s)+", model.getName())), Criteria.where("enable").is(model.getEnable()),
+                Criteria.where("labels").in(model.getLabels(), Criteria.where("organizationCode").is(model.getOrgCode()))));
+        query.with(PageRequest.of(model.getPageNum(), model.getPageSize(),
+                Sort.by(Direction.DESC, "updateDate")));
 
-        Criteria criteria = new Criteria().orOperator(Criteria.where("name").is(model.getName()),
-                Criteria.where("_id").is(model.getWorkflowId()), Criteria.where("projectId").is(model.getWorkflowId()),
-                Criteria.where("labels").in(model.getLabels()));
-
-        List<Workflow> workflows = mongoTemplate.find(new Query(criteria), Workflow.class,
-                MongoCollectionDefinition.WORKFLOWS.getName());
+        List<Workflow> workflows = mongoTemplate.find(query, Workflow.class, MongoCollectionDefinition.WORKFLOWS.getName());
 
         Collections.sort(workflows, (o1, o2) -> safeLongToInt(o2.getUpdateDate().getTime() - o1.getUpdateDate().getTime()));
 
-        return QueryWorkflowResult.builder()
-                .workflows(safeList(workflows).stream()
-                        .map(p -> Workflow.builder()
-                                .id(p.getId())
-                                .name(p.getName())
-                                .labels(p.getLabels())
-                                .enabled(p.getEnabled())
-                                .remark(p.getRemark())
-                                .updateBy(p.getUpdateBy())
-                                .updateDate(p.getUpdateDate())
-                                .build())
-                        .collect(toList()))
-                .build();
+        // QueryWorkflowResult.builder()
+        // .workflows(safeList(workflows).stream()
+        // .map(p -> Workflow.builder()
+        // .id(p.getId())
+        // .name(p.getName())
+        // .labels(p.getLabels())
+        // .enable(p.getEnable())
+        // .remark(p.getRemark())
+        // .updateBy(p.getUpdateBy())
+        // .updateDate(p.getUpdateDate())
+        // .createBy(p.getCreateBy())
+        // .createDate(p.getCreateDate())
+        // .build())
+        // .collect(toList()))
+        // .build();
+
+        return new PageHolder<Workflow>(model.getPageNum(), model.getPageSize()).withRecords(workflows);
     }
 
     @Override
@@ -86,12 +92,23 @@ public class WorkflowServiceImpl implements WorkflowService {
         Workflow workflow = Workflow.builder()
                 .id(IdGenUtil.next())
                 .name(model.getName())
+                .orgCode(model.getOrgCode())
                 .labels(model.getLabels())
-                .enabled(model.getEnabled())
+                .enable(model.getEnable())
                 .remark(model.getRemark())
-                .updateBy("admin")
-                .updateDate(new Date())
+                .updateBy(model.getUpdateBy())
+                .updateDate(model.getUpdateDate())
+                .createBy(model.getCreateBy())
+                .createDate(model.getCreateDate())
                 .build();
+
+        if (isNull(workflow.getId())) {
+            workflow.setId(IdGenUtil.next());
+            workflow.preInsert();
+        } else {
+            workflow.preUpdate();
+        }
+
         Workflow saved = mongoTemplate.insert(workflow, MongoCollectionDefinition.WORKFLOWS.getName());
         return SaveWorkflowResult.builder().id(saved.getId()).build();
     }

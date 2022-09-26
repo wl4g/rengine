@@ -80,13 +80,12 @@ public class GroovyScriptEngine extends AbstractScriptEngine {
             log.info("Load groovy script class: {}", cls);
 
             log.info("Instantiating groovy script class with {} ...", scriptMain);
-            final Function<ScriptContext, String> function = (Function<ScriptContext, String>) cls.getConstructor()
-                    .newInstance();
+            final Function<ScriptContext, String> function = (Function<ScriptContext, String>) cls.getConstructor().newInstance();
             log.info("Instantiated script class object: {}, is instance of java.util.function.Function: {}", function,
                     (function instanceof Function));
 
             log.info("Execution groovy script with {} ...", scriptMain);
-            final var result = function.apply(newRengineContext(model));
+            final var result = function.apply(newScriptContext(model));
             log.info("Execution groovy script: {}, result: {}", scriptMain, result.toString());
 
             // TODO re-definition result model structure

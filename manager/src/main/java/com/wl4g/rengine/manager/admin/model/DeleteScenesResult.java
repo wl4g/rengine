@@ -22,7 +22,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link DeleteProject}
+ * {@link DeleteScenesResult}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -33,5 +33,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class DeleteProject extends DeleteBase {
+public class DeleteScenesResult extends DeleteResultBase {
 }

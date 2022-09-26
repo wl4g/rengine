@@ -13,28 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.manager.admin.service;
+package com.wl4g.rengine.manager.admin.model;
 
-import com.wl4g.rengine.manager.admin.model.SaveProject;
-import com.wl4g.rengine.manager.admin.model.SaveProjectResult;
-import com.wl4g.rengine.manager.admin.model.DeleteProject;
-import com.wl4g.rengine.manager.admin.model.DeleteProjectResult;
-import com.wl4g.rengine.manager.admin.model.QueryProject;
-import com.wl4g.rengine.manager.admin.model.QueryProjectResult;
+import com.wl4g.rengine.common.bean.Scenes;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 /**
- * {@link ProjectService}
+ * {@link SaveScenes}
  * 
  * @author James Wong
- * @version 2022-08-29
+ * @version 2022-08-28
  * @since v3.0.0
  */
-public interface ProjectService {
-
-    QueryProjectResult query(QueryProject model);
-
-    SaveProjectResult save(SaveProject model);
-
-    DeleteProjectResult delete(DeleteProject model);
-
+@Getter
+@Setter
+@SuperBuilder
+@ToString
+@NoArgsConstructor
+public class SaveScenes extends Scenes {
+    private static final long serialVersionUID = 1L;
 }

@@ -28,7 +28,7 @@ import com.wl4g.rengine.common.model.EvaluationResult;
 public class DefaultWorkflowExecution implements IExecution {
 
     @Override
-    public EvaluationResult apply(Evaluation t) {
+    public EvaluationResult apply(Evaluation model) {
         // TODO Auto-generated method stub
         return null;
     }

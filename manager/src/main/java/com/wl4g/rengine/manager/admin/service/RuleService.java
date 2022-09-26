@@ -15,12 +15,13 @@
  */
 package com.wl4g.rengine.manager.admin.service;
 
-import com.wl4g.rengine.manager.admin.model.SaveRule;
-import com.wl4g.rengine.manager.admin.model.SaveRuleResult;
+import com.wl4g.infra.common.bean.page.PageHolder;
+import com.wl4g.rengine.common.bean.Rule;
 import com.wl4g.rengine.manager.admin.model.DeleteRule;
 import com.wl4g.rengine.manager.admin.model.DeleteRuleResult;
 import com.wl4g.rengine.manager.admin.model.QueryRule;
-import com.wl4g.rengine.manager.admin.model.QueryRuleResult;
+import com.wl4g.rengine.manager.admin.model.SaveRule;
+import com.wl4g.rengine.manager.admin.model.SaveRuleResult;
 
 /**
  * {@link RuleService}
@@ -31,7 +32,7 @@ import com.wl4g.rengine.manager.admin.model.QueryRuleResult;
  */
 public interface RuleService {
 
-    QueryRuleResult query(QueryRule model);
+    PageHolder<Rule> query(QueryRule model);
 
     SaveRuleResult save(SaveRule model);
 

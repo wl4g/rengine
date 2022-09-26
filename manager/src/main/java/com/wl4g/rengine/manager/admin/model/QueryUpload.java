@@ -15,13 +15,7 @@
  */
 package com.wl4g.rengine.manager.admin.model;
 
-import java.util.List;
-
 import javax.annotation.Nullable;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 import com.wl4g.rengine.common.bean.UploadObject;
 
@@ -43,10 +37,9 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class QueryUpload {
-    private @NotBlank UploadObject.UploadType UploadType;
-    private @NotBlank String filename;
-    private @NotBlank String extension;
-    private @Nullable List<String> labels;
-    private @NotNull @Min(0) @Max(1) Integer status;
+public class QueryUpload extends QueryBase<UploadObject> {
+    private @Nullable String uploadId;
+    private @Nullable String scenesId;
+    private @Nullable UploadObject.UploadType UploadType;
+    private @Nullable String extension;
 }

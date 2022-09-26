@@ -16,6 +16,7 @@
 package com.wl4g.rengine.evaluator.execution.engine;
 
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getBooleanProperty;
+import static com.wl4g.infra.common.lang.EnvironmentUtil.getIntProperty;
 import static java.lang.String.format;
 
 import java.util.List;
@@ -63,7 +64,8 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
             // Extraction graal.js from environment.
             Map<String, String> graaljsOptions = EnvironmentUtil.getConfigProperties("GRAALJS_OPTIONS_");
 
-            graalScriptManager = new GraalJsScriptManager(1, 10,
+            graalScriptManager = new GraalJsScriptManager(getIntProperty("graaljs.context.pool.min", 1),
+                    getIntProperty("graaljs.context.pool.max", 10),
                     () -> Context.newBuilder("js")
                             .allowAllAccess(getBooleanProperty("graaljs.allowAllAccess", true))
                             .allowExperimentalOptions(getBooleanProperty("graaljs.allowExperimentalOptions", true))

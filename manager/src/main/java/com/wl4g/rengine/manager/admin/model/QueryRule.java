@@ -15,10 +15,9 @@
  */
 package com.wl4g.rengine.manager.admin.model;
 
-import java.util.List;
-
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotBlank;
+
+import com.wl4g.rengine.common.bean.Rule;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,8 +37,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class QueryRule {
-    private @NotBlank String ruleId;
-    private @NotBlank String name;
-    private @Nullable List<String> labels;
+public class QueryRule extends QueryBase<Rule> {
+    private @Nullable Long ruleId;
+    private @Nullable Long scenesId;
 }

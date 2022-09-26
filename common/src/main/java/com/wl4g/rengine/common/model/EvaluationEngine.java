@@ -23,5 +23,5 @@ package com.wl4g.rengine.common.model;
  * @since v3.0.0
  */
 public enum EvaluationEngine {
-    GROOVY, JS
+    GROOVY, JS, FLINK_CEP_SQL
 }

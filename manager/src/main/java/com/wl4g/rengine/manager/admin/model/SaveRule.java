@@ -36,4 +36,5 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @NoArgsConstructor
 public class SaveRule extends Rule {
+    private static final long serialVersionUID = -8089363065684705215L;
 }

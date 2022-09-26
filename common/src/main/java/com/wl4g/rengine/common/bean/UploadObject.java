@@ -26,6 +26,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.infra.common.validation.EnumValue;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -49,7 +50,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class UploadObject extends BeanBase {
+public class UploadObject extends BaseBean {
+    private static final long serialVersionUID = 1L;
 
     @Schema(implementation = UploadObject.UploadType.class)
     private @NotBlank @EnumValue(enumCls = UploadObject.UploadType.class) String UploadType;
@@ -57,7 +59,6 @@ public class UploadObject extends BeanBase {
     private @NotBlank @Schema(hidden = false, accessMode = AccessMode.READ_ONLY) String objectPrefix;
     private @NotBlank String filename;
     private @NotBlank String extension;
-    private @Nullable List<String> labels;
     private @NotNull @Min(1) Long size;
     // private @Nullable String owner;
     // private @NotBlank String group;

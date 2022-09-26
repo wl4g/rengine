@@ -26,12 +26,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.manager.admin.model.SaveUpload;
+import com.wl4g.rengine.common.bean.UploadObject;
 import com.wl4g.rengine.manager.admin.model.DeleteUpload;
 import com.wl4g.rengine.manager.admin.model.DeleteUploadResult;
 import com.wl4g.rengine.manager.admin.model.QueryUpload;
-import com.wl4g.rengine.manager.admin.model.QueryUploadResult;
+import com.wl4g.rengine.manager.admin.model.SaveUpload;
 import com.wl4g.rengine.manager.admin.model.SaveUploadResult;
 import com.wl4g.rengine.manager.admin.service.UploadService;
 
@@ -62,9 +63,9 @@ public class UploadController {
     @Operation(description = "Query upload file list.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
-    public RespBase<QueryUploadResult> query(@Validated QueryUpload model) {
+    public RespBase<PageHolder<UploadObject>> query(@Validated QueryUpload model) {
         log.info("called: model={}", model);
-        RespBase<QueryUploadResult> resp = RespBase.create();
+        RespBase<PageHolder<UploadObject>> resp = RespBase.create();
         resp.setData(uploadService.query(model));
         return resp;
     }
@@ -85,7 +86,7 @@ public class UploadController {
     @Operation(description = "Delete project.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
-    public RespBase<DeleteUploadResult> delete(@Validated DeleteUpload model) {
+    public RespBase<DeleteUploadResult> delete(@Validated @RequestBody DeleteUpload model) {
         log.info("called: model={}", model);
         RespBase<DeleteUploadResult> resp = RespBase.create();
         resp.setData(uploadService.delete(model));

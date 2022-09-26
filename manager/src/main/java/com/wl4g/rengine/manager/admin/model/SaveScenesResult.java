@@ -15,11 +15,6 @@
  */
 package com.wl4g.rengine.manager.admin.model;
 
-import java.util.List;
-
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotBlank;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,7 +22,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link QueryProject}
+ * {@link SaveScenesResult}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -38,9 +33,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class QueryProject {
-    private @NotBlank String projectId;
-    private @NotBlank String name;
-    private @Nullable String owner;
-    private @Nullable List<String> labels;
+public class SaveScenesResult extends SaveResultBase {
 }

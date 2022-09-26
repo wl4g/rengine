@@ -70,8 +70,10 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
         IdentityProvider provider = model.getProvider();
         if (isNull(provider.getId())) {
             provider.setId(IdGenUtil.next());
+            provider.preInsert();
+        } else {
+            provider.preUpdate();
         }
-        provider.setUpdateBy("admin");
         provider.setUpdateDate(new Date());
         IdentityProvider saved = mongoTemplate.insert(provider, MongoCollectionDefinition.SYS_IDP_CONFIG.getName());
         return SaveIdentityProviderResult.builder().id(saved.getId()).build();

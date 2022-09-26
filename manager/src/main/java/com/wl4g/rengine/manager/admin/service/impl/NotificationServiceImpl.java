@@ -20,7 +20,6 @@ import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,12 +29,12 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import com.wl4g.rengine.common.bean.Notification;
-import com.wl4g.rengine.manager.admin.model.SaveNotification;
-import com.wl4g.rengine.manager.admin.model.SaveNotificationResult;
+import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.manager.admin.model.QueryNotification;
 import com.wl4g.rengine.manager.admin.model.QueryNotificationResult;
+import com.wl4g.rengine.manager.admin.model.SaveNotification;
+import com.wl4g.rengine.manager.admin.model.SaveNotificationResult;
 import com.wl4g.rengine.manager.admin.service.NotificationService;
-import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.manager.util.IdGenUtil;
 
 /**
@@ -71,9 +70,10 @@ public class NotificationServiceImpl implements NotificationService {
         Notification provider = model.getProvider();
         if (isNull(provider.getId())) {
             provider.setId(IdGenUtil.next());
+            provider.preInsert();
+        } else {
+            provider.preUpdate();
         }
-        provider.setUpdateBy("admin");
-        provider.setUpdateDate(new Date());
         Notification saved = mongoTemplate.insert(provider, MongoCollectionDefinition.SYS_NOTIFICATION_CONFIG.getName());
         return SaveNotificationResult.builder().id(saved.getId()).build();
     }
