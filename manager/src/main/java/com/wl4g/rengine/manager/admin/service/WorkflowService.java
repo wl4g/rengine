@@ -16,7 +16,7 @@
 package com.wl4g.rengine.manager.admin.service;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
-import com.wl4g.rengine.common.bean.Workflow;
+import com.wl4g.rengine.common.entity.Workflow;
 import com.wl4g.rengine.manager.admin.model.DeleteWorkflow;
 import com.wl4g.rengine.manager.admin.model.DeleteWorkflowResult;
 import com.wl4g.rengine.manager.admin.model.QueryWorkflow;

@@ -15,32 +15,29 @@
  */
 package com.wl4g.rengine.evaluator.execution;
 
-import javax.enterprise.inject.spi.BeanManager;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Named;
 
-import com.wl4g.rengine.common.model.EvaluationEngine;
+import com.wl4g.rengine.common.model.Evaluation;
+import com.wl4g.rengine.common.model.EvaluationResult;
 
 /**
- * {@link ExecutionFactory}
+ * {@link ScoreWorkflowExecution}
  * 
  * @author James Wong
  * @version 2022-09-17
  * @since v3.0.0
- * @see https://github.com/google/guice/wiki/Motivation
  */
-@Singleton
-public class ExecutionFactory {
+@Named(ScoreWorkflowExecution.BEAN_NAME)
+@ApplicationScoped
+public class ScoreWorkflowExecution extends BaseWorkflowExecution {
 
-    @Inject
-    BeanManager beanManager;
+    public static final String BEAN_NAME = "scoreWorkflowExecution";
 
-    public IExecution getExecution(EvaluationEngine engine) {
-
-        // TODO
-        // beanManager.getPassivationCapableBean(null);
-
-        return null;
+    @Override
+    public EvaluationResult apply(Evaluation model) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
     }
 
 }

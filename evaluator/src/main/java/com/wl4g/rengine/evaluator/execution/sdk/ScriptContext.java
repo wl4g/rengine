@@ -131,6 +131,7 @@ public class ScriptContext {
         }
     }
 
+    @ToString
     @SuperBuilder
     @NoArgsConstructor
     public static class ScriptEventSource {
@@ -151,6 +152,7 @@ public class ScriptContext {
         }
     }
 
+    @ToString
     @SuperBuilder
     @NoArgsConstructor
     public static class ScriptEventLocation {

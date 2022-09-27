@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.common.bean;
+package com.wl4g.rengine.common.entity;
 
 import java.util.List;
 
@@ -27,12 +27,12 @@ import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.infra.common.validation.EnumValue;
-import com.wl4g.rengine.common.bean.Notification.AliyunSmsConfig;
-import com.wl4g.rengine.common.bean.Notification.AliyunVmsConfig;
-import com.wl4g.rengine.common.bean.Notification.DingtalkConfig;
-import com.wl4g.rengine.common.bean.Notification.EmailConfig;
-import com.wl4g.rengine.common.bean.Notification.WeComConfig;
-import com.wl4g.rengine.common.bean.Notification.WebhookConfig;
+import com.wl4g.rengine.common.entity.Notification.AliyunSmsConfig;
+import com.wl4g.rengine.common.entity.Notification.AliyunVmsConfig;
+import com.wl4g.rengine.common.entity.Notification.DingtalkConfig;
+import com.wl4g.rengine.common.entity.Notification.EmailConfig;
+import com.wl4g.rengine.common.entity.Notification.WeComConfig;
+import com.wl4g.rengine.common.entity.Notification.WebhookConfig;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -53,9 +53,9 @@ import lombok.experimental.SuperBuilder;
 @Schema(oneOf = { EmailConfig.class, DingtalkConfig.class, WeComConfig.class, AliyunSmsConfig.class, AliyunVmsConfig.class,
         WebhookConfig.class }, discriminatorProperty = "@kind")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@kind", visible = true)
-@JsonSubTypes({ @Type(value = EmailConfig.class, name = "email"), @Type(value = DingtalkConfig.class, name = "dingtalk"),
-        @Type(value = WeComConfig.class, name = "wecom"), @Type(value = AliyunSmsConfig.class, name = "aliyunSms"),
-        @Type(value = AliyunVmsConfig.class, name = "aliyunVms"), @Type(value = WebhookConfig.class, name = "webhook") })
+@JsonSubTypes({ @Type(value = EmailConfig.class, name = "EMAIL"), @Type(value = DingtalkConfig.class, name = "DINGTALK"),
+        @Type(value = WeComConfig.class, name = "WECOM"), @Type(value = AliyunSmsConfig.class, name = "ALIYUNSMS"),
+        @Type(value = AliyunVmsConfig.class, name = "ALIYUNVMS"), @Type(value = WebhookConfig.class, name = "WEBHOOK") })
 @Getter
 @Setter
 @SuperBuilder
@@ -140,7 +140,7 @@ public abstract class Notification extends BaseBean {
     }
 
     public static enum NotificationKind {
-        email, dingtalk, wecom, aliyunSms, aliyunVms, webhook
+        EMAIL, DINGTALK, WECOM, ALIYUNSMS, ALIYUNVMS, WEBHOOK
     }
 
 }

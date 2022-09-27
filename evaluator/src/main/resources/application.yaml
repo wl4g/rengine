@@ -95,9 +95,9 @@ quarkus:
   ## see:https://quarkus.io/guides/smallrye-health
   smallrye-health:
     root-path: /healthz
-    liveness-path: /live
-    readiness-path: /ready
-    startup-path: /started
+    liveness-path: ${quarkus.smallrye-health.root-path:healthz}/live
+    readiness-path: ${quarkus.smallrye-health.root-path:healthz}/ready
+    startup-path: ${quarkus.smallrye-health.root-path:healthz}/started
   micrometer:
     enabled: true
     registry-enabled-default: true
@@ -226,6 +226,8 @@ quarkus:
     min-pool-size: 10
     max-connection-idle-time: 10m
     #max-connection-life-time: 30m
+    tls: false
+    tls-insecure: true
 
 ## MinIO configuration.
 minio:

@@ -20,7 +20,6 @@
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
   "methods":[
-    {"name":"<init>","parameterTypes":[] }, 
     {"name":"getEventType","parameterTypes":[] }, 
     {"name":"getObservedTime","parameterTypes":[] }, 
     {"name":"getBody","parameterTypes":[] }, 

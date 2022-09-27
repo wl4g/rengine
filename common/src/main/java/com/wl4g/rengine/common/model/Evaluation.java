@@ -63,7 +63,7 @@ public class Evaluation {
     String service;
 
     @NotBlank
-    String scenes;
+    String scenesCode;
 
     @NotNull
     Scripting scripting;

@@ -28,14 +28,14 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import com.wl4g.rengine.common.bean.Notification;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
+import com.wl4g.rengine.common.entity.Notification;
+import com.wl4g.rengine.common.util.IdGenUtil;
 import com.wl4g.rengine.manager.admin.model.QueryNotification;
 import com.wl4g.rengine.manager.admin.model.QueryNotificationResult;
 import com.wl4g.rengine.manager.admin.model.SaveNotification;
 import com.wl4g.rengine.manager.admin.model.SaveNotificationResult;
 import com.wl4g.rengine.manager.admin.service.NotificationService;
-import com.wl4g.rengine.manager.util.IdGenUtil;
 
 /**
  * {@link NotificationServiceImpl}

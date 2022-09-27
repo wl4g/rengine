@@ -23,6 +23,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.List;
 
+import javax.validation.Validator;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -34,10 +36,12 @@ import org.springframework.stereotype.Service;
 
 import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
-import com.wl4g.rengine.common.bean.UploadObject;
-import com.wl4g.rengine.common.bean.UploadObject.UploadType;
 import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
+import com.wl4g.rengine.common.entity.UploadObject;
+import com.wl4g.rengine.common.entity.UploadObject.UploadType;
+import com.wl4g.rengine.common.util.IdGenUtil;
+import com.wl4g.rengine.common.validation.ValidForEntityMarker;
 import com.wl4g.rengine.manager.admin.model.DeleteUpload;
 import com.wl4g.rengine.manager.admin.model.DeleteUploadResult;
 import com.wl4g.rengine.manager.admin.model.QueryUpload;
@@ -46,7 +50,6 @@ import com.wl4g.rengine.manager.admin.model.SaveUploadResult;
 import com.wl4g.rengine.manager.admin.service.UploadService;
 import com.wl4g.rengine.manager.minio.MinioClientManager;
 import com.wl4g.rengine.manager.minio.MinioClientProperties;
-import com.wl4g.rengine.manager.util.IdGenUtil;
 
 import io.minio.credentials.Credentials;
 
@@ -60,6 +63,7 @@ import io.minio.credentials.Credentials;
 @Service
 public class UploadServiceImpl implements UploadService {
 
+    private @Autowired Validator validator;
     private @Autowired MinioClientProperties config;
     private @Autowired MongoTemplate mongoTemplate;
     private @Autowired MinioClientManager minioManager;
@@ -69,11 +73,10 @@ public class UploadServiceImpl implements UploadService {
         Query query = new Query(new Criteria().orOperator(Criteria.where("_id").is(model.getUploadId()),
                 Criteria.where("scenesId").is(model.getScenesId()),
                 Criteria.where("name").regex(format("(%s)+", model.getName())), Criteria.where("enable").is(model.getEnable()),
-                Criteria.where("labels")
-                        .in(model.getLabels(), Criteria.where("organizationCode").is(model.getOrgCode()),
-                                Criteria.where("UploadType").is(model.getUploadType()))));
-        query.with(PageRequest.of(model.getPageNum(), model.getPageSize(),
-                Sort.by(Direction.DESC, "updateDate")));
+                Criteria.where("orgCode").is(model.getOrgCode()), Criteria.where("labels").in(model.getLabels()),
+                Criteria.where("UploadType").is(model.getUploadType())));
+
+        query.with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
 
         List<UploadObject> uploads = mongoTemplate.find(query, UploadObject.class, MongoCollectionDefinition.UPLOADS.getName());
 
@@ -114,7 +117,7 @@ public class UploadServiceImpl implements UploadService {
         // with precise authorized write permissions.
         String objectPrefix = format("%s/%s/%s", RengineConstants.DEF_MINIO_BUCKET, uploadType.getPrefix(), model.getFilename());
         UploadObject upload = UploadObject.builder()
-                .UploadType(model.getUploadType())
+                .uploadType(model.getUploadType())
                 .id(IdGenUtil.next())
                 .objectPrefix(objectPrefix)
                 .filename(model.getFilename())
@@ -124,10 +127,6 @@ public class UploadServiceImpl implements UploadService {
                 .size(model.getSize())
                 .enable(model.getEnable())
                 .remark(model.getRemark())
-                .updateBy(model.getUpdateBy())
-                .updateDate(model.getUpdateDate())
-                .createBy(model.getCreateBy())
-                .createDate(model.getCreateDate())
                 .build();
 
         if (isNull(upload.getId())) {
@@ -137,6 +136,8 @@ public class UploadServiceImpl implements UploadService {
             upload.preUpdate();
         }
 
+        validator.validate(upload, ValidForEntityMarker.class);
+
         // Save metadata to mongo table.
         mongoTemplate.insert(upload, MongoCollectionDefinition.UPLOADS.getName());
 
@@ -144,6 +145,7 @@ public class UploadServiceImpl implements UploadService {
         try {
             Credentials credentials = minioManager.createSTSCredentials(objectPrefix);
             return SaveUploadResult.builder()
+                    .id(upload.getId())
                     .endpoint(config.getEndpoint())
                     .region(config.getRegion())
                     // .bucket(config.getBucket())
@@ -152,7 +154,6 @@ public class UploadServiceImpl implements UploadService {
                     .secretKey(credentials.secretKey())
                     .sessionToken(credentials.sessionToken())
                     .partSize(config.getUserUpload().getLibraryPartSize().toBytes())
-                    .id(upload.getId())
                     .fileLimitSize(config.getUserUpload().getLibraryFileLimitSize().toBytes())
                     .objectPrefix(objectPrefix)
                     .extension(uploadType.getExtensions())

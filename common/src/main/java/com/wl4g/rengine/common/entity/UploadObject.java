@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.common.bean;
+package com.wl4g.rengine.common.entity;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -28,6 +28,7 @@ import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.infra.common.validation.EnumValue;
+import com.wl4g.rengine.common.validation.ValidForEntityMarker;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
@@ -54,9 +55,10 @@ public class UploadObject extends BaseBean {
     private static final long serialVersionUID = 1L;
 
     @Schema(implementation = UploadObject.UploadType.class)
-    private @NotBlank @EnumValue(enumCls = UploadObject.UploadType.class) String UploadType;
+    private @NotBlank @EnumValue(enumCls = UploadObject.UploadType.class) String uploadType;
     // Save API front-end without objectPrefix.
-    private @NotBlank @Schema(hidden = false, accessMode = AccessMode.READ_ONLY) String objectPrefix;
+    private @Nullable @NotBlank(groups = ValidForEntityMarker.class) @Schema(hidden = false,
+            accessMode = AccessMode.READ_ONLY) String objectPrefix;
     private @NotBlank String filename;
     private @NotBlank String extension;
     private @NotNull @Min(1) Long size;

@@ -63,8 +63,8 @@ public abstract class EvaluationResult {
     @ToString
     @NoArgsConstructor
     public static class GenericEvaluationResult extends EvaluationResult {
-        // private @NotBlank Map<String, Object> result;
-        private @Nullable String result;
+        // TODO re-definition result bean?
+        private @Nullable Object result;
     }
 
     @Getter

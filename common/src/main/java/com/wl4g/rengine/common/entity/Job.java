@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.common.bean;
+package com.wl4g.rengine.common.entity;
 
-import java.util.List;
+import java.util.Date;
 
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -30,7 +29,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link Workflow}
+ * {@link Job}
  * 
  * @author James Wong
  * @version 2022-08-29
@@ -41,11 +40,10 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class Workflow extends BaseBean {
+public class Job extends BaseBean {
     private static final long serialVersionUID = 1L;
-    private @NotNull Long scenesId;
-    // 需新建专用 tree 对象？
-    // private @NotBlank List<String> ruleIds;
-    private @NotBlank String name;
-    private @Nullable List<String> labels;
+    private @NotBlank String workflowId;
+    private @NotNull Date startDate;
+    private @NotNull Date endDate;
+    private @NotBlank String reason;
 }

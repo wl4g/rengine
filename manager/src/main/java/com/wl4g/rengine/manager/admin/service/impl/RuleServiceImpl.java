@@ -33,15 +33,15 @@ import org.springframework.stereotype.Service;
 
 import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
-import com.wl4g.rengine.common.bean.Rule;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
+import com.wl4g.rengine.common.entity.Rule;
+import com.wl4g.rengine.common.util.IdGenUtil;
 import com.wl4g.rengine.manager.admin.model.DeleteRule;
 import com.wl4g.rengine.manager.admin.model.DeleteRuleResult;
 import com.wl4g.rengine.manager.admin.model.QueryRule;
 import com.wl4g.rengine.manager.admin.model.SaveRule;
 import com.wl4g.rengine.manager.admin.model.SaveRuleResult;
 import com.wl4g.rengine.manager.admin.service.RuleService;
-import com.wl4g.rengine.manager.util.IdGenUtil;
 
 /**
  * {@link RuleServiceImpl}
@@ -60,13 +60,12 @@ public class RuleServiceImpl implements RuleService {
         Query query = new Query(new Criteria().orOperator(Criteria.where("_id").is(model.getRuleId()),
                 Criteria.where("scenesId").is(model.getScenesId()),
                 Criteria.where("name").regex(format("(%s)+", model.getName())), Criteria.where("enable").is(model.getEnable()),
-                Criteria.where("labels").in(model.getLabels())));
+                Criteria.where("labels").in(model.getLabels()), Criteria.where("orgCode").is(model.getOrgCode())));
         query.with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
 
         List<Rule> rules = mongoTemplate.find(query, Rule.class, MongoCollectionDefinition.RULES.getName());
         // List<Rule> rules = mongoTemplate.findAll(Rule.class,
         // MongoCollectionDefinition.RULES.getName());
-
         Collections.sort(rules, (o1, o2) -> safeLongToInt(o2.getUpdateDate().getTime() - o1.getUpdateDate().getTime()));
 
         // QueryRuleResult.builder()
@@ -89,16 +88,13 @@ public class RuleServiceImpl implements RuleService {
     @Override
     public SaveRuleResult save(SaveRule model) {
         Rule rule = Rule.builder()
-                .id(IdGenUtil.next())
+                .id(model.getId())
                 .name(model.getName())
                 .orgCode(model.getOrgCode())
                 .labels(model.getLabels())
+                .uploadIds(model.getUploadIds())
                 .enable(model.getEnable())
                 .remark(model.getRemark())
-                .updateBy(model.getUpdateBy())
-                .updateDate(model.getUpdateDate())
-                .createBy(model.getCreateBy())
-                .createDate(model.getCreateDate())
                 .build();
 
         if (isNull(rule.getId())) {

@@ -33,15 +33,15 @@ import org.springframework.stereotype.Service;
 
 import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
-import com.wl4g.rengine.common.bean.Workflow;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
+import com.wl4g.rengine.common.entity.Workflow;
+import com.wl4g.rengine.common.util.IdGenUtil;
 import com.wl4g.rengine.manager.admin.model.DeleteWorkflow;
 import com.wl4g.rengine.manager.admin.model.DeleteWorkflowResult;
 import com.wl4g.rengine.manager.admin.model.QueryWorkflow;
 import com.wl4g.rengine.manager.admin.model.SaveWorkflow;
 import com.wl4g.rengine.manager.admin.model.SaveWorkflowResult;
 import com.wl4g.rengine.manager.admin.service.WorkflowService;
-import com.wl4g.rengine.manager.util.IdGenUtil;
 
 /**
  * {@link WorkflowServiceImpl}
@@ -60,9 +60,8 @@ public class WorkflowServiceImpl implements WorkflowService {
         Query query = new Query(new Criteria().orOperator(Criteria.where("_id").is(model.getWorkflowId()),
                 Criteria.where("scenesId").is(model.getScenesId()),
                 Criteria.where("name").regex(format("(%s)+", model.getName())), Criteria.where("enable").is(model.getEnable()),
-                Criteria.where("labels").in(model.getLabels(), Criteria.where("organizationCode").is(model.getOrgCode()))));
-        query.with(PageRequest.of(model.getPageNum(), model.getPageSize(),
-                Sort.by(Direction.DESC, "updateDate")));
+                Criteria.where("orgCode").is(model.getOrgCode()), Criteria.where("labels").in(model.getLabels())));
+        query.with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
 
         List<Workflow> workflows = mongoTemplate.find(query, Workflow.class, MongoCollectionDefinition.WORKFLOWS.getName());
 
@@ -90,16 +89,13 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     public SaveWorkflowResult save(SaveWorkflow model) {
         Workflow workflow = Workflow.builder()
-                .id(IdGenUtil.next())
+                .id(model.getId())
                 .name(model.getName())
                 .orgCode(model.getOrgCode())
                 .labels(model.getLabels())
+                .ruleIds(model.getRuleIds())
                 .enable(model.getEnable())
                 .remark(model.getRemark())
-                .updateBy(model.getUpdateBy())
-                .updateDate(model.getUpdateDate())
-                .createBy(model.getCreateBy())
-                .createDate(model.getCreateDate())
                 .build();
 
         if (isNull(workflow.getId())) {

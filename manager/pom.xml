@@ -84,11 +84,17 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+        <!-- Native -->
         <dependency>
             <groupId>org.springframework.experimental</groupId>
             <artifactId>spring-native</artifactId>
         </dependency>
-        <!-- DOC -->
+        <!-- Arthas -->
+        <dependency>
+            <groupId>com.taobao.arthas</groupId>
+            <artifactId>arthas-spring-boot-starter</artifactId>
+        </dependency>
+        <!-- Docs -->
         <!-- see:https://springdoc.org/#demos -->
         <!-- see:https://github.com/springdoc/springdoc-openapi-demos -->
         <dependency>
