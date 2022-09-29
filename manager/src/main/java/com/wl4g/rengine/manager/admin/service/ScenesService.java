@@ -16,7 +16,7 @@
 package com.wl4g.rengine.manager.admin.service;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
-import com.wl4g.rengine.common.bean.Scenes;
+import com.wl4g.rengine.common.entity.Scenes;
 import com.wl4g.rengine.manager.admin.model.DeleteScenes;
 import com.wl4g.rengine.manager.admin.model.DeleteScenesResult;
 import com.wl4g.rengine.manager.admin.model.QueryScenes;

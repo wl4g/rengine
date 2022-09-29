@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.common.bean.Rule;
+import com.wl4g.rengine.common.entity.Rule;
 import com.wl4g.rengine.manager.admin.model.DeleteRule;
 import com.wl4g.rengine.manager.admin.model.DeleteRuleResult;
 import com.wl4g.rengine.manager.admin.model.QueryRule;

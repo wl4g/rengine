@@ -29,14 +29,14 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import com.wl4g.rengine.common.bean.IdentityProvider;
 import com.wl4g.rengine.manager.admin.model.SaveIdentityProvider;
 import com.wl4g.rengine.manager.admin.model.SaveIdentityProviderResult;
 import com.wl4g.rengine.manager.admin.model.QueryIdentityProvider;
 import com.wl4g.rengine.manager.admin.model.QueryIdentityProviderResult;
 import com.wl4g.rengine.manager.admin.service.IdentityProviderService;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
-import com.wl4g.rengine.manager.util.IdGenUtil;
+import com.wl4g.rengine.common.entity.IdentityProvider;
+import com.wl4g.rengine.common.util.IdGenUtil;
 
 /**
  * {@link IdentityProviderServiceImpl}

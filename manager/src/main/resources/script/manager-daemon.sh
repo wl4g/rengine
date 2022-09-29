@@ -11,10 +11,11 @@
 set -e
 
 # Source function library.
-. /etc/rc.d/init.d/functions
+
+[ -f /etc/rc.d/init.d/functions ] && . /etc/rc.d/init.d/functions || echo
 
 # Source networking configuration.
-. /etc/sysconfig/network
+[ -f /etc/sysconfig/network ] && . /etc/sysconfig/network || echo
 
 # Check that networking is up.
 [ "$NETWORKING" = "no" ] && exit 0

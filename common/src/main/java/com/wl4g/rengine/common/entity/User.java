@@ -13,12 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.common.bean;
-
-import java.util.Date;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+package com.wl4g.rengine.common.entity;
 
 import com.wl4g.infra.common.bean.BaseBean;
 
@@ -28,22 +23,22 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-/**
- * {@link Job}
- * 
- * @author James Wong
- * @version 2022-08-29
- * @since v3.0.0
- */
 @Getter
 @Setter
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class Job extends BaseBean {
-    private static final long serialVersionUID = 1L;
-    private @NotBlank String workflowId;
-    private @NotNull Date startDate;
-    private @NotNull Date endDate;
-    private @NotBlank String reason;
+public class User extends BaseBean {
+    private static final long serialVersionUID = -5762348176963349685L;
+
+    private Integer type;
+
+    private String username;
+
+    private String password;
+
+    private String email;
+
+    private String attrJson;
+
 }

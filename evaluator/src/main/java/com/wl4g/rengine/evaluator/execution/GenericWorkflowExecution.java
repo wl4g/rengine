@@ -15,22 +15,37 @@
  */
 package com.wl4g.rengine.evaluator.execution;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Named;
+
 import com.wl4g.rengine.common.model.Evaluation;
+import com.wl4g.rengine.common.model.EvaluationEngine;
 import com.wl4g.rengine.common.model.EvaluationResult;
+import com.wl4g.rengine.common.model.EvaluationResult.GenericEvaluationResult;
+import com.wl4g.rengine.evaluator.execution.engine.IEngine;
 
 /**
- * {@link DefaultWorkflowExecution}
+ * {@link GenericWorkflowExecution}
  * 
  * @author James Wong
  * @version 2022-09-17
  * @since v3.0.0
  */
-public class DefaultWorkflowExecution implements IExecution {
+@Named(GenericWorkflowExecution.BEAN_NAME)
+@ApplicationScoped
+public class GenericWorkflowExecution extends BaseWorkflowExecution {
+
+    public static final String BEAN_NAME = "genericWorkflowExecution";
 
     @Override
     public EvaluationResult apply(Evaluation model) {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO parse rules execution graph tree from workflow
+        IEngine engine = getEngine(EvaluationEngine.valueOf(model.getEngine()));
+
+        // TODO re-definition result bean?
+        Object result = engine.execute(model);
+
+        return GenericEvaluationResult.builder().result(result).build();
     }
 
 }

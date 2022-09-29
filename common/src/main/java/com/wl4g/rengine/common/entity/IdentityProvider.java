@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.common.bean;
+package com.wl4g.rengine.common.entity;
 
 import javax.validation.constraints.NotBlank;
 
@@ -23,8 +23,8 @@ import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.infra.common.validation.EnumValue;
-import com.wl4g.rengine.common.bean.IdentityProvider.OAuth2Config;
-import com.wl4g.rengine.common.bean.IdentityProvider.Saml2Config;
+import com.wl4g.rengine.common.entity.IdentityProvider.OAuth2Config;
+import com.wl4g.rengine.common.entity.IdentityProvider.Saml2Config;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;

@@ -55,16 +55,20 @@ public class EvaluatorMeterService extends PrometheusMeterFacade {
 
         evaluation_total("evaluation_total", "The stats of evaluation total"),
 
-        evaluation_success("evaluation_normal", "The stats of evaluation normal"),
+        evaluation_success("evaluation_success", "The stats of evaluation success"),
 
-        evaluation_failure("evaluation_suspicious", "The stats of evaluation suspicious");
+        evaluation_failure("evaluation_suspicious", "The stats of evaluation failure"),
+
+        evaluation_suspicious("evaluation_suspicious", "The stats of evaluation suspicious");
 
         private final String name;
         private final String help;
     }
 
     public static abstract class MetricsTag {
-        public static final String SCENES = "scenes";
+        public static final String KIND = "kind";
+        public static final String ENGINE = "engine";
+        public static final String SCENESCODE = "scenesCode";
         public static final String SERVICE = "service";
     }
 

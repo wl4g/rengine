@@ -33,15 +33,15 @@ import org.springframework.stereotype.Service;
 
 import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
-import com.wl4g.rengine.common.bean.Scenes;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
+import com.wl4g.rengine.common.entity.Scenes;
+import com.wl4g.rengine.common.util.IdGenUtil;
 import com.wl4g.rengine.manager.admin.model.DeleteScenes;
 import com.wl4g.rengine.manager.admin.model.DeleteScenesResult;
 import com.wl4g.rengine.manager.admin.model.QueryScenes;
 import com.wl4g.rengine.manager.admin.model.SaveScenes;
 import com.wl4g.rengine.manager.admin.model.SaveScenesResult;
 import com.wl4g.rengine.manager.admin.service.ScenesService;
-import com.wl4g.rengine.manager.util.IdGenUtil;
 
 /**
  * {@link ScenesServiceImpl}
@@ -59,12 +59,10 @@ public class ScenesServiceImpl implements ScenesService {
     public PageHolder<Scenes> query(QueryScenes model) {
         Query query = new Query(new Criteria().orOperator(Criteria.where("_id").is(model.getScenesId()),
                 Criteria.where("name").regex(format("(%s)+", model.getName())), Criteria.where("enable").is(model.getEnable()),
-                Criteria.where("labels").in(model.getLabels(), Criteria.where("organizationCode").is(model.getOrgCode()))));
-        query.with(PageRequest.of(model.getPageNum(), model.getPageSize(),
-                Sort.by(Direction.DESC, "updateDate")));
+                Criteria.where("orgCode").is(model.getOrgCode()), Criteria.where("labels").in(model.getLabels())));
+        query.with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
 
         List<Scenes> sceneses = mongoTemplate.find(query, Scenes.class, MongoCollectionDefinition.SCENESES.getName());
-
         Collections.sort(sceneses, (o1, o2) -> safeLongToInt(o2.getUpdateDate().getTime() - o1.getUpdateDate().getTime()));
 
         // QueryScenesResult.builder()
@@ -72,7 +70,7 @@ public class ScenesServiceImpl implements ScenesService {
         // .map(p -> Scenes.builder()
         // .id(p.getId())
         // .name(p.getName())
-        // .organizationCode(p.getOrganizationCode())
+        // .orgCode(p.getorgCode())
         // .labels(p.getLabels())
         // .enable(p.getEnable())
         // .remark(p.getRemark())
@@ -90,14 +88,12 @@ public class ScenesServiceImpl implements ScenesService {
         Scenes scenes = Scenes.builder()
                 .id(model.getId())
                 .name(model.getName())
+                .scenesCode(model.getScenesCode())
                 .orgCode(model.getOrgCode())
                 .labels(model.getLabels())
                 .enable(model.getEnable())
+                .workflowId(model.getWorkflowId())
                 .remark(model.getRemark())
-                .updateBy(model.getUpdateBy())
-                .updateDate(model.getUpdateDate())
-                .createBy(model.getCreateBy())
-                .createDate(model.getCreateDate())
                 .build();
 
         if (isNull(scenes.getId())) {

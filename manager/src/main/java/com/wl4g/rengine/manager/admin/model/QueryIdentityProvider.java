@@ -18,7 +18,7 @@ package com.wl4g.rengine.manager.admin.model;
 import javax.annotation.Nullable;
 
 import com.wl4g.infra.common.validation.EnumValue;
-import com.wl4g.rengine.common.bean.IdentityProvider.IdPKind;
+import com.wl4g.rengine.common.entity.IdentityProvider.IdPKind;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;

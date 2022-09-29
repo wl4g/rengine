@@ -37,6 +37,8 @@ public abstract class RengineConstants extends EnvironmentUtil {
 
     public static final String DEF_EVENTBUS_TOPIC = "rengine_event";
 
+    public static final String DEF_MONGODB_DATABASE = getStringProperty("mongodb.database", "rengine");
+
     public static final String DEF_MINIO_ENDPOINT = "http://localhost:9000";
     public static final String DEF_MINIO_REGION = "us-east-1";
     public static final String DEF_MINIO_BUCKET = "rengine";

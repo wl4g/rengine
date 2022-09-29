@@ -25,7 +25,7 @@ import javax.enterprise.event.Observes;
 import javax.inject.Singleton;
 import javax.validation.constraints.NotNull;
 
-import com.wl4g.rengine.common.bean.UploadObject.UploadType;
+import com.wl4g.rengine.common.entity.UploadObject.UploadType;
 import com.wl4g.rengine.common.exception.ExecutionException;
 import com.wl4g.rengine.common.model.Evaluation;
 import com.wl4g.rengine.common.model.EvaluationResult;
@@ -33,6 +33,7 @@ import com.wl4g.rengine.evaluator.execution.sdk.ScriptContext;
 
 import groovy.lang.GroovyClassLoader;
 import io.quarkus.runtime.StartupEvent;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -43,6 +44,7 @@ import lombok.extern.slf4j.Slf4j;
  * @since v3.0.0
  */
 @Slf4j
+@Getter
 @Singleton
 public class GroovyScriptEngine extends AbstractScriptEngine {
 

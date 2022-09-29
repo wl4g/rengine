@@ -13,33 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.common.bean;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
-import com.wl4g.infra.common.bean.BaseBean;
-
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.SuperBuilder;
+package com.wl4g.rengine.common.validation;
 
 /**
- * {@link Rule}
+ * {@link ValidForControllerMarker}
  * 
  * @author James Wong
- * @version 2022-08-29
+ * @version 2022-09-27
  * @since v3.0.0
  */
-@Getter
-@Setter
-@SuperBuilder
-@ToString
-@NoArgsConstructor
-public class Rule extends BaseBean {
-    private static final long serialVersionUID = 1L;
-    private @NotNull Long scenesId;
-    private @NotBlank String name;
+public interface ValidForControllerMarker {
 }

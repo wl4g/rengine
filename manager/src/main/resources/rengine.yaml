@@ -14,8 +14,8 @@
 spring:
   application.name: rengine
   profiles:
-    #include: data,devtool,telemetry,swagger,security-oauth,security-static
-    include: data,telemetry,swagger,security-static
+    #include: data,telemetry,swagger,arthas,security-oauth,security-static,devtool
+    include: data,telemetry,swagger,arthas,security-static
     active: dev
   banner:
       location: classpath:META-INF/banner.txt

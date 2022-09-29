@@ -13,14 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.manager.admin.model;
+package com.wl4g.rengine.common.entity;
 
 import java.util.List;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotBlank;
 
-import com.wl4g.rengine.common.entity.Scenes;
+import com.wl4g.infra.common.bean.BaseBean;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,10 +30,10 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link QueryScenesResult}
+ * {@link Rule}
  * 
  * @author James Wong
- * @version 2022-08-28
+ * @version 2022-08-29
  * @since v3.0.0
  */
 @Getter
@@ -39,6 +41,15 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class QueryScenesResult {
-    private @Nullable List<Scenes> sceneses;
+public class Rule extends BaseBean {
+    private static final long serialVersionUID = 1L;
+    private @NotBlank String name;
+    private @Nullable List<Long> uploadIds;
+
+    //
+    // Temporary fields.
+    //
+
+    @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
+    private @Nullable transient List<UploadObject> uploads;
 }

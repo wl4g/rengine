@@ -36,7 +36,7 @@ import javax.inject.Singleton;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import com.wl4g.rengine.common.bean.UploadObject.UploadType;
+import com.wl4g.rengine.common.entity.UploadObject.UploadType;
 import com.wl4g.rengine.evaluator.minio.MinioConfig.IOkHttpClientConfig;
 
 import io.minio.GetObjectArgs;

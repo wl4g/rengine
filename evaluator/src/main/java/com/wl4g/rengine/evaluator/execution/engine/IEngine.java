@@ -18,7 +18,6 @@ package com.wl4g.rengine.evaluator.execution.engine;
 import java.util.function.Function;
 
 import com.wl4g.rengine.common.model.Evaluation;
-import com.wl4g.rengine.common.model.EvaluationResult;
 
 /**
  * {@link IEngine}
@@ -27,6 +26,10 @@ import com.wl4g.rengine.common.model.EvaluationResult;
  * @version 2022-09-22
  * @since v3.0.0
  */
-public interface IEngine extends Function<Evaluation, EvaluationResult> {
+public interface IEngine extends Function<Evaluation, Object> {
+
+    default Object execute(Evaluation t) {
+        return apply(t);
+    }
 
 }

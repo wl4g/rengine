@@ -15,6 +15,7 @@
  */
 package com.wl4g.rengine.evaluator.rest;
 
+import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
@@ -27,8 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PreDestroy;
 import javax.enterprise.event.Observes;
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -39,14 +40,15 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Source;
 import org.graalvm.polyglot.Value;
 import org.graalvm.polyglot.proxy.ProxyObject;
 
+import com.wl4g.infra.common.graalvm.GraalJsScriptManager.ContextWrapper;
 import com.wl4g.infra.common.lang.EnvironmentUtil;
 import com.wl4g.infra.common.runtime.JvmRuntimeTool;
 import com.wl4g.infra.common.web.rest.RespBase;
+import com.wl4g.rengine.evaluator.execution.engine.GraalJSScriptEngine;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptContext;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptContext.ScriptEventLocation;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptContext.ScriptEventSource;
@@ -78,12 +80,16 @@ import lombok.extern.slf4j.Slf4j;
 @Singleton
 public class TestJavascriptResource {
 
+    // 注: 同一 Context 实例不允许多线程并发调用.
+    @Inject
     @NotNull
-    Context singletonContext; // 同一 Context 实例不允许多线程并发调用.
+    GraalJSScriptEngine jsScriptEngine;
 
+    // 已过时 Java11+ 计划移除.
     // graal.js, nashorn
+    // @Inject
     // @NotNull
-    // ScriptEngineManager engineManager;
+    // ScriptEngineManager scriptEngineManager;
 
     void onStart(@Observes StartupEvent event) {
         init();
@@ -91,47 +97,33 @@ public class TestJavascriptResource {
 
     // @PostConstruct
     void init() {
-        try {
-            log.info("Initialzing graalvm polyglot singleton context ...");
-            singletonContext = Context.create();
-        } catch (Exception e) {
-            log.error("Failed to init graalvm polyglot singleton context.", e);
-        }
         // try {
         // log.info("Initialzing script engine manager ...");
-        // engineManager = new ScriptEngineManager();
+        // scriptEngineManager = new ScriptEngineManager();
         // } catch (Exception e) {
         // log.error("Failed to init script engine manager.", e);
         // }
     }
 
-    @PreDestroy
-    void destroy() {
-        try {
-            log.info("Destroy graalvm polyglot singleton context ...");
-            singletonContext.close();
-        } catch (Exception e) {
-            log.error("Failed to destroy graalvm polyglot context.", e);
-        }
-    }
-
     @POST
     @Path("/execution")
-    public RespBase<Object> execution(JavascriptExecution model) throws Throwable {
-        log.info("called: Javascript execution ... {}", model);
+    public RespBase<Object> execution(JavascriptExecution model) {
+        log.info("called: JSScript execution ... {}", model);
 
         // Limiting test process.
         if (!JvmRuntimeTool.isJvmInDebugging && !EnvironmentUtil.getBooleanProperty("test.rest", false)) {
-            return RespBase.create().withMessage("Limited test process");
+            return RespBase.create().withMessage("Rejected test rest");
         }
 
-        try (Context newContext = Context.create();) {
-            log.info("Javascript script ...");
-            String codes = Files.readString(Paths.get(URI.create(model.getScriptPath())), Charset.forName("UTF-8"));
-            log.info("Loaded Javascript codes: {}", codes);
+        long begin = currentTimeMillis();
+        try (ContextWrapper context = jsScriptEngine.getGraalJsScriptManager().getContext();) {
+            log.info("JSScript execution ...");
+            System.out.println(format("cost(newContext): %sms", (currentTimeMillis() - begin)));
 
-            Context c = Context.newBuilder("js").allowAllAccess(true).build();
-            Value bindings = c.getBindings("js");
+            begin = currentTimeMillis();
+            String codes = Files.readString(Paths.get(URI.create(model.getScriptPath())), Charset.forName("UTF-8"));
+            System.out.println(format("cost(loadJSScript): %sms", (currentTimeMillis() - begin)));
+            log.info("Loaded JSScript codes: {}", codes);
 
             ScriptRengineEvent event = new ScriptRengineEvent("generic_device_temp_warning",
                     ScriptEventSource.builder()
@@ -153,17 +145,31 @@ public class TestJavascriptResource {
                     .attributes(ProxyObject.fromMap(attributes))
                     .build();
 
+            begin = currentTimeMillis();
+            context.eval(Source.newBuilder("js", codes, "test-js2java.js").build());
+            System.out.println(format("cost(eval): %sms", (currentTimeMillis() - begin)));
+
+            begin = currentTimeMillis();
+            Value bindings = context.getBindings("js");
+            System.out.println(format("cost(getBindings): %sms", (currentTimeMillis() - begin)));
+
+            begin = currentTimeMillis();
             bindings.putMember("httpClient", new ScriptHttpClient());
-            c.eval(Source.newBuilder("js", codes, "test-js2java.js").build());
+            System.out.println(format("cost(putMember): %sms", (currentTimeMillis() - begin)));
 
-            Value processFunction = c.getBindings("js").getMember("process");
+            begin = currentTimeMillis();
+            Value processFunction = bindings.getMember("process");
+            System.out.println(format("cost(getMember): %sms", (currentTimeMillis() - begin)));
+
+            begin = currentTimeMillis();
             Value result = processFunction.execute(scriptContext);
-            log.info("Javascript execution result: {}", result);
+            System.out.println(format("cost(execute): %sms", (currentTimeMillis() - begin)));
 
+            log.info("JSScript execution result: {}", result);
             return RespBase.create().withData(result.toString());
         } catch (Throwable e) {
-            log.error("Failed to excution Javascript script.", e);
-            throw e;
+            log.error("Failed to excution JSScript.", e);
+            return RespBase.create().withCode(500).withMessage(format("Failed to execution JSScript: %s", e.getMessage()));
         }
     }
 

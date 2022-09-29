@@ -1,6 +1,6 @@
 package com.wl4g.rengine.manager.admin.mapper;
 
-import com.wl4g.rengine.common.bean.User;
+import com.wl4g.rengine.common.entity.User;
 
 public interface UserMapper {
 

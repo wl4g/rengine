@@ -17,7 +17,10 @@ package com.wl4g.rengine.evaluator.service;
 
 import java.util.List;
 
-import com.wl4g.rengine.common.bean.Job;
+import javax.validation.constraints.NotBlank;
+
+import com.wl4g.rengine.common.entity.Job;
+import com.wl4g.rengine.common.entity.Scenes;
 import com.wl4g.rengine.evaluator.service.impl.JobServiceImpl;
 
 import io.smallrye.mutiny.Uni;
@@ -30,6 +33,8 @@ import io.smallrye.mutiny.Uni;
  * @since v3.0.0
  */
 public interface JobService {
+
+    Scenes loadScenesFull(@NotBlank String scenesCode);
 
     Uni<List<Job>> listAll();
 

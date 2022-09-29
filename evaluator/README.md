@@ -24,7 +24,9 @@ curl -v -XPOST \
 -H 'Content-Type: application/json' \
 'localhost:28002/evaluator/evaluate' \
 -d '{
-  "scenes": "generic_device_warn",
+  "@kind": "GENERIC",
+  "@engine": "JS",
+  "scenesCode": "iot_generic_temp_warn",
   "service": "collector",
   "attributes": {},
   "scripting": {
@@ -65,7 +67,7 @@ cd rengine
 # Should use java11+
 export JAVA_HOME=/usr/local/jdk-11.0.10/
 ./mvnw package -f evaluator/pom.xml \
--Dmaven.test.skip=true -DskipTests -Dnative \
+-Dmaven.test.skip=true -DskipTests -Dbuild:native \
 -Dquarkus.native.container-build=true \
 -Dquarkus.native.container-runtime=docker
 ```
@@ -86,6 +88,7 @@ docker build -f build/docker/Dockerfile.native -t wl4g/rengine-evaluator .
 - Health
 
 ```bash
+curl -v localhost:28002/healthz
 curl -v localhost:28002/healthz/live
 curl -v localhost:28002/healthz/ready
 curl -v localhost:28002/healthz/started
@@ -99,7 +102,7 @@ curl -v localhost:28002/metrics
 
 ### Native Troubleshooting
 
-- https://quarkus.io/guides/native-reference#profiling
+- [quarkus.io/guides/native-reference#profiling](https://quarkus.io/guides/native-reference#profiling)
 
 
 ## FAQ

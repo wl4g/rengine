@@ -89,7 +89,7 @@ public class TestGroovyResource {
 
         // Limiting test process.
         if (!JvmRuntimeTool.isJvmInDebugging && !EnvironmentUtil.getBooleanProperty("test.rest", false)) {
-            return RespBase.create().withMessage("Limited test process");
+            return RespBase.create().withMessage("Rejected test rest");
         }
 
         try {

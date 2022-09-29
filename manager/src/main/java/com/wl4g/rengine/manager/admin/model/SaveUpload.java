@@ -15,7 +15,7 @@
  */
 package com.wl4g.rengine.manager.admin.model;
 
-import com.wl4g.rengine.common.bean.UploadObject;
+import com.wl4g.rengine.common.entity.UploadObject;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

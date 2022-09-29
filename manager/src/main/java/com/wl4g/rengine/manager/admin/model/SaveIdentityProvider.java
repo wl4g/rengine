@@ -15,7 +15,7 @@
  */
 package com.wl4g.rengine.manager.admin.model;
 
-import com.wl4g.rengine.common.bean.IdentityProvider;
+import com.wl4g.rengine.common.entity.IdentityProvider;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

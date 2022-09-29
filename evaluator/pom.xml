@@ -213,6 +213,11 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-mongodb-client</artifactId>
         </dependency>
+        <!-- <dependency>-->
+        <!--     <groupId>io.quarkus</groupId>-->
+        <!--     <artifactId>quarkus-mongodb-panache</artifactId>-->
+        <!-- </dependency>-->
+        <!-- OTEL -->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-opentelemetry-exporter-otlp-deployment</artifactId>
@@ -322,16 +327,33 @@ and see:https://github.com/apache/groovy/blob/GROOVY_4_0_5/build.gradle#L98 -->
         </dependency>
         <!-- END: Integration for Javascript(graal.js/nashorn) script engine -->
 
+        <!-- Testing -->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-junit5</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- <dependency>-->
-        <!--     <groupId>io.rest-assured</groupId>-->
-        <!--     <artifactId>rest-assured</artifactId>-->
-        <!--     <scope>test</scope>-->
-        <!-- </dependency>-->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-junit5-mockito</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- see:https://quarkus.io/guides/mongodb#testing-helpers -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-test-mongodb</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
@@ -416,10 +438,10 @@ and see:https://github.com/apache/groovy/blob/GROOVY_4_0_5/build.gradle#L98 -->
     </build>
     <profiles>
         <profile>
-            <id>native</id>
+            <id>build:native</id>
             <activation>
                 <property>
-                    <name>native</name>
+                    <name>build:native</name>
                 </property>
             </activation>
             <properties>

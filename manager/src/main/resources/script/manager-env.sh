@@ -38,17 +38,17 @@ BASE_DIR="$(cd "`dirname "$0"`"/..; pwd)"
 #
 
 # Note that the application name must be the same as the boot jar file name. (Short name is recommended)
-APP_NAME="${APP_NAME:rengine-manager}"
-APP_VERSION="${APP_VERSION:1.0.0}"
-APP_PROFILE="${APP_PROFILE:pro}"
-MAIN_CLASS="${MAIN_CLASS:com.wl4g.RengineManager}"
+APP_NAME="${APP_NAME:-rengine-manager}"
+APP_VERSION="${APP_VERSION:-1.0.0}"
+APP_PROFILE="${APP_PROFILE:-pro}"
+MAIN_CLASS="${MAIN_CLASS:-com.wl4g.RengineManager}"
 
 # Need to enable the willcard classpath? (Enable: "1", otherwise not enabled),
 # When enabled, the generated startup script will contain wildcard loads e.g. "java -cp /usr/local/myapp1/lib/*"
 ENABLE_WILDCARD_CLASSPATH="${ENABLE_WILDCARD_CLASSPATH:1}"
 
 # Running in daemon mode?
-DAEMON_MODE="${DAEMON_MODE:true}"
+DAEMON_MODE="${DAEMON_MODE:-true}"
 
 # App home and config directory define.
 APP_HOME=$BASE_DIR
@@ -99,6 +99,12 @@ if [ -z "$JAVA_HOME" ]; then
 else
   JAVA="$JAVA_HOME/bin/java"
 fi
+# the first segment of the version number, which is '1' for releases before Java 9
+# it then becomes '9', '10' etc.
+# e.g: openjdk version "11.0.10" 2021-01-19
+JAVA_MAJOR_VERSION=$($JAVA -version 2>&1 | sed -E -n 's/.* version \"(.+)\.(.+)\.(.+)".*/\1/p')
+JAVA_MINOR_VERSION=$($JAVA -version 2>&1 | sed -E -n 's/.* version \"(.+)\.(.+)\.(.+)".*/\2/p')
+JAVA_PATCH_VERSION=$($JAVA -version 2>&1 | sed -E -n 's/.* version \"(.+)\.(.+)\.(.+)".*/\3/p')
 
 # Debug options
 if [ -n "$DEBUG_PORT" ]; then
@@ -126,8 +132,15 @@ fi
 if [ -z "$JVM_PERFORMANCE_OPTS" ]; then
   # The `-server` parameter indicates that the current JVM is activated in server or client mode (only the old 32 bit JDK is supported),
   # and is not supported in the current 64 bit JDK. 
-  JVM_PERFORMANCE_OPTS="-Djava.awt.headless=true -XX:MetaspaceSize=64m -XX:MaxMetaspaceSize=128m -XX:PermSize=256m -XX:MaxPermSize=512m \
--XX:MaxDirectMemorySize=1G -XX:NativeMemoryTracking=off"
+  JVM_PERFORMANCE_OPTS="$JVM_PERFORMANCE_OPTS -Djava.awt.headless=true -XX:MaxDirectMemorySize=1G -XX:NativeMemoryTracking=off"
+
+  if [[ "$JAVA_MAJOR_VERSION" -eq "1" ]] ; then
+    if [[ "$JAVA_MINOR_VERSION" -le "8" ]] ; then # e.g: jdk1.7.x
+      JVM_PERFORMANCE_OPTS="$JVM_PERFORMANCE_OPTS -XX:PermSize=256m -XX:MaxPermSize=512m"
+    else
+      JVM_PERFORMANCE_OPTS="$JVM_PERFORMANCE_OPTS -XX:MetaspaceSize=64m -XX:MaxMetaspaceSize=128m"
+    fi
+  fi
 
   # The -XX:HeapDumpOnOutOfMemoryError parameter generates a snapshot under the XX:HeapDumpPath when a memory overflow occurs in JVM,
   # and the default path is user.dir.
@@ -160,13 +173,8 @@ fi
 if [ -z "$GC_LOG_OPTS" ]; then # Enable default loggc args
   GC_LOG_OPTS="-XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:+DisableExplicitGC"
   GC_LOG_FILE_NAME="${APP_NAME}-gc.log"
-
-  # the first segment of the version number, which is '1' for releases before Java 9
-  # it then becomes '9', '10' etc.
-  # e.g: openjdk version "11.0.10" 2021-01-19
-  JAVA_MAJOR_VERSION=$($JAVA -version 2>&1 | sed -E -n 's/.* version "([^.-]*).*"/\1/p' | awk -F ' ' '{print $1}')
   if [[ "$JAVA_MAJOR_VERSION" -ge "9" ]] ; then
-    GC_LOG_OPTS="$GC_LOG_OPTS -Xlog:gc*:file=$LOG_DIR/$GC_LOG_FILE_NAME:time,tags:filecount=10,filesize=102400"
+    GC_LOG_OPTS="$GC_LOG_OPTS -Xlog:gc*:file=$LOG_DIR/$GC_LOG_FILE_NAME:time,tags:filecount=100,filesize=102400"
   else
     GC_LOG_OPTS="$GC_LOG_OPTS -Xloggc:${LOG_DIR}/${GC_LOG_FILE_NAME} -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps \
 -XX:+PrintGCTimeStamps -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=10 -XX:GCLogFileSize=100M"
@@ -203,12 +211,10 @@ CLASSPATH_ORDERED_LEN=${#CLASSPATH_ORDERED_ARR[@]}
 
 LIB_DIR="$BASE_DIR/$LIB_DIR_NAME"
 if [ -d "$LIB_DIR" ]; then
-  for file in `ls -a "$LIB_DIR"/* | sort`;
-  do
+  for file in `ls -a "$LIB_DIR"/* | sort`; do
     filename=$(basename $file)
     # Using wildcard classpath
-    if [ $ENABLE_WILDCARD_CLASSPATH == "1" ]; then
-
+    if [[ $ENABLE_WILDCARD_CLASSPATH == "1" ]]; then
       # Does it exist in a "$CLASSPATH_ORDERED_ARR" ?
       IS_EXIST=$(echo "${CLASSPATH_ORDERED_ARR[@]}" | grep -wq "$filename" && echo "Y" || echo "N")
       # echo $IS_EXIST" filename: "$filename
@@ -223,12 +229,11 @@ if [ -d "$LIB_DIR" ]; then
 fi
 
 # Add wildcard classpath. 
-if [ $ENABLE_WILDCARD_CLASSPATH == "1" ]; then
+if [[ $ENABLE_WILDCARD_CLASSPATH == "1" ]]; then
   APP_CLASSPATH="${APP_CLASSPATH}:${APP_HOME}/${LIB_DIR_NAME}/*"
 fi
 
 # Modify the loading order of classpath.
-#
 if [ $CLASSPATH_ORDERED_LEN -gt 1 ]; then
   echo "Repair classpath..."
   TMP_STR="__tmp_string_"
@@ -245,7 +250,6 @@ if [ $CLASSPATH_ORDERED_LEN -gt 1 ]; then
     APP_CLASSPATH=${APP_CLASSPATH/${CLASSPATH_ORDERED_ARR[i+1]}/${CLASSPATH_ORDERED_ARR[i]}}
     APP_CLASSPATH=${APP_CLASSPATH/$TMP_STR/${CLASSPATH_ORDERED_ARR[i+1]}}
   done;
-
 fi
 
 #
@@ -253,12 +257,12 @@ fi
 #
 if [ -z "$APP_OPTS" ]; then
   # Add the core options arguments it supports according to different application types.
-  if [ -n "$(ls lib/* | grep -E lib/spring-boot)" ]; then # This is spring-boot app?
+  if [ -n "$(ls ${BASE_DIR}/lib/* | grep -E ${BASE_DIR}/lib/spring-boot)" ]; then # This is spring-boot app?
     APP_OPTS="$APP_OPTS --spring.application.name=${APP_NAME}"
     APP_OPTS="$APP_OPTS --spring.profiles.active=${APP_PROFILE}"
     APP_OPTS="$APP_OPTS --server.tomcat.basedir=${DATA_DIR}"
     APP_OPTS="$APP_OPTS --logging.file.name=${LOG_DIR}/${APP_NAME}_${APP_PROFILE}.log"
-  else if [ -n "$(ls lib/* | grep -E lib/quarkus-core)" ]; then # This is quarkus app?
+  else if [ -n "$(ls ${BASE_DIR}/lib/* | grep -E ${BASE_DIR}/lib/quarkus-core)" ]; then # This is quarkus app?
     APP_OPTS="$APP_OPTS -Dquarkus.application.name=${APP_NAME}"
     APP_OPTS="$APP_OPTS -Dquarkus.log.file.path=${LOG_DIR}/${APP_NAME}_${APP_PROFILE}.log"
   fi
@@ -271,4 +275,5 @@ fi
 
 if [ ! -x "$LOG_DIR" ]; then
   mkdir -p "$LOG_DIR"
+fi
 fi

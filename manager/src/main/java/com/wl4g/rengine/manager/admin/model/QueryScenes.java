@@ -17,7 +17,7 @@ package com.wl4g.rengine.manager.admin.model;
 
 import javax.annotation.Nullable;
 
-import com.wl4g.rengine.common.bean.Scenes;
+import com.wl4g.rengine.common.entity.Scenes;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

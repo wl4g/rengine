@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.common.bean.Scenes;
+import com.wl4g.rengine.common.entity.Scenes;
 import com.wl4g.rengine.manager.admin.model.DeleteScenes;
 import com.wl4g.rengine.manager.admin.model.DeleteScenesResult;
 import com.wl4g.rengine.manager.admin.model.QueryScenes;
@@ -82,7 +82,7 @@ public class ScenesController {
     @Operation(description = "Delete project.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
-    public RespBase<DeleteScenesResult> delete(@Validated DeleteScenes model) {
+    public RespBase<DeleteScenesResult> delete(@Validated @RequestBody DeleteScenes model) {
         log.info("called: model={}", model);
         RespBase<DeleteScenesResult> resp = RespBase.create();
         resp.setData(scenesService.delete(model));

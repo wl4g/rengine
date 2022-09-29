@@ -15,7 +15,7 @@
  */
 package com.wl4g.rengine.manager.admin.model;
 
-import com.wl4g.rengine.common.bean.Rule;
+import com.wl4g.rengine.common.entity.Rule;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

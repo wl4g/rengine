@@ -19,7 +19,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import com.wl4g.rengine.common.bean.Workflow;
+import com.wl4g.rengine.common.entity.Workflow;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
