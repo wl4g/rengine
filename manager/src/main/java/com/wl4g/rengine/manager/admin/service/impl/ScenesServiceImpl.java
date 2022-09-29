@@ -80,7 +80,9 @@ public class ScenesServiceImpl implements ScenesService {
         // .collect(toList()))
         // .build();
 
-        return new PageHolder<Scenes>(model.getPageNum(), model.getPageSize()).withRecords(sceneses);
+        return new PageHolder<Scenes>(model.getPageNum(), model.getPageSize())
+                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.SCENESES.getName()))
+                .withRecords(sceneses);
     }
 
     @Override

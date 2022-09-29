@@ -15,6 +15,7 @@
  */
 package com.wl4g.rengine.evaluator.execution.engine;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getBooleanProperty;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getIntProperty;
 import static java.lang.String.format;
@@ -102,7 +103,7 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
         final String scriptMain = model.getScripting().getMainFun();
 
         try (ContextWrapper context = graalJsScriptManager.getContext();) {
-            final List<String> scripts = loadScripts(UploadType.USER_LIBRARY_WITH_JS, model);
+            final List<String> scripts = safeList(loadScripts(UploadType.USER_LIBRARY_WITH_JS, model));
 
             // Merge scripts dependencies.
             for (int i = 0; i < scripts.size(); i++) {

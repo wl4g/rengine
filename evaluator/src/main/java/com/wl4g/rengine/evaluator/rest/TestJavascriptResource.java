@@ -54,6 +54,7 @@ import com.wl4g.rengine.evaluator.execution.sdk.ScriptContext.ScriptEventLocatio
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptContext.ScriptEventSource;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptContext.ScriptRengineEvent;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptHttpClient;
+import com.wl4g.rengine.evaluator.execution.sdk.ScriptResult;
 import com.wl4g.rengine.evaluator.rest.interceptor.CustomValid;
 
 import io.quarkus.runtime.StartupEvent;
@@ -155,6 +156,7 @@ public class TestJavascriptResource {
 
             begin = currentTimeMillis();
             bindings.putMember("httpClient", new ScriptHttpClient());
+            bindings.putMember("ScriptResult", ScriptResult.class);
             System.out.println(format("cost(putMember): %sms", (currentTimeMillis() - begin)));
 
             begin = currentTimeMillis();
@@ -162,11 +164,16 @@ public class TestJavascriptResource {
             System.out.println(format("cost(getMember): %sms", (currentTimeMillis() - begin)));
 
             begin = currentTimeMillis();
-            Value result = processFunction.execute(scriptContext);
+            Value resultValue = processFunction.execute(scriptContext);
             System.out.println(format("cost(execute): %sms", (currentTimeMillis() - begin)));
 
+            log.info("JSScript execution resultValue: {}, scriptContext.getAttributes().getMembe('key1'): {}", resultValue,
+                    scriptContext.getAttributes().getMember("key1"));
+
+            ScriptResult result = resultValue.as(ScriptResult.class);
             log.info("JSScript execution result: {}", result);
-            return RespBase.create().withData(result.toString());
+
+            return RespBase.create().withData(result);
         } catch (Throwable e) {
             log.error("Failed to excution JSScript.", e);
             return RespBase.create().withCode(500).withMessage(format("Failed to execution JSScript: %s", e.getMessage()));
