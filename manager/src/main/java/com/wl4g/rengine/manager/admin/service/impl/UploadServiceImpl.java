@@ -104,7 +104,9 @@ public class UploadServiceImpl implements UploadService {
         // .collect(toList()))
         // .build();
 
-        return new PageHolder<UploadObject>(model.getPageNum(), model.getPageSize()).withRecords(uploads);
+        return new PageHolder<UploadObject>(model.getPageNum(), model.getPageSize())
+                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.UPLOADS.getName()))
+                .withRecords(uploads);
     }
 
     public SaveUploadResult apply(SaveUpload model) {

@@ -40,7 +40,7 @@ curl -v -XPOST \
 
 ## Development Guide
 
-### Build for JVM
+### Build for JAR
 
 - First fully build the dependent modules.
 
@@ -67,18 +67,38 @@ cd rengine
 # Should use java11+
 export JAVA_HOME=/usr/local/jdk-11.0.10/
 ./mvnw package -f evaluator/pom.xml \
--Dmaven.test.skip=true -DskipTests -Dbuild:native \
+-Dmaven.test.skip=true -DskipTests -Dnative \
 -Dquarkus.native.container-build=true \
 -Dquarkus.native.container-runtime=docker
 ```
 
-### Build for container image
+### Build for container(native) image
 
-- Then build as a container image.
+- Case1: Automatic build with quarkus plugin. [quarkus.io/guides/container-image#building](https://quarkus.io/guides/container-image#building)
+
+```bash
+# Should use java11+
+export JAVA_HOME=/usr/local/jdk-11.0.10/
+./mvnw package -f evaluator/pom.xml \
+-Dmaven.test.skip=true -DskipTests -Dnative \
+-Dquarkus.native.container-build=true \
+-Dquarkus.native.container-runtime=docker \
+-Dquarkus.container-image.build=true
+```
+
+- Case2: Build with raw commands.
 
 ```bash
 docker build -f build/docker/Dockerfile.jvm -t wl4g/rengine-evaluator .
 docker build -f build/docker/Dockerfile.native -t wl4g/rengine-evaluator .
+```
+
+### Build for container(JVM) image
+
+```bash
+./mvnw package -f evaluator/pom.xml \
+-Dmaven.test.skip=true -DskipTests \
+-Dquarkus.container-image.build=true
 ```
 
 ## Operation Guide

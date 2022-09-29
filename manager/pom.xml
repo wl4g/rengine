@@ -436,7 +436,7 @@
                         <configuration>
                             <!-- see:https://github.com/spotify/dockerfile-maven/issues/154 -->
                             <contextDirectory>${project.basedir}</contextDirectory>
-                            <dockerfile>${project.basedir}/build/docker/Dockerfile</dockerfile>
+                            <dockerfile>${project.basedir}/build/docker/Dockerfile.springtar</dockerfile>
                             <repository>wl4g/${project.build.finalName}</repository>
                             <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
                             <tag>${project.version}</tag>
@@ -540,7 +540,7 @@
                         <configuration>
                             <!-- see:https://github.com/spotify/dockerfile-maven/issues/154 -->
                             <contextDirectory>${project.basedir}</contextDirectory>
-                            <dockerfile>${project.basedir}/build/docker/Dockerfile</dockerfile>
+                            <dockerfile>${project.basedir}/build/docker/Dockerfile.native</dockerfile>
                             <repository>wl4g/${project.build.finalName}</repository>
                             <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
                             <tag>${project.version}</tag>

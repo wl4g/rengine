@@ -29,8 +29,9 @@ function process(context) {
     // for case3:
     const response2 = httpClient.postAsJson("http://httpbin.org/post", "");
     console.info("response2:", response2);
-    console.info("response2('/headers'):", response2.at("/headers"));
+    console.info("response2('/headers'):", response2.at("/headers").toString());
 
-    return response2;
-    //return "ok...";
+    // return response2;
+    // return "ok...";
+    return new ScriptResult(true).withValue(response2).addAttribute("key11111", "value1111");
 }

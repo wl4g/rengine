@@ -83,7 +83,9 @@ public class WorkflowServiceImpl implements WorkflowService {
         // .collect(toList()))
         // .build();
 
-        return new PageHolder<Workflow>(model.getPageNum(), model.getPageSize()).withRecords(workflows);
+        return new PageHolder<Workflow>(model.getPageNum(), model.getPageSize())
+                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.WORKFLOWS.getName()))
+                .withRecords(workflows);
     }
 
     @Override

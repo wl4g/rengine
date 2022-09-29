@@ -67,9 +67,12 @@ import okhttp3.Protocol;
 @Singleton
 public class MinioManager {
 
-    private @Inject MinioConfig config;
+    @Inject
+    @NotNull
+    MinioConfig config;
 
-    private @NotNull MinioClient minioClient;
+    @NotNull
+    MinioClient minioClient;
 
     void onStart(@Observes StartupEvent event) {
         IOkHttpClientConfig httpClient = config.httpClient();

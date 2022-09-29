@@ -16,6 +16,7 @@
 package com.wl4g.rengine.evaluator.execution.engine;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
@@ -72,7 +73,8 @@ public abstract class AbstractScriptEngine implements IEngine {
                 try {
                     scripts.add(minioManager.getObjectAsText(type, upload.getFilename()));
                 } catch (Exception e) {
-                    log.error("Failed to load dependency scripting from MinIO.", e);
+                    log.error(format("Failed to load dependency scripting from MinIO. - %s", upload.getObjectPrefix()), e);
+                    throw new IllegalStateException(e); // fast-fail:Stay-Strongly-Consistent
                 }
             });
         });

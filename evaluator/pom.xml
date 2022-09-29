@@ -438,10 +438,103 @@ and see:https://github.com/apache/groovy/blob/GROOVY_4_0_5/build.gradle#L98 -->
     </build>
     <profiles>
         <profile>
-            <id>build:native</id>
+            <id>build:tar</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <configuration>
+                            <finalName>${final.name}-${project.version}-bin</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assemble/package.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-assembly</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>build:tar:docker</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <configuration>
+                            <finalName>${final.name}-${project.version}-bin</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assemble/package.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-assembly</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Usages examples: -->
+                    <!-- export DOCKER_HOST=tcp://localhost:2375 -->
+                    <!-- [build]: mvn -Pbuild:tar:docker -->
+                    <!-- [push]: mvn -Pbuild:tar:docker -->
+                    <!-- [push]: mvn -Pbuild:tar:docker dockerfile:build dockerfile:push -Ddockerfile.username=wl4g -Ddockerfile.password=xxx -->
+                    <plugin>
+                        <groupId>com.spotify</groupId>
+                        <artifactId>dockerfile-maven-plugin</artifactId>
+                        <version>1.4.13</version>
+                        <executions>
+                            <execution>
+                                <id>default</id>
+                                <goals>
+                                    <goal>build</goal>
+                                    <!-- <goal>push</goal> -->
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <!-- see:https://github.com/spotify/dockerfile-maven/issues/154 -->
+                            <contextDirectory>${project.basedir}</contextDirectory>
+                            <dockerfile>${project.basedir}/build/docker/Dockerfile.jvm</dockerfile>
+                            <repository>wl4g/${project.build.finalName}</repository>
+                            <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
+                            <tag>${project.version}</tag>
+                            <readTimeoutMillis>60000</readTimeoutMillis>
+                            <connectTimeoutMillis>20000</connectTimeoutMillis>
+                            <buildArgs>
+                                <!-- Addidtion librarys. -->
+                                <!-- <ADD_LIBRARY></ADD_LIBRARY> -->
+                                <APP_NAME>${project.build.finalName}</APP_NAME>
+                                <APP_VERSION>${project.version}</APP_VERSION>
+                                <APP_MAINCLASS>${bootstrap-classname}</APP_MAINCLASS>
+                            </buildArgs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>native</id>
             <activation>
                 <property>
-                    <name>build:native</name>
+                    <name>native</name>
                 </property>
             </activation>
             <properties>

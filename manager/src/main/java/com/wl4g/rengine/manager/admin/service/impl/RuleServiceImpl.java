@@ -82,7 +82,9 @@ public class RuleServiceImpl implements RuleService {
         // .collect(toList()))
         // .build();
 
-        return new PageHolder<Rule>(model.getPageNum(), model.getPageSize()).withRecords(rules);
+        return new PageHolder<Rule>(model.getPageNum(), model.getPageSize())
+                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.RULES.getName()))
+                .withRecords(rules);
     }
 
     @Override
