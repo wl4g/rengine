@@ -16,11 +16,11 @@
 package com.wl4g.rengine.common.validation;
 
 /**
- * {@link ValidForControllerMarker}
+ * {@link ValidForRestMarker}
  * 
  * @author James Wong
  * @version 2022-09-27
  * @since v3.0.0
  */
-public interface ValidForControllerMarker {
+public interface ValidForRestMarker {
 }

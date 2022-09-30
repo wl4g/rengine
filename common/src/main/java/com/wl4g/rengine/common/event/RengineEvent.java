@@ -25,6 +25,7 @@ import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.emptyMap;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.HashMap;
@@ -140,7 +141,8 @@ public class RengineEvent extends EventObject {
     @Data
     @SuperBuilder
     @NoArgsConstructor
-    public static class EventSource {
+    public static class EventSource implements Serializable {
+        private static final long serialVersionUID = -4689601246194850124L;
         private @NotNull @Min(0) Long sourceTime;
         private @NotEmpty @Default List<String> principals = new ArrayList<>();
         private @Nullable @Default EventLocation location = EventLocation.builder().build();
@@ -149,7 +151,8 @@ public class RengineEvent extends EventObject {
     @Data
     @SuperBuilder
     @NoArgsConstructor
-    public static class EventLocation {
+    public static class EventLocation implements Serializable {
+        private static final long serialVersionUID = -5164248154057314473L;
         private @Nullable String ipAddress;
         private @Nullable Boolean ipv6;
         private @Nullable String isp;

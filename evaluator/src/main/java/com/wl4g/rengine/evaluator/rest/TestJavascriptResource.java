@@ -44,7 +44,7 @@ import org.graalvm.polyglot.Source;
 import org.graalvm.polyglot.Value;
 import org.graalvm.polyglot.proxy.ProxyObject;
 
-import com.wl4g.infra.common.graalvm.GraalJsScriptManager.ContextWrapper;
+import com.wl4g.infra.common.graalvm.GraalPolyglotManager.ContextWrapper;
 import com.wl4g.infra.common.lang.EnvironmentUtil;
 import com.wl4g.infra.common.runtime.JvmRuntimeTool;
 import com.wl4g.infra.common.web.rest.RespBase;
@@ -117,7 +117,7 @@ public class TestJavascriptResource {
         }
 
         long begin = currentTimeMillis();
-        try (ContextWrapper context = jsScriptEngine.getGraalJsScriptManager().getContext();) {
+        try (ContextWrapper context = jsScriptEngine.getGraalPolyglotManager().getContext();) {
             log.info("JSScript execution ...");
             System.out.println(format("cost(newContext): %sms", (currentTimeMillis() - begin)));
 
@@ -155,8 +155,8 @@ public class TestJavascriptResource {
             System.out.println(format("cost(getBindings): %sms", (currentTimeMillis() - begin)));
 
             begin = currentTimeMillis();
-            bindings.putMember("httpClient", new ScriptHttpClient());
-            bindings.putMember("ScriptResult", ScriptResult.class);
+            bindings.putMember(ScriptHttpClient.class.getSimpleName(), ScriptHttpClient.class);
+            bindings.putMember(ScriptResult.class.getSimpleName(), ScriptResult.class);
             System.out.println(format("cost(putMember): %sms", (currentTimeMillis() - begin)));
 
             begin = currentTimeMillis();

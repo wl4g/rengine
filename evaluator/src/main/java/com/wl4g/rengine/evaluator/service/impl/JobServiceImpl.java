@@ -168,6 +168,19 @@ public class JobServiceImpl implements JobService {
                     log.debug("Found scenes object by scenesCode: {} to json: {}", scenesCode, scenesDoc.toJson());
                 }
                 Scenes scenes = new Scenes();
+                scenes.setId(scenesDoc.getLong("_id"));
+                scenes.setName(scenesDoc.getString("name"));
+                scenes.setScenesCode(scenesDoc.getString("scenesCode"));
+                scenes.setWorkflowId(scenesDoc.getLong("workflowId"));
+                scenes.setOrgCode(scenesDoc.getString("orgCode"));
+                scenes.setEnable(scenesDoc.getInteger("enable"));
+                scenes.setLabels(scenesDoc.getList("labels", String.class));
+                scenes.setRemark(scenesDoc.getString("remark"));
+                scenes.setCreateBy(scenesDoc.getLong("createBy"));
+                scenes.setCreateDate(scenesDoc.getDate("createDate"));
+                scenes.setUpdateBy(scenesDoc.getLong("updateBy"));
+                scenes.setUpdateDate(scenesDoc.getDate("updateDate"));
+
                 safeList(scenesDoc.getList("workflow", Document.class)).stream().findFirst().ifPresent(workflowsDoc -> {
                     scenes.setWorkflow(Workflow.builder()
                             .id(workflowsDoc.getLong("_id"))
@@ -203,6 +216,7 @@ public class JobServiceImpl implements JobService {
                                                 .filename(uploadsDoc.getString("filename"))
                                                 .uploadType(uploadsDoc.getString("uploadType"))
                                                 .objectPrefix(uploadsDoc.getString("objectPrefix"))
+                                                .extension(uploadsDoc.getString("extension"))
                                                 .size(uploadsDoc.getLong("size"))
                                                 .md5sum(uploadsDoc.getString("md5sum"))
                                                 .sha1sum(uploadsDoc.getString("sha1sum"))

@@ -17,10 +17,16 @@ package com.wl4g.rengine.evaluator.minio;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.infra.common.lang.EnvironmentUtil.getIntProperty;
+import static com.wl4g.infra.common.lang.StringUtils2.getFilename;
+import static com.wl4g.infra.common.lang.TypeConverts.safeLongToInt;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-import java.io.ByteArrayOutputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -36,6 +42,8 @@ import javax.inject.Singleton;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.google.common.io.Resources;
+import com.wl4g.infra.common.io.FileIOUtils;
 import com.wl4g.rengine.common.entity.UploadObject.UploadType;
 import com.wl4g.rengine.evaluator.minio.MinioConfig.IOkHttpClientConfig;
 
@@ -49,7 +57,9 @@ import io.minio.errors.InvalidResponseException;
 import io.minio.errors.ServerException;
 import io.minio.errors.XmlParserException;
 import io.quarkus.runtime.StartupEvent;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Protocol;
@@ -63,7 +73,6 @@ import okhttp3.Protocol;
  */
 @Slf4j
 @Getter
-// @ApplicationScoped
 @Singleton
 public class MinioManager {
 
@@ -97,23 +106,75 @@ public class MinioManager {
         log.info("Initializated Minio Client: {}", minioClient);
     }
 
-    public String getObjectAsText(@NotNull UploadType type, @NotBlank String objectName)
-            throws ErrorResponseException, InsufficientDataException, InternalException, InvalidKeyException,
+    public ObjectResource loadObject(
+            @NotNull UploadType uploadType,
+            @NotBlank String objectPrefix,
+            @NotBlank String scenesCode,
+            boolean binary,
+            boolean useCache) throws ErrorResponseException, InsufficientDataException, InternalException, InvalidKeyException,
             InvalidResponseException, IOException, NoSuchAlgorithmException, ServerException, XmlParserException, IOException {
-        notNullOf(type, "uploadType");
-        return getObjectAsText(type.getPrefix().concat("/").concat(objectName));
-    }
 
-    public String getObjectAsText(@NotBlank String objectPrefix)
-            throws ErrorResponseException, InsufficientDataException, InternalException, InvalidKeyException,
-            InvalidResponseException, IOException, NoSuchAlgorithmException, ServerException, XmlParserException, IOException {
-        hasTextOf(objectPrefix, "objectPrefix");
-        try (GetObjectResponse result = minioClient.getObject(
-                GetObjectArgs.builder().bucket(config.bucket()).region(config.region()).object(objectPrefix).build());) {
-            ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
-            result.transferTo(out);
-            return out.toString(UTF_8);
+        File localFile = determineLocalFile(uploadType, objectPrefix, scenesCode);
+
+        // Gets from local cached.
+        if (useCache && localFile.exists() && localFile.length() > 0) {
+            return new ObjectResource(objectPrefix, binary, localFile, safeLongToInt(localFile.length()));
+        }
+
+        // Gets from MinIO brokers.
+        GetObjectArgs args = GetObjectArgs.builder().bucket(config.bucket()).region(config.region()).object(objectPrefix).build();
+        try (GetObjectResponse result = minioClient.getObject(args);) {
+            int available = result.available();
+            isTrue(available <= OBJECT_MAX_READABLE_SIZE, "Maximum file object readable limit exceeded: %s",
+                    OBJECT_MAX_READABLE_SIZE);
+
+            try (FileOutputStream out = new FileOutputStream(localFile, false);
+                    BufferedOutputStream bout = new BufferedOutputStream(out, OBJECT_READ_BUFFER_SIZE);) {
+                // ByteArrayOutputStream out = new ByteArrayOutputStream(4092);
+                // result.transferTo(out);
+                // out.toByteArray();
+                result.transferTo(bout);
+                return new ObjectResource(objectPrefix, binary, localFile, available);
+            }
         }
     }
+
+    static File determineLocalFile(@NotNull UploadType uploadType, @NotBlank String objectPrefix, @NotBlank String scenesCode)
+            throws IOException {
+        notNullOf(uploadType, "uploadType");
+        hasTextOf(objectPrefix, "objectPrefix");
+        hasTextOf(scenesCode, "scenesCode");
+
+        File localFile = new File("/tmp/__tmp_rengine_files_caches/".concat(uploadType.name())
+                .concat("/")
+                .concat(scenesCode)
+                .concat("/")
+                .concat(getFilename(objectPrefix)));
+        FileIOUtils.forceMkdirParent(localFile);
+        return localFile;
+    }
+
+    @Getter
+    @ToString
+    @AllArgsConstructor
+    public static class ObjectResource {
+        private @NotBlank String objectPrefix;
+        private @NotNull boolean binary;
+        private @NotNull File localFile;
+        private @NotNull int available;
+
+        public byte[] readToBytes() throws IOException {
+            isTrue(available <= OBJECT_MAX_READABLE_SIZE, "Maximum file object readable limit exceeded: %s",
+                    OBJECT_MAX_READABLE_SIZE);
+            return Resources.toByteArray(localFile.toURI().toURL());
+        }
+
+        public String readToString() throws IOException {
+            return new String(readToBytes(), UTF_8);
+        }
+    }
+
+    public static final int OBJECT_READ_BUFFER_SIZE = getIntProperty("OBJECT_READ_BUFFER_SIZE", 4 * 1024);
+    public static final int OBJECT_MAX_READABLE_SIZE = getIntProperty("OBJECT_MAX_READABLE_SIZE", 10 * 1024 * 1024);
 
 }

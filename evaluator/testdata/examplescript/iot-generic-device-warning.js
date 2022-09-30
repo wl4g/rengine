@@ -22,12 +22,12 @@ function process(context) {
     console.info("context.getEvent().getEventSource().getLocation().getZipcode():", context.getEvent().getEventSource().getLocation().getZipcode());
 
     // for case2:
-    const response1 = httpClient.getAsText("http://httpbin.org/get");
+    const response1 = context.getDefaultHttpClient().getAsText("http://httpbin.org/get");
     console.info("response1:", response1);
     console.info("response1('/headers'):", response1.at("/headers"));
 
     // for case3:
-    const response2 = httpClient.postAsJson("http://httpbin.org/post", "");
+    const response2 = new ScriptHttpClient().postAsJson("http://httpbin.org/post", "");
     console.info("response2:", response2);
     console.info("response2('/headers'):", response2.at("/headers").toString());
 

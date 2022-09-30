@@ -80,8 +80,8 @@ public class EvaluatorServiceImpl implements EvaluatorService {
                                 MetricsTag.SERVICE, model.getService())
                         .increment();
             } catch (Exception e) {
-                String errmsg = format("Failed to evaluation with kind(%s), engine(%s). - %s", model.getKind(), model.getEngine(),
-                        e.getMessage());
+                String errmsg = format("Could not to execution evaluate of kind: '%s', engine: '%s'. reason: %s", model.getKind(),
+                        model.getEngine(), e.getMessage());
                 log.error(errmsg, e);
 
                 // Buried-point: failed evaluation.

@@ -16,13 +16,19 @@
 package com.wl4g.rengine.evaluator.execution.engine;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getBooleanProperty;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getIntProperty;
+import static com.wl4g.infra.common.lang.FastTimeClock.currentTimeMillis;
+import static com.wl4g.infra.common.lang.StringUtils2.getFilename;
+import static com.wl4g.rengine.evaluator.metrics.EvaluatorMeterService.MetricsName.evaluation_execute_time;
 import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.stream.Collectors.toSet;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.PreDestroy;
 import javax.enterprise.event.Observes;
@@ -31,18 +37,23 @@ import javax.validation.constraints.NotNull;
 
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotAccess;
+import org.graalvm.polyglot.PolyglotException;
 import org.graalvm.polyglot.Source;
 import org.graalvm.polyglot.Value;
 
-import com.wl4g.infra.common.graalvm.GraalJsScriptManager;
-import com.wl4g.infra.common.graalvm.GraalJsScriptManager.ContextWrapper;
+import com.wl4g.infra.common.graalvm.GraalPolyglotManager;
+import com.wl4g.infra.common.graalvm.GraalPolyglotManager.ContextWrapper;
 import com.wl4g.infra.common.lang.EnvironmentUtil;
+import com.wl4g.infra.common.lang.StringUtils2;
 import com.wl4g.rengine.common.entity.UploadObject.UploadType;
 import com.wl4g.rengine.common.exception.ExecutionException;
 import com.wl4g.rengine.common.model.Evaluation;
-import com.wl4g.rengine.common.model.EvaluationResult;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptHttpClient;
+import com.wl4g.rengine.evaluator.execution.sdk.ScriptResult;
+import com.wl4g.rengine.evaluator.metrics.EvaluatorMeterService.MetricsTag;
+import com.wl4g.rengine.evaluator.minio.MinioManager.ObjectResource;
 
+import io.micrometer.core.instrument.Timer;
 import io.quarkus.runtime.StartupEvent;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -60,7 +71,7 @@ import lombok.extern.slf4j.Slf4j;
 public class GraalJSScriptEngine extends AbstractScriptEngine {
 
     @NotNull
-    GraalJsScriptManager graalJsScriptManager;
+    GraalPolyglotManager graalPolyglotManager;
 
     void onStart(@Observes StartupEvent event) {
         try {
@@ -69,7 +80,7 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
             // Extraction graal.js from environment.
             Map<String, String> graaljsOptions = EnvironmentUtil.getConfigProperties("GRAALJS_OPTIONS_");
 
-            graalJsScriptManager = new GraalJsScriptManager(getIntProperty("graaljs.context.pool.min", 1),
+            graalPolyglotManager = new GraalPolyglotManager(getIntProperty("graaljs.context.pool.min", 1),
                     getIntProperty("graaljs.context.pool.max", 10), () -> Context.newBuilder("js") // Only-allowed-JS-language
                             .allowAllAccess(getBooleanProperty("graaljs.allowAllAccess", true))
                             .allowExperimentalOptions(getBooleanProperty("graaljs.allowExperimentalOptions", true))
@@ -92,43 +103,68 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
     void destroy() {
         try {
             log.info("Destroy graal JSScript manager ...");
-            graalJsScriptManager.close();
+            graalPolyglotManager.close();
         } catch (Exception e) {
             log.error("Failed to destroy graal JSScript manager.", e);
         }
     }
 
     @Override
-    public EvaluationResult apply(Evaluation model) {
+    public ScriptResult apply(Evaluation model) {
         final String scriptMain = model.getScripting().getMainFun();
+        if (log.isDebugEnabled()) {
+            log.debug("Execution JS script main: {} ...", scriptMain);
+        }
 
-        try (ContextWrapper context = graalJsScriptManager.getContext();) {
-            final List<String> scripts = safeList(loadScripts(UploadType.USER_LIBRARY_WITH_JS, model));
+        try (ContextWrapper context = graalPolyglotManager.getContext();) {
+            // Load all scripts dependencies.
+            List<ObjectResource> scripts = safeList(loadScriptResources(UploadType.USER_LIBRARY_WITH_JS, model, true));
+            Set<String> scriptFileNames = scripts.stream().map(s -> getFilename(s.getObjectPrefix())).collect(toSet());
 
-            // Merge scripts dependencies.
-            for (int i = 0; i < scripts.size(); i++) {
+            for (ObjectResource script : scripts) {
+                isTrue(!script.isBinary(), "Invalid JS dependency library binary type");
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Evaling JS dependency: {}", script.getObjectPrefix());
+                }
+                String scriptName = StringUtils2.getFilename(script.getObjectPrefix()).concat("@").concat(model.getScenesCode());
                 try {
-                    final String script = scripts.get(i);
-                    log.debug("Eval JS script: {}", script);
-                    context.eval(Source.newBuilder("js", script, (scriptMain + "-" + i)).build());
-                } catch (IOException e) {
-                    throw new IllegalStateException(e);
+                    // merge JS library with dependency.
+                    context.eval(Source.newBuilder("js", script.readToString(), scriptName).build());
+                } catch (PolyglotException e) {
+                    throw new ExecutionException(format("Unable to parse JS dependency of '%s'", scriptName), e);
                 }
             }
 
-            log.info("Binding JS script with {} ...", scriptMain);
             Value bindings = context.getBindings("js");
-            bindings.putMember("httpClient", new ScriptHttpClient());
+            // Try not to bind implicit objects, let users create new objects by
+            // self or get default objects from the context.
+            bindings.putMember(ScriptHttpClient.class.getSimpleName(), ScriptHttpClient.class);
+            bindings.putMember(ScriptResult.class.getSimpleName(), ScriptResult.class);
+
+            if (log.isInfoEnabled()) {
+                log.info("Loading JS script main: {} ...", scriptMain);
+            }
             Value mainFunction = bindings.getMember(scriptMain);
 
-            log.info("Execution JS script with {} ...", scriptMain);
-            Value result = mainFunction.execute(newScriptContext(model));
-            log.info("Execution JS script: {}, result: {}", scriptMain, result.toString());
+            // Buried-point: execute cost-time.
+            Timer executeTimer = meterService.timer(evaluation_execute_time.getName(), evaluation_execute_time.getHelp(),
+                    new double[] { 0.5, 0.9, 0.95 }, MetricsTag.KIND, model.getKind(), MetricsTag.ENGINE, model.getEngine(),
+                    MetricsTag.SCENESCODE, model.getScenesCode(), MetricsTag.SERVICE, model.getService(), MetricsTag.LIBRARY,
+                    scriptFileNames.toString());
 
-            // TODO re-definition result model structure
-            return EvaluationResult.GenericEvaluationResult.builder().result(result.toString()).build();
+            final long begin = currentTimeMillis();
+            Value result = mainFunction.execute(newScriptContext(model));
+            final long costTime = currentTimeMillis() - begin;
+            executeTimer.record(costTime, MILLISECONDS);
+
+            if (log.isInfoEnabled()) {
+                log.info("Executed JS script main: {}, cost: {}ms, result: {}", scriptMain, costTime, result);
+            }
+
+            return result.as(ScriptResult.class);
         } catch (Exception e) {
-            throw new ExecutionException(format("Failed to execution '%s' with JS engine.", scriptMain), e);
+            throw new ExecutionException(format("Failed to execution JS script main: '%s'. %s", scriptMain, e.getMessage()), e);
         }
     }
 

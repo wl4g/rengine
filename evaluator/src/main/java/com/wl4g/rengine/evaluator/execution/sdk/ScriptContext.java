@@ -22,6 +22,7 @@ import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.emptyMap;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,13 +51,26 @@ import lombok.experimental.SuperBuilder;
  */
 @ToString
 @SuperBuilder
-public class ScriptContext {
+public class ScriptContext implements Serializable {
+    private static final long serialVersionUID = 1106545214350173531L;
+
+    // Constants attributes.
+    //
+    public static final transient ScriptHttpClient _defaultHttpClient = new ScriptHttpClient();
+
+    // Runtime context attributes.
+    //
     private final @NotBlank String id;
     private final @NotBlank String type;
-    private final @Default List<String> args = new ArrayList<>();
-    private final @Default ScriptRengineEvent event = new ScriptRengineEvent("__default_empty_event",
+    private final @NotNull @Default List<String> args = new ArrayList<>();
+    private final @NotNull @Default ScriptRengineEvent event = new ScriptRengineEvent("__default_empty_event",
             ScriptEventSource.builder().build());
-    private final @Default ProxyObject attributes = ProxyObject.fromMap(new HashMap<>());
+    private final @NotNull @Default ProxyObject attributes = ProxyObject.fromMap(new HashMap<>());
+    private final @Nullable ScriptResult lastResult;
+
+    // Helper attributes.
+    //
+    private final transient @Default ScriptHttpClient defaultHttpClient = _defaultHttpClient;
 
     public @HostAccess.Export String getId() {
         return id;
@@ -78,8 +92,17 @@ public class ScriptContext {
         return event;
     }
 
+    public @HostAccess.Export ScriptResult getLastResult() {
+        return lastResult;
+    }
+
+    public @HostAccess.Export ScriptHttpClient getDefaultHttpClient() {
+        return defaultHttpClient;
+    }
+
     @ToString
-    public static class ScriptRengineEvent {
+    public static class ScriptRengineEvent implements Serializable {
+        private static final long serialVersionUID = -63891594867432009L;
         private @NotBlank String eventType;
         private @NotNull @Min(0) @NotNull Long observedTime;
         private @NotNull String body;
@@ -134,7 +157,8 @@ public class ScriptContext {
     @ToString
     @SuperBuilder
     @NoArgsConstructor
-    public static class ScriptEventSource {
+    public static class ScriptEventSource implements Serializable {
+        private static final long serialVersionUID = -63891594867432011L;
         private @NotNull @Min(0) Long sourceTime;
         private @NotEmpty @Default List<String> principals = new ArrayList<>();
         private @NotNull @Default ScriptEventLocation location = ScriptEventLocation.builder().build();
@@ -155,7 +179,8 @@ public class ScriptContext {
     @ToString
     @SuperBuilder
     @NoArgsConstructor
-    public static class ScriptEventLocation {
+    public static class ScriptEventLocation implements Serializable {
+        private static final long serialVersionUID = -63891594867422209L;
         private @NotBlank String ipAddress;
         private @NotNull Boolean ipv6;
         private @NotBlank String isp;

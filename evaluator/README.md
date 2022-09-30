@@ -26,11 +26,11 @@ curl -v -XPOST \
 -d '{
   "@kind": "GENERIC",
   "@engine": "JS",
-  "scenesCode": "iot_generic_temp_warn",
+  "scenesCode": "iot_generic_temp_warning",
   "service": "collector",
   "attributes": {},
   "scripting": {
-    "mainFun": "",
+    "mainFun": "process",
     "args": []
   }
 }'
@@ -134,7 +134,7 @@ curl -v localhost:28002/metrics
 - Generate testing script to local path.
 
 ```bash
-curl -L -o /tmp/test.groovy 'https://raw.githubusercontent.com/wl4g/rengine/master/evaluator/testdata/test.groovy'
+curl -L -o /tmp/test.groovy 'https://raw.githubusercontent.com/wl4g/rengine/master/evaluator/testdata/testscript/test.groovy'
 ```
 
 - Run native
@@ -165,7 +165,7 @@ tail -f /tmp/rengine/evaluator.log | jq -r '.message'
 - Generate testing script to local path.
 
 ```bash
-curl -L -o /tmp/test-js2java.js 'https://raw.githubusercontent.com/wl4g/rengine/master/evaluator/testdata/test-js2java.js'
+curl -L -o /tmp/test-js2java.js 'https://raw.githubusercontent.com/wl4g/rengine/master/evaluator/testdata/testscript/test-js2java.js'
 ```
 
 - Run native

@@ -53,5 +53,5 @@ public class SaveUploadResult {
     private @NotBlank Long id;
     private @NotBlank long fileLimitSize;
     private @NotBlank String objectPrefix;
-    private @NotEmpty List<String> extension;
+    private @NotEmpty List<String> extensions;
 }

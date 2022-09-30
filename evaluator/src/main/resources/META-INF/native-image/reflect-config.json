@@ -11,6 +11,8 @@
     {"name":"getArgs","parameterTypes":[] },
     {"name":"getEvent","parameterTypes":[] },
     {"name":"getAttributes","parameterTypes":[] },
+    {"name":"getLastResult","parameterTypes":[] },
+    {"name":"getDefaultHttpClient","parameterTypes":[] },
     {"name":"toString","parameterTypes":[] }
   ]
 },
@@ -70,6 +72,8 @@
   "queryAllDeclaredConstructors":true,
   "methods":[
     {"name":"<init>","parameterTypes":[] }, 
+    {"name":"<init>","parameterTypes":["java.lang.Integer","java.lang.Integer","java.lang.Integer"] }, 
+    {"name":"<init>","parameterTypes":["java.lang.Boolean","java.lang.Integer","java.lang.Integer","java.lang.Integer"] }, 
     {"name":"getAsText","parameterTypes":["java.lang.String"] }, 
     {"name":"postAsText","parameterTypes":["java.lang.String","java.lang.Object"] }, 
     {"name":"getAsJson","parameterTypes":["java.lang.String"] }, 

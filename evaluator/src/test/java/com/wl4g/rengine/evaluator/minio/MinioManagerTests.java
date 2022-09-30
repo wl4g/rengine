@@ -13,24 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.evaluator.execution.engine;
+package com.wl4g.rengine.evaluator.minio;
 
-import java.util.function.Function;
+import java.io.File;
+import java.io.IOException;
 
-import com.wl4g.rengine.common.model.Evaluation;
-import com.wl4g.rengine.evaluator.execution.sdk.ScriptResult;
+import org.junit.Test;
+
+import com.wl4g.rengine.common.entity.UploadObject.UploadType;
 
 /**
- * {@link IEngine}
+ * {@link MinioManagerTests}
  * 
  * @author James Wong
- * @version 2022-09-22
+ * @version 2022-10-09
  * @since v3.0.0
  */
-public interface IEngine extends Function<Evaluation, ScriptResult> {
+public class MinioManagerTests {
 
-    default ScriptResult execute(Evaluation t) {
-        return apply(t);
+    @Test
+    public void testDetermineLocalFile() throws IOException {
+        File localFile = MinioManager.determineLocalFile(UploadType.USER_LIBRARY_WITH_JS,
+                "/rengine/library/js/commons-lang-3.0.0.js", "iot_generic_temp_warning");
+        System.out.println(localFile);
     }
 
 }
