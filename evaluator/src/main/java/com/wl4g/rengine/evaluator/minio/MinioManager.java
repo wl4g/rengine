@@ -50,6 +50,8 @@ import com.wl4g.rengine.evaluator.minio.MinioConfig.IOkHttpClientConfig;
 import io.minio.GetObjectArgs;
 import io.minio.GetObjectResponse;
 import io.minio.MinioClient;
+import io.minio.ObjectWriteResponse;
+import io.minio.PutObjectArgs;
 import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InsufficientDataException;
 import io.minio.errors.InternalException;
@@ -136,6 +138,23 @@ public class MinioManager {
                 result.transferTo(bout);
                 return new ObjectResource(objectPrefix, binary, localFile, available);
             }
+        }
+    }
+
+    public void writeObject(@NotBlank String objectPrefix) {
+        try {
+            PutObjectArgs args = PutObjectArgs.builder()
+                    .bucket(config.bucket())
+                    .region(config.region())
+                    .object(objectPrefix)
+                    .build();
+            ObjectWriteResponse result = minioClient.putObject(args);
+
+            // minio 不支持追加写??? 参考 zadig 的日志写入机制?
+
+        } catch (InvalidKeyException | ErrorResponseException | InsufficientDataException | InternalException
+                | InvalidResponseException | NoSuchAlgorithmException | ServerException | XmlParserException | IOException e) {
+            throw new IllegalStateException(e);
         }
     }
 

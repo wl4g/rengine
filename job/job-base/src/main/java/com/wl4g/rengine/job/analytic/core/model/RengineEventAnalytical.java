@@ -15,17 +15,11 @@
  */
 package com.wl4g.rengine.job.analytic.core.model;
 
-import java.io.Serializable;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.rengine.common.event.RengineEvent;
-import com.wl4g.rengine.common.event.RengineEvent.EventSource;
-
-import lombok.Builder.Default;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 /**
  * {@link RengineEventAnalytical}
@@ -34,10 +28,29 @@ import lombok.experimental.SuperBuilder;
  * @version 2022-06-08 v3.0.0
  * @since v3.0.0
  */
-@Data
-@SuperBuilder
-@NoArgsConstructor
-public class RengineEventAnalytical implements Serializable {
-    private static final long serialVersionUID = -3297058243453003737L;
-    private @NotNull @Default RengineEvent event = new RengineEvent("__default_empty_event", EventSource.builder().build());
+public class RengineEventAnalytical extends RengineEvent {
+    private static final long serialVersionUID = 7396808707170188284L;
+
+    public RengineEventAnalytical(@NotNull RengineEvent event) {
+        super(((RengineEvent) notNullOf(event, "event")).getType(), event.getObservedTime(), (EventSource) event.getSource(),
+                event.getBody(), event.getAttributes());
+    }
+
+    // /**
+    // * Sorted field list.
+    // */
+    // public static final List<Field> ORDERED_FIELDS = unmodifiableList(
+    // findAllDeclaredFields(RengineEventAnalytical.class,
+    // true).stream().filter(f -> {
+    // // Check if it is a valid field that needs to be persisted.
+    // int m = f.getModifiers();
+    // Class<?> t = f.getType();
+    // return !isTransient(m) && !isStatic(m) && !isFinal(m) && !isAbstract(m)
+    // && !isNative(m) && (t.isPrimitive()
+    // || t.isEnum() || String.class.isAssignableFrom(t) ||
+    // Number.class.isAssignableFrom(t));
+    // }).map(f -> {
+    // makeAccessible(f);
+    // return f;
+    // }).collect(toList()));
 }

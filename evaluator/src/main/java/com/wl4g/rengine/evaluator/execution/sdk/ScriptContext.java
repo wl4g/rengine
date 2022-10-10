@@ -21,9 +21,11 @@ import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.emptyMap;
+import static java.util.Objects.isNull;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.EventObject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +39,10 @@ import javax.validation.constraints.NotNull;
 import org.graalvm.polyglot.HostAccess;
 import org.graalvm.polyglot.proxy.ProxyObject;
 
+import com.wl4g.rengine.evaluator.minio.MinioManager;
+
 import lombok.Builder.Default;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -49,15 +54,12 @@ import lombok.experimental.SuperBuilder;
  * @version 2022-09-22
  * @since v3.0.0
  */
+@Getter
 @ToString
 @SuperBuilder
 public class ScriptContext implements Serializable {
     private static final long serialVersionUID = 1106545214350173531L;
-
-    // Constants attributes.
     //
-    public static final transient ScriptHttpClient _defaultHttpClient = new ScriptHttpClient();
-
     // Runtime context attributes.
     //
     private final @NotBlank String id;
@@ -67,10 +69,16 @@ public class ScriptContext implements Serializable {
             ScriptEventSource.builder().build());
     private final @NotNull @Default ProxyObject attributes = ProxyObject.fromMap(new HashMap<>());
     private final @Nullable ScriptResult lastResult;
-
+    //
     // Helper attributes.
     //
-    private final transient @Default ScriptHttpClient defaultHttpClient = _defaultHttpClient;
+    private transient ScriptLogger logger;
+    private transient ScriptHttpClient defaultHttpClient;
+    private transient ScriptDataService dataService;
+    //
+    // Internal attributes.
+    //
+    private transient MinioManager minioManager;
 
     public @HostAccess.Export String getId() {
         return id;
@@ -96,45 +104,63 @@ public class ScriptContext implements Serializable {
         return lastResult;
     }
 
+    //
+    // Helper functions.
+    //
+
+    public @HostAccess.Export ScriptLogger getLogger() {
+        if (isNull(logger)) {
+            synchronized (this) {
+                if (isNull(logger)) {
+                    logger = new ScriptLogger(this);
+                }
+            }
+        }
+        return logger;
+    }
+
+    public @HostAccess.Export ScriptDataService getDataService() {
+        return dataService;
+    }
+
     public @HostAccess.Export ScriptHttpClient getDefaultHttpClient() {
         return defaultHttpClient;
     }
 
     @ToString
-    public static class ScriptRengineEvent implements Serializable {
+    public static class ScriptRengineEvent extends EventObject {
         private static final long serialVersionUID = -63891594867432009L;
-        private @NotBlank String eventType;
+        private @NotBlank String type;
         private @NotNull @Min(0) @NotNull Long observedTime;
         private @NotNull String body;
-        private @NotNull ScriptEventSource eventSource = ScriptEventSource.builder().build();
         private @NotNull ProxyObject attributes = ProxyObject.fromMap(new HashMap<>());
 
-        public ScriptRengineEvent(@NotBlank String eventType, @NotNull ScriptEventSource eventSource) {
-            this(eventType, currentTimeMillis(), eventSource, null, new HashMap<>());
+        public ScriptRengineEvent(@NotBlank String type, @NotNull ScriptEventSource source) {
+            this(type, currentTimeMillis(), source, null, new HashMap<>());
         }
 
-        public ScriptRengineEvent(@NotBlank String eventType, @NotNull ScriptEventSource eventSource, @Nullable String body) {
-            this(eventType, currentTimeMillis(), eventSource, body, emptyMap());
+        public ScriptRengineEvent(@NotBlank String type, @NotNull ScriptEventSource source, @Nullable String body) {
+            this(type, currentTimeMillis(), source, body, emptyMap());
         }
 
-        public ScriptRengineEvent(@NotBlank String eventType, @NotNull ScriptEventSource eventSource, @Nullable String body,
+        public ScriptRengineEvent(@NotBlank String type, @NotNull ScriptEventSource source, @Nullable String body,
                 @Nullable Map<String, String> attributes) {
-            this(eventType, currentTimeMillis(), eventSource, body, attributes);
+            this(type, currentTimeMillis(), source, body, attributes);
         }
 
         @SuppressWarnings({ "unchecked", "rawtypes" })
-        public ScriptRengineEvent(@NotBlank String eventType, @Min(0) Long observedTime, @NotNull ScriptEventSource eventSource,
+        public ScriptRengineEvent(@NotBlank String type, @Min(0) Long observedTime, @NotNull ScriptEventSource source,
                 @Nullable String body, @Nullable Map<String, String> attributes) {
+            super(notNullOf(source, "eventSource"));
+            this.type = hasTextOf(type, "eventType");
             isTrueOf(observedTime > 0, format("observedTime > 0, but is: %s", observedTime));
-            this.eventType = hasTextOf(eventType, "eventType");
             this.observedTime = observedTime;
             this.body = body;
-            this.eventSource = notNullOf(eventSource, "eventSource");
             this.attributes = ProxyObject.fromMap((Map) attributes);
         }
 
-        public @HostAccess.Export String getEventType() {
-            return eventType;
+        public @HostAccess.Export String getType() {
+            return type;
         }
 
         public @HostAccess.Export Long getObservedTime() {
@@ -145,8 +171,8 @@ public class ScriptContext implements Serializable {
             return body;
         }
 
-        public @HostAccess.Export ScriptEventSource getEventSource() {
-            return eventSource;
+        public @HostAccess.Export ScriptEventSource getSource() {
+            return (ScriptEventSource) super.getSource();
         }
 
         public @HostAccess.Export ProxyObject getAttributes() {
@@ -159,12 +185,12 @@ public class ScriptContext implements Serializable {
     @NoArgsConstructor
     public static class ScriptEventSource implements Serializable {
         private static final long serialVersionUID = -63891594867432011L;
-        private @NotNull @Min(0) Long sourceTime;
+        private @NotNull @Min(0) Long time;
         private @NotEmpty @Default List<String> principals = new ArrayList<>();
         private @NotNull @Default ScriptEventLocation location = ScriptEventLocation.builder().build();
 
-        public @HostAccess.Export Long getSourceTime() {
-            return sourceTime;
+        public @HostAccess.Export Long getTime() {
+            return time;
         }
 
         public @HostAccess.Export List<String> getPrincipals() {

@@ -9,17 +9,17 @@ function process(context) {
     console.info("context.getAttributes()['objId']:", context.getAttributes()["objId"]);
 
     console.info("context.getEvent():", context.getEvent());
-    console.info("context.getEvent().getEventType():", context.getEvent().getEventType());
+    console.info("context.getEvent().getType():", context.getEvent().getType());
     console.info("context.getEvent().getObservedTime():", context.getEvent().getObservedTime());
     console.info("context.getEvent().getBody():", context.getEvent().getBody());
     console.info("context.getEvent().getAttributes():", context.getEvent().getAttributes());
 
-    console.info("context.getEvent().getEventSource():", context.getEvent().getEventSource());
-    console.info("context.getEvent().getEventSource().getSourceTime():", context.getEvent().getEventSource().getSourceTime());
-    console.info("context.getEvent().getEventSource().getPrincipals():", context.getEvent().getEventSource().getPrincipals());
-    console.info("context.getEvent().getEventSource().getLocation():", context.getEvent().getEventSource().getLocation());
-    console.info("context.getEvent().getEventSource().getLocation().getIpAddress():", context.getEvent().getEventSource().getLocation().getIpAddress());
-    console.info("context.getEvent().getEventSource().getLocation().getZipcode():", context.getEvent().getEventSource().getLocation().getZipcode());
+    console.info("context.getEvent().getSource():", context.getEvent().getSource());
+    console.info("context.getEvent().getSource().getTime():", context.getEvent().getSource().getTime());
+    console.info("context.getEvent().getSource().getPrincipals():", context.getEvent().getSource().getPrincipals());
+    console.info("context.getEvent().getSource().getLocation():", context.getEvent().getSource().getLocation());
+    console.info("context.getEvent().getSource().getLocation().getIpAddress():", context.getEvent().getSource().getLocation().getIpAddress());
+    console.info("context.getEvent().getSource().getLocation().getZipcode():", context.getEvent().getSource().getLocation().getZipcode());
 
     // for case2:
     const response1 = context.getDefaultHttpClient().getAsText("http://httpbin.org/get");

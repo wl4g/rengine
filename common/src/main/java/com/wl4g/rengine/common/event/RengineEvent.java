@@ -69,11 +69,13 @@ public class RengineEvent extends EventObject {
     /**
      * Event type.
      */
-    private @NotBlank String eventType;
+    private @NotBlank String type;
 
     /**
      * Event observed time-stamp.
      */
+    // private @NotNull @Min(0)
+    // @PersistenceConverter(dateFormatter="yyMMddHHmmssSSS") Long observedTime;
     private @NotNull @Min(0) Long observedTime;
 
     /**
@@ -86,19 +88,19 @@ public class RengineEvent extends EventObject {
      */
     private @Nullable Map<String, String> attributes = new HashMap<>();
 
-    public RengineEvent(@NotBlank String eventType, @NotNull EventSource source) {
-        this(eventType, currentTimeMillis(), source, null, new HashMap<>());
+    public RengineEvent(@NotBlank String type, @NotNull EventSource source) {
+        this(type, currentTimeMillis(), source, null, new HashMap<>());
     }
 
-    public RengineEvent(@NotBlank String eventType, @NotNull EventSource source, @Nullable String body) {
-        this(eventType, currentTimeMillis(), source, body, emptyMap());
+    public RengineEvent(@NotBlank String type, @NotNull EventSource source, @Nullable String body) {
+        this(type, currentTimeMillis(), source, body, emptyMap());
     }
 
-    public RengineEvent(@NotBlank String eventType, @Min(0) Long observedTime, @NotNull EventSource source, @Nullable String body,
+    public RengineEvent(@NotBlank String type, @Min(0) Long observedTime, @NotNull EventSource source, @Nullable String body,
             @Nullable Map<String, String> attributes) {
-        super(notNullOf(source, "source"));
+        super(notNullOf(source, "eventSource"));
         isTrueOf(observedTime > 0, format("observedTime > 0, but is: %s", observedTime));
-        this.eventType = hasTextOf(eventType, "eventType");
+        this.type = hasTextOf(type, "eventType");
         this.observedTime = observedTime;
         this.body = body;
         this.attributes = attributes;
@@ -108,31 +110,35 @@ public class RengineEvent extends EventObject {
         return RengineEvent.validate(this);
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @JsonCreator
     public static RengineEvent fromJson(JsonNode node) {
         notNullOf(node, "node");
 
-        String eventType = node.at("/eventType").asText();
+        // Event base
+        String type = node.at("/type").asText();
         Long observedTime = node.at("/observedTime").asLong();
-
-        Long sourceTime = node.at("/source/sourceTime").asLong();
-        EventLocation location = parseFromNode(node, "/source/location", EventLocation.class);
 
         String body = node.at("/body").asText();
         Map<String, String> attributes = parseJSON(node.at("/attributes").asText(), HASHMAP_TYPEREF);
 
-        return new RengineEvent(eventType, observedTime, EventSource.builder().sourceTime(sourceTime).location(location).build(),
-                body, attributes);
+        // Event source
+        Long sourceTime = node.at("/source/time").asLong();
+        List principals = parseFromNode(node, "/source/principals", List.class);
+        EventLocation location = parseFromNode(node, "/source/location", EventLocation.class);
+
+        return new RengineEvent(type, observedTime,
+                EventSource.builder().time(sourceTime).principals(principals).location(location).build(), body, attributes);
     }
 
     public static RengineEvent validate(RengineEvent event) {
-        hasTextOf(event.getEventType(), "eventType");
+        hasTextOf(event.getType(), "type");
         notNullOf(event.getObservedTime(), "observedTime");
         isTrueOf(event.getObservedTime() > 0, "Must observedTime > 0");
 
         EventSource source = (EventSource) event.getSource();
-        notNullOf(source.getSourceTime(), "sourceTime");
-        isTrueOf(source.getSourceTime() > 0, "Must sourceTime > 0");
+        notNullOf(source.getTime(), "sourceTime");
+        isTrueOf(source.getTime() > 0, "Must sourceTime > 0");
         notEmptyOf(source.getPrincipals(), "principals");
 
         return event;
@@ -143,11 +149,43 @@ public class RengineEvent extends EventObject {
     @NoArgsConstructor
     public static class EventSource implements Serializable {
         private static final long serialVersionUID = -4689601246194850124L;
-        private @NotNull @Min(0) Long sourceTime;
+        // private @NotNull @Min(0)
+        // @PersistenceConverter(dateFormatter="yyMMddHHmmssSSS") Long time;
+        private @NotNull @Min(0) Long time;
         private @NotEmpty @Default List<String> principals = new ArrayList<>();
         private @Nullable @Default EventLocation location = EventLocation.builder().build();
     }
 
+    /**
+     * Fix for example:
+     * 
+     * <pre>
+     *  IP2LocationRecord:
+     *      IP Address = 1.1.1.1
+     *      Country Short = US
+     *      Country Long = United States of America
+     *      Region = California
+     *      City = Los Angeles
+     *      ISP = Not_Supported
+     *      Latitude = 34.05223
+     *      Longitude = -118.24368
+     *      Domain = Not_Supported
+     *      ZipCode = 90001
+     *      TimeZone = -07:00
+     *      NetSpeed = Not_Supported
+     *      IDDCode = Not_Supported
+     *      AreaCode = Not_Supported
+     *      WeatherStationCode = Not_Supported
+     *      WeatherStationName = Not_Supported
+     *      MCC = Not_Supported
+     *      MNC = Not_Supported
+     *      MobileBrand = Not_Supported
+     *      Elevation = 0.0
+     *      UsageType = Not_Supported
+     *      AddressType = Not_Supported
+     *      Category = Not_Supported
+     * </pre>
+     **/
     @Data
     @SuperBuilder
     @NoArgsConstructor
@@ -157,14 +195,21 @@ public class RengineEvent extends EventObject {
         private @Nullable Boolean ipv6;
         private @Nullable String isp;
         private @Nullable String domain;
-        private @Nullable String country;
-        private @Nullable String region;
-        private @Nullable String city;
+        private @Nullable Float elevation;
         private @Nullable Float latitude;
         private @Nullable Float longitude;
         private @Nullable String timezone;
         private @Nullable String zipcode;
-        private @Nullable Float elevation;
+        private @Nullable String city;
+        private @Nullable String region;
+        private @Nullable String country;
     }
+
+    // @Target(FIELD)
+    // @Retention(RUNTIME)
+    // @Documented
+    // public static @interface PersistenceConverter {
+    // String dateFormatter();
+    // }
 
 }

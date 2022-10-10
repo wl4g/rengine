@@ -41,9 +41,12 @@ import com.wl4g.rengine.evaluator.execution.sdk.ScriptContext;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptContext.ScriptEventLocation;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptContext.ScriptEventSource;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptContext.ScriptRengineEvent;
+import com.wl4g.rengine.evaluator.execution.sdk.ScriptDataService;
+import com.wl4g.rengine.evaluator.execution.sdk.ScriptHttpClient;
 import com.wl4g.rengine.evaluator.metrics.EvaluatorMeterService;
 import com.wl4g.rengine.evaluator.minio.MinioManager;
 import com.wl4g.rengine.evaluator.minio.MinioManager.ObjectResource;
+import com.wl4g.rengine.evaluator.service.AggregationService;
 import com.wl4g.rengine.evaluator.service.JobService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -66,6 +69,9 @@ public abstract class AbstractScriptEngine implements IEngine {
 
     @Inject
     JobService jobService;
+
+    @Inject
+    AggregationService aggregationService;
 
     protected @NotNull List<ObjectResource> loadScriptResources(
             @NotNull UploadType type,
@@ -102,7 +108,7 @@ public abstract class AbstractScriptEngine implements IEngine {
 
         ScriptRengineEvent event = new ScriptRengineEvent("generic_device_temp_warning",
                 ScriptEventSource.builder()
-                        .sourceTime(currentTimeMillis())
+                        .time(currentTimeMillis())
                         .principals(singletonList("admin"))
                         .location(ScriptEventLocation.builder().zipcode("20500").build())
                         .build(),
@@ -112,15 +118,17 @@ public abstract class AbstractScriptEngine implements IEngine {
         attributes.put("objId", "1010012");
         attributes.put("remark", "The test js call to java ...");
 
-        ScriptContext scriptContext = ScriptContext.builder()
+        return ScriptContext.builder()
                 .id("100101")
                 .type("iot_warning")
                 .args(model.getScripting().getArgs())
                 .event(event)
                 .attributes(ProxyObject.fromMap(attributes))
+                .minioManager(minioManager)
+                // .logger(new ScriptLogger(minioManager))
+                .dataService(new ScriptDataService(aggregationService))
+                .defaultHttpClient(new ScriptHttpClient())
                 .build();
-
-        return scriptContext;
     }
 
 }

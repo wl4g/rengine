@@ -27,9 +27,13 @@ spring:
       validationTimeout: 5000
       leakDetectionThreshold: 0
   data:
+    ## see:https://docs.spring.io/spring-data/mongodb/docs/3.4.2/reference/html/#mongo-template.writeconcern
+    ## see:org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
     mongodb:
       #uri: mongodb://rengine:123456@localhost:27017/rengine
       uri: mongodb://localhost:27017/rengine
+      #username: rengine
+      #password: '123456'
     ## see:com.wl4g.rengine.manager.minio.MinioClientProperties
     minio:
       httpClient:

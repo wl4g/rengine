@@ -15,17 +15,6 @@
  */
 package com.wl4g.rengine.job.analytic.core.model;
 
-import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
-import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
-import static java.lang.System.currentTimeMillis;
-import static java.util.Collections.singletonList;
-
-import org.junit.Test;
-
-import com.wl4g.rengine.common.event.RengineEvent;
-import com.wl4g.rengine.common.event.RengineEvent.EventSource;
-import com.wl4g.rengine.common.event.RengineEvent.EventLocation;
-
 /**
  * {@link RengineEventAnalyticalTests}
  * 
@@ -35,28 +24,9 @@ import com.wl4g.rengine.common.event.RengineEvent.EventLocation;
  */
 public class RengineEventAnalyticalTests {
 
-    @Test
-    public void testAnalyticalModelToJson() {
-        RengineEventAnalytical model = RengineEventAnalytical.builder()
-                .event(new RengineEvent("device_temp_warning",
-                        EventSource.builder()
-                                .sourceTime(currentTimeMillis())
-                                .principals(singletonList("admin"))
-                                .location(EventLocation.builder().zipcode("20500").build())
-                                .build(),
-                        "A serious alarm occurs when the device temperature is greater than 52℃"))
-                .build();
-        System.out.println(toJSONString(model));
-    }
-
-    @Test
-    public void testAnalyticalModelFromJson() {
-        String json = "{\"event\":{\"source\":{\"sourceTime\":null,\"ipLocation\":{\"ipAddress\":\"1.1.1.1\",\"countryShort\":null,\"countryLong\":null,\"region\":\"Pennsylvania Avenue\",\"city\":\"Washington\",\"isp\":null,\"latitude\":null,\"longitude\":null,\"domain\":null,\"zipcode\":null,\"netspeed\":null,\"timezone\":null,\"iddcode\":null,\"areacode\":\"20500\",\"weatherstationcode\":null,\"weatherstationname\":null,\"mcc\":null,\"mnc\":null,\"mobilebrand\":null,\"elevation\":null,\"usagetype\":null,\"addresstype\":null,\"category\":null}},\"eventType\":\"device_temp_warning\",\"observedTime\":1663752299681,\"body\":\"A serious alarm occurs when the device temperature is greater than 52℃\",\"attributes\":{}}}";
-        RengineEventAnalytical model = parseJSON(json, RengineEventAnalytical.class);
-        System.out.println("   EventType: " + model.getEvent().getEventType());
-        System.out.println("ObservedTime: " + model.getEvent().getObservedTime());
-        System.out.println("      Source: " + model.getEvent().getSource());
-        System.out.println("  Attributes: " + model.getEvent().getAttributes());
-    }
+    // @Test
+    // public void testOrderedFields() {
+    // System.out.println(RengineEventAnalytical.ORDERED_FIELDS);
+    // }
 
 }

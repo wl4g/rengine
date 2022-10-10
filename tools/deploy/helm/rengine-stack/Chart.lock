@@ -1,0 +1,30 @@
+dependencies:
+- name: rengine-evaluator
+  repository: file://charts/rengine-evaluator
+  version: 0.1.0
+- name: jaeger
+  repository: https://jaegertracing.github.io/helm-charts
+  version: 0.57.1
+- name: jaeger-operator
+  repository: https://jaegertracing.github.io/helm-charts
+  version: 2.33.0
+- name: zookeeper
+  repository: https://charts.bitnami.com/bitnami
+  version: 10.0.6
+- name: kafka
+  repository: https://charts.bitnami.com/bitnami
+  version: 18.0.7
+- name: redis
+  repository: https://charts.bitnami.com/bitnami
+  version: 17.0.9
+- name: mysql
+  repository: https://charts.bitnami.com/bitnami
+  version: 9.2.6
+- name: mongodb
+  repository: https://charts.bitnami.com/bitnami
+  version: 12.1.31
+- name: minio
+  repository: https://charts.bitnami.com/bitnami
+  version: 11.7.19
+digest: sha256:d92cf1557d63f1585a166c805af600fc48df885cd6ebd5f4cf113565a4e58485
+generated: "2022-08-09T15:06:26.552911907+08:00"

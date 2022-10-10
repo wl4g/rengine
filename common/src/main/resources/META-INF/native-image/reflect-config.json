@@ -1,0 +1,20 @@
+[
+{
+  "name":"com.wl4g.rengine.common.entity.UploadObject$ExtensionType",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"of","parameterTypes":["java.lang.String"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.UploadObject$UploadType",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"of","parameterTypes":["java.lang.String"] }
+  ]
+}
+]

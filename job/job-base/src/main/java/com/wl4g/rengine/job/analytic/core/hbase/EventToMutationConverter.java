@@ -18,11 +18,19 @@ package com.wl4g.rengine.job.analytic.core.hbase;
 import static com.google.common.base.Charsets.UTF_8;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.infra.common.lang.EnvironmentUtil.getIntProperty;
+import static com.wl4g.infra.common.lang.EnvironmentUtil.getStringProperty;
 import static com.wl4g.infra.common.lang.StringUtils2.getBytes;
+import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 
+import java.io.Serializable;
+
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -31,7 +39,7 @@ import org.apache.flink.connector.hbase.sink.HBaseMutationConverter;
 import org.apache.hadoop.hbase.client.Mutation;
 import org.apache.hadoop.hbase.client.Put;
 
-import com.wl4g.rengine.common.event.RengineEvent;
+import com.wl4g.rengine.common.event.RengineEvent.EventLocation;
 import com.wl4g.rengine.common.event.RengineEvent.EventSource;
 import com.wl4g.rengine.job.analytic.core.model.RengineEventAnalytical;
 
@@ -62,67 +70,102 @@ public class EventToMutationConverter implements HBaseMutationConverter<RengineE
     @Override
     public Mutation convertToMutation(@NotNull RengineEventAnalytical model) {
         notNullOf(model, "model");
-        model.getEvent().validate();
+        model.validate();
 
-        final RengineEvent event = model.getEvent();
         final Put put = new Put(generateRowkey(model));
 
+        // Automatic mapped.
+        // for (Field f : RengineEventAnalytical.ORDERED_FIELDS) {
+        // byte[] value = nullStringBytes;
+        // Object v = getField(f, model, true);
+        // if (nonNull(v)) {
+        // value = getBytes(v.toString());
+        // }
+        // addPutColumn(put, f.getName(), value);
+        // }
+
         // observedTime
-        addPutColumn(put, "observedTime", DateFormatUtils.format(event.getObservedTime(), "yyyyMMddHHmmss"));
+        addPutColumn(put, "observedTime", DateFormatUtils.format(model.getObservedTime(), "yyMMddHHmmss"));
         // body
-        addPutColumn(put, "body", event.getBody());
+        addPutColumn(put, "body", model.getBody());
+        // attributes
+        addPutColumn(put, "attributes", toJSONString(model.getAttributes()));
+        // source
+        final EventSource source = (EventSource) model.getSource();
+        if (nonNull(source)) {
+            addPutColumn(put, "sourceTime", DateFormatUtils.format(source.getTime(), "yyMMddHHmmss"));
+            addPutColumn(put, "sourcePrincipals", getSourcePrincipalsString(source));
+        }
+        // source location
+        final EventLocation location = source.getLocation();
+        if (nonNull(location)) {
+            addPutColumn(put, "locationIpAddress", location.getIpAddress());
+            addPutColumn(put, "locationIpv6", (nonNull(location.getIpv6()) && location.getIpv6()) ? 1 : 0);
+            addPutColumn(put, "locationIsp", location.getIsp());
+            addPutColumn(put, "locationDomain", location.getDomain());
+            addPutColumn(put, "locationElevation", location.getElevation());
+            addPutColumn(put, "locationLatitude", location.getLatitude());
+            addPutColumn(put, "locationLongitude", location.getLongitude());
+            addPutColumn(put, "locationZipcode", location.getZipcode());
+            addPutColumn(put, "locationTimezone", location.getTimezone());
+            addPutColumn(put, "locationCity", getGeoCityKey(source));
+            addPutColumn(put, "locationRegion", getGeoRegionKey(source));
+            addPutColumn(put, "locationCountry", getGeoCountryKey(source));
+        }
 
         return put;
     }
 
-    protected void addPutColumn(@NotNull Put put, @NotBlank String field, @NotNull Object value) {
-        if (isNull(value)) {
-            value = nullStringBytes;
-        }
-        put.addColumn(getBytes("f1"), getBytes(field), getBytes(value.toString()));
+    protected void addPutColumn(@NotNull Put put, @NotBlank String field, @NotNull Serializable value) {
+        value = isNull(value) ? nullStringBytes : value;
+        put.addColumn(getBytes("info"), getBytes(field), (value instanceof byte[]) ? (byte[]) value : getBytes(value.toString()));
     }
 
     protected byte[] generateRowkey(@NotNull RengineEventAnalytical model) {
-        EventSource source = (EventSource) model.getEvent().getSource();
+        EventSource source = (EventSource) model.getSource();
 
         // Use reversed time strings to avoid data hotspots.
         // Options are: SSSssmmHHddMMyy | SSSyyMMddHHmmss?
-        String reverseDate = DateFormatUtils.format(source.getSourceTime(), "SSSyyMMddHHmmss");
+        String reverseDate = DateFormatUtils.format(source.getTime(), "SSSyyMMddHHmmss");
 
         // TODO transform to ZIPCODE-standard city/region/country name.
         return new StringBuilder()
                 // when
                 .append(reverseDate)
                 // who
-                .append(",")
-                .append(join(safeList(source.getPrincipals()).toArray(), ","))
+                .append(ROWKEY_SPEARATOR)
+                .append(getSourcePrincipalsString(source))
                 // what
-                .append(",")
-                .append(model.getEvent().getEventType())
+                .append(ROWKEY_SPEARATOR)
+                .append(model.getType())
                 // where
                 // TODO 未拿到准确且完整的区域编码字典，无法约束采集源端传来的值，暂时只能放到非 RowKey，
                 // 但由于管理端 “数据洞察”->“事件分析” 支持查看事件统计/分析，其中 echarts 按照全球地图展示，因此最好还是
                 // 使用一份完整的 Geo-ZipCode 映射字典
-                // .append(",")
+                // .append(ROWKEY_SPEARATOR)
                 // .append(getGeoCityKey(source))
-                // .append(",")
+                // .append(ROWKEY_SPEARATOR)
                 // .append(getGeoRegionKey(source))
-                // .append(",")
+                // .append(ROWKEY_SPEARATOR)
                 // .append(getGeoCountryKey(source))
                 .toString()
                 .getBytes(UTF_8);
     }
 
+    protected String getSourcePrincipalsString(@NotNull EventSource source) {
+        return join(safeList(source.getPrincipals()).toArray(), "|");
+    }
+
     protected String getGeoCityKey(@NotNull EventSource source) {
-        return fixFieldKey(source.getLocation().getCity());
+        return fixFieldRowKey(source.getLocation().getCity());
     }
 
     protected String getGeoRegionKey(@NotNull EventSource source) {
-        return fixFieldKey(source.getLocation().getRegion());
+        return fixFieldRowKey(source.getLocation().getRegion());
     }
 
     protected String getGeoCountryKey(@NotNull EventSource source) {
-        return fixFieldKey(source.getLocation().getCountry());
+        return fixFieldRowKey(source.getLocation().getCountry());
     }
 
     /**
@@ -155,15 +198,19 @@ public class EventToMutationConverter implements HBaseMutationConverter<RengineE
      *      Category = Not_Supported
      * </pre>
      **/
-    protected String fixFieldKey(String field) {
-        String cleanFieldKey = trimToEmpty(field).toLowerCase().replace(" ", "_");
+    protected String fixFieldRowKey(@Nullable String fieldValue) {
+        if (isBlank(fieldValue)) {
+            return null;
+        }
+        String cleanFieldKey = trimToEmpty(fieldValue).toLowerCase().replace(" ", "_");
         // Limit field max length.
-        if (cleanFieldKey.length() > DEFAULT_MAX_ROWKEY_FIELD_LENGTH) {
-            cleanFieldKey = cleanFieldKey.substring(0, DEFAULT_MAX_ROWKEY_FIELD_LENGTH);
+        if (cleanFieldKey.length() > ROWKEY_PART_MAX_LEN) {
+            cleanFieldKey = cleanFieldKey.substring(0, ROWKEY_PART_MAX_LEN);
         }
         return cleanFieldKey;
     }
 
-    public static final int DEFAULT_MAX_ROWKEY_FIELD_LENGTH = 24;
+    public static final int ROWKEY_PART_MAX_LEN = getIntProperty("HBASE_ROWKEY_PART_MAX_LEN", 16);
+    public static final String ROWKEY_SPEARATOR = getStringProperty("HBASE_ROWKEY_SPEARATOR", ":");
 
 }

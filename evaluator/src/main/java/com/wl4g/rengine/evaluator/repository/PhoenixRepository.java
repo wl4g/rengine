@@ -13,15 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.evaluator.util;
+package com.wl4g.rengine.evaluator.repository;
+
+import javax.inject.Singleton;
 
 /**
- * {@link ExecutorUtil}
+ * {@link PhoenixRepository}
  * 
  * @author James Wong
  * @version 2022-09-17
  * @since v3.0.0
  */
-public abstract class ExecutorUtil {
+@Singleton
+public class PhoenixRepository {
+
+    // TODO
 
 }

@@ -37,24 +37,29 @@ public class RengineEventTests {
 
     @Test
     public void testEventToJson() {
-        RengineEvent event = new RengineEvent("device_temp_warning",
+        RengineEvent event = new RengineEvent("iot_generic_device_temp_warning",
                 EventSource.builder()
-                        .sourceTime(currentTimeMillis())
+                        .time(currentTimeMillis())
                         .principals(singletonList("admin"))
                         .location(EventLocation.builder().ipAddress("1.1.1.1").zipcode("20500").build())
                         .build(),
-                "A serious alarm occurs when the device temperature is greater than 52℃");
+                // A serious alarm occurs when the device temperature is greater
+                // than 52℃
+                "52");
         System.out.println(toJSONString(event));
     }
 
     @Test
     public void testEventFromJson() {
-        String json = "{\"source\":{\"sourceTime\":null,\"ipLocation\":{\"ipAddress\":\"1.1.1.1\",\"countryShort\":null,\"countryLong\":null,\"region\":\"Pennsylvania Avenue\",\"city\":\"Washington\",\"isp\":null,\"latitude\":null,\"longitude\":null,\"domain\":null,\"zipcode\":null,\"netspeed\":null,\"timezone\":null,\"iddcode\":null,\"areacode\":\"20500\",\"weatherstationcode\":null,\"weatherstationname\":null,\"mcc\":null,\"mnc\":null,\"mobilebrand\":null,\"elevation\":null,\"usagetype\":null,\"addresstype\":null,\"category\":null}},\"eventType\":\"device_temp_warning\",\"observedTime\":1663744904483,\"body\":\"A serious alarm occurs when the device temperature is greater than 52℃\",\"attributes\":{}}";
+        String json = "{\"source\":{\"time\":1665849312303,\"principals\":[\"admin\"],\"location\":{\"ipAddress\":\"1.1.1.1\",\"ipv6\":null,\"isp\":null,\"domain\":null,\"country\":null,\"region\":null,\"city\":null,\"latitude\":null,\"longitude\":null,\"timezone\":null,\"zipcode\":\"20500\",\"elevation\":null}},\"type\":\"iot_generic_device_temp_warning\",\"observedTime\":1665849312304,\"body\":\"52\",\"attributes\":{}}";
         RengineEvent event = parseJSON(json, RengineEvent.class);
-        System.out.println("   EventType: " + event.getEventType());
-        System.out.println("ObservedTime: " + event.getObservedTime());
-        System.out.println("      Source: " + event.getSource());
-        System.out.println("  Attributes: " + event.getAttributes());
+        System.out.println("         EventType: " + event.getType());
+        System.out.println("      ObservedTime: " + event.getObservedTime());
+        System.out.println("            Source: " + event.getSource());
+        System.out.println("       Source.time: " + ((EventSource) event.getSource()).getTime());
+        System.out.println(" Source.principals: " + ((EventSource) event.getSource()).getPrincipals());
+        System.out.println("   Source.location: " + ((EventSource) event.getSource()).getLocation());
+        System.out.println("        Attributes: " + event.getAttributes());
     }
 
     @Test

@@ -36,23 +36,19 @@ import org.bson.conversions.Bson;
 
 import com.google.common.collect.Lists;
 import com.mongodb.Function;
-import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.Variable;
-import com.wl4g.rengine.common.constants.RengineConstants;
-import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.Job;
 import com.wl4g.rengine.common.entity.Rule;
 import com.wl4g.rengine.common.entity.Scenes;
 import com.wl4g.rengine.common.entity.UploadObject;
 import com.wl4g.rengine.common.entity.Workflow;
+import com.wl4g.rengine.evaluator.repository.MongoRepository;
 import com.wl4g.rengine.evaluator.service.JobService;
 
-import io.quarkus.mongodb.reactive.ReactiveMongoClient;
-import io.quarkus.mongodb.reactive.ReactiveMongoCollection;
 import io.smallrye.mutiny.Uni;
 import lombok.extern.slf4j.Slf4j;
 
@@ -69,9 +65,7 @@ import lombok.extern.slf4j.Slf4j;
 public class JobServiceImpl implements JobService {
 
     @Inject
-    MongoClient mongoClient;
-    @Inject
-    ReactiveMongoClient reactiveMongoClient;
+    MongoRepository mongoRepository;
 
     /**
      * Collection dependencies:
@@ -128,7 +122,7 @@ public class JobServiceImpl implements JobService {
      */
     @Override
     public Scenes loadScenesFull(@NotBlank String scenesCode) {
-        MongoCollection<Document> collection = getCollection(SCENESES);
+        MongoCollection<Document> collection = mongoRepository.getCollection(SCENESES);
 
         // Common exclude projection.
         Bson project = Aggregates.project(Projections.fields(Projections.exclude("_class", "delFlag")));
@@ -241,7 +235,7 @@ public class JobServiceImpl implements JobService {
     @Override
     public Uni<List<Job>> listAll() {
         // TODO hello world
-        return getReactiveCollection(JOBS).find().map(doc -> {
+        return mongoRepository.getReactiveCollection(JOBS).find().map(doc -> {
             Job job = Job.builder().id(doc.getLong("id")).build();
             return job;
         }).collect().asList();
@@ -252,15 +246,7 @@ public class JobServiceImpl implements JobService {
         // TODO hello world
         Document document = new Document().append("id",
                 job.getId())/* .append("labels", rule.getLabels()) */;
-        return getReactiveCollection(JOBS).insertOne(document).onItem().ignore().andContinueWithNull();
-    }
-
-    private MongoCollection<Document> getCollection(MongoCollectionDefinition collection) {
-        return mongoClient.getDatabase(RengineConstants.DEF_MONGODB_DATABASE).getCollection(collection.getName());
-    }
-
-    private ReactiveMongoCollection<Document> getReactiveCollection(MongoCollectionDefinition collection) {
-        return reactiveMongoClient.getDatabase(RengineConstants.DEF_MONGODB_DATABASE).getCollection(collection.getName());
+        return mongoRepository.getReactiveCollection(JOBS).insertOne(document).onItem().ignore().andContinueWithNull();
     }
 
 }

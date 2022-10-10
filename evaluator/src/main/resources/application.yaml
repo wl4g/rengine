@@ -22,10 +22,21 @@ quarkus:
   shutdown:
     timeout: 60s
   http:
+    http2: true
     host: 0.0.0.0
     port: 28002
+    ssl-port: 28003
+    test-ssl-port: 28004
     root-path: /
+    insecure-requests: enabled ## enabled|redirect|disabled
     cors: false
+  tls:
+    trust-all: false
+  thread-pool:
+    core-threads: 4
+    max-threads: 128
+    queue-size: 4
+    keep-alive-time: 30s
   log:
     level: INFO
     min-level: TRACE
@@ -58,16 +69,14 @@ quarkus:
         handlers: STRUCTURED_LOGGING,STRUCTURED_LOGGING_FILE
     console:
       enable: true
-      format: '%d{HH:mm:ss} %-5p [%c{2.}] (%t) %s%e%n'
-      json:
-        date-format: yyyy-MM-dd HH:mm:ss.SSS
-        pretty-print: false
-        zone-id: default
-        print-details: true
-      color: false
+      format: '%d{yyyy-dd-mm HH:mm:ss} %-5p [%c{2.}] (%t) %s%e%n'
+      color: true
+      async: false
+        #queue-length: 128
+        #overflow: block # block,discard
     file:
       enable: true
-      format: '%d{HH:mm:ss} %-5p [%c{2.}] (%t) %s%e%n'
+      format: '%d{yyyy-dd-mm HH:mm:ss} %-5p [%c{2.}] (%t) %s%e%n'
       path: /tmp/rengine/evaluator.log
       async: false
         #queue-length: 128
@@ -180,7 +189,8 @@ quarkus:
     ## [Notice]: As of GraalVM 22.2 the language:js plugin has been removed from the default plugin list, and needs to be installed manually by run $GRAALVM_HOME/bin/gu install js
     ## Run this command to check if the image is supports: docker run --rm quay.io/quarkus/ubi-quarkus-native-image:22.1-java11 --help | grep 'language'
     ## [Notice]: Required option: "--initialize-at-run-time=org.apache.commons.lang3.RandomUtils" is already set in the (com.wl4g:infra-common-java11) dependency module.
-    additional-build-args: "--language:js,--no-fallback,--report-unsupported-elements-at-runtime,--initialize-at-run-time=groovy.grape.GrapeIvy"
+    additional-build-args: "--language:js,--no-fallback,--report-unsupported-elements-at-runtime,--initialize-at-run-time=groovy.grape.GrapeIvy,\
+--trace-class-initialization=io.netty.util.concurrent.GlobalEventExecutor\\,io.netty.util.concurrent.ScheduledFutureTask"
     #compression:
     #  level: 5 # 1-10 The larger the higher the compression ratio, the longer the build time.
     #  additional-args: --ultra-brute,-v
@@ -228,6 +238,14 @@ quarkus:
     #max-connection-life-time: 30m
     tls: false
     tls-insecure: true
+  kubernetes:
+    remote-debug:
+      enabled: true
+      transport: dt_socket
+      suspend: n
+      address-port: 5005
+      lables: {}
+      annotations: {}
 
 ## MinIO configuration.
 minio:

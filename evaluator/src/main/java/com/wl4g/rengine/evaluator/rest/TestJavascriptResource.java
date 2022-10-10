@@ -128,7 +128,7 @@ public class TestJavascriptResource {
 
             ScriptRengineEvent event = new ScriptRengineEvent("generic_device_temp_warning",
                     ScriptEventSource.builder()
-                            .sourceTime(currentTimeMillis())
+                            .time(currentTimeMillis())
                             .principals(singletonList("admin"))
                             .location(ScriptEventLocation.builder().zipcode("20500").build())
                             .build(),

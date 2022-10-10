@@ -42,6 +42,12 @@ A generic real-time rule engine, such as bank transfer real-time risk control, t
 
 - Supports automatic analysis of hit rate reports.
 
+## More Docs
+
+- [evaluator docs](docs/en/EVALUATOR.md)
+
+- [job docs](docs/en/JOB.md)
+
 ## Quick Start
 
 ### Deploy on Docker compose

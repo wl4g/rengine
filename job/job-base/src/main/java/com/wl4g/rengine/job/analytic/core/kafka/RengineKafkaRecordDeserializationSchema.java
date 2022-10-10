@@ -28,6 +28,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
+import com.wl4g.rengine.common.event.RengineEvent;
 import com.wl4g.rengine.job.analytic.core.model.RengineEventAnalytical;
 
 import lombok.Getter;
@@ -53,7 +54,7 @@ public class RengineKafkaRecordDeserializationSchema implements KafkaRecordDeser
         }
         if (nonNull(record.value())) {
             String json = deserializer.deserialize(record.topic(), record.value());
-            collector.collect(parseJSON(json, RengineEventAnalytical.class));
+            collector.collect(new RengineEventAnalytical(parseJSON(json, RengineEvent.class)));
         }
     }
 

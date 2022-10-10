@@ -15,6 +15,9 @@
  */
 package com.wl4g.rengine.common.constants;
 
+import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.equalsAnyIgnoreCase;
+
 import com.wl4g.infra.common.lang.EnvironmentUtil;
 
 import lombok.AllArgsConstructor;
@@ -47,21 +50,34 @@ public abstract class RengineConstants extends EnvironmentUtil {
     @AllArgsConstructor
     public static enum MongoCollectionDefinition {
 
-        SCENESES("sceneses"),
+        SCENESES("sceneses", true),
 
-        WORKFLOWS("workflows"),
+        WORKFLOWS("workflows", true),
 
-        RULES("rules"),
+        RULES("rules", true),
 
-        UPLOADS("uploads"),
+        UPLOADS("uploads", true),
 
-        JOBS("jobs"),
+        JOBS("jobs", true),
 
-        SYS_NOTIFICATION_CONFIG("sys_notification_config"),
+        AGGREGATES("aggregates", true),
 
-        SYS_IDP_CONFIG("sys_idp_config");
+        SYS_NOTIFICATION_CONFIG("sys_notification_config", true),
+
+        SYS_IDP_CONFIG("sys_idp_config", true);
 
         private final String name;
+        private final boolean isWriteConcernSafe;
+
+        public static MongoCollectionDefinition of(String type) {
+            for (MongoCollectionDefinition a : values()) {
+                if (equalsAnyIgnoreCase(type, a.name(), a.getName())) {
+                    return a;
+                }
+            }
+            throw new IllegalArgumentException(format("Invalid Mongo collection type for '%s'", type));
+        }
+
     }
 
 }

@@ -37,20 +37,18 @@ public class EventToMutationConverterTests {
 
     @Test
     public void testEventToMutationConverter() {
-        RengineEventAnalytical model = RengineEventAnalytical.builder()
-                .event(new RengineEvent("device_temp_warning",
-                        EventSource.builder()
-                                .sourceTime(currentTimeMillis())
-                                .principals(singletonList("admin"))
-                                .location(EventLocation.builder()
-                                        .ipAddress("1.1.1.1")
-                                        .city("Washington")
-                                        .region("Pennsylvania Avenue")
-                                        .zipcode("20500")
-                                        .build())
-                                .build(),
-                        "A serious alarm occurs when the device temperature is greater than 52℃"))
-                .build();
+        RengineEventAnalytical model = new RengineEventAnalytical(new RengineEvent("device_temp_warning",
+                EventSource.builder()
+                        .time(currentTimeMillis())
+                        .principals(singletonList("admin"))
+                        .location(EventLocation.builder()
+                                .ipAddress("1.1.1.1")
+                                .city("Washington")
+                                .region("Pennsylvania Avenue")
+                                .zipcode("20500")
+                                .build())
+                        .build(),
+                "A serious alarm occurs when the device temperature is greater than 52℃"));
 
         EventToMutationConverter converter = new EventToMutationConverter();
         converter.open();
