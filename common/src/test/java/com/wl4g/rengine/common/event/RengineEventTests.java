@@ -21,7 +21,10 @@ import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.regex.Pattern;
+
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 
 import com.wl4g.rengine.common.event.RengineEvent.EventSource;
 import com.wl4g.rengine.common.event.RengineEvent.EventLocation;
@@ -37,7 +40,7 @@ public class RengineEventTests {
 
     @Test
     public void testEventToJson() {
-        RengineEvent event = new RengineEvent("iot_generic_device_temp_warning",
+        RengineEvent event = new RengineEvent("iot_temp_warn1",
                 EventSource.builder()
                         .time(currentTimeMillis())
                         .principals(singletonList("admin"))
@@ -51,7 +54,7 @@ public class RengineEventTests {
 
     @Test
     public void testEventFromJson() {
-        String json = "{\"source\":{\"time\":1665849312303,\"principals\":[\"admin\"],\"location\":{\"ipAddress\":\"1.1.1.1\",\"ipv6\":null,\"isp\":null,\"domain\":null,\"country\":null,\"region\":null,\"city\":null,\"latitude\":null,\"longitude\":null,\"timezone\":null,\"zipcode\":\"20500\",\"elevation\":null}},\"type\":\"iot_generic_device_temp_warning\",\"observedTime\":1665849312304,\"body\":\"52\",\"attributes\":{}}";
+        String json = "{\"source\":{\"time\":1665849312303,\"principals\":[\"admin\"],\"location\":{\"ipAddress\":\"1.1.1.1\",\"ipv6\":null,\"isp\":null,\"domain\":null,\"country\":null,\"region\":null,\"city\":null,\"latitude\":null,\"longitude\":null,\"timezone\":null,\"zipcode\":\"20500\",\"elevation\":null}},\"type\":\"iotice_temp_warning\",\"observedTime\":1665849312304,\"body\":\"52\",\"attributes\":{}}";
         RengineEvent event = parseJSON(json, RengineEvent.class);
         System.out.println("         EventType: " + event.getType());
         System.out.println("      ObservedTime: " + event.getObservedTime());
@@ -72,6 +75,61 @@ public class RengineEventTests {
 
         RengineEvent event1 = new RengineEvent("test_event", source1);
         assertNotNull(event1.getSource());
+    }
+
+    @Test
+    public void testValidateTypeRegexWithSuccess() {
+        var matches = Pattern.matches(RengineEvent.EVENT_TYPE_REGEX, "iot_temp_warn");
+        System.out.println(matches);
+        Assertions.assertTrue(matches);
+
+        matches = Pattern.matches(RengineEvent.EVENT_TYPE_REGEX, "iot-temp-warn");
+        System.out.println(matches);
+        Assertions.assertTrue(matches);
+
+        matches = Pattern.matches(RengineEvent.EVENT_TYPE_REGEX, "temp_warn@iot");
+        System.out.println(matches);
+        Assertions.assertTrue(matches);
+
+        matches = Pattern.matches(RengineEvent.EVENT_PRINCIPAL_REGEX, "jameswong12@gmail.com");
+        System.out.println(matches);
+        Assertions.assertTrue(matches);
+
+        matches = Pattern.matches(RengineEvent.EVENT_PRINCIPAL_REGEX, "_jameswong12");
+        System.out.println(matches);
+        Assertions.assertTrue(matches);
+
+        matches = Pattern.matches(RengineEvent.EVENT_LOCATION_COUNTRY_REGEX, "CN");
+        System.out.println(matches);
+        Assertions.assertTrue(matches);
+    }
+
+    @Test
+    public void testEventValidateRegexWithFail() {
+        // Invalid characters.
+        var matches = Pattern.matches(RengineEvent.EVENT_TYPE_REGEX, "iot:temp:warn");
+        System.out.println(matches);
+        Assertions.assertFalse(matches);
+
+        // Invalid characters.
+        matches = Pattern.matches(RengineEvent.EVENT_TYPE_REGEX, "temp:warn@iot");
+        System.out.println(matches);
+        Assertions.assertFalse(matches);
+
+        // Exceed max length.
+        matches = Pattern.matches(RengineEvent.EVENT_TYPE_REGEX, "abcdefghijklmnopqrstuvwxyz:temp:warn@iot:generic:dev");
+        System.out.println(matches);
+        Assertions.assertFalse(matches);
+
+        // Exceed max length.
+        matches = Pattern.matches(RengineEvent.EVENT_PRINCIPAL_REGEX, "jameswong1234567890@gmail.com");
+        System.out.println(matches);
+        Assertions.assertFalse(matches);
+
+        // Exceed max length.
+        matches = Pattern.matches(RengineEvent.EVENT_LOCATION_COUNTRY_REGEX, "China");
+        System.out.println(matches);
+        Assertions.assertFalse(matches);
     }
 
 }

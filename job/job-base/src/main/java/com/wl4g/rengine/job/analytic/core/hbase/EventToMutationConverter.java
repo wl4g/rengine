@@ -24,6 +24,7 @@ import static com.wl4g.infra.common.lang.StringUtils2.getBytes;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
@@ -142,12 +143,12 @@ public class EventToMutationConverter implements HBaseMutationConverter<RengineE
                 // TODO 未拿到准确且完整的区域编码字典，无法约束采集源端传来的值，暂时只能放到非 RowKey，
                 // 但由于管理端 “数据洞察”->“事件分析” 支持查看事件统计/分析，其中 echarts 按照全球地图展示，因此最好还是
                 // 使用一份完整的 Geo-ZipCode 映射字典
-                // .append(ROWKEY_SPEARATOR)
-                // .append(getGeoCityKey(source))
-                // .append(ROWKEY_SPEARATOR)
-                // .append(getGeoRegionKey(source))
-                // .append(ROWKEY_SPEARATOR)
-                // .append(getGeoCountryKey(source))
+                .append(ROWKEY_SPEARATOR)
+                .append(getGeoCityKey(source))
+                .append(ROWKEY_SPEARATOR)
+                .append(getGeoRegionKey(source))
+                .append(ROWKEY_SPEARATOR)
+                .append(getGeoCountryKey(source))
                 .toString()
                 .getBytes(UTF_8);
     }
@@ -200,7 +201,7 @@ public class EventToMutationConverter implements HBaseMutationConverter<RengineE
      **/
     protected String fixFieldRowKey(@Nullable String fieldValue) {
         if (isBlank(fieldValue)) {
-            return null;
+            return EMPTY;
         }
         String cleanFieldKey = trimToEmpty(fieldValue).toLowerCase().replace(" ", "_");
         // Limit field max length.

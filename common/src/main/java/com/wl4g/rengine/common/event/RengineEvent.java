@@ -16,6 +16,7 @@
 package com.wl4g.rengine.common.event;
 
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
 import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
@@ -24,6 +25,7 @@ import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.emptyMap;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -31,6 +33,7 @@ import java.util.EventObject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
@@ -132,14 +135,36 @@ public class RengineEvent extends EventObject {
     }
 
     public static RengineEvent validate(RengineEvent event) {
+        // Basic validate.
         hasTextOf(event.getType(), "type");
+        isTrue(Pattern.matches(EVENT_TYPE_REGEX, event.getType()), "Invalid event type '%s' does not satisfy the regex: %s",
+                event.getType(), EVENT_TYPE_REGEX);
         notNullOf(event.getObservedTime(), "observedTime");
         isTrueOf(event.getObservedTime() > 0, "Must observedTime > 0");
 
+        // Source validate.
         EventSource source = (EventSource) event.getSource();
         notNullOf(source.getTime(), "sourceTime");
         isTrueOf(source.getTime() > 0, "Must sourceTime > 0");
         notEmptyOf(source.getPrincipals(), "principals");
+
+        // Location validate.
+        EventLocation location = source.getLocation();
+        if (!isBlank(location.getCountry())) {
+            isTrue(Pattern.matches(EVENT_LOCATION_COUNTRY_REGEX, location.getCountry()),
+                    "Invalid event location country '%s' does not satisfy the regex: %s", location.getCountry(),
+                    EVENT_LOCATION_COUNTRY_REGEX);
+        }
+        if (!isBlank(location.getRegion())) {
+            isTrue(Pattern.matches(EVENT_LOCATION_REGION_REGEX, location.getRegion()),
+                    "Invalid event location region '%s' does not satisfy the regex: %s", location.getRegion(),
+                    EVENT_LOCATION_REGION_REGEX);
+        }
+        if (!isBlank(location.getCity())) {
+            isTrue(Pattern.matches(EVENT_LOCATION_CITY_REGEX, location.getCity()),
+                    "Invalid event location city '%s' does not satisfy the regex: %s", location.getCity(),
+                    EVENT_LOCATION_CITY_REGEX);
+        }
 
         return event;
     }
@@ -204,6 +229,18 @@ public class RengineEvent extends EventObject {
         private @Nullable String region;
         private @Nullable String country;
     }
+
+    /**
+     * Limit validation regex, for example, the maximum length of rowkey written
+     * to HBase should be less than 64.
+     * 
+     * @see {@link com.wl4g.rengine.job.analytic.core.hbase.EventToMutationConverter#generateRowkey()}
+     */
+    public static final String EVENT_TYPE_REGEX = "^([@a-zA-Z0-9_-]){1,16}$";
+    public static final String EVENT_PRINCIPAL_REGEX = "^[@a-zA-Z0-9._-]{1,22}$";
+    public static final String EVENT_LOCATION_COUNTRY_REGEX = "^([a-zA-Z0-9_-]){1,2}$";
+    public static final String EVENT_LOCATION_REGION_REGEX = "^([a-zA-Z0-9_-]){1,5}$";
+    public static final String EVENT_LOCATION_CITY_REGEX = "^([a-zA-Z0-9_-]){1,4}$";
 
     // @Target(FIELD)
     // @Retention(RUNTIME)
