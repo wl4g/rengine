@@ -60,7 +60,7 @@ import io.minio.credentials.Credentials;
  * 
  * @author James Wong
  * @version 2022-08-29
- * @since v3.0.0
+ * @since v1.0.0
  */
 @Service
 public class UploadServiceImpl implements UploadService {

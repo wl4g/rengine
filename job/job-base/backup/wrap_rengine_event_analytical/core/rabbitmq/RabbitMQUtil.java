@@ -20,7 +20,7 @@ package com.wl4g.rengine.job.analytic.core.rabbitmq;
  * 
  * @author James Wong
  * @version 2022-09-08
- * @since v3.0.0
+ * @since v1.0.0
  */
 public abstract class RabbitMQUtil {
 

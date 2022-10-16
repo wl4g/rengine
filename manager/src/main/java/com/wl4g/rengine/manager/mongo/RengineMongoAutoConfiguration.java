@@ -30,7 +30,7 @@ import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinit
  * 
  * @author James Wong
  * @version 2022-09-10
- * @since v3.0.0
+ * @since v1.0.0
  */
 @Configuration
 public class RengineMongoAutoConfiguration {

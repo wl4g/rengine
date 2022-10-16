@@ -34,13 +34,13 @@ import lombok.extern.slf4j.Slf4j;
  * 
  * @author James Wong
  * @version 2022-09-18
- * @since v3.0.0
+ * @since v1.0.0
  * @see https://quarkus.io/guides/lifecycle#listening-for-startup-and-shutdown-events
  */
 @Slf4j
 // @ApplicationScoped
 @Singleton
-public class ApplicationListener {
+public class EvaluatorApplicationInitializer {
 
     void onStart(@Observes StartupEvent event, @ConfigProperty(name = "quarkus.application.name") String appName) {
         log.info("The application is starting...");

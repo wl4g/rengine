@@ -26,7 +26,7 @@ import com.wl4g.rengine.common.model.EvaluationResult;
  * 
  * @author James Wong
  * @version 2022-09-17
- * @since v3.0.0
+ * @since v1.0.0
  */
 @Named(ScoreWorkflowExecution.BEAN_NAME)
 @ApplicationScoped

@@ -13,31 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.manager.config;
+package com.wl4g.rengine.client.collector.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 
-import com.wl4g.rengine.manager.constants.RengineManagerConstants;
-import com.wl4g.rengine.manager.minio.MinioClientAutoConfiguration;
+import com.wl4g.rengine.common.constants.RengineConstants;
 
 /**
- * {@link RengineAutoConfiguration}
+ * {@link CollectorAutoConfiguration}
  * 
  * @author James Wong
- * @version 2022-08-28
- * @since v3.0.0
+ * @version 2022-10-16
+ * @since v1.0.0
  */
 @Configuration
-@Import({ MinioClientAutoConfiguration.class })
-public class RengineAutoConfiguration {
+public class CollectorAutoConfiguration {
 
     @Bean
-    @ConfigurationProperties(prefix = RengineManagerConstants.CONF_PREFIX)
-    public RegineProperties regineProperties() {
-        return new RegineProperties();
+    @ConfigurationProperties(prefix = RengineConstants.CONF_PREFIX_CLIENT_COLLECTOR)
+    public CollectorProperties collectorProperties() {
+        return new CollectorProperties();
     }
 
 }

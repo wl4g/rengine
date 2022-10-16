@@ -51,6 +51,10 @@ dependencies:
     condition: rengine-evaluator.enabled
     repository: "file://charts/rengine-evaluator"
     version: "~0.1.0"
+  - name: "rengine-collector"
+    condition: rengine-collector.enabled
+    repository: "file://charts/rengine-collector"
+    version: "~0.1.0"
   - name: "jaeger"
     condition: global.components.jaeger.internal.enabled
     repository: "https://jaegertracing.github.io/helm-charts"

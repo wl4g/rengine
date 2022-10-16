@@ -26,7 +26,7 @@ import com.wl4g.rengine.evaluator.minio.MinioManagerTests;
  * 
  * @author James Wong
  * @version 2022-10-14
- * @since v3.0.0
+ * @since v1.0.0
  */
 public class ScriptLoggerTests {
 

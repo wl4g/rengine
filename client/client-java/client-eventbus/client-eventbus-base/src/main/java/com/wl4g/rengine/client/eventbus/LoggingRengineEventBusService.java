@@ -30,7 +30,7 @@ import lombok.CustomLog;
  * 
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2022-05-30 v3.0.0
- * @since v3.0.0
+ * @since v1.0.0
  */
 @CustomLog
 public class LoggingRengineEventBusService implements RengineEventBusService<RengineEvent> {

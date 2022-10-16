@@ -35,7 +35,7 @@ import io.swagger.v3.oas.models.info.Info;
  * 
  * @author James Wong
  * @version 2022-08-30
- * @since v3.0.0
+ * @since v1.0.0
  */
 @Configuration
 public class SpringDocOASAutoConfiguration {

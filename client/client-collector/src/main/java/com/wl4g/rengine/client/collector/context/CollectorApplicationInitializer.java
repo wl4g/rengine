@@ -13,20 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.manager.constants;
-
-import com.wl4g.rengine.common.constants.RengineConstants;
+package com.wl4g.rengine.client.collector.context;
 
 /**
- * {@link RengineManagerConstants}
+ * {@link CollectorApplicationInitializer}
  * 
  * @author James Wong
- * @version 2022-08-29
- * @since v3.0.0
+ * @version 2022-10-16
+ * @since v1.0.0
  */
-public abstract class RengineManagerConstants extends RengineConstants {
-
-    public static final String CONF_PREFIX = "spring.rengine";
-    public static final String CONF_MINIO_PREFIX = CONF_PREFIX + ".minio";
+public class CollectorApplicationInitializer {
 
 }

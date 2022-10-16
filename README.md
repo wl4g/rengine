@@ -4,7 +4,7 @@ A generic real-time rule engine, such as bank transfer real-time risk control, t
 
 ## Architectures
 
-- ![Global](docs/shots/rengine_architecture.png)
+- ![Global](./docs/shots/rengine_architecture.png)
 
 ## Requirements
 
@@ -12,7 +12,7 @@ A generic real-time rule engine, such as bank transfer real-time risk control, t
 
 - Maven 3.6 +
 
-- GraalVM-java11-22.1.0 + (If Necessary)
+- GraalVM-java11-22.1 + (Recommands)
 
 - MySQL 5.7 +
 
@@ -20,31 +20,35 @@ A generic real-time rule engine, such as bank transfer real-time risk control, t
 
 - MinIO 2021.x +
 
-- Flink 1.14.4 + (If Necessary)
+- Flink 1.14.4 + (Recommands)
 
-- HBase 2.2.x + (If Necessary)
+- HBase 2.2.x + (Recommands)
 
-- HDFS 3.0.x + (If Necessary)
+- HDFS 3.0.x + (Recommands)
 
-- Docker 20.x + (If Necessary)
+- Docker 20.x + (Recommands)
 
-- Kubernetes 1.21 + (If Necessary)
+- Kubernetes 1.21 + (Recommands)
 
 ## Features
 
-- Supports large-scale MMP parallel computing based on FLINK-CEP.
+- Supports large-scale MMP parallel near real-time aggregation computing based on Flink/CEP.
 
-- Supports multi-language scripting engine for `Groovy`, `JS(graal.js)`.
+- Supports multi-language scripting engine for [Groovy](http://groovy-lang.org/differences.html#_default_imports), [JS(graal.js)](https://www.graalvm.org/22.2/reference-manual/js/FAQ/#what-is-the-difference-between-running-graalvms-javascript-in-native-image-compared-to-the-jvm).
 
-- Supports highly flexible dynamic writing rule templates based on WEBIDE.
+- Supports highly flexible dynamic writing rule templates based on WebIDE.
 
 - Supports WebIDE uploading of custom class libraries and automatically completes code prompts.
 
 - Supports automatic analysis of hit rate reports.
 
-- Supports register connecting to arthas tunnel for easy administrator JVM troubleshooting.
+- Support [graalvm native mode](https://www.graalvm.org/22.1/docs/getting-started/#native-image) operation (currently supported services: manager/evaluator/collector, future plans to support: flink jobs).
+
+- Supports connecting to [arthas tunnel](https://arthas.aliyun.com/en/doc/tunnel.html) for easy administrator JVM troubleshooting (**Only in JVM run mode**).
 
 ## Quick start
+
+- [Rengine architecture](./docs/en/architecture.md)
 
 - [Deploy quide for standalone](./docs/en/deploy-standalone.md)
 

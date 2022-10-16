@@ -33,12 +33,12 @@ import io.smallrye.config.WithDefault;
  * 
  * @author James Wong
  * @version 2022-09-18
- * @since v3.0.0
+ * @since v1.0.0
  * @see https://quarkus.io/guides/config-mappings
  * @see https://quarkus.io/guides/config-extending-support#custom-config-source
  */
 @StaticInitSafe
-@ConfigMapping(prefix = "minio", namingStrategy = NamingStrategy.KEBAB_CASE)
+@ConfigMapping(prefix = RengineConstants.CONF_PREFIX_EVALUATOR + ".minio", namingStrategy = NamingStrategy.KEBAB_CASE)
 public interface MinioConfig {
 
     @WithDefault(RengineConstants.DEF_MINIO_ENDPOINT)

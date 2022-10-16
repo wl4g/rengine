@@ -1,4 +1,4 @@
-# Rengine for Development Guide
+# Rengine for Manager Development Guide
 
 ## Building
 

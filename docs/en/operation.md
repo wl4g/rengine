@@ -1,34 +1,8 @@
 # Rengine for Operation Guide
 
-## Manual telemetry
+- [GeoJSON updater](./docs/en/operation-geojson_updater.md)
 
-- Get health
-
-```bash
-curl -v localhost:28001/actuator/health
-```
-
-- Get metrics
-
-```bash
-curl -v localhost:28001/actuator/prometheus
-```
-
-## Deploy OTel collector
-
-```bash
-# Download collector configuration.
-sudo mkdir -p /etc/otel
-curl -L -o /etc/otel/collector.yaml 'https://raw.githubusercontent.com/wl4g/rengine/master/tools/operation/otel/collector.yaml'
-
-# Run OTel collector.
-docker run -d \
---name=otel-collector1 \
---network=host \
---restart=no \
--v /etc/otel/collector.yaml:/etc/otelcol/config.yaml \
-otel/opentelemetry-collector:0.60.0
-```
+- [Healthy Telemetry](./docs/en/operation-geojson_updater.md)
 
 ## FAQ
 

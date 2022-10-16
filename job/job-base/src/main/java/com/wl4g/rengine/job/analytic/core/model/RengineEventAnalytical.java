@@ -26,7 +26,7 @@ import com.wl4g.rengine.common.event.RengineEvent;
  * 
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2022-06-08 v3.0.0
- * @since v3.0.0
+ * @since v1.0.0
  */
 public class RengineEventAnalytical extends RengineEvent {
     private static final long serialVersionUID = 7396808707170188284L;

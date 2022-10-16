@@ -71,7 +71,7 @@ import okhttp3.Protocol;
  * 
  * @author James Wong
  * @version 2022-09-17
- * @since v3.0.0
+ * @since v1.0.0
  */
 @Slf4j
 @Getter

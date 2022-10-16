@@ -46,11 +46,19 @@ rengine-evaluator:
 
   appConfigs: {}
 
-  governance:
-    istio:
-      ingress:
-        ## see:https://istio.io/v1.14/docs/reference/config/networking/virtual-service/#HTTPRouteDestination
-        domain: wl4g.io ## Top level 1 domain.
+rengine-collector:
+  enabled: true
+  image:
+    #repository: wl4g/rengine-collector
+    repository: wl4g/rengine-collector-native # Recommands
+    baselineTag: 1.0.0
+    upgradeTag: 1.0.1
+
+  envConfigs: {}
+
+  agentConfigs: {}
+
+  appConfigs: {}
 
 ## ------------------------- Global Shared Components Configuration Examples. -------------------------
 global:

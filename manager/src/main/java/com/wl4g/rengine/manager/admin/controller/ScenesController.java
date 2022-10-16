@@ -46,7 +46,7 @@ import lombok.extern.slf4j.Slf4j;
  * 
  * @author James Wong
  * @version 2022-08-28
- * @since v3.0.0
+ * @since v1.0.0
  */
 @Tag(name = "ScenesAPI", description = "The Scenes management API")
 @Slf4j

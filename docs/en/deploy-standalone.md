@@ -49,9 +49,9 @@ docker run -d \
 --restart=no \
 -e SPRING_HIKARI_JDBCURL='jdbc:mysql://127.0.0.1:3306/rengine?useunicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf-8&useSSL=false' \
 -e SPRING_DATA_MONGODB_URI='mongodb://127.0.0.1:27017/rengine' \
--e SPRING_DATA_MINIO_ENDPOINT='http://127.0.0.1:19000' \
--e SPRING_DATA_MINIO_TENANTACCESSKEY='rengine' \
--e SPRING_DATA_MINIO_TENANTSECRETKEY='12345678' \
+-e RENGINE_MANAGER_MINIO_ENDPOINT='http://127.0.0.1:19000' \
+-e RENGINE_MANAGER_MINIO_TENANTACCESSKEY='rengine' \
+-e RENGINE_MANAGER_MINIO_TENANTSECRETKEY='12345678' \
 wl4g/rengine-manager
 ```
 
@@ -64,9 +64,9 @@ docker run -d \
 --restart=no \
 -e QUARKUS_HTTP_PORT="28002" \
 -e QUARKUS_MONGODB_CONNECTION_STRING="mongodb://localhost:27017" \
--e MINIO_ENDPOINT="http://localhost:9000" \
--e MINIO_TENANTACCESSKEY="rengine" \
--e MINIO_TENANTSECRETKEY="12345678" \
+-e RENGINE_EVALUATOR_MINIO_ENDPOINT="http://localhost:9000" \
+-e RENGINE_EVALUATOR_MINIO_TENANTACCESSKEY="rengine" \
+-e RENGINE_EVALUATOR_MINIO_TENANTSECRETKEY="12345678" \
 wl4g/rengine-evaluator-native
 ```
 

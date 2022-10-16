@@ -36,7 +36,7 @@ import lombok.Getter;
  * 
  * @author Wangl.sir &lt;James Wong <jameswong1376@gmail.com>&gt;
  * @version 2022-07-12
- * @since v3.0.0
+ * @since v1.0.0
  */
 // @ApplicationScoped
 @Singleton

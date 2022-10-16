@@ -20,7 +20,7 @@ package com.wl4g.rengine.common.exception;
  * 
  * @author James Wong
  * @version 2022-09-22
- * @since v3.0.0
+ * @since v1.0.0
  */
 public class RengineException extends RuntimeException {
     private static final long serialVersionUID = 5177120828249689148L;

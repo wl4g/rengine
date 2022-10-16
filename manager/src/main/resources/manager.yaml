@@ -12,10 +12,10 @@
 #
 
 spring:
-  application.name: rengine
+  application.name: rengine-manager
   profiles:
-    #include: data,telemetry,swagger,arthas,security-oauth,security-static,devtool
-    include: data,telemetry,swagger,arthas,security-static
+    #include: db,minio,telemetry,swagger,arthas,security-oauth,security-static,devtool
+    include: db,minio,telemetry,swagger,arthas,security-static
     active: dev
   banner:
       location: classpath:META-INF/banner.txt

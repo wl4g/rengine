@@ -28,15 +28,18 @@ import lombok.Getter;
  * 
  * @author James Wong
  * @version 2022-09-08
- * @since v3.0.0
+ * @since v1.0.0
  */
 public abstract class RengineConstants extends EnvironmentUtil {
 
-    public static final String CONF_PREFIX = "spring.rengine";
-    public static final String CONF_PREFIX_EVENTBUS = CONF_PREFIX + ".eventbus";
-    public static final String CONF_PREFIX_EVENTBUS_KAFKA = CONF_PREFIX_EVENTBUS + ".kafka";
-    public static final String CONF_PREFIX_EVENTBUS_PULSAR = CONF_PREFIX_EVENTBUS + ".pulsar";
-    public static final String CONF_PREFIX_EVENTBUS_ROCKETMQ = CONF_PREFIX_EVENTBUS + ".rabbitmq";
+    public static final String CONF_PREFIX = "rengine";
+    public static final String CONF_PREFIX_MANAGER = CONF_PREFIX + ".manager";
+    public static final String CONF_PREFIX_EVALUATOR = CONF_PREFIX + ".evaluator";
+    public static final String CONF_PREFIX_CLIENT_COLLECTOR = CONF_PREFIX + ".client.collector";
+    public static final String CONF_PREFIX_CLIENT_EVENTBUS = CONF_PREFIX + ".client.eventbus";
+    public static final String CONF_PREFIX_CLIENT_EVENTBUS_KAFKA = CONF_PREFIX_CLIENT_EVENTBUS + ".kafka";
+    public static final String CONF_PREFIX_CLIENT_EVENTBUS_PULSAR = CONF_PREFIX_CLIENT_EVENTBUS + ".pulsar";
+    public static final String CONF_PREFIX_CLIENT_EVENTBUS_ROCKETMQ = CONF_PREFIX_CLIENT_EVENTBUS + ".rabbitmq";
 
     public static final String DEF_EVENTBUS_TOPIC = "rengine_event";
 

@@ -37,7 +37,7 @@ import lombok.ToString;
  * 
  * @author James Wong
  * @version 2022-10-10
- * @since v3.0.0
+ * @since v1.0.0
  */
 @ToString
 @AllArgsConstructor
