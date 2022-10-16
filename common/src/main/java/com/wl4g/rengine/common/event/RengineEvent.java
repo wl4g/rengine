@@ -231,16 +231,17 @@ public class RengineEvent extends EventObject {
     }
 
     /**
-     * Limit validation regex, for example, the maximum length of rowkey written
-     * to HBase should be less than 64.
+     * Limit validation regex, For example, the rowkey size of HBase should not
+     * be too long.
      * 
+     * @see {@link https://github.com/apache/hbase/blob/rel/2.1.2/hbase-common/src/main/java/org/apache/hadoop/hbase/HConstants.java#L599}
      * @see {@link com.wl4g.rengine.job.analytic.core.hbase.EventToMutationConverter#generateRowkey()}
      */
     public static final String EVENT_TYPE_REGEX = "^([@a-zA-Z0-9_-]){1,16}$";
-    public static final String EVENT_PRINCIPAL_REGEX = "^[@a-zA-Z0-9._-]{1,22}$";
+    public static final String EVENT_PRINCIPAL_REGEX = "^[@a-zA-Z0-9._-]{1,24}$";
     public static final String EVENT_LOCATION_COUNTRY_REGEX = "^([a-zA-Z0-9_-]){1,2}$";
-    public static final String EVENT_LOCATION_REGION_REGEX = "^([a-zA-Z0-9_-]){1,5}$";
-    public static final String EVENT_LOCATION_CITY_REGEX = "^([a-zA-Z0-9_-]){1,4}$";
+    public static final String EVENT_LOCATION_REGION_REGEX = "^([a-zA-Z0-9_-]){1,16}$";
+    public static final String EVENT_LOCATION_CITY_REGEX = "^([a-zA-Z0-9_-]){1,16}$";
 
     // @Target(FIELD)
     // @Retention(RUNTIME)

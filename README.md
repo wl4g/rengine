@@ -42,71 +42,17 @@ A generic real-time rule engine, such as bank transfer real-time risk control, t
 
 - Supports automatic analysis of hit rate reports.
 
-## More Docs
+- Supports register connecting to arthas tunnel for easy administrator JVM troubleshooting.
 
-- [evaluator docs](docs/en/EVALUATOR.md)
+## Quick start
 
-- [job docs](docs/en/JOB.md)
+- [Deploy quide for standalone](./docs/en/deploy-standalone.md)
 
-## Quick Start
+- [Deploy quide for production](./docs/en/deploy-production.md)
 
-### Deploy on Docker compose
+- [Development quide](./docs/en/devel.md)
 
-```bash
-git clone https://github.com/wl4g/rengine.git
-cd tools/deploy/compose
-docker-compose up -d
-```
-
-- Deploy on Kubernetes with Helm
-
-```bash
-# TODO
-```
-
-## Development Guide
-
-- Rengine Manager build
-
-```bash
-git clone git@github.com/wl4g/rengine.git
-cd rengine
-./mvnw clean install -DskipTests -Dmaven.test.skip=true -T 2C
-```
-
-- [Rengine Evaluator build here](evaluator/README.md)
-
-## Operation Guide
-
-### Manual Telemetry Troubleshooting
-
-- Health
-
-```bash
-curl -v localhost:28001/actuator/health
-```
-
-- Metrics
-
-```bash
-curl -v localhost:28001/actuator/prometheus
-```
-
-### Deploy OTel collector
-
-```bash
-# Download collector configuration.
-sudo mkdir -p /etc/otel
-curl -L -o /etc/otel/collector.yaml 'https://raw.githubusercontent.com/wl4g/rengine/master/tools/operation/otel/collector.yaml'
-
-# Run OTel collector.
-docker run -d \
---name=otel-collector1 \
---network=host \
---restart=no \
--v /etc/otel/collector.yaml:/etc/otelcol/config.yaml \
-otel/opentelemetry-collector:0.60.0
-```
+- [Operation quide](./docs/en/operation.md)
 
 ## TODO
 
@@ -124,7 +70,7 @@ otel/opentelemetry-collector:0.60.0
 
 ## FAQ
 
-### If you use the groovy environment, pay attention to the version situation between the components
+## If you use the groovy environment, pay attention to the version situation between the components
   - 1. The **groovy-4.0.5**(current latest) that the rengine-evaluator module depends on only supports **jdk1.8/9/10/16**
   - 2. The **spring-native-0.12.1*** (current latest) that the rengine-manager module depends on only supports jdk11+
   - 3. Refer source code: [github.com/apache/groovy/blob/GROOVY_4_0_5/src/main/java/org/codehaus/groovy/vmplugin/VMPluginFactory.java#L39](https://github.com/apache/groovy/blob/GROOVY_4_0_5/src/main/java/org/codehaus/groovy/vmplugin/VMPluginFactory.java#L39)

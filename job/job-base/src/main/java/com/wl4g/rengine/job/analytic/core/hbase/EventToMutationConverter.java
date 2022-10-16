@@ -122,6 +122,9 @@ public class EventToMutationConverter implements HBaseMutationConverter<RengineE
         put.addColumn(getBytes("info"), getBytes(field), (value instanceof byte[]) ? (byte[]) value : getBytes(value.toString()));
     }
 
+    /**
+     * @see {@link https://github.com/apache/hbase/blob/rel/2.1.2/hbase-common/src/main/java/org/apache/hadoop/hbase/HConstants.java#L599}
+     */
     protected byte[] generateRowkey(@NotNull RengineEventAnalytical model) {
         EventSource source = (EventSource) model.getSource();
 
@@ -129,21 +132,23 @@ public class EventToMutationConverter implements HBaseMutationConverter<RengineE
         // Options are: SSSssmmHHddMMyy | SSSyyMMddHHmmss?
         String reverseDate = DateFormatUtils.format(source.getTime(), "SSSyyMMddHHmmss");
 
-        // TODO transform to ZIPCODE-standard city/region/country name.
         return new StringBuilder()
-                // when
+                // When
                 .append(reverseDate)
-                // who
+                // Who
                 .append(ROWKEY_SPEARATOR)
-                .append(getSourcePrincipalsString(source))
-                // what
+                // Notice: For HBase performance, the shortest rowkey should be
+                // used, so only the first one is used here, and the others are
+                // stored as non-rowkey fields
+                .append(source.getPrincipals().stream().findFirst().orElse(EMPTY))
+                // What
                 .append(ROWKEY_SPEARATOR)
                 .append(model.getType())
-                // where
+                // Where
+                .append(ROWKEY_SPEARATOR)
                 // TODO 未拿到准确且完整的区域编码字典，无法约束采集源端传来的值，暂时只能放到非 RowKey，
                 // 但由于管理端 “数据洞察”->“事件分析” 支持查看事件统计/分析，其中 echarts 按照全球地图展示，因此最好还是
                 // 使用一份完整的 Geo-ZipCode 映射字典
-                .append(ROWKEY_SPEARATOR)
                 .append(getGeoCityKey(source))
                 .append(ROWKEY_SPEARATOR)
                 .append(getGeoRegionKey(source))
@@ -211,7 +216,7 @@ public class EventToMutationConverter implements HBaseMutationConverter<RengineE
         return cleanFieldKey;
     }
 
-    public static final int ROWKEY_PART_MAX_LEN = getIntProperty("HBASE_ROWKEY_PART_MAX_LEN", 16);
+    public static final int ROWKEY_PART_MAX_LEN = getIntProperty("HBASE_ROWKEY_PART_MAX_LEN", 8);
     public static final String ROWKEY_SPEARATOR = getStringProperty("HBASE_ROWKEY_SPEARATOR", ":");
 
 }

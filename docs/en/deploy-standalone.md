@@ -1,8 +1,14 @@
-# Rengine Job
+# Rengine for Deploy Standalone
 
-## Quick start
+## Deploy on Docker(Compose)
 
-### Deploy on Docker (Recommended for local dev/test environments)
+```bash
+git clone https://github.com/wl4g/rengine.git
+cd tools/deploy/compose
+docker-compose up -d
+```
+
+## Deploy on Docker(Manual)
 
 - Deploy local HBase
 
@@ -34,17 +40,37 @@ docker run -d --name flink-tm1 --network host flink:1.14.4-scala_2.11-java11 tas
 
 - Browser accessing: http://localhost:8081
 
-### Deploy on Kubernetes (Recommended for production environments)
-
-- (first:) Deploy HBase distributed production Cluster with CDH. refer: [blogs.wl4g.com/archives/3368](https://blogs.wl4g.com/archives/3368)
-
-- Deploy Flink jobs to Kubernetes
+- Deploy local Rengine Manager
 
 ```bash
-#TODO
+docker run -d \
+--name=rengine-manager \
+--network=host \
+--restart=no \
+-e SPRING_HIKARI_JDBCURL='jdbc:mysql://127.0.0.1:3306/rengine?useunicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf-8&useSSL=false' \
+-e SPRING_DATA_MONGODB_URI='mongodb://127.0.0.1:27017/rengine' \
+-e SPRING_DATA_MINIO_ENDPOINT='http://127.0.0.1:19000' \
+-e SPRING_DATA_MINIO_TENANTACCESSKEY='rengine' \
+-e SPRING_DATA_MINIO_TENANTSECRETKEY='12345678' \
+wl4g/rengine-manager
 ```
 
-### Testing
+- Deploy local Rengine Evaluator
+
+```bash
+docker run -d \
+--name=rengine-evaluator \
+--network=host \
+--restart=no \
+-e QUARKUS_HTTP_PORT="28002" \
+-e QUARKUS_MONGODB_CONNECTION_STRING="mongodb://localhost:27017" \
+-e MINIO_ENDPOINT="http://localhost:9000" \
+-e MINIO_TENANTACCESSKEY="rengine" \
+-e MINIO_TENANTSECRETKEY="12345678" \
+wl4g/rengine-evaluator-native
+```
+
+## Initial & Testing
 
 - Init HBase table with phoenix. (see: https://github.com/wl4g/docker-hbase)
 
@@ -70,9 +96,9 @@ CREATE TABLE IF NOT EXISTS "rengine"."t_ods_event" (
     "info"."locationLongitude" VARCHAR(16),
     "info"."locationZipcode" VARCHAR(16),
     "info"."locationTimezone" VARCHAR(8),
-    "info"."locationCity" VARCHAR(16),
-    "info"."locationRegion" VARCHAR(16),
-    "info"."locationCountry" VARCHAR(8),
+    "info"."locationCity" VARCHAR(8),
+    "info"."locationRegion" VARCHAR(8),
+    "info"."locationCountry" VARCHAR(2),
     "info"."attributes" VARCHAR(1024)
 ) COLUMN_ENCODED_BYTES=0;
 
@@ -94,7 +120,7 @@ kafka-topics.sh --zookeeper 127.0.0.1:2181 --create --topic rengine_event --part
 ```bash
 kafka-console-producer.sh --broker-list 127.0.0.1:9092 --topic rengine_event --property parse.key=true --property key.separator=:
 
-rengine_event:{"source":{"time":1665847350487,"principals":["admin"],"location":{"ipAddress":"1.1.1.1","ipv6":false,"isp":null,"domain":null,"country":null,"region":null,"city":null,"latitude":null,"longitude":null,"timezone":null,"zipcode":"20500","elevation":null}},"type":"iot_temp_warn","observedTime":1665847350490,"body":"52","attributes":{}}
+rengine_event:{"source":{"time":1665847350487,"principals":["jameswong1234@gmail.com"],"location":{"ipAddress":"1.1.1.1","ipv6":false,"isp":null,"domain":null,"country":null,"region":null,"city":null,"latitude":null,"longitude":null,"timezone":null,"zipcode":"20500","elevation":null}},"type":"iot_temp_warn","observedTime":1665847350490,"body":"52","attributes":{}}
 ```
 
 - Manual subscribe event from Kafka
@@ -102,28 +128,3 @@ rengine_event:{"source":{"time":1665847350487,"principals":["admin"],"location":
 ```bash
 kafka-console-consumer.sh --bootstrap-server 127.0.0.1:9092 --topic rengine_event
 ```
-
-## FAQ
-
-### Run phoenix client error of: `java.sql.SQLException: ERROR 726 (43M10):  Inconsistent namespace mapping properties. Cannot initiate connection as SYSTEM:CATALOG is found but client does not have phoenix.schema.isNamespaceMappingEnabled enabled`
-
-- Refer to:
-  - [https://phoenix.apache.org/namspace_mapping.html](https://phoenix.apache.org/namspace_mapping.html)
-  - [https://issues.apache.org/jira/secure/attachment/12792283/PHOENIX-1311_v1.patch](https://issues.apache.org/jira/secure/attachment/12792283/PHOENIX-1311_v1.patch)
-  - [https://github.com/apache/phoenix/blob/v5.0.0-HBase-2.0/phoenix-core/src/main/java/org/apache/phoenix/util/SchemaUtil.java#L700](https://github.com/apache/phoenix/blob/v5.0.0-HBase-2.0/phoenix-core/src/main/java/org/apache/phoenix/util/SchemaUtil.java#L700)
-
-- Resolved: The new version of hbase2.x, the default namespace and table name separator is `":"`, but Phoenix uses `"."` by default, but from Phoenix4.8+,
-namespace mapping to hbase is supported, but you must manually configure the HBase server and Phoenix clients configure it, that is, add configuration items
-in hbase-site.xml (need restart) e.g:
-
-```xml
-    <property>
-        <name>phoenix.connection.isNamespaceMappingEnabled</name>
-        <value>true</value>
-    </property>
-    <property>
-        <name>phoenix.schema.isNamespaceMappingEnabled=true</name>
-        <value>true</value>
-    </property>
-```
-

@@ -1,57 +1,16 @@
-# Rengine Evaluator
+# Rengine for Evaluator Development Guide
 
-## Quick Start
-
-### Deploy on Docker
-
-```bash
-docker run -d \
---name=rengine-evaluator \
---network=host \
---restart=no \
--e QUARKUS_HTTP_PORT="8080" \
--e QUARKUS_MONGODB_CONNECTION_STRING="mongodb://localhost:27017" \
--e MINIO_ENDPOINT="http://localhost:9000" \
--e MINIO_TENANTACCESSKEY="rengine" \
--e MINIO_TENANTSECRETKEY="12345678" \
-wl4g/rengine-evaluator
-```
-
-- Manual evaluating testing
-
-```bash
-curl -v -XPOST \
--H 'Content-Type: application/json' \
-'localhost:28002/evaluator/evaluate' \
--d '{
-  "@kind": "GENERIC",
-  "@engine": "JS",
-  "scenesCode": "iot_generic_temp_warning",
-  "service": "collector",
-  "attributes": {},
-  "scripting": {
-    "mainFun": "process",
-    "args": []
-  }
-}'
-```
-
-- [More Configuration: quarkus.io/guides/all-config](https://quarkus.io/guides/all-config)
-
-## Development Guide
-
-### Build for JAR
+## Build for JAR
 
 - First fully build the dependent modules.
 
 ```bash
 git clone git@github.com/wl4g/rengine.git
-cd rengine
-
+cd rengine/evaluator
 ./mvnw clean install -DskipTests -Dmaven.test.skip=true -T 2C
 ```
 
-### Build for native image
+## Build for native image
 
 - Then build as a native image.
 
@@ -72,7 +31,7 @@ export JAVA_HOME=/usr/local/jdk-11.0.10/
 -Dquarkus.native.container-runtime=docker
 ```
 
-### Build for container(native) image
+## Build for container(native) image
 
 - Case1: Automatic build with quarkus plugin. [quarkus.io/guides/container-image#building](https://quarkus.io/guides/container-image#building)
 
@@ -93,7 +52,7 @@ docker build -f build/docker/Dockerfile.jvm -t wl4g/rengine-evaluator .
 docker build -f build/docker/Dockerfile.native -t wl4g/rengine-evaluator .
 ```
 
-### Build for container(JVM) image
+## Build for container(JVM) image
 
 ```bash
 ./mvnw package -f evaluator/pom.xml \
@@ -101,9 +60,7 @@ docker build -f build/docker/Dockerfile.native -t wl4g/rengine-evaluator .
 -Dquarkus.container-image.build=true
 ```
 
-## Operation Guide
-
-### Manual Telemetry Troubleshooting
+## Manual telemetry
 
 - Health
 
@@ -120,10 +77,28 @@ curl -v localhost:28002/healthz/started
 curl -v localhost:28002/metrics
 ```
 
-### Native Troubleshooting
+- Manual evaluating mocking
 
-- [quarkus.io/guides/native-reference#profiling](https://quarkus.io/guides/native-reference#profiling)
+```bash
+curl -v -XPOST \
+-H 'Content-Type: application/json' \
+'localhost:28002/evaluator/evaluate' \
+-d '{
+  "@kind": "GENERIC",
+  "@engine": "JS",
+  "scenesCode": "iot_generic_temp_warning",
+  "service": "collector",
+  "attributes": {},
+  "scripting": {
+    "mainFun": "process",
+    "args": []
+  }
+}'
+```
 
+- [More Configuration: quarkus.io/guides/all-config](https://quarkus.io/guides/all-config)
+
+- [Native Troubleshooting: quarkus.io/guides/native-reference#profiling](https://quarkus.io/guides/native-reference#profiling)
 
 ## FAQ
 

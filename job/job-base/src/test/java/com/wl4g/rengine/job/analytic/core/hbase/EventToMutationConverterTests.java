@@ -48,7 +48,9 @@ public class EventToMutationConverterTests {
                                 .zipcode("20500")
                                 .build())
                         .build(),
-                "A serious alarm occurs when the device temperature is greater than 52℃"));
+                // A serious alarm occurs when the device temperature is greater
+                // than 52℃
+                "52"));
 
         EventToMutationConverter converter = new EventToMutationConverter();
         converter.open();
