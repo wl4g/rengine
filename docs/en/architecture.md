@@ -40,7 +40,7 @@
 }
 ```
 
-## Flink directly sink to ODS Table (HBase for phoenix)
+## Flink sink original to ODS Table (HBase for phoenix)
 
 ```sql
 select * from "rengine"."t_ods_event" where "ROW"='487221015232230:jameswong1234@gmail.com:iot_temp_warn:US:California:Mountain_View' limit 1;
@@ -53,22 +53,28 @@ select * from "rengine"."t_ods_event" where "ROW"='487221015232230:jameswong1234
 1 row selected (0.017 seconds)
 ```
 
-## Flink aggregated sink to DWS Table (HBase for phoenix)
+## Flink sink aggregated to DWS Table (HBase for phoenix)
 
 ```sql
-select * from "rengine"."t_dws_event_with_aggregated_of_hour" where "ROW"='22101523:jameswong1234@gmail.com:iot_temp_warn' limit 1;
+select * from "rengine"."t_dws_event_with_aggregated_of_10m" where "ROW"='2210162230:jameswong1234@gmail.com:iot_temp_warn' limit 1;
 
-+----------------------------------------------------------+-------+-----+-------+-------+----------+-------------------------+ ...
-|                           ROW                            | count | avg |  max  |  min  | variance |    sourcePrincipals     |
-+----------------------------------------------------------+-------+-----+-------+-------+----------+-------------------------+ ...
-|      22101523:jameswong1234@gmail.com:iot_temp_warn      | 199   | 68  |  84   |  63   |    9     | jameswong1234@gmail.com |
-+----------------------------------------------------------+-------------+-------+-------+----------+-------------------------+ ...
++----------------------------------------------------------+--------------+-------+-----+-------+-------+----------+----------+----------------+-------------------------+ ...
+|                           ROW                            |  updateTime  | count | avg |  max  |  min  | variance |  matches | matchesVersion |        principals       |
++----------------------------------------------------------+--------------+-------+-----+-------+-------+----------+----------+----------------+-------------------------+ ...
+|     2210162230:jameswong1234@gmail.com:iot_temp_warn     | 221016224005 | 199   | 68  |  84   |  63   |    9     |    21    |     10001:9    | jameswong1234@gmail.com |
++----------------------------------------------------------+--------------+-------------+-------+-------+----------+----------+----------------+-------------------------+ ...
 1 row selected (0.019 seconds)
 ```
+
+- Notice: The `matchesVersion` represents the workflow version number corresponding to the aggregation computing, which can be used history to calculate the backtracking. format as: (**workflowId:version**)
 
 ## Evaluator DWS aggregates data + rules workflow computing
 
 ```bash
 #TODO
 ```
+
+## FAQ
+
+### storage aggregated write to mongo ??? (TODO)
 

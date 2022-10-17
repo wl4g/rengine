@@ -10,9 +10,15 @@ A generic real-time rule engine, such as bank transfer real-time risk control, t
 
 - JDK 11.x +
 
+- GraalVM-java11-22.1 + (Recommands)
+
 - Maven 3.6 +
 
-- GraalVM-java11-22.1 + (Recommands)
+- Spring Boot 2.7.3 (Spring 5.3.22)
+
+- Quarkus 2.12.2
+
+- Redis Cluster 5 +
 
 - MySQL 5.7 +
 
@@ -20,11 +26,11 @@ A generic real-time rule engine, such as bank transfer real-time risk control, t
 
 - MinIO 2021.x +
 
-- Flink 1.14.4 + (Recommands)
-
 - HBase 2.2.x + (Recommands)
 
 - HDFS 3.0.x + (Recommands)
+
+- Flink 1.14.4 + (Recommands)
 
 - Docker 20.x + (Recommands)
 
@@ -58,19 +64,9 @@ A generic real-time rule engine, such as bank transfer real-time risk control, t
 
 - [Operation quide](./docs/en/operation.md)
 
-## TODO
+## RoadMap
 
-- Integrate Arthas (proxy/tunnel) with Rengine Manager for easy troubleshooting by sysadmins
-
-- Improve the Rengine Evaluator(quarkus native) runtime debugging toolchain and documentation, including memory snapshot dumps, real-time thread status dumps
-
-- Add the rengine-operator module to make it auto management to the cloud-native environment?
-
-- Add built-in core metrics (prometheus) and write official metrics alert rules and grafana view rules.
-
-- Supported to Flink CEP(Real-time compute) or Flink SQL(Offline compute)
-
-- Improve Rengine Manager configuration management/UI, friendly to user configuration rules, support online simulation of test data sets
+- [roadmap-2022](./docs/en/roadmap-2022.md)
 
 ## FAQ
 

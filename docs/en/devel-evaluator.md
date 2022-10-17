@@ -23,8 +23,7 @@ cd rengine/evaluator
 - **Notice:** It is recommended that the build host has a memory larger than 6G~8G, because building native requires a lot of memory to pre-run analysis methods, and the first build may take 15-20min (due to the need to download the build image), please wait patiently, and the subsequent build will take about 5-10min.
 
 ```bash
-# Should use java11+
-export JAVA_HOME=/usr/local/jdk-11.0.10/
+export JAVA_HOME=/usr/local/jdk-11.0.10/ # Must java11+
 ./mvnw package -f evaluator/pom.xml \
 -Dmaven.test.skip=true -DskipTests -Dnative \
 -Dquarkus.native.container-build=true \
@@ -36,8 +35,7 @@ export JAVA_HOME=/usr/local/jdk-11.0.10/
 - Case1: Automatic build with quarkus plugin. [quarkus.io/guides/container-image#building](https://quarkus.io/guides/container-image#building)
 
 ```bash
-# Should use java11+
-export JAVA_HOME=/usr/local/jdk-11.0.10/
+export JAVA_HOME=/usr/local/jdk-11.0.10/ # Must java11+
 ./mvnw package -f evaluator/pom.xml \
 -Dmaven.test.skip=true -DskipTests -Dnative \
 -Dquarkus.native.container-build=true \

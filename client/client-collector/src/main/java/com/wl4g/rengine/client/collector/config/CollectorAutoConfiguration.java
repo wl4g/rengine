@@ -19,6 +19,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.wl4g.rengine.client.collector.context.CollectorApplicationInitializer;
 import com.wl4g.rengine.common.constants.RengineConstants;
 
 /**
@@ -35,6 +36,11 @@ public class CollectorAutoConfiguration {
     @ConfigurationProperties(prefix = RengineConstants.CONF_PREFIX_CLIENT_COLLECTOR)
     public CollectorProperties collectorProperties() {
         return new CollectorProperties();
+    }
+
+    @Bean
+    public CollectorApplicationInitializer collectorApplicationInitializer() {
+        return new CollectorApplicationInitializer();
     }
 
 }

@@ -15,6 +15,9 @@
  */
 package com.wl4g.rengine.client.collector.context;
 
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+
 /**
  * {@link CollectorApplicationInitializer}
  * 
@@ -22,6 +25,11 @@ package com.wl4g.rengine.client.collector.context;
  * @version 2022-10-16
  * @since v1.0.0
  */
-public class CollectorApplicationInitializer {
+public class CollectorApplicationInitializer implements ApplicationRunner {
+
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        // TODO Auto-generated method stub
+    }
 
 }
