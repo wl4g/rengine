@@ -56,7 +56,7 @@ public class JobServiceTests {
 
     @Test
     public void testLoadScenesFull() {
-        Scenes scenes = jobService.loadScenesFull("iot_generic_temp_warning");
+        Scenes scenes = jobService.loadScenesWithCascade("iot_generic_temp_warning");
         System.out.println(toJSONString(scenes));
     }
 

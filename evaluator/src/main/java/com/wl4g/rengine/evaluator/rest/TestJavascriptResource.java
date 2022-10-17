@@ -44,6 +44,7 @@ import org.graalvm.polyglot.Source;
 import org.graalvm.polyglot.Value;
 import org.graalvm.polyglot.proxy.ProxyObject;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.wl4g.infra.common.graalvm.GraalPolyglotManager.ContextWrapper;
 import com.wl4g.infra.common.lang.EnvironmentUtil;
 import com.wl4g.infra.common.runtime.JvmRuntimeTool;
@@ -79,6 +80,7 @@ import lombok.extern.slf4j.Slf4j;
 @Consumes(MediaType.APPLICATION_JSON)
 // 注1: 当编译为native运行时, 必须显示指定单例, 否则方法体中使用成员属性会空指针. (但使用JVM运行时却不会?)
 @Singleton
+@VisibleForTesting
 public class TestJavascriptResource {
 
     // 注: 同一 Context 实例不允许多线程并发调用.
@@ -108,7 +110,7 @@ public class TestJavascriptResource {
 
     @POST
     @Path("/execution")
-    public RespBase<Object> execution(JavascriptExecution model) {
+    public RespBase<Object> execution(TestJavascriptExecution model) {
         log.info("called: JSScript execution ... {}", model);
 
         // Limiting test process.
@@ -183,7 +185,7 @@ public class TestJavascriptResource {
     @Data
     @NoArgsConstructor
     @SuperBuilder
-    public static class JavascriptExecution {
+    public static class TestJavascriptExecution {
         @NotBlank
         String scriptPath;
         @NotEmpty

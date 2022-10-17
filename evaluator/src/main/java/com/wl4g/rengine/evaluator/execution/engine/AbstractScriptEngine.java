@@ -84,7 +84,7 @@ public abstract class AbstractScriptEngine implements IEngine {
         List<ObjectResource> scripts = Lists.newArrayList();
 
         // Gets scenes/workflow/rules/uploads information.
-        final Scenes scenes = jobService.loadScenesFull(model.getScenesCode());
+        final Scenes scenes = jobService.loadScenesWithCascade(model.getScenesCode());
         notNull(scenes, "Unable to find scenes '%s'", model.getScenesCode());
 
         // Add upload object script dependencies all by scenes.workflow.rules

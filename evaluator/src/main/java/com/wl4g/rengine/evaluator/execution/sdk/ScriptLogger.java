@@ -19,7 +19,6 @@ import org.graalvm.polyglot.HostAccess;
 
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
-import lombok.ToString;
 
 /**
  * {@link ScriptLogger}
@@ -29,11 +28,10 @@ import lombok.ToString;
  * @since v1.0.0
  */
 @CustomLog
-@ToString
 @AllArgsConstructor
 public class ScriptLogger {
 
-    private final ScriptContext context;
+    private final transient ScriptContext context;
 
     public @HostAccess.Export void trace(String format, Object... args) {
         write(1, format, args);

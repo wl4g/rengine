@@ -13,18 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.common.entity;
+package com.wl4g.rengine.client.core.config;
 
-import java.util.List;
+import java.net.URI;
 
-import javax.annotation.Nullable;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import com.wl4g.infra.common.bean.BaseBean;
-import com.wl4g.rengine.common.model.EvaluationEngine;
+import com.wl4g.rengine.common.model.Evaluation;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,27 +31,27 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link Workflow}
+ * {@link ClientConfig}
  * 
  * @author James Wong
- * @version 2022-08-29
- * @since v1.0.0
+ * @version 2022-10-17
+ * @since v3.0.0
  */
 @Getter
 @Setter
-@SuperBuilder
 @ToString
+@SuperBuilder
 @NoArgsConstructor
-public class Workflow extends BaseBean {
-    private static final long serialVersionUID = 1L;
-    private @NotBlank String name;
-    private @NotNull EvaluationEngine engine;
-    private @Nullable List<Long> ruleIds;
+public class ClientConfig {
 
-    //
-    // Temporary fields.
-    //
+    private @NotBlank @Default URI endpoint = URI.create("http://localhost:28002");
 
-    @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
-    private @Nullable transient List<Rule> rules;
+    private @NotBlank String accessKey;
+
+    private @NotBlank String accessSecret;
+
+    private @NotNull @Min(1) @Default Long defaultTimeout = Evaluation.DEFAULT_TIMEOUT;
+
+    private @NotNull @Min(1) @Default Boolean defaultBestEffort = Evaluation.DEFAULT_BESTEFFORT;
+
 }

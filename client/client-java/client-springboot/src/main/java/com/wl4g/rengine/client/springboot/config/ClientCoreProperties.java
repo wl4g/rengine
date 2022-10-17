@@ -13,31 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.evaluator.service;
+package com.wl4g.rengine.client.springboot.config;
 
-import java.util.List;
-
-import javax.validation.constraints.NotBlank;
-
-import com.wl4g.rengine.common.entity.Job;
-import com.wl4g.rengine.common.entity.Scenes;
-import com.wl4g.rengine.evaluator.service.impl.JobServiceImpl;
-
-import io.smallrye.mutiny.Uni;
+import com.wl4g.rengine.client.core.config.ClientConfig;
 
 /**
- * {@link JobServiceImpl}
+ * {@link ClientCoreProperties}
  * 
  * @author James Wong
- * @version 2022-09-17
- * @since v1.0.0
+ * @version 2022-10-17
+ * @since v3.0.0
  */
-public interface JobService {
-
-    Scenes loadScenesWithCascade(@NotBlank String scenesCode);
-
-    Uni<List<Job>> listAll();
-
-    Uni<Void> save(Job job);
-
+public class ClientCoreProperties extends ClientConfig {
 }

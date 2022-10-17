@@ -13,31 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.evaluator.service;
-
-import java.util.List;
+package com.wl4g.rengine.common.model;
 
 import javax.validation.constraints.NotBlank;
 
-import com.wl4g.rengine.common.entity.Job;
-import com.wl4g.rengine.common.entity.Scenes;
-import com.wl4g.rengine.evaluator.service.impl.JobServiceImpl;
-
-import io.smallrye.mutiny.Uni;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 /**
- * {@link JobServiceImpl}
+ * {@link EvaluationBase}
  * 
  * @author James Wong
- * @version 2022-09-17
- * @since v1.0.0
+ * @version 2022-10-17
+ * @since v3.0.0
  */
-public interface JobService {
+@Getter
+@Setter
+@ToString
+@SuperBuilder
+public class EvaluationBase {
 
-    Scenes loadScenesWithCascade(@NotBlank String scenesCode);
+    @NotBlank
+    String requestId;
 
-    Uni<List<Job>> listAll();
+    @NotBlank
+    String clientId;
 
-    Uni<Void> save(Job job);
+    @NotBlank
+    String clientSecret;
 
 }

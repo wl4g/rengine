@@ -21,7 +21,7 @@ import javax.inject.Named;
 import com.wl4g.rengine.common.model.Evaluation;
 import com.wl4g.rengine.common.model.EvaluationEngine;
 import com.wl4g.rengine.common.model.EvaluationResult;
-import com.wl4g.rengine.common.model.EvaluationResult.GenericEvaluationResult;
+import com.wl4g.rengine.common.model.EvaluationResult.SimpleEvaluationResult;
 import com.wl4g.rengine.evaluator.execution.engine.IEngine;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptResult;
 
@@ -46,7 +46,7 @@ public class GenericWorkflowExecution extends BaseWorkflowExecution {
         // TODO re-definition result bean?
         ScriptResult result = engine.execute(model);
 
-        return GenericEvaluationResult.builder().result(result).build();
+        return SimpleEvaluationResult.builder().result(result).build();
     }
 
 }

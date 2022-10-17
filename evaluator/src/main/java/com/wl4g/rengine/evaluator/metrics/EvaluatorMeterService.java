@@ -71,7 +71,7 @@ public class EvaluatorMeterService extends PrometheusMeterFacade {
         public static final String KIND = "kind";
         public static final String ENGINE = "engine";
         public static final String SCENESCODE = "scenesCode";
-        public static final String SERVICE = "service";
+         public static final String SERVICE = "service";
         public static final String LIBRARY = "library";
     }
 

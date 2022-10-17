@@ -44,7 +44,7 @@ public class LifecycleExecutionFactory {
         switch (kind) {
         case SCORE:
             return getBean(ScoreWorkflowExecution.class);
-        case GENERIC:
+        case SIMPLE:
         default:
             return getBean(GenericWorkflowExecution.class);
         }

@@ -35,6 +35,7 @@ public abstract class RengineConstants extends EnvironmentUtil {
     public static final String CONF_PREFIX = "rengine";
     public static final String CONF_PREFIX_MANAGER = CONF_PREFIX + ".manager";
     public static final String CONF_PREFIX_EVALUATOR = CONF_PREFIX + ".evaluator";
+    public static final String CONF_PREFIX_CLIENT_CORE = CONF_PREFIX + ".client.core";
     public static final String CONF_PREFIX_CLIENT_COLLECTOR = CONF_PREFIX + ".client.collector";
     public static final String CONF_PREFIX_CLIENT_EVENTBUS = CONF_PREFIX + ".client.eventbus";
     public static final String CONF_PREFIX_CLIENT_EVENTBUS_KAFKA = CONF_PREFIX_CLIENT_EVENTBUS + ".kafka";
@@ -48,6 +49,8 @@ public abstract class RengineConstants extends EnvironmentUtil {
     public static final String DEF_MINIO_ENDPOINT = "http://localhost:9000";
     public static final String DEF_MINIO_REGION = "us-east-1";
     public static final String DEF_MINIO_BUCKET = "rengine";
+
+    public static final String API_EVALUATOR_EVALUATE = "/evaluate";
 
     @Getter
     @AllArgsConstructor

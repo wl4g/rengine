@@ -24,6 +24,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.wl4g.infra.common.web.rest.RespBase;
+import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.common.model.Evaluation;
 import com.wl4g.rengine.common.model.EvaluationResult;
 import com.wl4g.rengine.evaluator.rest.interceptor.CustomValid;
@@ -68,9 +69,9 @@ public class EvaluatorResource {
      * @see https://quarkus.io/guides/resteasy-reactive#asyncreactive-support
      */
     @POST
-    @Path("/evaluate")
+    @Path(RengineConstants.API_EVALUATOR_EVALUATE)
     public Uni<RespBase<EvaluationResult>> evaluate(Evaluation model) throws SystemException {
-        log.info("called: evaluate ...");
+        log.debug("Evaluating of {}", model);
         return evaluatorService.evaluate(model);
     }
 

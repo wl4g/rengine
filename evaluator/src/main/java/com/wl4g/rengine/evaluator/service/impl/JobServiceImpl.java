@@ -121,7 +121,7 @@ public class JobServiceImpl implements JobService {
      * @see https://www.mongodb.com/docs/v4.2/tutorial/model-embedded-one-to-many-relationships-between-documents/
      */
     @Override
-    public Scenes loadScenesFull(@NotBlank String scenesCode) {
+    public Scenes loadScenesWithCascade(@NotBlank String scenesCode) {
         MongoCollection<Document> collection = mongoRepository.getCollection(SCENESES);
 
         // Common exclude projection.
@@ -152,7 +152,7 @@ public class JobServiceImpl implements JobService {
                                 project),
                         "workflow"));
         aggregates.add(project);
-        aggregates.add(Aggregates.merge("_tmp_loadScenesFull"));
+        aggregates.add(Aggregates.merge("_tmp_load_scenes_with_cascade"));
 
         return collection.aggregate(aggregates).batchSize(1024).map(new Function<Document, Scenes>() {
             @Override
