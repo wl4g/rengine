@@ -34,9 +34,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class HttpScrapeJob extends AbstractScrapeJob {
 
-    // @Autowired
-    // private FooRepository fooRepository;
-
     public HttpScrapeJob(CollectorProperties config) {
         super(config);
     }
@@ -52,4 +49,5 @@ public class HttpScrapeJob extends AbstractScrapeJob {
         // fooRepository.setCompleted(each.getId());
         // }
     }
+
 }

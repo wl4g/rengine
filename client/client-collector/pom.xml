@@ -79,10 +79,19 @@
             <groupId>com.wl4g</groupId>
             <artifactId>infra-context</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.wl4g</groupId>
+            <artifactId>rengine-client-springboot</artifactId>
+        </dependency>
         <!-- ELASTIC JOB -->
+        <!-- TODO use pure java client and springboot client?? -->
         <dependency>
             <groupId>org.apache.shardingsphere.elasticjob</groupId>
             <artifactId>elasticjob-lite-spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.shardingsphere.elasticjob</groupId>
+            <artifactId>elasticjob-lite-core</artifactId>
         </dependency>
         <!-- CORE -->
         <dependency>

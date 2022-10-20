@@ -11,66 +11,25 @@
 # #### Elastic Job configuration. ####
 #
 
-elasticjob:
-  reg-center:
-    server-lists: localhost:2181
-    namespace: rengine
-    #base-sleep-time-milliseconds:
-    #max-sleep-time-milliseconds:
-    #max-retries:
-    #session-timeout-milliseconds:
-    #connection-timeout-milliseconds:
-    #digest:
-  tracing:
-    type: RDB
-    includeJobNames: [httpScrapeJob, scriptScrapeJob]
-    #excludeJobNames:
-  dump:
-    enabled: true
-    port: 9888
-  jobs:
-    httpScrapeJob:
-      elasticJobClass:
-      #elasticJobType:
-      disabled: false
-      overwrite:
-      cron: 0/5 * * * * ?
-      timeZone: GMT+08:00
-      #sharding-total-count:
-      #sharding-item-parameters: 0=Beijing,1=Shanghai,2=Guangzhou
-      #jobBootstrapBeanName:
-      #job-parameter:
-      #job-sharding-strategy-type:
-      #job-executor-service-handler-type:
-      #job-error-handler-type:
-      #job-listener-types:
-      #monitor-execution:
-      #failover:
-      #misfire:
-      #max-time-diff-seconds:
-      #reconcile-interval-minutes:
-      description: 
-      #props:
-    scriptScrapeJob:
-      elasticJobClass:
-      #elasticJobType:
-      disabled: false
-      overwrite:
-      cron: 0/5 * * * * ?
-      timeZone: GMT+08:00
-      #sharding-total-count:
-      #sharding-item-parameters: 0=Beijing,1=Shanghai,2=Guangzhou
-      #jobBootstrapBeanName:
-      #job-parameter:
-      #job-sharding-strategy-type:
-      #job-executor-service-handler-type:
-      #job-error-handler-type:
-      #job-listener-types:
-      #monitor-execution:
-      #failover:
-      #misfire:
-      #max-time-diff-seconds:
-      #reconcile-interval-minutes:
-      description: 
-      #props:
-
+rengine:
+  client:
+    collector:
+      enabled: true
+      zookeeper:
+        ## see:org.apache.curator.test.TestingZooKeeperServer.TestingZooKeeperServer
+        ## see:org.apache.curator.test.InstanceSpec
+        quorumServers: localhost:2181
+        # TODO
+        electionAddress: "#{T(java.net.InetAddress).getLocalHost().getHostName()}:3181"
+        namespace: rengine
+      jobs:
+        httpScrapeJob:
+          cron: 0/5 * * * * ?
+          shardingTotalCount: 1
+          shardingItemParameters: 0=Beijing,1=Shanghai,2=Guangzhou
+          props: {}
+        scriptScrapeJob:
+          cron: 0/5 * * * * ?
+          shardingTotalCount: 1
+          shardingItemParameters: 0=Beijing,1=Shanghai,2=Guangzhou
+          props: {}

@@ -9,19 +9,21 @@
 #
 
 elasticjob:
-  tracing:
-    type: RDB
   regCenter:
     serverLists: localhost:21811
     namespace: elasticjob-lite-example
+  tracing:
+    type: RDB
+  dump:
+    port: 9888
   jobs:
     simpleJob:
-      elasticJobClass: com.wl4g.dopaas.uds.example.job.SpringBootSimpleJob
+      elasticJobClass: com.wl4g.rengine.client.collector.job.SpringBootSimpleJob
       cron: 0/5 * * * * ?
       shardingTotalCount: 3
       shardingItemParameters: 0=Beijing,1=Shanghai,2=Guangzhou
     dataflowJob:
-      elasticJobClass: com.wl4g.dopaas.uds.example.job.SpringBootDataflowJob
+      elasticJobClass: com.wl4g.rengine.client.collector.job.SpringBootDataflowJob
       cron: 0/5 * * * * ?
       shardingTotalCount: 3
       shardingItemParameters: 0=Beijing,1=Shanghai,2=Guangzhou
@@ -38,12 +40,17 @@ elasticjob:
       props:
         script.command.line: "echo Manual SCRIPT Job: "
     occurErrorNoticeDingtalkJob:
-      elasticJobClass: com.wl4g.dopaas.uds.example.job.SpringBootOccurErrorNoticeDingtalkJob
+      elasticJobClass: com.wl4g.rengine.client.collector.job.SpringBootOccurErrorNoticeDingtalkJob
       overwrite: true
       shardingTotalCount: 3
       shardingItemParameters: 0=Beijing,1=Shanghai,2=Guangzhou
-      jobErrorHandlerType: DINGTALK
+      jobErrorHandlerType: PRINT
       jobBootstrapBeanName: occurErrorNoticeDingtalkBean
+      #jobParameter:
+      #jobShardingStrategyType:
+      #jobExecutorServiceHandlerType:
+      #jobErrorNandlerType:
+      #jobListenerTypes:
       props:
         dingtalk:
           webhook: you_webhook
@@ -52,23 +59,28 @@ elasticjob:
           connectTimeout: 3000
           readTimeout: 5000
     occurErrorNoticeWechatJob:
-      elasticJobClass: com.wl4g.dopaas.uds.example.job.SpringBootOccurErrorNoticeWechatJob
+      elasticJobClass: com.wl4g.rengine.client.collector.job.SpringBootOccurErrorNoticeWechatJob
       overwrite: true
       shardingTotalCount: 3
       shardingItemParameters: 0=Beijing,1=Shanghai,2=Guangzhou
-      jobErrorHandlerType: WECHAT
+      jobErrorHandlerType: PRINT
       jobBootstrapBeanName: occurErrorNoticeWechatBean
+      #jobParameter:
+      #jobShardingStrategyType:
+      #jobExecutorServiceHandlerType:
+      #jobErrorNandlerType:
+      #jobListenerTypes:
       props:
         wechat:
           webhook: you_webhook
           connectTimeout: 3000
           readTimeout: 5000
     occurErrorNoticeEmailJob:
-      elasticJobClass: com.wl4g.dopaas.uds.example.job.SpringBootOccurErrorNoticeEmailJob
+      elasticJobClass: com.wl4g.rengine.client.collector.job.SpringBootOccurErrorNoticeEmailJob
       overwrite: true
       shardingTotalCount: 3
       shardingItemParameters: 0=Beijing,1=Shanghai,2=Guangzhou
-      jobErrorHandlerType: EMAIL
+      jobErrorHandlerType: PRINT
       jobBootstrapBeanName: occurErrorNoticeEmailBean
       props:
         email:
@@ -83,5 +95,3 @@ elasticjob:
           cc: cc@xxx.xx
           bcc: bcc@xxx.xx
           debug: false
-  dump:
-    port: 9888

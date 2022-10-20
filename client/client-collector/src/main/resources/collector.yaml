@@ -14,8 +14,8 @@
 spring:
   application.name: rengine-collector
   profiles:
-    #include: data,telemetry,arthas,devtool
-    include: data,telemetry,arthas
+    #include: arthas,elasticjob,devtool
+    include: arthas,elasticjob
     active: dev
   banner:
       location: classpath:META-INF/banner.txt

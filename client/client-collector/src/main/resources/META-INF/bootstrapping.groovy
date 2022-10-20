@@ -38,10 +38,10 @@ class RengineCollectorBootstrappingConfigurer implements IBootstrappingConfigure
     void defaultProperties(Properties prevDefaultProperties) {
         // Preset spring.config.name
         // for example: spring auto load for 'application-dev.yml/application-data-dev.yml'
-        def configName = new StringBuffer("application,collector")
+        def configName = new StringBuffer("application,collector,base")
 
         // Preset spring.config.additional-location
-        def additionalLocation = new StringBuffer("classpath:/")
+        def additionalLocation = new StringBuffer("classpath:/config-base/")
 
         // if (isJvmInDebugging) {
         //     System.out.println("Activation configuration location 'classpath:/config-dev/' ...")
