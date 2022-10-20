@@ -13,15 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.client.collector;
+package com.wl4g;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import com.wl4g.zookeeper.EmbedZookeeperServer;
 
 /**
- * {@link CollectorTests}
+ * {@link RengineCollectorTests}
  * 
  * @author James Wong
  * @version 2022-10-16
  * @since v1.0.0
  */
-public class CollectorTests {
+@SpringBootApplication
+public class RengineCollectorTests {
+
+    public static void main(String[] args) {
+        EmbedZookeeperServer.start(21811);
+        SpringApplication.run(RengineCollectorTests.class, args);
+    }
 
 }

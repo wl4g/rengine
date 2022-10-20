@@ -46,9 +46,9 @@ public class ClientConfig {
 
     private @NotBlank @Default URI endpoint = URI.create("http://localhost:28002");
 
-    private @NotBlank String accessKey;
+    private @NotBlank String clientId;
 
-    private @NotBlank String accessSecret;
+    private @NotBlank String clientSecret;
 
     private @NotNull @Min(1) @Default Long defaultTimeout = Evaluation.DEFAULT_TIMEOUT;
 

@@ -44,7 +44,7 @@ import lombok.experimental.SuperBuilder;
 // 2.对于swagger3注解,父类必须是抽象的，否则swagger3页面请求参数schemas展开后会以父类名重复展示3个.
 @Schema(oneOf = { OAuth2Config.class, Saml2Config.class }, discriminatorProperty = "@kind")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@kind", visible = true)
-@JsonSubTypes({ @Type(value = OAuth2Config.class, name = "oauth2"), @Type(value = Saml2Config.class, name = "saml2") })
+@JsonSubTypes({ @Type(value = OAuth2Config.class, name = "OAUTH2"), @Type(value = Saml2Config.class, name = "SAML2") })
 @Getter
 @Setter
 @SuperBuilder
@@ -85,7 +85,7 @@ public abstract class IdentityProvider extends BaseBean {
     }
 
     public static enum IdPKind {
-        oauth2, saml2
+        OAUTH2, SAML2
     }
 
 }

@@ -20,6 +20,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.wl4g.rengine.client.collector.context.CollectorApplicationInitializer;
+import com.wl4g.rengine.client.collector.job.HttpScrapeJob;
+import com.wl4g.rengine.client.collector.job.ScriptScrapeJob;
 import com.wl4g.rengine.common.constants.RengineConstants;
 
 /**
@@ -41,6 +43,16 @@ public class CollectorAutoConfiguration {
     @Bean
     public CollectorApplicationInitializer collectorApplicationInitializer() {
         return new CollectorApplicationInitializer();
+    }
+
+    @Bean
+    public HttpScrapeJob httpScrapeJob(CollectorProperties config) {
+        return new HttpScrapeJob(config);
+    }
+
+    @Bean
+    public ScriptScrapeJob scriptScrapeJob(CollectorProperties config) {
+        return new ScriptScrapeJob(config);
     }
 
 }

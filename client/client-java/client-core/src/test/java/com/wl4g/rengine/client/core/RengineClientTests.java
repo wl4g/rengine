@@ -42,8 +42,8 @@ public class RengineClientTests {
 
     ClientConfig unknownClientConfig = ClientConfig.builder()
             .endpoint(URI.create("http://localhost:12345"))
-            .accessKey("iot-mqttcollector01")
-            .accessSecret("abcdefghijklmnopqrstuvwxyz")
+            .clientId("iot-mqttcollector01")
+            .clientSecret("abcdefghijklmnopqrstuvwxyz")
             .build();
 
     EvaluationResult defaultFailbackResult = EvaluationResult.builder()
@@ -58,8 +58,8 @@ public class RengineClientTests {
         defaultClient = RengineClient.builder()
                 .config(ClientConfig.builder()
                         .endpoint(URI.create("http://localhost:28002"))
-                        .accessKey("iot-mqttcollector01")
-                        .accessSecret("abcdefghijklmnopqrstuvwxyz")
+                        .clientId("iot-mqttcollector01")
+                        .clientSecret("abcdefghijklmnopqrstuvwxyz")
                         .build())
                 .failback(e -> {
                     System.err.println("Failed to evaluation of reason: ");

@@ -55,4 +55,5 @@ public class Workflow extends BaseBean {
 
     @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
     private @Nullable transient List<Rule> rules;
+
 }

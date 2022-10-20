@@ -97,8 +97,8 @@ public class RengineClient {
         hasTextOf(scenesCode, "scenesCode");
         return evaluate(Evaluation.builder()
                 .requestId(valueOf(IdGenUtil.next()))
-                .accessKey(config.getAccessKey())
-                .accessSecret(config.getAccessSecret())
+                .clientId(config.getClientId())
+                .clientSecret(config.getClientSecret())
                 .scenesCode(scenesCode)
                 .timeout(timeoutMs)
                 .bestEffort(bestEffort)
