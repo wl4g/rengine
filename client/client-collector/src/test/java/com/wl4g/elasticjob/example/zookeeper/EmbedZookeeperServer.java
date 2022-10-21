@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.wl4g.rengine.client.collector.zookeeper;
+package com.wl4g.elasticjob.example.zookeeper;
 
 import static java.util.Objects.isNull;
 

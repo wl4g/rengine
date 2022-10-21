@@ -38,10 +38,10 @@ class RengineCollectorBootstrappingConfigurer implements IBootstrappingConfigure
     void defaultProperties(Properties prevDefaultProperties) {
         // Preset spring.config.name
         // for example: spring auto load for 'application-dev.yml/application-data-dev.yml'
-        def configName = new StringBuffer("application,collector,base")
+        def configName = new StringBuffer("application,collector")
 
         // Preset spring.config.additional-location
-        def additionalLocation = new StringBuffer("classpath:/config-base/")
+        def additionalLocation = new StringBuffer("classpath:/")
 
         // if (isJvmInDebugging) {
         //     System.out.println("Activation configuration location 'classpath:/config-dev/' ...")
@@ -54,6 +54,10 @@ class RengineCollectorBootstrappingConfigurer implements IBootstrappingConfigure
         // Preset 'spring.config.additional-location', external resources does not override resources in classpath.
         prevDefaultProperties.put(CONFIG_NAME_PROPERTY, configName.toString())
         prevDefaultProperties.put(CONFIG_ADDITIONAL_LOCATION_PROPERTY, additionalLocation.toString())
+
+        // ElasticJob is deeply integrated, and key configuration mandatory setup and are not allowed to be modified.
+        // see:org.apache.shardingsphere.elasticjob.lite.spring.boot.job.ElasticJobLiteAutoConfiguration
+        prevDefaultProperties.put("elasticjob.enabled", "true")
     }
 
 }

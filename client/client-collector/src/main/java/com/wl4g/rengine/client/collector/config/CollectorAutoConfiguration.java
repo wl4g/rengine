@@ -15,14 +15,28 @@
  */
 package com.wl4g.rengine.client.collector.config;
 
+import static com.wl4g.rengine.common.constants.RengineConstants.CONF_PREFIX_CLIENT_COLLECTOR;
+
+import javax.sql.DataSource;
+
+import org.apache.shardingsphere.elasticjob.lite.internal.snapshot.SnapshotService;
+import org.apache.shardingsphere.elasticjob.lite.spring.boot.job.ElasticJobBootstrapConfiguration;
+import org.apache.shardingsphere.elasticjob.lite.spring.boot.job.ScheduleJobBootstrapStartupRunner;
+import org.apache.shardingsphere.elasticjob.reg.base.CoordinatorRegistryCenter;
+import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperRegistryCenter;
+import org.apache.shardingsphere.elasticjob.tracing.api.TracingConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.wl4g.rengine.client.collector.context.CollectorApplicationInitializer;
-import com.wl4g.rengine.client.collector.job.HttpScrapeJob;
-import com.wl4g.rengine.client.collector.job.ScriptScrapeJob;
-import com.wl4g.rengine.common.constants.RengineConstants;
+import com.wl4g.rengine.client.collector.job.PrometheusEventJobExecutor;
+import com.wl4g.rengine.client.collector.job.SSHEventJobExecutor;
+import com.wl4g.rengine.client.collector.job.SimpleHttpEventJobExecutor;
+import com.wl4g.rengine.client.collector.job.SimpleJdbcEventJobExecutor;
+import com.wl4g.rengine.client.collector.job.SimpleRedisEventJobExecutor;
+import com.wl4g.rengine.client.collector.job.SimpleTcpEventJobExecutor;
 
 /**
  * {@link CollectorAutoConfiguration}
@@ -30,29 +44,73 @@ import com.wl4g.rengine.common.constants.RengineConstants;
  * @author James Wong
  * @version 2022-10-16
  * @since v1.0.0
+ * @see {@link org.apache.shardingsphere.elasticjob.lite.spring.boot.job.ElasticJobLiteAutoConfiguration}
  */
 @Configuration
 public class CollectorAutoConfiguration {
 
     @Bean
-    @ConfigurationProperties(prefix = RengineConstants.CONF_PREFIX_CLIENT_COLLECTOR)
+    @ConfigurationProperties(prefix = CONF_PREFIX_CLIENT_COLLECTOR)
     public CollectorProperties collectorProperties() {
         return new CollectorProperties();
     }
 
-    @Bean
-    public CollectorApplicationInitializer collectorApplicationInitializer() {
-        return new CollectorApplicationInitializer();
+    @Bean(initMethod = "init")
+    public ZookeeperRegistryCenter zookeeperRegistryCenter(CollectorProperties config) {
+        return new ZookeeperRegistryCenter(config.getZookeeper().toZookeeperConfiguration());
     }
 
     @Bean
-    public HttpScrapeJob httpScrapeJob(CollectorProperties config) {
-        return new HttpScrapeJob(config);
+    @ConditionalOnBean(DataSource.class)
+    @ConditionalOnProperty(name = CONF_PREFIX_CLIENT_COLLECTOR + ".tracing.type", havingValue = "RDB")
+    public TracingConfiguration<DataSource> tracingConfiguration(DataSource dataSource) {
+        return new TracingConfiguration<>("RDB", dataSource);
+    }
+
+    @ConditionalOnProperty(name = CONF_PREFIX_CLIENT_COLLECTOR + ".dump.port")
+    @Bean(initMethod = "listen", destroyMethod = "close")
+    public SnapshotService snapshotService(CoordinatorRegistryCenter registryCenter, CollectorProperties config) {
+        return new SnapshotService(registryCenter, config.getDump().getPort());
     }
 
     @Bean
-    public ScriptScrapeJob scriptScrapeJob(CollectorProperties config) {
-        return new ScriptScrapeJob(config);
+    public ElasticJobBootstrapConfiguration elasticJobBootstrapConfiguration() {
+        return new ElasticJobBootstrapConfiguration();
+    }
+
+    @Bean
+    public ScheduleJobBootstrapStartupRunner scheduleJobBootstrapStartupRunner() {
+        return new ScheduleJobBootstrapStartupRunner();
+    }
+
+    @Bean
+    public SimpleHttpEventJobExecutor simpleHttpEventJobExecutor() {
+        return new SimpleHttpEventJobExecutor();
+    }
+
+    @Bean
+    public PrometheusEventJobExecutor prometheusEventJobExecutor() {
+        return new PrometheusEventJobExecutor();
+    }
+
+    @Bean
+    public SimpleJdbcEventJobExecutor simpleJdbcEventJobExecutor() {
+        return new SimpleJdbcEventJobExecutor();
+    }
+
+    @Bean
+    public SimpleRedisEventJobExecutor simpleRedisEventJobExecutor() {
+        return new SimpleRedisEventJobExecutor();
+    }
+
+    @Bean
+    public SimpleTcpEventJobExecutor simpleTcpEventJobExecutor() {
+        return new SimpleTcpEventJobExecutor();
+    }
+
+    @Bean
+    public SSHEventJobExecutor sshEventJobExeutor() {
+        return new SSHEventJobExecutor();
     }
 
 }

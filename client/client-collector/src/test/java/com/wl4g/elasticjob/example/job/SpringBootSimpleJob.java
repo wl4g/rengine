@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.wl4g.rengine.client.collector.job;
+package com.wl4g.elasticjob.example.job;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -26,8 +26,8 @@ import org.apache.shardingsphere.elasticjob.simple.job.SimpleJob;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.wl4g.elasticjob.example.repository.FooRepository;
 import com.wl4g.rengine.client.collector.bean.Foo;
-import com.wl4g.rengine.client.collector.repository.FooRepository;
 
 import lombok.extern.slf4j.Slf4j;
 

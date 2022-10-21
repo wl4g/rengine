@@ -15,7 +15,7 @@
  */
 package com.wl4g;
 
-import com.wl4g.rengine.client.collector.zookeeper.EmbedZookeeperServer;
+import com.wl4g.elasticjob.example.zookeeper.EmbedZookeeperServer;
 
 /**
  * {@link RengineCollectorTests}

@@ -18,12 +18,12 @@ elasticjob:
     port: 9888
   jobs:
     simpleJob:
-      elasticJobClass: com.wl4g.rengine.client.collector.job.SpringBootSimpleJob
+      elasticJobClass: com.wl4g.rengine.client.collector.job.example.SpringBootSimpleJob
       cron: 0/5 * * * * ?
       shardingTotalCount: 3
       shardingItemParameters: 0=Beijing,1=Shanghai,2=Guangzhou
     dataflowJob:
-      elasticJobClass: com.wl4g.rengine.client.collector.job.SpringBootDataflowJob
+      elasticJobClass: com.wl4g.rengine.client.collector.job.example.SpringBootDataflowJob
       cron: 0/5 * * * * ?
       shardingTotalCount: 3
       shardingItemParameters: 0=Beijing,1=Shanghai,2=Guangzhou
@@ -40,7 +40,7 @@ elasticjob:
       props:
         script.command.line: "echo Manual SCRIPT Job: "
     occurErrorNoticeDingtalkJob:
-      elasticJobClass: com.wl4g.rengine.client.collector.job.SpringBootOccurErrorNoticeDingtalkJob
+      elasticJobClass: com.wl4g.rengine.client.collector.job.example.SpringBootOccurErrorNoticeDingtalkJob
       overwrite: true
       shardingTotalCount: 3
       shardingItemParameters: 0=Beijing,1=Shanghai,2=Guangzhou
@@ -59,7 +59,7 @@ elasticjob:
           connectTimeout: 3000
           readTimeout: 5000
     occurErrorNoticeWechatJob:
-      elasticJobClass: com.wl4g.rengine.client.collector.job.SpringBootOccurErrorNoticeWechatJob
+      elasticJobClass: com.wl4g.rengine.client.collector.job.example.SpringBootOccurErrorNoticeWechatJob
       overwrite: true
       shardingTotalCount: 3
       shardingItemParameters: 0=Beijing,1=Shanghai,2=Guangzhou
@@ -76,7 +76,7 @@ elasticjob:
           connectTimeout: 3000
           readTimeout: 5000
     occurErrorNoticeEmailJob:
-      elasticJobClass: com.wl4g.rengine.client.collector.job.SpringBootOccurErrorNoticeEmailJob
+      elasticJobClass: com.wl4g.rengine.client.collector.job.example.SpringBootOccurErrorNoticeEmailJob
       overwrite: true
       shardingTotalCount: 3
       shardingItemParameters: 0=Beijing,1=Shanghai,2=Guangzhou

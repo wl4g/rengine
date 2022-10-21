@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.wl4g.rengine.client.collector.repository;
+package com.wl4g.elasticjob.example.repository;
 
 import java.util.ArrayList;
 import java.util.List;

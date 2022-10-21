@@ -13,38 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.client.collector.error;
-
-import java.util.Properties;
-
-import org.apache.shardingsphere.elasticjob.error.handler.JobErrorHandler;
-
-import lombok.extern.slf4j.Slf4j;
+package com.wl4g.rengine.client.collector.zookeeper;
 
 /**
- * {@link PrintJobErrorHandler}
+ * Start-up a local built-in single-instance Zookeeper server, which is only
+ * suitable for rapid deployment in local or test environments. Please configure
+ * an external Zookeeper cluster for production environments.
  * 
  * @author James Wong
- * @version 2022-10-20
+ * @version 2022-10-26
  * @since v3.0.0
  */
-@Slf4j
-public class PrintJobErrorHandler implements JobErrorHandler {
-
-    @Override
-    public String getType() {
-        return "PRINT";
-    }
-
-    @Override
-    public void init(Properties props) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void handleException(String jobName, Throwable cause) {
-        log.error("------------ Job Error Printing: ------------\n", cause);
-    }
+public class LocalZookeeperServer {
 
 }

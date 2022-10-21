@@ -13,23 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.client.collector.context;
+package com.wl4g.rengine.client.collector.error;
 
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
+import java.util.Properties;
+
+import org.apache.shardingsphere.elasticjob.error.handler.JobErrorHandler;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link CollectorApplicationInitializer}
+ * {@link LoggingJobErrorHandler}
  * 
  * @author James Wong
- * @version 2022-10-16
- * @since v1.0.0
+ * @version 2022-10-20
+ * @since v3.0.0
  */
-public class CollectorApplicationInitializer implements ApplicationRunner {
+@Slf4j
+public class LoggingJobErrorHandler implements JobErrorHandler {
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public String getType() {
+        return "PRINT";
+    }
+
+    @Override
+    public void init(Properties props) {
         // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void handleException(String jobName, Throwable cause) {
+        log.error("------------ Job Error Printing: ------------\n", cause);
     }
 
 }
