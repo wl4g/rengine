@@ -52,9 +52,10 @@ rengine:
       scrapeJobConfigs:
         - !PROMETHEUS
           name: node-exporter-job
-          eventType: WITH_PROMETHEUS
-          #eventAttributes: {}
-          disabled: false
+          #eventType: WITH_PROMETHEUS
+          #eventAttributes:
+          #  foo: bar
+          #disabled: false
           #overwrite: true
           #monitorExecution: true
           #failover: false
@@ -65,13 +66,14 @@ rengine:
           #shardingItemParameters: 0=Beijing,1=Shanghai
           #maxTimeDiffSeconds: -1
           #reconcileIntervalMinutes: 0
-          #description: The job that scrapes events remote over HTTP.
+          description: The job that scrapes events remote over HTTP.
           staticParams:
             - name: web-1
               url: http://localhost:9100/metrics
               method: GET
               headers:
-                Content-Type: "text/html,X-Foo=Bar"
+                Content-Type: "text/html"
+                X-Foo: Bar
               body: ""
               connectTimeoutMs: 3000
               readTimeoutMs: 5000

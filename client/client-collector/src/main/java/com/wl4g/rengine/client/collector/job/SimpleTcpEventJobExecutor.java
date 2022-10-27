@@ -50,8 +50,7 @@ public class SimpleTcpEventJobExecutor extends EventJobExecutor<SimpleTcpEventJo
 
     @Override
     protected EventJobType type() {
-        // TODO Auto-generated method stub
-        return null;
+        return EventJobType.SIMPLE_TCP;
     }
 
     @Override

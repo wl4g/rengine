@@ -52,8 +52,7 @@ public class SimpleRedisEventJobExecutor extends EventJobExecutor<SimpleRedisEve
 
     @Override
     protected EventJobType type() {
-        // TODO Auto-generated method stub
-        return null;
+        return EventJobType.SIMPLE_REDIS;
     }
 
     @Override

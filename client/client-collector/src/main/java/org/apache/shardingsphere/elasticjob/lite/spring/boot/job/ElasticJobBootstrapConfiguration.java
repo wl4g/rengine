@@ -183,7 +183,7 @@ public class ElasticJobBootstrapConfiguration implements SmartInitializingSingle
                     new OneOffJobBootstrap(registryCenter, scrapeConfig.getJobType().name(), jobConfig));
         } else {
             String beanName = !isBlank(jobBootstrapBeanName) ? jobBootstrapBeanName
-                    : jobConfig.getJobName() + "ScheduleJobBootstrap";
+                    : jobConfig.getJobName() + "-ScheduleJobBootstrap";
             singletonBeanRegistry.registerSingleton(beanName,
                     new ScheduleJobBootstrap(registryCenter, scrapeConfig.getJobType().name(), jobConfig));
         }

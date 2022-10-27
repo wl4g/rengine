@@ -40,13 +40,13 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class JobConfiguration {
 
-    private final String jobName;
+    private String jobName;
 
-    private final String cron;
+    private String cron;
 
-    private final String timeZone;
+    private String timeZone;
 
-    private final int shardingTotalCount;
+    private int shardingTotalCount;
 
     /**
      * Set mapper of sharding items and sharding parameters.
@@ -59,9 +59,9 @@ public final class JobConfiguration {
      * For example: 0=a,1=b,2=c
      * </p>
      */
-    private final String shardingItemParameters;
+    private String shardingItemParameters;
 
-    private final String jobParameter;
+    private String jobParameter;
 
     /**
      * Set enable or disable monitor execution.
@@ -75,11 +75,11 @@ public final class JobConfiguration {
      * guarantee fetch data exactly once.
      * </p>
      */
-    private final boolean monitorExecution;
+    private boolean monitorExecution;
 
-    private final boolean failover;
+    private boolean failover;
 
-    private final boolean misfire;
+    private boolean misfire;
 
     /**
      * Set max tolerate time different seconds between job server and registry
@@ -90,7 +90,7 @@ public final class JobConfiguration {
      * seconds. -1 means do not check.
      * </p>
      */
-    private final int maxTimeDiffSeconds;
+    private int maxTimeDiffSeconds;
 
     /**
      * Set reconcile interval minutes for job sharding status.
@@ -100,7 +100,7 @@ public final class JobConfiguration {
      * if incorrect.
      * </p>
      */
-    private final int reconcileIntervalMinutes;
+    private int reconcileIntervalMinutes;
 
     /**
      * Set job sharding strategy type.
@@ -109,27 +109,39 @@ public final class JobConfiguration {
      * Default for {@code AverageAllocationJobShardingStrategy}.
      * </p>
      */
-    private final String jobShardingStrategyType;
+    private String jobShardingStrategyType;
 
-    private final String jobExecutorServiceHandlerType;
+    private String jobExecutorServiceHandlerType;
 
-    private final String jobErrorHandlerType;
-
-    private final Collection<String> jobListenerTypes;
-
-    private final Collection<JobExtraConfiguration> extraConfigurations;
-
-    private final String description;
+    private String jobErrorHandlerType;
 
     //
     // [Begin] MODIFIY FEATURES.
     //
-    private final Properties props = new Properties();
+    private @Default Collection<String> jobListenerTypes = new ArrayList<>();
     //
     // [End] MODIFIY FEATURES.
     //
 
-    private final boolean disabled;
+    //
+    // [Begin] MODIFIY FEATURES.
+    //
+    private @Default Collection<JobExtraConfiguration> extraConfigurations = new ArrayList<>();
+    //
+    // [End] MODIFIY FEATURES.
+    //
+
+    private String description;
+
+    //
+    // [Begin] MODIFIY FEATURES.
+    //
+    private @Default Properties props = new Properties();
+    //
+    // [End] MODIFIY FEATURES.
+    //
+
+    private boolean disabled;
 
     /**
      * Set whether overwrite local configuration to registry center when job
@@ -139,11 +151,11 @@ public final class JobConfiguration {
      * If overwrite enabled, every startup will use local configuration.
      * </p>
      */
-    private final boolean overwrite;
+    private boolean overwrite;
 
-    private final String label;
+    private String label;
 
-    private final boolean staticSharding;
+    private boolean staticSharding;
 
     //
     // [Begin] ADD FEATURES.

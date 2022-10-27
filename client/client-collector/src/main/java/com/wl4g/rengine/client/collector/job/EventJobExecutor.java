@@ -17,6 +17,7 @@ package com.wl4g.rengine.client.collector.job;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
+import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.System.currentTimeMillis;
 
@@ -82,6 +83,7 @@ public abstract class EventJobExecutor<P extends EventJobExecutor.JobParamBase> 
 
     @Override
     public String getType() {
+        notNull(type(), "The event job type is not allowed to be empty and must be implemented. - ", this);
         return type().name();
     }
 

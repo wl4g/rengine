@@ -52,8 +52,7 @@ public class SimpleJdbcEventJobExecutor extends EventJobExecutor<SimpleJdbcEvent
 
     @Override
     protected EventJobType type() {
-        // TODO Auto-generated method stub
-        return null;
+        return EventJobType.SIMPLE_JDBC;
     }
 
     @Override
