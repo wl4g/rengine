@@ -43,6 +43,17 @@ public final class JobConfigurationPOJO {
 
     private String timeZone;
 
+    //
+    // [Begin] ADD FEATURES.
+    //
+    // When setup true, the shardingTotalCount will be ignored, and the will
+    // be automatically allocated according to the number of cluster nodes
+    // priority.
+    private boolean autoShardingTotalCount;
+    //
+    // [End] ADD FEATURES.
+    //
+
     private int shardingTotalCount;
 
     private String shardingItemParameters;
@@ -120,6 +131,16 @@ public final class JobConfigurationPOJO {
         //
         JobConfiguration result = JobConfiguration.builder()
                 .jobName(jobName)
+                //
+                // [Begin] ADD FEATURES.
+                //
+                // When setup true, the shardingTotalCount will be ignored, and
+                // the will be automatically allocated according to the number
+                // of cluster nodes priority.
+                .autoShardingTotalCount(autoShardingTotalCount)
+                //
+                // [End] ADD FEATURES.
+                //
                 .shardingTotalCount(shardingTotalCount)
                 .cron(cron)
                 .timeZone(timeZone)
@@ -164,6 +185,18 @@ public final class JobConfigurationPOJO {
         result.setJobName(jobConfiguration.getJobName());
         result.setCron(jobConfiguration.getCron());
         result.setTimeZone(jobConfiguration.getTimeZone());
+
+        //
+        // [Begin] ADD FEATURES.
+        //
+        // When setup true, the shardingTotalCount will be ignored, and
+        // the will be automatically allocated according to the number
+        // of cluster nodes priority.
+        result.setAutoShardingTotalCount(jobConfiguration.isAutoShardingTotalCount());
+        //
+        // [End] ADD FEATURES.
+        //
+
         result.setShardingTotalCount(jobConfiguration.getShardingTotalCount());
         result.setShardingItemParameters(jobConfiguration.getShardingItemParameters());
         result.setJobParameter(jobConfiguration.getJobParameter());

@@ -46,6 +46,17 @@ public final class JobConfiguration {
 
     private String timeZone;
 
+    //
+    // [Begin] ADD FEATURES.
+    //
+    // When setup true, the shardingTotalCount will be ignored, and the will
+    // be automatically allocated according to the number of cluster nodes
+    // priority.
+    private boolean autoShardingTotalCount;
+    //
+    // [End] ADD FEATURES.
+    //
+
     private int shardingTotalCount;
 
     /**

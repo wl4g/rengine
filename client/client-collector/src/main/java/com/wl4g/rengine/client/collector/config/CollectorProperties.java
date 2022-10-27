@@ -94,7 +94,6 @@ public class CollectorProperties implements InitializingBean {
         // Merge default configuration to scrape job configuration.
         safeList(getScrapeJobConfigs()).forEach(jobConf -> {
             try {
-
                 // if (isNull(jobConf.getName())) {
                 // jobConf.setName(defaultJobConf.getName());
                 // }
@@ -129,7 +128,13 @@ public class CollectorProperties implements InitializingBean {
                 if (isBlank(jobConf.getJobBootstrapBeanName())) {
                     jobConf.setJobBootstrapBeanName(defaultJobConf.getJobBootstrapBeanName());
                 }
-                if (nonNull(jobConf.getShardingTotalCount()) && jobConf.getShardingTotalCount() <= 0) {
+                // When setup true, the shardingTotalCount will be ignored, and
+                // the will be automatically allocated according to the number
+                // of cluster nodes priority.
+                if (isNull(jobConf.getAutoShardingTotalCount())) {
+                    jobConf.setAutoShardingTotalCount(defaultJobConf.getAutoShardingTotalCount());
+                }
+                if (isNull(jobConf.getShardingTotalCount()) || jobConf.getShardingTotalCount() <= 0) {
                     jobConf.setShardingTotalCount(defaultJobConf.getShardingTotalCount());
                 }
                 if (isBlank(jobConf.getShardingItemParameters())) {
@@ -138,10 +143,10 @@ public class CollectorProperties implements InitializingBean {
                 if (isBlank(jobConf.getJobParameter())) {
                     jobConf.setJobParameter(defaultJobConf.getJobParameter());
                 }
-                if (nonNull(jobConf.getMaxTimeDiffSeconds()) && jobConf.getMaxTimeDiffSeconds() <= 0) {
+                if (isNull(jobConf.getMaxTimeDiffSeconds()) || jobConf.getMaxTimeDiffSeconds() <= 0) {
                     jobConf.setMaxTimeDiffSeconds(defaultJobConf.getMaxTimeDiffSeconds());
                 }
-                if (nonNull(jobConf.getReconcileIntervalMinutes()) && jobConf.getReconcileIntervalMinutes() <= 0) {
+                if (isNull(jobConf.getReconcileIntervalMinutes()) || jobConf.getReconcileIntervalMinutes() <= 0) {
                     jobConf.setReconcileIntervalMinutes(defaultJobConf.getReconcileIntervalMinutes());
                 }
                 if (isBlank(jobConf.getJobShardingStrategyType())) {
@@ -294,7 +299,11 @@ public class CollectorProperties implements InitializingBean {
         private String cron;
         private String timeZone;
         private String jobBootstrapBeanName;
-        private Integer shardingTotalCount;
+        // When setup true, the shardingTotalCount will be ignored, and the will
+        // be automatically allocated according to the number of cluster nodes
+        // priority.
+        private Boolean autoShardingTotalCount;
+        private @Min(1) Integer shardingTotalCount;
         private String shardingItemParameters;
         private String jobParameter;
         private Integer maxTimeDiffSeconds;
@@ -317,8 +326,12 @@ public class CollectorProperties implements InitializingBean {
                     .monitorExecution(nonNull(monitorExecution) ? monitorExecution : true)
                     .failover(nonNull(failover) ? failover : true)
                     .misfire(nonNull(misfire) ? misfire : false)
-                    .cron(isBlank(cron) ? "0/5 * * * * ?" : cron)
+                    .cron(isBlank(cron) ? "0/10 * * * * ?" : cron)
                     .timeZone(timeZone)
+                    // When setup true, the shardingTotalCount will be ignored,
+                    // and the will be automatically allocated according to the
+                    // number of cluster nodes priority.
+                    .autoShardingTotalCount(nonNull(autoShardingTotalCount) ? autoShardingTotalCount : true)
                     .shardingTotalCount(nonNull(shardingTotalCount) ? shardingTotalCount : 1)
                     .shardingItemParameters(shardingItemParameters)
                     .jobParameter(jobParameter)
@@ -353,7 +366,11 @@ public class CollectorProperties implements InitializingBean {
             setCron("0/10 * * * * ?");
             setTimeZone("GMT+08:00");
             // setJobBootstrapBeanName(null);
-            // Should it be adaptive based on the number of cluster nodes?
+
+            // When setup true, the shardingTotalCount will be ignored,
+            // and the will be automatically allocated according to the
+            // number of cluster nodes priority.
+            setAutoShardingTotalCount(true);
             setShardingTotalCount(1);
             setShardingItemParameters("0=Beijing,1=Shanghai");
             // setJobParameter(null);

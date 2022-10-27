@@ -20,6 +20,7 @@ import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.System.currentTimeMillis;
+import static java.util.Objects.nonNull;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -35,6 +36,8 @@ import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
 import org.apache.shardingsphere.elasticjob.api.ShardingContext;
 import org.apache.shardingsphere.elasticjob.executor.JobFacade;
 import org.apache.shardingsphere.elasticjob.executor.item.impl.TypedJobItemExecutor;
+import org.apache.shardingsphere.elasticjob.lite.internal.storage.JobNodePath;
+import org.apache.shardingsphere.elasticjob.reg.base.CoordinatorRegistryCenter;
 
 import com.wl4g.infra.context.utils.SpringContextHolder;
 import com.wl4g.rengine.client.collector.config.CollectorProperties;
@@ -73,11 +76,14 @@ public abstract class EventJobExecutor<P extends EventJobExecutor.JobParamBase> 
 
     protected final CollectorProperties config;
 
+    protected final CoordinatorRegistryCenter regCenter;
+
     @SuppressWarnings("rawtypes")
     protected final Collection<RengineEventBusService> eventbusServices;
 
     public EventJobExecutor() {
         this.config = SpringContextHolder.getBean(CollectorProperties.class);
+        this.regCenter = SpringContextHolder.getBean(CoordinatorRegistryCenter.class);
         this.eventbusServices = safeMap(SpringContextHolder.getBeans(RengineEventBusService.class)).values();
     }
 
@@ -92,14 +98,14 @@ public abstract class EventJobExecutor<P extends EventJobExecutor.JobParamBase> 
     public void process(ElasticJob elasticJob, JobConfiguration jobConfig, JobFacade jobFacade, ShardingContext context) {
         log.info("ShardingContext: {}", toJSONString(context));
 
-        List<JobParamBase> shardingParams = new ArrayList<>();
-        List<? extends JobParamBase> params = safeList(jobConfig.getJobParams());
+        final int shardingTotalCount = determineShardingTotalCount(elasticJob, jobConfig, jobFacade, context);
+        final List<JobParamBase> shardingParams = new ArrayList<>();
+        final List<? extends JobParamBase> params = safeList(jobConfig.getJobParams());
         for (int i = 0; i < params.size(); i++) {
-            if (i % context.getShardingTotalCount() == context.getShardingItem()) {
+            if (i % shardingTotalCount == context.getShardingItem()) {
                 shardingParams.add(params.get(i));
             }
         }
-
         // The parallel execution jobs.
         shardingParams.parallelStream().forEach(p -> execute((P) p, jobConfig, jobFacade, context));
     }
@@ -135,6 +141,35 @@ public abstract class EventJobExecutor<P extends EventJobExecutor.JobParamBase> 
 
         // Offer to event-bus channel.
         safeList(eventbusServices).forEach(eventbus -> eventbus.publish(event));
+    }
+
+    protected int determineShardingTotalCount(
+            ElasticJob elasticJob,
+            JobConfiguration jobConfig,
+            JobFacade jobFacade,
+            ShardingContext context) {
+
+        // When setup true, the shardingTotalCount will be ignored, and the will
+        // be automatically allocated according to the number of cluster nodes
+        // priority.
+        if (!jobConfig.isAutoShardingTotalCount()) {
+            return jobConfig.getShardingTotalCount();
+        }
+
+        // It is dynamically calculated according to the number of cluster
+        // nodes.
+        /*
+         * Only the instance path indicates the current number of online nodes
+         * (temporary), and the service path indicates the cumulative number of
+         * online + offline nodes (permanent). for example:
+         * /rengine/node-exporter-job/instances => [10.0.0.114@-@195117]
+         */
+        List<String> serverNames = regCenter.getChildrenKeys(new JobNodePath(jobConfig.getJobName()).getInstancesNodePath());
+        int shardingTotalCount = (nonNull(serverNames) && serverNames.size() > 0) ? serverNames.size()
+                : jobConfig.getShardingTotalCount();
+
+        log.debug("Allocated the automatic dynamic shards by cluster nodes: {}", shardingTotalCount);
+        return shardingTotalCount;
     }
 
     protected abstract EventJobType type();

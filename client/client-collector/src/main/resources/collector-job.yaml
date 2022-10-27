@@ -46,6 +46,8 @@ rengine:
         timeZone: GMT+08:00
         maxTimeDiffSeconds: -1
         reconcileIntervalMinutes: 0
+        ## When setup true, the shardingTotalCount will be ignored, and the will be automatically allocated according to the number of cluster nodes priority.
+        autoShardingTotalCount: true
         shardingTotalCount: 1
         shardingItemParameters: 0=Beijing,1=Shanghai
         jobShardingStrategyType: ""
@@ -68,6 +70,8 @@ rengine:
           #timeZone: GMT+08:00
           #maxTimeDiffSeconds: -1
           #reconcileIntervalMinutes: 0
+          ### When setup true, the shardingTotalCount will be ignored, and the will be automatically allocated according to the number of cluster nodes priority.
+          #autoShardingTotalCount: true
           #shardingTotalCount: 1
           #shardingItemParameters: 0=Beijing,1=Shanghai
           #jobShardingStrategyType: ""

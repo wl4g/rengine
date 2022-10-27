@@ -43,6 +43,8 @@ import lombok.experimental.SuperBuilder;
 public class YamlPolymorphismTests {
 
     /**
+     * see:https://github1s.com/snakeyaml/snakeyaml/blob/master/src/test/java/org/yaml/snakeyaml/constructor/ImplicitTagsTest.java#L88-L89
+     * 
      * YAML examples:
      * 
      * <pre>
