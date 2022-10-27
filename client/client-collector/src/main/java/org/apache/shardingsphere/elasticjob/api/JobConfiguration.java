@@ -121,7 +121,13 @@ public final class JobConfiguration {
 
     private final String description;
 
-    private final Properties props;
+    //
+    // [Begin] MODIFIY FEATURES.
+    //
+    private final Properties props = new Properties();
+    //
+    // [End] MODIFIY FEATURES.
+    //
 
     private final boolean disabled;
 
@@ -142,7 +148,7 @@ public final class JobConfiguration {
     //
     // [Begin] ADD FEATURES.
     //
-    private @Default List<JobParamBase> staticParams = new ArrayList<>();
+    private @Default List<? extends JobParamBase> staticParams = new ArrayList<>();
     //
     // [End] ADD FEATURES.
     //

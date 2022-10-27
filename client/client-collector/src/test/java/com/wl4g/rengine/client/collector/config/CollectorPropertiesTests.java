@@ -47,12 +47,12 @@ public class CollectorPropertiesTests {
     public void testScrapeJobPropertiesPolymorphismUnmarshal() throws Exception {
         // @formatter:off
         String yaml = "scrapeJobConfigs:\n"
-                + "  - name: http-job\n"
-                + "    type: SIMPLE_HTTP\n"
+//                + "  - !SIMPLE_HTTP\n"
+                + "  - !PROMETHEUS\n"
+                + "    name: http-job\n"
                 + "    description: The job that scrapes events remote over HTTP.\n"
                 + "    staticParams:\n"
-                + "      - !SIMPLE_HTTP\n"
-                + "        name: instance-1\n"
+                + "      - name: instance-1\n"
                 + "        url: http://localhost:8080/event\n"
                 + "        method: GET\n"
                 + "        headers:\n"

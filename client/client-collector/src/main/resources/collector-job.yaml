@@ -32,7 +32,6 @@ rengine:
         enabled: true
         port: 9888
       defaultScrapeJobConfig:
-        type: PROMETHEUS
         ## The custom event type, which should correspond to Rengine manager, evaluator, jobs.
         eventType: WITH_PROMETHEUS
         ## The custom event attached properties such as labels for Prometheus scraping jobs.
@@ -51,11 +50,11 @@ rengine:
         reconcileIntervalMinutes: 0
         description: The job that scrapes events remote over HTTP/TCP/SSH/Redis/JDBC etc.
       scrapeJobConfigs:
-        - name: node-exporter-job
-          type: PROMETHEUS
-          #eventType: WITH_PROMETHEUS
+        - !PROMETHEUS
+          name: node-exporter-job
+          eventType: WITH_PROMETHEUS
           #eventAttributes: {}
-          #disabled: false
+          disabled: false
           #overwrite: true
           #monitorExecution: true
           #failover: false
@@ -68,16 +67,15 @@ rengine:
           #reconcileIntervalMinutes: 0
           #description: The job that scrapes events remote over HTTP.
           staticParams:
-            - !SIMPLE_HTTP
-              name: web-1
+            - name: web-1
               url: http://localhost:9100/metrics
               method: GET
-              headers: "Content-Type=text/html,X-Foo=Bar"
+              headers:
+                Content-Type: "text/html,X-Foo=Bar"
               body: ""
               connectTimeoutMs: 3000
               readTimeoutMs: 5000
-            - !SIMPLE_HTTP
-              name: web-2
+            - name: web-2
               url: http://localhost:9100/metrics
             - name: sink-1
               url: http://localhost:9100/metrics
@@ -103,8 +101,8 @@ rengine:
               url: http://localhost:9100/metrics
             - name: emr-worker-3
               url: http://localhost:9100/metrics
-        - name: zookeeper-jmx-job
-          type: PROMETHEUS
+        - !PROMETHEUS
+          name: zookeeper-jmx-job
           staticParams:
             - name: zookeeper-exporter-1
               url: http://localhost:12181/metrics
@@ -112,8 +110,8 @@ rengine:
               url: http://localhost:12181/metrics
             - name: zookeeper-exporter-3
               url: http://localhost:12181/metrics
-        - name: kafka-jmx-job
-          type: PROMETHEUS
+        - !PROMETHEUS
+          name: kafka-jmx-job
           staticParams:
             - name: kafka-exporter-1
               url: http://localhost:10108/metrics
@@ -121,8 +119,8 @@ rengine:
               url: http://localhost:10108/metrics
             - name: kafka-exporter-3
               url: http://localhost:10108/metrics
-        - name: hbase-jmx-job
-          type: PROMETHEUS
+        - !PROMETHEUS
+          name: hbase-jmx-job
           staticParams:
             - name: hbase-master-1
               url: http://localhost:10106/metrics
@@ -134,8 +132,8 @@ rengine:
               url: http://localhost:10106/metrics
             - name: hbase-regionsever-3
               url: http://localhost:10106/metrics
-        - name: hdfs-jmx-job
-          type: PROMETHEUS
+        - !PROMETHEUS
+          name: hdfs-jmx-job
           staticParams:
             - name: hdfs-namenode-1
               url: http://localhost:10107/metrics
@@ -147,8 +145,8 @@ rengine:
               url: http://localhost:10107/metrics
             - name: hdfs-datanode-3
               url: http://localhost:10107/metrics
-        - name: yarn-jmx-job
-          type: PROMETHEUS
+        - !PROMETHEUS
+          name: yarn-jmx-job
           staticParams:
             - name: yarn-resourcemanager-1
               url: http://localhost:10107/metrics
@@ -160,13 +158,13 @@ rengine:
               url: http://localhost:10107/metrics
             - name: yarn-nodemanager-3
               url: http://localhost:10107/metrics
-        - name: redis-exporter-job
-          type: PROMETHEUS
-          props:
+        - !PROMETHEUS
+          name: redis-exporter-job
+          staticParams:
             - name: redis-exporter-1
               url: http://localhost:9121/metrics
-        - name: mysqld-exporter-job
-          type: PROMETHEUS
+        - !PROMETHEUS
+          name: mysqld-exporter-job
           staticParams:
             - name: mysql-exporter-1
               url: http://localhost:9104/metrics
@@ -174,15 +172,15 @@ rengine:
               url: http://localhost:9104/metrics
             - name: mysql-exporter-3
               url: http://localhost:9104/metrics
-        - name: haproxy-job
-          type: PROMETHEUS
+        - !PROMETHEUS
+          name: haproxy-job
           staticParams:
             - name: haproxy-1
               url: http://localhost:8404/metrics
             - name: haproxy-2
               url: http://localhost:8404/metrics
-        - name: minio-job
-          type: PROMETHEUS
+        - !PROMETHEUS
+          name: minio-job
           staticParams:
             - name: minio-1
               url: http://localhost:9000/metrics
@@ -190,8 +188,8 @@ rengine:
               url: http://localhost:9000/metrics
             - name: minio-3
               url: http://localhost:9000/metrics
-        - name: ssh-job
-          type: SSH
+        - !SSH
+          name: ssh-job
           staticParams:
             - name: web-1
               ## Detecting whether the SSH tunnel is reachable.

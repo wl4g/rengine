@@ -40,6 +40,11 @@ import org.springframework.beans.factory.InitializingBean;
 
 import com.wl4g.rengine.client.collector.job.EventJobExecutor.EventJobType;
 import com.wl4g.rengine.client.collector.job.EventJobExecutor.JobParamBase;
+import com.wl4g.rengine.client.collector.job.SSHEventJobExecutor.SSHJobParam;
+import com.wl4g.rengine.client.collector.job.SimpleHttpEventJobExecutor.SimpleHttpJobParam;
+import com.wl4g.rengine.client.collector.job.SimpleJdbcEventJobExecutor.SimpleJdbcJobParam;
+import com.wl4g.rengine.client.collector.job.SimpleRedisEventJobExecutor.SimpleRedisJobParam;
+import com.wl4g.rengine.client.collector.job.SimpleTcpEventJobExecutor.SimpleTcpJobParam;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -66,7 +71,19 @@ public class CollectorProperties implements InitializingBean {
 
     private SnapshotDumpProperties dump = new SnapshotDumpProperties();
 
-    private ScrapeJobProperties defaultScrapeJobConfig = new ScrapeJobProperties();
+    private ScrapeJobProperties defaultScrapeJobConfig = new ScrapeJobProperties() {
+        @Override
+        public EventJobType getJobType() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public List<? extends JobParamBase> getStaticJobParams() {
+            // Ignore, see: MARK1
+            throw new UnsupportedOperationException();
+        }
+
+    };
 
     private List<ScrapeJobProperties> scrapeJobConfigs = new ArrayList<>();
 
@@ -83,9 +100,6 @@ public class CollectorProperties implements InitializingBean {
             // if (isNull(jobConf.getName())) {
             // jobConf.setName(defaultJobConf.getName());
             // }
-            if (isNull(jobConf.getType())) {
-                jobConf.setType(defaultJobConf.getType());
-            }
             if (isBlank(jobConf.getEventType())) {
                 jobConf.setEventType(defaultJobConf.getEventType());
             }
@@ -152,8 +166,11 @@ public class CollectorProperties implements InitializingBean {
             cloneAttributes.putAll(jobConf.getEventAttributes());
             jobConf.setEventAttributes(cloneAttributes);
 
-            // Merge static job parameters.
-            jobConf.setStaticParams(defaultJobConf.getStaticParams());
+            // [MARK1]
+            // TODO Notice: It is temporarily considered unnecessary to merge
+            // the job parameter configuration, and then it can be determined
+            // whether it needs to be implemented according to the actual needs.
+            // jobConf.setStaticParams(defaultJobConf.getStaticParams());
         });
     }
 
@@ -247,9 +264,8 @@ public class CollectorProperties implements InitializingBean {
     @Setter
     @ToString
     @NoArgsConstructor
-    public static class ScrapeJobProperties {
+    public abstract static class ScrapeJobProperties {
         private String name;
-        private EventJobType type = EventJobType.PROMETHEUS;
 
         // private Class<? extends ElasticJob> elasticJobClass;
 
@@ -283,12 +299,9 @@ public class CollectorProperties implements InitializingBean {
         private Collection<String> jobListenerTypes = new LinkedList<>();
         private String description = "The job that scrapes events remote over HTTP/TCP/SSH/Redis/JDBC etc.";
 
-        // TODO spring yaml 多态配置实现
+        public abstract EventJobType getJobType();
 
-        /**
-         * Feature the static scrape job parameters.
-         */
-        private List<JobParamBase> staticParams = new ArrayList<>();
+        public abstract List<? extends JobParamBase> getStaticJobParams();
 
         public JobConfiguration toJobConfiguration(final String jobName) {
             JobConfiguration result = JobConfiguration.builder()
@@ -310,10 +323,121 @@ public class CollectorProperties implements InitializingBean {
                     .jobErrorHandlerType(jobErrorHandlerType)
                     .jobListenerTypes(jobListenerTypes)
                     .description(description)
-                    .staticParams(staticParams)
+                    .staticParams(getStaticJobParams())
                     .build();
             safeMap(eventAttributes).forEach((key, value) -> result.getProps().setProperty(key, value));
             return result;
+        }
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    @NoArgsConstructor
+    public static class SimpleHttpScrapeJobProperties extends ScrapeJobProperties {
+
+        /**
+         * Feature the static scrape job parameters.
+         */
+        private List<SimpleHttpJobParam> staticParams = new ArrayList<>();
+
+        @Override
+        public EventJobType getJobType() {
+            return EventJobType.SIMPLE_HTTP;
+        }
+
+        @Override
+        public List<SimpleHttpJobParam> getStaticJobParams() {
+            return staticParams;
+        }
+
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    @NoArgsConstructor
+    public static class SimpleJdbcScrapeJobProperties extends ScrapeJobProperties {
+
+        /**
+         * Feature the static scrape job parameters.
+         */
+        private List<SimpleJdbcJobParam> staticParams = new ArrayList<>();
+
+        @Override
+        public EventJobType getJobType() {
+            return EventJobType.SIMPLE_JDBC;
+        }
+
+        @Override
+        public List<SimpleJdbcJobParam> getStaticJobParams() {
+            return staticParams;
+        }
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    @NoArgsConstructor
+    public static class SimpleRedisScrapeJobProperties extends ScrapeJobProperties {
+
+        /**
+         * Feature the static scrape job parameters.
+         */
+        private List<SimpleRedisJobParam> staticParams = new ArrayList<>();
+
+        @Override
+        public EventJobType getJobType() {
+            return EventJobType.SIMPLE_REDIS;
+        }
+
+        @Override
+        public List<SimpleRedisJobParam> getStaticJobParams() {
+            return staticParams;
+        }
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    @NoArgsConstructor
+    public static class SimpleTcpScrapeJobProperties extends ScrapeJobProperties {
+
+        /**
+         * Feature the static scrape job parameters.
+         */
+        private List<SimpleTcpJobParam> staticParams = new ArrayList<>();
+
+        @Override
+        public EventJobType getJobType() {
+            return EventJobType.SIMPLE_TCP;
+        }
+
+        @Override
+        public List<SimpleTcpJobParam> getStaticJobParams() {
+            return staticParams;
+        }
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    @NoArgsConstructor
+    public static class SSHScrapeJobProperties extends ScrapeJobProperties {
+
+        /**
+         * Feature the static scrape job parameters.
+         */
+        private List<SSHJobParam> staticParams = new ArrayList<>();
+
+        @Override
+        public EventJobType getJobType() {
+            return EventJobType.SSH;
+        }
+
+        @Override
+        public List<SSHJobParam> getStaticJobParams() {
+            return staticParams;
         }
     }
 

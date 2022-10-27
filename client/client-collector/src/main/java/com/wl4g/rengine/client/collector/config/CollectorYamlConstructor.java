@@ -15,12 +15,10 @@
  */
 package com.wl4g.rengine.client.collector.config;
 
-import static java.util.Objects.nonNull;
-
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 
 import org.yaml.snakeyaml.TypeDescription;
+import org.yaml.snakeyaml.constructor.BaseConstructor;
 import org.yaml.snakeyaml.constructor.Constructor;
 
 import com.wl4g.rengine.client.collector.job.EventJobExecutor.EventJobType;
@@ -35,16 +33,16 @@ import com.wl4g.rengine.client.collector.job.EventJobExecutor.EventJobType;
 public class CollectorYamlConstructor extends Constructor {
 
     public CollectorYamlConstructor() {
+        configure(this);
+    }
+
+    public static void configure(BaseConstructor constructor) {
+        notNullOf(constructor, "constructor");
         for (EventJobType type : EventJobType.values()) {
-            // TODO 处理 prometheusEventJobExecutor 这种父类无泛型
-            Type genericSuperclass = type.getJobClass().getGenericSuperclass();
-            if (genericSuperclass instanceof ParameterizedType) {
-                Type[] types = ((ParameterizedType) genericSuperclass).getActualTypeArguments();
-                if (nonNull(types) && types.length > 0) {
-                    Class<?> jobParamClass = (Class<?>) types[0];
-                    addTypeDescription(new TypeDescription(jobParamClass, "!".concat(type.name())));
-                }
-            }
+            // TODO Notice: For example, PrometheusEventJobExecutor inherits the
+            // SimpleHttpEventJobExecutor and is temporarily treated as the
+            // latter class.
+            constructor.addTypeDescription(new TypeDescription(type.getJobConfigClass(), "!".concat(type.name())));
         }
     }
 

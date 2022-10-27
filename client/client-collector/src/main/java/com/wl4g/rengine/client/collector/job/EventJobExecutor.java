@@ -37,6 +37,12 @@ import org.apache.shardingsphere.elasticjob.executor.item.impl.TypedJobItemExecu
 
 import com.wl4g.infra.context.utils.SpringContextHolder;
 import com.wl4g.rengine.client.collector.config.CollectorProperties;
+import com.wl4g.rengine.client.collector.config.CollectorProperties.SSHScrapeJobProperties;
+import com.wl4g.rengine.client.collector.config.CollectorProperties.ScrapeJobProperties;
+import com.wl4g.rengine.client.collector.config.CollectorProperties.SimpleHttpScrapeJobProperties;
+import com.wl4g.rengine.client.collector.config.CollectorProperties.SimpleJdbcScrapeJobProperties;
+import com.wl4g.rengine.client.collector.config.CollectorProperties.SimpleRedisScrapeJobProperties;
+import com.wl4g.rengine.client.collector.config.CollectorProperties.SimpleTcpScrapeJobProperties;
 import com.wl4g.rengine.client.eventbus.RengineEventBusService;
 import com.wl4g.rengine.common.event.RengineEvent;
 import com.wl4g.rengine.common.event.RengineEvent.EventLocation;
@@ -85,7 +91,7 @@ public abstract class EventJobExecutor<P extends EventJobExecutor.JobParamBase> 
         log.info("ShardingContext: {}", toJSONString(context));
 
         List<JobParamBase> shardingParams = new ArrayList<>();
-        List<JobParamBase> params = safeList(jobConfig.getStaticParams());
+        List<? extends JobParamBase> params = safeList(jobConfig.getStaticParams());
         for (int i = 0; i < params.size(); i++) {
             if (i % context.getShardingTotalCount() == context.getShardingItem()) {
                 shardingParams.add(params.get(i));
@@ -173,18 +179,22 @@ public abstract class EventJobExecutor<P extends EventJobExecutor.JobParamBase> 
     @AllArgsConstructor
     public static enum EventJobType {
 
-        SIMPLE_HTTP(SimpleHttpEventJobExecutor.class),
+        SIMPLE_HTTP(SimpleHttpScrapeJobProperties.class, SimpleHttpEventJobExecutor.class),
 
-        PROMETHEUS(PrometheusEventJobExecutor.class),
+        // TODO Notice: For example, PrometheusEventJobExecutor inherits the
+        // SimpleHttpEventJobExecutor and is temporarily treated as the
+        // latter class.
+        PROMETHEUS(SimpleHttpScrapeJobProperties.class, PrometheusEventJobExecutor.class),
 
-        SIMPLE_JDBC(SimpleJdbcEventJobExecutor.class),
+        SIMPLE_JDBC(SimpleJdbcScrapeJobProperties.class, SimpleJdbcEventJobExecutor.class),
 
-        SIMPLE_REDIS(SimpleRedisEventJobExecutor.class),
+        SIMPLE_REDIS(SimpleRedisScrapeJobProperties.class, SimpleRedisEventJobExecutor.class),
 
-        SIMPLE_TCP(SimpleTcpEventJobExecutor.class),
+        SIMPLE_TCP(SimpleTcpScrapeJobProperties.class, SimpleTcpEventJobExecutor.class),
 
-        SSH(SSHEventJobExecutor.class);
+        SSH(SSHScrapeJobProperties.class, SSHEventJobExecutor.class);
 
+        private final Class<? extends ScrapeJobProperties> jobConfigClass;
         private final Class<? extends EventJobExecutor<? extends JobParamBase>> jobClass;
     }
 
