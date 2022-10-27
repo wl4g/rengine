@@ -118,6 +118,7 @@ public final class JobConfiguration {
     //
     // [Begin] MODIFIY FEATURES.
     //
+    // private Collection<String> jobListenerTypes ;
     private @Default Collection<String> jobListenerTypes = new ArrayList<>();
     //
     // [End] MODIFIY FEATURES.
@@ -126,6 +127,7 @@ public final class JobConfiguration {
     //
     // [Begin] MODIFIY FEATURES.
     //
+    // private Collection<JobExtraConfiguration> extraConfigurations;
     private @Default Collection<JobExtraConfiguration> extraConfigurations = new ArrayList<>();
     //
     // [End] MODIFIY FEATURES.
@@ -136,6 +138,7 @@ public final class JobConfiguration {
     //
     // [Begin] MODIFIY FEATURES.
     //
+    // private Properties props;
     private @Default Properties props = new Properties();
     //
     // [End] MODIFIY FEATURES.
@@ -160,7 +163,7 @@ public final class JobConfiguration {
     //
     // [Begin] ADD FEATURES.
     //
-    private @Default List<? extends JobParamBase> staticParams = new ArrayList<>();
+    private @Default List<? extends JobParamBase> jobParams = new ArrayList<>();
     //
     // [End] ADD FEATURES.
     //

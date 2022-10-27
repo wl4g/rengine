@@ -18,6 +18,7 @@ package com.wl4g.rengine.client.collector.config;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -31,12 +32,14 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nullable;
+import javax.validation.Validator;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
 import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
 import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperConfiguration;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.wl4g.rengine.client.collector.job.EventJobExecutor.EventJobType;
 import com.wl4g.rengine.client.collector.job.EventJobExecutor.JobParamBase;
@@ -50,6 +53,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * {@link CollectorProperties}
@@ -61,9 +65,12 @@ import lombok.ToString;
  */
 @Getter
 @Setter
+@Slf4j
 @ToString
 @NoArgsConstructor
 public class CollectorProperties implements InitializingBean {
+
+    private @Autowired Validator validator;
 
     private ZookeeperProperties zookeeper = new ZookeeperProperties();
 
@@ -71,25 +78,14 @@ public class CollectorProperties implements InitializingBean {
 
     private SnapshotDumpProperties dump = new SnapshotDumpProperties();
 
-    private ScrapeJobProperties defaultScrapeJobConfig = new ScrapeJobProperties() {
-        @Override
-        public EventJobType getJobType() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public List<? extends JobParamBase> getStaticJobParams() {
-            // Ignore, see: MARK1
-            throw new UnsupportedOperationException();
-        }
-
-    };
+    private DefaultScrapeJobProperties defaultScrapeJobConfig = new DefaultScrapeJobProperties();
 
     private List<ScrapeJobProperties> scrapeJobConfigs = new ArrayList<>();
 
     @Override
     public void afterPropertiesSet() throws Exception {
         applyDefaultToProperties();
+        validator.validate(this);
     }
 
     public void applyDefaultToProperties() {
@@ -97,80 +93,90 @@ public class CollectorProperties implements InitializingBean {
 
         // Merge default configuration to scrape job configuration.
         safeList(getScrapeJobConfigs()).forEach(jobConf -> {
-            // if (isNull(jobConf.getName())) {
-            // jobConf.setName(defaultJobConf.getName());
-            // }
-            if (isBlank(jobConf.getEventType())) {
-                jobConf.setEventType(defaultJobConf.getEventType());
-            }
-            // if (isNull(jobConf.getElasticJobClass())) {
-            // jobConf.setElasticJobClass(defaultJobConf.getElasticJobClass());
-            // }
-            if (isNull(jobConf.getDisabled())) {
-                jobConf.setDisabled(defaultJobConf.getDisabled());
-            }
-            if (isNull(jobConf.getOverwrite())) {
-                jobConf.setOverwrite(defaultJobConf.getOverwrite());
-            }
-            if (isNull(jobConf.getMonitorExecution())) {
-                jobConf.setMonitorExecution(defaultJobConf.getMonitorExecution());
-            }
-            if (isNull(jobConf.getFailover())) {
-                jobConf.setFailover(defaultJobConf.getFailover());
-            }
-            if (isNull(jobConf.getMisfire())) {
-                jobConf.setMisfire(defaultJobConf.getMisfire());
-            }
-            // Merge event job configuration properties.
-            if (isBlank(jobConf.getCron())) {
-                jobConf.setCron(defaultJobConf.getCron());
-            }
-            if (isBlank(jobConf.getTimeZone())) {
-                jobConf.setTimeZone(defaultJobConf.getTimeZone());
-            }
-            if (isBlank(jobConf.getJobBootstrapBeanName())) {
-                jobConf.setJobBootstrapBeanName(defaultJobConf.getJobBootstrapBeanName());
-            }
-            if (jobConf.getShardingTotalCount() <= 0) {
-                jobConf.setShardingTotalCount(defaultJobConf.getShardingTotalCount());
-            }
-            if (isBlank(jobConf.getShardingItemParameters())) {
-                jobConf.setShardingItemParameters(defaultJobConf.getShardingItemParameters());
-            }
-            if (isBlank(jobConf.getJobParameter())) {
-                jobConf.setJobParameter(defaultJobConf.getJobParameter());
-            }
-            if (jobConf.getMaxTimeDiffSeconds() <= 0) {
-                jobConf.setMaxTimeDiffSeconds(defaultJobConf.getMaxTimeDiffSeconds());
-            }
-            if (jobConf.getReconcileIntervalMinutes() <= 0) {
-                jobConf.setReconcileIntervalMinutes(defaultJobConf.getReconcileIntervalMinutes());
-            }
-            if (isBlank(jobConf.getJobShardingStrategyType())) {
-                jobConf.setJobShardingStrategyType(defaultJobConf.getJobShardingStrategyType());
-            }
-            if (isBlank(jobConf.getJobExecutorServiceHandlerType())) {
-                jobConf.setJobExecutorServiceHandlerType(defaultJobConf.getJobExecutorServiceHandlerType());
-            }
-            if (isBlank(jobConf.getJobErrorHandlerType())) {
-                jobConf.setJobErrorHandlerType(defaultJobConf.getJobErrorHandlerType());
-            }
-            if (isEmpty(jobConf.getJobListenerTypes())) {
-                jobConf.setJobListenerTypes(defaultJobConf.getJobListenerTypes());
-            }
-            if (isBlank(jobConf.getDescription())) {
-                jobConf.setDescription(defaultJobConf.getDescription());
-            }
-            // Merge event job extra attributes.
-            Map<String, String> cloneAttributes = new HashMap<>(defaultJobConf.getEventAttributes());
-            cloneAttributes.putAll(jobConf.getEventAttributes());
-            jobConf.setEventAttributes(cloneAttributes);
+            try {
 
-            // [MARK1]
-            // TODO Notice: It is temporarily considered unnecessary to merge
-            // the job parameter configuration, and then it can be determined
-            // whether it needs to be implemented according to the actual needs.
-            // jobConf.setStaticParams(defaultJobConf.getStaticParams());
+                // if (isNull(jobConf.getName())) {
+                // jobConf.setName(defaultJobConf.getName());
+                // }
+                if (isBlank(jobConf.getEventType())) {
+                    jobConf.setEventType(defaultJobConf.getEventType());
+                }
+                // if (isNull(jobConf.getElasticJobClass())) {
+                // jobConf.setElasticJobClass(defaultJobConf.getElasticJobClass());
+                // }
+                if (isNull(jobConf.getDisabled())) {
+                    jobConf.setDisabled(defaultJobConf.getDisabled());
+                }
+                if (isNull(jobConf.getOverwrite())) {
+                    jobConf.setOverwrite(defaultJobConf.getOverwrite());
+                }
+                if (isNull(jobConf.getMonitorExecution())) {
+                    jobConf.setMonitorExecution(defaultJobConf.getMonitorExecution());
+                }
+                if (isNull(jobConf.getFailover())) {
+                    jobConf.setFailover(defaultJobConf.getFailover());
+                }
+                if (isNull(jobConf.getMisfire())) {
+                    jobConf.setMisfire(defaultJobConf.getMisfire());
+                }
+                // Merge event job configuration properties.
+                if (isBlank(jobConf.getCron())) {
+                    jobConf.setCron(defaultJobConf.getCron());
+                }
+                if (isBlank(jobConf.getTimeZone())) {
+                    jobConf.setTimeZone(defaultJobConf.getTimeZone());
+                }
+                if (isBlank(jobConf.getJobBootstrapBeanName())) {
+                    jobConf.setJobBootstrapBeanName(defaultJobConf.getJobBootstrapBeanName());
+                }
+                if (nonNull(jobConf.getShardingTotalCount()) && jobConf.getShardingTotalCount() <= 0) {
+                    jobConf.setShardingTotalCount(defaultJobConf.getShardingTotalCount());
+                }
+                if (isBlank(jobConf.getShardingItemParameters())) {
+                    jobConf.setShardingItemParameters(defaultJobConf.getShardingItemParameters());
+                }
+                if (isBlank(jobConf.getJobParameter())) {
+                    jobConf.setJobParameter(defaultJobConf.getJobParameter());
+                }
+                if (nonNull(jobConf.getMaxTimeDiffSeconds()) && jobConf.getMaxTimeDiffSeconds() <= 0) {
+                    jobConf.setMaxTimeDiffSeconds(defaultJobConf.getMaxTimeDiffSeconds());
+                }
+                if (nonNull(jobConf.getReconcileIntervalMinutes()) && jobConf.getReconcileIntervalMinutes() <= 0) {
+                    jobConf.setReconcileIntervalMinutes(defaultJobConf.getReconcileIntervalMinutes());
+                }
+                if (isBlank(jobConf.getJobShardingStrategyType())) {
+                    jobConf.setJobShardingStrategyType(defaultJobConf.getJobShardingStrategyType());
+                }
+                if (isBlank(jobConf.getJobExecutorServiceHandlerType())) {
+                    jobConf.setJobExecutorServiceHandlerType(defaultJobConf.getJobExecutorServiceHandlerType());
+                }
+                if (isBlank(jobConf.getJobErrorHandlerType())) {
+                    jobConf.setJobErrorHandlerType(defaultJobConf.getJobErrorHandlerType());
+                }
+                if (isEmpty(jobConf.getJobListenerTypes())) {
+                    jobConf.setJobListenerTypes(defaultJobConf.getJobListenerTypes());
+                }
+                if (isBlank(jobConf.getDescription())) {
+                    jobConf.setDescription(defaultJobConf.getDescription());
+                }
+                // Merge event job extra attributes.
+                Map<String, String> cloneAttributes = new HashMap<>(defaultJobConf.getEventAttributes());
+                cloneAttributes.putAll(jobConf.getEventAttributes());
+                jobConf.setEventAttributes(cloneAttributes);
+
+                // [MARK1]
+                // TODO Notice: It is temporarily considered unnecessary to
+                // merge
+                // the job parameter configuration, and then it can be
+                // determined
+                // whether it needs to be implemented according to the actual
+                // needs.
+                // jobConf.setJobParams(defaultJobConf.getJobParams());
+
+            } catch (Exception e) {
+                log.error("Failed to merge default properties to job configuration.", e);
+                throw e;
+            }
         });
     }
 
@@ -273,26 +279,26 @@ public class CollectorProperties implements InitializingBean {
          * The custom event type, which should correspond to Rengine manager,
          * evaluator, jobs.
          */
-        private @NotBlank String eventType = "WITH_HTTP";
+        private @NotBlank String eventType;
 
         /**
          * The custom event attached properties such as labels for Prometheus
          * scraping jobs.
          */
         private @Nullable Map<String, String> eventAttributes = new HashMap<>();
-        private Boolean disabled = false;
-        private Boolean overwrite = true;
-        private Boolean monitorExecution = true;
-        private Boolean failover = false;
-        private Boolean misfire = false;
-        private String cron = "0/5 * * * * ?";
-        private String timeZone = "GMT+08:00";
+        private Boolean disabled;
+        private Boolean overwrite;
+        private Boolean monitorExecution;
+        private Boolean failover;
+        private Boolean misfire;
+        private String cron;
+        private String timeZone;
         private String jobBootstrapBeanName;
-        private int shardingTotalCount = 1;
-        private String shardingItemParameters = "0=Beijing,1=Shanghai";
+        private Integer shardingTotalCount;
+        private String shardingItemParameters;
         private String jobParameter;
-        private int maxTimeDiffSeconds = -1;
-        private int reconcileIntervalMinutes;
+        private Integer maxTimeDiffSeconds;
+        private Integer reconcileIntervalMinutes;
         private String jobShardingStrategyType;
         private String jobExecutorServiceHandlerType;
         private String jobErrorHandlerType;
@@ -301,33 +307,76 @@ public class CollectorProperties implements InitializingBean {
 
         public abstract EventJobType getJobType();
 
-        public abstract List<? extends JobParamBase> getStaticJobParams();
+        public abstract List<? extends JobParamBase> getJobParams();
 
         public JobConfiguration toJobConfiguration(final String jobName) {
             JobConfiguration result = JobConfiguration.builder()
                     .jobName(jobName)
-                    .disabled(disabled)
-                    .overwrite(overwrite)
-                    .monitorExecution(monitorExecution)
-                    .failover(failover)
-                    .cron(cron)
+                    .disabled(nonNull(disabled) ? disabled : false)
+                    .overwrite(nonNull(overwrite) ? overwrite : true)
+                    .monitorExecution(nonNull(monitorExecution) ? monitorExecution : true)
+                    .failover(nonNull(failover) ? failover : true)
+                    .misfire(nonNull(misfire) ? misfire : false)
+                    .cron(isBlank(cron) ? "0/5 * * * * ?" : cron)
                     .timeZone(timeZone)
-                    .shardingTotalCount(shardingTotalCount)
+                    .shardingTotalCount(nonNull(shardingTotalCount) ? shardingTotalCount : 1)
                     .shardingItemParameters(shardingItemParameters)
                     .jobParameter(jobParameter)
-                    .misfire(misfire)
-                    .maxTimeDiffSeconds(maxTimeDiffSeconds)
-                    .reconcileIntervalMinutes(reconcileIntervalMinutes)
+                    .maxTimeDiffSeconds(nonNull(maxTimeDiffSeconds) ? maxTimeDiffSeconds : -1)
+                    .reconcileIntervalMinutes(nonNull(reconcileIntervalMinutes) ? reconcileIntervalMinutes : 0)
                     .jobShardingStrategyType(jobShardingStrategyType)
                     .jobExecutorServiceHandlerType(jobExecutorServiceHandlerType)
                     .jobErrorHandlerType(jobErrorHandlerType)
                     .jobListenerTypes(jobListenerTypes)
                     .description(description)
-                    .staticParams(getStaticJobParams())
+                    .jobParams(getJobParams())
                     .build();
             safeMap(eventAttributes).forEach((key, value) -> result.getProps().setProperty(key, value));
             return result;
         }
+
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    public static class DefaultScrapeJobProperties extends ScrapeJobProperties {
+
+        public DefaultScrapeJobProperties() {
+            setEventType("WITH_HTTP");
+            // setEventAttributes(emptyMap());
+            setDisabled(false);
+            setOverwrite(true);
+            setMonitorExecution(true);
+            setFailover(true);
+            setMisfire(false);
+            setCron("0/10 * * * * ?");
+            setTimeZone("GMT+08:00");
+            // setJobBootstrapBeanName(null);
+            // Should it be adaptive based on the number of cluster nodes?
+            setShardingTotalCount(1);
+            setShardingItemParameters("0=Beijing,1=Shanghai");
+            // setJobParameter(null);
+            setMaxTimeDiffSeconds(-1);
+            setReconcileIntervalMinutes(0);
+            setJobShardingStrategyType(null);
+            setJobExecutorServiceHandlerType(null);
+            setJobErrorHandlerType(null);
+            // setJobListenerTypes(emptyList());
+            setDescription("The job that scrapes events remote over HTTP/TCP/SSH/Redis/JDBC etc.");
+        }
+
+        @Override
+        public EventJobType getJobType() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public List<? extends JobParamBase> getJobParams() {
+            // Ignore, see: MARK1
+            throw new UnsupportedOperationException();
+        }
+
     }
 
     @Getter
@@ -339,7 +388,7 @@ public class CollectorProperties implements InitializingBean {
         /**
          * Feature the static scrape job parameters.
          */
-        private List<SimpleHttpJobParam> staticParams = new ArrayList<>();
+        private List<SimpleHttpJobParam> jobParams = new ArrayList<>();
 
         @Override
         public EventJobType getJobType() {
@@ -347,8 +396,8 @@ public class CollectorProperties implements InitializingBean {
         }
 
         @Override
-        public List<SimpleHttpJobParam> getStaticJobParams() {
-            return staticParams;
+        public List<SimpleHttpJobParam> getJobParams() {
+            return jobParams;
         }
 
     }
@@ -362,7 +411,7 @@ public class CollectorProperties implements InitializingBean {
         /**
          * Feature the static scrape job parameters.
          */
-        private List<SimpleJdbcJobParam> staticParams = new ArrayList<>();
+        private List<SimpleJdbcJobParam> jobParams = new ArrayList<>();
 
         @Override
         public EventJobType getJobType() {
@@ -370,8 +419,8 @@ public class CollectorProperties implements InitializingBean {
         }
 
         @Override
-        public List<SimpleJdbcJobParam> getStaticJobParams() {
-            return staticParams;
+        public List<SimpleJdbcJobParam> getJobParams() {
+            return jobParams;
         }
     }
 
@@ -384,7 +433,7 @@ public class CollectorProperties implements InitializingBean {
         /**
          * Feature the static scrape job parameters.
          */
-        private List<SimpleRedisJobParam> staticParams = new ArrayList<>();
+        private List<SimpleRedisJobParam> jobParams = new ArrayList<>();
 
         @Override
         public EventJobType getJobType() {
@@ -392,8 +441,8 @@ public class CollectorProperties implements InitializingBean {
         }
 
         @Override
-        public List<SimpleRedisJobParam> getStaticJobParams() {
-            return staticParams;
+        public List<SimpleRedisJobParam> getJobParams() {
+            return jobParams;
         }
     }
 
@@ -406,7 +455,7 @@ public class CollectorProperties implements InitializingBean {
         /**
          * Feature the static scrape job parameters.
          */
-        private List<SimpleTcpJobParam> staticParams = new ArrayList<>();
+        private List<SimpleTcpJobParam> jobParams = new ArrayList<>();
 
         @Override
         public EventJobType getJobType() {
@@ -414,8 +463,8 @@ public class CollectorProperties implements InitializingBean {
         }
 
         @Override
-        public List<SimpleTcpJobParam> getStaticJobParams() {
-            return staticParams;
+        public List<SimpleTcpJobParam> getJobParams() {
+            return jobParams;
         }
     }
 
@@ -428,7 +477,7 @@ public class CollectorProperties implements InitializingBean {
         /**
          * Feature the static scrape job parameters.
          */
-        private List<SSHJobParam> staticParams = new ArrayList<>();
+        private List<SSHJobParam> jobParams = new ArrayList<>();
 
         @Override
         public EventJobType getJobType() {
@@ -436,8 +485,8 @@ public class CollectorProperties implements InitializingBean {
         }
 
         @Override
-        public List<SSHJobParam> getStaticJobParams() {
-            return staticParams;
+        public List<SSHJobParam> getJobParams() {
+            return jobParams;
         }
     }
 

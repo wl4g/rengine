@@ -42,12 +42,16 @@ rengine:
         monitorExecution: true
         failover: false
         misfire: false
-        cron: "0/5 * * * * ?"
+        cron: "0/10 * * * * ?"
         timeZone: GMT+08:00
-        shardingTotalCount: 1
-        shardingItemParameters: 0=Beijing,1=Shanghai
         maxTimeDiffSeconds: -1
         reconcileIntervalMinutes: 0
+        shardingTotalCount: 1
+        shardingItemParameters: 0=Beijing,1=Shanghai
+        jobShardingStrategyType: ""
+        jobExecutorServiceHandlerType: ""
+        jobErrorHandlerType: ""
+        jobListenerTypes: []
         description: The job that scrapes events remote over HTTP/TCP/SSH/Redis/JDBC etc.
       scrapeJobConfigs:
         - !PROMETHEUS
@@ -60,14 +64,18 @@ rengine:
           #monitorExecution: true
           #failover: false
           #misfire: false
-          #cron: "0/5 * * * * ?"
+          #cron: "0/10 * * * * ?"
           #timeZone: GMT+08:00
-          #shardingTotalCount: 1
-          #shardingItemParameters: 0=Beijing,1=Shanghai
           #maxTimeDiffSeconds: -1
           #reconcileIntervalMinutes: 0
-          description: The job that scrapes events remote over HTTP.
-          staticParams:
+          #shardingTotalCount: 1
+          #shardingItemParameters: 0=Beijing,1=Shanghai
+          #jobShardingStrategyType: ""
+          #jobExecutorServiceHandlerType: ""
+          #jobErrorHandlerType: ""
+          #jobListenerTypes: []
+          #description: The job that scrapes events remote over HTTP etc.
+          jobParams:
             - name: web-1
               url: http://localhost:9100/metrics
               method: GET
@@ -105,7 +113,7 @@ rengine:
               url: http://localhost:9100/metrics
         - !PROMETHEUS
           name: zookeeper-jmx-job
-          staticParams:
+          jobParams:
             - name: zookeeper-exporter-1
               url: http://localhost:12181/metrics
             - name: zookeeper-exporter-2
@@ -114,7 +122,7 @@ rengine:
               url: http://localhost:12181/metrics
         - !PROMETHEUS
           name: kafka-jmx-job
-          staticParams:
+          jobParams:
             - name: kafka-exporter-1
               url: http://localhost:10108/metrics
             - name: kafka-exporter-2
@@ -123,7 +131,7 @@ rengine:
               url: http://localhost:10108/metrics
         - !PROMETHEUS
           name: hbase-jmx-job
-          staticParams:
+          jobParams:
             - name: hbase-master-1
               url: http://localhost:10106/metrics
             - name: hbase-master-2
@@ -136,7 +144,7 @@ rengine:
               url: http://localhost:10106/metrics
         - !PROMETHEUS
           name: hdfs-jmx-job
-          staticParams:
+          jobParams:
             - name: hdfs-namenode-1
               url: http://localhost:10107/metrics
             - name: hdfs-namenode-2
@@ -149,7 +157,7 @@ rengine:
               url: http://localhost:10107/metrics
         - !PROMETHEUS
           name: yarn-jmx-job
-          staticParams:
+          jobParams:
             - name: yarn-resourcemanager-1
               url: http://localhost:10107/metrics
             - name: yarn-resourcemanager-2
@@ -162,12 +170,12 @@ rengine:
               url: http://localhost:10107/metrics
         - !PROMETHEUS
           name: redis-exporter-job
-          staticParams:
+          jobParams:
             - name: redis-exporter-1
               url: http://localhost:9121/metrics
         - !PROMETHEUS
           name: mysqld-exporter-job
-          staticParams:
+          jobParams:
             - name: mysql-exporter-1
               url: http://localhost:9104/metrics
             - name: mysql-exporter-2
@@ -176,14 +184,14 @@ rengine:
               url: http://localhost:9104/metrics
         - !PROMETHEUS
           name: haproxy-job
-          staticParams:
+          jobParams:
             - name: haproxy-1
               url: http://localhost:8404/metrics
             - name: haproxy-2
               url: http://localhost:8404/metrics
         - !PROMETHEUS
           name: minio-job
-          staticParams:
+          jobParams:
             - name: minio-1
               url: http://localhost:9000/metrics
             - name: minio-2
@@ -192,7 +200,7 @@ rengine:
               url: http://localhost:9000/metrics
         - !SSH
           name: ssh-job
-          staticParams:
+          jobParams:
             - name: web-1
               ## Detecting whether the SSH tunnel is reachable.
               command: "timeout 3 ssh rengine@localhost echo >/dev/null 2>&1; echo $?"

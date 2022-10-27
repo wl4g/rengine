@@ -93,7 +93,7 @@ public abstract class EventJobExecutor<P extends EventJobExecutor.JobParamBase> 
         log.info("ShardingContext: {}", toJSONString(context));
 
         List<JobParamBase> shardingParams = new ArrayList<>();
-        List<? extends JobParamBase> params = safeList(jobConfig.getStaticParams());
+        List<? extends JobParamBase> params = safeList(jobConfig.getJobParams());
         for (int i = 0; i < params.size(); i++) {
             if (i % context.getShardingTotalCount() == context.getShardingItem()) {
                 shardingParams.add(params.get(i));
