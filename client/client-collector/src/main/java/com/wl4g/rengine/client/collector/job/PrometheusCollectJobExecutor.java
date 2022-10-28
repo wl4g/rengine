@@ -17,7 +17,6 @@ package com.wl4g.rengine.client.collector.job;
 
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.util.Objects.nonNull;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.replace;
 import static org.apache.commons.lang3.StringUtils.split;
@@ -41,7 +40,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link PrometheusEventJobExecutor}
+ * {@link PrometheusCollectJobExecutor}
  * 
  * @author James Wong
  * @version 2022-10-20
@@ -49,7 +48,7 @@ import lombok.experimental.SuperBuilder;
  * @see {@link org.apache.shardingsphere.elasticjob.http.executor.HttpJobExecutor}
  */
 @Getter
-public class PrometheusEventJobExecutor extends SimpleHttpEventJobExecutor {
+public class PrometheusCollectJobExecutor extends SimpleHttpCollectJobExecutor {
 
     @Override
     public EventJobType type() {
@@ -57,20 +56,11 @@ public class PrometheusEventJobExecutor extends SimpleHttpEventJobExecutor {
     }
 
     @Override
-    protected String getEventType(
-            SimpleHttpEventJobExecutor.SimpleHttpJobParam shardingParam,
-            JobConfiguration jobConfig,
-            ShardingContext shardingContext) {
-        String eventType = super.getEventType(shardingParam, jobConfig, shardingContext);
-        return isBlank(eventType) ? EventJobType.PROMETHEUS.name() : eventType;
-    }
-
-    @Override
     protected BodyConverter getBodyConverter(
-            SimpleHttpEventJobExecutor.SimpleHttpJobParam shardingParam,
+            SimpleHttpCollectJobExecutor.SimpleHttpJobParam shardingParam,
             JobConfiguration jobConfig,
             ShardingContext shardingContext) {
-        return fromResult -> parseMetrics(fromResult);
+        return fromResult -> parseMetrics((String) fromResult);
     }
 
     /**
@@ -182,7 +172,7 @@ public class PrometheusEventJobExecutor extends SimpleHttpEventJobExecutor {
     // @ToString
     // @NoArgsConstructor
     // public static class PrometheusJobParam extends
-    // SimpleHttpEventJobExecutor.SimpleHttpJobParam {
+    // SimpleHttpCollectJobExecutor.SimpleHttpJobParam {
     // }
 
 }

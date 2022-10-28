@@ -41,13 +41,13 @@ import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperConfiguration
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.wl4g.rengine.client.collector.job.EventJobExecutor.EventJobType;
-import com.wl4g.rengine.client.collector.job.EventJobExecutor.JobParamBase;
-import com.wl4g.rengine.client.collector.job.SSHEventJobExecutor.SSHJobParam;
-import com.wl4g.rengine.client.collector.job.SimpleHttpEventJobExecutor.SimpleHttpJobParam;
-import com.wl4g.rengine.client.collector.job.SimpleJdbcEventJobExecutor.SimpleJdbcJobParam;
-import com.wl4g.rengine.client.collector.job.SimpleRedisEventJobExecutor.SimpleRedisJobParam;
-import com.wl4g.rengine.client.collector.job.SimpleTcpEventJobExecutor.SimpleTcpJobParam;
+import com.wl4g.rengine.client.collector.job.CollectJobExecutor.EventJobType;
+import com.wl4g.rengine.client.collector.job.CollectJobExecutor.JobParamBase;
+import com.wl4g.rengine.client.collector.job.SSHCollectJobExecutor.SSHJobParam;
+import com.wl4g.rengine.client.collector.job.SimpleHttpCollectJobExecutor.SimpleHttpJobParam;
+import com.wl4g.rengine.client.collector.job.SimpleJdbcCollectJobExecutor.SimpleJdbcJobParam;
+import com.wl4g.rengine.client.collector.job.SimpleRedisCollectJobExecutor.SimpleRedisJobParam;
+import com.wl4g.rengine.client.collector.job.SimpleTcpCollectJobExecutor.SimpleTcpJobParam;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

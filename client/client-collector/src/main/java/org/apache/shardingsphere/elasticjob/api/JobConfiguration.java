@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
-import com.wl4g.rengine.client.collector.job.EventJobExecutor.JobParamBase;
+import com.wl4g.rengine.client.collector.job.CollectJobExecutor.JobParamBase;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -49,10 +49,13 @@ public final class JobConfiguration {
     //
     // [Begin] ADD FEATURES.
     //
+    private String eventType;
+
     // When setup true, the shardingTotalCount will be ignored, and the will
     // be automatically allocated according to the number of cluster nodes
     // priority.
     private boolean autoShardingTotalCount;
+
     //
     // [End] ADD FEATURES.
     //

@@ -46,10 +46,14 @@ public final class JobConfigurationPOJO {
     //
     // [Begin] ADD FEATURES.
     //
+
+    private String eventType;
+
     // When setup true, the shardingTotalCount will be ignored, and the will
     // be automatically allocated according to the number of cluster nodes
     // priority.
     private boolean autoShardingTotalCount;
+
     //
     // [End] ADD FEATURES.
     //
@@ -134,6 +138,7 @@ public final class JobConfigurationPOJO {
                 //
                 // [Begin] ADD FEATURES.
                 //
+                .eventType(eventType)
                 // When setup true, the shardingTotalCount will be ignored, and
                 // the will be automatically allocated according to the number
                 // of cluster nodes priority.
@@ -189,6 +194,7 @@ public final class JobConfigurationPOJO {
         //
         // [Begin] ADD FEATURES.
         //
+        result.setEventType(jobConfiguration.getEventType());
         // When setup true, the shardingTotalCount will be ignored, and
         // the will be automatically allocated according to the number
         // of cluster nodes priority.
@@ -223,4 +229,5 @@ public final class JobConfigurationPOJO {
         result.setStaticSharding(jobConfiguration.isStaticSharding());
         return result;
     }
+
 }

@@ -79,6 +79,14 @@
             <groupId>com.wl4g</groupId>
             <artifactId>infra-context</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.wl4g</groupId>
+            <artifactId>infra-support</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+        </dependency>
         <!-- TODO use pure java or springboot client ?? -->
         <dependency>
             <groupId>com.wl4g</groupId>
@@ -88,7 +96,7 @@
             <groupId>com.wl4g</groupId>
             <artifactId>rengine-client-eventbus-base</artifactId>
         </dependency>
-        <!-- ELASTIC JOB -->
+        <!-- Elastic-Job -->
         <!-- <dependency> -->
         <!--     <groupId>org.apache.shardingsphere.elasticjob</groupId> -->
         <!--     <artifactId>elasticjob-lite-spring-boot-starter</artifactId> -->
@@ -97,10 +105,14 @@
             <groupId>org.apache.shardingsphere.elasticjob</groupId>
             <artifactId>elasticjob-lite-core</artifactId>
         </dependency>
-        <!-- CORE -->
+        <!-- Spring Boot -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.experimental</groupId>
+            <artifactId>spring-native</artifactId>
         </dependency>
         <!-- Native -->
         <dependency>
@@ -132,6 +144,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-actuator-autoconfigure</artifactId>
         </dependency>
+        <!-- Metrics -->
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-jmx</artifactId>
@@ -140,13 +153,14 @@
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
-        <!-- DEVEL -->
+        <!-- Devel -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <scope>test</scope>
             <optional>true</optional>
         </dependency>
+        <!-- Tests -->
         <dependency>
             <groupId>com.github.spotbugs</groupId>
             <artifactId>spotbugs-annotations</artifactId>

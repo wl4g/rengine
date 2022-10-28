@@ -37,7 +37,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * {@link SSHEventJobExecutor}
+ * {@link SSHCollectJobExecutor}
  * 
  * @author James Wong
  * @version 2022-10-20
@@ -46,7 +46,7 @@ import lombok.ToString;
  * @see {@link org.apache.shardingsphere.elasticjob.http.executor.ScriptJobExecutor}
  */
 @Getter
-public class SSHEventJobExecutor extends EventJobExecutor<SSHEventJobExecutor.SSHJobParam> {
+public class SSHCollectJobExecutor extends CollectJobExecutor<SSHCollectJobExecutor.SSHJobParam> {
 
     @Override
     public EventJobType type() {
@@ -54,7 +54,12 @@ public class SSHEventJobExecutor extends EventJobExecutor<SSHEventJobExecutor.SS
     }
 
     @Override
-    public void execute(SSHJobParam shardingParam, JobConfiguration jobConfig, JobFacade jobFacade, ShardingContext context) {
+    public void execute(
+            SSHJobParam shardingParam,
+            int currentShardingTotalCount,
+            JobConfiguration jobConfig,
+            JobFacade jobFacade,
+            ShardingContext context) throws Exception {
         String host = shardingParam.getHost();
         int port = shardingParam.getPort();
         String user = shardingParam.getUser();
@@ -75,10 +80,11 @@ public class SSHEventJobExecutor extends EventJobExecutor<SSHEventJobExecutor.SS
         }
     }
 
-    @Override
-    protected BodyConverter getBodyConverter(SSHJobParam shardingParam, JobConfiguration jobConfig, ShardingContext context) {
-        // Ignore, if it is special job, it should be override.
-        return fromResult -> fromResult;
+    protected BodyConverter getBodyConverter(
+            SSHJobParam shardingParam,
+            JobConfiguration jobConfig,
+            ShardingContext shardingContext) {
+        return BodyConverter.DEFAULT_STRING;
     }
 
     @Override
@@ -100,7 +106,7 @@ public class SSHEventJobExecutor extends EventJobExecutor<SSHEventJobExecutor.SS
     @Setter
     @ToString
     @NoArgsConstructor
-    public static class SSHJobParam extends EventJobExecutor.JobParamBase {
+    public static class SSHJobParam extends CollectJobExecutor.JobParamBase {
         private String host;
         private int port;
         private String user;

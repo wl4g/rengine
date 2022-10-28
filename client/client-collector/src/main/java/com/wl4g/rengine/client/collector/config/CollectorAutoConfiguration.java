@@ -31,12 +31,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.wl4g.rengine.client.collector.job.PrometheusEventJobExecutor;
-import com.wl4g.rengine.client.collector.job.SSHEventJobExecutor;
-import com.wl4g.rengine.client.collector.job.SimpleHttpEventJobExecutor;
-import com.wl4g.rengine.client.collector.job.SimpleJdbcEventJobExecutor;
-import com.wl4g.rengine.client.collector.job.SimpleRedisEventJobExecutor;
-import com.wl4g.rengine.client.collector.job.SimpleTcpEventJobExecutor;
+import com.wl4g.rengine.client.collector.job.PrometheusCollectJobExecutor;
+import com.wl4g.rengine.client.collector.job.SSHCollectJobExecutor;
+import com.wl4g.rengine.client.collector.job.SimpleHttpCollectJobExecutor;
+import com.wl4g.rengine.client.collector.job.SimpleJdbcCollectJobExecutor;
+import com.wl4g.rengine.client.collector.job.SimpleRedisCollectJobExecutor;
+import com.wl4g.rengine.client.collector.job.SimpleTcpCollectJobExecutor;
 
 /**
  * {@link CollectorAutoConfiguration}
@@ -84,33 +84,33 @@ public class CollectorAutoConfiguration {
     }
 
     @Bean
-    public SimpleHttpEventJobExecutor simpleHttpEventJobExecutor() {
-        return new SimpleHttpEventJobExecutor();
+    public SimpleHttpCollectJobExecutor simpleHttpCollectJobExecutor() {
+        return new SimpleHttpCollectJobExecutor();
     }
 
     @Bean
-    public PrometheusEventJobExecutor prometheusEventJobExecutor() {
-        return new PrometheusEventJobExecutor();
+    public PrometheusCollectJobExecutor prometheusCollectJobExecutor() {
+        return new PrometheusCollectJobExecutor();
     }
 
     @Bean
-    public SimpleJdbcEventJobExecutor simpleJdbcEventJobExecutor() {
-        return new SimpleJdbcEventJobExecutor();
+    public SimpleJdbcCollectJobExecutor simpleJdbcCollectJobExecutor() {
+        return new SimpleJdbcCollectJobExecutor();
     }
 
     @Bean
-    public SimpleRedisEventJobExecutor simpleRedisEventJobExecutor() {
-        return new SimpleRedisEventJobExecutor();
+    public SimpleRedisCollectJobExecutor simpleRedisCollectJobExecutor() {
+        return new SimpleRedisCollectJobExecutor();
     }
 
     @Bean
-    public SimpleTcpEventJobExecutor simpleTcpEventJobExecutor() {
-        return new SimpleTcpEventJobExecutor();
+    public SimpleTcpCollectJobExecutor simpleTcpCollectJobExecutor() {
+        return new SimpleTcpCollectJobExecutor();
     }
 
     @Bean
-    public SSHEventJobExecutor sshEventJobExeutor() {
-        return new SSHEventJobExecutor();
+    public SSHCollectJobExecutor sshEventJobExeutor() {
+        return new SSHCollectJobExecutor();
     }
 
 }

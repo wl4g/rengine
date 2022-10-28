@@ -15,36 +15,50 @@
  */
 package com.wl4g.rengine.client.collector.job;
 
-import java.util.List;
+import java.net.Socket;
 
 import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
 import org.apache.shardingsphere.elasticjob.api.ShardingContext;
 import org.apache.shardingsphere.elasticjob.executor.JobFacade;
 
-import com.wl4g.rengine.client.collector.job.EventJobExecutor.JobParamBase;
+import com.google.common.io.ByteStreams;
+import com.wl4g.infra.common.codec.CodecSource;
+import com.wl4g.rengine.client.collector.job.CollectJobExecutor.JobParamBase;
 import com.wl4g.rengine.common.event.RengineEvent.EventLocation;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link SimpleTcpEventJobExecutor}
+ * {@link SimpleTcpCollectJobExecutor}
  * 
  * @author James Wong
  * @version 2022-10-26
  * @since v3.0.0
  */
-public class SimpleTcpEventJobExecutor extends EventJobExecutor<SimpleTcpEventJobExecutor.SimpleTcpJobParam> {
+@Slf4j
+public class SimpleTcpCollectJobExecutor extends CollectJobExecutor<SimpleTcpCollectJobExecutor.SimpleTcpJobParam> {
 
     @Override
     protected void execute(
             SimpleTcpJobParam shardingParam,
+            int currentShardingTotalCount,
             JobConfiguration jobConfig,
             JobFacade jobFacade,
-            ShardingContext context) {
-        // TODO Auto-generated method stub
+            ShardingContext context) throws Exception {
+
+        try (Socket socket = new Socket(shardingParam.getHost(), shardingParam.getPort());) {
+            // Write message to server.
+            socket.getOutputStream().write(CodecSource.fromBase64(shardingParam.getBase64Message()).getBytes());
+            // Read message from server.
+            byte[] result = ByteStreams.toByteArray(socket.getInputStream());
+            log.debug("Collect to result: {}", result);
+
+            offer(shardingParam, jobConfig, jobFacade, context, result);
+        }
 
     }
 
@@ -53,22 +67,11 @@ public class SimpleTcpEventJobExecutor extends EventJobExecutor<SimpleTcpEventJo
         return EventJobType.SIMPLE_TCP;
     }
 
-    @Override
     protected BodyConverter getBodyConverter(
             SimpleTcpJobParam shardingParam,
             JobConfiguration jobConfig,
             ShardingContext shardingContext) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    protected List<String> getPrincipals(
-            SimpleTcpJobParam shardingParam,
-            JobConfiguration jobConfig,
-            ShardingContext shardingContext) {
-        // TODO Auto-generated method stub
-        return null;
+        return BodyConverter.DEFAULT_STRING;
     }
 
     @Override
@@ -76,8 +79,7 @@ public class SimpleTcpEventJobExecutor extends EventJobExecutor<SimpleTcpEventJo
             SimpleTcpJobParam shardingParam,
             JobConfiguration jobConfig,
             ShardingContext shardingContext) {
-        // TODO Auto-generated method stub
-        return null;
+        return EventLocation.builder().ipAddress(shardingParam.getHost()).build();
     }
 
     @Getter
@@ -85,9 +87,10 @@ public class SimpleTcpEventJobExecutor extends EventJobExecutor<SimpleTcpEventJo
     @ToString
     @NoArgsConstructor
     public static class SimpleTcpJobParam extends JobParamBase {
-        private String host;
-        private String port;
+        private String host = "localhost";
+        private int port = 9100;
         private String base64Message;
+        // private String readEOFChar; // TODO supported custom end char?
     }
 
 }

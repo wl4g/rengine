@@ -19,8 +19,11 @@ import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
+import static java.util.Collections.singletonList;
 import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -28,7 +31,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nullable;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import org.apache.shardingsphere.elasticjob.api.ElasticJob;
@@ -72,16 +75,14 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Getter
-public abstract class EventJobExecutor<P extends EventJobExecutor.JobParamBase> implements TypedJobItemExecutor {
+public abstract class CollectJobExecutor<P extends CollectJobExecutor.JobParamBase> implements TypedJobItemExecutor {
 
     protected final CollectorProperties config;
-
     protected final CoordinatorRegistryCenter regCenter;
-
     @SuppressWarnings("rawtypes")
     protected final Collection<RengineEventBusService> eventbusServices;
 
-    public EventJobExecutor() {
+    public CollectJobExecutor() {
         this.config = SpringContextHolder.getBean(CollectorProperties.class);
         this.regCenter = SpringContextHolder.getBean(CoordinatorRegistryCenter.class);
         this.eventbusServices = safeMap(SpringContextHolder.getBeans(RengineEventBusService.class)).values();
@@ -98,19 +99,31 @@ public abstract class EventJobExecutor<P extends EventJobExecutor.JobParamBase> 
     public void process(ElasticJob elasticJob, JobConfiguration jobConfig, JobFacade jobFacade, ShardingContext context) {
         log.info("ShardingContext: {}", toJSONString(context));
 
-        final int shardingTotalCount = determineShardingTotalCount(elasticJob, jobConfig, jobFacade, context);
+        final int currentShardingTotalCount = determineShardingTotalCount(elasticJob, jobConfig, jobFacade, context);
         final List<JobParamBase> shardingParams = new ArrayList<>();
         final List<? extends JobParamBase> params = safeList(jobConfig.getJobParams());
         for (int i = 0; i < params.size(); i++) {
-            if (i % shardingTotalCount == context.getShardingItem()) {
+            if (i % currentShardingTotalCount == context.getShardingItem()) {
                 shardingParams.add(params.get(i));
             }
         }
+
         // The parallel execution jobs.
-        shardingParams.parallelStream().forEach(p -> execute((P) p, jobConfig, jobFacade, context));
+        shardingParams.parallelStream().forEach(p -> {
+            try {
+                execute((P) p, currentShardingTotalCount, jobConfig, jobFacade, context);
+            } catch (Exception e) {
+                log.error(format("Failed to collect job execution. - %s", p), e);
+            }
+        });
     }
 
-    protected abstract void execute(P param, JobConfiguration jobConfig, JobFacade jobFacade, ShardingContext context);
+    protected abstract void execute(
+            P param,
+            int currentShardingTotalCount,
+            JobConfiguration jobConfig,
+            JobFacade jobFacade,
+            ShardingContext context) throws Exception;
 
     /**
      * Offer result data to event-bus channel.
@@ -126,7 +139,7 @@ public abstract class EventJobExecutor<P extends EventJobExecutor.JobParamBase> 
             JobConfiguration jobConfig,
             JobFacade jobFacade,
             ShardingContext shardingContext,
-            String result) {
+            Object result) {
 
         // Transform to event.
         RengineEvent event = new RengineEvent(getEventType(shardingParam, jobConfig, shardingContext),
@@ -152,7 +165,7 @@ public abstract class EventJobExecutor<P extends EventJobExecutor.JobParamBase> 
         // When setup true, the shardingTotalCount will be ignored, and the will
         // be automatically allocated according to the number of cluster nodes
         // priority.
-        if (!jobConfig.isAutoShardingTotalCount()) {
+        if (nonNull(jobConfig.isAutoShardingTotalCount()) && !jobConfig.isAutoShardingTotalCount()) {
             return jobConfig.getShardingTotalCount();
         }
 
@@ -168,14 +181,14 @@ public abstract class EventJobExecutor<P extends EventJobExecutor.JobParamBase> 
         int shardingTotalCount = (nonNull(serverNames) && serverNames.size() > 0) ? serverNames.size()
                 : jobConfig.getShardingTotalCount();
 
-        log.debug("Allocated the automatic dynamic shards by cluster nodes: {}", shardingTotalCount);
+        log.debug("Assigned the shards dynamic accroding to cluster nodes: {}", shardingTotalCount);
         return shardingTotalCount;
     }
 
     protected abstract EventJobType type();
 
     protected String getEventType(P shardingParam, JobConfiguration jobConfig, ShardingContext shardingContext) {
-        return getType();
+        return isBlank(jobConfig.getEventType()) ? getType() : jobConfig.getEventType();
     }
 
     protected long getObservedTime(P shardingParam, JobConfiguration jobConfig, ShardingContext shardingContext) {
@@ -191,12 +204,13 @@ public abstract class EventJobExecutor<P extends EventJobExecutor.JobParamBase> 
         return currentTimeMillis();
     }
 
-    protected abstract List<String> getPrincipals(P shardingParam, JobConfiguration jobConfig, ShardingContext shardingContext);
+    protected List<String> getPrincipals(P shardingParam, JobConfiguration jobConfig, ShardingContext shardingContext) {
+        return singletonList(shardingParam.getName());
+    }
 
-    protected abstract EventLocation getEventLocation(
-            P shardingParam,
-            JobConfiguration jobConfig,
-            ShardingContext shardingContext);
+    protected EventLocation getEventLocation(P shardingParam, JobConfiguration jobConfig, ShardingContext shardingContext) {
+        return EventLocation.builder().build();
+    }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     protected Map<String, String> getEventAttributes(
@@ -209,30 +223,32 @@ public abstract class EventJobExecutor<P extends EventJobExecutor.JobParamBase> 
     }
 
     public static interface BodyConverter {
-        String convert(String fromResult);
+        String convert(Object fromResult);
+
+        public static final BodyConverter DEFAULT_STRING = fromResult -> fromResult.toString();
     }
 
     @Getter
     @AllArgsConstructor
     public static enum EventJobType {
 
-        SIMPLE_HTTP(SimpleHttpScrapeJobProperties.class, SimpleHttpEventJobExecutor.class),
+        SIMPLE_HTTP(SimpleHttpScrapeJobProperties.class, SimpleHttpCollectJobExecutor.class),
 
-        // TODO Notice: For example, PrometheusEventJobExecutor inherits the
-        // SimpleHttpEventJobExecutor and is temporarily treated as the
+        // TODO Notice: For example, PrometheusCollectJobExecutor inherits the
+        // SimpleHttpCollectJobExecutor and is temporarily treated as the
         // latter class.
-        PROMETHEUS(SimpleHttpScrapeJobProperties.class, PrometheusEventJobExecutor.class),
+        PROMETHEUS(SimpleHttpScrapeJobProperties.class, PrometheusCollectJobExecutor.class),
 
-        SIMPLE_JDBC(SimpleJdbcScrapeJobProperties.class, SimpleJdbcEventJobExecutor.class),
+        SIMPLE_JDBC(SimpleJdbcScrapeJobProperties.class, SimpleJdbcCollectJobExecutor.class),
 
-        SIMPLE_REDIS(SimpleRedisScrapeJobProperties.class, SimpleRedisEventJobExecutor.class),
+        SIMPLE_REDIS(SimpleRedisScrapeJobProperties.class, SimpleRedisCollectJobExecutor.class),
 
-        SIMPLE_TCP(SimpleTcpScrapeJobProperties.class, SimpleTcpEventJobExecutor.class),
+        SIMPLE_TCP(SimpleTcpScrapeJobProperties.class, SimpleTcpCollectJobExecutor.class),
 
-        SSH(SSHScrapeJobProperties.class, SSHEventJobExecutor.class);
+        SSH(SSHScrapeJobProperties.class, SSHCollectJobExecutor.class);
 
         private final Class<? extends ScrapeJobProperties> jobConfigClass;
-        private final Class<? extends EventJobExecutor<? extends JobParamBase>> jobClass;
+        private final Class<? extends CollectJobExecutor<? extends JobParamBase>> jobClass;
     }
 
     @Getter
@@ -244,7 +260,7 @@ public abstract class EventJobExecutor<P extends EventJobExecutor.JobParamBase> 
         /**
          * The collect parameter for name.
          */
-        private @Nullable String name;
+        private @NotBlank String name;
 
         /**
          * The collect parameter for connect timeout.

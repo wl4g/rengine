@@ -43,7 +43,7 @@ import org.apache.shardingsphere.elasticjob.infra.json.GsonFactory;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.wl4g.rengine.client.collector.job.EventJobExecutor.JobParamBase;
+import com.wl4g.rengine.client.collector.job.CollectJobExecutor.JobParamBase;
 import com.wl4g.rengine.common.event.RengineEvent.EventLocation;
 
 import lombok.Getter;
@@ -53,7 +53,7 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link SimpleHttpEventJobExecutor}
+ * {@link SimpleHttpCollectJobExecutor}
  * 
  * @author James Wong
  * @version 2022-10-20
@@ -62,7 +62,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Getter
-public class SimpleHttpEventJobExecutor extends EventJobExecutor<SimpleHttpEventJobExecutor.SimpleHttpJobParam> {
+public class SimpleHttpCollectJobExecutor extends CollectJobExecutor<SimpleHttpCollectJobExecutor.SimpleHttpJobParam> {
 
     @Override
     public EventJobType type() {
@@ -72,9 +72,10 @@ public class SimpleHttpEventJobExecutor extends EventJobExecutor<SimpleHttpEvent
     @Override
     protected void execute(
             SimpleHttpJobParam shardingParam,
+            int currentShardingTotalCount,
             JobConfiguration jobConfig,
             JobFacade jobFacade,
-            ShardingContext context) {
+            ShardingContext context) throws Exception {
 
         HttpURLConnection connection = null;
         try {
@@ -149,9 +150,8 @@ public class SimpleHttpEventJobExecutor extends EventJobExecutor<SimpleHttpEvent
     protected BodyConverter getBodyConverter(
             SimpleHttpJobParam shardingParam,
             JobConfiguration jobConfig,
-            ShardingContext context) {
-        // Ignore, if it is special job, it should be override.
-        return fromResult -> fromResult;
+            ShardingContext shardingContext) {
+        return BodyConverter.DEFAULT_STRING;
     }
 
     @Override

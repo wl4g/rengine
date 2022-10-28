@@ -21,7 +21,7 @@ import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.constructor.BaseConstructor;
 import org.yaml.snakeyaml.constructor.Constructor;
 
-import com.wl4g.rengine.client.collector.job.EventJobExecutor.EventJobType;
+import com.wl4g.rengine.client.collector.job.CollectJobExecutor.EventJobType;
 
 /**
  * {@link CollectorYamlConstructor}
@@ -39,8 +39,8 @@ public class CollectorYamlConstructor extends Constructor {
     public static void configure(BaseConstructor constructor) {
         notNullOf(constructor, "constructor");
         for (EventJobType type : EventJobType.values()) {
-            // TODO Notice: For example, PrometheusEventJobExecutor inherits the
-            // SimpleHttpEventJobExecutor and is temporarily treated as the
+            // TODO Notice: For example, PrometheusCollectJobExecutor inherits the
+            // SimpleHttpCollectJobExecutor and is temporarily treated as the
             // latter class.
             constructor.addTypeDescription(new TypeDescription(type.getJobConfigClass(), "!".concat(type.name())));
         }

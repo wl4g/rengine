@@ -36,7 +36,7 @@ public class PromethuesEventJobExecutorTests {
                 + "go_gc_duration_seconds{quantile=\"1\"} 0.005432199\n" + "go_gc_duration_seconds_sum 0.009511142\n"
                 + "go_gc_duration_seconds_count 11\n" + "# HELP go_goroutines Number of goroutines that currently exist.\n"
                 + "# TYPE go_goroutines gauge\n" + "go_goroutines 6";
-        String result = PrometheusEventJobExecutor.parseMetrics(fromResult);
+        String result = PrometheusCollectJobExecutor.parseMetrics(fromResult);
         System.out.println(result);
     }
 
