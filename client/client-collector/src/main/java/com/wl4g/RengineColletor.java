@@ -17,6 +17,10 @@ package com.wl4g;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration;
+
+import com.wl4g.infra.support.cache.jedis.JedisClientAutoConfiguration;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,7 +32,8 @@ import lombok.extern.slf4j.Slf4j;
  * @since v1.0.0
  */
 @Slf4j
-@SpringBootApplication
+@SpringBootApplication(
+        exclude = { JdbcTemplateAutoConfiguration.class, DataSourceAutoConfiguration.class, JedisClientAutoConfiguration.class })
 public class RengineColletor {
 
     // Private are not accessible, can only be checked using the class-name.
