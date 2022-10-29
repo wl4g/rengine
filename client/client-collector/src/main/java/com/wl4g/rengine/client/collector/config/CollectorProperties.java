@@ -16,9 +16,13 @@
 package com.wl4g.rengine.client.collector.config;
 
 import static com.wl4g.infra.common.bean.ConfigBeanUtils.configureWithDefault;
+import static com.wl4g.infra.common.collection.CollectionUtils2.ensureMap;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
-import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.lang.Assert2.isTrue;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.getField;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.isGenericModifier;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.setField;
+import static com.wl4g.rengine.client.collector.util.EnvironmentConfigUtils.resolveString;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -27,6 +31,7 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -45,7 +50,9 @@ import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
 import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperConfiguration;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 
+import com.wl4g.infra.common.reflect.ReflectionUtils2;
 import com.wl4g.rengine.client.collector.job.CollectJobExecutor.EventJobType;
 import com.wl4g.rengine.client.collector.job.CollectJobExecutor.JobParamBase;
 import com.wl4g.rengine.client.collector.job.SSHCollectJobExecutor.SSHJobParam;
@@ -77,6 +84,7 @@ import lombok.extern.slf4j.Slf4j;
 public class CollectorProperties implements InitializingBean {
 
     private @Autowired Validator validator;
+    private @Autowired Environment environment;
 
     private ZookeeperProperties zookeeper = new ZookeeperProperties();
 
@@ -91,8 +99,8 @@ public class CollectorProperties implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         applyDefaultToProperties();
-        validator.validate(this);
-        safeConstraintValidate();
+        validateProperties();
+        resolveJobScrapeProperties();
     }
 
     protected void applyDefaultToProperties() {
@@ -211,7 +219,12 @@ public class CollectorProperties implements InitializingBean {
         });
     }
 
-    protected void safeConstraintValidate() {
+    protected void validateProperties() {
+        validator.validate(this);
+        validateForSafeConstraints();
+    }
+
+    protected void validateForSafeConstraints() {
         // The validate for event type.
         safeList(scrapeJobConfigs).stream().forEach(jobConf -> RengineEvent.validateForEventType(jobConf.getEventType()));
 
@@ -226,15 +239,68 @@ public class CollectorProperties implements InitializingBean {
         isTrue(duplicateJobNames.isEmpty(), "The duplicate job names for : %s", duplicateJobNames);
 
         // The validate for duplicate jobParam names.
-        List<String> duplicateJobParamNames = safeList(scrapeJobConfigs).stream()
-                .flatMap(jobConf -> safeList(jobConf.getJobParams()).stream())
-                .collect(groupingBy(jobParam -> jobParam.getName()))
-                .entrySet()
-                .stream()
-                .filter(e -> safeList(e.getValue()).size() > 1)
-                .map(e -> e.getKey())
-                .collect(toList());
-        isTrue(duplicateJobParamNames.isEmpty(), "The duplicate job params names for : %s", duplicateJobParamNames);
+        //
+        // @formatter:off
+        // List<String> duplicateJobParamNames = safeList(scrapeJobConfigs).stream()
+        //         .flatMap(jobConf -> safeList(jobConf.getJobParams()).stream())
+        //         .collect(groupingBy(jobParam -> jobParam.getName()))
+        //         .entrySet()
+        //         .stream()
+        //         .filter(e -> safeList(e.getValue()).size() > 1)
+        //         .map(e -> e.getKey())
+        //         .collect(toList());
+        // isTrue(duplicateJobParamNames.isEmpty(), "The duplicate job params names for : %s", duplicateJobParamNames);
+        // @formatter:on
+        //
+        // The validate for duplicate jobParam by job.
+        safeList(scrapeJobConfigs).stream().forEach(jobConf -> {
+            List<String> duplicateJobParamNames = safeList(jobConf.getJobParams()).stream()
+                    .collect(groupingBy(jobParam -> jobParam.getName()))
+                    .entrySet()
+                    .stream()
+                    .filter(e -> safeList(e.getValue()).size() > 1)
+                    .map(e -> e.getKey())
+                    .collect(toList());
+            isTrue(duplicateJobParamNames.isEmpty(), "The duplicate job params names for : %s", duplicateJobParamNames);
+        });
+    }
+
+    protected void resolveJobScrapeProperties() {
+        safeList(scrapeJobConfigs).forEach(jobConf -> {
+            jobConf.setName(environment.resolvePlaceholders(jobConf.getName()));
+            jobConf.setEventType(environment.resolvePlaceholders(jobConf.getEventType()));
+
+            // Resolve event attributes.
+            Map<String, String> attributes = ensureMap(jobConf.getEventAttributes());
+            new HashMap<>(ensureMap(jobConf.getEventAttributes()))
+                    .forEach((key, value) -> attributes.put(key, environment.resolvePlaceholders(value)));
+
+            jobConf.setCron(resolveString(environment, jobConf.getCron()));
+            jobConf.setTimeZone(resolveString(environment, jobConf.getTimeZone()));
+            jobConf.setJobBootstrapBeanName(resolveString(environment, jobConf.getJobBootstrapBeanName()));
+            jobConf.setShardingItemParameters(resolveString(environment, jobConf.getShardingItemParameters()));
+            jobConf.setJobParameter(resolveString(environment, jobConf.getJobParameter()));
+            jobConf.setJobShardingStrategyType(resolveString(environment, jobConf.getJobShardingStrategyType()));
+            jobConf.setJobExecutorServiceHandlerType(resolveString(environment, jobConf.getJobExecutorServiceHandlerType()));
+            jobConf.setJobErrorHandlerType(resolveString(environment, jobConf.getJobErrorHandlerType()));
+
+            List<String> jobListenerTypes = safeList(jobConf.getJobListenerTypes());
+            for (int i = 0; i < jobListenerTypes.size(); i++) {
+                jobListenerTypes.set(i, environment.resolvePlaceholders(jobListenerTypes.get(i)));
+            }
+
+            jobConf.setDescription(environment.resolvePlaceholders(jobConf.getDescription()));
+
+            // Resolve jobParams values.
+            safeList(jobConf.getJobParams()).forEach(p -> {
+                ReflectionUtils2.doFullWithFields(p, targetField -> isGenericModifier(targetField.getModifiers()),
+                        (field, objOfField) -> {
+                            if (String.class.isAssignableFrom(field.getType()) && !Modifier.isFinal(field.getModifiers())) {
+                                setField(field, objOfField, resolveString(environment, getField(field, objOfField, true)), true);
+                            }
+                        });
+            });
+        });
     }
 
     @Getter
@@ -397,7 +463,7 @@ public class CollectorProperties implements InitializingBean {
                     .description(description)
                     .jobParams(getJobParams())
                     .build();
-            safeMap(eventAttributes).forEach((key, value) -> result.getProps().setProperty(key, value));
+            ensureMap(eventAttributes).forEach((key, value) -> result.getProps().setProperty(key, value));
             return result;
         }
     }

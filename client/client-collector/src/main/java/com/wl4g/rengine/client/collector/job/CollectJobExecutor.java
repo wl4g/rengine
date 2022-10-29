@@ -219,7 +219,7 @@ public abstract class CollectJobExecutor<P extends CollectJobExecutor.JobParamBa
             JobConfiguration jobConfig,
             ShardingContext shardingContext) {
         // return
-        // ConfigUtils.parseToMap(jobConfig.getProps().getProperty(EVENT_ATTRIBUTES_KEY));
+        // ParamsUtils.parseToMap(jobConfig.getProps().getProperty(EVENT_ATTRIBUTES_KEY));
         return (Map) jobConfig.getProps();
     }
 

@@ -41,7 +41,7 @@ public class ConfigUtilsTests {
         original.put("http.url", "http://192.168.8.3:9100/metrics");
         original.put("url", "http://192.168.8.3:9100/metrics");
 
-        Map<String, Map<String, String>> result = ConfigUtils.toGroupMapWithFirst(original, "defaults");
+        Map<String, Map<String, String>> result = ParamsUtils.toGroupMapWithFirst(original, "defaults");
         result.forEach((k, v) -> System.out.println(k + " => " + v));
 
         Assertions.assertEquals(result.get("web-1").get("http.url"), web1HttpUrl);

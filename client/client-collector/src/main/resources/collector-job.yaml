@@ -14,7 +14,7 @@
 rengine:
   client:
     collector:
-      regCenter:
+      zookeeper:
         #serverLists: "#{T(java.net.InetAddress).getLocalHost().getHostName()}:2181"
         serverLists: localhost:2181
         namespace: rengine
@@ -37,7 +37,7 @@ rengine:
         ## The custom event attached properties such as labels for Prometheus scraping jobs.
         eventAttributes:
           foo: bar
-        disabled: false
+        disabled: false ## Default by false
         overwrite: true
         monitorExecution: true
         failover: false
@@ -113,9 +113,20 @@ rengine:
             #luaScript: "return 'hello'"
             #luaKeys: ["mykey1"]
             #luaArgs: ["myarg1"]
+          simpleTcp:
+            #host: "localhost"
+            #port: 1883
+            base64Message: "SGVsbG8K"
+          ssh:
+            #host: "localhost"
+            port: 22
+            #user: "root"
+            #password: ""
+            #privateKey:
+            #command: "echo 'hello'"
       scrapeJobConfigs:
         - !PROMETHEUS
-          name: node-exporter-job
+          name: node-example-job
           jobParams:
             - name: node-local
               url: http://localhost:9100/metrics
@@ -129,17 +140,16 @@ rengine:
             - name: rengine-collect-local
               url: http://localhost:10108/actuator/metrics
         - !SIMPLE_JDBC
-          name: jdbc-job
+          name: jdbc-example-job
           jobParams:
-            - name: mysql-local-1
+            - name: mysql-local
               hikariConfig:
                 jdbcUrl: "jdbc:mysql://localhost:3306/rengine?useunicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf-8&useSSL=false&allowMultiQueries=true&autoReconnect=true"
                 username: rengine
                 password: rengine
               sql: "SELECT NOW()"
         - !SIMPLE_REDIS
-          name: redis-job
-          disabled: true ## Default by false
+          name: redis-example-job
           jobParams:
             - name: redis-local
               jedisConfig:
@@ -158,3 +168,13 @@ rengine:
                 return { value }
               luaKeys: ["test:pi"]
               luaArgs: ["3.141592653", "60"]
+        - !SSH
+          name: ssh-example-job
+          jobParams:
+            - name: ssh-local
+              host: localhost
+              port: 22
+              user: rengine
+              password: 12345678
+              #privateKey:
+              command: "echo 'hello'"
