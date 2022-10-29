@@ -30,7 +30,7 @@ import com.wl4g.rengine.job.analytic.core.model.RengineEventAnalytical;
  * 
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2022-05-31 v3.0.0
- * @since v3.0.0
+ * @since v1.0.0
  */
 public class RengineEventWatermarks extends BoundedOutOfOrdernessWatermarks<RengineEventAnalytical> {
 
@@ -40,7 +40,7 @@ public class RengineEventWatermarks extends BoundedOutOfOrdernessWatermarks<Reng
 
     @Override
     public void onEvent(RengineEventAnalytical model, long eventTimestamp, WatermarkOutput output) {
-        super.onEvent(model, ((EventSource) model.getEvent().getSource()).getSourceTime(), output);
+        super.onEvent(model, ((EventSource) model.getSource()).getTime(), output);
     }
 
     /**

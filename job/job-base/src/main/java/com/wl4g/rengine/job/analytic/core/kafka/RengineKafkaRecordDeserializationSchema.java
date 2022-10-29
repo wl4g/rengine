@@ -16,6 +16,7 @@
 package com.wl4g.rengine.job.analytic.core.kafka;
 
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
+import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
@@ -28,17 +29,20 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
+import com.wl4g.rengine.common.event.RengineEvent;
 import com.wl4g.rengine.job.analytic.core.model.RengineEventAnalytical;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * {@link RengineKafkaRecordDeserializationSchema}
  * 
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2022-06-03 v3.0.0
- * @since v3.0.0
+ * @since v1.0.0
  */
+@Slf4j
 @Getter
 public class RengineKafkaRecordDeserializationSchema implements KafkaRecordDeserializationSchema<RengineEventAnalytical> {
     private static final long serialVersionUID = -3765473065594331694L;
@@ -53,7 +57,11 @@ public class RengineKafkaRecordDeserializationSchema implements KafkaRecordDeser
         }
         if (nonNull(record.value())) {
             String json = deserializer.deserialize(record.topic(), record.value());
-            collector.collect(parseJSON(json, RengineEventAnalytical.class));
+            try {
+                collector.collect(new RengineEventAnalytical(parseJSON(json, RengineEvent.class).validate()));
+            } catch (Exception e) {
+                log.warn(format("Unable to parse event json. - %s", json), e);
+            }
         }
     }
 

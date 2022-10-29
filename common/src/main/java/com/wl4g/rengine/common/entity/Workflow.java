@@ -19,8 +19,10 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.bean.BaseBean;
+import com.wl4g.rengine.common.model.EvaluationEngine;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -34,7 +36,7 @@ import lombok.experimental.SuperBuilder;
  * 
  * @author James Wong
  * @version 2022-08-29
- * @since v3.0.0
+ * @since v1.0.0
  */
 @Getter
 @Setter
@@ -44,6 +46,7 @@ import lombok.experimental.SuperBuilder;
 public class Workflow extends BaseBean {
     private static final long serialVersionUID = 1L;
     private @NotBlank String name;
+    private @NotNull EvaluationEngine engine;
     private @Nullable List<Long> ruleIds;
 
     //
@@ -52,4 +55,5 @@ public class Workflow extends BaseBean {
 
     @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
     private @Nullable transient List<Rule> rules;
+
 }

@@ -28,12 +28,12 @@ import com.wl4g.rengine.common.constants.RengineConstants;
  * 
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2022-05-30 v3.0.0
- * @since v3.0.0
+ * @since v1.0.0
  */
 public class RengineEventBusAutoConfiguration {
 
     @Bean
-    @ConfigurationProperties(prefix = RengineConstants.CONF_PREFIX_EVENTBUS)
+    @ConfigurationProperties(prefix = RengineConstants.CONF_PREFIX_CLIENT_EVENTBUS)
     public RengineEventBusProperties rengineEventBusProperties() {
         return new RengineEventBusProperties();
     }

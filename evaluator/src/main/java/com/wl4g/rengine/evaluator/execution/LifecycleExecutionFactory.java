@@ -31,7 +31,7 @@ import com.wl4g.rengine.common.model.EvaluationKind;
  * 
  * @author James Wong
  * @version 2022-09-17
- * @since v3.0.0
+ * @since v1.0.0
  * @see https://github.com/google/guice/wiki/Motivation
  */
 @Singleton
@@ -44,7 +44,7 @@ public class LifecycleExecutionFactory {
         switch (kind) {
         case SCORE:
             return getBean(ScoreWorkflowExecution.class);
-        case GENERIC:
+        case SIMPLE:
         default:
             return getBean(GenericWorkflowExecution.class);
         }

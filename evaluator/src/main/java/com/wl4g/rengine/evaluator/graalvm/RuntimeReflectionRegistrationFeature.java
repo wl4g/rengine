@@ -29,7 +29,7 @@
 // * 
 // * @author James Wong
 // * @version 2022-09-25
-// * @since v3.0.0
+// * @since v1.0.0
 // * @see io.quarkus.runtime.graal.ResourcesFeature
 // */
 //public class RuntimeReflectionRegistrationFeature implements Feature {

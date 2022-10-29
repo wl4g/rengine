@@ -47,7 +47,7 @@ import lombok.Getter;
  * 
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2022-06-07 v3.0.0
- * @since v3.0.0
+ * @since v1.0.0
  */
 @Getter
 @CustomLog
@@ -63,9 +63,9 @@ public abstract class RengineHBaseStreamingSupport extends RengineFlinkStreaming
     protected RengineHBaseStreamingSupport() {
         super();
         // Sink options.
-        builder.mustLongOption("hbaseZkAddrs", "HBase zookeeper quorum addresses.")
-                .longOption("hTableNamespace", "iam", "Sink to HBase table namespace.")
-                .longOption("hTableName", "t_iam_event", "Sink to HBase table name.")
+        builder.longOption("hbaseZkAddrs", "localhost:2181", "HBase zookeeper quorum addresses.")
+                .longOption("hTableNamespace", "rengine", "Sink to HBase table namespace.")
+                .longOption("hTableName", "t_ods_event", "Sink to HBase table name.")
                 .longOption("bufferFlushMaxSizeInBytes", "8192",
                         "Sink to HBase write flush max buffer size. if <=0, it will not be setup and keep the default behavior.")
                 .longOption("bufferFlushMaxRows", "128",
@@ -128,10 +128,10 @@ public abstract class RengineHBaseStreamingSupport extends RengineFlinkStreaming
             TableName table = TableName.valueOf(hTableNamespace, hTableName);
             if (!admin.tableExists(table)) {
                 TableDescriptor tabDesc = TableDescriptorBuilder.newBuilder(table)
-                        .setColumnFamily(ColumnFamilyDescriptorBuilder.of("f1"))
-                        // .setCompactionEnabled(true)
-                        // .setMergeEnabled(true)
-                        // .setSplitEnabled(true)
+                        .setColumnFamily(ColumnFamilyDescriptorBuilder.of("info"))
+                        .setCompactionEnabled(true)
+                        .setMergeEnabled(true)
+                        .setSplitEnabled(true)
                         .build();
                 if (numberRegions > 1) {
                     admin.createTable(tabDesc, Arrays.copyOfRange(SPLIT_KEYS, 0, numberRegions - 1));

@@ -15,20 +15,15 @@
  */
 package com.wl4g.rengine.common.model;
 
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.wl4g.infra.common.validation.EnumValue;
-
-import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder.Default;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -38,51 +33,50 @@ import lombok.experimental.SuperBuilder;
  * 
  * @author James Wong
  * @version 2022-09-18
- * @since v3.0.0
+ * @since v1.0.0
  */
 @Getter
 @Setter
 @SuperBuilder
 @ToString
-@NoArgsConstructor
-public class Evaluation {
-
-    @Schema(name = "@kind", implementation = EvaluationKind.class)
-    @JsonProperty(value = "@kind")
-    @NotBlank
-    @EnumValue(enumCls = EvaluationKind.class)
-    String kind;
-
-    @Schema(name = "@engine", implementation = EvaluationEngine.class)
-    @JsonProperty(value = "@engine")
-    @NotBlank
-    @EnumValue(enumCls = EvaluationEngine.class)
-    String engine;
-
-    @NotBlank
-    String service;
+public class Evaluation extends EvaluationBase {
 
     @NotBlank
     String scenesCode;
 
+    /**
+     * That is, the maximum execution time, and the user determines the
+     * acceptable maximum execution time according to actual needs. Returns
+     * immediately if evaluation/feature acquisition and computation times out.
+     */
     @NotNull
-    Scripting scripting;
+    @Min(1)
+    @Default
+    Long timeout = DEFAULT_TIMEOUT;
 
+    /**
+     * This attribute is used to control the behavior when the calculation
+     * fails. If it is false, if there is an error in the feature acquisition,
+     * such as the database is not found, the calculation times out, etc., an
+     * error message is returned. If it is true, when an error occurs, it will
+     * still return the same response content as when it is correct, but the
+     * value of the evaluation result/feature will be given a default value, and
+     * the corresponding error code will be set. </br>
+     * refer to: https://mp.weixin.qq.com/s/UG4VJ3HuzcBhjLcmtVpLFw
+     */
+    @NotNull
+    @Default
+    Boolean bestEffort = DEFAULT_BESTEFFORT;
+
+    /**
+     * The arguments required for evaluating models/features, such as
+     * page_view_count_userid, which requires key arguments such as
+     * BuyerId+UserId to execute it.
+     */
     @Nullable
-    Map<String, String> attributes;
+    Map<String, String> args;
 
-    @Getter
-    @Setter
-    @SuperBuilder
-    @ToString
-    @NoArgsConstructor
-    public static class Scripting {
-
-        @NotBlank
-        String mainFun;
-
-        @NotEmpty
-        List<String> args;
-    }
+    public static final long DEFAULT_TIMEOUT = 3_000L;
+    public static final boolean DEFAULT_BESTEFFORT = false;
 
 }

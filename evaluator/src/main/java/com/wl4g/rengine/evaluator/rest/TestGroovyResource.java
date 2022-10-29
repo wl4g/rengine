@@ -23,6 +23,7 @@ import java.util.function.Function;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.inject.Singleton;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -32,6 +33,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.io.Resources;
 import com.wl4g.infra.common.lang.EnvironmentUtil;
 import com.wl4g.infra.common.runtime.JvmRuntimeTool;
@@ -49,7 +51,7 @@ import lombok.extern.slf4j.Slf4j;
  * 
  * @author James Wong
  * @version 2022-09-18
- * @since v3.0.0
+ * @since v1.0.0
  */
 @Slf4j
 @Path("/test/groovy")
@@ -57,6 +59,9 @@ import lombok.extern.slf4j.Slf4j;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @SuppressWarnings("unchecked")
+// 注1: 当编译为native运行时, 必须显示指定单例, 否则方法体中使用成员属性会空指针. (但使用JVM运行时却不会?)
+@Singleton
+@VisibleForTesting
 public class TestGroovyResource {
 
     @NotNull
@@ -84,7 +89,7 @@ public class TestGroovyResource {
 
     @POST
     @Path("/execution")
-    public RespBase<Object> execution(GroovyExecution model) throws Throwable {
+    public RespBase<Object> execution(TestGroovyExecution model) throws Throwable {
         log.info("called: groovy execution ...");
 
         // Limiting test process.
@@ -119,7 +124,7 @@ public class TestGroovyResource {
     @Getter
     @Setter
     @ToString
-    public static class GroovyExecution {
+    public static class TestGroovyExecution {
         @NotBlank
         String scriptPath;
         @NotEmpty

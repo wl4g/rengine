@@ -25,7 +25,7 @@ import com.wl4g.rengine.manager.admin.model.QueryIdentityProviderResult;
  * 
  * @author James Wong
  * @version 2022-08-29
- * @since v3.0.0
+ * @since v1.0.0
  */
 public interface IdentityProviderService {
 

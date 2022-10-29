@@ -17,6 +17,7 @@ package com.wl4g.rengine.common.entity;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static org.apache.commons.lang3.StringUtils.equalsAnyIgnoreCase;
 
 import java.util.List;
 
@@ -44,7 +45,7 @@ import lombok.experimental.SuperBuilder;
  * 
  * @author James Wong
  * @version 2022-08-29
- * @since v3.0.0
+ * @since v1.0.0
  */
 @Getter
 @Setter
@@ -56,9 +57,11 @@ public class UploadObject extends BaseBean {
 
     @Schema(implementation = UploadObject.UploadType.class)
     private @NotBlank @EnumValue(enumCls = UploadObject.UploadType.class) String uploadType;
+
     // Save API front-end without objectPrefix.
     private @Nullable @NotBlank(groups = ValidForEntityMarker.class) @Schema(hidden = false,
             accessMode = AccessMode.READ_ONLY) String objectPrefix;
+
     private @NotBlank String filename;
     private @NotBlank String extension;
     private @NotNull @Min(1) Long size;
@@ -70,15 +73,45 @@ public class UploadObject extends BaseBean {
 
     @Getter
     @AllArgsConstructor
+    public static enum ExtensionType {
+        JAR(true, ".jar"),
+
+        GROOVY(false, ".groovy"),
+
+        JS(false, ".js"),
+
+        TS(false, ".ts"),
+
+        CSV(false, ".csv"),
+
+        MJS(false, "mjs");
+
+        private final boolean binary;
+        private final String suffix;
+
+        @JsonCreator
+        public static ExtensionType of(String type) {
+            for (ExtensionType a : values()) {
+                if (equalsAnyIgnoreCase(type, a.name().toLowerCase(), a.getSuffix())) {
+                    return a;
+                }
+            }
+            throw new IllegalArgumentException(format("Invalid extension type for '%s'", type));
+        }
+
+    }
+
+    @Getter
+    @AllArgsConstructor
     public static enum UploadType {
-        USER_LIBRARY_WITH_GROOVY("library/groovy", asList(".groovy", ".jar")),
+        USER_LIBRARY_WITH_GROOVY("library/groovy", asList(ExtensionType.GROOVY, ExtensionType.JAR)),
 
-        USER_LIBRARY_WITH_JS("library/js", asList(".js")),
+        USER_LIBRARY_WITH_JS("library/js", asList(ExtensionType.JS, ExtensionType.TS, ExtensionType.MJS)),
 
-        TEST_DATASET("testset/csv", asList(".csv"));
+        TEST_DATASET("testset/csv", asList(ExtensionType.CSV));
 
         private final String prefix;
-        private final List<String> extensions;
+        private final List<ExtensionType> extensions;
 
         @JsonCreator
         public static UploadType of(String type) {
@@ -87,7 +120,7 @@ public class UploadObject extends BaseBean {
                     return a;
                 }
             }
-            throw new IllegalArgumentException(format("Invalid upload biz type for '%s'", type));
+            throw new IllegalArgumentException(format("Invalid upload type for '%s'", type));
         }
 
     }

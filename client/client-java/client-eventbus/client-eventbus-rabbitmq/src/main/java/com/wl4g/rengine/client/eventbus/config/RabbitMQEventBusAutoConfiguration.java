@@ -27,12 +27,12 @@ import com.wl4g.rengine.common.constants.RengineConstants;
  * 
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2022-05-31 v3.0.0
- * @since v3.0.0
+ * @since v1.0.0
  */
 public class RabbitMQEventBusAutoConfiguration {
 
     @Bean
-    @ConfigurationProperties(prefix = RengineConstants.CONF_PREFIX_EVENTBUS_ROCKETMQ)
+    @ConfigurationProperties(prefix = RengineConstants.CONF_PREFIX_CLIENT_EVENTBUS_ROCKETMQ)
     public RabbitMQEventBusProperties rocketmqEventBusProperties() {
         return new RabbitMQEventBusProperties();
     }

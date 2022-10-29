@@ -5,12 +5,15 @@
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
   "methods":[
-    {"name":"<init>","parameterTypes":[] }, 
     {"name":"getId","parameterTypes":[] }, 
     {"name":"getType","parameterTypes":[] }, 
     {"name":"getArgs","parameterTypes":[] },
     {"name":"getEvent","parameterTypes":[] },
     {"name":"getAttributes","parameterTypes":[] },
+    {"name":"getLastResult","parameterTypes":[] },
+    {"name":"getLogger","parameterTypes":[] },
+    {"name":"getDataService","parameterTypes":[] },
+    {"name":"getDefaultHttpClient","parameterTypes":[] },
     {"name":"toString","parameterTypes":[] }
   ]
 },
@@ -20,10 +23,10 @@
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
   "methods":[
-    {"name":"getEventType","parameterTypes":[] }, 
+    {"name":"getType","parameterTypes":[] }, 
     {"name":"getObservedTime","parameterTypes":[] }, 
     {"name":"getBody","parameterTypes":[] }, 
-    {"name":"getEventSource","parameterTypes":[] },
+    {"name":"getSource","parameterTypes":[] },
     {"name":"getAttributes","parameterTypes":[] },
     {"name":"toString","parameterTypes":[] }
   ]
@@ -35,7 +38,7 @@
   "queryAllDeclaredConstructors":true,
   "methods":[
     {"name":"<init>","parameterTypes":[] }, 
-    {"name":"getSourceTime","parameterTypes":[] },
+    {"name":"getTime","parameterTypes":[] },
     {"name":"getPrincipals","parameterTypes":[] }, 
     {"name":"getLocation","parameterTypes":[] }, 
     {"name":"toString","parameterTypes":[] }
@@ -64,12 +67,24 @@
   ]
 },
 {
+  "name":"com.wl4g.rengine.evaluator.execution.sdk.ScriptLogger",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"trace","parameterTypes":["java.lang.String","[Ljava.lang.Object"] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
   "name":"com.wl4g.rengine.evaluator.execution.sdk.ScriptHttpClient",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
   "methods":[
     {"name":"<init>","parameterTypes":[] }, 
+    {"name":"<init>","parameterTypes":["java.lang.Integer","java.lang.Integer","java.lang.Integer"] }, 
+    {"name":"<init>","parameterTypes":["java.lang.Boolean","java.lang.Integer","java.lang.Integer","java.lang.Integer"] }, 
     {"name":"getAsText","parameterTypes":["java.lang.String"] }, 
     {"name":"postAsText","parameterTypes":["java.lang.String","java.lang.Object"] }, 
     {"name":"getAsJson","parameterTypes":["java.lang.String"] }, 
@@ -91,7 +106,17 @@
     {"name":"getAttributes","parameterTypes":[] }, 
     {"name":"addAttribute","parameterTypes":["java.lang.String","java.lang.Object"] }, 
     {"name":"removeAttribute","parameterTypes":["java.lang.String"] }, 
-    {"name":"reset","parameterTypes":["java.lang.String"] }, 
+    {"name":"reset","parameterTypes":[] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.evaluator.execution.sdk.ScriptDataService",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"findAggregates","parameterTypes":["java.lang.String","java.util.Map"] }, 
     {"name":"toString","parameterTypes":[] }
   ]
 },

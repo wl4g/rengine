@@ -76,6 +76,9 @@
     </parent>
     <properties>
         <grpc.version>1.49.0</grpc.version>
+        <elasticjob.version>3.0.1</elasticjob.version>
+        <curator.version>5.1.0</curator.version>
+        <logstash.version>7.2</logstash.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -254,6 +257,44 @@
                 <groupId>org.springframework.experimental</groupId>
                 <artifactId>spring-native</artifactId>
                 <version>${spring-native.version}</version>
+            </dependency>
+            <!-- ELASTIC JOB -->
+            <dependency>
+                <groupId>org.apache.shardingsphere.elasticjob</groupId>
+                <artifactId>elasticjob-lite-spring-boot-starter</artifactId>
+                <version>${elasticjob.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.shardingsphere.elasticjob</groupId>
+                <artifactId>elasticjob-lite-core</artifactId>
+                <version>${elasticjob.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.shardingsphere.elasticjob</groupId>
+                <artifactId>elasticjob-error-handler-dingtalk</artifactId>
+                <version>${elasticjob.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.shardingsphere.elasticjob</groupId>
+                <artifactId>elasticjob-error-handler-wechat</artifactId>
+                <version>${elasticjob.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.shardingsphere.elasticjob</groupId>
+                <artifactId>elasticjob-error-handler-email</artifactId>
+                <version>${elasticjob.version}</version>
+            </dependency>
+            <!-- ZOOKEEPER -->
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-test</artifactId>
+                <version>${curator.version}</version>
+            </dependency>
+            <!-- LOGGING -->
+            <dependency>
+                <groupId>net.logstash.logback</groupId>
+                <artifactId>logstash-logback-encoder</artifactId>
+                <version>${logstash.version}</version>
             </dependency>
             <!-- GRPC -->
             <dependency>

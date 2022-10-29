@@ -44,7 +44,7 @@ import lombok.extern.slf4j.Slf4j;
  * 
  * @author James Wong
  * @version 2022-09-18
- * @since v3.0.0
+ * @since v1.0.0
  * @see https://quarkus.io/guides/resteasy-reactive#asyncreactive-support
  */
 @Slf4j
@@ -80,8 +80,8 @@ public class EvaluatorServiceImpl implements EvaluatorService {
                                 MetricsTag.SERVICE, model.getService())
                         .increment();
             } catch (Exception e) {
-                String errmsg = format("Failed to evaluation with kind(%s), engine(%s). - %s", model.getKind(), model.getEngine(),
-                        e.getMessage());
+                String errmsg = format("Could not to execution evaluate of kind: '%s', engine: '%s'. reason: %s", model.getKind(),
+                        model.getEngine(), e.getMessage());
                 log.error(errmsg, e);
 
                 // Buried-point: failed evaluation.

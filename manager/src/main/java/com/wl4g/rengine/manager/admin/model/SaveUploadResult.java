@@ -31,7 +31,7 @@ import lombok.experimental.SuperBuilder;
  * 
  * @author James Wong
  * @version 2022-08-28
- * @since v3.0.0
+ * @since v1.0.0
  */
 @Getter
 @Setter
@@ -53,5 +53,5 @@ public class SaveUploadResult {
     private @NotBlank Long id;
     private @NotBlank long fileLimitSize;
     private @NotBlank String objectPrefix;
-    private @NotEmpty List<String> extension;
+    private @NotEmpty List<String> extensions;
 }

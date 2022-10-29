@@ -18,17 +18,18 @@ package com.wl4g.rengine.evaluator.execution.engine;
 import java.util.function.Function;
 
 import com.wl4g.rengine.common.model.Evaluation;
+import com.wl4g.rengine.evaluator.execution.sdk.ScriptResult;
 
 /**
  * {@link IEngine}
  * 
  * @author James Wong
  * @version 2022-09-22
- * @since v3.0.0
+ * @since v1.0.0
  */
-public interface IEngine extends Function<Evaluation, Object> {
+public interface IEngine extends Function<Evaluation, ScriptResult> {
 
-    default Object execute(Evaluation t) {
+    default ScriptResult execute(Evaluation t) {
         return apply(t);
     }
 

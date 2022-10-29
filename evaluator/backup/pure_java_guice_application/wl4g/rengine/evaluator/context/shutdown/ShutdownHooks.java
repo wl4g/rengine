@@ -41,7 +41,7 @@ import lombok.extern.slf4j.Slf4j;
  * 
  * @author James Wong
  * @version 2022-09-17
- * @since v3.0.0
+ * @since v1.0.0
  * @see learning refer to:
  *      https://github.com/hivemq/hivemq-community-edition/blob/2022.1/src/main/java/com/hivemq/common/shutdown/ShutdownHooks.java
  */

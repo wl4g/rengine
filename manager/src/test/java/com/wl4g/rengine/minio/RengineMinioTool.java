@@ -50,12 +50,12 @@ import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 
 /**
- * {@link MinioAdminTools}
+ * {@link MinioAdminTool}
  * 
  * @author James Wong
  * @version 2022-09-16
  * @since Copy of
- *        https://github.com/wl4g/infra/blob/master/common/src/test/java/com/wl4g/infra/common/minio/MinioAdminTools.java
+ *        https://github.com/wl4g/infra/blob/master/common/src/test/java/com/wl4g/infra/common/minio/MinioAdminTool.java
  */
 public final class RengineMinioTool {
 
@@ -75,9 +75,9 @@ public final class RengineMinioTool {
         CommandLineFacade line = CommandLineTool.builder()
                 .option("e", "endpoint", DEFAULT_ENDPOINT, "MinIO server endpoint.")
                 .option("r", "region", DEFAULT_REGION, "MinIO server region.")
-                .option("A", "adminAccessKey", DEFAULT_ADMIN_ACCESSKEY, "Admin accessKey.")
+                .option("A", "adminAccessKey", DEFAULT_ADMIN_ACCESSKEY, "Admin clientId.")
                 .option("S", "adminSecretKey", DEFAULT_ADMIN_SECRETKEY, "Admin secretKey.")
-                .option("a", "tenantAccessKey", DEFAULT_TENANT_ACCESSKEY, "Tenant accessKey.")
+                .option("a", "tenantAccessKey", DEFAULT_TENANT_ACCESSKEY, "Tenant clientId.")
                 .option("s", "tenantSecretKey", DEFAULT_TENANT_SECRETKEY, "Tenant secretKey.")
                 .option("b", "tenantBucket", DEFAULT_TENANT_BUCKET, "Tenant bucket.")
                 .option("n", "policyName", DEFAULT_TENANT_POLICY_NAME, "Tenant policy name.")
@@ -116,11 +116,11 @@ public final class RengineMinioTool {
         System.out.println("           region: " + region);
         System.out.println("   adminAccessKey: " + adminAccessKey);
         System.out.println("   adminSecretKey: " + adminSecretKey);
-        System.out.println(" tenantAccessKey: " + tenantAccessKey);
-        System.out.println(" tenantSecretKey: " + tenantSecretKey);
-        System.out.println("    tenantBucket: " + tenantBucket);
-        System.out.println("tenantPolicyName: " + tenantPolicyName);
-        System.out.println("tenantPolicyJson: " + tenantPolicyJson);
+        System.out.println("  tenantAccessKey: " + tenantAccessKey);
+        System.out.println("  tenantSecretKey: " + tenantSecretKey);
+        System.out.println("     tenantBucket: " + tenantBucket);
+        System.out.println(" tenantPolicyName: " + tenantPolicyName);
+        System.out.println(" tenantPolicyJson: " + tenantPolicyJson);
         System.out.println("---------------------------------------");
         System.out.println("\nCall to MinIO Server ...\n");
 

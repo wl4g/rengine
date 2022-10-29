@@ -15,6 +15,8 @@
  */
 package com.wl4g;
 
+import com.wl4g.infra.common.arthas.ArthasAttacher;
+
 import io.quarkus.runtime.ApplicationLifecycleManager;
 import io.quarkus.runtime.Quarkus;
 import io.quarkus.runtime.QuarkusApplication;
@@ -25,7 +27,7 @@ import io.quarkus.runtime.annotations.QuarkusMain;
  * 
  * @author James Wong
  * @version 2022-09-17
- * @since v3.0.0
+ * @since v1.0.0
  * @see https://github.com/quarkusio/quarkus-quickstarts
  * @see https://github.com/keycloak/keycloak/blob/17.0.1/quarkus/runtime/src/main/java/org/keycloak/quarkus/runtime/KeycloakMain.java
  */
@@ -33,6 +35,7 @@ import io.quarkus.runtime.annotations.QuarkusMain;
 public class RengineEvaluator implements QuarkusApplication {
 
     public static void main(String[] args) {
+        ArthasAttacher.attachIfNecessary("rengine-evaluator");
         System.setProperty("org.apache.commons.logging.LogFactory", "org.apache.commons.logging.impl.JBossLogFactory");
         Quarkus.run(RengineEvaluator.class, args);
     }

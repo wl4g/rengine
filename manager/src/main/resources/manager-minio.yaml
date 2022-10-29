@@ -1,0 +1,46 @@
+# Copyright (c) 2017 ~ 2025, the original author wangl.sir individual Inc,
+# All rights reserved. Contact us <Wanglsir@gmail.com, 983708408@qq.com>
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#
+# #### Environment MinIO configuration. ####
+#
+
+rengine:
+  ## see:com.wl4g.rengine.manager.minio.MinioClientProperties
+  minio:
+    httpClient:
+      connectTimeout: 5s
+      readTimeout: 5s
+      writeTimeout: 5s
+    endpoint: http://10.0.0.114:9000
+    region: us-east-1
+    ## The should manually create tenant accessKey and assign permission policies.
+    ## Can use this tools: https://github.com/wl4g/rengine/tree/master/web/src/test/java/com/wl4g/rengine/minio/RengineMinioTool.java
+    tenantAccessKey: rengine
+    tenantSecretKey: 12345678
+    userUpload:
+      #stsPolicyActions: {}
+      ## The adjusting partSize will affect whether the pubObject() of the
+      ## minio-js SDK enables multipart upload, that is, the interface
+      ## corresponding to s3:ListBucketMultipartUploads will be called, but
+      ## this interface must have read permission of the bucket root
+      ## directory? See the source codes:
+      ## @see https://github.com/minio/minio-js/blob/7.0.32/src/main/minio.js#L1212
+      ## @see https://github.com/minio/minio-js/blob/7.0.32/src/main/object-uploader.js#L75
+      ## @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/router.go#L95
+      ## @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/object-handler.go#L345
+      ## @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/auth-handler.go#L391
+      ## @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1754
+      ## @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1680
+      ## @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1723
+      libraryPartSize: 10MB
+      libraryFileLimitSize: 10MB
+      testsetPartSize: 10MB
+      testsetFileLimitSize: 10MB
+      expiredDuration: 5M

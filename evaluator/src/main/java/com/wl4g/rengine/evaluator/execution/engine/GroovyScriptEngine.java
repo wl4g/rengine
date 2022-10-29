@@ -17,7 +17,6 @@ package com.wl4g.rengine.evaluator.execution.engine;
 
 import static java.lang.String.format;
 
-import java.util.List;
 import java.util.function.Function;
 
 import javax.annotation.PreDestroy;
@@ -25,11 +24,13 @@ import javax.enterprise.event.Observes;
 import javax.inject.Singleton;
 import javax.validation.constraints.NotNull;
 
+import com.wl4g.infra.common.lang.StringUtils2;
 import com.wl4g.rengine.common.entity.UploadObject.UploadType;
 import com.wl4g.rengine.common.exception.ExecutionException;
 import com.wl4g.rengine.common.model.Evaluation;
-import com.wl4g.rengine.common.model.EvaluationResult;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptContext;
+import com.wl4g.rengine.evaluator.execution.sdk.ScriptResult;
+import com.wl4g.rengine.evaluator.minio.MinioManager.ObjectResource;
 
 import groovy.lang.GroovyClassLoader;
 import io.quarkus.runtime.StartupEvent;
@@ -41,7 +42,7 @@ import lombok.extern.slf4j.Slf4j;
  * 
  * @author James Wong
  * @version 2022-09-22
- * @since v3.0.0
+ * @since v1.0.0
  */
 @Slf4j
 @Getter
@@ -72,28 +73,51 @@ public class GroovyScriptEngine extends AbstractScriptEngine {
 
     @SuppressWarnings("unchecked")
     @Override
-    public EvaluationResult apply(Evaluation model) {
+    public ScriptResult apply(Evaluation model) {
         final String scriptMain = model.getScripting().getMainFun();
+        if (log.isDebugEnabled()) {
+            log.debug("Execution Groovy script main: {} ...", scriptMain);
+        }
+
         try {
-            final List<String> scripts = loadScripts(UploadType.USER_LIBRARY_WITH_GROOVY, model);
+            // Load all scripts dependencies.
+            Function<ScriptContext, String> mainFunction = null;
+            for (ObjectResource script : loadScriptResources(UploadType.USER_LIBRARY_WITH_JS, model, true)) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Parsing groovy dependency: {}", script.getObjectPrefix());
+                }
+                String scriptName = StringUtils2.getFilename(script.getObjectPrefix()).concat("@").concat(scriptMain);
+                try {
+                    // TODO merge depends library
+                    if (script.isBinary()) {
+                        // TODO load jar file
+                        gcl.addClasspath(script.getLocalFile().getAbsolutePath());
+                    } else {
+                        Class<?> cls = gcl.parseClass(script.readToString(), scriptMain);
 
-            // TODO merge(import?) scripts all.
-            final Class<?> cls = gcl.parseClass(scripts.get(0), scriptMain);
-            log.info("Load groovy script class: {}", cls);
+                        if (log.isDebugEnabled()) {
+                            log.debug("Instantiating Groovy library main: {} ...", scriptMain);
+                        }
 
-            log.info("Instantiating groovy script class with {} ...", scriptMain);
-            final Function<ScriptContext, String> function = (Function<ScriptContext, String>) cls.getConstructor().newInstance();
-            log.info("Instantiated script class object: {}, is instance of java.util.function.Function: {}", function,
-                    (function instanceof Function));
+                        // TODO determine main function
+                        mainFunction = (Function<ScriptContext, String>) cls.getConstructor().newInstance();
+                        if (log.isDebugEnabled()) {
+                            log.debug("Execution Groovy libary main: {} with object: {} ...", scriptMain, mainFunction);
+                        }
+                    }
+                } catch (Throwable e) {
+                    throw new ExecutionException(format("Failed to load groovy dependency '%s'", scriptName), e);
+                }
+            }
 
-            log.info("Execution groovy script with {} ...", scriptMain);
-            final var result = function.apply(newScriptContext(model));
-            log.info("Execution groovy script: {}, result: {}", scriptMain, result.toString());
-
-            // TODO re-definition result model structure
-            return EvaluationResult.GenericEvaluationResult.builder().result(result).build();
+            var result = mainFunction.apply(newScriptContext(model));
+            if (log.isDebugEnabled()) {
+                log.debug("Executed Groovy script main: {}, result: {}", scriptMain, result.toString());
+            }
+            // TODO re-wrap result object
+            return new ScriptResult(null);
         } catch (Exception e) {
-            throw new ExecutionException(format("Failed to execution '%s' with Groovy engine.", scriptMain), e);
+            throw new ExecutionException(format("Failed to execution JS script main: '%s'. %s", scriptMain, e.getMessage()), e);
         }
     }
 

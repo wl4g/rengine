@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 
  * @author James Wong
  * @version 2022-08-29
- * @since v3.0.0
+ * @since v1.0.0
  */
 @RestController
 @RequestMapping("/api/v1/applib")

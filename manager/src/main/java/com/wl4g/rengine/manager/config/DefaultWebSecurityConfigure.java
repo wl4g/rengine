@@ -27,7 +27,7 @@ import org.springframework.security.web.SecurityFilterChain;
  * 
  * @author James Wong
  * @version 2022-08-29
- * @since v3.0.0
+ * @since v1.0.0
  * @see https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter
  */
 @Configuration

@@ -20,19 +20,16 @@ import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.mongodb.ConnectionString;
-import com.mongodb.MongoClientSettings;
-import com.mongodb.MongoDriverInformation;
-import com.mongodb.client.internal.MongoClientImpl;
 import com.wl4g.rengine.common.entity.Scenes;
 import com.wl4g.rengine.evaluator.service.JobService;
+import com.wl4g.rengine.evaluator.util.TestMongoUtil;
 
 /**
  * {@link JobServiceTests}
  * 
  * @author James Wong
  * @version 2022-09-27
- * @since v3.0.0
+ * @since v1.0.0
  */
 // @QuarkusTest
 // @ExtendWith(MockitoExtension.class)
@@ -51,17 +48,15 @@ public class JobServiceTests {
         // JobService mock = Mockito.mock(JobService.class);
         // QuarkusMock.installMockForType(mock, JobService.class);
 
-        // Temporary manual initialization.
+        // Manual setup/inject depends.
         JobServiceImpl jobService = new JobServiceImpl();
-        jobService.mongoClient = new MongoClientImpl(MongoClientSettings.builder()
-                .applyConnectionString(new ConnectionString("mongodb://localhost:27017/rengine"))
-                .build(), MongoDriverInformation.builder().build());
+        jobService.mongoRepository = TestMongoUtil.createMongoRepository();
         this.jobService = jobService;
     }
 
     @Test
     public void testLoadScenesFull() {
-        Scenes scenes = jobService.loadScenesFull("iot_generic_temp_warning");
+        Scenes scenes = jobService.loadScenesWithCascade("iot_generic_temp_warning");
         System.out.println(toJSONString(scenes));
     }
 

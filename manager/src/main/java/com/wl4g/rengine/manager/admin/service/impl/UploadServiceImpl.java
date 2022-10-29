@@ -15,9 +15,11 @@
  */
 package com.wl4g.rengine.manager.admin.service.impl;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.TypeConverts.safeLongToInt;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
+import static java.util.stream.Collectors.toList;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
@@ -58,7 +60,7 @@ import io.minio.credentials.Credentials;
  * 
  * @author James Wong
  * @version 2022-08-29
- * @since v3.0.0
+ * @since v1.0.0
  */
 @Service
 public class UploadServiceImpl implements UploadService {
@@ -81,28 +83,6 @@ public class UploadServiceImpl implements UploadService {
         List<UploadObject> uploads = mongoTemplate.find(query, UploadObject.class, MongoCollectionDefinition.UPLOADS.getName());
 
         Collections.sort(uploads, (o1, o2) -> safeLongToInt(o2.getUpdateDate().getTime() - o1.getUpdateDate().getTime()));
-
-        // QueryUploadResult.builder()
-        // .uploads(safeList(uploads).stream()
-        // .map(p -> UploadObject.builder()
-        // .UploadType(p.getUploadType())
-        // .id(p.getId())
-        // .objectPrefix(p.getObjectPrefix())
-        // .filename(p.getFilename())
-        // .extension(p.getExtension())
-        // .labels(p.getLabels())
-        // .size(p.getSize())
-        // .sha1sum(p.getSha1sum())
-        // .md5sum(p.getMd5sum())
-        // .enable(p.getEnable())
-        // .remark(p.getRemark())
-        // .updateBy(p.getUpdateBy())
-        // .updateDate(p.getUpdateDate())
-        // .createBy(p.getCreateBy())
-        // .createDate(p.getCreateDate())
-        // .build())
-        // .collect(toList()))
-        // .build();
 
         return new PageHolder<UploadObject>(model.getPageNum(), model.getPageSize())
                 .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.UPLOADS.getName()))
@@ -158,7 +138,7 @@ public class UploadServiceImpl implements UploadService {
                     .partSize(config.getUserUpload().getLibraryPartSize().toBytes())
                     .fileLimitSize(config.getUserUpload().getLibraryFileLimitSize().toBytes())
                     .objectPrefix(objectPrefix)
-                    .extension(uploadType.getExtensions())
+                    .extensions(safeList(uploadType.getExtensions()).stream().map(t -> t.getSuffix()).collect(toList()))
                     .build();
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException("Failed to create STS with assumeRole grant", e);

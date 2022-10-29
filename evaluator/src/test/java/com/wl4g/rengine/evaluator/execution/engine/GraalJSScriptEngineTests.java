@@ -20,8 +20,8 @@ package com.wl4g.rengine.evaluator.execution.engine;
  * 
  * @author James Wong
  * @version 2022-09-23
- * @since v3.0.0
- * @see https://github.com/wl4g/infra/blob/master/common-java11/src/test/java/com/wl4g/infra/common/graalvm/GraalJsScriptManagerTests.java#L97
+ * @since v1.0.0
+ * @see https://github.com/wl4g/infra/blob/master/common-java11/src/test/java/com/wl4g/infra/common/graalvm/GraalPolyglotManagerTests.java#L97
  */
 public class GraalJSScriptEngineTests {
 

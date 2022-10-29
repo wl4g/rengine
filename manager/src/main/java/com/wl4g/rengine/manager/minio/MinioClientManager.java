@@ -42,7 +42,7 @@ import okhttp3.OkHttpClient;
  * 
  * @author James Wong
  * @version 2022-08-31
- * @since v3.0.0
+ * @since v1.0.0
  */
 // @Slf4j
 @AllArgsConstructor

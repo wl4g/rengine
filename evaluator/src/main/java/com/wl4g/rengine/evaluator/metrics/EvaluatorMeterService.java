@@ -36,7 +36,7 @@ import lombok.Getter;
  * 
  * @author Wangl.sir &lt;James Wong <jameswong1376@gmail.com>&gt;
  * @version 2022-07-12
- * @since v3.0.0
+ * @since v1.0.0
  */
 // @ApplicationScoped
 @Singleton
@@ -59,6 +59,8 @@ public class EvaluatorMeterService extends PrometheusMeterFacade {
 
         evaluation_failure("evaluation_suspicious", "The stats of evaluation failure"),
 
+        evaluation_execute_time("evaluation_execute_time", "The stats of evaluation execute time"),
+
         evaluation_suspicious("evaluation_suspicious", "The stats of evaluation suspicious");
 
         private final String name;
@@ -69,7 +71,8 @@ public class EvaluatorMeterService extends PrometheusMeterFacade {
         public static final String KIND = "kind";
         public static final String ENGINE = "engine";
         public static final String SCENESCODE = "scenesCode";
-        public static final String SERVICE = "service";
+         public static final String SERVICE = "service";
+        public static final String LIBRARY = "library";
     }
 
 }

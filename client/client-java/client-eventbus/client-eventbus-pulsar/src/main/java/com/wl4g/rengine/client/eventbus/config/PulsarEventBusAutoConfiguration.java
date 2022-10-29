@@ -27,12 +27,12 @@ import com.wl4g.rengine.common.constants.RengineConstants;
  * 
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2022-05-31 v3.0.0
- * @since v3.0.0
+ * @since v1.0.0
  */
 public class PulsarEventBusAutoConfiguration {
 
     @Bean
-    @ConfigurationProperties(prefix = RengineConstants.CONF_PREFIX_EVENTBUS_PULSAR)
+    @ConfigurationProperties(prefix = RengineConstants.CONF_PREFIX_CLIENT_EVENTBUS_PULSAR)
     public PulsarEventBusProperties pulsarEventBusProperties() {
         return new PulsarEventBusProperties();
     }

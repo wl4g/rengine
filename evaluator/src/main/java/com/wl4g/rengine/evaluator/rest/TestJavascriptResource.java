@@ -44,7 +44,8 @@ import org.graalvm.polyglot.Source;
 import org.graalvm.polyglot.Value;
 import org.graalvm.polyglot.proxy.ProxyObject;
 
-import com.wl4g.infra.common.graalvm.GraalJsScriptManager.ContextWrapper;
+import com.google.common.annotations.VisibleForTesting;
+import com.wl4g.infra.common.graalvm.GraalPolyglotManager.ContextWrapper;
 import com.wl4g.infra.common.lang.EnvironmentUtil;
 import com.wl4g.infra.common.runtime.JvmRuntimeTool;
 import com.wl4g.infra.common.web.rest.RespBase;
@@ -68,7 +69,7 @@ import lombok.extern.slf4j.Slf4j;
  * 
  * @author James Wong
  * @version 2022-09-18
- * @since v3.0.0
+ * @since v1.0.0
  * @see https://github.com/graalvm/graal-js-jdk11-maven-demo
  * @see https://docs.oracle.com/javase/8/docs/technotes/guides/scripting/prog_guide/api.html
  */
@@ -79,6 +80,7 @@ import lombok.extern.slf4j.Slf4j;
 @Consumes(MediaType.APPLICATION_JSON)
 // 注1: 当编译为native运行时, 必须显示指定单例, 否则方法体中使用成员属性会空指针. (但使用JVM运行时却不会?)
 @Singleton
+@VisibleForTesting
 public class TestJavascriptResource {
 
     // 注: 同一 Context 实例不允许多线程并发调用.
@@ -108,7 +110,7 @@ public class TestJavascriptResource {
 
     @POST
     @Path("/execution")
-    public RespBase<Object> execution(JavascriptExecution model) {
+    public RespBase<Object> execution(TestJavascriptExecution model) {
         log.info("called: JSScript execution ... {}", model);
 
         // Limiting test process.
@@ -117,7 +119,7 @@ public class TestJavascriptResource {
         }
 
         long begin = currentTimeMillis();
-        try (ContextWrapper context = jsScriptEngine.getGraalJsScriptManager().getContext();) {
+        try (ContextWrapper context = jsScriptEngine.getGraalPolyglotManager().getContext();) {
             log.info("JSScript execution ...");
             System.out.println(format("cost(newContext): %sms", (currentTimeMillis() - begin)));
 
@@ -128,7 +130,7 @@ public class TestJavascriptResource {
 
             ScriptRengineEvent event = new ScriptRengineEvent("generic_device_temp_warning",
                     ScriptEventSource.builder()
-                            .sourceTime(currentTimeMillis())
+                            .time(currentTimeMillis())
                             .principals(singletonList("admin"))
                             .location(ScriptEventLocation.builder().zipcode("20500").build())
                             .build(),
@@ -155,8 +157,8 @@ public class TestJavascriptResource {
             System.out.println(format("cost(getBindings): %sms", (currentTimeMillis() - begin)));
 
             begin = currentTimeMillis();
-            bindings.putMember("httpClient", new ScriptHttpClient());
-            bindings.putMember("ScriptResult", ScriptResult.class);
+            bindings.putMember(ScriptHttpClient.class.getSimpleName(), ScriptHttpClient.class);
+            bindings.putMember(ScriptResult.class.getSimpleName(), ScriptResult.class);
             System.out.println(format("cost(putMember): %sms", (currentTimeMillis() - begin)));
 
             begin = currentTimeMillis();
@@ -183,7 +185,7 @@ public class TestJavascriptResource {
     @Data
     @NoArgsConstructor
     @SuperBuilder
-    public static class JavascriptExecution {
+    public static class TestJavascriptExecution {
         @NotBlank
         String scriptPath;
         @NotEmpty
