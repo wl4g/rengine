@@ -22,10 +22,13 @@ import static java.util.Objects.nonNull;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
@@ -35,14 +38,12 @@ import org.apache.shardingsphere.elasticjob.executor.JobFacade;
 import com.wl4g.infra.support.cache.jedis.JedisClient;
 import com.wl4g.infra.support.cache.jedis.JedisClientAutoConfiguration.JedisProperties;
 import com.wl4g.infra.support.cache.jedis.JedisClientFactoryBean;
-import com.wl4g.rengine.client.collector.job.CollectJobExecutor.JobParamBase;
 import com.wl4g.rengine.common.event.RengineEvent.EventLocation;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * {@link SimpleRedisCollectJobExecutor}
@@ -51,7 +52,6 @@ import lombok.extern.slf4j.Slf4j;
  * @version 2022-10-26
  * @since v3.0.0
  */
-@Slf4j
 public class SimpleRedisCollectJobExecutor extends CollectJobExecutor<SimpleRedisCollectJobExecutor.SimpleRedisJobParam>
         implements Closeable {
 
@@ -71,7 +71,7 @@ public class SimpleRedisCollectJobExecutor extends CollectJobExecutor<SimpleRedi
             ShardingContext context) throws Exception {
 
         JedisClient jedisClient = obtainShardingJedisClient(shardingParam, currentShardingTotalCount, jobConfig, context);
-        Object result = jedisClient.eval(shardingParam.getLuaScript());
+        Object result = jedisClient.eval(shardingParam.getLuaScript(), shardingParam.getLuaKeys(), shardingParam.getLuaArgs());
         log.debug("Collect to result: {}", result);
 
         offer(shardingParam, jobConfig, jobFacade, context, result);
@@ -115,6 +115,7 @@ public class SimpleRedisCollectJobExecutor extends CollectJobExecutor<SimpleRedi
                 jedisClient = jedisClientCaches.get(shardingParam.getName());
                 if (isNull(jedisClient)) {
                     JedisClientFactoryBean factoryBean = new JedisClientFactoryBean(shardingParam.getJedisConfig());
+                    factoryBean.afterPropertiesSet();
                     jedisClientCaches.put(shardingParam.getName(), (jedisClient = factoryBean.getObject()));
                 }
             }
@@ -141,9 +142,11 @@ public class SimpleRedisCollectJobExecutor extends CollectJobExecutor<SimpleRedi
     @Setter
     @ToString
     @NoArgsConstructor
-    public static class SimpleRedisJobParam extends JobParamBase {
+    public static class SimpleRedisJobParam extends CollectJobExecutor.JobParamBase {
         private @NotNull JedisProperties jedisConfig = new JedisProperties();
         private @NotBlank String luaScript;
+        private @NotEmpty List<String> luaKeys = new ArrayList<>();
+        private @NotEmpty List<String> luaArgs = new ArrayList<>();
     }
 
 }

@@ -131,9 +131,25 @@ class OriginTrackedYamlLoader extends YamlProcessor {
             node.setValue(node.getValue().stream().map(KeyScalarNode::get).collect(Collectors.toList()));
         }
 
+        @SuppressWarnings("unused")
         private Object constructTrackedObject(Node node, Object value) {
+            //
+            // [Begin] REMOVE FEATURES.
+            // 使用 OriginTrackedValue 序列化和反序列化时对多态类型的处理会有问题.
+            //
             Origin origin = getOrigin(node);
-            return OriginTrackedValue.of(getValue(value), origin);
+            // return OriginTrackedValue.of(getValue(value), origin);
+            //
+            // [End] REMOVE FEATURES.
+            //
+
+            //
+            // [Begin] ADD FEATURES.
+            //
+            return getValue(value);
+            //
+            // [End] ADD FEATURES.
+            //
         }
 
         private Object getValue(Object value) {

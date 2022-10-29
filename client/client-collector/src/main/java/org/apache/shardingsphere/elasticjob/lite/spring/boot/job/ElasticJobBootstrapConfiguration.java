@@ -37,6 +37,7 @@ import com.google.common.base.Preconditions;
 import com.wl4g.rengine.client.collector.config.CollectorProperties;
 import com.wl4g.rengine.client.collector.config.CollectorProperties.ScrapeJobProperties;
 import com.wl4g.rengine.client.collector.config.CollectorProperties.TracingProperties;
+import com.wl4g.rengine.client.collector.job.CollectJobExecutor.JobParamBase;
 
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -172,7 +173,7 @@ public class ElasticJobBootstrapConfiguration implements SmartInitializingSingle
             final SingletonBeanRegistry singletonBeanRegistry,
             final CoordinatorRegistryCenter registryCenter,
             final TracingConfiguration<?> tracingConfig,
-            final ScrapeJobProperties scrapeConfig) {
+            final ScrapeJobProperties<? extends JobParamBase> scrapeConfig) {
 
         JobConfiguration jobConfig = scrapeConfig.toJobConfiguration(jobName);
         jobExtraConfigurations(jobConfig, tracingConfig);

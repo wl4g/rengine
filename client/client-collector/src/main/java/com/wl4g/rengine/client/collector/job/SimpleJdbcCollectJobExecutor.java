@@ -33,16 +33,14 @@ import org.apache.shardingsphere.elasticjob.api.ShardingContext;
 import org.apache.shardingsphere.elasticjob.executor.JobFacade;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.wl4g.rengine.client.collector.job.CollectJobExecutor.JobParamBase;
+import com.wl4g.infra.common.bean.ConfigBeanUtils;
 import com.wl4g.rengine.common.event.RengineEvent.EventLocation;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * {@link SimpleJdbcCollectJobExecutor}
@@ -52,7 +50,6 @@ import lombok.extern.slf4j.Slf4j;
  * @since v1.0.0
  * @see https://github1s.com/apache/commons-dbutils/tree/DBUTILS_1_7/src/test/java/org/apache/commons/dbutils
  */
-@Slf4j
 public class SimpleJdbcCollectJobExecutor extends CollectJobExecutor<SimpleJdbcCollectJobExecutor.SimpleJdbcJobParam>
         implements Closeable {
 
@@ -146,8 +143,7 @@ public class SimpleJdbcCollectJobExecutor extends CollectJobExecutor<SimpleJdbcC
     @Getter
     @Setter
     @ToString
-    @NoArgsConstructor
-    public static class SimpleJdbcJobParam extends JobParamBase {
+    public static class SimpleJdbcJobParam extends CollectJobExecutor.JobParamBase {
 
         /**
          * If this variable is {@code false}, we will throw exceptions on SQL
@@ -201,18 +197,34 @@ public class SimpleJdbcCollectJobExecutor extends CollectJobExecutor<SimpleJdbcC
         /**
          * The properties for {@link HikariConfig}
          */
-        private HikariConfig hikariConfig = new HikariConfig() {
-            {
-                // Setup default collect JDBC to target URL.
-                setJdbcUrl(
-                        "jdbc:mysql://localhost:3306/test?useunicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf-8&useSSL=false&allowMultiQueries=true");
-            }
-        };
+        private HikariConfig hikariConfig = new HikariConfig();
 
         /**
          * The collect to target JDBC SQL.
          */
         private @NotBlank String sql = "SELECT 1";
+
+        /**
+         * 注: 不能在这里设置默认值, 经测试发现, 启动服务初始化时调用 snakeyaml 解析后最终的属性值并非此处设置的值, 还是父类
+         * {@link HikariConfig} 无参构造方法设置的默认值??? 然而这样会影响
+         * {@link ConfigBeanUtils#configureWithDefault(Object, Object, Object)}
+         * 合并时对初始值的检查而出BUG(即:当未设置 destObj 的默认值时, 也没有正常覆盖 defaultObj 的值).
+         */
+        public SimpleJdbcJobParam() {
+            //@formatter:off
+            // getHikariConfig().setJdbcUrl(
+            //         "jdbc:mysql://localhost:3306/test?useunicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf-8&useSSL=false&allowMultiQueries=true&autoReconnect=true");
+            // getHikariConfig().setConnectionTimeout(30_000);
+            // getHikariConfig().setIdleTimeout(600_000);
+            // getHikariConfig().setInitializationFailTimeout(1);
+            // getHikariConfig().setMinimumIdle(1);
+            // getHikariConfig().setMaxLifetime(1800_000);
+            // getHikariConfig().setMaximumPoolSize(1);
+            // getHikariConfig().setValidationTimeout(5_000);
+            // getHikariConfig().setLeakDetectionThreshold(0);
+            //@formatter:on
+        }
+
     }
 
 }

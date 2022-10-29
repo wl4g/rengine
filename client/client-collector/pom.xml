@@ -96,6 +96,11 @@
             <groupId>com.wl4g</groupId>
             <artifactId>rengine-client-eventbus-base</artifactId>
         </dependency>
+        <!-- MySQL -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
         <!-- Elastic-Job -->
         <!-- <dependency> -->
         <!--     <groupId>org.apache.shardingsphere.elasticjob</groupId> -->

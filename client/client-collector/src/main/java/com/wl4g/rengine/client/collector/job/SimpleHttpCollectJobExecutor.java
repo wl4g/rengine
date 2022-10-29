@@ -43,14 +43,12 @@ import org.apache.shardingsphere.elasticjob.infra.json.GsonFactory;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.wl4g.rengine.client.collector.job.CollectJobExecutor.JobParamBase;
 import com.wl4g.rengine.common.event.RengineEvent.EventLocation;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * {@link SimpleHttpCollectJobExecutor}
@@ -60,7 +58,6 @@ import lombok.extern.slf4j.Slf4j;
  * @since v1.0.0
  * @see {@link org.apache.shardingsphere.elasticjob.http.executor.HttpJobExecutor}
  */
-@Slf4j
 @Getter
 public class SimpleHttpCollectJobExecutor extends CollectJobExecutor<SimpleHttpCollectJobExecutor.SimpleHttpJobParam> {
 
@@ -103,7 +100,7 @@ public class SimpleHttpCollectJobExecutor extends CollectJobExecutor<SimpleHttpC
             if (isRequestSucceed(code)) {
                 resultInputStream = connection.getInputStream();
             } else {
-                log.warn("HTTP job {} executed with response code {}", jobConfig.getJobName(), code);
+                log.warn("HTTP collect job {} executed with response code {}", jobConfig.getJobName(), code);
                 resultInputStream = connection.getErrorStream();
             }
             StringBuilder result = new StringBuilder();
@@ -115,10 +112,12 @@ public class SimpleHttpCollectJobExecutor extends CollectJobExecutor<SimpleHttpC
                 }
             }
             if (isRequestSucceed(code)) {
-                log.debug("HTTP job execute result : {}", result.toString());
+                log.debug("HTTP collect job executed result : {}",
+                        result.toString().substring(0, Math.min(result.length(), 1024)));
                 offer(shardingParam, jobConfig, jobFacade, context, result.toString());
             } else {
-                log.warn("HTTP job {} executed with response body {}", jobConfig.getJobName(), result.toString());
+                log.warn("HTTP collect job {} executed with response body {}", jobConfig.getJobName(),
+                        result.substring(0, Math.min(result.length(), 1024)));
             }
         } catch (final IOException ex) {
             throw new JobExecutionException(ex);
@@ -167,7 +166,7 @@ public class SimpleHttpCollectJobExecutor extends CollectJobExecutor<SimpleHttpC
     @Setter
     @ToString
     @NoArgsConstructor
-    public static class SimpleHttpJobParam extends JobParamBase {
+    public static class SimpleHttpJobParam extends CollectJobExecutor.JobParamBase {
 
         /**
          * The collect HTTP to target URL.

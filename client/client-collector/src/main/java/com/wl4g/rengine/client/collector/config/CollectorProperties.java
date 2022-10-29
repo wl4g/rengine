@@ -15,10 +15,15 @@
  */
 package com.wl4g.rengine.client.collector.config;
 
+import static com.wl4g.infra.common.bean.ConfigBeanUtils.configureWithDefault;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
+import static com.wl4g.infra.common.lang.Assert2.isTrue;
+import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -48,6 +53,7 @@ import com.wl4g.rengine.client.collector.job.SimpleHttpCollectJobExecutor.Simple
 import com.wl4g.rengine.client.collector.job.SimpleJdbcCollectJobExecutor.SimpleJdbcJobParam;
 import com.wl4g.rengine.client.collector.job.SimpleRedisCollectJobExecutor.SimpleRedisJobParam;
 import com.wl4g.rengine.client.collector.job.SimpleTcpCollectJobExecutor.SimpleTcpJobParam;
+import com.wl4g.rengine.common.event.RengineEvent;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -80,16 +86,17 @@ public class CollectorProperties implements InitializingBean {
 
     private DefaultScrapeJobProperties defaultScrapeJobConfig = new DefaultScrapeJobProperties();
 
-    private List<ScrapeJobProperties> scrapeJobConfigs = new ArrayList<>();
+    private List<ScrapeJobProperties<JobParamBase>> scrapeJobConfigs = new ArrayList<>();
 
     @Override
     public void afterPropertiesSet() throws Exception {
         applyDefaultToProperties();
         validator.validate(this);
+        safeConstraintValidate();
     }
 
-    public void applyDefaultToProperties() {
-        ScrapeJobProperties defaultJobConf = getDefaultScrapeJobConfig();
+    protected void applyDefaultToProperties() {
+        DefaultScrapeJobProperties defaultJobConf = getDefaultScrapeJobConfig();
 
         // Merge default configuration to scrape job configuration.
         safeList(getScrapeJobConfigs()).forEach(jobConf -> {
@@ -97,12 +104,18 @@ public class CollectorProperties implements InitializingBean {
                 // if (isNull(jobConf.getName())) {
                 // jobConf.setName(defaultJobConf.getName());
                 // }
-                if (isBlank(jobConf.getEventType())) {
-                    jobConf.setEventType(defaultJobConf.getEventType());
-                }
                 // if (isNull(jobConf.getElasticJobClass())) {
                 // jobConf.setElasticJobClass(defaultJobConf.getElasticJobClass());
                 // }
+
+                // Merge from default event type/attributes.
+                if (isBlank(jobConf.getEventType())) {
+                    jobConf.setEventType(defaultJobConf.getEventType());
+                }
+                Map<String, String> cloneAttributes = new HashMap<>(defaultJobConf.getEventAttributes());
+                cloneAttributes.putAll(jobConf.getEventAttributes());
+                jobConf.setEventAttributes(cloneAttributes);
+
                 if (isNull(jobConf.getDisabled())) {
                     jobConf.setDisabled(defaultJobConf.getDisabled());
                 }
@@ -118,7 +131,8 @@ public class CollectorProperties implements InitializingBean {
                 if (isNull(jobConf.getMisfire())) {
                     jobConf.setMisfire(defaultJobConf.getMisfire());
                 }
-                // Merge event job configuration properties.
+
+                // Merge from default job configuration.
                 if (isBlank(jobConf.getCron())) {
                     jobConf.setCron(defaultJobConf.getCron());
                 }
@@ -164,25 +178,63 @@ public class CollectorProperties implements InitializingBean {
                 if (isBlank(jobConf.getDescription())) {
                     jobConf.setDescription(defaultJobConf.getDescription());
                 }
-                // Merge event job extra attributes.
-                Map<String, String> cloneAttributes = new HashMap<>(defaultJobConf.getEventAttributes());
-                cloneAttributes.putAll(jobConf.getEventAttributes());
-                jobConf.setEventAttributes(cloneAttributes);
 
                 // [MARK1]
-                // TODO Notice: It is temporarily considered unnecessary to
-                // merge
-                // the job parameter configuration, and then it can be
-                // determined
-                // whether it needs to be implemented according to the actual
-                // needs.
-                // jobConf.setJobParams(defaultJobConf.getJobParams());
+                // Merge from default job parameters.
+                for (int i = 0; i < jobConf.getJobParams().size(); i++) {
+                    JobParamBase p = jobConf.getJobParams().get(i);
+                    try {
+                        JobParamBase init = p.getClass().getConstructor().newInstance(), merged = p;
+                        if (p instanceof SimpleHttpJobParam) {
+                            merged = configureWithDefault(init, p, defaultJobConf.getJobParamsConfig().getSimpleHttp());
+                        } else if (p instanceof SimpleJdbcJobParam) {
+                            merged = configureWithDefault(init, p, defaultJobConf.getJobParamsConfig().getSimpleJdbc());
+                        } else if (p instanceof SimpleRedisJobParam) {
+                            merged = configureWithDefault(init, p, defaultJobConf.getJobParamsConfig().getSimpleRedis());
+                        } else if (p instanceof SimpleTcpJobParam) {
+                            merged = configureWithDefault(init, p, defaultJobConf.getJobParamsConfig().getSimpleTcp());
+                        } else if (p instanceof SSHJobParam) {
+                            merged = configureWithDefault(init, p, defaultJobConf.getJobParamsConfig().getSsh());
+                        } else {
+                            throw new Error(format("Should't to be here."));
+                        }
+                        jobConf.getJobParams().set(i, merged);
+                    } catch (Exception e) {
+                        throw new IllegalStateException(format("Could't to merge default to job param. - %s", p), e);
+                    }
+                }
 
             } catch (Exception e) {
                 log.error("Failed to merge default properties to job configuration.", e);
                 throw e;
             }
         });
+    }
+
+    protected void safeConstraintValidate() {
+        // The validate for event type.
+        safeList(scrapeJobConfigs).stream().forEach(jobConf -> RengineEvent.validateForEventType(jobConf.getEventType()));
+
+        // The validate for duplicate job names.
+        List<String> duplicateJobNames = safeList(scrapeJobConfigs).stream()
+                .collect(groupingBy(jobConf -> jobConf.getName()))
+                .entrySet()
+                .stream()
+                .filter(e -> safeList(e.getValue()).size() > 1)
+                .map(e -> e.getKey())
+                .collect(toList());
+        isTrue(duplicateJobNames.isEmpty(), "The duplicate job names for : %s", duplicateJobNames);
+
+        // The validate for duplicate jobParam names.
+        List<String> duplicateJobParamNames = safeList(scrapeJobConfigs).stream()
+                .flatMap(jobConf -> safeList(jobConf.getJobParams()).stream())
+                .collect(groupingBy(jobParam -> jobParam.getName()))
+                .entrySet()
+                .stream()
+                .filter(e -> safeList(e.getValue()).size() > 1)
+                .map(e -> e.getKey())
+                .collect(toList());
+        isTrue(duplicateJobParamNames.isEmpty(), "The duplicate job params names for : %s", duplicateJobParamNames);
     }
 
     @Getter
@@ -275,7 +327,7 @@ public class CollectorProperties implements InitializingBean {
     @Setter
     @ToString
     @NoArgsConstructor
-    public abstract static class ScrapeJobProperties {
+    public abstract static class ScrapeJobProperties<C extends JobParamBase> {
         private String name;
 
         // private Class<? extends ElasticJob> elasticJobClass;
@@ -299,6 +351,7 @@ public class CollectorProperties implements InitializingBean {
         private String cron;
         private String timeZone;
         private String jobBootstrapBeanName;
+
         // When setup true, the shardingTotalCount will be ignored, and the will
         // be automatically allocated according to the number of cluster nodes
         // priority.
@@ -316,7 +369,7 @@ public class CollectorProperties implements InitializingBean {
 
         public abstract EventJobType getJobType();
 
-        public abstract List<? extends JobParamBase> getJobParams();
+        public abstract List<C> getJobParams();
 
         public JobConfiguration toJobConfiguration(final String jobName) {
             JobConfiguration result = JobConfiguration.builder()
@@ -347,17 +400,17 @@ public class CollectorProperties implements InitializingBean {
             safeMap(eventAttributes).forEach((key, value) -> result.getProps().setProperty(key, value));
             return result;
         }
-
     }
 
     @Getter
     @Setter
     @ToString
-    public static class DefaultScrapeJobProperties extends ScrapeJobProperties {
+    public static class DefaultScrapeJobProperties extends ScrapeJobProperties<JobParamBase> {
+        private DefaultJobParamsProperties jobParamsConfig = new DefaultJobParamsProperties();
 
         public DefaultScrapeJobProperties() {
-            setEventType("WITH_HTTP");
-            // setEventAttributes(emptyMap());
+            setEventType("PROMETHEUS");
+            setEventAttributes(new HashMap<>());
             setDisabled(false);
             setOverwrite(true);
             setMonitorExecution(true);
@@ -365,7 +418,7 @@ public class CollectorProperties implements InitializingBean {
             setMisfire(false);
             setCron("0/10 * * * * ?");
             setTimeZone("GMT+08:00");
-            // setJobBootstrapBeanName(null);
+            setJobBootstrapBeanName(null);
 
             // When setup true, the shardingTotalCount will be ignored,
             // and the will be automatically allocated according to the
@@ -373,13 +426,13 @@ public class CollectorProperties implements InitializingBean {
             setAutoShardingTotalCount(true);
             setShardingTotalCount(1);
             setShardingItemParameters("0=Beijing,1=Shanghai");
-            // setJobParameter(null);
+            setJobParameter(null);
             setMaxTimeDiffSeconds(-1);
             setReconcileIntervalMinutes(0);
             setJobShardingStrategyType(null);
             setJobExecutorServiceHandlerType(null);
             setJobErrorHandlerType(null);
-            // setJobListenerTypes(emptyList());
+            setJobListenerTypes(new ArrayList<>());
             setDescription("The job that scrapes events remote over HTTP/TCP/SSH/Redis/JDBC etc.");
         }
 
@@ -389,18 +442,46 @@ public class CollectorProperties implements InitializingBean {
         }
 
         @Override
-        public List<? extends JobParamBase> getJobParams() {
+        public List<JobParamBase> getJobParams() {
             // Ignore, see: MARK1
             throw new UnsupportedOperationException();
         }
 
+        @Getter
+        @Setter
+        @ToString
+        public static class DefaultJobParamsProperties {
+            private SimpleHttpJobParam simpleHttp = new SimpleHttpJobParam();
+
+            private SimpleJdbcJobParam simpleJdbc = new SimpleJdbcJobParam() {
+                {
+                    // Setup default collect JDBC to target URL.
+                    getHikariConfig().setJdbcUrl(
+                            "jdbc:mysql://localhost:3306/test?useunicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf-8&useSSL=false&allowMultiQueries=true&autoReconnect=true");
+                    getHikariConfig().setConnectionTimeout(30_000);
+                    getHikariConfig().setIdleTimeout(600_000);
+                    getHikariConfig().setInitializationFailTimeout(1);
+                    getHikariConfig().setMinimumIdle(3);
+                    getHikariConfig().setMaxLifetime(1800_000);
+                    getHikariConfig().setMaximumPoolSize(1);
+                    getHikariConfig().setValidationTimeout(5_000);
+                    getHikariConfig().setLeakDetectionThreshold(0);
+                }
+            };
+
+            private SimpleRedisJobParam simpleRedis = new SimpleRedisJobParam();
+
+            private SimpleTcpJobParam simpleTcp = new SimpleTcpJobParam();
+
+            private SSHJobParam ssh = new SSHJobParam();
+        }
     }
 
     @Getter
     @Setter
     @ToString
     @NoArgsConstructor
-    public static class SimpleHttpScrapeJobProperties extends ScrapeJobProperties {
+    public static class SimpleHttpScrapeJobProperties extends ScrapeJobProperties<SimpleHttpJobParam> {
 
         /**
          * Feature the static scrape job parameters.
@@ -423,7 +504,7 @@ public class CollectorProperties implements InitializingBean {
     @Setter
     @ToString
     @NoArgsConstructor
-    public static class SimpleJdbcScrapeJobProperties extends ScrapeJobProperties {
+    public static class SimpleJdbcScrapeJobProperties extends ScrapeJobProperties<SimpleJdbcJobParam> {
 
         /**
          * Feature the static scrape job parameters.
@@ -445,7 +526,7 @@ public class CollectorProperties implements InitializingBean {
     @Setter
     @ToString
     @NoArgsConstructor
-    public static class SimpleRedisScrapeJobProperties extends ScrapeJobProperties {
+    public static class SimpleRedisScrapeJobProperties extends ScrapeJobProperties<SimpleRedisJobParam> {
 
         /**
          * Feature the static scrape job parameters.
@@ -467,7 +548,7 @@ public class CollectorProperties implements InitializingBean {
     @Setter
     @ToString
     @NoArgsConstructor
-    public static class SimpleTcpScrapeJobProperties extends ScrapeJobProperties {
+    public static class SimpleTcpScrapeJobProperties extends ScrapeJobProperties<SimpleTcpJobParam> {
 
         /**
          * Feature the static scrape job parameters.
@@ -489,7 +570,7 @@ public class CollectorProperties implements InitializingBean {
     @Setter
     @ToString
     @NoArgsConstructor
-    public static class SSHScrapeJobProperties extends ScrapeJobProperties {
+    public static class SSHScrapeJobProperties extends ScrapeJobProperties<SSHJobParam> {
 
         /**
          * Feature the static scrape job parameters.

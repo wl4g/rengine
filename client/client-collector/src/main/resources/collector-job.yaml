@@ -33,7 +33,7 @@ rengine:
         port: 9888
       defaultScrapeJobConfig:
         ## The custom event type, which should correspond to Rengine manager, evaluator, jobs.
-        eventType: WITH_PROMETHEUS
+        eventType: PROMETHEUS
         ## The custom event attached properties such as labels for Prometheus scraping jobs.
         eventAttributes:
           foo: bar
@@ -55,158 +55,106 @@ rengine:
         jobErrorHandlerType: ""
         jobListenerTypes: []
         description: The job that scrapes events remote over HTTP/TCP/SSH/Redis/JDBC etc.
+        jobParamsConfig:
+          simpleHttp:
+            url: http://localhost:8080/event
+            method: GET
+            headers:
+              Content-Type: "text/html"
+              X-Foo: Bar
+            body: ""
+            connectTimeoutMs: 3000
+            readTimeoutMs: 5000
+          simpleJdbc:
+            ## If this variable is false, we will throw exceptions on SQL warnings.
+            ignoreWarnings: true
+            ## If this variable is set to a non-negative value, it will be used for setting the fetchSize property 
+            ## on statements used for query processing.
+            fetchSize: -1
+            ## If this variable is set to a non-negative value, it will be used for setting the maxRows property on
+            ## statements used for query processing.
+            maxRows: -1
+            ## If this variable is set to a non-negative value, it will be used for setting the queryTimeout property
+            ## on statements used for query processing.
+            queryTimeout: -1
+            ## If this variable is set to true, then all results checking will be bypassed for any callable statement
+            ## processing. This can be used to avoid a bug in some older Oracle JDBC drivers like 10.1.0.2.
+            skipResultsProcessing: false
+            ## If this variable is set to true then all results from a stored procedure call that don't have a 
+            ## corresponding SqlOutParameter declaration will be bypassed. All other results processing will 
+            ## be take place unless the variable skipResultsProcessing is set true
+            skipUndeclaredResults: false
+            ## If this variable is set to true then execution of a CallableStatement will return the results in a Map
+            ## that uses case-insensitive names for the parameters.
+            resultsMapCaseInsensitive: false
+            sql: "SELECT 1" ## The collect to target JDBC SQL.
+            ## The properties for HikariConfig
+            hikariConfig:
+              #jdbcUrl: ""
+              #username: ""
+              #password: ""
+              connectionTimeout: 30000
+              idleTimeout: 600000
+              initializationFailTimeout: 1
+              minimumIdle: 1
+              maxLifetime: 1800000
+              maximumPoolSize: 1
+              validationTimeout: 5000
+              leakDetectionThreshold: 0
+          simpleRedis:
+            jedisConfig:
+              nodes: [localhost:6379,localhost:6380,localhost:6381,localhost:7379,localhost:7380,localhost:7381]
+              passwd: 'zzx!@#$%'
+              #clientName: 
+              connTimeout: 10000
+              soTimeout: 10000
+              maxAttempts: 20
+              database:  0
+            #luaScript: "return 'hello'"
+            #luaKeys: ["mykey1"]
+            #luaArgs: ["myarg1"]
       scrapeJobConfigs:
         - !PROMETHEUS
           name: node-exporter-job
-          #eventType: WITH_PROMETHEUS
-          #eventAttributes:
-          #  foo: bar
-          #disabled: false
-          #overwrite: true
-          #monitorExecution: true
-          #failover: false
-          #misfire: false
-          #cron: "0/10 * * * * ?"
-          #timeZone: GMT+08:00
-          #maxTimeDiffSeconds: -1
-          #reconcileIntervalMinutes: 0
-          ### When setup true, the shardingTotalCount will be ignored, and the will be automatically allocated according to the number of cluster nodes priority.
-          #autoShardingTotalCount: true
-          #shardingTotalCount: 1
-          #shardingItemParameters: 0=Beijing,1=Shanghai
-          #jobShardingStrategyType: ""
-          #jobExecutorServiceHandlerType: ""
-          #jobErrorHandlerType: ""
-          #jobListenerTypes: []
-          #description: The job that scrapes events remote over HTTP etc.
           jobParams:
-            - name: web-1
-              url: http://localhost:9100/metrics
-              method: GET
-              headers:
-                Content-Type: "text/html"
-                X-Foo: Bar
-              body: ""
-              connectTimeoutMs: 3000
-              readTimeoutMs: 5000
-            - name: web-2
-              url: http://localhost:9100/metrics
-            - name: sink-1
-              url: http://localhost:9100/metrics
-            - name: sink-2
-              url: http://localhost:9100/metrics
-            - name: collect-1
-              url: http://localhost:9100/metrics
-            - name: collect-2
-              url: http://localhost:9100/metrics
-            - name: kafka-1
-              url: http://localhost:9100/metrics
-            - name: kafka-2
-              url: http://localhost:9100/metrics
-            - name: kafka-3
-              url: http://localhost:9100/metrics
-            - name: emr-header-1
-              url: http://localhost:9100/metrics
-            - name: emr-header-2
-              url: http://localhost:9100/metrics
-            - name: emr-worker-1
-              url: http://localhost:9100/metrics
-            - name: emr-worker-2
-              url: http://localhost:9100/metrics
-            - name: emr-worker-3
+            - name: node-local
               url: http://localhost:9100/metrics
         - !PROMETHEUS
-          name: zookeeper-jmx-job
+          name: rengine-jmx-job
           jobParams:
-            - name: zookeeper-exporter-1
-              url: http://localhost:12181/metrics
-            - name: zookeeper-exporter-2
-              url: http://localhost:12181/metrics
-            - name: zookeeper-exporter-3
-              url: http://localhost:12181/metrics
-        - !PROMETHEUS
-          name: kafka-jmx-job
+            - name: rengine-manager-local
+              url: http://localhost:10108/actuator/metrics
+            - name: rengine-evaluator-local
+              url: http://localhost:28002/metrics
+            - name: rengine-collect-local
+              url: http://localhost:10108/actuator/metrics
+        - !SIMPLE_JDBC
+          name: jdbc-job
           jobParams:
-            - name: kafka-exporter-1
-              url: http://localhost:10108/metrics
-            - name: kafka-exporter-2
-              url: http://localhost:10108/metrics
-            - name: kafka-exporter-3
-              url: http://localhost:10108/metrics
-        - !PROMETHEUS
-          name: hbase-jmx-job
+            - name: mysql-local-1
+              hikariConfig:
+                jdbcUrl: "jdbc:mysql://localhost:3306/rengine?useunicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf-8&useSSL=false&allowMultiQueries=true&autoReconnect=true"
+                username: rengine
+                password: rengine
+              sql: "SELECT NOW()"
+        - !SIMPLE_REDIS
+          name: redis-job
+          disabled: true ## Default by false
           jobParams:
-            - name: hbase-master-1
-              url: http://localhost:10106/metrics
-            - name: hbase-master-2
-              url: http://localhost:10106/metrics
-            - name: hbase-regionsever-1
-              url: http://localhost:10106/metrics
-            - name: hbase-regionsever-2
-              url: http://localhost:10106/metrics
-            - name: hbase-regionsever-3
-              url: http://localhost:10106/metrics
-        - !PROMETHEUS
-          name: hdfs-jmx-job
-          jobParams:
-            - name: hdfs-namenode-1
-              url: http://localhost:10107/metrics
-            - name: hdfs-namenode-2
-              url: http://localhost:10107/metrics
-            - name: hdfs-datanode-1
-              url: http://localhost:10107/metrics
-            - name: hdfs-datanode-2
-              url: http://localhost:10107/metrics
-            - name: hdfs-datanode-3
-              url: http://localhost:10107/metrics
-        - !PROMETHEUS
-          name: yarn-jmx-job
-          jobParams:
-            - name: yarn-resourcemanager-1
-              url: http://localhost:10107/metrics
-            - name: yarn-resourcemanager-2
-              url: http://localhost:10107/metrics
-            - name: yarn-nodemanager-1
-              url: http://localhost:10107/metrics
-            - name: yarn-nodemanager-2
-              url: http://localhost:10107/metrics
-            - name: yarn-nodemanager-3
-              url: http://localhost:10107/metrics
-        - !PROMETHEUS
-          name: redis-exporter-job
-          jobParams:
-            - name: redis-exporter-1
-              url: http://localhost:9121/metrics
-        - !PROMETHEUS
-          name: mysqld-exporter-job
-          jobParams:
-            - name: mysql-exporter-1
-              url: http://localhost:9104/metrics
-            - name: mysql-exporter-2
-              url: http://localhost:9104/metrics
-            - name: mysql-exporter-3
-              url: http://localhost:9104/metrics
-        - !PROMETHEUS
-          name: haproxy-job
-          jobParams:
-            - name: haproxy-1
-              url: http://localhost:8404/metrics
-            - name: haproxy-2
-              url: http://localhost:8404/metrics
-        - !PROMETHEUS
-          name: minio-job
-          jobParams:
-            - name: minio-1
-              url: http://localhost:9000/metrics
-            - name: minio-2
-              url: http://localhost:9000/metrics
-            - name: minio-3
-              url: http://localhost:9000/metrics
-        - !SSH
-          name: ssh-job
-          jobParams:
-            - name: web-1
-              ## Detecting whether the SSH tunnel is reachable.
-              command: "timeout 3 ssh rengine@localhost echo >/dev/null 2>&1; echo $?"
-            - name: web-2
-              command: "timeout 3 ssh rengine@localhost echo >/dev/null 2>&1; echo $?"
+            - name: redis-local
+              jedisConfig:
+                nodes: [localhost:6379,localhost:6380,localhost:6381,localhost:7379,localhost:7380,localhost:7381]
+                passwd: 'zzx!@#$%'
+              luaScript: |-
+                local pi_key = KEYS[1]
+                local default_value = tonumber(ARGV[1])
+                local ttl = tonumber(ARGV[2])
+                local value = tonumber(redis.call("get", pi_key))
+                if value == nil then
+                  value = default_value
+                end
+                value = value * 2.0
+                redis.call("setex", pi_key, ttl, value)
+                return { value }
+              luaKeys: ["test:pi"]
+              luaArgs: ["3.141592653", "60"]

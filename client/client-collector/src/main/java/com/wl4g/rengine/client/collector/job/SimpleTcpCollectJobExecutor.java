@@ -23,14 +23,12 @@ import org.apache.shardingsphere.elasticjob.executor.JobFacade;
 
 import com.google.common.io.ByteStreams;
 import com.wl4g.infra.common.codec.CodecSource;
-import com.wl4g.rengine.client.collector.job.CollectJobExecutor.JobParamBase;
 import com.wl4g.rengine.common.event.RengineEvent.EventLocation;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * {@link SimpleTcpCollectJobExecutor}
@@ -39,7 +37,6 @@ import lombok.extern.slf4j.Slf4j;
  * @version 2022-10-26
  * @since v3.0.0
  */
-@Slf4j
 public class SimpleTcpCollectJobExecutor extends CollectJobExecutor<SimpleTcpCollectJobExecutor.SimpleTcpJobParam> {
 
     @Override
@@ -86,7 +83,7 @@ public class SimpleTcpCollectJobExecutor extends CollectJobExecutor<SimpleTcpCol
     @Setter
     @ToString
     @NoArgsConstructor
-    public static class SimpleTcpJobParam extends JobParamBase {
+    public static class SimpleTcpJobParam extends CollectJobExecutor.JobParamBase {
         private String host = "localhost";
         private int port = 9100;
         private String base64Message;

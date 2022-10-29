@@ -15,10 +15,10 @@ spring:
   application.name: rengine-collector
   profiles:
     #include: arthas,job,devtool
-    include: arthas,job
+    include: arthas,job,job-safecloud
     active: dev
   banner:
-      location: classpath:META-INF/banner.txt
+    location: classpath:META-INF/banner.txt
   main:
     allow-circular-references: true
   jackson:

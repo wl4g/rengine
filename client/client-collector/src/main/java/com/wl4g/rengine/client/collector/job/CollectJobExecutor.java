@@ -42,6 +42,8 @@ import org.apache.shardingsphere.elasticjob.executor.item.impl.TypedJobItemExecu
 import org.apache.shardingsphere.elasticjob.lite.internal.storage.JobNodePath;
 import org.apache.shardingsphere.elasticjob.reg.base.CoordinatorRegistryCenter;
 
+import com.wl4g.infra.common.log.SmartLogger;
+import com.wl4g.infra.common.log.SmartLoggerFactory;
 import com.wl4g.infra.context.utils.SpringContextHolder;
 import com.wl4g.rengine.client.collector.config.CollectorProperties;
 import com.wl4g.rengine.client.collector.config.CollectorProperties.SSHScrapeJobProperties;
@@ -60,7 +62,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * The job abstract executor that actively collects time for scraping events.
@@ -73,10 +74,9 @@ import lombok.extern.slf4j.Slf4j;
  * @version 2022-10-20
  * @since v1.0.0
  */
-@Slf4j
 @Getter
 public abstract class CollectJobExecutor<P extends CollectJobExecutor.JobParamBase> implements TypedJobItemExecutor {
-
+    protected final SmartLogger log = SmartLoggerFactory.getLogger(getClass());
     protected final CollectorProperties config;
     protected final CoordinatorRegistryCenter regCenter;
     @SuppressWarnings("rawtypes")
@@ -151,6 +151,7 @@ public abstract class CollectJobExecutor<P extends CollectJobExecutor.JobParamBa
                         .build(),
                 getBodyConverter(shardingParam, jobConfig, shardingContext).convert(result),
                 getEventAttributes(shardingParam, jobConfig, shardingContext));
+        event.validate();
 
         // Offer to event-bus channel.
         safeList(eventbusServices).forEach(eventbus -> eventbus.publish(event));
@@ -247,7 +248,7 @@ public abstract class CollectJobExecutor<P extends CollectJobExecutor.JobParamBa
 
         SSH(SSHScrapeJobProperties.class, SSHCollectJobExecutor.class);
 
-        private final Class<? extends ScrapeJobProperties> jobConfigClass;
+        private final Class<? extends ScrapeJobProperties<? extends JobParamBase>> jobConfigClass;
         private final Class<? extends CollectJobExecutor<? extends JobParamBase>> jobClass;
     }
 

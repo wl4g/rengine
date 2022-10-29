@@ -136,9 +136,7 @@ public class RengineEvent extends EventObject {
 
     public static RengineEvent validate(RengineEvent event) {
         // Basic validate.
-        hasTextOf(event.getType(), "type");
-        isTrue(Pattern.matches(EVENT_TYPE_REGEX, event.getType()), "Invalid event type '%s' does not satisfy the regex: %s",
-                event.getType(), EVENT_TYPE_REGEX);
+        validateForEventType(event.getType());
         notNullOf(event.getObservedTime(), "observedTime");
         isTrueOf(event.getObservedTime() > 0, "Must observedTime > 0");
 
@@ -167,6 +165,12 @@ public class RengineEvent extends EventObject {
         }
 
         return event;
+    }
+
+    public static void validateForEventType(String eventType) {
+        hasTextOf(eventType, "type");
+        isTrue(Pattern.matches(EVENT_TYPE_REGEX, eventType), "Invalid event type '%s' does not satisfy the regex: %s", eventType,
+                EVENT_TYPE_REGEX);
     }
 
     @Data
