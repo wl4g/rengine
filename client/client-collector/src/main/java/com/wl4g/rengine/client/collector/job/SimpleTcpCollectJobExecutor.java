@@ -85,7 +85,7 @@ public class SimpleTcpCollectJobExecutor extends CollectJobExecutor<SimpleTcpCol
     @NoArgsConstructor
     public static class SimpleTcpJobParam extends CollectJobExecutor.JobParamBase {
         private String host = "localhost";
-        private int port = 9100;
+        private int port = 32000;
         private String base64Message;
         // private String readEOFChar; // TODO supported custom end char?
     }

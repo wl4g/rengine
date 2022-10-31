@@ -22,6 +22,8 @@ import java.util.TimeZone;
 import org.junit.jupiter.api.Test;
 import org.yaml.snakeyaml.Yaml;
 
+import com.wl4g.infra.context.utils.expression.SpelExpressions;
+
 /**
  * {@link CollectorPropertiesTests}
  * 
@@ -47,7 +49,7 @@ public class CollectorPropertiesTests {
     public void testScrapeJobPropertiesPolymorphismUnmarshal() throws Exception {
         // @formatter:off
         String yaml = "scrapeJobConfigs:\n"
-//                + "  - !SIMPLE_HTTP\n"
+               // + "  - !SIMPLE_HTTP\n"
                 + "  - !PROMETHEUS\n"
                 + "    name: http-job\n"
                 + "    description: The job that scrapes events remote over HTTP.\n"
@@ -64,6 +66,16 @@ public class CollectorPropertiesTests {
 
         CollectorProperties config = new Yaml(new CollectorYamlConstructor()).loadAs(yaml, CollectorProperties.class);
         System.out.println(config);
+    }
+
+    @Test
+    public void testSpelExpression() throws Exception {
+        //@formatter:off
+        //String expression = "#{T(com.wl4g.infra.common.lang.DateUtils2).getDateOf(T(com.wl4g.infra.common.lang.DateUtils2).addDays(new java.util.Date(),-1),\"yyyy-MM-dd\")}";
+        //@formatter:on
+        String expression = "#{T(com.wl4g.infra.common.lang.DateUtils2).getDateOf(5, -1, \"yyyy-MM-dd\")}";
+        Object result = SpelExpressions.create().resolve(expression);
+        System.out.println(result);
     }
 
 }

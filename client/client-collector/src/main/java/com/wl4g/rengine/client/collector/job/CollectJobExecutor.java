@@ -52,6 +52,7 @@ import com.wl4g.rengine.client.collector.config.CollectorProperties.SimpleHttpSc
 import com.wl4g.rengine.client.collector.config.CollectorProperties.SimpleJdbcScrapeJobProperties;
 import com.wl4g.rengine.client.collector.config.CollectorProperties.SimpleRedisScrapeJobProperties;
 import com.wl4g.rengine.client.collector.config.CollectorProperties.SimpleTcpScrapeJobProperties;
+import com.wl4g.rengine.client.collector.util.SpelVariables;
 import com.wl4g.rengine.client.eventbus.RengineEventBusService;
 import com.wl4g.rengine.common.event.RengineEvent;
 import com.wl4g.rengine.common.event.RengineEvent.EventLocation;
@@ -77,15 +78,18 @@ import lombok.ToString;
 @Getter
 public abstract class CollectJobExecutor<P extends CollectJobExecutor.JobParamBase> implements TypedJobItemExecutor {
     protected final SmartLogger log = SmartLoggerFactory.getLogger(getClass());
+
     protected final CollectorProperties config;
     protected final CoordinatorRegistryCenter regCenter;
     @SuppressWarnings("rawtypes")
     protected final Collection<RengineEventBusService> eventbusServices;
+    protected final SpelVariables spelVariables;
 
     public CollectJobExecutor() {
         this.config = SpringContextHolder.getBean(CollectorProperties.class);
         this.regCenter = SpringContextHolder.getBean(CoordinatorRegistryCenter.class);
         this.eventbusServices = safeMap(SpringContextHolder.getBeans(RengineEventBusService.class)).values();
+        this.spelVariables = new SpelVariables().from(config.getGlobalScrapeJobConfig().getJobVariables());
     }
 
     @Override
@@ -219,8 +223,12 @@ public abstract class CollectJobExecutor<P extends CollectJobExecutor.JobParamBa
             JobConfiguration jobConfig,
             ShardingContext shardingContext) {
         // return
-        // ConfigUtils.parseToMap(jobConfig.getProps().getProperty(EVENT_ATTRIBUTES_KEY));
+        // ParamUtils.parseToMap(jobConfig.getProps().getProperty(EVENT_ATTRIBUTES_KEY));
         return (Map) jobConfig.getProps();
+    }
+
+    protected List<String> resolveVariables(List<String> args) {
+        return spelVariables.resolve(args);
     }
 
     public static interface BodyConverter {

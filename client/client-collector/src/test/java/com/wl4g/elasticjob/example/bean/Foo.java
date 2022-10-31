@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.wl4g.rengine.client.collector.bean;
+package com.wl4g.elasticjob.example.bean;
 
 import java.io.Serializable;
 

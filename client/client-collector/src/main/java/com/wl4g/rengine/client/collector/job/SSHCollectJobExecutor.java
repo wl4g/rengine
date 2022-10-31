@@ -108,7 +108,7 @@ public class SSHCollectJobExecutor extends CollectJobExecutor<SSHCollectJobExecu
     @NoArgsConstructor
     public static class SSHJobParam extends CollectJobExecutor.JobParamBase {
         private String host;
-        private int port;
+        private int port = 22;
         private String user;
         private String password;
         private String privateKey;

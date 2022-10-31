@@ -5,4 +5,4 @@
 
 ## Deploy on Kubernetes
 
-- [Deploy Rengine Stack (Manager, Evaluator) to Kubernetes with helm.](../../tools/deploy/helm/rengine-stack/README.md)
+- [Deploy Rengine Stack (Manager, Evaluator, Job, Collector) to Kubernetes with helm.](../../tools/deploy/helm/rengine-stack/README.md)

@@ -256,14 +256,53 @@ rengine:
           jobParams:
             - name: trends-1
               url: http://10.111.0.60:10108/actuator/metrics
-        #- !SSH
-        #  name: ssh-job
-        #  jobParams:
-        #      ## Detecting whether the SSH tunnel is reachable.
-        #    - name: web-1
-        #      host: 10.111.178.79
-        #      port: 22
-        #      user: rengine
-        #      password: 12345678
-        #      #privateKey:
-        #      command: "echo 'hello'"
+        - !SIMPLE_JDBC
+          name: jdbc-job
+          cron: "0 6 * * * ?"
+          jobParams:
+            - name: mysql-safecloud-local
+              hikariConfig:
+                jdbcUrl: "jdbc:mysql://localhost:3306/safecloud?useunicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf-8&useSSL=false&allowMultiQueries=true&autoReconnect=true"
+                username: safecloud
+                password: 8cc316d960f4
+              sql: |-
+                SELECT
+                    SUM(b.sharpAmount + b.peakAmount + b.flatAmount + b.valleyAmount) totalAmount,
+                    SUM(b.activePowerAmount) activeAmount
+                FROM
+                    sm_elec_bill_history b 
+                WHERE
+                    b.billStartTime >= DATE_FORMAT( DATE_ADD( NOW(), INTERVAL - 1 DAY ), '%Y-%m-%d' ) 
+                    AND b.billEndTime <= date_format( now(), '%Y-%m-%d' ) 
+                    LIMIT 5000
+            #- name: mysql-safecloud-pro
+            #  hikariConfig:
+            #    jdbcUrl: "jdbc:mysql://safecloud-defaulti.mysql.rds.aliyuncs.com:3306/safecloud?useUnicode=true&serverTimezone=UTC&characterEncoding=utf-8&useSSL=false"
+            #    username: safecloud_web
+            #    password: ""
+            #    password: """
+            #  sql: "SELECT NOW()"
+        - !SIMPLE_REDIS
+          name: redis-job
+          jobParams:
+            - name: redis-local
+              jedisConfig:
+                nodes: [localhost:6379,localhost:6380,localhost:6381,localhost:7379,localhost:7380,localhost:7381]
+                passwd: 'zzx!@#$%'
+              luaScript: |-
+                local prefix = KEYS[1]
+                local yesterday = ARGV[1]
+                -- https://itecnote.com/tecnote/lua-script-for-redis-which-sums-the-values-of-keys/
+                local sum = 0
+                -- e.g: RealtimeMeterStateAspect,ZZDFZ,2022-10-30,ELE_R_PC
+                local matches = redis.call("keys", string.format('%s,*,%s,*', prefix, yesterday))
+                for _, key in ipairs(matches) do
+                    local val = redis.call('GET', key)
+                    sum = sum + tonumber(val)
+                end
+                return { sum }
+              luaKeys: ["RealtimeMeterStateAspect"]
+              ## see:com.wl4g.rengine.client.collector.job.CollectJobExecutor#resolveVariables()
+              ## The variables define refer to: rengine.client.collector.globalScrapeJobConfig.jobVariables.yesterday
+              luaArgs: ["{{yesterday}}"]
+

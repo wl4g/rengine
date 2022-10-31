@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Repository;
 
-import com.wl4g.rengine.client.collector.bean.Foo;
+import com.wl4g.elasticjob.example.bean.Foo;
 
 @Repository
 public class FooRepository {
