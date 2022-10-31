@@ -41,7 +41,7 @@
 |  &nbsp;&nbsp;.jobErrorHandlerType  | null |   |   |
 |  &nbsp;&nbsp;.jobListenerTypes  | null |   |   |
 |  <b>&nbsp;&nbsp;.jobVariables</b>  |  |  |  The define global variables of SPEL expression, which can be used for job dynamic input arguemnts. see:com.wl4g.rengine.client.collector.job.CollectJobExecutor#resolveVariables() <b>Note: If you run in grailvm native image mode, you can only call META-INF/native-image/reflect-config.json defined fields and methods, because the SPEL needs reflection calls, or the user-defined extension reflect-config.json recompiles and packages.</b> |
-|  &nbsp;&nbsp;&nbsp;&nbsp;.yesterday  | "`#{T(com.wl4g.infra.common.lang.DateUtils2).getDateOf(5,-1,\\"yyyy-MM-dd\\")}`" |   |   |
+|  &nbsp;&nbsp;&nbsp;&nbsp;.yesterday  | "#{T(com.wl4g.infra.common.lang.DateUtils2).getDateOf(5,-1,\\"yyyy-MM-dd\\")}" |   |   |
 |  <b>&nbsp;&nbsp;.jobParamConfigs</b>  |   |   |   |
 |  <b>&nbsp;&nbsp;&nbsp;&nbsp;.simpleHttp</b>  |   |   |   |
 |  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.url  | "http://localhost:8080/event" |  "http://localhost:9100/metrics" |   |
@@ -68,9 +68,9 @@
 |  <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.jedisConfig</b>  | null |   |   |
 |  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.nodes  | [] |   |   |
 |  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.passwd  | "" |   |   |
-|  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.luaScript  | "`return 'Hello'" | "return string.format('Hello, yesterday is: %s', KEYS[1])`" |   |
-|  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.luaKeys  | [] |  ["`myprefix`"]  |   |
-|  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.luaArgs  | [] |  ["`{{yesterday}}`"] | Use double braces to reference dynamic variables. such as: `{{my_variable}}` |
+|  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.luaScript  | "return 'Hello'" | "return string.format('Hello, yesterday is: %s', KEYS[1])" |   |
+|  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.luaKeys  | [] |  ["myprefix"]  |   |
+|  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.luaArgs  | [] |  ["{{yesterday}}"] | Use double braces to reference dynamic variables. such as: {{my_variable}} |
 |  <b>&nbsp;&nbsp;&nbsp;&nbsp;.simpleTcp</b>  |   |   |   |
 |  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.host  | null | "localhost"  |   |
 |  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.port  | 32000 | 1883  |   |
