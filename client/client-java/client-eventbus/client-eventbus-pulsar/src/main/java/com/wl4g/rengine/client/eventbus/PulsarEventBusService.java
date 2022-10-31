@@ -25,7 +25,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import com.wl4g.rengine.client.eventbus.RabbitmqEventBusService.ProducerResult;
+import com.wl4g.rengine.client.eventbus.PulsarEventBusService.ProducerResult;
 import com.wl4g.rengine.client.eventbus.config.ClientEventBusConfig;
 import com.wl4g.rengine.client.eventbus.recorder.EventRecorder;
 import com.wl4g.rengine.common.event.RengineEvent;
@@ -34,23 +34,23 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * {@link RabbitmqEventBusService}
+ * {@link PulsarEventBusService}
  * 
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2022-05-30 v3.0.0
  * @since v1.0.0
  */
 @Getter
-public class RabbitmqEventBusService extends AbstractEventBusService<ProducerResult> implements Closeable {
+public class PulsarEventBusService extends AbstractEventBusService<ProducerResult> implements Closeable {
 
     // TODO
-    // private final RabbitmqProducer<String, String> pulsarProducer;
+    // private final PulsarProducer<String, String> pulsarProducer;
 
-    public RabbitmqEventBusService(ClientEventBusConfig eventBusConfig, EventRecorder recorder) {
+    public PulsarEventBusService(ClientEventBusConfig eventBusConfig, EventRecorder recorder) {
         super(eventBusConfig, recorder);
         // TODO
         // this.pulsarProducer = new
-        // RabbitmqProducer<>(eventBusConfig.getRabbitmq().getProperties());
+        // PulsarProducer<>(eventBusConfig.getPulsar().getProperties());
     }
 
     @Override
@@ -65,7 +65,7 @@ public class RabbitmqEventBusService extends AbstractEventBusService<ProducerRes
         // TODO
         // if (nonNull(pulsarProducer)) {
         // try {
-        // pulsarProducer.close(eventBusConfig.getRabbitmq().getClosingTimeout());
+        // pulsarProducer.close(eventBusConfig.getPulsar().getClosingTimeout());
         // } catch (Exception e) {
         // log.warn("Unable to closing pulsar producer.", e);
         // }

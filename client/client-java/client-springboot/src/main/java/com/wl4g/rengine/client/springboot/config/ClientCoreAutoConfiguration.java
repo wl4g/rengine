@@ -24,6 +24,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.wl4g.rengine.client.core.RengineClient;
+import com.wl4g.rengine.client.core.config.ClientConfig;
 import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.common.model.EvaluationResult;
 
@@ -62,6 +63,9 @@ public class ClientCoreAutoConfiguration {
             System.err.println("Failed to evaluation of reason: ");
             return null;
         }
+    }
+
+    public static class ClientCoreProperties extends ClientConfig {
     }
 
 }

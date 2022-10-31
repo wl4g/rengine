@@ -15,6 +15,7 @@
  */
 package com.wl4g.rengine.common.event;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
@@ -70,6 +71,11 @@ public class RengineEvent extends EventObject {
     };
 
     /**
+     * Event ID.
+     */
+    private @NotBlank String id;
+
+    /**
      * Event type.
      */
     private @NotBlank String type;
@@ -105,6 +111,7 @@ public class RengineEvent extends EventObject {
         isTrueOf(observedTime > 0, format("observedTime > 0, but is: %s", observedTime));
         this.type = hasTextOf(type, "eventType");
         this.observedTime = observedTime;
+        this.id = format("%s:%s:%s", type, observedTime, safeList(source.getPrincipals()).stream().findFirst().orElse(null));
         this.body = body;
         this.attributes = attributes;
     }

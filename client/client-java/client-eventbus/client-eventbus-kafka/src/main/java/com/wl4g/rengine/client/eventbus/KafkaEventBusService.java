@@ -15,17 +15,29 @@
  */
 package com.wl4g.rengine.client.eventbus;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+import static java.util.Collections.singletonList;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import com.wl4g.rengine.client.eventbus.RabbitmqEventBusService.ProducerResult;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.Metric;
+import org.apache.kafka.common.MetricName;
+
+import com.wl4g.rengine.client.eventbus.KafkaEventBusService.ProducerResult;
 import com.wl4g.rengine.client.eventbus.config.ClientEventBusConfig;
 import com.wl4g.rengine.client.eventbus.recorder.EventRecorder;
 import com.wl4g.rengine.common.event.RengineEvent;
@@ -34,74 +46,64 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * {@link RabbitmqEventBusService}
+ * {@link LoggingEventBusService}
  * 
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2022-05-30 v3.0.0
  * @since v1.0.0
  */
 @Getter
-public class RabbitmqEventBusService extends AbstractEventBusService<ProducerResult> implements Closeable {
+public class KafkaEventBusService extends AbstractEventBusService<ProducerResult> implements Closeable {
 
-    // TODO
-    // private final RabbitmqProducer<String, String> pulsarProducer;
+    private final KafkaProducer<String, String> kafkaProducer;
 
-    public RabbitmqEventBusService(ClientEventBusConfig eventBusConfig, EventRecorder recorder) {
+    public KafkaEventBusService(ClientEventBusConfig eventBusConfig, EventRecorder recorder) {
         super(eventBusConfig, recorder);
-        // TODO
-        // this.pulsarProducer = new
-        // RabbitmqProducer<>(eventBusConfig.getRabbitmq().getProperties());
+        this.kafkaProducer = new KafkaProducer<>(eventBusConfig.getKafka().getProperties());
     }
 
     @Override
     public Object getOriginal() {
-        // TODO
-        // return pulsarProducer;
-        return null;
+        return kafkaProducer;
+    }
+
+    public Map<MetricName, ? extends Metric> metrics() {
+        return kafkaProducer.metrics();
     }
 
     @Override
     public void close() throws IOException {
-        // TODO
-        // if (nonNull(pulsarProducer)) {
-        // try {
-        // pulsarProducer.close(eventBusConfig.getRabbitmq().getClosingTimeout());
-        // } catch (Exception e) {
-        // log.warn("Unable to closing pulsar producer.", e);
-        // }
-        // }
+        if (nonNull(kafkaProducer)) {
+            try {
+                kafkaProducer.close(eventBusConfig.getKafka().getClosingTimeout());
+            } catch (Exception e) {
+                log.warn("Unable to closing kafka producer.", e);
+            }
+        }
     }
 
     @Override
     public List<Future<ProducerResult>> doPublish(final List<RengineEvent> events) {
-        // TODO
-        // ProducerRecord<String, String> record = new
-        // ProducerRecord<>(eventBusConfig.getEventTopic(),
-        // toJSONString(events));
-        // log.debug("Sending : {}", record);
-        //
-        // List<Future<ProducerResult>> results = new
-        // ArrayList<>(events.size());
-        // safeList(events).parallelStream().forEach(event -> {
-        // Future<RecordMetadata> future = pulsarProducer.send(record,
-        // (metadata, exception) -> {
-        // if (isNull(exception)) {
-        // recorder.addCompleted(singletonList(event));
-        // }
-        // });
-        // results.add(new ProducerFuture(future, event));
-        // });
-        //
-        // return results;
-        return null;
+        ProducerRecord<String, String> record = new ProducerRecord<>(eventBusConfig.getEventTopic(), toJSONString(events));
+        log.debug("Sending : {}", record);
+
+        List<Future<ProducerResult>> results = new ArrayList<>(events.size());
+        safeList(events).parallelStream().forEach(event -> {
+            Future<RecordMetadata> future = kafkaProducer.send(record, (metadata, exception) -> {
+                if (isNull(exception)) {
+                    recorder.completed(singletonList(event));
+                }
+            });
+            results.add(new ProducerFuture(future, event));
+        });
+
+        return results;
     }
 
     @Getter
     @AllArgsConstructor
     public static class ProducerFuture implements Future<ProducerResult> {
-        // TODO
-        // private Future<RecordMetadata> future;
-        private Future<Object> future;
+        private Future<RecordMetadata> future;
         private RengineEvent event;
 
         @Override
@@ -121,9 +123,7 @@ public class RabbitmqEventBusService extends AbstractEventBusService<ProducerRes
 
         @Override
         public ProducerResult get() throws InterruptedException, ExecutionException {
-            // TODO
-            // RecordMetadata recordMetadata = future.get();
-            Object recordMetadata = future.get();
+            RecordMetadata recordMetadata = future.get();
             if (nonNull(recordMetadata)) {
                 return new ProducerResult(recordMetadata, event);
             }
@@ -132,9 +132,7 @@ public class RabbitmqEventBusService extends AbstractEventBusService<ProducerRes
 
         @Override
         public ProducerResult get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-            // TODO
-            // RecordMetadata recordMetadata = future.get(timeout, unit);
-            Object recordMetadata = future.get(timeout, unit);
+            RecordMetadata recordMetadata = future.get(timeout, unit);
             if (nonNull(recordMetadata)) {
                 return new ProducerResult(recordMetadata, event);
             }
@@ -145,9 +143,7 @@ public class RabbitmqEventBusService extends AbstractEventBusService<ProducerRes
     @Getter
     @AllArgsConstructor
     public static class ProducerResult {
-        // TODO
-        // private RecordMetadata recordMetadata;
-        private Object recordMetadata;
+        private RecordMetadata recordMetadata;
         private RengineEvent event;
     }
 

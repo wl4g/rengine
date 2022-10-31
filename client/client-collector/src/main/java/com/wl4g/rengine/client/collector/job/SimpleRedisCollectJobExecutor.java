@@ -35,7 +35,7 @@ import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
 import org.apache.shardingsphere.elasticjob.api.ShardingContext;
 import org.apache.shardingsphere.elasticjob.executor.JobFacade;
 
-import com.wl4g.infra.support.cache.jedis.JedisClient;
+import com.wl4g.infra.common.cache.jedis.JedisClient;
 import com.wl4g.infra.support.cache.jedis.JedisClientAutoConfiguration.JedisProperties;
 import com.wl4g.infra.support.cache.jedis.JedisClientFactoryBean;
 import com.wl4g.rengine.common.event.RengineEvent.EventLocation;

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false" scan="false" scanPeriod="10 seconds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.padual.com/java/logback.xsd">
+
+	<!-- <include resource="org/springframework/boot/logging/logback/base.xml" /> -->
+	<include resource="org/springframework/boot/logging/logback/defaults.xml" />
+	<!-- <include resource="org/springframework/boot/logging/logback/console-appender.xml" /> -->
+	<!-- <include resource="org/springframework/boot/logging/logback/file-appender.xml" /> -->
+	<springProperty name="appName" source="spring.application.name" />
+
+	<!-- <springProfile name="dev,staging"> -->
+	<!-- </springProfile> -->
+
+	<appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} [%clr(${appName})] [%clr(%-12.12X{principal})] [%clr(%-32.32X{traceId})] [%clr(%-8.8X{spanId})] %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx</pattern>
+		</encoder>
+	</appender>
+
+	<!-- see:com.wl4g.infra.core.logging.custom.logback.CustomLogbackConfigurer -->
+	<!-- see:org.springframework.boot.logging.logback.DefaultLogbackConfiguration.DefaultLogbackConfiguration -->
+	<appender name="fileout" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>/mnt/disk1/log/${appName}/${appName}.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+			<cleanHistoryOnStart>false</cleanHistoryOnStart>
+			<maxFileSize>128MB</maxFileSize>
+			<totalSizeCap>10GB</totalSizeCap>
+			<maxHistory>15</maxHistory>
+		</rollingPolicy>
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<maxFileSize>128MB</maxFileSize>
+		</triggeringPolicy>
+		<encoder class="net.logstash.logback.encoder.LogstashEncoder">
+			<includeMdc>true</includeMdc>
+			<includeTags>true</includeTags>
+			<includeCallerData>true</includeCallerData>
+			<includeStructuredArguments>true</includeStructuredArguments>
+			<shortenedLoggerNameLength>30</shortenedLoggerNameLength>
+			<customFields>
+				{
+				"service": "${appName}",
+				"logger_group": "main"
+				}
+			</customFields>
+			<!-- <logstashFieldNames></logstashFieldNames> -->
+			<messageSplitRegex>UNIX</messageSplitRegex>
+			<providers>
+				<timestamp>
+					<timeZone>EST</timeZone>
+				</timestamp>
+				<pattern>
+					<pattern>
+						{
+						"level": "%level",
+						"service": "${appName}",
+						"traceId": "%X{X-B3-TraceId:-}",
+						"spanId": "%X{X-B3-SpanId:-}",
+						"thread": "%thread",
+						"class": "%logger{40}",
+						"message": "%message"
+						}
+					</pattern>
+				</pattern>
+				<stackTrace>
+					<throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+						<maxDepthPerThrowable>30</maxDepthPerThrowable>
+						<maxLength>2048</maxLength>
+						<shortenedClassNameLength>20</shortenedClassNameLength>
+						<rootCauseFirst>true</rootCauseFirst>
+					</throwableConverter>
+				</stackTrace>
+			</providers>
+		</encoder>
+	</appender>
+
+	<root level="info">
+		<appender-ref ref="fileout" />
+		<appender-ref ref="stdout" />
+	</root>
+
+	<logger name="org.apache.tomcat" level="info" additivity="false">
+		<appender-ref ref="fileout" />
+		<appender-ref ref="stdout" />
+	</logger>
+
+	<logger name="org.springframework.boot.context.config" level="debug" additivity="false">
+		<appender-ref ref="fileout" />
+		<appender-ref ref="stdout" />
+	</logger>
+
+	<logger name="com.wl4g" level="debug" additivity="false">
+		<appender-ref ref="fileout" />
+		<appender-ref ref="stdout" />
+	</logger>
+
+</configuration>

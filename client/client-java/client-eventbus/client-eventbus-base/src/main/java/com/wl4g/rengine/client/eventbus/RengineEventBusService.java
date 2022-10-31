@@ -15,6 +15,10 @@
  */
 package com.wl4g.rengine.client.eventbus;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static java.util.Collections.singletonList;
+
+import java.util.List;
 import java.util.concurrent.Future;
 
 import com.wl4g.rengine.common.event.RengineEvent;
@@ -30,6 +34,10 @@ public interface RengineEventBusService<R> {
 
     Object getOriginal();
 
-    Future<R> publish(RengineEvent event);
+    default Future<R> publish(RengineEvent event) {
+        return safeList(publish(singletonList(event))).stream().findFirst().orElse(null);
+    }
+
+    List<Future<R>> publish(List<RengineEvent> events);
 
 }

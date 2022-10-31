@@ -145,6 +145,7 @@
         <module>evaluator</module>
         <module>job</module>
         <module>manager</module>
+        <!-- <module>example</module> -->
     </modules>
     <build>
         <pluginManagement>

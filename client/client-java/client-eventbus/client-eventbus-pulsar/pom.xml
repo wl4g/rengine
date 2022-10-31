@@ -25,9 +25,9 @@
 	</dependencyManagement>
 	<dependencies>
 		<dependency>
-			<groupId>com.wl4g</groupId>
-			<artifactId>rengine-client-eventbus-base</artifactId>
-		</dependency>
+            <groupId>com.wl4g</groupId>
+            <artifactId>rengine-client-eventbus-base</artifactId>
+        </dependency>
 	</dependencies>
 	<build>
 		<plugins>
