@@ -288,7 +288,7 @@ rengine:
             - name: redis-local
               jedisConfig:
                 nodes: [localhost:6379,localhost:6380,localhost:6381,localhost:7379,localhost:7380,localhost:7381]
-                passwd: 'zzx!@#$%-${spring.application.name}'
+                passwd: 'zzx!@#$%'
               luaScript: |-
                 local prefix = KEYS[1]
                 local yesterday = ARGV[1]
@@ -302,4 +302,7 @@ rengine:
                 end
                 return { sum }
               luaKeys: ["RealtimeMeterStateAspect"]
-              luaArgs: ["2022-10-28"] # TODO use dynamic date
+              ## see:com.wl4g.rengine.client.collector.job.CollectJobExecutor#resolveVariables()
+              ## The variables define refer to: rengine.client.collector.globalScrapeJobConfig.jobVariables.yesterday
+              luaArgs: ["{{yesterday}}"]
+

@@ -8,15 +8,15 @@
 
 ```json
 {
-    "type": "iot_temp_warn",
-    "observedTime": 1665931162234,
-    "body": "69(℃)",
+    "type": "iot_temp_warn", // Custom event type. (too long is not allowed)
+    "observedTime": 1665931162567, // Time when the event was observed.
+    "body": "69(℃)", // Event content details, which can be any string or json.
     "source": {
-        "time": 1665931161234,
-        "principals": [
+        "time": 1665931161234, // Time of occurrence of the event source.
+        "principals": [ // Event principal or primary dimension, such as can be user id or any object id.
             "jameswong1234@gmail.com"
         ],
-        "location": {
+        "location": { // Geographic location of the event.
             "ipAddress": "8.8.8.1",
             "ipv6": false,
             "isp": "Google Cloud (US) Technology Co., Ltd.",
@@ -31,7 +31,7 @@
             "country": "US"
         }
     },
-    "attributes": {
+    "attributes": { // Event any additional attributes.
         "org": "AS15169 Google LLC",
         "asn": "AS15169",
         "email": "network-abuse@google.com",

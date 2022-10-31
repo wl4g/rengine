@@ -22,7 +22,7 @@ import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.getField;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.isGenericModifier;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.setField;
-import static com.wl4g.rengine.client.collector.util.EnvironmentConfigUtils.resolveString;
+import static com.wl4g.rengine.client.collector.util.EnvironmentUtils.resolveString;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -92,7 +92,7 @@ public class CollectorProperties implements InitializingBean {
 
     private SnapshotDumpProperties dump = new SnapshotDumpProperties();
 
-    private DefaultScrapeJobProperties defaultScrapeJobConfig = new DefaultScrapeJobProperties();
+    private GlobalScrapeJobProperties globalScrapeJobConfig = new GlobalScrapeJobProperties();
 
     private List<ScrapeJobProperties<JobParamBase>> scrapeJobConfigs = new ArrayList<>();
 
@@ -101,90 +101,91 @@ public class CollectorProperties implements InitializingBean {
         applyDefaultToProperties();
         validateProperties();
         resolveJobScrapeProperties();
+        // parseJobVariables();
     }
 
     protected void applyDefaultToProperties() {
-        DefaultScrapeJobProperties defaultJobConf = getDefaultScrapeJobConfig();
+        GlobalScrapeJobProperties globalJobConf = getGlobalScrapeJobConfig();
 
         // Merge default configuration to scrape job configuration.
         safeList(getScrapeJobConfigs()).forEach(jobConf -> {
             try {
                 // if (isNull(jobConf.getName())) {
-                // jobConf.setName(defaultJobConf.getName());
+                // jobConf.setName(globalJobConf.getName());
                 // }
                 // if (isNull(jobConf.getElasticJobClass())) {
-                // jobConf.setElasticJobClass(defaultJobConf.getElasticJobClass());
+                // jobConf.setElasticJobClass(globalJobConf.getElasticJobClass());
                 // }
 
                 // Merge from default event type/attributes.
                 if (isBlank(jobConf.getEventType())) {
-                    jobConf.setEventType(defaultJobConf.getEventType());
+                    jobConf.setEventType(globalJobConf.getEventType());
                 }
-                Map<String, String> cloneAttributes = new HashMap<>(defaultJobConf.getEventAttributes());
+                Map<String, String> cloneAttributes = new HashMap<>(globalJobConf.getEventAttributes());
                 cloneAttributes.putAll(jobConf.getEventAttributes());
                 jobConf.setEventAttributes(cloneAttributes);
 
                 if (isNull(jobConf.getDisabled())) {
-                    jobConf.setDisabled(defaultJobConf.getDisabled());
+                    jobConf.setDisabled(globalJobConf.getDisabled());
                 }
                 if (isNull(jobConf.getOverwrite())) {
-                    jobConf.setOverwrite(defaultJobConf.getOverwrite());
+                    jobConf.setOverwrite(globalJobConf.getOverwrite());
                 }
                 if (isNull(jobConf.getMonitorExecution())) {
-                    jobConf.setMonitorExecution(defaultJobConf.getMonitorExecution());
+                    jobConf.setMonitorExecution(globalJobConf.getMonitorExecution());
                 }
                 if (isNull(jobConf.getFailover())) {
-                    jobConf.setFailover(defaultJobConf.getFailover());
+                    jobConf.setFailover(globalJobConf.getFailover());
                 }
                 if (isNull(jobConf.getMisfire())) {
-                    jobConf.setMisfire(defaultJobConf.getMisfire());
+                    jobConf.setMisfire(globalJobConf.getMisfire());
                 }
 
                 // Merge from default job configuration.
                 if (isBlank(jobConf.getCron())) {
-                    jobConf.setCron(defaultJobConf.getCron());
+                    jobConf.setCron(globalJobConf.getCron());
                 }
                 if (isBlank(jobConf.getTimeZone())) {
-                    jobConf.setTimeZone(defaultJobConf.getTimeZone());
+                    jobConf.setTimeZone(globalJobConf.getTimeZone());
                 }
                 if (isBlank(jobConf.getJobBootstrapBeanName())) {
-                    jobConf.setJobBootstrapBeanName(defaultJobConf.getJobBootstrapBeanName());
+                    jobConf.setJobBootstrapBeanName(globalJobConf.getJobBootstrapBeanName());
                 }
                 // When setup true, the shardingTotalCount will be ignored, and
                 // the will be automatically allocated according to the number
                 // of cluster nodes priority.
                 if (isNull(jobConf.getAutoShardingTotalCount())) {
-                    jobConf.setAutoShardingTotalCount(defaultJobConf.getAutoShardingTotalCount());
+                    jobConf.setAutoShardingTotalCount(globalJobConf.getAutoShardingTotalCount());
                 }
                 if (isNull(jobConf.getShardingTotalCount()) || jobConf.getShardingTotalCount() <= 0) {
-                    jobConf.setShardingTotalCount(defaultJobConf.getShardingTotalCount());
+                    jobConf.setShardingTotalCount(globalJobConf.getShardingTotalCount());
                 }
                 if (isBlank(jobConf.getShardingItemParameters())) {
-                    jobConf.setShardingItemParameters(defaultJobConf.getShardingItemParameters());
+                    jobConf.setShardingItemParameters(globalJobConf.getShardingItemParameters());
                 }
                 if (isBlank(jobConf.getJobParameter())) {
-                    jobConf.setJobParameter(defaultJobConf.getJobParameter());
+                    jobConf.setJobParameter(globalJobConf.getJobParameter());
                 }
                 if (isNull(jobConf.getMaxTimeDiffSeconds()) || jobConf.getMaxTimeDiffSeconds() <= 0) {
-                    jobConf.setMaxTimeDiffSeconds(defaultJobConf.getMaxTimeDiffSeconds());
+                    jobConf.setMaxTimeDiffSeconds(globalJobConf.getMaxTimeDiffSeconds());
                 }
                 if (isNull(jobConf.getReconcileIntervalMinutes()) || jobConf.getReconcileIntervalMinutes() <= 0) {
-                    jobConf.setReconcileIntervalMinutes(defaultJobConf.getReconcileIntervalMinutes());
+                    jobConf.setReconcileIntervalMinutes(globalJobConf.getReconcileIntervalMinutes());
                 }
                 if (isBlank(jobConf.getJobShardingStrategyType())) {
-                    jobConf.setJobShardingStrategyType(defaultJobConf.getJobShardingStrategyType());
+                    jobConf.setJobShardingStrategyType(globalJobConf.getJobShardingStrategyType());
                 }
                 if (isBlank(jobConf.getJobExecutorServiceHandlerType())) {
-                    jobConf.setJobExecutorServiceHandlerType(defaultJobConf.getJobExecutorServiceHandlerType());
+                    jobConf.setJobExecutorServiceHandlerType(globalJobConf.getJobExecutorServiceHandlerType());
                 }
                 if (isBlank(jobConf.getJobErrorHandlerType())) {
-                    jobConf.setJobErrorHandlerType(defaultJobConf.getJobErrorHandlerType());
+                    jobConf.setJobErrorHandlerType(globalJobConf.getJobErrorHandlerType());
                 }
                 if (isEmpty(jobConf.getJobListenerTypes())) {
-                    jobConf.setJobListenerTypes(defaultJobConf.getJobListenerTypes());
+                    jobConf.setJobListenerTypes(globalJobConf.getJobListenerTypes());
                 }
                 if (isBlank(jobConf.getDescription())) {
-                    jobConf.setDescription(defaultJobConf.getDescription());
+                    jobConf.setDescription(globalJobConf.getDescription());
                 }
 
                 // [MARK1]
@@ -194,15 +195,15 @@ public class CollectorProperties implements InitializingBean {
                     try {
                         JobParamBase init = p.getClass().getConstructor().newInstance(), merged = p;
                         if (p instanceof SimpleHttpJobParam) {
-                            merged = configureWithDefault(init, p, defaultJobConf.getJobParamsConfig().getSimpleHttp());
+                            merged = configureWithDefault(init, p, globalJobConf.getJobParamConfigs().getSimpleHttp());
                         } else if (p instanceof SimpleJdbcJobParam) {
-                            merged = configureWithDefault(init, p, defaultJobConf.getJobParamsConfig().getSimpleJdbc());
+                            merged = configureWithDefault(init, p, globalJobConf.getJobParamConfigs().getSimpleJdbc());
                         } else if (p instanceof SimpleRedisJobParam) {
-                            merged = configureWithDefault(init, p, defaultJobConf.getJobParamsConfig().getSimpleRedis());
+                            merged = configureWithDefault(init, p, globalJobConf.getJobParamConfigs().getSimpleRedis());
                         } else if (p instanceof SimpleTcpJobParam) {
-                            merged = configureWithDefault(init, p, defaultJobConf.getJobParamsConfig().getSimpleTcp());
+                            merged = configureWithDefault(init, p, globalJobConf.getJobParamConfigs().getSimpleTcp());
                         } else if (p instanceof SSHJobParam) {
-                            merged = configureWithDefault(init, p, defaultJobConf.getJobParamsConfig().getSsh());
+                            merged = configureWithDefault(init, p, globalJobConf.getJobParamConfigs().getSsh());
                         } else {
                             throw new Error(format("Should't to be here."));
                         }
@@ -471,11 +472,14 @@ public class CollectorProperties implements InitializingBean {
     @Getter
     @Setter
     @ToString
-    public static class DefaultScrapeJobProperties extends ScrapeJobProperties<JobParamBase> {
-        private DefaultJobParamsProperties jobParamsConfig = new DefaultJobParamsProperties();
+    public static class GlobalScrapeJobProperties extends ScrapeJobProperties<JobParamBase> {
 
-        public DefaultScrapeJobProperties() {
-            setEventType("PROMETHEUS");
+        private Map<String, String> jobVariables = new HashMap<>();
+
+        private GlobalJobParamsProperties jobParamConfigs = new GlobalJobParamsProperties();
+
+        public GlobalScrapeJobProperties() {
+            setEventType("PROM");
             setEventAttributes(new HashMap<>());
             setDisabled(false);
             setOverwrite(true);
@@ -516,7 +520,8 @@ public class CollectorProperties implements InitializingBean {
         @Getter
         @Setter
         @ToString
-        public static class DefaultJobParamsProperties {
+        public static class GlobalJobParamsProperties {
+
             private SimpleHttpJobParam simpleHttp = new SimpleHttpJobParam();
 
             private SimpleJdbcJobParam simpleJdbc = new SimpleJdbcJobParam() {

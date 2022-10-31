@@ -15,36 +15,38 @@
  */
 package com.wl4g.rengine.client.collector.util;
 
+import static java.util.Collections.singletonList;
+import static org.apache.commons.lang3.StringUtils.startsWith;
+
+import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import com.wl4g.infra.common.lang.DateUtils2;
+
 /**
- * {@link ConfigUtilsTests}
+ * {@link SpelVariablesTests}
  * 
  * @author James Wong
  * @version 2022-10-22
  * @since v3.0.0
  */
-public class ConfigUtilsTests {
+public class SpelVariablesTests {
 
     @Test
-    public void testGetShardingProps() {
-        Map<String, String> original = new HashMap<>();
-        String web1HttpUrl = "http://192.168.8.1:9100/metrics";
-        original.put("web-1.http.url", web1HttpUrl);
-        original.put("web-1.http.headers", "Content-Type=text/html,X-Foo=Bar");
-        original.put("web-2.http.url", "http://192.168.8.2:9100/metrics");
-        // Special case:
-        original.put("http.url", "http://192.168.8.3:9100/metrics");
-        original.put("url", "http://192.168.8.3:9100/metrics");
+    public void testFromAndResolve() {
+        Map<String, String> variables = new HashMap<>();
+        variables.put("getYesterday", "#{T(com.wl4g.infra.common.lang.DateUtils2).getDateOf(5,-1,\"yyyy-MM-dd\")}");
 
-        Map<String, Map<String, String>> result = ParamsUtils.toGroupMapWithFirst(original, "defaults");
-        result.forEach((k, v) -> System.out.println(k + " => " + v));
+        SpelVariables spelVariables = new SpelVariables().from(variables);
+        List<String> resolved = spelVariables.resolve(singletonList("myprefix-{{getYesterday}}"));
 
-        Assertions.assertEquals(result.get("web-1").get("http.url"), web1HttpUrl);
+        String yesterday = DateUtils2.getDateOf(Calendar.DAY_OF_MONTH, -1, "yyyy-MM-dd");
+        Assertions.assertTrue(startsWith(resolved.get(0), "myprefix-" + yesterday));
     }
 
 }

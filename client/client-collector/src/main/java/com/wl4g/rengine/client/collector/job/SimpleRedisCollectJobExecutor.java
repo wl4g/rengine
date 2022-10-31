@@ -71,9 +71,12 @@ public class SimpleRedisCollectJobExecutor extends CollectJobExecutor<SimpleRedi
             ShardingContext context) throws Exception {
 
         JedisClient jedisClient = obtainShardingJedisClient(shardingParam, currentShardingTotalCount, jobConfig, context);
-        Object result = jedisClient.eval(shardingParam.getLuaScript(), shardingParam.getLuaKeys(), shardingParam.getLuaArgs());
-        log.debug("Collect to result: {}", result);
 
+        List<String> luaKeys = resolveVariables(shardingParam.getLuaKeys());
+        List<String> luaArgs = resolveVariables(shardingParam.getLuaArgs());
+        Object result = jedisClient.eval(shardingParam.getLuaScript(), luaKeys, luaArgs);
+
+        log.debug("Collect to result: {}", result);
         offer(shardingParam, jobConfig, jobFacade, context, result);
     }
 

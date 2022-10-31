@@ -20,13 +20,13 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import org.springframework.core.env.Environment;
 
 /**
- * {@link EnvironmentConfigUtils}
+ * {@link EnvironmentUtils}
  * 
  * @author James Wong
  * @version 2022-10-30
  * @since v3.0.0
  */
-public abstract class EnvironmentConfigUtils {
+public abstract class EnvironmentUtils {
 
     public static String resolveString(Environment environment, String placeholder) {
         if (isBlank(placeholder)) {
@@ -34,11 +34,5 @@ public abstract class EnvironmentConfigUtils {
         }
         return environment.resolvePlaceholders(placeholder);
     }
-
-    // public static String resolveInt(Environment environment, String
-    // placeholder) {
-    // String value = resolveString(environment, placeholder);
-    // return TypeConverts.parseIntOrDefault(value);
-    // }
 
 }
