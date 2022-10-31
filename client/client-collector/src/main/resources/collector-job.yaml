@@ -124,7 +124,7 @@ rengine:
             #host: "localhost"
             #port: 1883
             base64Message: "SGVsbG8K"
-          ssh:
+          simpleSsh:
             #host: "localhost"
             port: 22
             #user: "root"
@@ -177,7 +177,7 @@ rengine:
                 return { message, value }
               luaKeys: ["test:pi"]
               luaArgs: ["3.141592653", "{{yesterday}}", "60"]
-        - !SSH
+        - !SIMPLE_SSH
           name: ssh-example-job
           jobParams:
             - name: ssh-local

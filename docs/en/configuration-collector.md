@@ -75,7 +75,7 @@
 |  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.host  | null | "localhost"  |   |
 |  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.port  | 32000 | 1883  |   |
 |  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.base64Message  | null | "SGVsbG8K"  |   |
-|  <b>&nbsp;&nbsp;&nbsp;&nbsp;.ssh</b>  |   |   |   |
+|  <b>&nbsp;&nbsp;&nbsp;&nbsp;.simpleSsh</b>  |   |   |   |
 |  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.host  | null | 192.168.8.8  |   |
 |  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.port  | 22 | 22  |   |
 |  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.user  | null | "root"  |   |

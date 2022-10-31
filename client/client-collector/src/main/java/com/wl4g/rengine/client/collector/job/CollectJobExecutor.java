@@ -46,7 +46,7 @@ import com.wl4g.infra.common.log.SmartLogger;
 import com.wl4g.infra.common.log.SmartLoggerFactory;
 import com.wl4g.infra.context.utils.SpringContextHolder;
 import com.wl4g.rengine.client.collector.config.CollectorProperties;
-import com.wl4g.rengine.client.collector.config.CollectorProperties.SSHScrapeJobProperties;
+import com.wl4g.rengine.client.collector.config.CollectorProperties.SimpleSSHScrapeJobProperties;
 import com.wl4g.rengine.client.collector.config.CollectorProperties.ScrapeJobProperties;
 import com.wl4g.rengine.client.collector.config.CollectorProperties.SimpleHttpScrapeJobProperties;
 import com.wl4g.rengine.client.collector.config.CollectorProperties.SimpleJdbcScrapeJobProperties;
@@ -254,7 +254,7 @@ public abstract class CollectJobExecutor<P extends CollectJobExecutor.JobParamBa
 
         SIMPLE_TCP(SimpleTcpScrapeJobProperties.class, SimpleTcpCollectJobExecutor.class),
 
-        SSH(SSHScrapeJobProperties.class, SSHCollectJobExecutor.class);
+        SIMPLE_SSH(SimpleSSHScrapeJobProperties.class, SimpleSSHCollectJobExecutor.class);
 
         private final Class<? extends ScrapeJobProperties<? extends JobParamBase>> jobConfigClass;
         private final Class<? extends CollectJobExecutor<? extends JobParamBase>> jobClass;

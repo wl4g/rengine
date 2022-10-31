@@ -12,4 +12,4 @@ com.wl4g.rengine.client.collector.job.PrometheusCollectJobExecutor
 com.wl4g.rengine.client.collector.job.SimpleJdbcCollectJobExecutor
 com.wl4g.rengine.client.collector.job.SimpleRedisCollectJobExecutor
 com.wl4g.rengine.client.collector.job.SimpleTcpCollectJobExecutor
-com.wl4g.rengine.client.collector.job.SSHCollectJobExecutor
+com.wl4g.rengine.client.collector.job.SimpleSSHCollectJobExecutor

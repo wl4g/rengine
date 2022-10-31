@@ -32,7 +32,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.wl4g.rengine.client.collector.job.PrometheusCollectJobExecutor;
-import com.wl4g.rengine.client.collector.job.SSHCollectJobExecutor;
+import com.wl4g.rengine.client.collector.job.SimpleSSHCollectJobExecutor;
 import com.wl4g.rengine.client.collector.job.SimpleHttpCollectJobExecutor;
 import com.wl4g.rengine.client.collector.job.SimpleJdbcCollectJobExecutor;
 import com.wl4g.rengine.client.collector.job.SimpleRedisCollectJobExecutor;
@@ -109,8 +109,8 @@ public class CollectorAutoConfiguration {
     }
 
     @Bean
-    public SSHCollectJobExecutor sshEventJobExeutor() {
-        return new SSHCollectJobExecutor();
+    public SimpleSSHCollectJobExecutor sshEventJobExeutor() {
+        return new SimpleSSHCollectJobExecutor();
     }
 
 }
