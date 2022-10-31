@@ -37,7 +37,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * {@link SSHCollectJobExecutor}
+ * {@link SimpleSSHCollectJobExecutor}
  * 
  * @author James Wong
  * @version 2022-10-20
@@ -46,16 +46,16 @@ import lombok.ToString;
  * @see {@link org.apache.shardingsphere.elasticjob.http.executor.ScriptJobExecutor}
  */
 @Getter
-public class SSHCollectJobExecutor extends CollectJobExecutor<SSHCollectJobExecutor.SSHJobParam> {
+public class SimpleSSHCollectJobExecutor extends CollectJobExecutor<SimpleSSHCollectJobExecutor.SimpleSSHJobParam> {
 
     @Override
     public EventJobType type() {
-        return EventJobType.SSH;
+        return EventJobType.SIMPLE_SSH;
     }
 
     @Override
     public void execute(
-            SSHJobParam shardingParam,
+            SimpleSSHJobParam shardingParam,
             int currentShardingTotalCount,
             JobConfiguration jobConfig,
             JobFacade jobFacade,
@@ -81,14 +81,14 @@ public class SSHCollectJobExecutor extends CollectJobExecutor<SSHCollectJobExecu
     }
 
     protected BodyConverter getBodyConverter(
-            SSHJobParam shardingParam,
+            SimpleSSHJobParam shardingParam,
             JobConfiguration jobConfig,
             ShardingContext shardingContext) {
         return BodyConverter.DEFAULT_STRING;
     }
 
     @Override
-    protected List<String> getPrincipals(SSHJobParam shardingParam, JobConfiguration jobConfig, ShardingContext context) {
+    protected List<String> getPrincipals(SimpleSSHJobParam shardingParam, JobConfiguration jobConfig, ShardingContext context) {
         String host = shardingParam.getHost();
         int port = shardingParam.getPort();
         // Notice: Since the ":" separator is not allowed if the backend storage
@@ -98,7 +98,7 @@ public class SSHCollectJobExecutor extends CollectJobExecutor<SSHCollectJobExecu
     }
 
     @Override
-    protected EventLocation getEventLocation(SSHJobParam shardingParam, JobConfiguration jobConfig, ShardingContext context) {
+    protected EventLocation getEventLocation(SimpleSSHJobParam shardingParam, JobConfiguration jobConfig, ShardingContext context) {
         return EventLocation.builder().ipAddress(shardingParam.getHost()).build();
     }
 
@@ -106,7 +106,7 @@ public class SSHCollectJobExecutor extends CollectJobExecutor<SSHCollectJobExecu
     @Setter
     @ToString
     @NoArgsConstructor
-    public static class SSHJobParam extends CollectJobExecutor.JobParamBase {
+    public static class SimpleSSHJobParam extends CollectJobExecutor.JobParamBase {
         private String host;
         private int port = 22;
         private String user;

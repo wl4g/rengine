@@ -55,7 +55,7 @@ import org.springframework.core.env.Environment;
 import com.wl4g.infra.common.reflect.ReflectionUtils2;
 import com.wl4g.rengine.client.collector.job.CollectJobExecutor.EventJobType;
 import com.wl4g.rengine.client.collector.job.CollectJobExecutor.JobParamBase;
-import com.wl4g.rengine.client.collector.job.SSHCollectJobExecutor.SSHJobParam;
+import com.wl4g.rengine.client.collector.job.SimpleSSHCollectJobExecutor.SimpleSSHJobParam;
 import com.wl4g.rengine.client.collector.job.SimpleHttpCollectJobExecutor.SimpleHttpJobParam;
 import com.wl4g.rengine.client.collector.job.SimpleJdbcCollectJobExecutor.SimpleJdbcJobParam;
 import com.wl4g.rengine.client.collector.job.SimpleRedisCollectJobExecutor.SimpleRedisJobParam;
@@ -202,8 +202,8 @@ public class CollectorProperties implements InitializingBean {
                             merged = configureWithDefault(init, p, globalJobConf.getJobParamConfigs().getSimpleRedis());
                         } else if (p instanceof SimpleTcpJobParam) {
                             merged = configureWithDefault(init, p, globalJobConf.getJobParamConfigs().getSimpleTcp());
-                        } else if (p instanceof SSHJobParam) {
-                            merged = configureWithDefault(init, p, globalJobConf.getJobParamConfigs().getSsh());
+                        } else if (p instanceof SimpleSSHJobParam) {
+                            merged = configureWithDefault(init, p, globalJobConf.getJobParamConfigs().getSimpleSsh());
                         } else {
                             throw new Error(format("Should't to be here."));
                         }
@@ -544,7 +544,7 @@ public class CollectorProperties implements InitializingBean {
 
             private SimpleTcpJobParam simpleTcp = new SimpleTcpJobParam();
 
-            private SSHJobParam ssh = new SSHJobParam();
+            private SimpleSSHJobParam simpleSsh = new SimpleSSHJobParam();
         }
     }
 
@@ -641,20 +641,20 @@ public class CollectorProperties implements InitializingBean {
     @Setter
     @ToString
     @NoArgsConstructor
-    public static class SSHScrapeJobProperties extends ScrapeJobProperties<SSHJobParam> {
+    public static class SimpleSSHScrapeJobProperties extends ScrapeJobProperties<SimpleSSHJobParam> {
 
         /**
          * Feature the static scrape job parameters.
          */
-        private List<SSHJobParam> jobParams = new ArrayList<>();
+        private List<SimpleSSHJobParam> jobParams = new ArrayList<>();
 
         @Override
         public EventJobType getJobType() {
-            return EventJobType.SSH;
+            return EventJobType.SIMPLE_SSH;
         }
 
         @Override
-        public List<SSHJobParam> getJobParams() {
+        public List<SimpleSSHJobParam> getJobParams() {
             return jobParams;
         }
     }
