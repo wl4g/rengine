@@ -163,18 +163,20 @@ rengine:
                 nodes: [localhost:6379,localhost:6380,localhost:6381,localhost:7379,localhost:7380,localhost:7381]
                 passwd: 'zzx!@#$%'
               luaScript: |-
-                local pi_key = KEYS[1]
-                local default_value = tonumber(ARGV[1])
-                local ttl = tonumber(ARGV[2])
-                local value = tonumber(redis.call("get", pi_key))
+                local testKey = KEYS[1]
+                local defaultVal = tonumber(ARGV[1])
+                local yesterday = ARGV[2]
+                local ttl = tonumber(ARGV[3])
+                local message = string.format('Hello, yesterday is: %s', yesterday)
+                local value = tonumber(redis.call("get", testKey))
                 if value == nil then
-                  value = default_value
+                  value = defaultVal
                 end
                 value = value * 2.0
-                redis.call("setex", pi_key, ttl, value)
-                return { value }
+                redis.call("setex", testKey, ttl, value)
+                return { message, value }
               luaKeys: ["test:pi"]
-              luaArgs: ["3.141592653", "60"]
+              luaArgs: ["3.141592653", "{{yesterday}}", "60"]
         - !SSH
           name: ssh-example-job
           jobParams:

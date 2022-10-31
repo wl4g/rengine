@@ -68,9 +68,9 @@
 |  <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.jedisConfig</b>  | null |   |   |
 |  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.nodes  | [] |   |   |
 |  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.passwd  | "" |   |   |
-|  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.luaScript  | "return 'Hello'" |   |   |
-|  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.luaKeys  | [] |  ["myprefix"]  |   |
-|  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.luaArgs  | [] |  ["{{yesterday}}"] | Use double braces to reference dynamic variables. such as: `{{my_variable}}` |
+|  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.luaScript  | "`return 'Hello'" | "return string.format('Hello, yesterday is: %s', KEYS[1])`" |   |
+|  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.luaKeys  | [] |  ["`myprefix`"]  |   |
+|  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.luaArgs  | [] |  ["`{{yesterday}}`"] | Use double braces to reference dynamic variables. such as: `{{my_variable}}` |
 |  <b>&nbsp;&nbsp;&nbsp;&nbsp;.simpleTcp</b>  |   |   |   |
 |  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.host  | null | "localhost"  |   |
 |  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.port  | 32000 | 1883  |   |
