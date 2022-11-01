@@ -22,12 +22,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-import com.wl4g.rengine.client.eventbus.LoggingEventBusService;
-import com.wl4g.rengine.client.eventbus.RengineEventBusService;
-import com.wl4g.rengine.client.eventbus.config.ClientEventBusConfig;
-import com.wl4g.rengine.client.eventbus.recorder.EhcacheEventRecorder;
-import com.wl4g.rengine.client.eventbus.recorder.EventRecorder;
 import com.wl4g.rengine.common.constants.RengineConstants;
+import com.wl4g.rengine.eventbus.LoggingEventBusService;
+import com.wl4g.rengine.eventbus.RengineEventBusService;
+import com.wl4g.rengine.eventbus.config.ClientEventBusConfig;
+import com.wl4g.rengine.eventbus.recorder.EhcacheEventRecorder;
+import com.wl4g.rengine.eventbus.recorder.EventRecorder;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

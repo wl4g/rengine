@@ -141,11 +141,6 @@
             </dependency>
             <dependency>
                 <groupId>com.wl4g</groupId>
-                <artifactId>rengine-client-collector</artifactId>
-                <version>${project.parent.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wl4g</groupId>
                 <artifactId>rengine-client-core</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
@@ -156,32 +151,32 @@
             </dependency>
             <dependency>
                 <groupId>com.wl4g</groupId>
-                <artifactId>rengine-client-eventbus</artifactId>
+                <artifactId>rengine-collector</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wl4g</groupId>
-                <artifactId>rengine-client-eventbus-base</artifactId>
+                <artifactId>rengine-eventbus</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wl4g</groupId>
-                <artifactId>rengine-client-eventbus-kafka</artifactId>
+                <artifactId>rengine-eventbus-base</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wl4g</groupId>
-                <artifactId>rengine-client-eventbus-pulsar</artifactId>
+                <artifactId>rengine-eventbus-kafka</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wl4g</groupId>
-                <artifactId>rengine-client-eventbus-rabbitmq</artifactId>
+                <artifactId>rengine-eventbus-pulsar</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wl4g</groupId>
-                <artifactId>rengine-evaluator</artifactId>
+                <artifactId>rengine-eventbus-rabbitmq</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>
@@ -237,6 +232,11 @@
             <dependency>
                 <groupId>com.wl4g</groupId>
                 <artifactId>rengine-job-rabbitmq-hive</artifactId>
+                <version>${project.parent.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.wl4g</groupId>
+                <artifactId>rengine-evaluator</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>

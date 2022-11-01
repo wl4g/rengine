@@ -78,7 +78,7 @@
 		<version>1.0.0</version>
 	</parent>
 	<modules>
-      <module>example-springboot</module>
+      <module>example-client-springboot</module>
 	</modules>
 	<dependencies>
 		<dependency>

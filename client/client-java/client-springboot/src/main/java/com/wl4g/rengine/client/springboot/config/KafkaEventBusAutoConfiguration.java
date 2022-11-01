@@ -18,10 +18,10 @@ package com.wl4g.rengine.client.springboot.config;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 
-import com.wl4g.rengine.client.eventbus.KafkaEventBusService;
-import com.wl4g.rengine.client.eventbus.RengineEventBusService;
-import com.wl4g.rengine.client.eventbus.config.ClientEventBusConfig;
-import com.wl4g.rengine.client.eventbus.recorder.EventRecorder;
+import com.wl4g.rengine.eventbus.KafkaEventBusService;
+import com.wl4g.rengine.eventbus.RengineEventBusService;
+import com.wl4g.rengine.eventbus.config.ClientEventBusConfig;
+import com.wl4g.rengine.eventbus.recorder.EventRecorder;
 
 /**
  * {@link KafkaEventBusAutoConfiguration}

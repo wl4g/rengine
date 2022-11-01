@@ -57,37 +57,33 @@
     <dependencies>
         <dependency>
             <groupId>com.wl4g</groupId>
-            <artifactId>rengine-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.wl4g</groupId>
             <artifactId>rengine-client-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.wl4g</groupId>
-            <artifactId>rengine-client-eventbus-base</artifactId>
-            <version>${project.version}</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>com.wl4g</groupId>
-            <artifactId>rengine-client-eventbus-kafka</artifactId>
+            <artifactId>rengine-eventbus-base</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.wl4g</groupId>
-            <artifactId>rengine-client-eventbus-pulsar</artifactId>
+            <artifactId>rengine-eventbus-kafka</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.wl4g</groupId>
-            <artifactId>rengine-client-eventbus-rabbitmq</artifactId>
+            <artifactId>rengine-eventbus-pulsar</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.wl4g</groupId>
+            <artifactId>rengine-eventbus-rabbitmq</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
             <optional>true</optional>

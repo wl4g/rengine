@@ -79,7 +79,6 @@
 	</parent>
 	<modules>
 		<module>client-core</module>
-		<module>client-eventbus</module>
 		<module>client-springboot</module>
 	</modules>
 	<dependencies>
