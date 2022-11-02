@@ -31,11 +31,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Function;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
+import com.wl4g.infra.common.reflect.ObjectInstantiators;
 import com.wl4g.rengine.client.core.RengineClient;
 import com.wl4g.rengine.common.exception.EvaluationException;
 import com.wl4g.rengine.common.model.EvaluationResult;
@@ -62,13 +64,16 @@ public class DefaultREvaluationHandler implements REvaluationHandler<REvaluation
         final long timeoutMs = annotation.timeout();
         final boolean bestEffort = annotation.bestEffort();
         final String paramsTemplate = annotation.paramsTemplate();
+        final Class<? extends Function<Throwable, EvaluationResult>> failbackClazz = annotation.failback();
         hasText(scenesCode, "The evaluation parameter for scenesCode is missing.");
         isTrue(timeoutMs > 0, "The evaluation timeoutMs must > 0.");
         hasText(paramsTemplate, "The evaluation parameter for paramsTemplate is missing.");
-        final String requestId = IdGenUtil.next();
 
+        final String requestId = IdGenUtil.next();
+        final Function<Throwable, EvaluationResult> failback = getFailback(failbackClazz);
         final Map<String, String> args = buildEvaluateParams(jp, annotation, paramsTemplate);
-        final EvaluationResult result = rengineClient.evaluate(requestId, scenesCode, bestEffort, timeoutMs, args);
+
+        final EvaluationResult result = rengineClient.evaluate(requestId, scenesCode, timeoutMs, bestEffort, args, failback);
         log.debug("Evaluated of result: {}, {} => {}", result, scenesCode, args);
 
         // Assertion evaluation result.
@@ -78,6 +83,14 @@ public class DefaultREvaluationHandler implements REvaluationHandler<REvaluation
         }
 
         return jp.proceed();
+    }
+
+    protected Function<Throwable, EvaluationResult> getFailback(
+            Class<? extends Function<Throwable, EvaluationResult>> failbackClazz) {
+        if (isNull(failbackClazz)) {
+            return null;
+        }
+        return ObjectInstantiators.newInstance(failbackClazz);
     }
 
     protected Map<String, String> buildEvaluateParams(ProceedingJoinPoint jp, REvaluation annotation, String paramsTemplate) {

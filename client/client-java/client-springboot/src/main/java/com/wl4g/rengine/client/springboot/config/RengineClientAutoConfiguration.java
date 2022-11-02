@@ -26,6 +26,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.wl4g.rengine.client.core.RengineClient;
+import com.wl4g.rengine.client.core.RengineClient.DefaultFailback;
 import com.wl4g.rengine.client.core.config.ClientConfig;
 import com.wl4g.rengine.client.springboot.intercept.DefaultREvaluationHandler;
 import com.wl4g.rengine.client.springboot.intercept.REvaluation;
@@ -59,8 +60,8 @@ public class RengineClientAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public RengineClient rengineClient(ClientCoreProperties config, Function<Throwable, EvaluationResult> failback) {
-        return RengineClient.builder().config(config).failback(failback).build();
+    public RengineClient rengineClient(ClientCoreProperties config, Function<Throwable, EvaluationResult> defaultFailback) {
+        return RengineClient.builder().config(config).defaultFailback(defaultFailback).build();
     }
 
     @Bean
@@ -75,15 +76,6 @@ public class RengineClientAutoConfiguration {
     @ConditionalOnBean(REvaluationHandler.class)
     public REvaluationAdvice rEvaluationAdvice(REvaluationHandler<REvaluation> handler) {
         return new REvaluationAdvice(handler);
-    }
-
-    public static class DefaultFailback implements Function<Throwable, EvaluationResult> {
-        @Override
-        public EvaluationResult apply(Throwable t) {
-            // System.err.println(format("Failed to evaluation of reason: %s",
-            // t.getMessage()));
-            return EvaluationResult.builder().errorCount(Integer.MAX_VALUE).build();
-        }
     }
 
     public static class ClientCoreProperties extends ClientConfig {

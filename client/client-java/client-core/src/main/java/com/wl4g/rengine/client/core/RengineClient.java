@@ -66,21 +66,21 @@ import okhttp3.Response;
 public class RengineClient {
     private @Default ClientConfig config = new ClientConfig();
     private @Default OkHttpClient httpClient = new OkHttpClient().newBuilder().build();
-    private @Default Function<Throwable, EvaluationResult> failback = e -> null;
+    private @Default Function<Throwable, EvaluationResult> defaultFailback = new DefaultFailback();
 
     public EvaluationResult evaluate(@NotBlank String scenesCode, @Nullable Map<String, String> args) {
-        return evaluate(IdGenUtil.next(), scenesCode, Evaluation.DEFAULT_TIMEOUT, Evaluation.DEFAULT_BESTEFFORT, args);
+        return evaluate(IdGenUtil.next(), scenesCode, Evaluation.DEFAULT_TIMEOUT, Evaluation.DEFAULT_BESTEFFORT, args, null);
     }
 
     public EvaluationResult evaluate(@NotBlank String scenesCode, @Min(1) Long timeoutMs, @Nullable Map<String, String> args) {
-        return evaluate(IdGenUtil.next(), scenesCode, timeoutMs, Evaluation.DEFAULT_BESTEFFORT, args);
+        return evaluate(IdGenUtil.next(), scenesCode, timeoutMs, Evaluation.DEFAULT_BESTEFFORT, args, null);
     }
 
     public EvaluationResult evaluate(
             @NotNull @NotBlank String scenesCode,
             @NotNull Boolean bestEffort,
             @Nullable Map<String, String> args) {
-        return evaluate(IdGenUtil.next(), scenesCode, Evaluation.DEFAULT_TIMEOUT, bestEffort, args);
+        return evaluate(IdGenUtil.next(), scenesCode, Evaluation.DEFAULT_TIMEOUT, bestEffort, args, null);
     }
 
     public EvaluationResult evaluate(
@@ -89,7 +89,7 @@ public class RengineClient {
             @NotNull Boolean bestEffort,
             @Min(1) Long timeoutMs,
             @Nullable Map<String, String> args) {
-        return evaluate(requestId, scenesCode, timeoutMs, bestEffort, args);
+        return evaluate(requestId, scenesCode, timeoutMs, bestEffort, args, null);
     }
 
     public EvaluationResult evaluate(
@@ -98,6 +98,16 @@ public class RengineClient {
             @NotNull @Min(1) Long timeoutMs,
             @NotNull Boolean bestEffort,
             @Nullable Map<String, String> args) {
+        return evaluate(requestId, scenesCode, timeoutMs, bestEffort, args, null);
+    }
+
+    public EvaluationResult evaluate(
+            String requestId,
+            @NotBlank String scenesCode,
+            @NotNull @Min(1) Long timeoutMs,
+            @NotNull Boolean bestEffort,
+            @Nullable Map<String, String> args,
+            Function<Throwable, EvaluationResult> failback) {
         hasTextOf(scenesCode, "scenesCode");
         return evaluate(Evaluation.builder()
                 .requestId(valueOf(requestId))
@@ -107,10 +117,10 @@ public class RengineClient {
                 .timeout(timeoutMs)
                 .bestEffort(bestEffort)
                 .args(args)
-                .build());
+                .build(), failback);
     }
 
-    public EvaluationResult evaluate(@NotNull Evaluation evaluation) {
+    public EvaluationResult evaluate(@NotNull Evaluation evaluation, Function<Throwable, EvaluationResult> failback) {
         notNullOf(evaluation, "evaluation");
         hasTextOf(evaluation.getClientId(), "clientId");
         hasTextOf(evaluation.getClientSecret(), "clientSecret");
@@ -140,7 +150,7 @@ public class RengineClient {
             }
             // Fast fail-back.
             if (evaluation.getBestEffort()) {
-                return failback.apply(null);
+                return defaultFailback.apply(null);
             }
         } catch (Throwable e) {
             String errmsg = format("Could not to evaluation of '%s'", requestBody);
@@ -150,13 +160,22 @@ public class RengineClient {
                 log.warn(format("%s. - %s", errmsg, e.getMessage()));
             }
             if (evaluation.getBestEffort()) {
-                return failback.apply(e);
+                return defaultFailback.apply(e);
             }
             throw new ClientEvaluationException(evaluation.getScenesCode(), evaluation.getTimeout(), evaluation.getBestEffort(),
                     e);
         }
 
         return null;
+    }
+
+    public static class DefaultFailback implements Function<Throwable, EvaluationResult> {
+        @Override
+        public EvaluationResult apply(Throwable t) {
+            // System.err.println(format("Failed to evaluation of reason: %s",
+            // t.getMessage()));
+            return EvaluationResult.builder().errorCount(Integer.MAX_VALUE).build();
+        }
     }
 
     private static final TypeReference<RespBase<EvaluationResult>> RESULT_TYPEREF = new TypeReference<RespBase<EvaluationResult>>() {

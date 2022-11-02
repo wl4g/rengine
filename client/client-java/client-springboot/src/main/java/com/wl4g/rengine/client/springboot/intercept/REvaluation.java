@@ -20,8 +20,11 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.function.Function;
 
+import com.wl4g.rengine.client.core.RengineClient.DefaultFailback;
 import com.wl4g.rengine.common.model.Evaluation;
+import com.wl4g.rengine.common.model.EvaluationResult;
 
 /**
  * {@link REvaluation}
@@ -70,5 +73,12 @@ public @interface REvaluation {
      * @return
      */
     String paramsTemplate() default "";
+
+    /**
+     * When evaluation failure to callback handler.
+     * 
+     * @return
+     */
+    Class<? extends Function<Throwable, EvaluationResult>> failback() default DefaultFailback.class;
 
 }
