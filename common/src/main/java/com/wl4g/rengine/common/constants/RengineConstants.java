@@ -35,12 +35,12 @@ public abstract class RengineConstants extends EnvironmentUtil {
     public static final String CONF_PREFIX = "rengine";
     public static final String CONF_PREFIX_MANAGER = CONF_PREFIX + ".manager";
     public static final String CONF_PREFIX_EVALUATOR = CONF_PREFIX + ".evaluator";
-    public static final String CONF_PREFIX_CLIENT_CORE = CONF_PREFIX + ".client.core";
-    public static final String CONF_PREFIX_CLIENT_COLLECTOR = CONF_PREFIX + ".client.collector";
-    public static final String CONF_PREFIX_CLIENT_EVENTBUS = CONF_PREFIX + ".client.eventbus";
-    public static final String CONF_PREFIX_CLIENT_EVENTBUS_KAFKA = CONF_PREFIX_CLIENT_EVENTBUS + ".kafka";
-    public static final String CONF_PREFIX_CLIENT_EVENTBUS_PULSAR = CONF_PREFIX_CLIENT_EVENTBUS + ".pulsar";
-    public static final String CONF_PREFIX_CLIENT_EVENTBUS_ROCKETMQ = CONF_PREFIX_CLIENT_EVENTBUS + ".rabbitmq";
+    public static final String CONF_PREFIX_COLLECTOR = CONF_PREFIX + ".collector";
+    public static final String CONF_PREFIX_EVENTBUS = CONF_PREFIX + ".eventbus";
+    public static final String CONF_PREFIX_EVENTBUS_KAFKA = CONF_PREFIX_EVENTBUS + ".kafka";
+    public static final String CONF_PREFIX_EVENTBUS_PULSAR = CONF_PREFIX_EVENTBUS + ".pulsar";
+    public static final String CONF_PREFIX_EVENTBUS_ROCKETMQ = CONF_PREFIX_EVENTBUS + ".rabbitmq";
+    public static final String CONF_PREFIX_CLIENT = CONF_PREFIX + ".client";
 
     public static final String DEF_EVENTBUS_TOPIC = "rengine_event";
 

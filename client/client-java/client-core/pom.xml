@@ -188,5 +188,38 @@
                 </repository>
             </distributionManagement>
         </profile>
+        <profile>
+            <id>with:eventbus-kafka</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.wl4g</groupId>
+                    <artifactId>rengine-eventbus-kafka</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>with:eventbus-pulsar</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.wl4g</groupId>
+                    <artifactId>rengine-eventbus-pulsar</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>with:eventbus-rabbitmq</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.wl4g</groupId>
+                    <artifactId>rengine-eventbus-rabbitmq</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
     </profiles>
 </project>

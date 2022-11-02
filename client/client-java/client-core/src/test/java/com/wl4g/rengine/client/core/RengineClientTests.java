@@ -40,7 +40,7 @@ import com.wl4g.rengine.common.model.EvaluationResult.ResultDescription;
  */
 public class RengineClientTests {
 
-    ClientConfig unknownClientConfig = ClientConfig.builder()
+    ClientConfig invalidClientConfig = ClientConfig.builder()
             .endpoint(URI.create("http://localhost:12345"))
             .clientId("iot-mqttcollector01")
             .clientSecret("abcdefghijklmnopqrstuvwxyz")
@@ -78,7 +78,7 @@ public class RengineClientTests {
 
     @Test(expected = RengineException.class)
     public void testNewRengineClientEvaluationWithTimeoutFail() {
-        RengineClient timeoutClient = RengineClient.builder().config(unknownClientConfig).failback(e -> {
+        RengineClient timeoutClient = RengineClient.builder().config(invalidClientConfig).failback(e -> {
             System.out.println("\nFailed to evaluation of reason: " + e.getMessage());
             return defaultFailbackResult;
         }).build();
@@ -89,7 +89,7 @@ public class RengineClientTests {
 
     @Test
     public void testNewRengineClientEvaluationWithTimeoutSuccess() {
-        RengineClient timeoutClient = RengineClient.builder().config(unknownClientConfig).failback(e -> {
+        RengineClient timeoutClient = RengineClient.builder().config(invalidClientConfig).failback(e -> {
             System.out.println("\nFailed to evaluation of reason: " + e.getMessage());
             return defaultFailbackResult;
         }).build();

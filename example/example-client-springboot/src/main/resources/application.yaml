@@ -1,0 +1,54 @@
+# Copyright (c) 2017 ~ 2025, the original authors individual Inc,
+# All rights reserved. Contact us James Wong <jameswong1376@gmail.com>
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# #### Environment base configuration. ####
+#
+
+spring:
+  application.name: rengine-example
+  profiles:
+    active: rengine
+
+logging:
+  group:
+    config: "org.springframework.boot.context.config"
+    tomcat: "org.apache.catalina,org.apache.coyote,org.apache.tomcat"
+  file:
+    name: /tmp/log/${spring.application.name}/${spring.application.name}.log
+  pattern:
+    console: '%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} [%clr(${spring.application.name})] [%clr(%-12.12X{principal})] [%clr(%-32.32X{traceId})] [%clr(%-8.8X{spanId})] %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx'
+    file: '%d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${PID:- } [${spring.application.name}] [%-12.12X{principal}] [%-32.32X{traceId}] [%-8.8X{spanId}] --- [%t] %-40.40logger{39} : %m%n%wEx'
+    dateformat: yyyy-MM-dd HH:mm:ss.SSS
+    level: '%5p'
+  logback:
+    rollingpolicy:
+      file-name-pattern: ${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz
+      clean-history-on-start: false ## Default by false
+      max-file-size: 1GB ## Default by 200MB
+      max-history: 30 ## Default by 7
+      total-size-cap: 100GB ## Default by 10GB
+  level:
+    root: INFO
+    tomcat: INFO
+    config: INFO
+    web: INFO
+    sql: INFO
+    org:
+      springframework: INFO
+      apache: INFO
+    com:
+      wl4g: DEBUG
+
+server:
+  port: 28004
+  servlet:
+    contextPath: /
+  tomcat:
+    basedir: /tmp/${spring.application.name}

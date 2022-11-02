@@ -41,7 +41,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 public class EvaluationResult {
-
     private @NotNull @Default Integer errorCount = 0;
     private @NotNull @Default List<ResultDescription> results = new ArrayList<>();
 
