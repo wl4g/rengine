@@ -22,6 +22,5 @@ rengine:
     store:
       provider: ROCKSDB
     kafka:
-      closingTimeout: 1m
       properties:
         bootstrap.servers: localhost:9092

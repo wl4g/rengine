@@ -73,7 +73,27 @@ rengine:
         compression.type: gzip
     pulsar:
       closingTimeout: 1m
-      #properties: {}
+      ## see:https://pulsar.apache.org/docs/client-libraries-java#connection-urls
+      serviceUrl: "pulsar://localhost:6650"
+      connectionTimeout: 3s
+      connectionsPerBroker: 100
+      lookupTimeout: 30s
+      operationTimeout: 5s
+      startingBackoffInterval: 5s
+      listenerThreads: 1
+      ioThreads: 5
+      allowTlsInsecureConnection: true
+      enableTlsHostnameVerification: false
+      enableTcpNoDelay: true
+      enableTransaction: false
+      maxBackoffInterval: 30n
+      maxConcurrentLookupRequests: 5000
+      maxLookupRedirects: 50000
+      maxLookupRequests: 50000
+      maxNumberOfRejectedRequestPerConnection: 50
+      keepAliveInterval: 30s
+      enableChunking: true
+      enableBatching: true
     rabbitmq:
       closingTimeout: 1m
       #properties: {}

@@ -73,7 +73,7 @@ public class RabbitmqEventBusService extends AbstractEventBusService<ProducerRes
     }
 
     @Override
-    public List<Future<ProducerResult>> doPublish(final List<RengineEvent> events) {
+    public List<Future<ProducerResult>> doPublish(final List<RengineEvent> events) throws IOException {
         // TODO
         // ProducerRecord<String, String> record = new
         // ProducerRecord<>(eventBusConfig.getEventTopic(),

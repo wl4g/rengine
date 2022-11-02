@@ -16,7 +16,9 @@
 package com.wl4g.rengine.eventbus;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static java.lang.String.format;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -39,20 +41,25 @@ import lombok.Getter;
 public abstract class AbstractEventBusService<R> implements RengineEventBusService<R> {
     protected final SmartLogger log = SmartLoggerFactory.getLogger(getClass());
 
-    protected final ClientEventBusConfig eventBusConfig;
+    protected final ClientEventBusConfig config;
     protected final EventRecorder recorder;
 
-    public AbstractEventBusService(ClientEventBusConfig eventBusConfig, EventRecorder recorder) {
-        this.eventBusConfig = notNullOf(eventBusConfig, "eventBusConfig");
+    public AbstractEventBusService(ClientEventBusConfig config, EventRecorder recorder) {
+        this.config = notNullOf(config, "config");
         this.recorder = notNullOf(recorder, "recorder");
     }
 
     @Override
     public List<Future<R>> publish(List<RengineEvent> events) {
-        recorder.padding(events);
-        return doPublish(events);
+        try {
+            recorder.padding(events);
+            return doPublish(events);
+        } catch (IOException e) {
+            log.error(format("Unable to publish events. - %s", events), e);
+            return null;
+        }
     }
 
-    protected abstract List<Future<R>> doPublish(List<RengineEvent> events);
+    protected abstract List<Future<R>> doPublish(List<RengineEvent> events) throws IOException;
 
 }

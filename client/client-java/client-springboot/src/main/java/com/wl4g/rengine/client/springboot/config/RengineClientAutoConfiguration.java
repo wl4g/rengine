@@ -29,7 +29,7 @@ import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.common.model.EvaluationResult;
 
 /**
- * {@link ClientCoreAutoConfiguration}
+ * {@link RengineClientAutoConfiguration}
  * 
  * @author James Wong
  * @version 2022-10-17
@@ -37,7 +37,7 @@ import com.wl4g.rengine.common.model.EvaluationResult;
  */
 @Configuration
 @ConditionalOnClass(RengineClient.class)
-public class ClientCoreAutoConfiguration {
+public class RengineClientAutoConfiguration {
 
     @Bean
     @ConfigurationProperties(prefix = RengineConstants.CONF_PREFIX_CLIENT)
@@ -61,7 +61,7 @@ public class ClientCoreAutoConfiguration {
         @Override
         public EvaluationResult apply(Throwable t) {
             System.err.println("Failed to evaluation of reason: ");
-            return null;
+            return EvaluationResult.builder().errorCount(Integer.MAX_VALUE).build();
         }
     }
 

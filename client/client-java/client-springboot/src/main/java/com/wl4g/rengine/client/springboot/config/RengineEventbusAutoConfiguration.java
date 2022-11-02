@@ -38,7 +38,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link ClientEventbusAutoConfiguration}
+ * {@link RengineEventbusAutoConfiguration}
  * 
  * @author James Wong
  * @version 2022-10-17
@@ -47,7 +47,7 @@ import lombok.experimental.SuperBuilder;
 @Configuration
 @ConditionalOnClass(RengineEventBusService.class)
 @Import({ KafkaEventBusAutoConfiguration.class, PulsarEventBusAutoConfiguration.class, RabbitmqEventBusAutoConfiguration.class })
-public class ClientEventbusAutoConfiguration {
+public class RengineEventbusAutoConfiguration {
 
     @Bean
     @ConfigurationProperties(prefix = RengineConstants.CONF_PREFIX_EVENTBUS)

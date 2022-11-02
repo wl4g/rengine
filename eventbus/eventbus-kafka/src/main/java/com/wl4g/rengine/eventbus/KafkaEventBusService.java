@@ -58,9 +58,9 @@ public class KafkaEventBusService extends AbstractEventBusService<ProducerResult
 
     private final KafkaProducer<String, String> kafkaProducer;
 
-    public KafkaEventBusService(ClientEventBusConfig eventBusConfig, EventRecorder recorder) {
-        super(eventBusConfig, recorder);
-        this.kafkaProducer = new KafkaProducer<>(eventBusConfig.getKafka().getProperties(), new StringSerializer(),
+    public KafkaEventBusService(ClientEventBusConfig config, EventRecorder recorder) {
+        super(config, recorder);
+        this.kafkaProducer = new KafkaProducer<>(config.getKafka().getProperties(), new StringSerializer(),
                 new StringSerializer());
     }
 
@@ -77,7 +77,7 @@ public class KafkaEventBusService extends AbstractEventBusService<ProducerResult
     public void close() throws IOException {
         if (nonNull(kafkaProducer)) {
             try {
-                kafkaProducer.close(eventBusConfig.getKafka().getClosingTimeout());
+                kafkaProducer.close(config.getKafka().getClosingTimeout());
             } catch (Exception e) {
                 log.warn("Unable to closing kafka producer.", e);
             }
@@ -85,12 +85,12 @@ public class KafkaEventBusService extends AbstractEventBusService<ProducerResult
     }
 
     @Override
-    public List<Future<ProducerResult>> doPublish(final List<RengineEvent> events) {
-        ProducerRecord<String, String> record = new ProducerRecord<>(eventBusConfig.getTopic(), toJSONString(events));
-        log.debug("Sending : {}", record);
-
+    public List<Future<ProducerResult>> doPublish(final List<RengineEvent> events) throws IOException {
         List<Future<ProducerResult>> results = new ArrayList<>(events.size());
+
         safeList(events).parallelStream().forEach(event -> {
+            ProducerRecord<String, String> record = new ProducerRecord<>(config.getTopic(), toJSONString(event));
+            log.debug("Sending : {}", record);
             Future<RecordMetadata> future = kafkaProducer.send(record, (metadata, exception) -> {
                 if (isNull(exception)) {
                     recorder.completed(singletonList(event));

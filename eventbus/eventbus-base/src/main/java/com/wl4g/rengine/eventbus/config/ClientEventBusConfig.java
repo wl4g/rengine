@@ -128,7 +128,27 @@ public class ClientEventBusConfig {
     @NoArgsConstructor
     public static class PulsarEventBusConfig {
         private @Default Duration closingTimeout = Duration.ofMinutes(1);
-        private @Default Properties properties = new Properties();
+        private @Default String serviceUrl = "pulsar://localhost:6650";
+        private @Default Duration connectionTimeout = Duration.ofSeconds(3);
+        private @Default int connectionsPerBroker = 100;
+        private @Default Duration lookupTimeout = Duration.ofSeconds(30);
+        private @Default Duration operationTimeout = Duration.ofSeconds(5);
+        private @Default Duration startingBackoffInterval = Duration.ofSeconds(5);
+        private @Default int listenerThreads = 1;
+        private @Default int ioThreads = 5;
+        private @Default boolean allowTlsInsecureConnection = true;
+        private @Default boolean enableTlsHostnameVerification = false;
+        private @Default boolean enableTcpNoDelay = true;
+        private @Default boolean enableTransaction = false;
+        private @Default Duration maxBackoffInterval = Duration.ofNanos(30);
+        private @Default int maxConcurrentLookupRequests = 5000;
+        private @Default int maxLookupRedirects = 50000;
+        private @Default int maxLookupRequests = 50000;
+        private @Default int maxNumberOfRejectedRequestPerConnection = 50;
+        private @Default Duration keepAliveInterval = Duration.ofSeconds(30);
+        // Producer
+        private @Default boolean enableChunking = true;
+        private @Default boolean enableBatching = true;
     }
 
     @Getter

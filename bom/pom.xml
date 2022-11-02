@@ -76,6 +76,9 @@
     </parent>
     <properties>
         <grpc.version>1.49.0</grpc.version>
+        <kafka.version>3.1.1</kafka.version>
+        <pulsar.version>2.10.2</pulsar.version>
+        <rabbitmq.version>5.16.0</rabbitmq.version>
         <elasticjob.version>3.0.1</elasticjob.version>
         <curator.version>5.1.0</curator.version>
         <logstash.version>7.2</logstash.version>
@@ -283,6 +286,24 @@
                 <groupId>org.apache.shardingsphere.elasticjob</groupId>
                 <artifactId>elasticjob-error-handler-email</artifactId>
                 <version>${elasticjob.version}</version>
+            </dependency>
+            <!-- KAFKA -->
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-clients</artifactId>
+                <version>${kafka.version}</version>
+            </dependency>
+            <!-- PULSAR -->
+            <dependency>
+                <groupId>org.apache.pulsar</groupId>
+                <artifactId>pulsar-client</artifactId>
+                <version>${pulsar.version}</version>
+            </dependency>
+            <!-- RABBITMQ -->
+            <dependency>
+                <groupId>com.rabbitmq</groupId>
+                <artifactId>amqp-client</artifactId>
+                <version>${rabbitmq.version}</version>
             </dependency>
             <!-- ZOOKEEPER -->
             <dependency>

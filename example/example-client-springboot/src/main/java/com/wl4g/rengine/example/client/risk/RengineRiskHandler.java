@@ -43,7 +43,7 @@ public class RengineRiskHandler {
     public void checkRiskFor(String scenesCode, Map<String, String> args) {
         log.info("Risk checking for : {} => {}", scenesCode, args);
 
-        final var result = rengineClient.evaluate(scenesCode, args);
+        final var result = rengineClient.evaluate(scenesCode, true, args);
         log.info("Risk checked for result: {}, {} => {}", result, scenesCode, args);
 
         // Assertion risk evaluation result.
