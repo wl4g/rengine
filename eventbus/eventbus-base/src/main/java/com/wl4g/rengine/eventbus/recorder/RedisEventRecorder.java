@@ -22,9 +22,9 @@ import static java.util.Objects.nonNull;
 import java.io.IOException;
 import java.util.List;
 
+import com.wl4g.infra.common.store.RedisMapStore;
 import com.wl4g.rengine.common.event.RengineEvent;
 import com.wl4g.rengine.eventbus.config.ClientEventBusConfig;
-import com.wl4g.rengine.eventbus.recorder.store.RedisEventStore;
 
 import lombok.Getter;
 
@@ -37,27 +37,27 @@ import lombok.Getter;
  */
 @Getter
 public class RedisEventRecorder extends AbstractEventRecorder {
-    private final RedisEventStore paddingCache;
-    private final RedisEventStore completedCache;
+    private final RedisMapStore paddingStore;
+    private final RedisMapStore completedStore;
 
     public RedisEventRecorder(ClientEventBusConfig config) {
         super(config);
-        this.paddingCache = new RedisEventStore(config.getRecorder().getRedis(), RengineEvent.class, "padding");
-        this.completedCache = new RedisEventStore(config.getRecorder().getRedis(), Long.class, "completed");
+        this.paddingStore = new RedisMapStore(config.getRecorder().getRedis(), RengineEvent.class, "padding");
+        this.completedStore = new RedisMapStore(config.getRecorder().getRedis(), Long.class, "completed");
     }
 
     @Override
     public void close() throws IOException {
-        if (nonNull(paddingCache)) {
+        if (nonNull(paddingStore)) {
             try {
-                paddingCache.close();
+                paddingStore.close();
             } catch (Exception e) {
                 log.error("Unable to closing padding cache.", e);
             }
         }
-        if (nonNull(completedCache)) {
+        if (nonNull(completedStore)) {
             try {
-                completedCache.close();
+                completedStore.close();
             } catch (Exception e) {
                 log.error("Unable to closing completed cache.", e);
             }
@@ -66,12 +66,12 @@ public class RedisEventRecorder extends AbstractEventRecorder {
 
     @Override
     public void padding(List<RengineEvent> events) {
-        safeList(events).parallelStream().forEach(event -> paddingCache.put(event.getId(), event));
+        safeList(events).parallelStream().forEach(event -> paddingStore.put(event.getId(), event));
     }
 
     @Override
     public void completed(List<RengineEvent> events) {
-        safeList(events).parallelStream().forEach(event -> completedCache.put(event.getId(), currentTimeMillis()));
+        safeList(events).parallelStream().forEach(event -> completedStore.put(event.getId(), currentTimeMillis()));
     }
 
 }

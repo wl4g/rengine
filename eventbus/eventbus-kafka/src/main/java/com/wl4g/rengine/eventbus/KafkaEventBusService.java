@@ -36,10 +36,9 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.Metric;
 import org.apache.kafka.common.MetricName;
+import org.apache.kafka.common.serialization.StringSerializer;
 
 import com.wl4g.rengine.common.event.RengineEvent;
-import com.wl4g.rengine.eventbus.AbstractEventBusService;
-import com.wl4g.rengine.eventbus.LoggingEventBusService;
 import com.wl4g.rengine.eventbus.KafkaEventBusService.ProducerResult;
 import com.wl4g.rengine.eventbus.config.ClientEventBusConfig;
 import com.wl4g.rengine.eventbus.recorder.EventRecorder;
@@ -61,7 +60,8 @@ public class KafkaEventBusService extends AbstractEventBusService<ProducerResult
 
     public KafkaEventBusService(ClientEventBusConfig eventBusConfig, EventRecorder recorder) {
         super(eventBusConfig, recorder);
-        this.kafkaProducer = new KafkaProducer<>(eventBusConfig.getKafka().getProperties());
+        this.kafkaProducer = new KafkaProducer<>(eventBusConfig.getKafka().getProperties(), new StringSerializer(),
+                new StringSerializer());
     }
 
     @Override

@@ -34,10 +34,10 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import com.google.common.base.Preconditions;
-import com.wl4g.rengine.client.collector.config.CollectorProperties;
-import com.wl4g.rengine.client.collector.config.CollectorProperties.ScrapeJobProperties;
-import com.wl4g.rengine.client.collector.config.CollectorProperties.TracingProperties;
-import com.wl4g.rengine.client.collector.job.CollectJobExecutor.JobParamBase;
+import com.wl4g.rengine.collector.config.CollectorProperties;
+import com.wl4g.rengine.collector.config.CollectorProperties.ScrapeJobProperties;
+import com.wl4g.rengine.collector.config.CollectorProperties.TracingProperties;
+import com.wl4g.rengine.collector.job.CollectJobExecutor.JobParamBase;
 
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;

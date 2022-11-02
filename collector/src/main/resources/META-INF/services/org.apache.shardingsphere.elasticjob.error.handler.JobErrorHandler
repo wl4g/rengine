@@ -7,4 +7,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-com.wl4g.rengine.client.collector.error.LoggingJobErrorHandler
+com.wl4g.rengine.collector.error.LoggingJobErrorHandler

@@ -40,7 +40,7 @@ import com.wl4g.rengine.common.model.EvaluationResult;
 public class ClientCoreAutoConfiguration {
 
     @Bean
-    @ConfigurationProperties(prefix = RengineConstants.CONF_PREFIX_CLIENT_CORE)
+    @ConfigurationProperties(prefix = RengineConstants.CONF_PREFIX_CLIENT)
     public ClientCoreProperties clientCoreProperties() {
         return new ClientCoreProperties();
     }

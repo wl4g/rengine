@@ -28,6 +28,8 @@ import com.wl4g.rengine.eventbus.RengineEventBusService;
 import com.wl4g.rengine.eventbus.config.ClientEventBusConfig;
 import com.wl4g.rengine.eventbus.recorder.EhcacheEventRecorder;
 import com.wl4g.rengine.eventbus.recorder.EventRecorder;
+import com.wl4g.rengine.eventbus.recorder.RedisEventRecorder;
+import com.wl4g.rengine.eventbus.recorder.RocksDBEventRecorder;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,15 +50,27 @@ import lombok.experimental.SuperBuilder;
 public class ClientEventbusAutoConfiguration {
 
     @Bean
-    @ConfigurationProperties(prefix = RengineConstants.CONF_PREFIX_CLIENT_EVENTBUS)
+    @ConfigurationProperties(prefix = RengineConstants.CONF_PREFIX_EVENTBUS)
     public ClientEventbusProperties clientEventbusProperties() {
         return new ClientEventbusProperties();
     }
 
     @Bean
     @ConditionalOnMissingBean
+    public EventRecorder rocksDBEventRecorder(ClientEventbusProperties config) {
+        return new RocksDBEventRecorder(config);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     public EventRecorder encacheEventRecorder(ClientEventbusProperties config) {
         return new EhcacheEventRecorder(config);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public EventRecorder redisEventRecorder(ClientEventbusProperties config) {
+        return new RedisEventRecorder(config);
     }
 
     @Bean

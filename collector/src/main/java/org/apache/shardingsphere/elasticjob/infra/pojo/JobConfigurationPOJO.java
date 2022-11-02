@@ -29,7 +29,7 @@ import org.apache.shardingsphere.elasticjob.infra.yaml.config.YamlConfiguration;
 import org.apache.shardingsphere.elasticjob.infra.yaml.config.YamlConfigurationConverterFactory;
 import org.apache.shardingsphere.elasticjob.infra.yaml.exception.YamlConfigurationConverterNotFoundException;
 
-import com.wl4g.rengine.client.collector.job.CollectJobExecutor.JobParamBase;
+import com.wl4g.rengine.collector.job.CollectJobExecutor.JobParamBase;
 
 import lombok.Getter;
 import lombok.Setter;

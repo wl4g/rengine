@@ -7,9 +7,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-com.wl4g.rengine.client.collector.job.SimpleHttpCollectJobExecutor
-com.wl4g.rengine.client.collector.job.PrometheusCollectJobExecutor
-com.wl4g.rengine.client.collector.job.SimpleJdbcCollectJobExecutor
-com.wl4g.rengine.client.collector.job.SimpleRedisCollectJobExecutor
-com.wl4g.rengine.client.collector.job.SimpleTcpCollectJobExecutor
-com.wl4g.rengine.client.collector.job.SimpleSSHCollectJobExecutor
+com.wl4g.rengine.collector.job.SimpleHttpCollectJobExecutor
+com.wl4g.rengine.collector.job.PrometheusCollectJobExecutor
+com.wl4g.rengine.collector.job.SimpleJdbcCollectJobExecutor
+com.wl4g.rengine.collector.job.SimpleRedisCollectJobExecutor
+com.wl4g.rengine.collector.job.SimpleTcpCollectJobExecutor
+com.wl4g.rengine.collector.job.SimpleSSHCollectJobExecutor

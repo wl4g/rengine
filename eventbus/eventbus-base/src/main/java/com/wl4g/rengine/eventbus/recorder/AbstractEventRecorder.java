@@ -29,8 +29,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.wl4g.infra.common.log.SmartLogger;
+import com.wl4g.infra.common.store.MapStore;
 import com.wl4g.rengine.eventbus.config.ClientEventBusConfig;
-import com.wl4g.rengine.eventbus.recorder.store.EventStore;
 
 /**
  * {@link AbstractEventRecorder}
@@ -53,9 +53,9 @@ public abstract class AbstractEventRecorder implements Closeable, EventRecorder 
                 r -> new Thread(r, getClass().getSimpleName().concat("-" + counter.incrementAndGet())));
     }
 
-    protected abstract EventStore getPaddingCache();
+    protected abstract MapStore getPaddingStore();
 
-    protected abstract EventStore getCompletedCache();
+    protected abstract MapStore getCompletedStore();
 
     @Override
     public void close() throws IOException {
@@ -72,13 +72,20 @@ public abstract class AbstractEventRecorder implements Closeable, EventRecorder 
     class CompactionTask implements Runnable {
         @Override
         public void run() {
-            log.debug("Start compaction task ...");
-            Iterator<Entry<String, Serializable>> it = getCompletedCache().iterator();
-            while (it.hasNext()) {
-                Entry<String, Serializable> entry = it.next();
-                log.debug("Removing to completed send event for : {}", entry.getKey());
-                getPaddingCache().remove(entry.getKey());
-                getCompletedCache().remove(entry.getKey());
+            AtomicInteger total = new AtomicInteger(0);
+            try {
+                log.info("Start compaction task ...");
+                Iterator<Entry<String, Serializable>> it = getCompletedStore().iterator();
+                while (it.hasNext()) {
+                    Entry<String, Serializable> entry = it.next();
+                    log.debug("Removing to completed send event for : {}", entry.getKey());
+                    getPaddingStore().remove(entry.getKey());
+                    getCompletedStore().remove(entry.getKey());
+                    total.incrementAndGet();
+                }
+                log.info("Completed compaction task of total: {}", total);
+            } catch (Exception e) {
+                log.error("Failed to compaction padding events.", e);
             }
         }
     }

@@ -16,35 +16,36 @@
 package com.wl4g.rengine.eventbus.recorder;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
-import static java.lang.String.valueOf;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Objects.nonNull;
 
 import java.io.IOException;
 import java.util.List;
 
-import com.wl4g.infra.common.store.EhCacheMapStore;
+import com.wl4g.infra.common.rocksdb.RocksDBService;
+import com.wl4g.infra.common.store.RocksDBMapStore;
 import com.wl4g.rengine.common.event.RengineEvent;
 import com.wl4g.rengine.eventbus.config.ClientEventBusConfig;
 
 import lombok.Getter;
 
 /**
- * {@link EhcacheEventRecorder}
+ * {@link RocksDBEventRecorder}
  * 
  * @author James Wong
  * @version 2022-10-31
  * @since v3.0.0
  */
 @Getter
-public class EhcacheEventRecorder extends AbstractEventRecorder {
-    private final EhCacheMapStore paddingStore;
-    private final EhCacheMapStore completedStore;
+public class RocksDBEventRecorder extends AbstractEventRecorder {
+    private final RocksDBMapStore paddingStore;
+    private final RocksDBMapStore completedStore;
 
-    public EhcacheEventRecorder(ClientEventBusConfig config) {
+    public RocksDBEventRecorder(ClientEventBusConfig config) {
         super(config);
-        this.paddingStore = new EhCacheMapStore(config.getRecorder().getEhcache(), "padding");
-        this.completedStore = new EhCacheMapStore(config.getRecorder().getEhcache(), "completed");
+        RocksDBService rocksDBService = new RocksDBService(config.getRecorder().getRocksdb());
+        this.paddingStore = new RocksDBMapStore(rocksDBService, RengineEvent.class, "padding");
+        this.completedStore = new RocksDBMapStore(rocksDBService, Long.class, "completed");
     }
 
     @Override
@@ -53,16 +54,16 @@ public class EhcacheEventRecorder extends AbstractEventRecorder {
             try {
                 paddingStore.close();
             } catch (Exception e) {
-                log.error("Unable to closing padding cache.", e);
+                log.error("Unable to closing rocks store.", e);
             }
         }
-        if (nonNull(completedStore)) {
-            try {
-                completedStore.close();
-            } catch (Exception e) {
-                log.error("Unable to closing completed cache.", e);
-            }
-        }
+        // if (nonNull(completedStore)) {
+        // try {
+        // completedStore.close();
+        // } catch (Exception e) {
+        // log.error("Unable to closing completed rocks store.", e);
+        // }
+        // }
     }
 
     @Override
@@ -72,7 +73,7 @@ public class EhcacheEventRecorder extends AbstractEventRecorder {
 
     @Override
     public void completed(List<RengineEvent> events) {
-        safeList(events).parallelStream().forEach(event -> completedStore.put(event.getId(), valueOf(currentTimeMillis())));
+        safeList(events).parallelStream().forEach(event -> completedStore.put(event.getId(), currentTimeMillis()));
     }
 
 }

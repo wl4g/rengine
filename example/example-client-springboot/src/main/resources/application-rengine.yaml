@@ -12,29 +12,16 @@
 #
 rengine:
   client:
-    ## see:com.wl4g.rengine.client.springboot.config.ClientCoreAutoConfiguration.ClientCoreProperties
-    core:
-      endpoint: http://localhost:28002
-      clientId: abcdefghijklmnopqrstuvwxyz
-      clientSecret: abcdefghijklmnopqrstuvwxyz
-      defaultTimeout: 3000
-      defaultBestEffort: false
-    ## see:com.wl4g.rengine.client.springboot.config.ClientEventbusAutoConfiguration.ClientEventbusProperties
-    eventbus:
-      topic: rengine_event
-      store:
-        provider: ROCKSDB
-        #rocksdb: {}
-        #ehcache: {}
-        #redis: {}
-        #memory: {}
-        #compaction: {}
-      kafka:
-        closingTimeout: 1m
-        #properties: {}
-      pulsar:
-        closingTimeout: 1m
-        #properties: {}
-      rabbitmq:
-        closingTimeout: 1m
-        #properties: {}
+    endpoint: http://localhost:28002
+    clientId: abcdefghijklmnopqrstuvwxyz
+    clientSecret: abcdefghijklmnopqrstuvwxyz
+    defaultTimeout: 3000
+    defaultBestEffort: false
+  eventbus:
+    topic: rengine_event
+    store:
+      provider: ROCKSDB
+    kafka:
+      closingTimeout: 1m
+      properties:
+        bootstrap.servers: localhost:9092

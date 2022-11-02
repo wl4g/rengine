@@ -54,37 +54,31 @@
         <artifactId>rengine-client-java</artifactId>
         <version>1.0.0</version>
     </parent>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.wl4g</groupId>
+                <artifactId>rengine-bom</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>com.wl4g</groupId>
             <artifactId>rengine-client-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.wl4g</groupId>
-            <artifactId>rengine-eventbus-base</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>com.wl4g</groupId>
-            <artifactId>rengine-eventbus-kafka</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.wl4g</groupId>
             <artifactId>rengine-eventbus-pulsar</artifactId>
-            <version>${project.version}</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.wl4g</groupId>
             <artifactId>rengine-eventbus-rabbitmq</artifactId>
-            <version>${project.version}</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
@@ -210,6 +204,36 @@
                     <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
                 </repository>
             </distributionManagement>
+        </profile>
+        <profile>
+            <id>with:eventbus-kafka</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.wl4g</groupId>
+                    <artifactId>rengine-eventbus-kafka</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>with:eventbus-pulsar</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.wl4g</groupId>
+                    <artifactId>rengine-eventbus-pulsar</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>with:eventbus-rabbitmq</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.wl4g</groupId>
+                    <artifactId>rengine-eventbus-rabbitmq</artifactId>
+                </dependency>
+            </dependencies>
         </profile>
     </profiles>
 </project>

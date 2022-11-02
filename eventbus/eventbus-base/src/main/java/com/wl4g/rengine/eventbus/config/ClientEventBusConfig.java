@@ -15,16 +15,12 @@
  */
 package com.wl4g.rengine.eventbus.config;
 
-import static com.wl4g.infra.common.lang.FastTimeClock.currentTimeMillis;
-import static org.apache.commons.lang3.SystemUtils.JAVA_IO_TMPDIR;
-
-import java.io.File;
 import java.time.Duration;
 import java.util.Properties;
 
-import com.wl4g.infra.common.cache.jedis.JedisClientBuilder.JedisConfig;
-import com.wl4g.infra.common.io.DataSize;
-import com.wl4g.infra.common.rocksdb.RocksDBConfig;
+import com.wl4g.infra.common.store.MapStoreConfig.EhCacheStoreConfig;
+import com.wl4g.infra.common.store.MapStoreConfig.RedisStoreConfig;
+import com.wl4g.infra.common.store.MapStoreConfig.RocksDBStoreConfig;
 import com.wl4g.rengine.common.constants.RengineConstants;
 
 import lombok.Builder.Default;
@@ -50,7 +46,7 @@ public class ClientEventBusConfig {
 
     private @Default String topic = RengineConstants.DEF_EVENTBUS_TOPIC;
 
-    private @Default EventRecorderConfig recorder = new EventRecorderConfig();
+    private @Default EventStoreConfig recorder = new EventStoreConfig();
 
     private @Default KafkaEventBusConfig kafka = new KafkaEventBusConfig();
 
@@ -63,75 +59,23 @@ public class ClientEventBusConfig {
     @ToString
     @SuperBuilder
     @NoArgsConstructor
-    public static class EventRecorderConfig {
+    public static class EventStoreConfig {
 
         private @Default EventRecorderProvider provider = EventRecorderProvider.ROCKSDB;
 
         private @Default CompactionConfig compaction = new CompactionConfig();
 
-        private @Default RocksDBRecorderConfig rocksdb = new RocksDBRecorderConfig();
+        private @Default RocksDBStoreConfig rocksdb = new RocksDBStoreConfig();
 
-        private @Default EhCacheRecorderConfig ehcache = new EhCacheRecorderConfig();
+        private @Default EhCacheStoreConfig ehcache = new EhCacheStoreConfig();
 
-        private @Default RedisRecorderConfig redis = new RedisRecorderConfig();
+        private @Default RedisStoreConfig redis = new RedisStoreConfig();
 
         @Getter
         @Setter
         @ToString
         public static class CompactionConfig {
             private int threadPools = 1;
-        }
-
-        @Getter
-        @Setter
-        @ToString
-        public static class RocksDBRecorderConfig extends RocksDBConfig {
-        }
-
-        @Getter
-        @Setter
-        @ToString
-        public static class EhCacheRecorderConfig {
-
-            /**
-             * The cached data elimination algorithm.
-             */
-            private EliminationAlgorithm eliminationAlg = EliminationAlgorithm.LRU;
-
-            /**
-             * The cache persistence data directory.
-             */
-            private File dataDir = new File(JAVA_IO_TMPDIR, "ehcache-data-" + currentTimeMillis());
-
-            /**
-             * The number of entries not persisted to keep in memory.
-             */
-            private long heapEntries = 0L;
-
-            /**
-             * The number of data size not persisted to keep in memory. must be
-             * less than {@link #diskSize}
-             */
-            private DataSize offHeapSize = DataSize.ofMegabytes(0);
-
-            /**
-             * The number of total data size not persisted to keep in disk. must
-             * be greater than {@link #offHeapSize}
-             */
-            private DataSize diskSize = DataSize.ofTerabytes(1);
-
-            public static enum EliminationAlgorithm {
-                LRU, LFU, FIFO;
-            }
-        }
-
-        @Getter
-        @Setter
-        @ToString
-        public static class RedisRecorderConfig extends JedisConfig {
-            private static final long serialVersionUID = 1L;
-            private String cachePrefix = "rengine:eventbus";
-            private long expireMs = 60_000L;
         }
 
         public static enum EventRecorderProvider {
@@ -153,7 +97,28 @@ public class ClientEventBusConfig {
     @NoArgsConstructor
     public static class KafkaEventBusConfig {
         private @Default Duration closingTimeout = Duration.ofMinutes(1);
-        private @Default Properties properties = new Properties();
+        private @Default Properties properties = new Properties() {
+            {
+                put("bootstrap.servers", "localhost:9092");
+                // see:https://kafka.apache.org/documentation/#producerconfigs_acks
+                put("acks", "1"); // Default by all,
+                put("send.buffer.bytes", "-1");
+                put("batch.size", "16384");// Default by 16KiB
+                put("buffer.memory", "33554432");// Default by 32MiB
+                put("retries", "3");
+                put("retry.backoff.ms", "5000");// Default by 100ms
+                put("linger.ms", "20");// Default by 0ms.
+                // The maximum blocking time after the total sending buffer is
+                // slow, and an exception will be thrown after the time is
+                // exceeded.
+                put("max.block.ms", "60000"); // Default by 1m
+                // The maximum size of a single request packet body, which
+                // cannot exceed the maximum value of the accepted packet body
+                // set by the server.
+                put("max.request.size", "1048576");// Default by 1048576
+                put("compression.type", "gzip");
+            }
+        };
     }
 
     @Getter

@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
-import com.wl4g.rengine.client.collector.job.CollectJobExecutor.JobParamBase;
+import com.wl4g.rengine.collector.job.CollectJobExecutor.JobParamBase;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

@@ -38,7 +38,7 @@ import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Representer;
 import org.yaml.snakeyaml.resolver.Resolver;
 
-import com.wl4g.rengine.client.collector.config.CollectorYamlConstructor;
+import com.wl4g.rengine.collector.config.CollectorYamlConstructor;
 
 import org.springframework.beans.factory.config.YamlProcessor;
 import org.springframework.boot.origin.Origin;
