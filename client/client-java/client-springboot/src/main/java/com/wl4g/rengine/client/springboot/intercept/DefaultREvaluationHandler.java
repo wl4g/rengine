@@ -31,6 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -55,6 +56,7 @@ import lombok.CustomLog;
 @CustomLog
 public class DefaultREvaluationHandler implements REvaluationHandler<REvaluation> {
 
+    private final Map<Class<?>, Object> failbackCaching = new ConcurrentHashMap<>(16);
     private @Autowired Environment environment;
     private @Autowired RengineClient rengineClient;
 
@@ -85,12 +87,23 @@ public class DefaultREvaluationHandler implements REvaluationHandler<REvaluation
         return jp.proceed();
     }
 
+    @SuppressWarnings("unchecked")
     protected Function<Throwable, EvaluationResult> getFailback(
             Class<? extends Function<Throwable, EvaluationResult>> failbackClazz) {
         if (isNull(failbackClazz)) {
             return null;
         }
-        return ObjectInstantiators.newInstance(failbackClazz);
+        Function<Throwable, EvaluationResult> failback = (Function<Throwable, EvaluationResult>) failbackCaching
+                .get(failbackClazz);
+        if (isNull(failback)) {
+            synchronized (this) {
+                failback = (Function<Throwable, EvaluationResult>) failbackCaching.get(failbackClazz);
+                if (isNull(failback)) {
+                    failbackCaching.put(failbackClazz, failback = ObjectInstantiators.newInstance(failbackClazz));
+                }
+            }
+        }
+        return failback;
     }
 
     protected Map<String, String> buildEvaluateParams(ProceedingJoinPoint jp, REvaluation annotation, String paramsTemplate) {
