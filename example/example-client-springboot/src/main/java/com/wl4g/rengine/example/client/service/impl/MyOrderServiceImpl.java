@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.wl4g.rengine.client.springboot.intercept.REvaluation;
 import com.wl4g.rengine.example.client.risk.RengineRiskHandler;
 import com.wl4g.rengine.example.client.service.MyOrderService;
 
@@ -44,7 +45,7 @@ public class MyOrderServiceImpl implements MyOrderService {
 
     private final RengineRiskHandler riskHandler;
 
-    private @Value("${myrisk.scenesCodes.create-order:myCreateOrderFreqLimit}") String createOrderScenesCode;
+    private @Value("${scenesDefinition.createOrder:myCreateFreqLimit}") String createOrderScenesCode;
 
     public MyOrderServiceImpl(@Autowired RengineRiskHandler riskHandler) {
         this.riskHandler = riskHandler;
@@ -59,6 +60,25 @@ public class MyOrderServiceImpl implements MyOrderService {
         riskHandler.checkRiskFor(createOrderScenesCode, args);
 
         log.info("Creating to order ...");
+
+        // ...
+        // some order creating logistic
+        // ...
+
+        Map<String, String> orderInfo = new HashMap<>();
+        orderInfo.put("orderId", UUID.randomUUID().toString());
+        orderInfo.put("status", "1");
+        orderInfo.put("timestamp", valueOf(currentTimeMillis()));
+        orderInfo.put("address", address);
+
+        return orderInfo;
+    }
+
+    @REvaluation(scenesCode = "${scenesDefinition.createOrder:myCreateFreqLimit}", bestEffort = true,
+            paramsTemplate = "{{userId=#0,goodId=#1}}")
+    @Override
+    public Map<String, String> create2(String userId, String goodId, String address, Integer count) {
+        log.info("Creating2 to order ...");
 
         // ...
         // some order creating logistic

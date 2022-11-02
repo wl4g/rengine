@@ -24,3 +24,7 @@ rengine:
     kafka:
       properties:
         bootstrap.servers: localhost:9092
+
+## The custom scenees codes definition.
+scenesDefinition:
+  createOrder: myCreateFreqLimit

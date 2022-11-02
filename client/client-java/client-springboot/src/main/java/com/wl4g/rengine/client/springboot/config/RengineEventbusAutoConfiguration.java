@@ -15,14 +15,20 @@
  */
 package com.wl4g.rengine.client.springboot.config;
 
+import static com.wl4g.infra.common.lang.Assert2.isTrue;
+import static com.wl4g.rengine.common.constants.RengineConstants.CONF_PREFIX_EVENTBUS;
+import static java.util.Objects.nonNull;
+
+import java.util.List;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.eventbus.LoggingEventBusService;
 import com.wl4g.rengine.eventbus.RengineEventBusService;
 import com.wl4g.rengine.eventbus.config.ClientEventBusConfig;
@@ -50,32 +56,40 @@ import lombok.experimental.SuperBuilder;
 public class RengineEventbusAutoConfiguration {
 
     @Bean
-    @ConfigurationProperties(prefix = RengineConstants.CONF_PREFIX_EVENTBUS)
+    @ConfigurationProperties(prefix = CONF_PREFIX_EVENTBUS)
     public ClientEventbusProperties clientEventbusProperties() {
         return new ClientEventbusProperties();
     }
 
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnExpression("'ROCKSDB'" + ON_EXPRESSION_SUFFIX)
     public EventRecorder rocksDBEventRecorder(ClientEventbusProperties config) {
         return new RocksDBEventRecorder(config);
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    public EventRecorder encacheEventRecorder(ClientEventbusProperties config) {
+    @ConditionalOnExpression("'EHCACHE'" + ON_EXPRESSION_SUFFIX)
+    public EventRecorder ehcacheEventRecorder(ClientEventbusProperties config) {
         return new EhcacheEventRecorder(config);
     }
 
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnExpression("'REDIS'" + ON_EXPRESSION_SUFFIX)
     public EventRecorder redisEventRecorder(ClientEventbusProperties config) {
         return new RedisEventRecorder(config);
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public RengineEventBusService<?> loggingEventBusService(ClientEventbusProperties config, EventRecorder recorder) {
         return new LoggingEventBusService(config, recorder);
+    }
+
+    @Bean
+    public Object validateMultiEventBusServices(List<RengineEventBusService<?>> eventbuses) {
+        isTrue(nonNull(eventbuses) && eventbuses.size() == 1,
+                "Cannot unsupported simultaneous multi-variety eventbus realization, unneeded invalid model block to be removed from classpath of classpath, guaranteed rengine-eventbus-kafka, rengine-eventbus-pulsar, rengine-eventbus-rabbitmq etc.");
+        return null;
     }
 
     @Getter
@@ -85,5 +99,8 @@ public class RengineEventbusAutoConfiguration {
     @NoArgsConstructor
     public static class ClientEventbusProperties extends ClientEventBusConfig {
     }
+
+    public static final String ON_EXPRESSION_SUFFIX = ".equalsIgnoreCase('${" + CONF_PREFIX_EVENTBUS
+            + ".recorder.provider:ROCKSDB}')";
 
 }

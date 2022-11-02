@@ -64,39 +64,43 @@ import okhttp3.Response;
 @Slf4j
 @SuperBuilder
 public class RengineClient {
-
     private @Default ClientConfig config = new ClientConfig();
-
     private @Default OkHttpClient httpClient = new OkHttpClient().newBuilder().build();
-
     private @Default Function<Throwable, EvaluationResult> failback = e -> null;
 
-    public EvaluationResult evaluate(@NotNull @NotBlank String scenesCode, @Nullable Map<String, String> args) {
-        return evaluate(scenesCode, Evaluation.DEFAULT_TIMEOUT, Evaluation.DEFAULT_BESTEFFORT, args);
+    public EvaluationResult evaluate(@NotBlank String scenesCode, @Nullable Map<String, String> args) {
+        return evaluate(IdGenUtil.next(), scenesCode, Evaluation.DEFAULT_TIMEOUT, Evaluation.DEFAULT_BESTEFFORT, args);
     }
 
-    public EvaluationResult evaluate(
-            @NotNull @NotBlank String scenesCode,
-            @NotNull @Min(1) Long timeoutMs,
-            @Nullable Map<String, String> args) {
-        return evaluate(scenesCode, timeoutMs, Evaluation.DEFAULT_BESTEFFORT, args);
+    public EvaluationResult evaluate(@NotBlank String scenesCode, @Min(1) Long timeoutMs, @Nullable Map<String, String> args) {
+        return evaluate(IdGenUtil.next(), scenesCode, timeoutMs, Evaluation.DEFAULT_BESTEFFORT, args);
     }
 
     public EvaluationResult evaluate(
             @NotNull @NotBlank String scenesCode,
             @NotNull Boolean bestEffort,
             @Nullable Map<String, String> args) {
-        return evaluate(scenesCode, Evaluation.DEFAULT_TIMEOUT, bestEffort, args);
+        return evaluate(IdGenUtil.next(), scenesCode, Evaluation.DEFAULT_TIMEOUT, bestEffort, args);
     }
 
     public EvaluationResult evaluate(
-            @NotNull @NotBlank String scenesCode,
+            String requestId,
+            @NotBlank String scenesCode,
+            @NotNull Boolean bestEffort,
+            @Min(1) Long timeoutMs,
+            @Nullable Map<String, String> args) {
+        return evaluate(requestId, scenesCode, timeoutMs, bestEffort, args);
+    }
+
+    public EvaluationResult evaluate(
+            String requestId,
+            @NotBlank String scenesCode,
             @NotNull @Min(1) Long timeoutMs,
             @NotNull Boolean bestEffort,
             @Nullable Map<String, String> args) {
         hasTextOf(scenesCode, "scenesCode");
         return evaluate(Evaluation.builder()
-                .requestId(valueOf(IdGenUtil.next()))
+                .requestId(valueOf(requestId))
                 .clientId(config.getClientId())
                 .clientSecret(config.getClientSecret())
                 .scenesCode(scenesCode)

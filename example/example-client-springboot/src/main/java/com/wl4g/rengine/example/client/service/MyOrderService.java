@@ -28,4 +28,6 @@ public interface MyOrderService {
 
     Map<String, String> create(String userId, String goodId, String address, Integer count);
 
+    Map<String, String> create2(String userId, String goodId, String address, Integer count);
+
 }

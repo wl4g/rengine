@@ -44,7 +44,7 @@ logging:
       springframework: INFO
       apache: INFO
     com:
-      wl4g: DEBUG
+      wl4g: INFO
 
 server:
   port: 28004

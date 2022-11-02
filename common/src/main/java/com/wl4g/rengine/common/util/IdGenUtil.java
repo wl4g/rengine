@@ -15,6 +15,8 @@
  */
 package com.wl4g.rengine.common.util;
 
+import java.util.UUID;
+
 import com.wl4g.infra.common.id.SnowflakeIdGenerator;
 
 /**
@@ -26,7 +28,11 @@ import com.wl4g.infra.common.id.SnowflakeIdGenerator;
  */
 public abstract class IdGenUtil {
 
-    public static long next() {
+    public static String next() {
+        return UUID.randomUUID().toString();
+    }
+
+    public static long nextLong() {
         return SnowflakeIdGenerator.getDefault().nextId();
     }
 

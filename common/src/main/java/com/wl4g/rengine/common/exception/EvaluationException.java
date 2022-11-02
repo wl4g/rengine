@@ -20,32 +20,32 @@ import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import lombok.Getter;
 
 /**
- * {@link ExecutionException}
+ * {@link EvaluationException}
  * 
  * @author James Wong
  * @version 2022-09-22
  * @since v1.0.0
  */
 @Getter
-public class ExecutionException extends RengineException {
+public class EvaluationException extends RengineException {
     private static final long serialVersionUID = 5177120828249689148L;
 
     private String scenesCode;
     private String requestId;
 
-    public ExecutionException(String requestId, String scenesCode, String message) {
+    public EvaluationException(String requestId, String scenesCode, String message) {
         super(message);
         this.requestId = hasTextOf(requestId, "requestId");
         this.scenesCode = hasTextOf(scenesCode, "scenesCode");
     }
 
-    public ExecutionException(String requestId, String scenesCode, String message, Throwable cause) {
+    public EvaluationException(String requestId, String scenesCode, String message, Throwable cause) {
         super(message, cause);
         this.requestId = hasTextOf(requestId, "requestId");
         this.scenesCode = hasTextOf(scenesCode, "scenesCode");
     }
 
-    public ExecutionException(String requestId, String scenesCode, Throwable cause) {
+    public EvaluationException(String requestId, String scenesCode, Throwable cause) {
         super(cause);
         this.requestId = hasTextOf(requestId, "requestId");
         this.scenesCode = hasTextOf(scenesCode, "scenesCode");

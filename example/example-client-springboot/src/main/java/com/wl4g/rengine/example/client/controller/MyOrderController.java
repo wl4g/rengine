@@ -56,4 +56,14 @@ public class MyOrderController {
         return resp;
     }
 
+    @RequestMapping("/create2")
+    public Map<String, Object> create2(String userId, String goodId, String address, Integer count) {
+        log.info("Creating2 to order ... {}, {}, {}, {}", userId, goodId, address, count);
+
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("data", myOrderService.create2(userId, goodId, address, count));
+
+        return resp;
+    }
+
 }

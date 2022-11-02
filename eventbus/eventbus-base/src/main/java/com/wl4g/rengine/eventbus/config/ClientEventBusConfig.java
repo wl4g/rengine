@@ -79,15 +79,8 @@ public class ClientEventBusConfig {
         }
 
         public static enum EventRecorderProvider {
-            ROCKSDB,
-
-            EHCACHE,
-
-            REDIS,
-
-            MEMORY;
+            ROCKSDB, EHCACHE, REDIS;
         }
-
     }
 
     @Getter

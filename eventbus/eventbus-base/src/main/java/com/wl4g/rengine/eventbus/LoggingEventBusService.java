@@ -52,7 +52,7 @@ public class LoggingEventBusService extends AbstractEventBusService<RengineEvent
 
     @Override
     public List<Future<RengineEvent>> doPublish(List<RengineEvent> events) {
-        log.info("Logging event: {}", events);
+        log.info("(PRETEND) Sending event: {}", events);
         return safeList(events).stream().map(e -> new NoneFuture(e)).collect(toList());
     }
 
