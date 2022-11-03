@@ -30,7 +30,7 @@ import org.graalvm.polyglot.HostAccess;
 import lombok.ToString;
 
 /**
- * {@link ScriptResult}
+ * {@link WorkflowResult}
  * 
  * @author James Wong
  * @version 2022-09-29

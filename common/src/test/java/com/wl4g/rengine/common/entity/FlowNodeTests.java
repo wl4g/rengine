@@ -19,9 +19,11 @@ import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 
 import com.wl4g.rengine.common.entity.FlowNode.FlowNodeType;
-import com.wl4g.rengine.common.entity.FlowNode.OperationFlowNode;
+import com.wl4g.rengine.common.entity.FlowNode.RelationNode;
+import com.wl4g.rengine.common.entity.FlowNode.RelationType;
 
 /**
  * {@link FlowNodeTests}
@@ -34,25 +36,31 @@ public class FlowNodeTests {
 
     @Test
     public void testOperationFlowNodeSerialze() {
-        FlowNode node = OperationFlowNode.builder()
+        FlowNode node = RelationNode.builder()
+                .type(FlowNodeType.RELATION.name())
                 .id("100010")
                 .name("同时满足")
-                .type(FlowNodeType.OPERATION.name())
                 .color("WHITE")
                 .top("80px")
                 .left("20px")
+                .relation(RelationType.AND)
                 .build();
         System.out.println(toJSONString(node));
+        Assertions.assertEquals(node.getType(), FlowNodeType.RELATION.name());
     }
 
     @Test
     public void testOperationFlowNodeDeSerialze() {
-        String json = "{\"@type\":\"OPERATION\",\"id\":\"100010\",\"name\":\"同时满足\",\"top\":\"80px\",\"left\":\"20px\",\"color\":\"WHITE\",\"attributes\":{},\"operator\":null,\"@type\":\"OPERATION\"}";
+        String json = "{\"@type\":\"RELATION\",\"id\":\"100010\",\"parentId\":null,\"name\":\"同时满足\",\"top\":\"80px\",\"left\":\"20px\",\"color\":\"WHITE\",\"attributes\":{},\"relation\":\"AND\"}";
         FlowNode node = parseJSON(json, FlowNode.class);
-        System.out.println(" node.getClass(): " + node.getClass());
-        System.out.println("    node.getId(): " + node.getId());
-        System.out.println("  node.getName(): " + node.getName());
-        System.out.println("  node.getType(): " + node.getType());
+        System.out.println("       node.getClass(): " + node.getClass());
+        System.out.println("          node.getId(): " + node.getId());
+        System.out.println("        node.getName(): " + node.getName());
+        System.out.println("        node.getType(): " + node.getType());
+        System.out.println("         node.getTop(): " + node.getTop());
+        System.out.println("        node.getLeft(): " + node.getLeft());
+        System.out.println("       node.getColor(): " + node.getColor());
+        System.out.println("  node.getAttributes(): " + node.getAttributes());
     }
 
 }

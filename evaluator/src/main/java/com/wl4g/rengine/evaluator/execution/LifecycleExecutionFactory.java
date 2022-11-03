@@ -42,11 +42,9 @@ public class LifecycleExecutionFactory {
 
     public IExecution getExecution(EvaluationKind kind, EvaluationEngine engine) {
         switch (kind) {
-        case SCORE:
-            return getBean(ScoreWorkflowExecution.class);
-        case SIMPLE:
+        case DEFAULT:
         default:
-            return getBean(GenericWorkflowExecution.class);
+            return getBean(DefaultWorkflowExecution.class);
         }
     }
 

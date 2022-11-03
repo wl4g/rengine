@@ -103,6 +103,7 @@ public abstract class AbstractScriptEngine implements IEngine {
         return scripts;
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     protected @NotNull ScriptContext newScriptContext(Evaluation model) {
         // TODO dynamic setup more parameters
 
@@ -114,18 +115,17 @@ public abstract class AbstractScriptEngine implements IEngine {
                         .build(),
                 "A serious alarm occurs when the device temperature is greater than 52℃", singletonMap("objId", "1010012"));
 
-        Map<String, Object> attributes = new HashMap<>();
-        attributes.put("objId", "1010012");
-        attributes.put("remark", "The test js call to java ...");
+        // Map<String, Object> attributes = new HashMap<>();
+        // attributes.put("objId", "1010012");
+        // attributes.put("remark", "The test js call to java ...");
 
         return ScriptContext.builder()
                 .id("100101")
                 .type("iot_warning")
-                .args(model.getScripting().getArgs())
+                .args(ProxyObject.fromMap((Map) model.getArgs()))
                 .event(event)
-                .attributes(ProxyObject.fromMap(attributes))
+                // .attributes(ProxyObject.fromMap(attributes))
                 .minioManager(minioManager)
-                // .logger(new ScriptLogger(minioManager))
                 .dataService(new ScriptDataService(aggregationService))
                 .defaultHttpClient(new ScriptHttpClient())
                 .build();

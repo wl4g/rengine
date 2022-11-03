@@ -70,9 +70,12 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
-		<scala.version>2.11</scala.version>
-		<flink.version>1.14.4</flink.version>
-		<flink-shaded-jackson.version>2.12.4-14.0</flink-shaded-jackson.version>
+		<!-- <scala.version>2.11</scala.version> -->
+		<scala.version>2.12</scala.version>
+		<!-- <flink.version>1.14.4</flink.version> -->
+		<flink.version>1.15.2</flink.version>
+		<!-- <flink-shaded-jackson.version>2.12.4-14.0</flink-shaded-jackson.version> -->
+		<flink-shaded-jackson.version>2.12.4-15.0</flink-shaded-jackson.version>
 		<hadoop.version>2.7.2</hadoop.version>
 		<hbase.version>2.2.1</hbase.version>
 		<testcontainers.version>1.16.2</testcontainers.version>

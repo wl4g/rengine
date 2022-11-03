@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.job.analytic.core.hbase;
+package com.wl4g.rengine.job.hbase;
 
 import static java.lang.String.format;
 
@@ -36,8 +36,8 @@ import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.hadoop.hbase.client.TableDescriptor;
 import org.apache.hadoop.hbase.client.TableDescriptorBuilder;
 
-import com.wl4g.rengine.job.analytic.core.RengineFlinkStreamingBase;
-import com.wl4g.rengine.job.analytic.core.model.RengineEventAnalytical;
+import com.wl4g.rengine.job.RengineFlinkStreamingBase;
+import com.wl4g.rengine.job.model.RengineEventAnalytical;
 
 import lombok.CustomLog;
 import lombok.Getter;

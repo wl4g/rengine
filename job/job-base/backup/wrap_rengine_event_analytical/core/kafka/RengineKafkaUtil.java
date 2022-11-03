@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.job.analytic.core.kafka;
+package com.wl4g.rengine.job.kafka;
 
 import java.util.regex.Pattern;
 
@@ -23,8 +23,8 @@ import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.kafka.clients.consumer.OffsetResetStrategy;
 
-import com.wl4g.rengine.job.analytic.core.RengineFlinkStreamingBase;
-import com.wl4g.rengine.job.analytic.core.model.RengineEventAnalytical;
+import com.wl4g.rengine.job.RengineFlinkStreamingBase;
+import com.wl4g.rengine.job.model.RengineEventAnalytical;
 
 /**
  * {@link RenginePulsarUtil}

@@ -64,7 +64,7 @@ public class ScriptContext implements Serializable {
     //
     private final @NotBlank String id;
     private final @NotBlank String type;
-    private final @NotNull @Default List<String> args = new ArrayList<>();
+    private final @NotNull @Default ProxyObject args = ProxyObject.fromMap(new HashMap<>());
     private final @NotNull @Default ScriptRengineEvent event = new ScriptRengineEvent("__default_empty_event",
             ScriptEventSource.builder().build());
     private final @NotNull @Default ProxyObject attributes = ProxyObject.fromMap(new HashMap<>());
@@ -88,7 +88,7 @@ public class ScriptContext implements Serializable {
         return type;
     }
 
-    public @HostAccess.Export List<String> getArgs() {
+    public @HostAccess.Export ProxyObject getArgs() {
         return args;
     }
 

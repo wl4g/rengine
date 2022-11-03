@@ -17,16 +17,24 @@ package com.wl4g.rengine.common.entity;
 
 import static java.lang.String.format;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotBlank;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.wl4g.rengine.common.entity.FlowNode.OperationFlowNode;
-import com.wl4g.rengine.common.entity.FlowNode.OutputFlowNode;
+import com.wl4g.rengine.common.entity.FlowNode.EndNode;
+import com.wl4g.rengine.common.entity.FlowNode.ExecutionNode;
+import com.wl4g.rengine.common.entity.FlowNode.OutputNode;
+import com.wl4g.rengine.common.entity.FlowNode.RelationNode;
+import com.wl4g.rengine.common.entity.FlowNode.StartNode;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -43,69 +51,99 @@ import lombok.experimental.SuperBuilder;
  * 
  * @author James Wong
  * @version 2022-10-20
- * @since v3.0.0
+ * @since v1.0.0
  */
-@Schema(oneOf = { OperationFlowNode.class, OutputFlowNode.class }, discriminatorProperty = "@type")
+@Schema(oneOf = { RelationNode.class, OutputNode.class }, discriminatorProperty = "@type")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type", visible = true)
-@JsonSubTypes({ @Type(value = OperationFlowNode.class, name = "OPERATION"),
-        @Type(value = OutputFlowNode.class, name = "OUTPUT") })
+@JsonSubTypes({ @Type(value = StartNode.class, name = "START"), @Type(value = EndNode.class, name = "END"),
+        @Type(value = RelationNode.class, name = "RELATION"), @Type(value = ExecutionNode.class, name = "EXECUTION"),
+        @Type(value = OutputNode.class, name = "OUTPUT") })
 @Getter
 @Setter
 @ToString
 @SuperBuilder
 @NoArgsConstructor
-public abstract class FlowNode {
+public abstract class FlowNode implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     @Schema(name = "@type", implementation = FlowNodeType.class)
-    @JsonProperty(value = "@type")
-    private String type;
-    private String id;
-    private String name;
-    private String top;
-    private String left;
-    private String color;
-    private @Default Map<String, Object> attributes = new HashMap<>();
+    @JsonProperty(value = "@type", access = Access.WRITE_ONLY)
+    private @NotBlank String type;
+    private @NotBlank String id;
+    private @NotBlank String parentId;
+    private @NotBlank @Default String name = "Node 1";
+    private @NotBlank @Default String top = "0px";
+    private @NotBlank @Default String left = "1px";
+    private @NotBlank @Default String color = "blue";
+    private @Nullable @Default Map<String, Object> attributes = new HashMap<>();
 
     @Getter
     @Setter
-    @ToString
+    @ToString(callSuper = true)
     @SuperBuilder
     @NoArgsConstructor
-    public static class OperationFlowNode extends FlowNode {
-        private OperatorType operator;
+    public static class StartNode extends FlowNode {
+        private static final long serialVersionUID = 422265264435899065L;
     }
 
     @Getter
     @Setter
-    @ToString
+    @ToString(callSuper = true)
     @SuperBuilder
     @NoArgsConstructor
-    public static class OutputFlowNode extends FlowNode {
-        private OperatorType operator;
+    public static class EndNode extends FlowNode {
+        private static final long serialVersionUID = 42226522235899065L;
     }
 
-    /**
-     * Operator Type Definitions for Rule DAG Execution Graphs.
-     */
+    @Getter
+    @Setter
+    @ToString(callSuper = true)
+    @SuperBuilder
+    @NoArgsConstructor
+    public static class RelationNode extends FlowNode {
+        private static final long serialVersionUID = 4222652655435899065L;
+        private RelationType relation;
+    }
+
+    @Getter
+    @Setter
+    @ToString(callSuper = true)
+    @SuperBuilder
+    public static class ExecutionNode extends FlowNode {
+        private static final long serialVersionUID = 42226526447799065L;
+        // The current this node corresponding rule ID.
+        private @NotBlank String ruleId;
+    }
+
+    @Getter
+    @Setter
+    @ToString(callSuper = true)
+    @SuperBuilder
+    @NoArgsConstructor
+    public static class OutputNode extends FlowNode {
+        private static final long serialVersionUID = 422261164435899065L;
+    }
+
     @Getter
     @ToString
     @AllArgsConstructor
-    public static enum OperatorType {
+    public static enum RelationType {
 
-        AND("The similar to code operator: &&"),
+        AND("The similar to relation operator: &&"),
 
-        OR("The similar to code operator: ||"),
+        OR("The similar to relation operator: ||"),
 
-        NOT("The similar to code operator: !"),
+        NOT("The similar to relation operator: !"),
 
-        ALL("The similar to code operator: &"),
+        ALL("The similar to relation operator: &"),
 
-        ANY("The similar to code operator: |");
+        ANY("The similar to relation operator: |");
 
         private final String description;
 
         @JsonCreator
-        public static OperatorType of(String type) {
-            for (OperatorType a : values()) {
+        public static RelationType of(String type) {
+            for (RelationType a : values()) {
                 if (a.name().equalsIgnoreCase(type)) {
                     return a;
                 }
@@ -115,8 +153,22 @@ public abstract class FlowNode {
 
     }
 
+    @Getter
+    @ToString
+    @AllArgsConstructor
     public static enum FlowNodeType {
-        OPERATION, OUTPUT
+
+        START(StartNode.class),
+
+        END(EndNode.class),
+
+        RELATION(RelationNode.class),
+
+        EXECUTION(ExecutionNode.class),
+
+        OUTPUT(OutputNode.class);
+
+        private final Class<? extends FlowNode> clazz;
     }
 
 }

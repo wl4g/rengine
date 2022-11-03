@@ -18,7 +18,7 @@ package com.wl4g.rengine.job.analytic;
 import org.apache.flink.api.connector.source.Source;
 import org.apache.flink.api.connector.source.SourceSplit;
 
-import com.wl4g.rengine.job.analytic.core.hive.RengineHiveStreamingSupport;
+import com.wl4g.rengine.job.hive.RengineHiveStreamingSupport;
 
 /**
  * {@link IamEventRabbitMQ2HiveStreaming}

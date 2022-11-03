@@ -22,7 +22,6 @@ package com.wl4g.rengine.common.model;
  * @version 2022-09-21
  * @since v1.0.0
  */
-@Deprecated
 public enum EvaluationKind {
-    SIMPLE, SCORE
+    DEFAULT
 }

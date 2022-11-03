@@ -50,8 +50,8 @@ public class EvaluationResult {
     @SuperBuilder
     @NoArgsConstructor
     public static class ResultDescription {
-        // TODO 之后演进为通用特征平台后, 此字段表示为: feature
-        // 参见: https://mp.weixin.qq.com/s/UG4VJ3HuzcBhjLcmtVpLFw
+        // TODO 未来演进为通用特征平台后, 此字段表示为: feature
+        // 参见eBay特征平台博文: https://mp.weixin.qq.com/s/UG4VJ3HuzcBhjLcmtVpLFw
         private @NotNull String node; // 暂定义为执行失败的 workflow 节点 ID
         private @NotNull Boolean success;
         private @NotBlank String value;
