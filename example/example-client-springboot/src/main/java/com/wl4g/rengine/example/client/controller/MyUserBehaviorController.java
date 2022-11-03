@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,7 +49,7 @@ public class MyUserBehaviorController {
     }
 
     @RequestMapping("/report")
-    public Map<String, Object> report(BehaviorReport report) {
+    public Map<String, Object> report(@RequestBody BehaviorReport report) {
         log.info("Reporting to behavior ... - {}", report);
 
         Map<String, Object> resp = new HashMap<>();
@@ -58,7 +59,7 @@ public class MyUserBehaviorController {
     }
 
     @RequestMapping("/report2")
-    public Map<String, Object> report2(BehaviorReport report) {
+    public Map<String, Object> report2(@RequestBody BehaviorReport report) {
         log.info("Reporting to behavior ... - {}", report);
 
         Map<String, Object> resp = new HashMap<>();

@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,7 +49,7 @@ public class MyOrderController {
     }
 
     @RequestMapping("/create")
-    public Map<String, Object> create(CreateOrder order, Integer count) {
+    public Map<String, Object> create(@RequestBody CreateOrder order, Integer count) {
         log.info("Creating to order ... - {}, count: {}", order, count);
 
         Map<String, Object> resp = new HashMap<>();
@@ -58,7 +59,7 @@ public class MyOrderController {
     }
 
     @RequestMapping("/create2")
-    public Map<String, Object> create2(CreateOrder order, Integer count) {
+    public Map<String, Object> create2(@RequestBody CreateOrder order, Integer count) {
         log.info("Creating2 to order ... - {}, count: {}", order, count);
 
         Map<String, Object> resp = new HashMap<>();

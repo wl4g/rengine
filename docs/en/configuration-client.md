@@ -54,6 +54,18 @@
     }
 ```
 
+- Example mocking requests
+
+```bash
+curl -v 'localhost:28004/order/create?count=2' \
+-H "Content-Type: application/json" \
+-d '{
+"userId": "u100012",
+"goodId": "G2022120312412",
+"address": "Xxx sheet 12th."
+}'
+```
+
 - ***Notice:*** The params template expression to invoke the object get method is shallow, for example: `{{userId=#0.userId}}` is supported, `{{city=#0.address.city}}` is not supported.
 
 ## Configuration
