@@ -50,7 +50,6 @@ public class RengineRiskHandler {
         if (result.getErrorCount() > 0) {
             throw new RengineException(format("Unable to operation, detected risk in your environment."));
         }
-
     }
 
 }

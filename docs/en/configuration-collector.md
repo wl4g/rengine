@@ -1,6 +1,6 @@
 # Rengine configuration for Collector
 
-## Configuration Define
+## Configuration
 
 - for example:
   - [collect-job.yaml](../../client/client-collector/src/main/resources/collector-job.yaml)

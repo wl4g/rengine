@@ -30,6 +30,7 @@ import com.wl4g.rengine.client.core.config.ClientConfig;
 import com.wl4g.rengine.common.exception.RengineException;
 import com.wl4g.rengine.common.model.EvaluationResult;
 import com.wl4g.rengine.common.model.EvaluationResult.ResultDescription;
+import com.wl4g.rengine.common.util.IdGenUtil;
 
 /**
  * {@link RengineClientTests}
@@ -61,7 +62,7 @@ public class RengineClientTests {
                         .clientId("iot-mqttcollector01")
                         .clientSecret("abcdefghijklmnopqrstuvwxyz")
                         .build())
-                .failback(e -> {
+                .defaultFailback(e -> {
                     System.err.println("Failed to evaluation of reason: ");
                     e.printStackTrace();
                     return null;
@@ -78,23 +79,23 @@ public class RengineClientTests {
 
     @Test(expected = RengineException.class)
     public void testNewRengineClientEvaluationWithTimeoutFail() {
-        RengineClient timeoutClient = RengineClient.builder().config(invalidClientConfig).failback(e -> {
+        RengineClient timeoutClient = RengineClient.builder().config(invalidClientConfig).defaultFailback(e -> {
             System.out.println("\nFailed to evaluation of reason: " + e.getMessage());
             return defaultFailbackResult;
         }).build();
 
-        final var result = timeoutClient.evaluate("iot_temp_warn", 1000L, false, emptyMap());
+        final var result = timeoutClient.evaluate(IdGenUtil.next(), "iot_temp_warn", 1000L, false, emptyMap());
         System.out.println("Evaluated result: " + result);
     }
 
     @Test
     public void testNewRengineClientEvaluationWithTimeoutSuccess() {
-        RengineClient timeoutClient = RengineClient.builder().config(invalidClientConfig).failback(e -> {
+        RengineClient timeoutClient = RengineClient.builder().config(invalidClientConfig).defaultFailback(e -> {
             System.out.println("\nFailed to evaluation of reason: " + e.getMessage());
             return defaultFailbackResult;
         }).build();
 
-        final var result = timeoutClient.evaluate("iot_temp_warn", 1000L, true, emptyMap());
+        final var result = timeoutClient.evaluate(IdGenUtil.next(), "iot_temp_warn", 1000L, true, emptyMap());
         System.out.println("Evaluated result: " + result);
         Assertions.assertEquals(defaultFailbackResult, result);
     }

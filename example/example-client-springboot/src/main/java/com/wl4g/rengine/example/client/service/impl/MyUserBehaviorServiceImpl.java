@@ -16,73 +16,64 @@
 package com.wl4g.rengine.example.client.service.impl;
 
 import static java.lang.String.valueOf;
-import static java.lang.System.currentTimeMillis;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.wl4g.rengine.client.springboot.intercept.REvaluation;
-import com.wl4g.rengine.example.client.model.CreateOrder;
+import com.wl4g.rengine.example.client.model.BehaviorReport;
 import com.wl4g.rengine.example.client.risk.MyFailback;
 import com.wl4g.rengine.example.client.risk.RengineRiskHandler;
-import com.wl4g.rengine.example.client.service.MyOrderService;
+import com.wl4g.rengine.example.client.service.MyUserBehaviorService;
 
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link MyOrderServiceImpl}
+ * {@link MyUserBehaviorServiceImpl}
  * 
  * @author James Wong
- * @version 2022-11-01
- * @since v1.0.0
+ * @version 2022-11-03
+ * @since v3.0.0
  */
 @Slf4j
 @Service
-public class MyOrderServiceImpl implements MyOrderService {
+public class MyUserBehaviorServiceImpl implements MyUserBehaviorService {
 
     private @Autowired RengineRiskHandler riskHandler;
-    private @Value("${scenes_configs.createOrder}") String createOrderScenesCode;
+    private @Value("${scenes_configs.behaviorReport}") String behaviorReportScenesCode;
 
-    @REvaluation(scenesCode = "${scenes_configs.createOrder}", bestEffort = true,
-            paramsTemplate = "{{userId=#0.userId,goodId=#0.goodId,count=#1}}", failback = MyFailback.class)
+    @REvaluation(scenesCode = "${scenes_configs.behaviorReport}", bestEffort = true,
+            paramsTemplate = "{{userId=#0,operationType=#1,observedTime=#1}}", failback = MyFailback.class)
     @Override
-    public Map<String, String> create(CreateOrder order, Integer count) {
-        log.info("Creating to order ...");
-
-        // some order creating logical
+    public Map<String, String> report(BehaviorReport report) {
+        log.info("Reporting to behavior ...");
+        // some reporting logical
         // ...
 
         Map<String, String> orderInfo = new HashMap<>();
-        orderInfo.put("orderId", UUID.randomUUID().toString());
-        orderInfo.put("status", "1");
-        orderInfo.put("timestamp", valueOf(currentTimeMillis()));
-        orderInfo.put("address", order.getAddress());
+        orderInfo.put("result", "success");
 
         return orderInfo;
     }
 
     @Override
-    public Map<String, String> create2(CreateOrder order, Integer count) {
+    public Map<String, String> report2(BehaviorReport report) {
         Map<String, String> args = new HashMap<>();
-        args.put("userId", order.getUserId());
-        args.put("goodId", order.getGoodId());
-        args.put("count", valueOf(count));
-        riskHandler.checkRiskFor(createOrderScenesCode, args);
+        args.put("userId", report.getUserId());
+        args.put("operationType", report.getOperationType());
+        args.put("observedTime", valueOf(report.getObservedTime()));
+        riskHandler.checkRiskFor(behaviorReportScenesCode, args);
 
-        log.info("Creating2 to order ...");
-        // some order creating logical
+        log.info("Reporting to behavior ...");
+        // some reporting logical
         // ...
 
         Map<String, String> orderInfo = new HashMap<>();
-        orderInfo.put("orderId", UUID.randomUUID().toString());
-        orderInfo.put("status", "1");
-        orderInfo.put("timestamp", valueOf(currentTimeMillis()));
-        orderInfo.put("address", order.getAddress());
+        orderInfo.put("result", "success");
 
         return orderInfo;
     }

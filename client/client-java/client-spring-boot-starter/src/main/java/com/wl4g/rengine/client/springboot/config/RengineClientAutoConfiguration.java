@@ -17,6 +17,8 @@ package com.wl4g.rengine.client.springboot.config;
 
 import java.util.function.Function;
 
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -24,7 +26,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.wl4g.rengine.client.core.RengineClient;
+import com.wl4g.rengine.client.core.RengineClient.DefaultFailback;
 import com.wl4g.rengine.client.core.config.ClientConfig;
+import com.wl4g.rengine.client.springboot.intercept.DefaultREvaluationHandler;
+import com.wl4g.rengine.client.springboot.intercept.REvaluation;
+import com.wl4g.rengine.client.springboot.intercept.REvaluationAdvice;
+import com.wl4g.rengine.client.springboot.intercept.REvaluationHandler;
 import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.common.model.EvaluationResult;
 
@@ -53,16 +60,22 @@ public class RengineClientAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public RengineClient rengineClient(ClientCoreProperties config, Function<Throwable, EvaluationResult> failback) {
-        return RengineClient.builder().config(config).failback(failback).build();
+    public RengineClient rengineClient(ClientCoreProperties config, Function<Throwable, EvaluationResult> defaultFailback) {
+        return RengineClient.builder().config(config).defaultFailback(defaultFailback).build();
     }
 
-    public static class DefaultFailback implements Function<Throwable, EvaluationResult> {
-        @Override
-        public EvaluationResult apply(Throwable t) {
-            System.err.println("Failed to evaluation of reason: ");
-            return EvaluationResult.builder().errorCount(Integer.MAX_VALUE).build();
-        }
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnClass(ProceedingJoinPoint.class)
+    public REvaluationHandler<REvaluation> defaultREvaluationHandler() {
+        return new DefaultREvaluationHandler();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean(REvaluationHandler.class)
+    public REvaluationAdvice rEvaluationAdvice(REvaluationHandler<REvaluation> handler) {
+        return new REvaluationAdvice(handler);
     }
 
     public static class ClientCoreProperties extends ClientConfig {

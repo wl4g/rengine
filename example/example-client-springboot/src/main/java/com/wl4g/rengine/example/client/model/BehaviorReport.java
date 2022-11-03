@@ -13,27 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.common.util;
+package com.wl4g.rengine.example.client.model;
 
-import java.util.UUID;
+import java.util.Map;
 
-import com.wl4g.infra.common.id.SnowflakeIdGenerator;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 /**
- * {@link IdGenUtil}
+ * {@link BehaviorReport}
  * 
  * @author James Wong
- * @version 2022-09-16
- * @since v1.0.0
+ * @version 2022-11-03
+ * @since v3.0.0
  */
-public abstract class IdGenUtil {
-
-    public static String next() {
-        return UUID.randomUUID().toString();
-    }
-
-    public static long nextLong() {
-        return SnowflakeIdGenerator.getDefault().nextId();
-    }
-
+@Getter
+@Setter
+@ToString
+@SuperBuilder
+@NoArgsConstructor
+public class BehaviorReport {
+    private String userId;
+    private String operationType;
+    private Long observedTime;
+    private Map<String, String> attributes;
 }

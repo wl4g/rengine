@@ -13,27 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.common.util;
+package com.wl4g.rengine.example.client.risk;
 
-import java.util.UUID;
+import static java.lang.String.format;
 
-import com.wl4g.infra.common.id.SnowflakeIdGenerator;
+import com.wl4g.rengine.client.core.RengineClient.DefaultFailback;
+import com.wl4g.rengine.common.model.EvaluationResult;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link IdGenUtil}
+ * {@link MyFailback}
  * 
  * @author James Wong
- * @version 2022-09-16
+ * @version 2022-11-03
  * @since v1.0.0
  */
-public abstract class IdGenUtil {
+@Slf4j
+public class MyFailback extends DefaultFailback {
 
-    public static String next() {
-        return UUID.randomUUID().toString();
-    }
-
-    public static long nextLong() {
-        return SnowflakeIdGenerator.getDefault().nextId();
+    @Override
+    public EvaluationResult apply(Throwable t) {
+        log.warn(format(":::Failed to evaluation of reason: %s", t.getMessage()));
+        return EvaluationResult.builder().errorCount(Integer.MAX_VALUE).build();
     }
 
 }

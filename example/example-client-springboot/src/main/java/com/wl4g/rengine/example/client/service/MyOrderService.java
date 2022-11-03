@@ -17,6 +17,8 @@ package com.wl4g.rengine.example.client.service;
 
 import java.util.Map;
 
+import com.wl4g.rengine.example.client.model.CreateOrder;
+
 /**
  * {@link MyOrderService}
  * 
@@ -26,6 +28,8 @@ import java.util.Map;
  */
 public interface MyOrderService {
 
-    Map<String, String> create(String userId, String goodId, String address, Integer count);
+    Map<String, String> create(CreateOrder order, Integer count);
+
+    Map<String, String> create2(CreateOrder order, Integer count);
 
 }

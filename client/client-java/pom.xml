@@ -79,7 +79,7 @@
 	</parent>
 	<modules>
 		<module>client-core</module>
-		<module>client-springboot</module>
+		<module>client-spring-boot-starter</module>
 	</modules>
 	<dependencies>
 		<dependency>

@@ -47,7 +47,7 @@ public class Evaluation extends EvaluationBase {
     /**
      * That is, the maximum execution time, and the user determines the
      * acceptable maximum execution time according to actual needs. Returns
-     * immediately if evaluation/feature acquisition and computation times out.
+     * immediately if evaluation/feature acquisition and computation times-out.
      */
     @NotNull
     @Min(1)

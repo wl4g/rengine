@@ -30,6 +30,7 @@ import lombok.Getter;
 public class ClientEvaluationException extends RengineException {
     private static final long serialVersionUID = 4247583228100258388L;
 
+    private String requestId;
     private String scenesCode;
     private Boolean bestEffort;
     private Long timeout;
@@ -38,22 +39,26 @@ public class ClientEvaluationException extends RengineException {
         super();
     }
 
-    public ClientEvaluationException(String scenesCode, Long timeout, Boolean bestEffort, String message) {
+    public ClientEvaluationException(String requestId, String scenesCode, Long timeout, Boolean bestEffort, String message) {
         super(message);
+        this.requestId = requestId;
         this.scenesCode = scenesCode;
         this.timeout = timeout;
         this.bestEffort = bestEffort;
     }
 
-    public ClientEvaluationException(String scenesCode, Long timeout, Boolean bestEffort, String message, Throwable cause) {
+    public ClientEvaluationException(String requestId, String scenesCode, Long timeout, Boolean bestEffort, String message,
+            Throwable cause) {
         super(message, cause);
+        this.requestId = requestId;
         this.scenesCode = scenesCode;
         this.timeout = timeout;
         this.bestEffort = bestEffort;
     }
 
-    public ClientEvaluationException(String scenesCode, Long timeout, Boolean bestEffort, Throwable cause) {
+    public ClientEvaluationException(String requestId, String scenesCode, Long timeout, Boolean bestEffort, Throwable cause) {
         super(cause);
+        this.requestId = requestId;
         this.scenesCode = scenesCode;
         this.timeout = timeout;
         this.bestEffort = bestEffort;

@@ -15,6 +15,10 @@
  */
 package com.wl4g.rengine.common.exception;
 
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+
+import lombok.Getter;
+
 /**
  * {@link ExecutionException}
  * 
@@ -22,26 +26,29 @@ package com.wl4g.rengine.common.exception;
  * @version 2022-09-22
  * @since v1.0.0
  */
+@Getter
 public class ExecutionException extends RengineException {
     private static final long serialVersionUID = 5177120828249689148L;
 
-    public ExecutionException() {
-        super();
-    }
+    private String scenesCode;
+    private String requestId;
 
-    public ExecutionException(String message) {
+    public ExecutionException(String requestId, String scenesCode, String message) {
         super(message);
+        this.requestId = hasTextOf(requestId, "requestId");
+        this.scenesCode = hasTextOf(scenesCode, "scenesCode");
     }
 
-    public ExecutionException(String message, Throwable cause) {
+    public ExecutionException(String requestId, String scenesCode, String message, Throwable cause) {
         super(message, cause);
+        this.requestId = hasTextOf(requestId, "requestId");
+        this.scenesCode = hasTextOf(scenesCode, "scenesCode");
     }
 
-    public ExecutionException(Throwable cause) {
+    public ExecutionException(String requestId, String scenesCode, Throwable cause) {
         super(cause);
+        this.requestId = hasTextOf(requestId, "requestId");
+        this.scenesCode = hasTextOf(scenesCode, "scenesCode");
     }
 
-    protected ExecutionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
 }

@@ -100,7 +100,7 @@ public class RuleServiceImpl implements RuleService {
                 .build();
 
         if (isNull(rule.getId())) {
-            rule.setId(IdGenUtil.next());
+            rule.setId(IdGenUtil.nextLong());
             rule.preInsert();
         } else {
             rule.preUpdate();

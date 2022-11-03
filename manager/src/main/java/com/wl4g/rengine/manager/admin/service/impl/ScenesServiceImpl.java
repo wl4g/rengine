@@ -99,7 +99,7 @@ public class ScenesServiceImpl implements ScenesService {
                 .build();
 
         if (isNull(scenes.getId())) {
-            scenes.setId(IdGenUtil.next());
+            scenes.setId(IdGenUtil.nextLong());
             scenes.preInsert();
         } else {
             scenes.preUpdate();
