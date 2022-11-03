@@ -101,7 +101,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .build();
 
         if (isNull(workflow.getId())) {
-            workflow.setId(IdGenUtil.next());
+            workflow.setId(IdGenUtil.nextLong());
             workflow.preInsert();
         } else {
             workflow.preUpdate();

@@ -17,15 +17,24 @@ package com.wl4g.rengine.client.springboot.intercept;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
 import static com.wl4g.infra.common.lang.Assert2.hasText;
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.isTrue;
+import static com.wl4g.infra.common.lang.Assert2.notNull;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.infra.common.lang.ClassUtils2.getMethod;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.invokeMethod;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.contains;
 import static org.apache.commons.lang3.StringUtils.endsWith;
 import static org.apache.commons.lang3.StringUtils.split;
 import static org.apache.commons.lang3.StringUtils.startsWith;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
+import static org.springframework.util.ReflectionUtils.makeAccessible;
 
+import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -34,7 +43,11 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
@@ -107,7 +120,8 @@ public class DefaultREvaluationHandler implements REvaluationHandler<REvaluation
     }
 
     protected Map<String, String> buildEvaluateParams(ProceedingJoinPoint jp, REvaluation annotation, String paramsTemplate) {
-        return parseParamsTemplate(safeArrayToList(jp.getArgs()), paramsTemplate);
+        return parseParamsTemplate(jp.getTarget(), safeArrayToList(jp.getArgs()), (MethodSignature) jp.getSignature(),
+                paramsTemplate);
     }
 
     /**
@@ -117,53 +131,92 @@ public class DefaultREvaluationHandler implements REvaluationHandler<REvaluation
      * for example:
      * 
      * <pre>
-     *  params template: "{{  userId=#0, goodId=#1 }}"
+     *  params template: "{{  userId=#0.userId, goodId=#0.goodId, count=#1 }}"
      * 
-     *       definition: void myCreate(String userId, String goodId, int count) {}
+     *       definition: void myCreate(CreateOrder order) {}
      * 
-     *             call: myCreate("u100101", "G202202082139942", 2) {}
+     *             call: myCreate(CreateOrder.builder()
+     *                      .userId("u100101")
+     *                      .goodId("G202202082139942")
+     *                      .build(),
+     *                      2) {}
      * 
-     *      parsed args: { "userId" => "u100101", "goodId" => "G202202082139942" }
+     *      parsed args: { "userId" => "u100101", "goodId" => "G202202082139942", "count" => 2 }
      * </pre>
      * </p>
      * 
      * @param arguments
+     * @param signature
      * @param paramsTemplate
      * @return
      */
-    static Map<String, String> parseParamsTemplate(List<Object> arguments, String paramsTemplate) {
+    public static Map<String, String> parseParamsTemplate(
+            @NotNull Object targetObj,
+            @NotNull List<Object> arguments,
+            @NotNull MethodSignature signature,
+            @NotBlank String paramsTemplate) {
+        notNullOf(targetObj, "targetObj");
+        notNullOf(arguments, "arguments");
+        notNullOf(signature, "signature");
+        hasTextOf(paramsTemplate, "paramsTemplate");
+
+        final List<Class<?>> parameterTypes = safeArrayToList(signature.getMethod().getParameterTypes());
+        isTrue(parameterTypes.size() == arguments.size(),
+                "Synatax error, the parameters count must be equals arguments size. but %s == %s ?", parameterTypes.size(),
+                arguments.size());
+
         isTrue(startsWith(paramsTemplate, "{{") && endsWith(paramsTemplate, "}}"),
-                "The synatax error, the parameters template must be followed by open '{{' and '}}' end.");
+                "Synatax error, the parameters template must be followed by open '{{' and '}}' end.");
         paramsTemplate = paramsTemplate.substring(2, paramsTemplate.length() - 2);
 
-        final Map<String, String> args = new LinkedHashMap<>(arguments.size());
         // Parse template parameters.
-        for (String param : split(trimToEmpty(paramsTemplate), ",")) {
+        final Map<String, String> args = new LinkedHashMap<>(arguments.size());
+        for (String param : split(paramsTemplate, ",")) {
             final String[] keyValueParts = split(param, "=");
-            isTrue(keyValueParts.length == 2, "The synatax error, the parameters template part of %s", asList(keyValueParts));
+            isTrue(keyValueParts.length == 2, "Synatax error, the parameters template parts of %s", asList(keyValueParts));
 
             final String name = trimToEmpty(keyValueParts[0]);
             final String placeholder = trimToEmpty(keyValueParts[1]);
-            isTrue(startsWith(placeholder, "#"),
-                    "The synatax error, the parameter template value placeholder of %s, must '#' start.", placeholder);
-            final String parseIndexStr = placeholder.substring(1);
+            isTrue(startsWith(placeholder, "#"), "Synatax error, the parameter template value placeholder of %s, must '#' start.",
+                    placeholder);
+            final String indexIndex = placeholder.substring(1, Math.max(placeholder.indexOf("."), 2));
             try {
-                Integer.parseInt(parseIndexStr);
+                Integer.parseInt(indexIndex);
             } catch (Exception e) {
                 throw new IllegalArgumentException(
-                        format("The synatax error, the parameter template value placeholder index of %s.", parseIndexStr), e);
+                        format("Synatax error, the parameter template value placeholder index of '%s'.", indexIndex), e);
             }
-            isTrue(!args.values().contains(parseIndexStr), "The duplicate params template placeholder index: %s", parseIndexStr);
-            isTrue(isNull(args.putIfAbsent(name, parseIndexStr)), "The duplicate params template name: %s", name);
+            final String indexExpr = placeholder.substring(1, Math.max(placeholder.indexOf("."), placeholder.length()));
+            isTrue(isNull(args.putIfAbsent(name, indexExpr)), "The duplicate params template name: '%s' -> '%s'", name,
+                    placeholder);
         }
 
         // Setup actual parameter values.
         final Iterator<Entry<String, String>> it = args.entrySet().iterator();
         while (it.hasNext()) {
             Entry<String, String> entry = it.next();
-            final int paramIndex = Integer.parseInt(entry.getValue());
-            final Object paramValue = arguments.get(paramIndex);
-            entry.setValue(isNull(paramValue) ? "" : paramValue.toString());
+            final String indexExpr = entry.getValue();
+            if (contains(indexExpr, ".")) {
+                final String[] indexExprParts = split(indexExpr, ".");
+                isTrue(indexExprParts.length == 2, "Synatax error, the parameters template parts of %s", asList(indexExprParts));
+                final int paramIndex = Integer.parseInt(indexExprParts[0]);
+                final String paramProperty = indexExprParts[1];
+                final Class<?> paramType = parameterTypes.get(paramIndex);
+                final Object paramValue = arguments.get(paramIndex);
+                if (nonNull(paramValue)) {
+                    final String getMethodName = "get"
+                            + paramProperty.substring(0, 1).toUpperCase().concat(paramProperty.substring(1));
+                    final Method getMethod = getMethod(paramType, getMethodName);
+                    notNull(getMethod, "Could not found exprssion get method for : {}.{}()", paramType.getName(), getMethodName);
+                    makeAccessible(getMethod);
+                    final Object propertyValue = invokeMethod(getMethod, targetObj);
+                    entry.setValue(isNull(propertyValue) ? "" : propertyValue.toString());
+                }
+            } else {
+                final int paramIndex = Integer.parseInt(indexExpr);
+                final Object paramValue = arguments.get(paramIndex);
+                entry.setValue(isNull(paramValue) ? "" : paramValue.toString());
+            }
         }
 
         return args;

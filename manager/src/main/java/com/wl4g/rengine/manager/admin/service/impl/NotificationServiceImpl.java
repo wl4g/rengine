@@ -69,7 +69,7 @@ public class NotificationServiceImpl implements NotificationService {
     public SaveNotificationResult save(SaveNotification model) {
         Notification provider = model.getProvider();
         if (isNull(provider.getId())) {
-            provider.setId(IdGenUtil.next());
+            provider.setId(IdGenUtil.nextLong());
             provider.preInsert();
         } else {
             provider.preUpdate();

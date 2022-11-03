@@ -83,9 +83,10 @@ public @interface REvaluation {
      * Evaluation to parameters template.
      * 
      * <p>
-     * for example: {{userId=#0,goodId=#1}}
+     * for example: {{ userId=#0.userId, goodId=#0.goodId, count=#1 }}
      * </p>
      * 
+     * @see {@link DefaultREvaluationHandler#parseParamsTemplate(java.util.List, String)}
      * @return
      */
     String paramsTemplate() default "";

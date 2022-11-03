@@ -13,23 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.example.client.service;
+package com.wl4g.rengine.example.client.model;
 
-import java.util.Map;
-
-import com.wl4g.rengine.example.client.model.CreateOrder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 /**
- * {@link MyOrderService}
+ * {@link CreateOrder}
  * 
  * @author James Wong
- * @version 2022-11-01
- * @since v1.0.0
+ * @version 2022-11-03
+ * @since v3.0.0
  */
-public interface MyOrderService {
-
-    Map<String, String> create(CreateOrder order, Integer count);
-
-    Map<String, String> create2(CreateOrder order, Integer count);
-
+@Getter
+@Setter
+@ToString
+@SuperBuilder
+@NoArgsConstructor
+public class CreateOrder {
+    private String userId;
+    private String goodId;
+    private String address;
 }

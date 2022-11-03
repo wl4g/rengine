@@ -100,7 +100,7 @@ public class UploadServiceImpl implements UploadService {
         String objectPrefix = format("%s/%s/%s", RengineConstants.DEF_MINIO_BUCKET, uploadType.getPrefix(), model.getFilename());
         UploadObject upload = UploadObject.builder()
                 .uploadType(model.getUploadType())
-                .id(IdGenUtil.next())
+                .id(IdGenUtil.nextLong())
                 .objectPrefix(objectPrefix)
                 .filename(model.getFilename())
                 .extension(model.getExtension())
@@ -112,7 +112,7 @@ public class UploadServiceImpl implements UploadService {
                 .build();
 
         if (isNull(upload.getId())) {
-            upload.setId(IdGenUtil.next());
+            upload.setId(IdGenUtil.nextLong());
             upload.preInsert();
         } else {
             upload.preUpdate();

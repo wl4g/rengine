@@ -23,13 +23,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.wl4g.rengine.example.client.model.CreateOrder;
-import com.wl4g.rengine.example.client.service.MyOrderService;
+import com.wl4g.rengine.example.client.model.BehaviorReport;
+import com.wl4g.rengine.example.client.service.MyUserBehaviorService;
 
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link MyOrderController}
+ * {@link MyUserBehaviorController}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -38,31 +38,31 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @ResponseBody
 @RestController
-@RequestMapping("/order")
-public class MyOrderController {
+@RequestMapping("/userBehavior")
+public class MyUserBehaviorController {
 
-    private final MyOrderService myOrderService;
+    private final MyUserBehaviorService userBehaviorService;
 
-    public MyOrderController(@Autowired MyOrderService myOrderService) {
-        this.myOrderService = myOrderService;
+    public MyUserBehaviorController(@Autowired MyUserBehaviorService userBehaviorService) {
+        this.userBehaviorService = userBehaviorService;
     }
 
-    @RequestMapping("/create")
-    public Map<String, Object> create(CreateOrder order, Integer count) {
-        log.info("Creating to order ... - {}, count: {}", order, count);
+    @RequestMapping("/report")
+    public Map<String, Object> report(BehaviorReport report) {
+        log.info("Reporting to behavior ... - {}", report);
 
         Map<String, Object> resp = new HashMap<>();
-        resp.put("data", myOrderService.create(order, count));
+        resp.put("data", userBehaviorService.report(report));
 
         return resp;
     }
 
-    @RequestMapping("/create2")
-    public Map<String, Object> create2(CreateOrder order, Integer count) {
-        log.info("Creating2 to order ... - {}, count: {}", order, count);
+    @RequestMapping("/report2")
+    public Map<String, Object> report2(BehaviorReport report) {
+        log.info("Reporting to behavior ... - {}", report);
 
         Map<String, Object> resp = new HashMap<>();
-        resp.put("data", myOrderService.create2(order, count));
+        resp.put("data", userBehaviorService.report2(report));
 
         return resp;
     }

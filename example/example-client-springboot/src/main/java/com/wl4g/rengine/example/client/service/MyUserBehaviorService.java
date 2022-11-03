@@ -17,19 +17,19 @@ package com.wl4g.rengine.example.client.service;
 
 import java.util.Map;
 
-import com.wl4g.rengine.example.client.model.CreateOrder;
+import com.wl4g.rengine.example.client.model.BehaviorReport;
 
 /**
- * {@link MyOrderService}
+ * {@link MyUserBehaviorService}
  * 
  * @author James Wong
  * @version 2022-11-01
  * @since v1.0.0
  */
-public interface MyOrderService {
+public interface MyUserBehaviorService {
 
-    Map<String, String> create(CreateOrder order, Integer count);
+    Map<String, String> report(BehaviorReport report);
 
-    Map<String, String> create2(CreateOrder order, Integer count);
+    Map<String, String> report2(BehaviorReport report);
 
 }

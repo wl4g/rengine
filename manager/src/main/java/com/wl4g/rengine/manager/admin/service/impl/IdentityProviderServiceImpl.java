@@ -69,7 +69,7 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
     public SaveIdentityProviderResult save(SaveIdentityProvider model) {
         IdentityProvider provider = model.getProvider();
         if (isNull(provider.getId())) {
-            provider.setId(IdGenUtil.next());
+            provider.setId(IdGenUtil.nextLong());
             provider.preInsert();
         } else {
             provider.preUpdate();

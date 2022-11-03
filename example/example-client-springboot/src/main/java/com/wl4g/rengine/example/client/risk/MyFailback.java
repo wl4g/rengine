@@ -13,23 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.example.client.service;
+package com.wl4g.rengine.example.client.risk;
 
-import java.util.Map;
+import static java.lang.String.format;
 
-import com.wl4g.rengine.example.client.model.CreateOrder;
+import com.wl4g.rengine.client.core.RengineClient.DefaultFailback;
+import com.wl4g.rengine.common.model.EvaluationResult;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link MyOrderService}
+ * {@link MyFailback}
  * 
  * @author James Wong
- * @version 2022-11-01
+ * @version 2022-11-03
  * @since v1.0.0
  */
-public interface MyOrderService {
+@Slf4j
+public class MyFailback extends DefaultFailback {
 
-    Map<String, String> create(CreateOrder order, Integer count);
-
-    Map<String, String> create2(CreateOrder order, Integer count);
+    @Override
+    public EvaluationResult apply(Throwable t) {
+        log.warn(format(":::Failed to evaluation of reason: %s", t.getMessage()));
+        return EvaluationResult.builder().errorCount(Integer.MAX_VALUE).build();
+    }
 
 }

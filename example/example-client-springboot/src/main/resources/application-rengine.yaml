@@ -27,4 +27,5 @@ rengine:
 
 ## The custom scenees codes configuration.
 scenes_configs:
-  createOrder: createFreqLimit
+  createOrder: orderRiskSafety
+  behaviorReport: behaniorCleanFilter
