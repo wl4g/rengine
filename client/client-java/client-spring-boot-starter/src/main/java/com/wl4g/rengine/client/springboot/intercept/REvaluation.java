@@ -27,7 +27,19 @@ import com.wl4g.rengine.common.model.Evaluation;
 import com.wl4g.rengine.common.model.EvaluationResult;
 
 /**
- * {@link REvaluation}
+ * for example:
+ * 
+ * <pre>
+ * &#64;Service
+ * class MyOrderServiceImpl implements MyOrderService {
+ * 
+ *     &#64;REvaluation(scenesCode = "${scenes_configs.createOrder}", bestEffort = true, paramsTemplate = "{{userId=#0,goodId=#1}}")
+ *     &#64;Override
+ *     Map<String, String> create2(String userId, String goodId, String address, Integer count) {
+ *         // Some logical ...
+ *     }
+ * }
+ * </pre>
  * 
  * @author James Wong
  * @version 2022-11-02
@@ -68,7 +80,11 @@ public @interface REvaluation {
     boolean bestEffort() default Evaluation.DEFAULT_BESTEFFORT;
 
     /**
-     * Evaluation input parameters template.
+     * Evaluation to parameters template.
+     * 
+     * <p>
+     * for example: {{userId=#0,goodId=#1}}
+     * </p>
      * 
      * @return
      */

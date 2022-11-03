@@ -25,6 +25,6 @@ rengine:
       properties:
         bootstrap.servers: localhost:9092
 
-## The custom scenees codes definition.
-scenesDefinition:
-  createOrder: myCreateFreqLimit
+## The custom scenees codes configuration.
+scenes_configs:
+  createOrder: createFreqLimit

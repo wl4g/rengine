@@ -15,6 +15,7 @@
  */
 package com.wl4g.rengine.example.client.service.impl;
 
+import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.lang.System.currentTimeMillis;
 
@@ -26,7 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.wl4g.rengine.client.core.RengineClient.DefaultFailback;
 import com.wl4g.rengine.client.springboot.intercept.REvaluation;
+import com.wl4g.rengine.common.model.EvaluationResult;
 import com.wl4g.rengine.example.client.risk.RengineRiskHandler;
 import com.wl4g.rengine.example.client.service.MyOrderService;
 
@@ -45,7 +48,7 @@ public class MyOrderServiceImpl implements MyOrderService {
 
     private final RengineRiskHandler riskHandler;
 
-    private @Value("${scenesDefinition.createOrder:myCreateFreqLimit}") String createOrderScenesCode;
+    private @Value("${scenes_configs.createOrder}") String createOrderScenesCode;
 
     public MyOrderServiceImpl(@Autowired RengineRiskHandler riskHandler) {
         this.riskHandler = riskHandler;
@@ -62,7 +65,7 @@ public class MyOrderServiceImpl implements MyOrderService {
         log.info("Creating to order ...");
 
         // ...
-        // some order creating logistic
+        // some order creating logical
         // ...
 
         Map<String, String> orderInfo = new HashMap<>();
@@ -74,14 +77,14 @@ public class MyOrderServiceImpl implements MyOrderService {
         return orderInfo;
     }
 
-    @REvaluation(scenesCode = "${scenesDefinition.createOrder:myCreateFreqLimit}", bestEffort = true,
-            paramsTemplate = "{{userId=#0,goodId=#1}}")
+    @REvaluation(scenesCode = "${scenes_configs.createOrder}", bestEffort = true, paramsTemplate = "{{userId=#0,goodId=#1}}",
+            failback = MyFailback.class)
     @Override
     public Map<String, String> create2(String userId, String goodId, String address, Integer count) {
         log.info("Creating2 to order ...");
 
         // ...
-        // some order creating logistic
+        // some order creating logical
         // ...
 
         Map<String, String> orderInfo = new HashMap<>();
@@ -91,6 +94,15 @@ public class MyOrderServiceImpl implements MyOrderService {
         orderInfo.put("address", address);
 
         return orderInfo;
+    }
+
+    @Slf4j
+    public static class MyFailback extends DefaultFailback {
+        @Override
+        public EvaluationResult apply(Throwable t) {
+            log.warn(format(":::Failed to evaluation of reason: %s", t.getMessage()));
+            return EvaluationResult.builder().errorCount(Integer.MAX_VALUE).build();
+        }
     }
 
 }

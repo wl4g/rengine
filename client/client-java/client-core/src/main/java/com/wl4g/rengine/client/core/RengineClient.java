@@ -162,8 +162,8 @@ public class RengineClient {
             if (evaluation.getBestEffort()) {
                 return defaultFailback.apply(e);
             }
-            throw new ClientEvaluationException(evaluation.getScenesCode(), evaluation.getTimeout(), evaluation.getBestEffort(),
-                    e);
+            throw new ClientEvaluationException(evaluation.getRequestId(), evaluation.getScenesCode(), evaluation.getTimeout(),
+                    evaluation.getBestEffort(), e);
         }
 
         return null;

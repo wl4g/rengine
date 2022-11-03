@@ -149,7 +149,7 @@
             </dependency>
             <dependency>
                 <groupId>com.wl4g</groupId>
-                <artifactId>rengine-client-springboot</artifactId>
+                <artifactId>rengine-client-spring-boot-starter</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>

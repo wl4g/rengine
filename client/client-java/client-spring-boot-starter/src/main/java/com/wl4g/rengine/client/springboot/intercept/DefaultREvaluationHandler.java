@@ -40,7 +40,7 @@ import org.springframework.core.env.Environment;
 
 import com.wl4g.infra.common.reflect.ObjectInstantiators;
 import com.wl4g.rengine.client.core.RengineClient;
-import com.wl4g.rengine.common.exception.EvaluationException;
+import com.wl4g.rengine.client.core.exception.ClientEvaluationException;
 import com.wl4g.rengine.common.model.EvaluationResult;
 import com.wl4g.rengine.common.util.IdGenUtil;
 
@@ -80,7 +80,7 @@ public class DefaultREvaluationHandler implements REvaluationHandler<REvaluation
 
         // Assertion evaluation result.
         if (result.getErrorCount() > 0) {
-            throw new EvaluationException(requestId, scenesCode,
+            throw new ClientEvaluationException(requestId, scenesCode, timeoutMs, bestEffort,
                     format("Unable to operation, detected risk in your environment."));
         }
 
