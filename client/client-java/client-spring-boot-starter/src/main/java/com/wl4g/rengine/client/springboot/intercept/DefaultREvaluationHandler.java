@@ -120,8 +120,7 @@ public class DefaultREvaluationHandler implements REvaluationHandler<REvaluation
     }
 
     protected Map<String, String> buildEvaluateParams(ProceedingJoinPoint jp, REvaluation annotation, String paramsTemplate) {
-        return parseParamsTemplate(jp.getTarget(), safeArrayToList(jp.getArgs()), (MethodSignature) jp.getSignature(),
-                paramsTemplate);
+        return parseParamsTemplate(safeArrayToList(jp.getArgs()), (MethodSignature) jp.getSignature(), paramsTemplate);
     }
 
     /**
@@ -151,11 +150,9 @@ public class DefaultREvaluationHandler implements REvaluationHandler<REvaluation
      * @return
      */
     public static Map<String, String> parseParamsTemplate(
-            @NotNull Object targetObj,
             @NotNull List<Object> arguments,
             @NotNull MethodSignature signature,
             @NotBlank String paramsTemplate) {
-        notNullOf(targetObj, "targetObj");
         notNullOf(arguments, "arguments");
         notNullOf(signature, "signature");
         hasTextOf(paramsTemplate, "paramsTemplate");
@@ -209,7 +206,7 @@ public class DefaultREvaluationHandler implements REvaluationHandler<REvaluation
                     final Method getMethod = getMethod(paramType, getMethodName);
                     notNull(getMethod, "Could not found exprssion get method for : {}.{}()", paramType.getName(), getMethodName);
                     makeAccessible(getMethod);
-                    final Object propertyValue = invokeMethod(getMethod, targetObj);
+                    final Object propertyValue = invokeMethod(getMethod, arguments.get(paramIndex));
                     entry.setValue(isNull(propertyValue) ? "" : propertyValue.toString());
                 }
             } else {

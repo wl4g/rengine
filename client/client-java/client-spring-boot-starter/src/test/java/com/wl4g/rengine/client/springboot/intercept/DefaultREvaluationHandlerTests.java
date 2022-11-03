@@ -47,7 +47,7 @@ public class DefaultREvaluationHandlerTests {
         arguments.add(2);
 
         String paramsTemplate = "{{userId=#0.userId, goodId=#0.goodId, count=#1}}";
-        Map<String, String> args = DefaultREvaluationHandler.parseParamsTemplate(dto, arguments, defaultMethodSignature,
+        Map<String, String> args = DefaultREvaluationHandler.parseParamsTemplate(arguments, defaultMethodSignature,
                 paramsTemplate);
         System.out.println(args);
         Assertions.assertEquals(args.get("goodId"), "G202202082139942");
@@ -57,23 +57,21 @@ public class DefaultREvaluationHandlerTests {
 
     @Test(expected = Throwable.class)
     public void testParseParamsTemplateFail() {
-        TestCreateOrderDTO dto = TestCreateOrderDTO.builder().build();
-
         List<Object> arguments = new ArrayList<>();
         arguments.add("u100101");
         arguments.add("G202202082139942");
         arguments.add("2");
         String paramsTemplate = "{{ userId=0, goodId=1 }}";
-        DefaultREvaluationHandler.parseParamsTemplate(dto, arguments, defaultMethodSignature, paramsTemplate);
+        DefaultREvaluationHandler.parseParamsTemplate(arguments, defaultMethodSignature, paramsTemplate);
 
         String paramsTemplate2 = "userId=1, goodId=0";
-        DefaultREvaluationHandler.parseParamsTemplate(dto, arguments, defaultMethodSignature, paramsTemplate2);
+        DefaultREvaluationHandler.parseParamsTemplate(arguments, defaultMethodSignature, paramsTemplate2);
 
         String paramsTemplate3 = "{{ userId=#0, goodId=#0 }}";
-        DefaultREvaluationHandler.parseParamsTemplate(dto, arguments, defaultMethodSignature, paramsTemplate3);
+        DefaultREvaluationHandler.parseParamsTemplate(arguments, defaultMethodSignature, paramsTemplate3);
 
         String paramsTemplate4 = "{{ userId=#0, userId=#1 }}";
-        DefaultREvaluationHandler.parseParamsTemplate(dto, arguments, defaultMethodSignature, paramsTemplate4);
+        DefaultREvaluationHandler.parseParamsTemplate(arguments, defaultMethodSignature, paramsTemplate4);
     }
 
     @Getter

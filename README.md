@@ -60,6 +60,8 @@ A generic real-time rule engine, such as bank transfer real-time risk control, t
 
 - [Deploy quide for production](./docs/en/deploy-production.md)
 
+- [Configuration for client](./docs/en/configuration-client.md)
+
 - [Configuration for collector](./docs/en/configuration-collector.md)
 
 - [Configuration for manager](./docs/en/configuration-manager.md)
