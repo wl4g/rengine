@@ -17,6 +17,7 @@ package com.wl4g.rengine.eventbus.recorder;
 
 import java.util.List;
 
+import com.wl4g.infra.common.function.CallbackFunction;
 import com.wl4g.rengine.common.event.RengineEvent;
 
 /**
@@ -32,6 +33,6 @@ public interface EventRecorder {
 
     void completed(List<RengineEvent> events);
 
-    void compact();
+    void compact(CallbackFunction<RengineEvent> resender);
 
 }

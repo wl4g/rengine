@@ -39,7 +39,7 @@ import lombok.CustomLog;
  * @since v1.0.0
  */
 @CustomLog
-public class LoggingEventBusService extends AbstractEventBusService<RengineEvent> {
+public class LoggingEventBusService extends AbstractEventBusService<Future<RengineEvent>> {
 
     public LoggingEventBusService(ClientEventBusConfig eventBusConfig, EventRecorder recorder) {
         super(eventBusConfig, recorder);

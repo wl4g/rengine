@@ -154,10 +154,10 @@ public class JobServiceImpl implements JobService {
         aggregates.add(project);
         aggregates.add(Aggregates.merge("_tmp_load_scenes_with_cascade"));
 
+        // Document scenesDoc = aggregateIt.first();
         return collection.aggregate(aggregates).batchSize(1024).map(new Function<Document, Scenes>() {
             @Override
             public Scenes apply(Document scenesDoc) {
-                // Document scenesDoc = aggregateIt.first();
                 if (log.isDebugEnabled()) {
                     log.debug("Found scenes object by scenesCode: {} to json: {}", scenesCode, scenesDoc.toJson());
                 }

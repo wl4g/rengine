@@ -47,8 +47,8 @@ import lombok.extern.slf4j.Slf4j;
  * @since v1.0.0
  * @see https://quarkus.io/guides/resteasy-reactive#asyncreactive-support
  */
-@Slf4j
 // @ApplicationScoped
+@Slf4j
 @Singleton
 public class EvaluatorServiceImpl implements EvaluatorService {
 

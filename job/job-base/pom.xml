@@ -11,11 +11,7 @@
         <artifactId>rengine-job</artifactId>
         <version>1.0.0</version>
     </parent>
-    <properties>
-        <!-- <hbase.version>2.1.0-cdh6.3.1</hbase.version> -->
-        <flink-ml.version>2.1.0</flink-ml.version>
-        <flink-statefun.version>3.2.0</flink-statefun.version>
-    </properties>
+    <properties></properties>
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -55,19 +51,17 @@
         <!-- FLINK streaming -->
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <!-- <artifactId>flink-streaming-java_${scala.version}</artifactId> -->
-            <artifactId>flink-streaming-java</artifactId>
+            <artifactId>flink-streaming-java${suffix-scala.version}</artifactId>
             <version>${flink.version}</version>
         </dependency>
         <!-- <dependency> -->
         <!-- <groupId>org.apache.flink</groupId> -->
-        <!-- <artifactId>flink-streaming-scala_${scala.version}</artifactId> -->
+        <!-- <artifactId>flink-streaming-scala${suffix-scala.version}</artifactId> -->
         <!-- <version>${flink.version}</version> -->
         <!-- </dependency> -->
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <!-- <artifactId>flink-clients_${scala.version}</artifactId> -->
-            <artifactId>flink-clients</artifactId>
+            <artifactId>flink-clients${suffix-scala.version}</artifactId>
             <version>${flink.version}</version>
         </dependency>
         <dependency>
@@ -88,8 +82,7 @@
         <!-- Recommends -->
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <!-- <artifactId>flink-runtime-web_${scala.version}</artifactId> -->
-            <artifactId>flink-runtime-web</artifactId>
+            <artifactId>flink-runtime-web${suffix-scala.version}</artifactId>
             <version>${flink.version}</version>
         </dependency>
         <!-- FLINK TABLES -->
@@ -105,65 +98,61 @@
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <!-- <artifactId>flink-table-api-java-bridge_${scala.version}</artifactId> -->
-            <artifactId>flink-table-api-java-bridge</artifactId>
+            <artifactId>flink-table-api-java-bridge${suffix-scala.version}</artifactId>
             <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
         <!-- FLINK CEP -->
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <!-- <artifactId>flink-cep_${scala.version}</artifactId> -->
-            <artifactId>flink-cep</artifactId>
+            <artifactId>flink-cep${suffix-scala.version}</artifactId>
             <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
         <!-- <dependency> -->
         <!-- <groupId>org.apache.flink</groupId> -->
-        <!-- <artifactId>flink-cep-scala_${scala.version}</artifactId> -->
+        <!-- <artifactId>flink-cep-scala${suffix-scala.version}</artifactId> -->
         <!-- <version>${flink.version}</version> -->
         <!-- <scope>provided</scope> -->
         <!-- </dependency> -->
         <!-- <dependency> -->
         <!-- <groupId>org.apache.flink</groupId> -->
-        <!-- <artifactId>flink-table-api-scala_${scala.version}</artifactId> -->
+        <!-- <artifactId>flink-table-api-scala${suffix-scala.version}</artifactId> -->
         <!-- <version>${flink.version}</version> -->
         <!-- </dependency> -->
         <!-- <dependency> -->
         <!-- <groupId>org.apache.flink</groupId> -->
-        <!-- <artifactId>flink-table-api-scala-bridge_${scala.version}</artifactId> -->
+        <!-- <artifactId>flink-table-api-scala-bridge${suffix-scala.version}</artifactId> -->
         <!-- <version>${flink.version}</version> -->
         <!-- <scope>provided</scope> -->
         <!-- </dependency> -->
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-table-planner_${scala.version}</artifactId>
+            <artifactId>flink-table-planner${suffix-scala.version}</artifactId>
             <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
         <!-- <dependency> -->
         <!--     <groupId>org.apache.flink</groupId> -->
-        <!--     <artifactId>flink-table-planner-loader</artifactId> -->
+        <!--     <artifactId>flink-table-planner-loader${suffix-scala.version}</artifactId> -->
         <!--     <version>${flink.version}</version> -->
         <!--     <optional>true</optional> -->
         <!-- </dependency> -->
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <!-- <artifactId>flink-table-runtime_${scala.version}</artifactId> -->
-            <artifactId>flink-table-runtime</artifactId>
+            <artifactId>flink-table-runtime${suffix-scala.version}</artifactId>
             <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
         <!-- <dependency> -->
         <!-- <groupId>org.apache.flink</groupId> -->
-        <!-- <artifactId>flink-table-uber_${scala.version}</artifactId> -->
+        <!-- <artifactId>flink-table-uber${suffix-scala.version}</artifactId> -->
         <!-- <version>${flink.version}</version> -->
         <!-- <scope>provided</scope> -->
         <!-- </dependency> -->
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <!-- <artifactId>flink-sql-client_${scala.version}</artifactId> -->
-            <artifactId>flink-sql-client</artifactId>
+            <artifactId>flink-sql-client${suffix-scala.version}</artifactId>
             <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -186,49 +175,44 @@
         <!-- FLINK connector's (Optional of children modules components) -->
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <!-- <artifactId>flink-connector-kafka_${scala.version}</artifactId> -->
-            <artifactId>flink-connector-kafka</artifactId>
+            <artifactId>flink-connector-kafka${suffix-scala.version}</artifactId>
             <version>${flink.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <!-- <artifactId>flink-connector-pulsar_${scala.version}</artifactId> -->
-            <artifactId>flink-connector-pulsar</artifactId>
+            <artifactId>flink-connector-pulsar${suffix-scala.version}</artifactId>
             <version>${flink.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <!-- <artifactId>flink-connector-rabbitmq_${scala.version}</artifactId> -->
-            <artifactId>flink-connector-rabbitmq</artifactId>
+            <artifactId>flink-connector-rabbitmq${suffix-scala.version}</artifactId>
             <version>${flink.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <!-- <artifactId>flink-connector-hbase-2.2_${scala.version}</artifactId> -->
-            <artifactId>flink-connector-hbase-2.2</artifactId>
+            <artifactId>flink-connector-hbase-2.2${suffix-scala.version}</artifactId>
             <version>${flink.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <!-- <artifactId>flink-connector-elasticsearch7_${scala.version}</artifactId> -->
-            <artifactId>flink-connector-elasticsearch7</artifactId>
+            <artifactId>flink-connector-elasticsearch7${suffix-scala.version}</artifactId>
             <version>${flink.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-hive_${scala.version}</artifactId>
+            <artifactId>flink-connector-hive${suffix-scala.version}</artifactId>
             <version>${flink.version}</version>
             <optional>true</optional>
         </dependency>
         <!-- FLINK ML -->
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-ml-uber</artifactId>
+            <artifactId>flink-ml-uber${suffix-scala.version}</artifactId>
             <version>${flink-ml.version}</version>
             <optional>true</optional>
         </dependency>
@@ -241,7 +225,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-test-utils</artifactId>
+            <artifactId>flink-test-utils${suffix-scala.version}</artifactId>
             <version>${flink.version}</version>
             <scope>test</scope>
             <optional>true</optional>
@@ -271,8 +255,13 @@
             <artifactId>hadoop-client</artifactId>
             <version>${hadoop.version}</version>
         </dependency>
-        <!-- <dependency> <groupId>jdk.tools</groupId> <artifactId>jdk.tools</artifactId> <version>${java.version}</version> <scope>system</scope> 
-			<systemPath>${JAVA_HOME}/lib/tools.jar</systemPath> </dependency> -->
+        <!-- <dependency> -->
+        <!--     <groupId>jdk.tools</groupId> -->
+        <!--     <artifactId>jdk.tools</artifactId> -->
+        <!--     <version>${java.version}</version> -->
+        <!--     <scope>system</scope> -->
+        <!--     <systemPath>${JAVA_HOME}/lib/tools.jar</systemPath> -->
+        <!-- </dependency> -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

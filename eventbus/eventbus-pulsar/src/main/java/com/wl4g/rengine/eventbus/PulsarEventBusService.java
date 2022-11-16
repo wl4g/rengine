@@ -56,7 +56,7 @@ import lombok.Getter;
  * @see 待发送队列源码分析:https://github1s.com/apache/pulsar/blob/branch-2.11/pulsar-client/src/main/java/org/apache/pulsar/client/impl/ProducerImpl.java#L1938-L1939
  */
 @Getter
-public class PulsarEventBusService extends AbstractEventBusService<ProducerResult> implements Closeable {
+public class PulsarEventBusService extends AbstractEventBusService<Future<ProducerResult>> implements Closeable {
     private final PulsarEventBusConfig pulsarConfig;
     private final PulsarClient client;
     private final Producer<RengineEvent> producer;
@@ -157,7 +157,7 @@ public class PulsarEventBusService extends AbstractEventBusService<ProducerResul
     }
 
     @Override
-    public List<Future<ProducerResult>> doPublish(final List<RengineEvent> events) throws IOException {
+    public List<Future<ProducerResult>> doPublish(final List<RengineEvent> events) throws Exception {
         log.debug("Sending : {}", events);
 
         List<Future<ProducerResult>> results = new ArrayList<>(events.size());

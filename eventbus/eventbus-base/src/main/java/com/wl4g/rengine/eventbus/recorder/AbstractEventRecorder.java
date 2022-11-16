@@ -17,6 +17,8 @@ package com.wl4g.rengine.eventbus.recorder;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
+import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
+import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 
 import java.io.Closeable;
@@ -28,9 +30,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.wl4g.infra.common.function.CallbackFunction;
 import com.wl4g.infra.common.log.SmartLogger;
 import com.wl4g.infra.common.store.MapStore;
+import com.wl4g.rengine.common.event.RengineEvent;
 import com.wl4g.rengine.eventbus.config.ClientEventBusConfig;
+
+import lombok.AllArgsConstructor;
 
 /**
  * {@link AbstractEventRecorder}
@@ -65,11 +71,14 @@ public abstract class AbstractEventRecorder implements Closeable, EventRecorder 
     }
 
     @Override
-    public void compact() {
-        executor.submit(new CompactionTask());
+    public void compact(CallbackFunction<RengineEvent> resender) {
+        executor.submit(new CompactionTask(resender));
     }
 
+    @AllArgsConstructor
     class CompactionTask implements Runnable {
+        private final CallbackFunction<RengineEvent> resender;
+
         @Override
         public void run() {
             AtomicInteger total = new AtomicInteger(0);
@@ -78,10 +87,19 @@ public abstract class AbstractEventRecorder implements Closeable, EventRecorder 
                 Iterator<Entry<String, Serializable>> it = getCompletedStore().iterator();
                 while (it.hasNext()) {
                     Entry<String, Serializable> entry = it.next();
-                    log.debug("Removing to completed send event for : {}", entry.getKey());
-                    getPaddingStore().remove(entry.getKey());
-                    getCompletedStore().remove(entry.getKey());
-                    total.incrementAndGet();
+                    try {
+                        log.debug("Resending to uncompleted send event for : {}", entry.getKey());
+                        String eventJson = getPaddingStore().get(entry.getKey());
+                        resender.process(parseJSON(eventJson, RengineEvent.class)); // Re-sending
+
+                        log.debug("Removing to uncompleted send event for : {}", entry.getKey());
+                        getPaddingStore().remove(entry.getKey());
+                        getCompletedStore().remove(entry.getKey());
+
+                        total.incrementAndGet();
+                    } catch (Exception e) {
+                        log.warn(format("Unable to resending. - %s", entry.getKey()), e);
+                    }
                 }
                 log.info("Completed compaction task of total: {}", total);
             } catch (Exception e) {

@@ -82,6 +82,8 @@
         <elasticjob.version>3.0.1</elasticjob.version>
         <curator.version>5.1.0</curator.version>
         <logstash.version>7.2</logstash.version>
+        <junit.version>4.13.2</junit.version>
+        <testcontainers.version>1.16.2</testcontainers.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -347,6 +349,25 @@
                 <groupId>io.grpc</groupId>
                 <artifactId>grpc-protobuf</artifactId>
                 <version>${grpc.version}</version>
+            </dependency>
+            <!-- Testing-->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>kafka</artifactId>
+                <version>${testcontainers.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${testcontainers.version}</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -54,7 +54,7 @@ import lombok.Getter;
  * @since v1.0.0
  */
 @Getter
-public class KafkaEventBusService extends AbstractEventBusService<ProducerResult> implements Closeable {
+public class KafkaEventBusService extends AbstractEventBusService<Future<ProducerResult>> implements Closeable {
 
     private final KafkaProducer<String, String> kafkaProducer;
 
@@ -85,7 +85,7 @@ public class KafkaEventBusService extends AbstractEventBusService<ProducerResult
     }
 
     @Override
-    public List<Future<ProducerResult>> doPublish(final List<RengineEvent> events) throws IOException {
+    public List<Future<ProducerResult>> doPublish(final List<RengineEvent> events) throws Exception {
         List<Future<ProducerResult>> results = new ArrayList<>(events.size());
 
         safeList(events).parallelStream().forEach(event -> {
