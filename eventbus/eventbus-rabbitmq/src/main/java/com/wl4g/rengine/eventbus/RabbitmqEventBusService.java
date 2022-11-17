@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -77,21 +78,21 @@ public class RabbitmqEventBusService extends AbstractEventBusService<ProducerRes
 
     @Override
     public List<ProducerResult> doPublish(final List<RengineEvent> events) throws Exception {
-        try (Connection connection = factory.newConnection(); Channel channel = connection.createChannel();) {
+        try (Connection connection = factory.newConnection();) {
             log.debug("Sending : {}", toJSONString(events));
 
             List<ProducerResult> results = new ArrayList<>(events.size());
             safeList(events)/* .parallelStream() */.forEach(event -> {
-                try {
+                try (Channel channel = connection.createChannel();) {
                     /* Queue.DeclareOk ok = */ channel.queueDeclare(eventBusConfig.getTopic(), true, true, false, emptyMap());
                     channel.addReturnListener(reply -> {
                         // see:https://www.rabbitmq.com/amqp-0-9-1-reference.html#domain.reply-code
-                        if (reply.getReplyCode() == 200) {
+                        if (reply.getReplyCode() == AMQP.REPLY_SUCCESS) {
                             recorder.completed(singletonList(event));
                         }
                         results.add(new ProducerResult(reply, event));
                     });
-                } catch (IOException e) {
+                } catch (Exception e) {
                     log.warn(format("Unable to send event. - %s", event), e);
                 }
             });

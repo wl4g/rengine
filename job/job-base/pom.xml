@@ -210,9 +210,27 @@
             <optional>true</optional>
         </dependency>
         <!-- FLINK ML -->
+        <!-- <dependency> -->
+        <!--     <groupId>org.apache.flink</groupId> -->
+        <!--     <artifactId>flink-ml-uber${suffix-scala.version}</artifactId> -->
+        <!--     <version>${flink-ml.version}</version> -->
+        <!--     <optional>true</optional> -->
+        <!-- </dependency> -->
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-ml-uber${suffix-scala.version}</artifactId>
+            <artifactId>flink-ml-core${suffix-scala.version}</artifactId>
+            <version>${flink-ml.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-ml-iteration${suffix-scala.version}</artifactId>
+            <version>${flink-ml.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-ml-lib${suffix-scala.version}</artifactId>
             <version>${flink-ml.version}</version>
             <optional>true</optional>
         </dependency>
