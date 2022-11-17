@@ -30,11 +30,11 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.wl4g.rengine.common.entity.FlowNode.EndNode;
-import com.wl4g.rengine.common.entity.FlowNode.ExecutionNode;
-import com.wl4g.rengine.common.entity.FlowNode.OutputNode;
-import com.wl4g.rengine.common.entity.FlowNode.RelationNode;
-import com.wl4g.rengine.common.entity.FlowNode.StartNode;
+import com.wl4g.rengine.common.entity.OperatorNode.EndNode;
+import com.wl4g.rengine.common.entity.OperatorNode.ExecutionNode;
+import com.wl4g.rengine.common.entity.OperatorNode.OutputNode;
+import com.wl4g.rengine.common.entity.OperatorNode.RelationNode;
+import com.wl4g.rengine.common.entity.OperatorNode.StartNode;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -63,26 +63,29 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @SuperBuilder
 @NoArgsConstructor
-public abstract class FlowNode implements Serializable {
-
+public abstract class OperatorNode implements Serializable {
     private static final long serialVersionUID = 1L;
-    @Schema(name = "@type", implementation = FlowNodeType.class)
+
+    @Schema(name = "@type", implementation = OperatorType.class)
     @JsonProperty(value = "@type", access = Access.WRITE_ONLY)
     private @NotBlank String type;
     private @NotBlank String id;
     private @NotBlank String parentId;
-    private @NotBlank @Default String name = "Node 1";
-    private @NotBlank @Default String top = "0px";
-    private @NotBlank @Default String left = "1px";
-    private @NotBlank @Default String color = "blue";
-    private @Nullable @Default Map<String, Object> attributes = new HashMap<>();
+    private @NotBlank @Default String name = "Unnamed Node";
+    private @Nullable @Default Map<String, Object> attributes = new HashMap<>() {
+        {
+            put("top", "10px");
+            put("left", "10px");
+            put("color", "#5f5f5f");
+        }
+    };
 
     @Getter
     @Setter
     @ToString(callSuper = true)
     @SuperBuilder
     @NoArgsConstructor
-    public static class StartNode extends FlowNode {
+    public static class StartNode extends OperatorNode {
         private static final long serialVersionUID = 422265264435899065L;
     }
 
@@ -91,7 +94,7 @@ public abstract class FlowNode implements Serializable {
     @ToString(callSuper = true)
     @SuperBuilder
     @NoArgsConstructor
-    public static class EndNode extends FlowNode {
+    public static class EndNode extends OperatorNode {
         private static final long serialVersionUID = 42226522235899065L;
     }
 
@@ -100,7 +103,7 @@ public abstract class FlowNode implements Serializable {
     @ToString(callSuper = true)
     @SuperBuilder
     @NoArgsConstructor
-    public static class RelationNode extends FlowNode {
+    public static class RelationNode extends OperatorNode {
         private static final long serialVersionUID = 4222652655435899065L;
         private RelationType relation;
     }
@@ -109,7 +112,7 @@ public abstract class FlowNode implements Serializable {
     @Setter
     @ToString(callSuper = true)
     @SuperBuilder
-    public static class ExecutionNode extends FlowNode {
+    public static class ExecutionNode extends OperatorNode {
         private static final long serialVersionUID = 42226526447799065L;
         // The current this node corresponding rule ID.
         private @NotBlank String ruleId;
@@ -120,7 +123,7 @@ public abstract class FlowNode implements Serializable {
     @ToString(callSuper = true)
     @SuperBuilder
     @NoArgsConstructor
-    public static class OutputNode extends FlowNode {
+    public static class OutputNode extends OperatorNode {
         private static final long serialVersionUID = 422261164435899065L;
     }
 
@@ -156,7 +159,7 @@ public abstract class FlowNode implements Serializable {
     @Getter
     @ToString
     @AllArgsConstructor
-    public static enum FlowNodeType {
+    public static enum OperatorType {
 
         START(StartNode.class),
 
@@ -168,7 +171,7 @@ public abstract class FlowNode implements Serializable {
 
         OUTPUT(OutputNode.class);
 
-        private final Class<? extends FlowNode> clazz;
+        private final Class<? extends OperatorNode> clazz;
     }
 
 }

@@ -1,0 +1,587 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>rengine-collector</artifactId>
+    <name>Rengine Collector</name>
+    <description>Rengine Collector.</description>
+    <organization>
+        <name>wl4g</name>
+        <url>https://rengine.wl4g.com</url>
+    </organization>
+    <licenses>
+        <license>
+            <name>Apache License Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <connection>scm:git:git@github.com:wl4g/rengine.git</connection>
+        <developerConnection>scm:git:git@github.com:wl4g/rengine.git</developerConnection>
+        <url>https://github.com/wl4g/rengine</url>
+        <tag>HEAD</tag>
+    </scm>
+    <issueManagement>
+        <system>github</system>
+        <url>https://github.com/wl4g/rengine/issues</url>
+    </issueManagement>
+    <developers>
+        <developer>
+            <id>James Wong</id>
+            <name>jameswong1376</name>
+            <email>jameswong1376@gmail.com</email>
+            <roles>
+                <role>owner</role>
+                <role>maintainer</role>
+                <role>developer</role>
+            </roles>
+            <timezone>+8</timezone>
+        </developer>
+        <developer>
+            <id>xburnerair00</id>
+            <name>xburnerair00</name>
+            <email>xburnerair00@163.com</email>
+            <roles>
+                <role>maintainer</role>
+                <role>developer</role>
+            </roles>
+            <timezone>+8</timezone>
+        </developer>
+    </developers>
+    <properties>
+        <repackage.classifier />
+        <elastic-logback.version>1.5.0</elastic-logback.version>
+        <bootstrap-classname>com.wl4g.RengineCollector</bootstrap-classname>
+        <final.name>rengine-collector</final.name>
+    </properties>
+    <parent>
+        <groupId>com.wl4g</groupId>
+        <artifactId>rengine-parent</artifactId>
+        <version>1.0.0</version>
+    </parent>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.wl4g</groupId>
+                <artifactId>rengine-bom</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>com.wl4g</groupId>
+            <artifactId>rengine-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.wl4g</groupId>
+            <artifactId>infra-context</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.wl4g</groupId>
+            <artifactId>infra-support</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.wl4g</groupId>
+            <artifactId>rengine-client-spring-boot-starter</artifactId>
+        </dependency>
+        <!-- Spring Webflux(Non default requires) -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webflux</artifactId>
+        </dependency>
+        <!-- Spring Boot -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+        </dependency>
+        <!-- Native -->
+        <dependency>
+            <groupId>org.springframework.experimental</groupId>
+            <artifactId>spring-native</artifactId>
+        </dependency>
+        <!-- DB -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+        </dependency>
+        <!-- MySQL -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <!-- Elastic-Job -->
+        <!-- <dependency> -->
+        <!--     <groupId>org.apache.shardingsphere.elasticjob</groupId> -->
+        <!--     <artifactId>elasticjob-lite-spring-boot-starter</artifactId> -->
+        <!-- </dependency> -->
+        <dependency>
+            <groupId>org.apache.shardingsphere.elasticjob</groupId>
+            <artifactId>elasticjob-lite-core</artifactId>
+        </dependency>
+        <!-- Arthas -->
+        <dependency>
+            <groupId>com.taobao.arthas</groupId>
+            <artifactId>arthas-spring-boot-starter</artifactId>
+        </dependency>
+        <!-- Logging -->
+        <!-- see:https://loki4j.github.io/loki-logback-appender/#quick-start -->
+        <!-- see:https://www.elastic.co/guide/en/ecs-logging/java/current/setup.html#setup -->
+        <!-- <dependency>-->
+        <!--     <groupId>co.elastic.logging</groupId>-->
+        <!--     <artifactId>logback-ecs-encoder</artifactId>-->
+        <!--     <version>${elastic-logback.version}</version>-->
+        <!-- </dependency>-->
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-actuator-autoconfigure</artifactId>
+        </dependency>
+        <!-- Metrics -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-jmx</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+        <!-- Devel -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>test</scope>
+            <optional>true</optional>
+        </dependency>
+        <!-- Tests -->
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-test</artifactId>
+            <scope>test</scope>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+    <build>
+        <finalName>${final.name}</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/**.yaml</include>
+                    <include>**/**.yml</include>
+                    <include>**/**.conf</include>
+                    <include>**/**.properties</include>
+                    <include>**/**.json</include>
+                    <include>**/**.xml</include>
+                    <include>**/**.txt</include>
+                    <include>**/**.tpl</include>
+                    <include>**/**.groovy</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>META-INF/**</include>
+                    <include>static/**</include>
+                </includes>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <include>**/*Tests.java</include>
+                    </includes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <configuration>
+                    <configLocation>/../tools/checkstyle/google_checks.xml</configLocation>
+                </configuration>
+                <executions>
+                    <!-- Solutions to maven checkstyle errors in Eclipse: https://gitee.com/wl4g/blogs/blob/master/articles/maven.checkstyle-eclipse-error/README_CN.md -->
+                    <!-- <execution> -->
+                    <!-- <id>checkstyle</id> -->
+                    <!-- <phase>validate</phase> -->
+                    <!-- <goals> -->
+                    <!-- <goal>check</goal> -->
+                    <!-- </goals> -->
+                    <!-- <configuration> -->
+                    <!-- <failOnViolation>true</failOnViolation> -->
+                    <!-- </configuration> -->
+                    <!-- </execution> -->
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>integration-test</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+        <profile>
+            <id>build:tar</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <configuration>
+                            <finalName>${final.name}-${project.version}-bin</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assemble/package.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-assembly</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>build:native</id>
+            <properties>
+                <repackage.classifier>exec</repackage.classifier>
+                <native-buildtools.version>0.9.13</native-buildtools.version>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.junit.platform</groupId>
+                    <artifactId>junit-platform-launcher</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>
+                                    <groupId>org.projectlombok</groupId>
+                                    <artifactId>lombok</artifactId>
+                                </exclude>
+                            </excludes>
+                            <classifier>${repackage.classifier}</classifier>
+                            <image>
+                                <builder>paketobuildpacks/builder:tiny</builder>
+                                <env>
+                                    <BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
+                                </env>
+                            </image>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.springframework.experimental</groupId>
+                        <artifactId>spring-aot-maven-plugin</artifactId>
+                        <version>${spring-native.version}</version>
+                        <!-- <configuration> -->
+                        <!-- <removeSpelSupport>false</removeSpelSupport> -->
+                        <!-- <systemPropertyVariables> -->
+                        <!-- <springAot>true</springAot> -->
+                        <!-- </systemPropertyVariables> -->
+                        <!-- </configuration> -->
+                        <executions>
+                            <execution>
+                                <id>test-generate</id>
+                                <goals>
+                                    <goal>test-generate</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>generate</id>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <version>${native-buildtools.version}</version>
+                        <extensions>true</extensions>
+                        <executions>
+                            <execution>
+                                <id>test-native</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>test</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>build-native</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>build:tar:docker</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <configuration>
+                            <finalName>${final.name}-${project.version}-bin</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assemble/package.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-assembly</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Usages examples: -->
+                    <!-- export DOCKER_HOST=tcp://localhost:2375 -->
+                    <!-- [build]: mvn -Pbuild:tar:docker -->
+                    <!-- [push]: mvn -Pbuild:tar:docker -->
+                    <!-- [push]: mvn -Pbuild:tar:docker dockerfile:build dockerfile:push -Ddockerfile.username=wl4g -Ddockerfile.password=xxx -->
+                    <plugin>
+                        <groupId>com.spotify</groupId>
+                        <artifactId>dockerfile-maven-plugin</artifactId>
+                        <version>1.4.13</version>
+                        <executions>
+                            <execution>
+                                <id>default</id>
+                                <goals>
+                                    <goal>build</goal>
+                                    <!-- <goal>push</goal> -->
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <!-- see:https://github.com/spotify/dockerfile-maven/issues/154 -->
+                            <contextDirectory>${project.basedir}</contextDirectory>
+                            <dockerfile>${project.basedir}/build/docker/Dockerfile.springtar</dockerfile>
+                            <repository>wl4g/${project.build.finalName}</repository>
+                            <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
+                            <tag>${project.version}</tag>
+                            <readTimeoutMillis>60000</readTimeoutMillis>
+                            <connectTimeoutMillis>20000</connectTimeoutMillis>
+                            <buildArgs>
+                                <!-- Addidtion librarys. -->
+                                <!-- <ADD_LIBRARY></ADD_LIBRARY> -->
+                                <APP_NAME>${project.build.finalName}</APP_NAME>
+                                <APP_VERSION>${project.version}</APP_VERSION>
+                                <APP_MAINCLASS>${bootstrap-classname}</APP_MAINCLASS>
+                            </buildArgs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <!-- TODO 暂时 Dockerfile 还不支持 native 执行文件 -->
+        <profile>
+            <id>build:native:docker</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>
+                                    <groupId>org.projectlombok</groupId>
+                                    <artifactId>lombok</artifactId>
+                                </exclude>
+                            </excludes>
+                            <classifier>${repackage.classifier}</classifier>
+                            <image>
+                                <builder>paketobuildpacks/builder:tiny</builder>
+                                <env>
+                                    <BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
+                                </env>
+                            </image>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.springframework.experimental</groupId>
+                        <artifactId>spring-aot-maven-plugin</artifactId>
+                        <version>${spring-native.version}</version>
+                        <executions>
+                            <execution>
+                                <id>test-generate</id>
+                                <goals>
+                                    <goal>test-generate</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>generate</id>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <version>${native-buildtools.version}</version>
+                        <extensions>true</extensions>
+                        <executions>
+                            <execution>
+                                <id>test-native</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>test</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>build-native</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Usages examples: -->
+                    <!-- export DOCKER_HOST=tcp://localhost:2375 -->
+                    <!-- [build]: mvn -Pbuild:tar:docker -->
+                    <!-- [push]: mvn -Pbuild:tar:docker -->
+                    <!-- [push]: mvn -Pbuild:tar:docker dockerfile:build dockerfile:push -Ddockerfile.username=wl4g -Ddockerfile.password=xxx -->
+                    <plugin>
+                        <groupId>com.spotify</groupId>
+                        <artifactId>dockerfile-maven-plugin</artifactId>
+                        <version>1.4.13</version>
+                        <executions>
+                            <execution>
+                                <id>default</id>
+                                <goals>
+                                    <goal>build</goal>
+                                    <!-- <goal>push</goal> -->
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <!-- see:https://github.com/spotify/dockerfile-maven/issues/154 -->
+                            <contextDirectory>${project.basedir}</contextDirectory>
+                            <dockerfile>${project.basedir}/build/docker/Dockerfile.springnative</dockerfile>
+                            <repository>wl4g/${project.build.finalName}</repository>
+                            <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
+                            <tag>${project.version}</tag>
+                            <readTimeoutMillis>60000</readTimeoutMillis>
+                            <connectTimeoutMillis>20000</connectTimeoutMillis>
+                            <buildArgs>
+                                <!-- Addidtion librarys. -->
+                                <!-- <ADD_LIBRARY></ADD_LIBRARY> -->
+                                <APP_NAME>${project.build.finalName}</APP_NAME>
+                                <APP_VERSION>${project.version}</APP_VERSION>
+                                <APP_MAINCLASS>${bootstrap-classname}</APP_MAINCLASS>
+                            </buildArgs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>with:eventbus-kafka</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.wl4g</groupId>
+                    <artifactId>rengine-eventbus-kafka</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>with:eventbus-pulsar</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.wl4g</groupId>
+                    <artifactId>rengine-eventbus-pulsar</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>with:eventbus-rabbitmq</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.wl4g</groupId>
+                    <artifactId>rengine-eventbus-rabbitmq</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+</project>

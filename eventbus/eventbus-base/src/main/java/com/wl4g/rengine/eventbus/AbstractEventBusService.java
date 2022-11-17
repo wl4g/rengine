@@ -55,6 +55,8 @@ public abstract class AbstractEventBusService<R> implements RengineEventBusServi
         this.recorder = notNullOf(recorder, "recorder");
         this.compactScheduler = new GenericTaskRunner<RunnerProperties>(new RunnerProperties(StartupMode.ASYNC, 1)) {
         };
+        this.compactScheduler.start();
+
         // Timing scheduling execution.
         this.compactScheduler.getWorker()
                 .schedule(() -> recorder.compact(event -> doPublish(singletonList(event))),
@@ -67,7 +69,7 @@ public abstract class AbstractEventBusService<R> implements RengineEventBusServi
     }
 
     @Override
-    public List<R> publish(List<RengineEvent> events) {
+    public List<R> publishs(List<RengineEvent> events) {
         try {
             recorder.padding(events);
             return doPublish(events);

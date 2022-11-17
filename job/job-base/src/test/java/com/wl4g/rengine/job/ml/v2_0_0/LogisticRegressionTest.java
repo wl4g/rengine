@@ -115,6 +115,7 @@ public class LogisticRegressionTest {
                 assertEquals(1, prediction, TOLERANCE);
                 assertTrue(rawPrediction.get(0) < 0.5);
             }
+            System.out.println("rawPrediction: " + rawPrediction + ", prediction: " + prediction + ", feature: " + feature);
         }
     }
 
@@ -184,6 +185,7 @@ public class LogisticRegressionTest {
         logisticRegression = StageTestUtils.saveAndReload(env, logisticRegression, tempFolder.newFolder().getAbsolutePath());
         LogisticRegressionModel model = logisticRegression.fit(binomialDataTable);
         model = StageTestUtils.saveAndReload(env, model, tempFolder.newFolder().getAbsolutePath());
+        System.out.println(tempFolder.newFolder().getAbsolutePath());
         assertEquals(Collections.singletonList("coefficient"), model.getModelData()[0].getResolvedSchema().getColumnNames());
         Table output = model.transform(binomialDataTable)[0];
         verifyPredictionResult(output, logisticRegression.getFeaturesCol(), logisticRegression.getPredictionCol(),

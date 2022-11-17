@@ -11,7 +11,9 @@
         <artifactId>rengine-job</artifactId>
         <version>1.0.0</version>
     </parent>
-    <properties></properties>
+    <properties>
+        <aviator.version>5.3.0</aviator.version>
+    </properties>
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -272,6 +274,12 @@
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-client</artifactId>
             <version>${hadoop.version}</version>
+        </dependency>
+        <!-- Aviator -->
+        <dependency>
+            <groupId>com.googlecode.aviator</groupId>
+            <artifactId>aviator</artifactId>
+            <version>${aviator.version}</version>
         </dependency>
         <!-- <dependency> -->
         <!--     <groupId>jdk.tools</groupId> -->

@@ -34,9 +34,9 @@ public interface RengineEventBusService<R> {
     Object getOriginal();
 
     default R publish(RengineEvent event) {
-        return safeList(publish(singletonList(event))).stream().findFirst().orElse(null);
+        return safeList(publishs(singletonList(event))).stream().findFirst().orElse(null);
     }
 
-    List<R> publish(List<RengineEvent> events);
+    List<R> publishs(List<RengineEvent> events);
 
 }

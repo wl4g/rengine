@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
+import javax.inject.Singleton;
 import javax.validation.constraints.NotBlank;
 
 import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
@@ -58,7 +59,7 @@ import lombok.ToString;
  * @since v1.0.0
  * @see {@link org.apache.shardingsphere.elasticjob.http.executor.HttpJobExecutor}
  */
-@Getter
+@Singleton
 public class SimpleHttpCollectJobExecutor extends CollectJobExecutor<SimpleHttpCollectJobExecutor.SimpleHttpJobParam> {
 
     @Override

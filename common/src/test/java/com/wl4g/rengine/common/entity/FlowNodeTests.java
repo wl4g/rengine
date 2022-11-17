@@ -21,9 +21,9 @@ import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 
-import com.wl4g.rengine.common.entity.FlowNode.FlowNodeType;
-import com.wl4g.rengine.common.entity.FlowNode.RelationNode;
-import com.wl4g.rengine.common.entity.FlowNode.RelationType;
+import com.wl4g.rengine.common.entity.OperatorNode.FlowNodeType;
+import com.wl4g.rengine.common.entity.OperatorNode.RelationNode;
+import com.wl4g.rengine.common.entity.OperatorNode.RelationType;
 
 /**
  * {@link FlowNodeTests}
@@ -36,7 +36,7 @@ public class FlowNodeTests {
 
     @Test
     public void testOperationFlowNodeSerialze() {
-        FlowNode node = RelationNode.builder()
+        OperatorNode node = RelationNode.builder()
                 .type(FlowNodeType.RELATION.name())
                 .id("100010")
                 .name("同时满足")
@@ -52,7 +52,7 @@ public class FlowNodeTests {
     @Test
     public void testOperationFlowNodeDeSerialze() {
         String json = "{\"@type\":\"RELATION\",\"id\":\"100010\",\"parentId\":null,\"name\":\"同时满足\",\"top\":\"80px\",\"left\":\"20px\",\"color\":\"WHITE\",\"attributes\":{},\"relation\":\"AND\"}";
-        FlowNode node = parseJSON(json, FlowNode.class);
+        OperatorNode node = parseJSON(json, OperatorNode.class);
         System.out.println("       node.getClass(): " + node.getClass());
         System.out.println("          node.getId(): " + node.getId());
         System.out.println("        node.getName(): " + node.getName());

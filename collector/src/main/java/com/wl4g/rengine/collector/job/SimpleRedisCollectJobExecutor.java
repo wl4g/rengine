@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.inject.Singleton;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -36,8 +37,8 @@ import org.apache.shardingsphere.elasticjob.api.ShardingContext;
 import org.apache.shardingsphere.elasticjob.executor.JobFacade;
 
 import com.wl4g.infra.common.jedis.JedisClient;
-import com.wl4g.infra.support.cache.jedis.JedisClientAutoConfiguration.JedisProperties;
-import com.wl4g.infra.support.cache.jedis.JedisClientFactoryBean;
+import com.wl4g.infra.common.jedis.JedisClientBuilder;
+import com.wl4g.infra.common.jedis.JedisClientBuilder.JedisConfig;
 import com.wl4g.rengine.common.event.RengineEvent.EventLocation;
 
 import lombok.Getter;
@@ -52,6 +53,7 @@ import lombok.ToString;
  * @version 2022-10-26
  * @since v3.0.0
  */
+@Singleton
 public class SimpleRedisCollectJobExecutor extends CollectJobExecutor<SimpleRedisCollectJobExecutor.SimpleRedisJobParam>
         implements Closeable {
 
@@ -117,9 +119,8 @@ public class SimpleRedisCollectJobExecutor extends CollectJobExecutor<SimpleRedi
             synchronized (this) {
                 jedisClient = jedisClientCaches.get(shardingParam.getName());
                 if (isNull(jedisClient)) {
-                    JedisClientFactoryBean factoryBean = new JedisClientFactoryBean(shardingParam.getJedisConfig());
-                    factoryBean.afterPropertiesSet();
-                    jedisClientCaches.put(shardingParam.getName(), (jedisClient = factoryBean.getObject()));
+                    JedisClientBuilder builder = new JedisClientBuilder(shardingParam.getJedisConfig());
+                    jedisClientCaches.put(shardingParam.getName(), (jedisClient = builder.build()));
                 }
             }
         }
@@ -146,7 +147,7 @@ public class SimpleRedisCollectJobExecutor extends CollectJobExecutor<SimpleRedi
     @ToString
     @NoArgsConstructor
     public static class SimpleRedisJobParam extends CollectJobExecutor.JobParamBase {
-        private @NotNull JedisProperties jedisConfig = new JedisProperties();
+        private @NotNull JedisConfig jedisConfig = new JedisConfig();
         private @NotBlank String luaScript;
         private @NotEmpty List<String> luaKeys = new ArrayList<>();
         private @NotEmpty List<String> luaArgs = new ArrayList<>();

@@ -23,7 +23,7 @@ import java.util.Map;
 
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.cep.CEP;
-import org.apache.flink.cep.PatternSelectFunction;
+import org.apache.flink.cep.PatternFlatSelectFunction;
 import org.apache.flink.cep.PatternStream;
 import org.apache.flink.cep.pattern.Pattern;
 import org.apache.flink.cep.pattern.conditions.IterativeCondition;
@@ -34,6 +34,7 @@ import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor;
 import org.apache.flink.streaming.api.windowing.time.Time;
+import org.apache.flink.util.Collector;
 
 import com.google.common.io.Resources;
 
@@ -78,46 +79,62 @@ public class LoginEventCepStreamingDemo {
         });
 
         // 2. 定义匹配模式
-        Pattern<LoginEvent, LoginEvent> loginFailPattern = Pattern.begin("begin");
-        loginFailPattern.where(new IterativeCondition<LoginEvent>() {
+        Pattern<LoginEvent, LoginEvent> loginFailPattern = Pattern.begin("first");
+        loginFailPattern = loginFailPattern.where(new IterativeCondition<LoginEvent>() {
             private static final long serialVersionUID = 1L;
 
             @Override
             public boolean filter(LoginEvent value, Context<LoginEvent> ctx) throws Exception {
                 return value.eventType.equalsIgnoreCase("fail");
             }
-        }).next("next").where(new IterativeCondition<LoginEvent>() {
+        }).followedBy("next1").where(new IterativeCondition<LoginEvent>() {
             private static final long serialVersionUID = 1L;
 
             @Override
             public boolean filter(LoginEvent value, Context<LoginEvent> ctx) throws Exception {
                 return value.eventType.equalsIgnoreCase("fail");
             }
-        }).within(Time.milliseconds(10000));
+            // n秒内连续失败的次数在 from 与 to 之间，则标记为匹配
+        }).within(Time.milliseconds(1001)).oneOrMore()/* .times(1, 10) */;
 
         // 3. 在事件流上应用模式，得到一个pattern stream
         PatternStream<LoginEvent> patternStream = CEP.pattern(loginEventStream, loginFailPattern);
 
         // 4. 从pattern stream上应用select function，检出匹配事件序列
-        SingleOutputStreamOperator<Warning> loginFailDataStream = patternStream.select(new LoginFailMatch());
+        //@formatter:off
+//        SingleOutputStreamOperator<Warning> loginFailDataStream = patternStream.select(new LoginFailMatch());
+        //@formatter:on
+        SingleOutputStreamOperator<Warning> loginFailDataStream = patternStream.flatSelect(new LoginFailMatch());
 
         loginFailDataStream.print();
 
         env.execute("login fail with cep job");
     }
 
-    static class LoginFailMatch implements PatternSelectFunction<LoginEvent, Warning> {
+    static class LoginFailMatch implements /* PatternSelectFunction , */ PatternFlatSelectFunction<LoginEvent, Warning> {
         private static final long serialVersionUID = 1L;
 
         @Override
-        public Warning select(Map<String, List<LoginEvent>> pattern) throws Exception {
+        public void flatSelect(Map<String, List<LoginEvent>> pattern, Collector<Warning> out) throws Exception {
             // 从map中按照名称取出对应的事件
-            LoginEvent firstFail = pattern.get("begin").iterator().next();
+            LoginEvent firstFail = pattern.get("first").iterator().next();
             // Could't get of next???
-            // LoginEvent lastFail = pattern.get("next").iterator().next();
-            return new Warning(firstFail.userId, firstFail.eventTime,
-                    /* lastFail.eventTime */-0L, "login fail!");
+            LoginEvent next1Fail = pattern.get("next1").iterator().next();
+            out.collect(new Warning(firstFail.userId, firstFail.eventTime, next1Fail.eventTime, "login fail!"));
         }
+
+        //@formatter:off
+//        @Override
+//        public Warning select(Map<String, List<LoginEvent>> pattern) throws Exception {
+//            // 从map中按照名称取出对应的事件
+//            LoginEvent firstFail = pattern.get("first").iterator().next();
+//            // Could't get of next???
+//            // LoginEvent lastFail = pattern.get("next").iterator().next();
+//            return new Warning(firstFail.userId, firstFail.eventTime,
+//                    /* lastFail.eventTime */-0L, "login fail!");
+//        }
+        //@formatter:on
+
     }
 
     // 输入的登录事件样例类

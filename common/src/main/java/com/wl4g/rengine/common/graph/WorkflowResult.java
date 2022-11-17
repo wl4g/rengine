@@ -15,7 +15,6 @@
  */
 package com.wl4g.rengine.common.graph;
 
-import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.util.Collections.synchronizedMap;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -36,12 +35,12 @@ import lombok.ToString;
  */
 @ToString
 public class WorkflowResult {
-    private final Boolean isContinue;
+    private final boolean isContinue;
     private Object value;
     private final Map<String, Object> attributes = synchronizedMap(new HashMap<>());
 
-    public WorkflowResult(@NotNull Boolean isContinue) {
-        this.isContinue = notNullOf(isContinue, "isContinue");
+    public WorkflowResult(@NotNull boolean isContinue) {
+        this.isContinue = isContinue;
     }
 
     public boolean isContinue() {

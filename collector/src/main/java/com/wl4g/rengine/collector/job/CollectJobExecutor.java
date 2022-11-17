@@ -16,13 +16,13 @@
 package com.wl4g.rengine.collector.job;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
-import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.time.Duration;
@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import javax.enterprise.inject.spi.CDI;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -44,15 +45,14 @@ import org.apache.shardingsphere.elasticjob.reg.base.CoordinatorRegistryCenter;
 
 import com.wl4g.infra.common.log.SmartLogger;
 import com.wl4g.infra.common.log.SmartLoggerFactory;
-import com.wl4g.infra.context.utils.SpringContextHolder;
 import com.wl4g.rengine.collector.config.CollectorProperties;
-import com.wl4g.rengine.collector.config.CollectorProperties.SimpleSSHScrapeJobProperties;
 import com.wl4g.rengine.collector.config.CollectorProperties.ScrapeJobProperties;
 import com.wl4g.rengine.collector.config.CollectorProperties.SimpleHttpScrapeJobProperties;
 import com.wl4g.rengine.collector.config.CollectorProperties.SimpleJdbcScrapeJobProperties;
 import com.wl4g.rengine.collector.config.CollectorProperties.SimpleRedisScrapeJobProperties;
+import com.wl4g.rengine.collector.config.CollectorProperties.SimpleSSHScrapeJobProperties;
 import com.wl4g.rengine.collector.config.CollectorProperties.SimpleTcpScrapeJobProperties;
-import com.wl4g.rengine.collector.util.SpelVariables;
+import com.wl4g.rengine.collector.util.ExpressionVariables;
 import com.wl4g.rengine.common.event.RengineEvent;
 import com.wl4g.rengine.common.event.RengineEvent.EventLocation;
 import com.wl4g.rengine.common.event.RengineEvent.EventSource;
@@ -82,14 +82,29 @@ public abstract class CollectJobExecutor<P extends CollectJobExecutor.JobParamBa
     protected final CollectorProperties config;
     protected final CoordinatorRegistryCenter regCenter;
     @SuppressWarnings("rawtypes")
-    protected final Collection<RengineEventBusService> eventbusServices;
-    protected final SpelVariables spelVariables;
+    protected final List<RengineEventBusService> eventbusServices;
+    protected final ExpressionVariables expressionVariables;
 
+    @SuppressWarnings("rawtypes")
     public CollectJobExecutor() {
-        this.config = SpringContextHolder.getBean(CollectorProperties.class);
-        this.regCenter = SpringContextHolder.getBean(CoordinatorRegistryCenter.class);
-        this.eventbusServices = safeMap(SpringContextHolder.getBeans(RengineEventBusService.class)).values();
-        this.spelVariables = new SpelVariables().from(config.getGlobalScrapeJobConfig().getJobVariables());
+        this.config = CDI.current().select(CollectorProperties.class).get();
+        this.regCenter = CDI.current().select(CoordinatorRegistryCenter.class).get();
+        // TODO testing
+        // this.eventbusServices = CDI.current()
+        // .getBeanManager()
+        // .getBeans(RengineEventBusService.class)
+        // .stream()
+        // .map(bean -> (RengineEventBusService)
+        // bean.getInjectionPoints().toArray(new
+        // InjectionPoint[0])[0].getBean())
+        // .collect(toList());
+        this.eventbusServices = CDI.current()
+                .stream()
+                .filter(bean -> bean instanceof RengineEventBusService)
+                .map(bean -> (RengineEventBusService) bean)
+                .collect(toList());
+        // TODO
+        this.expressionVariables = new ExpressionVariables().from(config.getGlobalScrapeJobConfig().getJobVariables());
     }
 
     @Override
@@ -228,7 +243,7 @@ public abstract class CollectJobExecutor<P extends CollectJobExecutor.JobParamBa
     }
 
     protected List<String> resolveVariables(List<String> args) {
-        return spelVariables.resolve(args);
+        return expressionVariables.resolve(args);
     }
 
     public static interface BodyConverter {

@@ -15,14 +15,12 @@
  */
 package com.wl4g;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration;
+import com.wl4g.infra.common.arthas.ArthasAttacher;
 
-import com.wl4g.infra.support.cache.jedis.JedisClientAutoConfiguration;
-
-import lombok.extern.slf4j.Slf4j;
+import io.quarkus.runtime.ApplicationLifecycleManager;
+import io.quarkus.runtime.Quarkus;
+import io.quarkus.runtime.QuarkusApplication;
+import io.quarkus.runtime.annotations.QuarkusMain;
 
 /**
  * {@link RengineColletor}
@@ -31,28 +29,19 @@ import lombok.extern.slf4j.Slf4j;
  * @version 2022-10-16
  * @since v1.0.0
  */
-@Slf4j
-@SpringBootApplication(
-        exclude = { JdbcTemplateAutoConfiguration.class, DataSourceAutoConfiguration.class, JedisClientAutoConfiguration.class })
-public class RengineColletor {
-
-    // Private are not accessible, can only be checked using the class-name.
-    public static final String SILENTEXITEXCEPTION_CLASS = "org.springframework.boot.devtools.restart.SilentExitExceptionHandler$SilentExitException";
+@QuarkusMain
+public class RengineColletor implements QuarkusApplication {
 
     public static void main(String[] args) {
-        try {
-            SpringApplication.run(RengineColletor.class, args);
-        } catch (Exception e) {
-            if (e.getClass().getName().equals(SILENTEXITEXCEPTION_CLASS)) {
-                // issue-see:https://stackoverflow.com/questions/32770884/breakpoint-at-throw-new-silentexitexception-in-eclipse-spring-boot
-                // System.setProperty("spring.devtools.restart.enabled","false");
-                log.warn("SilentExitException exception occurred. This is a known issue that "
-                        + "usually only occurs on development eclipse, but it may not affect "
-                        + "configuration hot reloading, you can verify this and ignore it.");
-            } else {
-                throw e;
-            }
-        }
+        ArthasAttacher.attachIfNecessary("rengine-collector");
+        System.setProperty("org.apache.commons.logging.LogFactory", "org.apache.commons.logging.impl.JBossLogFactory");
+        Quarkus.run(RengineColletor.class, args);
+    }
+
+    @Override
+    public int run(String... args) throws Exception {
+        Quarkus.waitForExit();
+        return ApplicationLifecycleManager.getExitCode();
     }
 
 }

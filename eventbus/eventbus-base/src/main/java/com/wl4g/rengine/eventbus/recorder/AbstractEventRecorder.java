@@ -82,10 +82,13 @@ public abstract class AbstractEventRecorder implements Closeable, EventRecorder 
         @Override
         public void run() {
             AtomicInteger total = new AtomicInteger(0);
+            AtomicInteger success = new AtomicInteger(0);
             try {
                 log.info("Start compaction task ...");
+
                 Iterator<Entry<String, Serializable>> it = getCompletedStore().iterator();
                 while (it.hasNext()) {
+                    total.incrementAndGet();
                     Entry<String, Serializable> entry = it.next();
                     try {
                         log.debug("Resending to uncompleted send event for : {}", entry.getKey());
@@ -96,14 +99,15 @@ public abstract class AbstractEventRecorder implements Closeable, EventRecorder 
                         getPaddingStore().remove(entry.getKey());
                         getCompletedStore().remove(entry.getKey());
 
-                        total.incrementAndGet();
+                        success.incrementAndGet();
                     } catch (Exception e) {
                         log.warn(format("Unable to resending. - %s", entry.getKey()), e);
                     }
                 }
-                log.info("Completed compaction task of total: {}", total);
+
+                log.info("Completed compaction tasks of : {}/{}", success, total);
             } catch (Exception e) {
-                log.error("Failed to compaction padding events.", e);
+                log.error(format("Failed to compaction tasks of : {}/{}", success, total), e);
             }
         }
     }

@@ -27,12 +27,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.wl4g.rengine.common.entity.FlowNode;
+import com.wl4g.rengine.common.entity.OperatorNode;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -51,72 +50,78 @@ import lombok.ToString;
 @Setter
 @ToString(callSuper = true, exclude = "parent")
 @NoArgsConstructor
-public class WorkflowGraph extends FlowNode {
+public class WorkflowGraph extends OperatorNode {
     private static final long serialVersionUID = 420565264435899065L;
 
     private final List<WorkflowGraph> childrens = new LinkedList<>();;
 
     private transient @JsonIgnore WorkflowGraph parent;
 
-    public WorkflowGraph(@NotNull FlowNode node) {
+    public WorkflowGraph(@NotNull OperatorNode node) {
         notNullOf(node, "node");
         setType(node.getType());
         setId(node.getId());
         setParentId(node.getParentId());
         setName(node.getName());
-        setTop(node.getTop());
-        setLeft(node.getLeft());
-        setColor(node.getColor());
-        setAttributes(node.getAttributes());
+        getAttributes().putAll(node.getAttributes());
     }
 
     public WorkflowResult process(WorkflowContext context) {
-
         // TODO
-        for (FlowNode node : safeList(childrens)) {
-            WorkflowGraph grap = (WorkflowGraph) node;
-            if (node instanceof StartNode) {
-                StartNode n = (StartNode) node;
-            } else if (node instanceof EndNode) {
+        for (OperatorNode node : safeList(childrens)) {
+            WorkflowGraph graph = (WorkflowGraph) node;
+            if (node instanceof EndNode) {
                 EndNode n = (EndNode) node;
             } else if (node instanceof RelationNode) {
                 // 实现 java.util.Predicate 接口来处理嵌套运算？
                 RelationNode n = (RelationNode) node;
                 switch (n.getRelation()) {
-                case AND:// 短路与
-                    for (WorkflowGraph sub : grap.getChildrens()) {
+                case AND:// Short circuit and operation
+                    for (WorkflowGraph sub : graph.getChildrens()) {
                         WorkflowResult result = sub.process(context);
-                        Boolean resultValue = result.getValue();
-                        // 必须所有children都返回true, 只要有一个返回false, 则返回false
-                        if (!resultValue) {
+                        // If all children return true, true is finally
+                        // returned. If any node returns false, it ends and
+                        // returns.
+                        if (!result.isContinue()) {
                             return new WorkflowResult(false);
                         }
                     }
                     break;
-                case OR: // 短路或
-                    for (WorkflowGraph sub : grap.getChildrens()) {
+                case OR: // Short circuit or operation
+                    for (WorkflowGraph sub : graph.getChildrens()) {
                         WorkflowResult result = sub.process(context);
-                        Boolean resultValue = result.getValue();
-                        // 只要有children返回true, 则返回true
-                        if (resultValue) {
+                        // If any child returns true, it will eventually return
+                        // true.
+                        if (result.isContinue()) {
                             return new WorkflowResult(false);
                         }
                     }
                     break;
-                case ALL: // 非短路与
-                    // Boolean resultValue = false;
-                    // for (WorkflowGraph sub : grap.getChildrens()) {
-                    // WorkflowResult result = sub.process(context);
-                    // resultValue = result.getValue();
-                    // // 只要有children返回true, 则返回true
-                    // if (resultValue) {
-                    // return new WorkflowResult(false);
-                    // }
-                    // }
+                case ALL: // Non-short circuit and operation
+                    Boolean isContinue = null;
+                    for (WorkflowGraph sub : graph.getChildrens()) {
+                        WorkflowResult result = sub.process(context);
+                        // If all children return true, true is finally
+                        // returned. If any node returns false, it ends and
+                        // returns. (If the current node returns false, the
+                        // subsequent nodes will still the execution)
+                        if (isNull(isContinue) && !(isContinue = result.isContinue())) {
+                            return new WorkflowResult(false);
+                        }
+                    }
                     break;
-                case ANY: // 非短路或
+                case ANY: // Non-short circuit or operation
+                    for (WorkflowGraph sub : graph.getChildrens()) {
+                        WorkflowResult result = sub.process(context);
+                        // If any child returns true, it will eventually return
+                        // true. (If the current node returns true, the
+                        // subsequent nodes will still the execution)
+                        if (result.isContinue()) {
+                            return new WorkflowResult(false);
+                        }
+                    }
                     break;
-                case NOT: // 非
+                case NOT: // Not and operation
                     break;
                 }
 
@@ -130,19 +135,18 @@ public class WorkflowGraph extends FlowNode {
         }
 
         return new WorkflowResult(false);
-
     }
 
-    public static List<FlowNode> validate(List<FlowNode> nodes) {
+    public static List<OperatorNode> validateEffective(List<OperatorNode> nodes) {
         notNullOf(nodes, "nodes");
 
         // Checking for start node.
-        List<FlowNode> startNodes = nodes.stream().filter(n -> n instanceof StartNode).collect(toList());
+        List<OperatorNode> startNodes = nodes.stream().filter(n -> n instanceof StartNode).collect(toList());
         isTrue(startNodes.size() == 1, "There must be one and only one start node.");
         isTrue(isBlank(startNodes.get(0).getParentId()), "The parentId value of start node must be empty.");
 
         // Checking for end node.
-        List<FlowNode> endNodes = nodes.stream().filter(n -> n instanceof EndNode).collect(toList());
+        List<OperatorNode> endNodes = nodes.stream().filter(n -> n instanceof EndNode).collect(toList());
         isTrue(endNodes.size() == 1, "There must be one and only one end node.");
 
         // Checking for start-to-end reachable continuity.
@@ -152,47 +156,48 @@ public class WorkflowGraph extends FlowNode {
     }
 
     /**
-     * The parse to tree {@link WorkflowGraph} from {@link FlowNode} flat list.
+     * The parse to tree {@link WorkflowGraph} from {@link OperatorNode} flat
+     * list.
      * 
      * @param nodes
      * @return
      * @see https://www.java-success.com/00-%E2%99%A6-creating-tree-list-flattening-back-list-java/
      */
-    public static WorkflowGraph from(List<FlowNode> nodes) {
+    public static WorkflowGraph from(List<OperatorNode> nodes) {
         if (isNull(nodes)) {
             return null;
         }
-        validate(nodes);
+        validateEffective(nodes);
 
-        // FlowNode startNode = nodes.stream().filter(n -> n instanceof
+        // OperatorNode startNode = nodes.stream().filter(n -> n instanceof
         // StartNode).collect(toList()).stream().findFirst().get();
         // WorkflowGraph graph = new WorkflowGraph(startNode);
 
-        List<WorkflowGraph> transformedNodes = safeList(nodes).stream().map(n -> new WorkflowGraph(n)).collect(toList());
+        List<WorkflowGraph> originalNodes = safeList(nodes).stream().map(n -> new WorkflowGraph(n)).collect(toList());
 
         // Save all nodes to a map
-        Map<String, WorkflowGraph> mapTmp = new HashMap<>();
-        for (WorkflowGraph current : transformedNodes) {
-            mapTmp.put(current.getId(), current);
+        Map<String, WorkflowGraph> tmpNodes = new HashMap<>();
+        for (WorkflowGraph current : originalNodes) {
+            tmpNodes.put(current.getId(), current);
         }
 
         // loop and assign parent/child relationships
-        for (WorkflowGraph current : transformedNodes) {
+        for (WorkflowGraph current : originalNodes) {
             String parentId = current.getParentId();
             if (!isBlank(parentId)) {
-                WorkflowGraph parent = mapTmp.get(parentId);
+                WorkflowGraph parent = tmpNodes.get(parentId);
                 if (nonNull(parent)) {
                     current.parent = parent;
                     parent.getChildrens().add(current);
-                    mapTmp.put(parentId, parent);
-                    mapTmp.put(current.getId(), current);
+                    tmpNodes.put(parentId, parent);
+                    tmpNodes.put(current.getId(), current);
                 }
             }
         }
 
-        // get the root. (start node)
+        // find the root. (start node)
         WorkflowGraph root = null;
-        for (WorkflowGraph node : mapTmp.values()) {
+        for (WorkflowGraph node : tmpNodes.values()) {
             if (isNull(node.parent)) {
                 root = node;
                 break;

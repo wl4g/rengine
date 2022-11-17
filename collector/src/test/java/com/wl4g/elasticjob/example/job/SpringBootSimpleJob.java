@@ -21,10 +21,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.apache.shardingsphere.elasticjob.api.ShardingContext;
 import org.apache.shardingsphere.elasticjob.simple.job.SimpleJob;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import com.wl4g.elasticjob.example.bean.Foo;
 import com.wl4g.elasticjob.example.repository.FooRepository;
@@ -32,10 +33,10 @@ import com.wl4g.elasticjob.example.repository.FooRepository;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Component
+@Singleton
 public class SpringBootSimpleJob implements SimpleJob {
 
-    @Autowired
+    @Inject
     private FooRepository fooRepository;
 
     @Override

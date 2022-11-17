@@ -3,8 +3,8 @@
 ## Configuration
 
 - for example:
-  - [collect-job.yaml](../../client/client-collector/src/main/resources/collector-job.yaml)
-  - [collect-job-safecloud.yaml](../../client/client-collector/src/main/resources/collector-job-safecloud.yaml)
+  - [collect-job.yaml](../../collector/src/main/resources/collector-job.yaml)
+  - [collect-job-safecloud.yaml](../../collector/src/main/resources/collector-job-safecloud.yaml)
 
 |  Property  |  Default | Example |  Description |
 | ------------ | ------------ | ------------ | ------------ |

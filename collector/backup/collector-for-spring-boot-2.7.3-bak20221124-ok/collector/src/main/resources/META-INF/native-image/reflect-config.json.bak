@@ -1,0 +1,90 @@
+[
+{
+  "name":"org.apache.shardingsphere.elasticjob.infra.spi.SPIPostProcessor",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+  ]
+},
+{
+  "name":"org.apache.shardingsphere.elasticjob.infra.spi.TypedSPI",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+  ]
+},
+{
+  "name":"org.apache.shardingsphere.elasticjob.executor.item.impl.TypedJobItemExecutor",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+  ]
+},
+{
+  "name":"org.apache.shardingsphere.elasticjob.error.handler.JobErrorHandler",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+  ]
+},
+{
+  "name":"org.apache.shardingsphere.elasticjob.lite.internal.setup.JobClassNameProviderFactory",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+  ]
+},
+{
+  "name":"com.wl4g.rengine.client.collector.error.LoggingJobErrorHandler",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+  ]
+},
+{
+  "name":"com.wl4g.rengine.client.collector.job.EventJobExecutor",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+  ]
+},
+{
+  "name":"com.wl4g.rengine.client.collector.job.EventJobExecutor$BodyConverter",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+  ]
+},
+{
+  "name":"com.wl4g.rengine.client.collector.job.PrometheusEventJobExeutor",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+  ]
+},
+{
+  "name":"com.wl4g.rengine.client.collector.job.SimpleHttpEventJobExeutor",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+  ]
+},
+{
+  "name":"com.wl4g.rengine.client.collector.job.SSHEventJobExeutor",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+  ]
+}
+]

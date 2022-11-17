@@ -72,6 +72,12 @@
         </dependency>
         <dependency>
             <groupId>com.wl4g</groupId>
+            <artifactId>rengine-eventbus-kafka</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.wl4g</groupId>
             <artifactId>rengine-eventbus-pulsar</artifactId>
             <scope>provided</scope>
             <optional>true</optional>

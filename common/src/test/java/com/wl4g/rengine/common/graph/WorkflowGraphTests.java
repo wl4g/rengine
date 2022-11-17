@@ -24,12 +24,12 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 
-import com.wl4g.rengine.common.entity.FlowNode;
-import com.wl4g.rengine.common.entity.FlowNode.EndNode;
-import com.wl4g.rengine.common.entity.FlowNode.FlowNodeType;
-import com.wl4g.rengine.common.entity.FlowNode.RelationNode;
-import com.wl4g.rengine.common.entity.FlowNode.RelationType;
-import com.wl4g.rengine.common.entity.FlowNode.StartNode;
+import com.wl4g.rengine.common.entity.OperatorNode;
+import com.wl4g.rengine.common.entity.OperatorNode.EndNode;
+import com.wl4g.rengine.common.entity.OperatorNode.FlowNodeType;
+import com.wl4g.rengine.common.entity.OperatorNode.RelationNode;
+import com.wl4g.rengine.common.entity.OperatorNode.RelationType;
+import com.wl4g.rengine.common.entity.OperatorNode.StartNode;
 
 /**
  * {@link WorkflowGraphTests}
@@ -42,10 +42,10 @@ public class WorkflowGraphTests {
 
     @Test
     public void testFromFlowNodes() {
-        List<FlowNode> nodes = new LinkedList<>();
+        List<OperatorNode> nodes = new LinkedList<>();
         nodes.add(StartNode.builder().type(FlowNodeType.START.name()).id("0").name("The Start").build());
 
-        FlowNode node1 = RelationNode.builder()
+        OperatorNode node1 = RelationNode.builder()
                 .type(FlowNodeType.RELATION.name())
                 .id("1")
                 .parentId("0")
@@ -54,7 +54,7 @@ public class WorkflowGraphTests {
                 .build();
         nodes.add(node1);
 
-        FlowNode node2 = RelationNode.builder()
+        OperatorNode node2 = RelationNode.builder()
                 .type(FlowNodeType.RELATION.name())
                 .id("2")
                 .parentId("1")
@@ -63,7 +63,7 @@ public class WorkflowGraphTests {
                 .build();
         nodes.add(node2);
 
-        FlowNode node3 = RelationNode.builder()
+        OperatorNode node3 = RelationNode.builder()
                 .type(FlowNodeType.RELATION.name())
                 .id("3")
                 .parentId("2")
@@ -72,7 +72,7 @@ public class WorkflowGraphTests {
                 .build();
         nodes.add(node3);
 
-        FlowNode node4 = RelationNode.builder()
+        OperatorNode node4 = RelationNode.builder()
                 .type(FlowNodeType.RELATION.name())
                 .id("4")
                 .parentId("1")
@@ -81,7 +81,7 @@ public class WorkflowGraphTests {
                 .build();
         nodes.add(node4);
 
-        FlowNode node5 = RelationNode.builder()
+        OperatorNode node5 = RelationNode.builder()
                 .type(FlowNodeType.RELATION.name())
                 .id("5")
                 .parentId("4")

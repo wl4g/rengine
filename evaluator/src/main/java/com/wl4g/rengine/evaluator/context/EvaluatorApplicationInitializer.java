@@ -44,8 +44,7 @@ public class EvaluatorApplicationInitializer {
 
     void onStart(@Observes StartupEvent event, @ConfigProperty(name = "quarkus.application.name") String appName) {
         log.info("The application is starting...");
-        // RespBase.ErrorPromptMessageBuilder.setPrompt(appName);
-        RespBase.ErrorPromptMessageBuilder.setPrompt("EVALUATOR");
+        RespBase.ErrorPromptMessageBuilder.setPrompt(appName.substring(Math.max(appName.lastIndexOf("-") + 1, 0)));
     }
 
     void onStop(@Observes ShutdownEvent event) {

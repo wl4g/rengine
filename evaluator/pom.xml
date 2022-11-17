@@ -524,7 +524,7 @@ and see:https://github.com/apache/groovy/blob/GROOVY_4_0_5/build.gradle#L98 -->
                         <configuration>
                             <!-- see:https://github.com/spotify/dockerfile-maven/issues/154 -->
                             <contextDirectory>${project.basedir}</contextDirectory>
-                            <dockerfile>${project.basedir}/build/docker/Dockerfile.jvm</dockerfile>
+                            <dockerfile>${project.basedir}/build/docker/Dockerfile.quarkustar</dockerfile>
                             <repository>wl4g/${project.build.finalName}</repository>
                             <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
                             <tag>${project.version}</tag>

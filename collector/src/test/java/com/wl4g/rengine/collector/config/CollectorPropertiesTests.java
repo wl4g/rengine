@@ -15,6 +15,8 @@
  */
 package com.wl4g.rengine.collector.config;
 
+import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+
 import java.io.IOException;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -22,7 +24,8 @@ import java.util.TimeZone;
 import org.junit.jupiter.api.Test;
 import org.yaml.snakeyaml.Yaml;
 
-import com.wl4g.infra.context.utils.expression.SpelExpressions;
+//import com.wl4g.infra.context.utils.expression.SpelExpressions;
+import com.wl4g.rengine.collector.config.yaml.CollectorYamlConstructor;
 
 /**
  * {@link CollectorPropertiesTests}
@@ -53,7 +56,7 @@ public class CollectorPropertiesTests {
                 + "  - !PROMETHEUS\n"
                 + "    name: http-job\n"
                 + "    description: The job that scrapes events remote over HTTP.\n"
-                + "    staticParams:\n"
+                + "    jobParams:\n"
                 + "      - name: instance-1\n"
                 + "        url: http://localhost:8080/event\n"
                 + "        method: GET\n"
@@ -65,17 +68,19 @@ public class CollectorPropertiesTests {
         // @formatter:on
 
         CollectorProperties config = new Yaml(new CollectorYamlConstructor()).loadAs(yaml, CollectorProperties.class);
-        System.out.println(config);
+        System.out.println(toJSONString(config, true));
     }
 
-    @Test
-    public void testSpelExpression() throws Exception {
-        //@formatter:off
-        //String expression = "#{T(com.wl4g.infra.common.lang.DateUtils2).getDateOf(T(com.wl4g.infra.common.lang.DateUtils2).addDays(new java.util.Date(),-1),\"yyyy-MM-dd\")}";
-        //@formatter:on
-        String expression = "#{T(com.wl4g.infra.common.lang.DateUtils2).getDateOf(5, -1, \"yyyy-MM-dd\")}";
-        Object result = SpelExpressions.create().resolve(expression);
-        System.out.println(result);
-    }
+    // @Test
+    // public void testSpelExpression() throws Exception {
+//        //@formatter:off
+//        //String expression = "#{T(com.wl4g.infra.common.lang.DateUtils2).getDateOf(T(com.wl4g.infra.common.lang.DateUtils2).addDays(new java.util.Date(),-1),\"yyyy-MM-dd\")}";
+//        //@formatter:on
+    // String expression =
+    // "#{T(com.wl4g.infra.common.lang.DateUtils2).getDateOf(5, -1,
+    // \"yyyy-MM-dd\")}";
+    // Object result = SpelExpressions.create().resolve(expression);
+    // System.out.println(result);
+    // }
 
 }
