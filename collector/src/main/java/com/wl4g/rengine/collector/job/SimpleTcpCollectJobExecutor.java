@@ -17,8 +17,6 @@ package com.wl4g.rengine.collector.job;
 
 import java.net.Socket;
 
-import javax.inject.Singleton;
-
 import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
 import org.apache.shardingsphere.elasticjob.api.ShardingContext;
 import org.apache.shardingsphere.elasticjob.executor.JobFacade;
@@ -39,7 +37,6 @@ import lombok.ToString;
  * @version 2022-10-26
  * @since v3.0.0
  */
-@Singleton
 public class SimpleTcpCollectJobExecutor extends CollectJobExecutor<SimpleTcpCollectJobExecutor.SimpleTcpJobParam> {
 
     @Override

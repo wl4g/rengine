@@ -13,7 +13,7 @@
 // * See the License for the specific language governing permissions and
 // * limitations under the License.
 // */
-//package com.wl4g.rengine.evaluator.graalvm;
+//package com.wl4g.rengine.evaluator.graal;
 //
 //import org.apache.commons.logging.LogFactory;
 //import org.apache.commons.logging.impl.JBossLogFactory;
@@ -24,8 +24,7 @@
 ///**
 // * {@link RuntimeReflectionRegistrationFeature}
 // * 
-// * Usage(Equivalent to configuring in reflect-config.json): 
-// *       -Dquarkus.native.additional-build-args="--features=com.wl4g.rengine.evaluator.graalvm.RuntimeReflectionRegistrationFeature"
+// * Usages: -Dquarkus.native.additional-build-args="--features=com.wl4g.rengine.evaluator.graal.RuntimeReflectionRegistrationFeature"
 // * 
 // * @author James Wong
 // * @version 2022-09-25

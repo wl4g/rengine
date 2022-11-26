@@ -189,7 +189,11 @@ quarkus:
     ## [Notice]: As of GraalVM 22.2 the language:js plugin has been removed from the default plugin list, and needs to be installed manually by run $GRAALVM_HOME/bin/gu install js
     ## Run this command to check if the image is supports: docker run --rm quay.io/quarkus/ubi-quarkus-native-image:22.1-java11 --help | grep 'language'
     ## [Notice]: Required option: "--initialize-at-run-time=org.apache.commons.lang3.RandomUtils" is already set in the (com.wl4g:infra-common-java11) dependency module.
-    additional-build-args: "--language:js,--no-fallback,--report-unsupported-elements-at-runtime,--initialize-at-run-time=groovy.grape.GrapeIvy,--trace-class-initialization=io.netty.util.concurrent.GlobalEventExecutor\\,io.netty.util.concurrent.ScheduledFutureTask"
+    additional-build-args: "--language:js,--no-fallback,--report-unsupported-elements-at-runtime,\
+--initialize-at-run-time=groovy.grape.GrapeIvy\\,\
+org.apache.shardingsphere.elasticjob.executor.item.JobItemExecutorFactory,\
+--trace-object-instantiation=java.security.SecureRandom\\,java.util.Random,\
+--trace-class-initialization=io.netty.util.concurrent.GlobalEventExecutor\\,io.netty.util.concurrent.ScheduledFutureTask"
     #compression:
     #  level: 5 # 1-10 The larger the higher the compression ratio, the longer the build time.
     #  additional-args: --ultra-brute,-v

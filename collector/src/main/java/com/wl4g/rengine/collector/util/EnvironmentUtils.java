@@ -17,7 +17,7 @@ package com.wl4g.rengine.collector.util;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-import org.eclipse.microprofile.config.ConfigProvider;
+import org.springframework.core.env.Environment;
 
 /**
  * {@link EnvironmentUtils}
@@ -28,11 +28,11 @@ import org.eclipse.microprofile.config.ConfigProvider;
  */
 public abstract class EnvironmentUtils {
 
-    public static String resolveString(String placeholder) {
+    public static String resolveString(Environment environment, String placeholder) {
         if (isBlank(placeholder)) {
             return placeholder;
         }
-        return ConfigProvider.getConfig().getConfigValue(placeholder).getValue();
+        return environment.resolvePlaceholders(placeholder);
     }
 
 }

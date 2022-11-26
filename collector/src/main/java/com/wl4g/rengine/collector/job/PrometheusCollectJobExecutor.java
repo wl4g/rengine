@@ -26,8 +26,6 @@ import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Singleton;
-
 import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
 import org.apache.shardingsphere.elasticjob.api.ShardingContext;
 
@@ -49,7 +47,7 @@ import lombok.experimental.SuperBuilder;
  * @since v1.0.0
  * @see {@link org.apache.shardingsphere.elasticjob.http.executor.HttpJobExecutor}
  */
-@Singleton
+@Getter
 public class PrometheusCollectJobExecutor extends SimpleHttpCollectJobExecutor {
 
     @Override

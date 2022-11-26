@@ -22,11 +22,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.inject.Singleton;
+import org.springframework.stereotype.Repository;
 
 import com.wl4g.elasticjob.example.bean.Foo;
 
-@Singleton
+@Repository
 public class FooRepository {
 
     private final Map<Long, Foo> data = new ConcurrentHashMap<>(300, 1);

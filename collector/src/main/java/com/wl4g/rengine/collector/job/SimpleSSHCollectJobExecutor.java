@@ -17,7 +17,6 @@ package com.wl4g.rengine.collector.job;
 
 import java.util.List;
 
-import javax.inject.Singleton;
 import javax.validation.constraints.NotBlank;
 
 import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
@@ -46,7 +45,7 @@ import lombok.ToString;
  * @see {@link org.apache.shardingsphere.elasticjob.http.executor.HttpJobExecutor}
  * @see {@link org.apache.shardingsphere.elasticjob.http.executor.ScriptJobExecutor}
  */
-@Singleton
+@Getter
 public class SimpleSSHCollectJobExecutor extends CollectJobExecutor<SimpleSSHCollectJobExecutor.SimpleSSHJobParam> {
 
     @Override

@@ -327,17 +327,6 @@ and see:https://github.com/apache/groovy/blob/GROOVY_4_0_5/build.gradle#L98 -->
         </dependency>
         <!-- END: Integration for Javascript(graal.js/nashorn) script engine -->
 
-        <!-- Arthas (The use of JVM attach(arthas) cannot be supported in native mode) -->
-        <dependency>
-            <groupId>com.taobao.arthas</groupId>
-            <artifactId>arthas-agent-attach</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>com.taobao.arthas</groupId>
-            <artifactId>arthas-packaging</artifactId>
-            <optional>true</optional>
-        </dependency>
         <!-- Devel tools -->
         <dependency>
             <groupId>com.github.spotbugs</groupId>
@@ -542,26 +531,9 @@ and see:https://github.com/apache/groovy/blob/GROOVY_4_0_5/build.gradle#L98 -->
                 </plugins>
             </build>
         </profile>
-        <!-- Packaging for JVM -->
-        <profile>
-            <id>default</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.taobao.arthas</groupId>
-                    <artifactId>arthas-agent-attach</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>com.taobao.arthas</groupId>
-                    <artifactId>arthas-packaging</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
         <!-- Packaging for native (The use of JVM attach(arthas) cannot be supported in native mode) -->
         <profile>
-            <id>native</id>
+            <id>build:native</id>
             <activation>
                 <property>
                     <name>native</name>
@@ -594,6 +566,25 @@ and see:https://github.com/apache/groovy/blob/GROOVY_4_0_5/build.gradle#L98 -->
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>with:arthas</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <!-- Arthas (The use of JVM attach(arthas) cannot be supported in native mode) -->
+                <dependency>
+                    <groupId>com.taobao.arthas</groupId>
+                    <artifactId>arthas-agent-attach</artifactId>
+                    <optional>true</optional>
+                </dependency>
+                <dependency>
+                    <groupId>com.taobao.arthas</groupId>
+                    <artifactId>arthas-packaging</artifactId>
+                    <optional>true</optional>
+                </dependency>
+            </dependencies>
         </profile>
     </profiles>
 </project>

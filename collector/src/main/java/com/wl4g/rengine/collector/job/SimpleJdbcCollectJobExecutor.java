@@ -15,7 +15,6 @@
  */
 package com.wl4g.rengine.collector.job;
 
-import static com.wl4g.infra.common.lang.TypeConverts.safeLongToInt;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -23,23 +22,21 @@ import static java.util.Objects.nonNull;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
-import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.inject.Singleton;
 import javax.validation.constraints.NotBlank;
 
-import org.apache.commons.dbutils.StatementConfiguration;
 import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
 import org.apache.shardingsphere.elasticjob.api.ShardingContext;
 import org.apache.shardingsphere.elasticjob.executor.JobFacade;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.wl4g.infra.common.bean.ConfigBeanUtils;
-import com.wl4g.rengine.collector.util.HikariJdbcHelper;
 import com.wl4g.rengine.common.event.RengineEvent.EventLocation;
 import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -53,11 +50,10 @@ import lombok.ToString;
  * @since v1.0.0
  * @see https://github1s.com/apache/commons-dbutils/tree/DBUTILS_1_7/src/test/java/org/apache/commons/dbutils
  */
-@Singleton
 public class SimpleJdbcCollectJobExecutor extends CollectJobExecutor<SimpleJdbcCollectJobExecutor.SimpleJdbcJobParam>
         implements Closeable {
 
-    private Map<String, HikariJdbcHelper> jdbcHelperCaches;
+    private Map<String, JdbcTemplate> jdbcTemplateCaches;
 
     @Override
     protected EventJobType type() {
@@ -72,8 +68,8 @@ public class SimpleJdbcCollectJobExecutor extends CollectJobExecutor<SimpleJdbcC
             JobFacade jobFacade,
             ShardingContext context) throws Exception {
 
-        HikariJdbcHelper jdbcHelper = obtainShardingJdbcHelper(shardingParam, currentShardingTotalCount, jobConfig, context);
-        List<Map<String, Object>> result = jdbcHelper.queryForList(shardingParam.getSql());
+        JdbcTemplate jdbcTemplate = obtainShardingJdbcTemplate(shardingParam, currentShardingTotalCount, jobConfig, context);
+        List<Map<String, Object>> result = jdbcTemplate.queryForList(shardingParam.getSql());
         log.debug("Collect to result: {}", result);
 
         offer(shardingParam, jobConfig, jobFacade, context, result);
@@ -95,45 +91,50 @@ public class SimpleJdbcCollectJobExecutor extends CollectJobExecutor<SimpleJdbcC
         return EventLocation.builder().ipAddress(URI.create(shardingParam.getHikariConfig().getJdbcUrl()).getHost()).build();
     }
 
-    protected HikariJdbcHelper obtainShardingJdbcHelper(
+    protected JdbcTemplate obtainShardingJdbcTemplate(
             SimpleJdbcJobParam shardingParam,
             int currentShardingTotalCount,
             JobConfiguration jobConfig,
             ShardingContext shardingContext) throws Exception {
 
-        if (isNull(jdbcHelperCaches)) {
+        if (isNull(jdbcTemplateCaches)) {
             synchronized (this) {
-                if (isNull(jdbcHelperCaches)) {
-                    jdbcHelperCaches = new ConcurrentHashMap<>(currentShardingTotalCount);
+                if (isNull(jdbcTemplateCaches)) {
+                    jdbcTemplateCaches = new ConcurrentHashMap<>(currentShardingTotalCount);
                 }
             }
         }
 
-        HikariJdbcHelper jdbcHelper = jdbcHelperCaches.get(shardingParam.getName());
-        if (isNull(jdbcHelper)) {
+        JdbcTemplate jdbcTemplate = jdbcTemplateCaches.get(shardingParam.getName());
+        if (isNull(jdbcTemplate)) {
             synchronized (this) {
-                jdbcHelper = jdbcHelperCaches.get(shardingParam.getName());
-                if (isNull(jdbcHelper)) {
-                    jdbcHelper = new HikariJdbcHelper(new StatementConfiguration(shardingParam.getFetchDirection(),
-                            shardingParam.getFetchSize(), shardingParam.getMaxFieldSize(), shardingParam.getMaxRows(),
-                            safeLongToInt(shardingParam.getQueryTimeout().toSeconds())), shardingParam.getHikariConfig());
-                    jdbcHelperCaches.put(shardingParam.getName(), jdbcHelper);
+                jdbcTemplate = jdbcTemplateCaches.get(shardingParam.getName());
+                if (isNull(jdbcTemplate)) {
+                    jdbcTemplate = new JdbcTemplate(new HikariDataSource(shardingParam.getHikariConfig()));
+                    jdbcTemplate.setIgnoreWarnings(shardingParam.isIgnoreWarnings());
+                    jdbcTemplate.setFetchSize(shardingParam.getFetchSize());
+                    jdbcTemplate.setMaxRows(shardingParam.getMaxRows());
+                    jdbcTemplate.setQueryTimeout(shardingParam.getQueryTimeout());
+                    jdbcTemplate.setSkipResultsProcessing(shardingParam.isSkipResultsProcessing());
+                    jdbcTemplate.setSkipUndeclaredResults(shardingParam.isSkipUndeclaredResults());
+                    jdbcTemplate.setResultsMapCaseInsensitive(shardingParam.isResultsMapCaseInsensitive());
+                    jdbcTemplateCaches.put(shardingParam.getName(), jdbcTemplate);
                 }
             }
         }
 
-        return jdbcHelper;
+        return jdbcTemplate;
     }
 
     @Override
     public void close() throws IOException {
-        if (nonNull(jdbcHelperCaches)) {
-            log.info("Closing to target jdbc dataSources for : {}", jdbcHelperCaches.keySet());
-            jdbcHelperCaches.forEach((name, jdbcHelper) -> {
+        if (nonNull(jdbcTemplateCaches)) {
+            log.info("Closing to target jdbc dataSources for : {}", jdbcTemplateCaches.keySet());
+            jdbcTemplateCaches.forEach((name, jdbcTemplate) -> {
                 try {
-                    jdbcHelper.close();
+                    ((HikariDataSource) jdbcTemplate.getDataSource()).close();
                 } catch (Exception e) {
-                    log.warn(format("Unable to closing jdbc helper. - %s", name), e);
+                    log.warn(format("Unable to closing target jdbc dataSource. - %s", name), e);
                 }
             });
         }
@@ -145,31 +146,53 @@ public class SimpleJdbcCollectJobExecutor extends CollectJobExecutor<SimpleJdbcC
     public static class SimpleJdbcJobParam extends CollectJobExecutor.JobParamBase {
 
         /**
-         * The direction for fetching rows from database tables.
+         * If this variable is {@code false}, we will throw exceptions on SQL
+         * warnings.
          */
-        private Integer fetchDirection;
+        private boolean ignoreWarnings = true;
 
         /**
-         * The number of rows that should be fetched from the database when more
-         * rows are needed.
+         * If this variable is set to a non-negative value, it will be used for
+         * setting the fetchSize property on statements used for query
+         * processing.
          */
-        private Integer fetchSize;
+        private int fetchSize = -1;
 
         /**
-         * The maximum number of bytes that can be returned for character and
-         * binary column values.
+         * If this variable is set to a non-negative value, it will be used for
+         * setting the maxRows property on statements used for query processing.
          */
-        private Integer maxFieldSize = 64;
+        private int maxRows = -1;
 
         /**
-         * The maximum number of rows that a <code>ResultSet</code> can produce.
+         * If this variable is set to a non-negative value, it will be used for
+         * setting the queryTimeout property on statements used for query
+         * processing.
          */
-        private Integer maxRows = 1024;
+        private int queryTimeout = -1;
 
         /**
-         * The number of seconds the driver will wait for execution.
+         * If this variable is set to true, then all results checking will be
+         * bypassed for any callable statement processing. This can be used to
+         * avoid a bug in some older Oracle JDBC drivers like 10.1.0.2.
          */
-        private Duration queryTimeout = Duration.ofSeconds(15);
+        private boolean skipResultsProcessing = false;
+
+        /**
+         * If this variable is set to true then all results from a stored
+         * procedure call that don't have a corresponding SqlOutParameter
+         * declaration will be bypassed. All other results processing will be
+         * take place unless the variable {@code skipResultsProcessing} is set
+         * to {@code true}.
+         */
+        private boolean skipUndeclaredResults = false;
+
+        /**
+         * If this variable is set to true then execution of a CallableStatement
+         * will return the results in a Map that uses case-insensitive names for
+         * the parameters.
+         */
+        private boolean resultsMapCaseInsensitive = false;
 
         /**
          * The properties for {@link HikariConfig}

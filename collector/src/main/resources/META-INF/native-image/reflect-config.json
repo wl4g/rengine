@@ -1,13 +1,5 @@
 [
 {
-  "name":"org.apache.shardingsphere.elasticjob.lite.spring.core.setup.QuarkusProxyJobClassNameProvider",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true,
-  "methods":[
-  ]
-},
-{
   "name":"com.wl4g.rengine.client.collector.error.LoggingJobErrorHandler",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,

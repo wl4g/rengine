@@ -17,17 +17,16 @@
 
 package com.wl4g.elasticjob.example.job;
 
-import javax.inject.Singleton;
-
 import org.apache.shardingsphere.elasticjob.api.ShardingContext;
 import org.apache.shardingsphere.elasticjob.simple.job.SimpleJob;
+import org.springframework.stereotype.Component;
 
-@Singleton
+@Component
 public class SpringBootOccurErrorNoticeEmailJob implements SimpleJob {
 
-    @Override
-    public void execute(final ShardingContext shardingContext) {
-        throw new RuntimeException(
-                String.format("An exception has occurred in Job, The parameter is %s", shardingContext.getShardingParameter()));
-    }
+	@Override
+	public void execute(final ShardingContext shardingContext) {
+		throw new RuntimeException(
+				String.format("An exception has occurred in Job, The parameter is %s", shardingContext.getShardingParameter()));
+	}
 }
