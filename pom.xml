@@ -131,6 +131,7 @@
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <maven-springboot.version>2.7.3</maven-springboot.version>
         <maven-springdoc-openapi.version>1.4</maven-springdoc-openapi.version>
+        <maven-exec.version>3.1.0</maven-exec.version>
     </properties>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -245,6 +246,11 @@
                     <groupId>org.springdoc</groupId>
                     <artifactId>springdoc-openapi-maven-plugin</artifactId>
                     <version>${maven-springdoc-openapi.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>${maven-exec.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>

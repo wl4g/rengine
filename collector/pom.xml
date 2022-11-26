@@ -121,13 +121,6 @@
             <groupId>org.apache.shardingsphere.elasticjob</groupId>
             <artifactId>elasticjob-lite-core</artifactId>
         </dependency>
-
-        <!-- Arthas(build native error) -->
-        <!-- <dependency> -->
-        <!--     <groupId>com.taobao.arthas</groupId> -->
-        <!--     <artifactId>arthas-spring-boot-starter</artifactId> -->
-        <!-- </dependency> -->
-
         <!-- Logging -->
         <!-- see:https://loki4j.github.io/loki-logback-appender/#quick-start -->
         <!-- see:https://www.elastic.co/guide/en/ecs-logging/java/current/setup.html#setup -->
@@ -320,68 +313,132 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
                         <configuration>
-                            <excludes>
-                                <exclude>
-                                    <groupId>org.projectlombok</groupId>
-                                    <artifactId>lombok</artifactId>
-                                </exclude>
-                            </excludes>
-                            <classifier>${repackage.classifier}</classifier>
-                            <image>
-                                <builder>paketobuildpacks/builder:tiny</builder>
-                                <env>
-                                    <BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
-                                </env>
-                            </image>
+                            <finalName>${final.name}-${project.version}-bin</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assemble/package.xml</descriptor>
+                            </descriptors>
                         </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.springframework.experimental</groupId>
-                        <artifactId>spring-aot-maven-plugin</artifactId>
-                        <version>${spring-native.version}</version>
-                        <!-- <configuration> -->
-                        <!-- <removeSpelSupport>false</removeSpelSupport> -->
-                        <!-- <systemPropertyVariables> -->
-                        <!-- <springAot>true</springAot> -->
-                        <!-- </systemPropertyVariables> -->
-                        <!-- </configuration> -->
                         <executions>
                             <execution>
-                                <id>test-generate</id>
+                                <id>make-assembly</id>
+                                <phase>package</phase>
                                 <goals>
-                                    <goal>test-generate</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>generate</id>
-                                <goals>
-                                    <goal>generate</goal>
+                                    <goal>single</goal>
                                 </goals>
                             </execution>
                         </executions>
                     </plugin>
+                    <!-- <plugin> -->
+                    <!--     <groupId>org.springframework.boot</groupId> -->
+                    <!--     <artifactId>spring-boot-maven-plugin</artifactId> -->
+                    <!--     <configuration> -->
+                    <!--         <excludes> -->
+                    <!--             <exclude> -->
+                    <!--                 <groupId>org.projectlombok</groupId> -->
+                    <!--                 <artifactId>lombok</artifactId> -->
+                    <!--             </exclude> -->
+                    <!--         </excludes> -->
+                    <!--         <classifier>${repackage.classifier}</classifier> -->
+                    <!--         <image> -->
+                    <!--             <builder>paketobuildpacks/builder:tiny</builder> -->
+                    <!--             <env> -->
+                    <!--                 <BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE> -->
+                    <!--             </env> -->
+                    <!--         </image> -->
+                    <!--     </configuration> -->
+                    <!-- </plugin> -->
+                    <!-- <plugin> -->
+                    <!--     <groupId>org.springframework.experimental</groupId> -->
+                    <!--     <artifactId>spring-aot-maven-plugin</artifactId> -->
+                    <!--     <version>${spring-native.version}</version> -->
+                    <!--     <executions> -->
+                    <!--         <execution> -->
+                    <!--             <id>test-generate</id> -->
+                    <!--             <goals> -->
+                    <!--                 <goal>test-generate</goal> -->
+                    <!--             </goals> -->
+                    <!--         </execution> -->
+                    <!--         <execution> -->
+                    <!--             <id>generate</id> -->
+                    <!--             <goals> -->
+                    <!--                 <goal>generate</goal> -->
+                    <!--             </goals> -->
+                    <!--         </execution> -->
+                    <!--     </executions> -->
+                    <!-- </plugin> -->
+                    <!-- see:https://www.graalvm.org/dev/reference-manual/native-image/guides/use-native-image-maven-plugin/ -->
+                    <!-- <plugin> -->
+                    <!--     <groupId>org.graalvm.buildtools</groupId> -->
+                    <!--     <artifactId>native-maven-plugin</artifactId> -->
+                    <!--     <version>${native-buildtools.version}</version> -->
+                    <!--     <extensions>true</extensions> -->
+                    <!--     <executions> -->
+                    <!--         <execution> -->
+                    <!--             <id>test-native</id> -->
+                    <!--             <phase>test</phase> -->
+                    <!--             <goals> -->
+                    <!--                 <goal>test</goal> -->
+                    <!--             </goals> -->
+                    <!--         </execution> -->
+                    <!--         <execution> -->
+                    <!--             <id>build-native</id> -->
+                    <!--             <phase>package</phase> -->
+                    <!--             <goals> -->
+                    <!--                 <goal>build</goal> -->
+                    <!--             </goals> -->
+                    <!--         </execution> -->
+                    <!--     </executions> -->
+                    <!--     <configuration> -->
+                    <!--         <fallback>false</fallback> -->
+                    <!--     </configuration> -->
+                    <!-- </plugin> -->
                     <plugin>
-                        <groupId>org.graalvm.buildtools</groupId>
-                        <artifactId>native-maven-plugin</artifactId>
-                        <version>${native-buildtools.version}</version>
-                        <extensions>true</extensions>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>test-native</id>
-                                <phase>test</phase>
-                                <goals>
-                                    <goal>test</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>build-native</id>
+                                <id>unpack-tar</id>
                                 <phase>package</phase>
                                 <goals>
-                                    <goal>build</goal>
+                                    <goal>exec</goal>
                                 </goals>
+                                <configuration>
+                                    <executable>tar</executable>
+                                    <arguments>
+                                        <argument>-xvf</argument>
+                                        <argument>${final.name}-${project.version}-bin.tar</argument>
+                                        <argument>-C</argument>
+                                        <argument>${project.basedir}/target/</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>build-native-with-docker</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>docker</executable>
+                                    <arguments>
+                                        <argument>run</argument>
+                                        <argument>--rm</argument>
+                                        <argument>--memory=6G</argument>
+                                        <argument>--memory-swap=-1</argument>
+                                        <argument>-v</argument>
+                                        <argument>${project.basedir}/target/${final.name}-${project.version}-bin:/workspace</argument>
+                                        <argument>registry.cn-shenzhen.aliyuncs.com/wl4g/graalvm-ce:22.1.0-java11</argument>
+                                        <argument>native-image</argument>
+                                        <argument>-H:+ReportExceptionStackTraces</argument>
+                                        <argument>-cp</argument>
+                                        <argument>conf/*:lib/${final.name}.jar:lib/*</argument>
+                                        <argument>${bootstrap-classname}</argument>
+                                    </arguments>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
@@ -564,13 +621,15 @@
                 <!-- Arthas (The use of JVM attach(arthas) cannot be supported in native mode) -->
                 <dependency>
                     <groupId>com.taobao.arthas</groupId>
+                    <artifactId>arthas-spring-boot-starter</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>com.taobao.arthas</groupId>
                     <artifactId>arthas-agent-attach</artifactId>
-                    <optional>true</optional>
                 </dependency>
                 <dependency>
                     <groupId>com.taobao.arthas</groupId>
                     <artifactId>arthas-packaging</artifactId>
-                    <optional>true</optional>
                 </dependency>
             </dependencies>
         </profile>

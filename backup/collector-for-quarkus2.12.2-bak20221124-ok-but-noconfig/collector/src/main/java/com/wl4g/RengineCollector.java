@@ -30,7 +30,7 @@ import io.quarkus.runtime.annotations.QuarkusMain;
  * @since v1.0.0
  */
 @QuarkusMain
-public class RengineColletor implements QuarkusApplication {
+public class RengineCollector implements QuarkusApplication {
 
     public static void main(String[] args) {
         ArthasAttacher.attachIfNecessary("rengine-collector");

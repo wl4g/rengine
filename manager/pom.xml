@@ -89,11 +89,6 @@
             <groupId>org.springframework.experimental</groupId>
             <artifactId>spring-native</artifactId>
         </dependency>
-        <!-- Arthas -->
-        <dependency>
-            <groupId>com.taobao.arthas</groupId>
-            <artifactId>arthas-spring-boot-starter</artifactId>
-        </dependency>
         <!-- Docs -->
         <!-- see:https://springdoc.org/#demos -->
         <!-- see:https://github.com/springdoc/springdoc-openapi-demos -->
@@ -557,6 +552,27 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>with:arthas</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <!-- Arthas (The use of JVM attach(arthas) cannot be supported in native mode) -->
+                <dependency>
+                    <groupId>com.taobao.arthas</groupId>
+                    <artifactId>arthas-spring-boot-starter</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>com.taobao.arthas</groupId>
+                    <artifactId>arthas-agent-attach</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>com.taobao.arthas</groupId>
+                    <artifactId>arthas-packaging</artifactId>
+                </dependency>
+            </dependencies>
         </profile>
     </profiles>
 </project>

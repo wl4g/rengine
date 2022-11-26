@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -25,7 +25,7 @@ import com.wl4g.infra.support.cache.jedis.JedisClientAutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link RengineColletor}
+ * {@link RengineCollector}
  * 
  * @author James Wong
  * @version 2022-10-16
@@ -34,14 +34,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @SpringBootApplication(
         exclude = { JdbcTemplateAutoConfiguration.class, DataSourceAutoConfiguration.class, JedisClientAutoConfiguration.class })
-public class RengineColletor {
+public class RengineCollector {
 
     // Private are not accessible, can only be checked using the class-name.
     public static final String SILENTEXITEXCEPTION_CLASS = "org.springframework.boot.devtools.restart.SilentExitExceptionHandler$SilentExitException";
 
     public static void main(String[] args) {
         try {
-            SpringApplication.run(RengineColletor.class, args);
+            SpringApplication.run(RengineCollector.class, args);
         } catch (Exception e) {
             if (e.getClass().getName().equals(SILENTEXITEXCEPTION_CLASS)) {
                 // issue-see:https://stackoverflow.com/questions/32770884/breakpoint-at-throw-new-silentexitexception-in-eclipse-spring-boot

@@ -34,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @SpringBootApplication(
         exclude = { JdbcTemplateAutoConfiguration.class, DataSourceAutoConfiguration.class, JedisClientAutoConfiguration.class })
-public class RengineColletor {
+public class RengineCollector {
 
     // Private are not accessible, can only be checked using the class-name.
     public static final String SILENTEXITEXCEPTION_CLASS = "org.springframework.boot.devtools.restart.SilentExitExceptionHandler$SilentExitException";
