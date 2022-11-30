@@ -20,6 +20,8 @@ import static java.util.Arrays.asList;
 
 import org.junit.Test;
 
+import com.wl4g.rengine.common.entity.Rule.RuleEngine;
+
 /**
  * {@link EvaluationEngine}
  * 
@@ -32,7 +34,7 @@ public class EvaluationEngineTests {
     @SuppressWarnings("rawtypes")
     @Test
     public void testReflectGetEnumNameMethod() throws Exception {
-        Class<?> cls = EvaluationEngine.class;
+        Class<?> cls = RuleEngine.class;
 
         System.out.println(findMethodNullable(cls, "name"));
         System.out.println(cls.getMethod("name"));

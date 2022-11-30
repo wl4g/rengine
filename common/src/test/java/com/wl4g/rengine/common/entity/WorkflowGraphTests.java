@@ -37,7 +37,7 @@ public class WorkflowGraphTests {
 
     @Test
     public void testWorkflowGraphSerialze() {
-        LogicalNode node = new LogicalNode().withId("100010").withName("同时满足").withRelation(LogicalType.AND);
+        LogicalNode node = new LogicalNode().withId("100010").withName("同时满足").withLogical(LogicalType.AND);
         node.getAttributes().put("color", "white");
         node.getAttributes().put("left", "10px");
         node.getAttributes().put("top", "10px");
@@ -47,7 +47,7 @@ public class WorkflowGraphTests {
 
     @Test
     public void testWorkflowGraphDeserialze() {
-        String json = "{\"@type\":\"LOGICAL\",\"id\":\"100010\",\"name\":\"同时满足\",\"attributes\":{\"top\":\"10px\",\"color\":\"white\",\"left\":\"10px\"},\"logical\":\"AND\"}";
+        String json = "{\"@type\":\"LOGICAL\",\"id\":\"100010\",\"name\":\"同时满足\",\"attributes\":{\"top\":\"10px\",\"color\":\"white\",\"left\":\"10px\"},\"rangeTime\":null,\"logical\":\"AND\"}";
         BaseNode<?> node = parseJSON(json, BaseNode.class);
         System.out.println("      node.getClass(): " + node.getClass());
         System.out.println("         node.getId(): " + node.getId());

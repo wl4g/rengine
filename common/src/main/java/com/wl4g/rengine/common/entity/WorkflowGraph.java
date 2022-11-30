@@ -28,7 +28,6 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -75,15 +74,15 @@ public class WorkflowGraph {
      * @version 2022-10-20
      * @since v1.0.0
      */
-    @Schema(oneOf = { BootNode.class, DebugNode.class, LogicalNode.class, ExecutionNode.class }, discriminatorProperty = "@type")
+    @SuppressWarnings("unchecked")
+    @Schema(oneOf = { BootNode.class, LogicalNode.class, RunNode.class }, discriminatorProperty = "@type")
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type", visible = true)
-    @JsonSubTypes({ @Type(value = BootNode.class, name = "BOOT"), @Type(value = DebugNode.class, name = "DEBUG"),
-            @Type(value = LogicalNode.class, name = "LOGICAL"), @Type(value = ExecutionNode.class, name = "EXECUTION") })
+    @JsonSubTypes({ @Type(value = BootNode.class, name = "BOOT"), @Type(value = LogicalNode.class, name = "LOGICAL"),
+            @Type(value = RunNode.class, name = "RUN") })
     @Getter
     @Setter
     @ToString
     @NoArgsConstructor
-    @SuppressWarnings("unchecked")
     public static abstract class BaseNode<E extends BaseNode<?>> implements Serializable {
         private static final long serialVersionUID = 1L;
 
@@ -92,7 +91,6 @@ public class WorkflowGraph {
         private @NotBlank @Setter(AccessLevel.PROTECTED) String type;
         private @NotBlank String id;
         private @NotBlank String name = DEFAULT_NODE_NAME;
-        private @NotNull RangeTime rangeTime;
         private @Nullable Map<String, Object> attributes = new HashMap<String, Object>() {
             private static final long serialVersionUID = 1L;
             {
@@ -132,11 +130,22 @@ public class WorkflowGraph {
     @Getter
     @Setter
     @ToString(callSuper = true)
-    public static class DebugNode extends BaseNode<DebugNode> {
-        private static final long serialVersionUID = 422261164435899065L;
+    public static class ProcessNode extends BaseRunNode<ProcessNode> {
+        private static final long serialVersionUID = 422265264435899065L;
 
-        public DebugNode() {
-            setType(NodeType.DEBUG.name());
+        public ProcessNode() {
+            setType(NodeType.PROCESS.name());
+        }
+    }
+
+    @Getter
+    @Setter
+    @ToString(callSuper = true)
+    public static class FailbackNode extends BaseRunNode<FailbackNode> {
+        private static final long serialVersionUID = 422265264435899065L;
+
+        public FailbackNode() {
+            setType(NodeType.FAILBACK.name());
         }
     }
 
@@ -152,8 +161,8 @@ public class WorkflowGraph {
             setType(NodeType.LOGICAL.name());
         }
 
-        public LogicalNode withRelation(LogicalType relation) {
-            setLogical(relation);
+        public LogicalNode withLogical(LogicalType logical) {
+            setLogical(logical);
             return this;
         }
     }
@@ -161,7 +170,7 @@ public class WorkflowGraph {
     @Getter
     @Setter
     @ToString(callSuper = true)
-    public static class ExecutionNode extends BaseNode<ExecutionNode> {
+    public static abstract class BaseRunNode<E extends BaseRunNode<?>> extends BaseNode<E> {
         private static final long serialVersionUID = 42226526447799065L;
 
         /**
@@ -169,13 +178,21 @@ public class WorkflowGraph {
          */
         private @NotBlank String ruleId;
 
-        public ExecutionNode() {
-            setType(NodeType.EXECUTION.name());
-        }
-
-        public ExecutionNode withRuleId(String ruleId) {
+        @SuppressWarnings("unchecked")
+        public E withRuleId(String ruleId) {
             setRuleId(ruleId);
-            return this;
+            return (E) this;
+        }
+    }
+
+    @Getter
+    @Setter
+    @ToString(callSuper = true)
+    public static class RunNode extends BaseRunNode<RunNode> {
+        private static final long serialVersionUID = 42226526447799065L;
+
+        public RunNode() {
+            setType(NodeType.RUN.name());
         }
     }
 
@@ -215,11 +232,13 @@ public class WorkflowGraph {
 
         BOOT(BootNode.class),
 
-        DEBUG(DebugNode.class),
+        PROCESS(ProcessNode.class),
+
+        FAILBACK(FailbackNode.class),
 
         LOGICAL(LogicalNode.class),
 
-        EXECUTION(ExecutionNode.class);
+        RUN(RunNode.class);
 
         private final Class<? extends BaseNode<? extends BaseNode<?>>> clazz;
 
@@ -254,16 +273,6 @@ public class WorkflowGraph {
             this.to = hasTextOf(to, "to");
             this.from = hasTextOf(from, "from");
         }
-    }
-
-    @Getter
-    @Setter
-    @ToString
-    @SuperBuilder
-    @NoArgsConstructor
-    public static class RangeTime {
-        private @NotBlank Long startTime;
-        private @NotBlank Long endTime;
     }
 
     public static final String DEFAULT_NODE_NAME = "Unnamed Node";

@@ -15,13 +15,17 @@
  */
 package com.wl4g.rengine.evaluator.service.impl;
 
-import org.junit.Before;
+import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 
-import com.wl4g.rengine.evaluator.service.JobService;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.wl4g.rengine.common.entity.Scenes;
+import com.wl4g.rengine.evaluator.service.EvaluatorService;
 import com.wl4g.rengine.evaluator.util.TestMongoUtil;
 
 /**
- * {@link JobServiceTests}
+ * {@link EvaluatorServiceTests}
  * 
  * @author James Wong
  * @version 2022-09-27
@@ -31,12 +35,12 @@ import com.wl4g.rengine.evaluator.util.TestMongoUtil;
 // @ExtendWith(MockitoExtension.class)
 // @QuarkusTestResource(value = MongoTestResource.class, initArgs =
 // @ResourceArg(name = MongoTestResource.PORT, value = "27017"))
-public class JobServiceTests {
+public class EvaluatorServiceTests {
 
     // @Mock
     // @org.mockito.Mock
     // @InjectMock(convertScopes = true)
-    JobService jobService;
+    EvaluatorService evaluatorService;
 
     @Before
     public void setup() {
@@ -45,9 +49,15 @@ public class JobServiceTests {
         // QuarkusMock.installMockForType(mock, JobService.class);
 
         // Manual setup/inject depends.
-        JobServiceImpl jobService = new JobServiceImpl();
-        jobService.mongoRepository = TestMongoUtil.createMongoRepository();
-        this.jobService = jobService;
+        EvaluatorServiceImpl evaluatorService = new EvaluatorServiceImpl();
+        evaluatorService.mongoRepository = TestMongoUtil.createMongoRepository();
+        this.evaluatorService = evaluatorService;
+    }
+
+    @Test
+    public void testLoadScenesWithCascade() {
+        Scenes scenes = evaluatorService.loadScenesWithCascade("iot_generic_temp_warning");
+        System.out.println(toJSONString(scenes));
     }
 
 }

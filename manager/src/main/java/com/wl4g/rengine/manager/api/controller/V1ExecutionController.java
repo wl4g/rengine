@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @since v1.0.0
  */
 @RestController
-@RequestMapping("/api/v1/applib")
+@RequestMapping("/api/v1/evaluation")
 public class V1ExecutionController {
 
 }

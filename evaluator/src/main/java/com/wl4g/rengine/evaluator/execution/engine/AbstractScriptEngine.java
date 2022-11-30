@@ -16,18 +16,17 @@
 package com.wl4g.rengine.evaluator.execution.engine;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
-import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import org.graalvm.polyglot.proxy.ProxyObject;
@@ -75,24 +74,20 @@ public abstract class AbstractScriptEngine implements IEngine {
 
     protected @NotNull List<ObjectResource> loadScriptResources(
             @NotNull UploadType type,
-            @NotNull Evaluation model,
+            @NotBlank Scenes scenes,
             boolean useCache) {
         notNullOf(type, "uploadType");
-        notNullOf(model, "evaluation");
-        log.debug("Loading script by {}, {} ...", type, model);
+        notNullOf(scenes, "scenes");
+        log.debug("Loading script by {} of scenesCode: {} ...", type, scenes.getScenesCode());
 
         List<ObjectResource> scripts = Lists.newArrayList();
-
-        // Gets scenes/workflow/rules/uploads information.
-        final Scenes scenes = jobService.loadScenesWithCascade(model.getScenesCode());
-        notNull(scenes, "Unable to find scenes '%s'", model.getScenesCode());
 
         // Add upload object script dependencies all by scenes.workflow.rules
         safeList(scenes.getWorkflow().getRules()).forEach(rule -> {
             safeList(rule.getUploads()).forEach(upload -> {
                 try {
                     scripts.add(minioManager.loadObject(UploadType.of(upload.getUploadType()), upload.getObjectPrefix(),
-                            model.getScenesCode(), ExtensionType.of(upload.getExtension()).isBinary(), useCache));
+                            scenes.getScenesCode(), ExtensionType.of(upload.getExtension()).isBinary(), useCache));
                 } catch (Exception e) {
                     log.error(format("Unable to load dependency script from MinIO: %s", upload.getObjectPrefix()), e);
                     throw new IllegalStateException(e); // fast-fail:Stay-Strongly-Consistent
@@ -130,5 +125,8 @@ public abstract class AbstractScriptEngine implements IEngine {
                 .defaultHttpClient(new ScriptHttpClient())
                 .build();
     }
+
+    // TODO handcode for 'process' ???
+    public static final String DEFAULT_MAIN_FUNCTION = "process";
 
 }

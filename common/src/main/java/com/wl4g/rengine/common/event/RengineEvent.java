@@ -120,6 +120,10 @@ public class RengineEvent extends EventObject {
         return RengineEvent.validate(this);
     }
 
+    public static RengineEvent fromJson(String json) {
+        return fromJson(parseJSON(json, JsonNode.class));
+    }
+
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @JsonCreator
     public static RengineEvent fromJson(JsonNode node) {

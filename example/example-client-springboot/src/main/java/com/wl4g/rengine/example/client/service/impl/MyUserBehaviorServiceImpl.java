@@ -62,7 +62,7 @@ public class MyUserBehaviorServiceImpl implements MyUserBehaviorService {
 
     @Override
     public Map<String, String> report2(BehaviorReport report) {
-        Map<String, String> args = new HashMap<>();
+        Map<String, Object> args = new HashMap<>();
         args.put("userId", report.getUserId());
         args.put("operationType", report.getOperationType());
         args.put("observedTime", valueOf(report.getObservedTime()));

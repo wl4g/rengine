@@ -17,7 +17,7 @@ package com.wl4g.rengine.common.graph;
 
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.System.currentTimeMillis;
-import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonMap;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -28,11 +28,12 @@ import org.junit.Test;
 import com.wl4g.rengine.common.entity.WorkflowGraph;
 import com.wl4g.rengine.common.entity.WorkflowGraph.BaseNode;
 import com.wl4g.rengine.common.entity.WorkflowGraph.BootNode;
-import com.wl4g.rengine.common.entity.WorkflowGraph.DebugNode;
-import com.wl4g.rengine.common.entity.WorkflowGraph.ExecutionNode;
+import com.wl4g.rengine.common.entity.WorkflowGraph.FailbackNode;
 import com.wl4g.rengine.common.entity.WorkflowGraph.LogicalNode;
 import com.wl4g.rengine.common.entity.WorkflowGraph.LogicalType;
 import com.wl4g.rengine.common.entity.WorkflowGraph.NodeConnection;
+import com.wl4g.rengine.common.entity.WorkflowGraph.ProcessNode;
+import com.wl4g.rengine.common.entity.WorkflowGraph.RunNode;
 import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
 
 /**
@@ -45,68 +46,53 @@ import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
 public class ExecutionGraphTests {
 
     @Test
-    public void testFromWorkflow() {
-        // @formatter:off
-//        List<BaseNode<?>> nodes = new LinkedList<>();
-//        nodes.add(new BootNode().withId("0").withName("The Start"));
-//        nodes.add(new DebugNode().withId("10").withParentId("0").withName("调试1"));
-//        nodes.add(new LogicalNode().withId("20").withParentId("10").withName("条件1").withRelation(LogicalType.AND));
-//        nodes.add(new ExecutionNode().withId("30").withParentId("20").withName("条件2"));
-//        nodes.add(new LogicalNode().withId("40").withParentId("30").withName("条件3").withRelation(LogicalType.OR));
-//        nodes.add(new EndNode().withId("100").withParentId("40").withName("The End"));
-//
-//        ExecutionGraph<?> graph = ExecutionGraph.from(nodes);
-//        String json = toJSONString(graph);
-//        System.out.println("=> " + json);
-        // @formatter:on
-
-        // ExecutionGraph<?> graph2 = parseJSON(json, ExecutionGraph.class);
-        // System.out.println("=> " + graph2);
-    }
-
-    // TODO
-    @Test
     public void testECommerceTradeWorkflow() {
         List<BaseNode<?>> nodes = new LinkedList<>();
         nodes.add(new BootNode().withId("0").withName("The Boot"));
-        nodes.add(new DebugNode().withId("11").withName("模拟当前时间"));
-        nodes.add(new LogicalNode().withId("21").withName("ALL_AND逻辑运算(10.1~10.8)").withRelation(LogicalType.ALL_AND));
-        nodes.add(new LogicalNode().withId("31").withName("AND逻辑运算").withRelation(LogicalType.AND));
-        nodes.add(new ExecutionNode().withId("41").withName("充值是否>=120元"));
-        nodes.add(new LogicalNode().withId("42").withName("AND逻辑运算").withRelation(LogicalType.AND));
-        nodes.add(new ExecutionNode().withId("51").withName("赠送库存是否<=100"));
-        nodes.add(new ExecutionNode().withId("52").withName("赠送10元余额"));
-        nodes.add(new LogicalNode().withId("32").withName("ALL_AND逻辑运算(10.5~10.8)").withRelation(LogicalType.AND));
-        nodes.add(new ExecutionNode().withId("43").withName("充值是否>=50元"));
-        nodes.add(new ExecutionNode().withId("44").withName("赠送20积分"));
+        nodes.add(new ProcessNode().withId("11").withName("预处理(如篡改当前时间以用于测试目的)").withRuleId("r100100"));
+        nodes.add(new ProcessNode().withId("21").withName("当前时间是否满足(10.1~10.8)").withRuleId("r100222"));
+        nodes.add(new LogicalNode().withId("31").withName("ALL_AND逻辑运算").withLogical(LogicalType.ALL_AND));
+        nodes.add(new LogicalNode().withId("41").withName("AND逻辑运算").withLogical(LogicalType.AND));
+        nodes.add(new LogicalNode().withId("42").withName("AND逻辑运算").withLogical(LogicalType.AND));
+        nodes.add(new ProcessNode().withId("51").withName("充值是否>=120元").withRuleId("r100101"));
+        nodes.add(new LogicalNode().withId("52").withName("AND逻辑运算").withLogical(LogicalType.AND));
+        nodes.add(new ProcessNode().withId("53").withName("当前时间是否满足(10.5~10.8)").withRuleId("r100223"));
+        nodes.add(new ProcessNode().withId("54").withName("充值是否>=50元").withRuleId("r100104"));
+        nodes.add(new ProcessNode().withId("61").withName("赠送库存是否<=100").withRuleId("r100102"));
+        nodes.add(new FailbackNode().withId("62").withName("如果赠送余额失败则执行回退规则").withRuleId("r111111"));
+        nodes.add(new RunNode().withId("63").withName("赠送20积分").withRuleId("r100105"));
+        nodes.add(new RunNode().withId("71").withName("赠送10元余额").withRuleId("r100103"));
 
         List<NodeConnection> collections = new LinkedList<>();
         collections.add(new NodeConnection("11", "0"));
         collections.add(new NodeConnection("21", "11"));
         collections.add(new NodeConnection("31", "21"));
-        collections.add(new NodeConnection("32", "21"));
         collections.add(new NodeConnection("41", "31"));
         collections.add(new NodeConnection("42", "31"));
-        collections.add(new NodeConnection("51", "42"));
-        collections.add(new NodeConnection("52", "42"));
-        collections.add(new NodeConnection("32", "21"));
-        collections.add(new NodeConnection("43", "32"));
-        collections.add(new NodeConnection("44", "32"));
+        collections.add(new NodeConnection("51", "41"));
+        collections.add(new NodeConnection("52", "41"));
+        collections.add(new NodeConnection("53", "42"));
+        collections.add(new NodeConnection("54", "42"));
+        collections.add(new NodeConnection("61", "51"));
+        collections.add(new NodeConnection("62", "52"));
+        collections.add(new NodeConnection("63", "54"));
+        collections.add(new NodeConnection("71", "62"));
 
         WorkflowGraph workflow = new WorkflowGraph(nodes, collections);
+        System.out.println("Workflow Nodes Json : " + toJSONString(workflow));
 
         ExecutionGraphParameter parameter = ExecutionGraphParameter.builder()
                 .requestTime(currentTimeMillis())
                 .traceId(UUID.randomUUID().toString())
                 .debug(true)
-                .workflowId("wf100101001")
-                .parameter(emptyMap()) // TODO
+                .workflowId("wf1234567890")
+                .args(singletonMap("deviceId", "12345678"))
                 .build();
-        ExecutionGraphContext context = new ExecutionGraphContext(parameter);
-        ExecutionGraph<?> graph = ExecutionGraph.from(workflow, ctx -> ReturnState.TRUE);
+        ExecutionGraphContext context = new ExecutionGraphContext(parameter, ctx -> ReturnState.TRUE);
+        ExecutionGraph<?> graph = ExecutionGraph.from(workflow);
         ExecutionGraphResult result = graph.apply(context);
-        System.out.println("Executed trace text : " + context.getTraceText());
-        System.out.println("    Executed result : " + toJSONString(result));
+        System.out.println("    Executed Result : " + toJSONString(result));
+        System.out.println("Executed Trace Text : \n" + context.asTraceText(true));
     }
 
 }

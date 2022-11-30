@@ -22,7 +22,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.bean.BaseBean;
-import com.wl4g.rengine.common.model.EvaluationEngine;
+import com.wl4g.rengine.common.entity.Rule.RuleEngine;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -46,14 +46,19 @@ import lombok.experimental.SuperBuilder;
 public class Workflow extends BaseBean {
     private static final long serialVersionUID = 1L;
     private @NotBlank String name;
-    private @NotNull EvaluationEngine engine;
+    private @NotNull RuleEngine ruleEngine;
     private @Nullable List<Long> ruleIds;
 
     //
     // Temporary fields.
     //
 
+    // TODO??
     @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
     private @Nullable transient List<Rule> rules;
+
+    // TODO??
+    @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
+    private @Nullable transient WorkflowGraph graph;
 
 }

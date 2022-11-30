@@ -25,7 +25,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.enterprise.event.Observes;
@@ -143,7 +142,7 @@ public class TestJavascriptResource {
             ScriptContext scriptContext = ScriptContext.builder()
                     .id("100101")
                     .type("iot_warning")
-                    .args(model.getArgs())
+                    .args(ProxyObject.fromMap(model.getArgs()))
                     .event(event)
                     .attributes(ProxyObject.fromMap(attributes))
                     .build();
@@ -189,7 +188,7 @@ public class TestJavascriptResource {
         @NotBlank
         String scriptPath;
         @NotEmpty
-        List<String> args;
+        Map<String, Object> args;
     }
 
 }

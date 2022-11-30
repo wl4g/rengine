@@ -41,7 +41,7 @@ public class RengineRiskHandler {
 
     private @Autowired RengineClient rengineClient;
 
-    public void checkRiskFor(String scenesCode, Map<String, String> args) {
+    public void checkRiskFor(String scenesCode, Map<String, Object> args) {
         log.info("Risk checking for : {} => {}", scenesCode, args);
 
         EvaluationResult result = rengineClient.evaluate(scenesCode, true, args);

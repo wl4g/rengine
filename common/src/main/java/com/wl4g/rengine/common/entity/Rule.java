@@ -19,6 +19,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.bean.BaseBean;
 
@@ -44,6 +45,7 @@ import lombok.experimental.SuperBuilder;
 public class Rule extends BaseBean {
     private static final long serialVersionUID = 1L;
     private @NotBlank String name;
+    private @NotNull RuleEngine kind;
     private @Nullable List<Long> uploadIds;
 
     //
@@ -52,4 +54,19 @@ public class Rule extends BaseBean {
 
     @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
     private @Nullable transient List<UploadObject> uploads;
+
+    public static enum RuleEngine {
+
+        /**
+         * Noice: The temporarily unable to support graalvm native mode.
+         */
+        // @Deprecated
+        // GROOVY,
+
+        JS,
+
+        FLINK_SQL,
+
+        FLINK_CEP_SQL
+    }
 }

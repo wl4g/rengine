@@ -45,6 +45,7 @@ import com.wl4g.infra.common.graalvm.GraalPolyglotManager;
 import com.wl4g.infra.common.graalvm.GraalPolyglotManager.ContextWrapper;
 import com.wl4g.infra.common.lang.EnvironmentUtil;
 import com.wl4g.infra.common.lang.StringUtils2;
+import com.wl4g.rengine.common.entity.Scenes;
 import com.wl4g.rengine.common.entity.UploadObject.UploadType;
 import com.wl4g.rengine.common.exception.ExecutionException;
 import com.wl4g.rengine.common.model.Evaluation;
@@ -55,8 +56,8 @@ import com.wl4g.rengine.evaluator.minio.MinioManager.ObjectResource;
 
 import io.micrometer.core.instrument.Timer;
 import io.quarkus.runtime.StartupEvent;
+import lombok.CustomLog;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * {@link GraalJSScriptEngine}
@@ -65,7 +66,7 @@ import lombok.extern.slf4j.Slf4j;
  * @version 2022-09-22
  * @since v1.0.0
  */
-@Slf4j
+@CustomLog
 @Getter
 @Singleton
 public class GraalJSScriptEngine extends AbstractScriptEngine {
@@ -110,29 +111,24 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
     }
 
     @Override
-    public ScriptResult apply(Evaluation model) {
-        final String scriptMain = model.getScripting().getMainFun();
-        if (log.isDebugEnabled()) {
-            log.debug("Execution JS script main: {} ...", scriptMain);
-        }
+    public ScriptResult execute(final Evaluation evaluation, final Scenes scenes) {
+        log.debug("Execution JS script for scenesCode: {} ...", scenes.getScenesCode());
 
         try (ContextWrapper context = graalPolyglotManager.getContext();) {
             // Load all scripts dependencies.
-            List<ObjectResource> scripts = safeList(loadScriptResources(UploadType.USER_LIBRARY_WITH_JS, model, true));
-            Set<String> scriptFileNames = scripts.stream().map(s -> getFilename(s.getObjectPrefix())).collect(toSet());
-
+            List<ObjectResource> scripts = safeList(loadScriptResources(UploadType.USER_LIBRARY_WITH_JS, scenes, true));
             for (ObjectResource script : scripts) {
                 isTrue(!script.isBinary(), "Invalid JS dependency library binary type");
+                log.debug("Evaling js-dependencys: {}", script.getObjectPrefix());
 
-                if (log.isDebugEnabled()) {
-                    log.debug("Evaling JS dependency: {}", script.getObjectPrefix());
-                }
-                String scriptName = StringUtils2.getFilename(script.getObjectPrefix()).concat("@").concat(model.getScenesCode());
+                String scriptName = StringUtils2.getFilename(script.getObjectPrefix()).concat("@").concat(scenes.getScenesCode());
                 try {
                     // merge JS library with dependency.
                     context.eval(Source.newBuilder("js", script.readToString(), scriptName).build());
                 } catch (PolyglotException e) {
-                    throw new ExecutionException(format("Unable to parse JS dependency of '%s'", scriptName), e);
+                    throw new ExecutionException(evaluation.getRequestId(), scenes.getScenesCode(),
+                            format("Unable to parse JS dependency of '%s', scenesCode: %s", scriptName, scenes.getScenesCode()),
+                            e);
                 }
             }
 
@@ -142,29 +138,26 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
             bindings.putMember(ScriptHttpClient.class.getSimpleName(), ScriptHttpClient.class);
             bindings.putMember(ScriptResult.class.getSimpleName(), ScriptResult.class);
 
-            if (log.isInfoEnabled()) {
-                log.info("Loading JS script main: {} ...", scriptMain);
-            }
-            Value mainFunction = bindings.getMember(scriptMain);
+            log.debug("Loading js-script ...");
+            Value mainFunction = bindings.getMember(DEFAULT_MAIN_FUNCTION);
 
             // Buried-point: execute cost-time.
+            Set<String> scriptFileNames = scripts.stream().map(s -> getFilename(s.getObjectPrefix())).collect(toSet());
             Timer executeTimer = meterService.timer(evaluation_execute_time.getName(), evaluation_execute_time.getHelp(),
-                    new double[] { 0.5, 0.9, 0.95 }, MetricsTag.KIND, model.getKind(), MetricsTag.ENGINE, model.getEngine(),
-                    MetricsTag.SCENESCODE, model.getScenesCode(), MetricsTag.SERVICE, model.getService(), MetricsTag.LIBRARY,
-                    scriptFileNames.toString());
+                    new double[] { 0.5, 0.9, 0.95 }, MetricsTag.CLIENT_ID, evaluation.getClientId(), MetricsTag.SCENESCODE,
+                    evaluation.getScenesCode(), MetricsTag.ENGINE, scenes.getWorkflow().getRuleEngine().name(),
+                    MetricsTag.LIBRARY, scriptFileNames.toString());
 
             final long begin = currentTimeMillis();
-            Value result = mainFunction.execute(newScriptContext(model));
+            Value result = mainFunction.execute(newScriptContext(evaluation));
             final long costTime = currentTimeMillis() - begin;
             executeTimer.record(costTime, MILLISECONDS);
 
-            if (log.isInfoEnabled()) {
-                log.info("Executed JS script main: {}, cost: {}ms, result: {}", scriptMain, costTime, result);
-            }
-
+            log.info("Executed for scenesCode: {}, cost: {}ms, result: {}", scenes.getScenesCode(), costTime, result);
             return result.as(ScriptResult.class);
         } catch (Exception e) {
-            throw new ExecutionException(format("Failed to execution JS script main: '%s'. %s", scriptMain, e.getMessage()), e);
+            throw new ExecutionException(evaluation.getRequestId(), scenes.getScenesCode(),
+                    format("Failed to execution for scenesCode: %s", scenes.getScenesCode()), e);
         }
     }
 

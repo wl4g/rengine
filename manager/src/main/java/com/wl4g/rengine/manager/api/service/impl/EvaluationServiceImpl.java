@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.common.model;
+package com.wl4g.rengine.manager.api.service.impl;
 
 /**
- * {@link EvaluationEngine}
+ * {@link EvaluationServiceImpl}
  * 
  * @author James Wong
- * @version 2022-09-21
+ * @version 2022-08-29
  * @since v1.0.0
  */
-public enum EvaluationEngine {
-    GROOVY, JS, FLINK_CEP_SQL
+public class EvaluationServiceImpl {
+
 }

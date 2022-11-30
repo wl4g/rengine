@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.evaluator.execution;
+package com.wl4g.rengine.manager.api.model;
 
-import java.util.function.Function;
-
-import com.wl4g.rengine.common.model.Evaluation;
-import com.wl4g.rengine.common.model.EvaluationResult;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.Getter;
 
 /**
- * {@link IExecution}
+ * {@link EvaluationResultModel}
  * 
  * @author James Wong
- * @version 2022-09-17
+ * @version 2022-08-29
  * @since v1.0.0
  */
-public interface IExecution extends Function<Evaluation, EvaluationResult> {
+@Getter
+@Setter
+@ToString
+public class EvaluationResultModel {
+
 }

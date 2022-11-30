@@ -16,11 +16,10 @@
 package com.wl4g.rengine.common.graph;
 
 import static java.util.Collections.singletonMap;
-import static java.util.Collections.synchronizedMap;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -42,7 +41,7 @@ import lombok.ToString;
 @ToString
 public class ExecutionGraphResult {
     private final ReturnState returnState;
-    private final Map<String, Object> attributes = synchronizedMap(new HashMap<>());
+    private final Map<String, Object> valueMap = new LinkedHashMap<>(4);
 
     public ExecutionGraphResult(@NotNull final ReturnState returnState) {
         this(returnState, null);
@@ -53,27 +52,27 @@ public class ExecutionGraphResult {
         this(returnState, singletonMap(key, value));
     }
 
-    public ExecutionGraphResult(@NotNull final ReturnState returnState, @Nullable final Map<String, Object> attributes) {
+    public ExecutionGraphResult(@NotNull final ReturnState returnState, @Nullable final Map<String, Object> valueMap) {
         this.returnState = returnState;
-        if (nonNull(attributes)) {
-            this.attributes.putAll(attributes);
+        if (nonNull(valueMap)) {
+            this.valueMap.putAll(valueMap);
         }
     }
 
-    public ExecutionGraphResult addAttribute(String key, Object value) {
+    public ExecutionGraphResult addValue(String key, Object value) {
         if (!isBlank(key) && nonNull(value)) {
-            getAttributes().put(key, value);
+            getValueMap().put(key, value);
         }
         return this;
     }
 
-    public ExecutionGraphResult removeAttribute(String key) {
-        getAttributes().get(key);
+    public ExecutionGraphResult removeValue(String key) {
+        getValueMap().get(key);
         return this;
     }
 
     public ExecutionGraphResult reset() {
-        getAttributes().clear();
+        getValueMap().clear();
         return this;
     }
 
@@ -87,6 +86,10 @@ public class ExecutionGraphResult {
 
         public static boolean isTrue(ReturnState state) {
             return nonNull(state) && state == TRUE;
+        }
+
+        public static ReturnState of(Boolean state) {
+            return (nonNull(state) && state) ? TRUE : FALSE;
         }
     }
 }

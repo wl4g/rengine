@@ -68,7 +68,7 @@ public class MyOrderServiceImpl implements MyOrderService {
 
     @Override
     public Map<String, String> create2(CreateOrder order, Integer count) {
-        Map<String, String> args = new HashMap<>();
+        Map<String, Object> args = new HashMap<>();
         args.put("userId", order.getUserId());
         args.put("goodId", order.getGoodId());
         args.put("count", valueOf(count));

@@ -16,8 +16,10 @@
 package com.wl4g.rengine.evaluator.service;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 
 import com.wl4g.infra.common.web.rest.RespBase;
+import com.wl4g.rengine.common.entity.Scenes;
 import com.wl4g.rengine.common.model.Evaluation;
 import com.wl4g.rengine.common.model.EvaluationResult;
 
@@ -33,5 +35,7 @@ import io.smallrye.mutiny.Uni;
 public interface EvaluatorService {
 
     Uni<RespBase<EvaluationResult>> evaluate(@Valid Evaluation model);
+
+    Scenes loadScenesWithCascade(@NotBlank String scenesCode);
 
 }

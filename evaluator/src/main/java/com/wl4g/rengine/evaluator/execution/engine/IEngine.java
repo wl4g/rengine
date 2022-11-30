@@ -15,8 +15,9 @@
  */
 package com.wl4g.rengine.evaluator.execution.engine;
 
-import java.util.function.Function;
+import javax.validation.constraints.NotNull;
 
+import com.wl4g.rengine.common.entity.Scenes;
 import com.wl4g.rengine.common.model.Evaluation;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptResult;
 
@@ -27,10 +28,6 @@ import com.wl4g.rengine.evaluator.execution.sdk.ScriptResult;
  * @version 2022-09-22
  * @since v1.0.0
  */
-public interface IEngine extends Function<Evaluation, ScriptResult> {
-
-    default ScriptResult execute(Evaluation t) {
-        return apply(t);
-    }
-
+public interface IEngine {
+    ScriptResult execute(@NotNull final Evaluation evaluation, @NotNull final Scenes scenes);
 }

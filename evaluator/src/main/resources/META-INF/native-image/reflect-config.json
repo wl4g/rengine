@@ -98,15 +98,15 @@
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
   "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
     {"name":"<init>","parameterTypes":["java.lang.Boolean"] }, 
-    {"name":"isContinue","parameterTypes":[] }, 
-    {"name":"getValue","parameterTypes":[] }, 
-    {"name":"setValue","parameterTypes":["java.lang.Object"] }, 
-    {"name":"withValue","parameterTypes":["java.lang.Object"] }, 
-    {"name":"getAttributes","parameterTypes":[] }, 
-    {"name":"addAttribute","parameterTypes":["java.lang.String","java.lang.Object"] }, 
-    {"name":"removeAttribute","parameterTypes":["java.lang.String"] }, 
+    {"name":"getState","parameterTypes":[] }, 
+    {"name":"getValueMap","parameterTypes":[] }, 
+    {"name":"addValue","parameterTypes":["java.lang.String","java.lang.Object"] }, 
+    {"name":"removeValue","parameterTypes":["java.lang.String"] }, 
     {"name":"reset","parameterTypes":[] }, 
+    {"name":"newTrue","parameterTypes":[] }, 
+    {"name":"newFalse","parameterTypes":[] }, 
     {"name":"toString","parameterTypes":[] }
   ]
 },

@@ -302,6 +302,7 @@
             <properties>
                 <repackage.classifier>exec</repackage.classifier>
                 <native-buildtools.version>0.9.13</native-buildtools.version>
+                <native.buildmemory>8G</native.buildmemory>
             </properties>
             <dependencies>
                 <dependency>
@@ -427,7 +428,7 @@
                                     <arguments>
                                         <argument>run</argument>
                                         <argument>--rm</argument>
-                                        <argument>--memory=6G</argument>
+                                        <argument>--memory=${native.buildmemory}</argument>
                                         <argument>--memory-swap=-1</argument>
                                         <argument>-v</argument>
                                         <argument>${project.basedir}/target/${final.name}-${project.version}-bin:/workspace</argument>

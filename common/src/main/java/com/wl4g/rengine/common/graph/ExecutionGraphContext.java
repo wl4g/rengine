@@ -15,20 +15,31 @@
  */
 package com.wl4g.rengine.common.graph;
 
+import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
+import static java.util.Objects.isNull;
 
 import java.io.Serializable;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.Function;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
+
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 /**
- * Process context.
+ * Workflow handler graph context.
  * 
  * @author James Wong
  * @version 2022-11-04
@@ -41,34 +52,51 @@ public final class ExecutionGraphContext implements Serializable {
     private static final long serialVersionUID = -7452442617432048671L;
 
     /**
-     * The execution executing start time.
-     */
-    private final Long startTime;
-
-    /**
-     * The execution paramaeter.
+     * The handler paramaeter.
      */
     private final ExecutionGraphParameter parameter;
 
-    /*
-     ** The processing flow nodes debug information.
+    /**
+     * The execution handler.
      */
-    private final StringBuilder traceText;
+    private final Function<ExecutionGraphContext, ReturnState> handler;
 
     /**
-     * The execution end time.
+     * The processing flow nodes trace spans.
+     */
+    private final Map<String, TraceSpan> traceSpans;
+
+    /**
+     * The execution script rule ID.
+     */
+    private String ruleId;
+
+    /**
+     * The handler executing start time.
+     */
+    private Long startTime;
+
+    /**
+     * The handler end time.
      */
     private Long endTime;
 
-    public ExecutionGraphContext(@NotNull final ExecutionGraphParameter parameter) {
-        this(currentTimeMillis(), parameter);
+    public ExecutionGraphContext(@NotNull final ExecutionGraphParameter parameter,
+            @NotNull final Function<ExecutionGraphContext, ReturnState> handler) {
+        this.parameter = notNullOf(parameter, "parameter");
+        this.handler = notNullOf(handler, "handler");
+        this.traceSpans = new LinkedHashMap<>(8);
+        this.endTime = null;
     }
 
-    public ExecutionGraphContext(@Min(0) final long startTime, @NotNull final ExecutionGraphParameter parameter) {
-        this.startTime = startTime;
-        this.parameter = notNullOf(parameter, "parameter");
-        this.traceText = new StringBuilder(1024);
-        this.endTime = null;
+    ExecutionGraphContext start() {
+        return start(currentTimeMillis());
+    }
+
+    public ExecutionGraphContext start(final long startTime) {
+        isTrue(startTime > 0, "startTime>0 miss, but is %s", startTime);
+        setStartTime(startTime);
+        return this;
     }
 
     public ExecutionGraphContext end() {
@@ -76,31 +104,73 @@ public final class ExecutionGraphContext implements Serializable {
     }
 
     public ExecutionGraphContext end(final long endTime) {
+        isTrue(endTime > 0, "endTime>0 miss, but is %s", endTime);
         setEndTime(endTime);
         return this;
     }
 
-    public ExecutionGraphContext addTraceNode(@NotNull final ExecutionGraph<?> node, @NotNull final ExecutionGraphResult result) {
-        return addTraceNode(node, result, false);
+    public ExecutionGraphContext beginTrace(@NotNull final ExecutionGraph<?> node) {
+        this.traceSpans.put(node.getId(), TraceSpan.builder().node(node).build());
+        return this;
     }
 
-    public ExecutionGraphContext addTraceNode(
-            @NotNull final ExecutionGraph<?> node,
-            @NotNull final ExecutionGraphResult result,
-            final boolean end) {
-        traceText.append("{\"")
-                .append(node.getName())
-                .append("\", ")
-                .append(node.getId())
-                .append("@")
-                .append(node.getClass().getSimpleName())
-                .append(":")
-                .append(result.getReturnState().getAlias())
-                .append("}");
-        if (!end) {
-            traceText.append(" -> ");
+    public ExecutionGraphContext endTrace(@NotNull final ExecutionGraph<?> node, @NotNull final ExecutionGraphResult result) {
+        TraceSpan traceSpan = traceSpans.get(node.getId());
+        if (isNull(traceSpan)) {
+            throw new IllegalStateException(format("Could not trace span : %s@%s, you must first call #beginTrance()",
+                    node.getId(), node.getClass().getSimpleName()));
         }
+        traceSpan.setResult(result);
         return this;
+    }
+
+    public String asTraceText() {
+        return asTraceText(false);
+    }
+
+    public String asTraceText(boolean isPretty) {
+        StringBuilder traceText = new StringBuilder(traceSpans.size() * 32);
+        final Iterator<Entry<String, TraceSpan>> it = traceSpans.entrySet().iterator();
+        int stacks = 0;
+        while (it.hasNext()) {
+            TraceSpan traceSpan = it.next().getValue();
+            if (isPretty) {
+                if (stacks > 0) {
+                    traceText.append("\n");
+                }
+                for (int i = 0, size = stacks++; i < size; i++) {
+                    traceText.append("    ");
+                }
+            }
+            if (isPretty) {
+                traceText.append("→ ");
+            }
+            traceText.append("{\"")
+                    .append(traceSpan.getNode().getName())
+                    .append("\", ")
+                    .append(traceSpan.getNode().getId())
+                    .append("@")
+                    .append(traceSpan.getNode().getClass().getSimpleName())
+                    .append(":")
+                    .append(traceSpan.getResult().getReturnState().getAlias())
+                    .append("}");
+            if (it.hasNext()) {
+                if (!isPretty) {
+                    traceText.append(" → ");
+                }
+            }
+        }
+        return traceText.toString();
+    }
+
+    @Getter
+    @Setter
+    @SuperBuilder
+    @ToString
+    @NoArgsConstructor
+    public static class TraceSpan {
+        private @NotNull ExecutionGraph<?> node;
+        private @NotNull ExecutionGraphResult result;
     }
 
 }

@@ -68,18 +68,18 @@ public class RengineClient {
     private @Default OkHttpClient httpClient = new OkHttpClient().newBuilder().build();
     private @Default Function<Throwable, EvaluationResult> defaultFailback = new DefaultFailback();
 
-    public EvaluationResult evaluate(@NotBlank String scenesCode, @Nullable Map<String, String> args) {
+    public EvaluationResult evaluate(@NotBlank String scenesCode, @Nullable Map<String, Object> args) {
         return evaluate(IdGenUtil.next(), scenesCode, Evaluation.DEFAULT_TIMEOUT, Evaluation.DEFAULT_BESTEFFORT, args, null);
     }
 
-    public EvaluationResult evaluate(@NotBlank String scenesCode, @Min(1) Long timeoutMs, @Nullable Map<String, String> args) {
+    public EvaluationResult evaluate(@NotBlank String scenesCode, @Min(1) Long timeoutMs, @Nullable Map<String, Object> args) {
         return evaluate(IdGenUtil.next(), scenesCode, timeoutMs, Evaluation.DEFAULT_BESTEFFORT, args, null);
     }
 
     public EvaluationResult evaluate(
             @NotNull @NotBlank String scenesCode,
             @NotNull Boolean bestEffort,
-            @Nullable Map<String, String> args) {
+            @Nullable Map<String, Object> args) {
         return evaluate(IdGenUtil.next(), scenesCode, Evaluation.DEFAULT_TIMEOUT, bestEffort, args, null);
     }
 
@@ -88,7 +88,7 @@ public class RengineClient {
             @NotBlank String scenesCode,
             @NotNull Boolean bestEffort,
             @Min(1) Long timeoutMs,
-            @Nullable Map<String, String> args) {
+            @Nullable Map<String, Object> args) {
         return evaluate(requestId, scenesCode, timeoutMs, bestEffort, args, null);
     }
 
@@ -97,7 +97,7 @@ public class RengineClient {
             @NotBlank String scenesCode,
             @NotNull @Min(1) Long timeoutMs,
             @NotNull Boolean bestEffort,
-            @Nullable Map<String, String> args) {
+            @Nullable Map<String, Object> args) {
         return evaluate(requestId, scenesCode, timeoutMs, bestEffort, args, null);
     }
 
@@ -106,7 +106,7 @@ public class RengineClient {
             @NotBlank String scenesCode,
             @NotNull @Min(1) Long timeoutMs,
             @NotNull Boolean bestEffort,
-            @Nullable Map<String, String> args,
+            @Nullable Map<String, Object> args,
             Function<Throwable, EvaluationResult> failback) {
         hasTextOf(scenesCode, "scenesCode");
         return evaluate(Evaluation.builder()

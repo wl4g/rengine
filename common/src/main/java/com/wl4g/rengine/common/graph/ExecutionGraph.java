@@ -17,6 +17,7 @@ package com.wl4g.rengine.common.graph;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
@@ -32,18 +33,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.rengine.common.entity.WorkflowGraph;
 import com.wl4g.rengine.common.entity.WorkflowGraph.BaseNode;
+import com.wl4g.rengine.common.entity.WorkflowGraph.BootNode;
+import com.wl4g.rengine.common.entity.WorkflowGraph.FailbackNode;
 import com.wl4g.rengine.common.entity.WorkflowGraph.LogicalNode;
-import com.wl4g.rengine.common.entity.WorkflowGraph.LogicalType;
 import com.wl4g.rengine.common.entity.WorkflowGraph.NodeConnection;
 import com.wl4g.rengine.common.entity.WorkflowGraph.NodeType;
+import com.wl4g.rengine.common.entity.WorkflowGraph.ProcessNode;
+import com.wl4g.rengine.common.entity.WorkflowGraph.RunNode;
 import com.wl4g.rengine.common.exception.InvalidNodeRelationshipException;
 import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
 
+import lombok.CustomLog;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -61,7 +67,8 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @ToString(callSuper = true, exclude = { "prev" })
-public class ExecutionGraph<E extends ExecutionGraph<?>> implements Function<ExecutionGraphContext, ExecutionGraphResult> {
+public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
+        implements Function<ExecutionGraphContext, ExecutionGraphResult> {
     private String id;
     private String name;
     private String prevId;
@@ -71,11 +78,6 @@ public class ExecutionGraph<E extends ExecutionGraph<?>> implements Function<Exe
         notNullOf(node, "node");
         this.id = hasTextOf(node.getId(), "id");
         this.name = hasTextOf(node.getName(), "name");
-    }
-
-    @Override
-    public ExecutionGraphResult apply(ExecutionGraphContext t) {
-        throw new UnsupportedOperationException();
     }
 
     public static List<BaseNode<?>> validateEffective(List<BaseNode<?>> nodes) {
@@ -126,14 +128,10 @@ public class ExecutionGraph<E extends ExecutionGraph<?>> implements Function<Exe
      * list.
      * 
      * @param workflow
-     * @param execution
      * @return
      * @see https://www.java-success.com/00-%E2%99%A6-creating-tree-list-flattening-back-list-java/
      */
-    public static ExecutionGraph<?> from(
-            final WorkflowGraph workflow,
-            @NotNull final Function<ExecutionGraphContext, ReturnState> execution) {
-        notNullOf(execution, "execution");
+    public static ExecutionGraph<?> from(final WorkflowGraph workflow) {
         if (isNull(workflow)) {
             return null;
         }
@@ -142,17 +140,14 @@ public class ExecutionGraph<E extends ExecutionGraph<?>> implements Function<Exe
         // Validate for effective.
         validateEffective(workflow.getNodes());
 
-        // BaseNode<?> startNode = workflow.getNodes().stream().filter(n -> n
-        // instanceof
-        // BootOperator).collect(toList()).stream().findFirst().get();
-        // ExecutionGraph<?> graph = new ExecutionGraph<>(startNode);
-
-        List<ExecutionGraph<?>> flatNodes = safeList(workflow.getNodes()).stream().map(n -> {
+        List<BaseOperator<?>> flatNodes = safeList(workflow.getNodes()).stream().map(n -> {
             switch (NodeType.of(n.getType())) {
             case BOOT:
-                return new BootOperator(n);
-            case DEBUG:
-                return new DebugOperator(n);
+                return new BootOperator((BootNode) n);
+            case PROCESS:
+                return new ProcessOperator((ProcessNode) n);
+            case FAILBACK:
+                return new FailbackOperator((FailbackNode) n);
             case LOGICAL:
                 LogicalNode rn = (LogicalNode) n;
                 switch (rn.getLogical()) {
@@ -167,8 +162,8 @@ public class ExecutionGraph<E extends ExecutionGraph<?>> implements Function<Exe
                 default:
                     throw new Error("Should't to be here");
                 }
-            case EXECUTION:
-                return new ExecutionOperator(n, execution);
+            case RUN:
+                return new RunOperator((RunNode) n);
             default:
                 throw new Error("Should't to be here");
             }
@@ -176,10 +171,6 @@ public class ExecutionGraph<E extends ExecutionGraph<?>> implements Function<Exe
 
         // Map<String, ExecutionGraph<?>> flatNodeMap =
         // safeList(flatNodes).stream().collect(toMap(n -> n.getId(), l -> l));
-
-        // Map<String, String> toConnectionMap =
-        // safeList(workflow.getConnections()).stream().collect(toMap(l ->
-        // l.getTo(), l -> l.getFrom()));
 
         Map<String, String> toConnectionMap = new LinkedHashMap<>();
         for (NodeConnection link : safeList(workflow.getConnections())) {
@@ -200,27 +191,19 @@ public class ExecutionGraph<E extends ExecutionGraph<?>> implements Function<Exe
 
         // Save all nodes to a map. (without end operator)
         Map<String, ExecutionGraph<?>> treeNodes = new HashMap<>();
-        for (ExecutionGraph<?> current : flatNodes) {
+        for (BaseOperator<?> current : flatNodes) {
             current.setPrevId(toConnectionMap.get(current.getId()));
-            treeNodes.put(current.getId(), (ExecutionGraph<?>) current);
+            treeNodes.put(current.getId(), current);
         }
 
         // loop and assign parent/child relationships
-        for (ExecutionGraph<?> current : flatNodes) {
+        for (BaseOperator<?> current : flatNodes) {
             String prevId = current.getPrevId();
             if (!isBlank(prevId)) {
                 ExecutionGraph<?> prev = treeNodes.get(prevId);
                 if (nonNull(prev)) {
                     current.setPrev(prev);
                     if (prev instanceof LogicalOperator) {
-                        // TODO 因为把逻辑关系拆分到最小，所以关系节点下只能是执行节点？
-                        // @formatter:off
-//                        if (!(current instanceof LogicalOperator)) {
-//                            throw new InvalidNodeRelationshipException(format(
-//                                    "Invalid connection relationship, the child node of the relationship operator node can only be the execution node of current.id : %s",
-//                                    current.getId()));
-//                        }
-                        // @formatter:on
                         ((LogicalOperator<?>) prev).getNexts().add(current);
                     }
                     if (prev instanceof SingleOperator) {
@@ -255,9 +238,41 @@ public class ExecutionGraph<E extends ExecutionGraph<?>> implements Function<Exe
 
     @Getter
     @Setter
+    @ToString(callSuper = true)
+    public static abstract class BaseOperator<E extends BaseOperator<?>> extends ExecutionGraph<E> {
+
+        public BaseOperator(@Nullable BaseNode<?> node) {
+            super(node);
+        }
+
+        @Override
+        public ExecutionGraphResult apply(ExecutionGraphContext context) {
+            beforeExecution(context);
+            ExecutionGraphResult result = execute(context);
+            afterExecution(context, result);
+            return result;
+        }
+
+        void beforeExecution(ExecutionGraphContext context) {
+            if (context.getParameter().isTrace()) {
+                context.beginTrace(this);
+            }
+        }
+
+        void afterExecution(ExecutionGraphContext context, ExecutionGraphResult result) {
+            if (context.getParameter().isTrace()) {
+                context.endTrace(this, result);
+            }
+        }
+
+        abstract ExecutionGraphResult execute(@NotNull final ExecutionGraphContext context);
+    }
+
+    @Getter
+    @Setter
     @ToString(callSuper = true, exclude = { "next" })
-    public static abstract class SingleOperator<E extends SingleOperator<?>> extends ExecutionGraph<E> {
-        private ExecutionGraph<?> next;
+    public static abstract class SingleOperator<E extends SingleOperator<?>> extends BaseOperator<E> {
+        private BaseOperator<?> next;
 
         public SingleOperator(@NotNull BaseNode<?> node) {
             super(node);
@@ -266,79 +281,141 @@ public class ExecutionGraph<E extends ExecutionGraph<?>> implements Function<Exe
 
     /**
      * The bootstrap operator node, responsible for execution start and end.
-     * 
-     * @author James Wong
-     * @version 2022-11-28
-     * @since v1.0.0
      */
     @Getter
     @Setter
     @ToString(callSuper = true)
     public static class BootOperator extends SingleOperator<BootOperator> {
-        public BootOperator(@NotNull BaseNode<?> node) {
-            super(node);
-        }
-
-        @Override
-        public ExecutionGraphResult apply(@NotNull final ExecutionGraphContext context) {
-            notNullOf(context, "context");
-            final ExecutionGraphResult result = getNext().apply(context);
-            context.addTraceNode(this, result, true);
-            context.end();
-            return result;
-        }
-    }
-
-    @Getter
-    @Setter
-    @ToString(callSuper = true)
-    public static class DebugOperator extends SingleOperator<DebugOperator> {
-        public DebugOperator(@NotNull BaseNode<?> node) {
-            super(node);
-        }
-
-        @Override
-        public ExecutionGraphResult apply(@NotNull final ExecutionGraphContext context) {
-            notNullOf(context, "context");
-            final ExecutionGraphResult result = getNext().apply(context);
-            context.addTraceNode(this, result);
-            return result;
-        }
-    }
-
-    @Getter
-    @Setter
-    @ToString(callSuper = true)
-    public static abstract class LogicalOperator<E extends LogicalOperator<?>> extends ExecutionGraph<E> {
-        private LogicalType logical;
-        private List<ExecutionGraph<?>> nexts = new LinkedList<>();
-
-        public LogicalOperator(@NotNull BaseNode<?> node) {
-            super(node);
-        }
-
-        @Override
-        public ExecutionGraphResult apply(@NotNull final ExecutionGraphContext context) {
-            final ExecutionGraphResult result = execute(context);
-            context.addTraceNode(this, result);
-            return result;
-        }
-
-        abstract ExecutionGraphResult execute(@NotNull final ExecutionGraphContext context);
-    }
-
-    @Getter
-    @Setter
-    @ToString(callSuper = true)
-    public static class AndOperator extends LogicalOperator<AndOperator> {
-        public AndOperator(@NotNull BaseNode<?> node) {
+        public BootOperator(@NotNull BootNode node) {
             super(node);
         }
 
         @Override
         public ExecutionGraphResult execute(@NotNull final ExecutionGraphContext context) {
             notNullOf(context, "context");
-            for (ExecutionGraph<?> sub : safeList(getNexts())) {
+            notNull(getNext(), "The next is missing of current id : %s", getId());
+            try {
+                context.start();
+                // and other init ...
+                return getNext().apply(context);
+            } finally {
+                context.end();
+                // and other release ...
+            }
+        }
+    }
+
+    /**
+     * The similar equivalent pseudocode such as:
+     * 
+     * <pre>
+     * boolean process(args) {
+     *   if (checkCondition(args)) {
+     *      if (next) {
+     *          return next.process(args)
+     *      }
+     *      return true
+     *   }
+     *   return false
+     * }
+     * </pre>
+     */
+    @Getter
+    @Setter
+    @ToString(callSuper = true)
+    public static class ProcessOperator extends SingleOperator<ProcessOperator> {
+        private @NotBlank String ruleId;
+
+        public ProcessOperator(@NotNull ProcessNode node) {
+            super(node);
+            this.ruleId = hasTextOf(node.getRuleId(), "ruleId");
+        }
+
+        @Override
+        public ExecutionGraphResult execute(@NotNull final ExecutionGraphContext context) {
+            notNullOf(context, "context");
+
+            // setup current script rule ID.
+            context.setRuleId(getRuleId());
+
+            // Run script rule handler.
+            final ReturnState result = context.getHandler().apply(context);
+            if (result == ReturnState.TRUE) {
+                if (nonNull(getNext())) {
+                    return getNext().apply(context);
+                }
+                return new ExecutionGraphResult(result);
+            }
+
+            return new ExecutionGraphResult(ReturnState.FALSE);
+        }
+    }
+
+    /**
+     * The similar equivalent pseudocode such as:
+     * 
+     * <pre>
+     * boolean process(args) {
+     *   try {
+     *     return next.process(args)
+     *   } catch(e) {
+     *     return fallback.process(args)
+     *   }
+     * }
+     * </pre>
+     */
+    @CustomLog
+    @Getter
+    @Setter
+    @ToString(callSuper = true)
+    public static class FailbackOperator extends SingleOperator<FailbackOperator> {
+        private @NotBlank String ruleId;
+
+        public FailbackOperator(@NotNull FailbackNode node) {
+            super(node);
+            this.ruleId = hasTextOf(node.getRuleId(), "ruleId");
+        }
+
+        @Override
+        public ExecutionGraphResult execute(@NotNull final ExecutionGraphContext context) {
+            notNullOf(context, "context");
+            notNull(getNext(), "The next is missing of current id : %s", getId());
+
+            try {
+                // Run script rule handler.
+                return getNext().apply(context);
+            } catch (Throwable e) {
+                log.debug("Failback to execute of caused by : {}", e.getMessage());
+                // setup current script rule ID.
+                context.setRuleId(getRuleId());
+                return new ExecutionGraphResult(context.getHandler().apply(context));
+            }
+        }
+    }
+
+    @Getter
+    @Setter
+    @ToString(callSuper = true)
+    public static abstract class LogicalOperator<E extends LogicalOperator<?>> extends BaseOperator<E> {
+        private List<BaseOperator<?>> nexts = new LinkedList<>();
+
+        public LogicalOperator(@NotNull BaseNode<?> node) {
+            super(node);
+        }
+    }
+
+    @Getter
+    @Setter
+    @ToString(callSuper = true)
+    public static class AndOperator extends LogicalOperator<AndOperator> {
+        public AndOperator(@NotNull LogicalNode node) {
+            super(node);
+        }
+
+        @Override
+        public ExecutionGraphResult execute(@NotNull final ExecutionGraphContext context) {
+            notNullOf(context, "context");
+            for (BaseOperator<?> sub : safeList(getNexts())) {
                 final ExecutionGraphResult result = sub.apply(context);
                 // If all children return true, true is finally
                 // returned. If any node returns false, it ends and
@@ -355,14 +432,14 @@ public class ExecutionGraph<E extends ExecutionGraph<?>> implements Function<Exe
     @Setter
     @ToString(callSuper = true)
     public static class OrOperator extends LogicalOperator<AndOperator> {
-        public OrOperator(@NotNull BaseNode<?> node) {
+        public OrOperator(@NotNull LogicalNode node) {
             super(node);
         }
 
         @Override
         public ExecutionGraphResult execute(@NotNull final ExecutionGraphContext context) {
             notNullOf(context, "context");
-            for (ExecutionGraph<?> sub : safeList(getNexts())) {
+            for (BaseOperator<?> sub : safeList(getNexts())) {
                 final ExecutionGraphResult result = sub.apply(context);
                 // If any child returns true, it will eventually return
                 // true.
@@ -378,27 +455,27 @@ public class ExecutionGraph<E extends ExecutionGraph<?>> implements Function<Exe
     @Setter
     @ToString(callSuper = true)
     public static class AllAndOperator extends LogicalOperator<AndOperator> {
-        public AllAndOperator(@NotNull BaseNode<?> node) {
+        public AllAndOperator(@NotNull LogicalNode node) {
             super(node);
         }
 
         @Override
         public ExecutionGraphResult execute(@NotNull final ExecutionGraphContext context) {
             notNullOf(context, "context");
-            Boolean flag = null;
-            for (ExecutionGraph<?> sub : safeList(getNexts())) {
+            Boolean hasFalse = null;
+            for (BaseOperator<?> sub : safeList(getNexts())) {
                 final ExecutionGraphResult result = sub.apply(context);
                 // If all children return true, true is finally
                 // returned. If any node returns false, it ends and
                 // returns. (If the current node returns false, the
                 // subsequent nodes workflowstill the execution)
-                if (isNull(flag) || flag) {
-                    flag = (result.getReturnState() == ReturnState.FALSE);
+                if (isNull(hasFalse) && result.getReturnState() == ReturnState.FALSE) {
+                    hasFalse = true;
                 }
             }
             // false if there are no child nodes, or if any child nodes return
             // false.
-            if (isNull(flag) || (nonNull(flag) && !flag)) {
+            if (nonNull(hasFalse) && hasFalse) {
                 return new ExecutionGraphResult(ReturnState.FALSE);
             }
             return new ExecutionGraphResult(ReturnState.TRUE);
@@ -409,51 +486,61 @@ public class ExecutionGraph<E extends ExecutionGraph<?>> implements Function<Exe
     @Setter
     @ToString(callSuper = true)
     public static class AllOrOperator extends LogicalOperator<AndOperator> {
-        public AllOrOperator(@NotNull BaseNode<?> node) {
+        public AllOrOperator(@NotNull LogicalNode node) {
             super(node);
         }
 
         @Override
         public ExecutionGraphResult execute(@NotNull final ExecutionGraphContext context) {
             notNullOf(context, "context");
-            Boolean flag = null;
-            for (ExecutionGraph<?> sub : safeList(getNexts())) {
+            Boolean hasTrue = null;
+            for (BaseOperator<?> sub : safeList(getNexts())) {
                 final ExecutionGraphResult result = sub.apply(context);
                 // If any child returns true, it will eventually return
                 // true. (If the current node returns true, the
                 // subsequent nodes will still the execution)
-                if (isNull(flag) || !flag) {
-                    flag = (result.getReturnState() == ReturnState.TRUE);
+                if (isNull(hasTrue) || result.getReturnState() == ReturnState.TRUE) {
+                    hasTrue = true;
                 }
             }
             // true if there are no child nodes, or if any child nodes return
             // true.
-            if (isNull(flag) || (nonNull(flag) && flag)) {
+            if (nonNull(hasTrue) && hasTrue) {
                 return new ExecutionGraphResult(ReturnState.TRUE);
             }
             return new ExecutionGraphResult(ReturnState.FALSE);
         }
     }
 
+    /**
+     * The similar equivalent pseudocode such as:
+     * 
+     * <pre>
+     * boolean process(args) {
+     *   return handler.execute(args)
+     * }
+     * </pre>
+     */
     @Getter
     @Setter
     @ToString(callSuper = true)
-    public static class ExecutionOperator extends SingleOperator<ExecutionOperator> {
+    public static class RunOperator extends BaseOperator<RunOperator> {
         private @NotBlank String ruleId;
-        private final Function<ExecutionGraphContext, ReturnState> execution;
 
-        public ExecutionOperator(@NotNull BaseNode<?> node, Function<ExecutionGraphContext, ReturnState> execution) {
+        public RunOperator(@NotNull RunNode node) {
             super(node);
-            this.execution = notNullOf(execution, "execution");
+            this.ruleId = hasTextOf(node.getRuleId(), "ruleId");
         }
 
         @Override
-        public ExecutionGraphResult apply(@NotNull final ExecutionGraphContext context) {
+        public ExecutionGraphResult execute(@NotNull final ExecutionGraphContext context) {
             notNullOf(context, "context");
-            // actual execution
-            final ExecutionGraphResult result = new ExecutionGraphResult(execution.apply(context));
-            context.addTraceNode(this, result);
-            return result;
+
+            // Setup current script rule ID.
+            context.setRuleId(getRuleId());
+
+            // Actual execution rule script.
+            return new ExecutionGraphResult(context.getHandler().apply(context));
         }
     }
 

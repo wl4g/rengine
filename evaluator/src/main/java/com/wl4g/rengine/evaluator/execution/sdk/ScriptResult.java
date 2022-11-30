@@ -16,11 +16,11 @@
 package com.wl4g.rengine.evaluator.execution.sdk;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static java.util.Collections.synchronizedMap;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.validation.constraints.NotNull;
@@ -30,59 +30,62 @@ import org.graalvm.polyglot.HostAccess;
 import lombok.ToString;
 
 /**
- * {@link ExecutionGraphResult}
+ * {@link ScriptResult}
  * 
  * @author James Wong
  * @version 2022-09-29
  * @since v1.0.0
  */
-@ToString
+@ToString(callSuper = true)
 public class ScriptResult {
-    private final Boolean isContinue;
-    private Object value;
-    private final Map<String, Object> attributes = synchronizedMap(new HashMap<>());
+    private Boolean state;
+    private Map<String, Object> valueMap = new LinkedHashMap<>(4);
 
-    public @HostAccess.Export ScriptResult(@NotNull Boolean isContinue) {
-        this.isContinue = notNullOf(isContinue, "isContinue");
+    public @HostAccess.Export ScriptResult() {
     }
 
-    public @HostAccess.Export boolean isContinue() {
-        return isContinue;
+    public @HostAccess.Export ScriptResult(@NotNull Boolean state) {
+        this.state = notNullOf(state, "state");
     }
 
-    public @HostAccess.Export Object getValue() {
-        return value;
+    public @HostAccess.Export Boolean getState() {
+        return state;
     }
 
-    public @HostAccess.Export void setValue(Object value) {
-        this.value = value;
+    public @HostAccess.Export Map<String, Object> getValueMap() {
+        if (isNull(valueMap)) {
+            synchronized (this) {
+                if (isNull(valueMap)) {
+                    valueMap = new LinkedHashMap<>();
+                }
+            }
+        }
+        return valueMap;
     }
 
-    public @HostAccess.Export ScriptResult withValue(Object value) {
-        setValue(value);
-        return this;
-    }
-
-    public @HostAccess.Export Map<String, Object> getAttributes() {
-        return attributes;
-    }
-
-    public @HostAccess.Export ScriptResult addAttribute(String key, Object value) {
+    public @HostAccess.Export ScriptResult addValue(String key, Object value) {
         if (!isBlank(key) && nonNull(value)) {
-            getAttributes().put(key, value);
+            getValueMap().put(key, value);
         }
         return this;
     }
 
-    public @HostAccess.Export ScriptResult removeAttribute(String key) {
-        getAttributes().get(key);
+    public @HostAccess.Export ScriptResult removeValue(String key) {
+        getValueMap().get(key);
         return this;
     }
 
     public @HostAccess.Export ScriptResult reset() {
-        this.value = null;
-        getAttributes().clear();
+        this.state = null;
+        getValueMap().clear();
         return this;
     }
 
+    public @HostAccess.Export static ScriptResult newTrue() {
+        return new ScriptResult(true);
+    }
+
+    public @HostAccess.Export static ScriptResult newFalse() {
+        return new ScriptResult(false);
+    }
 }

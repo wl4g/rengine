@@ -23,8 +23,7 @@ import java.lang.annotation.Annotation;
 import javax.enterprise.inject.spi.CDI;
 import javax.inject.Singleton;
 
-import com.wl4g.rengine.common.model.EvaluationEngine;
-import com.wl4g.rengine.common.model.EvaluationKind;
+import com.wl4g.rengine.common.entity.Rule.RuleEngine;
 
 /**
  * {@link LifecycleExecutionFactory}
@@ -40,9 +39,8 @@ public class LifecycleExecutionFactory {
     // @Inject
     // BeanManager beanManager;
 
-    public IExecution getExecution(EvaluationKind kind, EvaluationEngine engine) {
-        switch (kind) {
-        case DEFAULT:
+    public WorkflowExecution getExecution(RuleEngine engine) {
+        switch (engine) {
         default:
             return getBean(DefaultWorkflowExecution.class);
         }

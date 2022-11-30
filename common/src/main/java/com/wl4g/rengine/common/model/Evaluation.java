@@ -42,6 +42,12 @@ import lombok.experimental.SuperBuilder;
 public class Evaluation extends EvaluationBase {
 
     @NotBlank
+    String clientId;
+
+    @NotBlank
+    String clientSecret;
+
+    @NotBlank
     String scenesCode;
 
     /**
@@ -74,9 +80,8 @@ public class Evaluation extends EvaluationBase {
      * BuyerId+UserId to execute it.
      */
     @Nullable
-    Map<String, String> args;
+    Map<String, Object> args;
 
     public static final long DEFAULT_TIMEOUT = 3_000L;
     public static final boolean DEFAULT_BESTEFFORT = false;
-
 }

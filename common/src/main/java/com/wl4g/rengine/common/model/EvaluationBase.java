@@ -18,6 +18,7 @@ package com.wl4g.rengine.common.model;
 import javax.validation.constraints.NotBlank;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -33,15 +34,9 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @ToString
 @SuperBuilder
+@NoArgsConstructor
 public class EvaluationBase {
 
     @NotBlank
     String requestId;
-
-    @NotBlank
-    String clientId;
-
-    @NotBlank
-    String clientSecret;
-
 }

@@ -15,13 +15,24 @@
  */
 package com.wl4g.rengine.evaluator.execution;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Named;
+import static java.lang.String.valueOf;
+import static java.lang.System.currentTimeMillis;
+import static java.util.Collections.singletonList;
+import static java.util.Objects.nonNull;
 
+import javax.inject.Inject;
+
+import com.wl4g.rengine.common.entity.Rule.RuleEngine;
+import com.wl4g.rengine.common.entity.Scenes;
+import com.wl4g.rengine.common.graph.ExecutionGraph;
+import com.wl4g.rengine.common.graph.ExecutionGraphContext;
+import com.wl4g.rengine.common.graph.ExecutionGraphParameter;
+import com.wl4g.rengine.common.graph.ExecutionGraphResult;
+import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
 import com.wl4g.rengine.common.model.Evaluation;
-import com.wl4g.rengine.common.model.EvaluationEngine;
 import com.wl4g.rengine.common.model.EvaluationResult;
 import com.wl4g.rengine.common.model.EvaluationResult.ResultDescription;
+import com.wl4g.rengine.evaluator.execution.engine.GraalJSScriptEngine;
 import com.wl4g.rengine.evaluator.execution.engine.IEngine;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptResult;
 
@@ -32,20 +43,56 @@ import com.wl4g.rengine.evaluator.execution.sdk.ScriptResult;
  * @version 2022-09-17
  * @since v1.0.0
  */
-@Named(DefaultWorkflowExecution.BEAN_NAME)
-@ApplicationScoped
-public class DefaultWorkflowExecution extends AbstractWorkflowExecution {
-    public static final String BEAN_NAME = "simpleWorkflowExecution";
+public class DefaultWorkflowExecution implements WorkflowExecution {
+
+    // @Inject
+    // GroovyScriptEngine groovyScriptEngine;
+
+    @Inject
+    GraalJSScriptEngine graalJSScriptEngine;
 
     @Override
-    public EvaluationResult apply(Evaluation model) {
-        // TODO parse rules execution graph tree from workflow
-        IEngine engine = getEngine(EvaluationEngine.valueOf(model.getEngine()));
+    public EvaluationResult execute(final Evaluation evaluation, final Scenes scenes) {
+        IEngine engine = getEngine(scenes.getWorkflow().getRuleEngine());
 
-        // TODO re-definition result bean?
-        ScriptResult result = engine.execute(model);
+        ExecutionGraphParameter parameter = ExecutionGraphParameter.builder()
+                .requestTime(currentTimeMillis())
+                .traceId(evaluation.getRequestId())
+                .trace(true)
+                .debug(true)
+                .workflowId(valueOf(scenes.getWorkflowId()))
+                .args(evaluation.getArgs())
+                .build();
 
-        return ResultDescription.builder().result(result).build();
+        ExecutionGraphContext context = new ExecutionGraphContext(parameter, ctx -> {
+            // TODO 应该分别调用 GraalJSEngine.execute()，应该改成每调用一次只会执行一个 rule 脚本
+            ScriptResult result = engine.execute(evaluation, scenes);
+            if (nonNull(result)) {
+                return ReturnState.of(result.getState());
+            }
+            return ReturnState.FALSE;
+        });
+
+        ExecutionGraph<?> graph = ExecutionGraph.from(scenes.getWorkflow().getGraph());
+        ExecutionGraphResult result = graph.apply(context);
+
+        // TODO 支持批量 evaluation 返回
+        return EvaluationResult.builder()
+                .results(singletonList(ResultDescription.builder()
+                        .scenesCode(evaluation.getScenesCode())
+                        .valueMap(result.getValueMap())
+                        .build()))
+                .build();
+    }
+
+    protected IEngine getEngine(RuleEngine kind) {
+        switch (kind) {
+        // case GROOVY:
+        // return groovyScriptEngine;
+        case JS:
+        default:
+            return graalJSScriptEngine;
+        }
     }
 
 }

@@ -68,10 +68,9 @@ public class EvaluatorMeterService extends PrometheusMeterFacade {
     }
 
     public static abstract class MetricsTag {
-        public static final String KIND = "kind";
         public static final String ENGINE = "engine";
         public static final String SCENESCODE = "scenesCode";
-         public static final String SERVICE = "service";
+         public static final String CLIENT_ID = "clientId";
         public static final String LIBRARY = "library";
     }
 
