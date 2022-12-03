@@ -67,9 +67,9 @@ public final class ExecutionGraphContext implements Serializable {
     private final Map<String, TraceSpan> traceSpans;
 
     /**
-     * The execution script rule ID.
+     * The execution graph operator node.
      */
-    private String ruleId;
+    private ExecutionGraph<?> currentNode;
 
     /**
      * The handler executing start time.

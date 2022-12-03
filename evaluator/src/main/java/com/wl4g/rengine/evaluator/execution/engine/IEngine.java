@@ -17,7 +17,9 @@ package com.wl4g.rengine.evaluator.execution.engine;
 
 import javax.validation.constraints.NotNull;
 
+import com.wl4g.rengine.common.entity.Rule;
 import com.wl4g.rengine.common.entity.Scenes;
+import com.wl4g.rengine.common.graph.ExecutionGraphContext;
 import com.wl4g.rengine.common.model.Evaluation;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptResult;
 
@@ -29,5 +31,9 @@ import com.wl4g.rengine.evaluator.execution.sdk.ScriptResult;
  * @since v1.0.0
  */
 public interface IEngine {
-    ScriptResult execute(@NotNull final Evaluation evaluation, @NotNull final Scenes scenes);
+    ScriptResult execute(
+            @NotNull final ExecutionGraphContext graphContext,
+            @NotNull final Evaluation evaluation,
+            @NotNull final Scenes scenes,
+            @NotNull final Rule rule);
 }

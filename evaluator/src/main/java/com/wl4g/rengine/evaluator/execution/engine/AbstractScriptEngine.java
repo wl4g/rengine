@@ -18,9 +18,7 @@ package com.wl4g.rengine.evaluator.execution.engine;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.lang.String.format;
-import static java.lang.System.currentTimeMillis;
-import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
+import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 import java.util.Map;
@@ -31,15 +29,13 @@ import javax.validation.constraints.NotNull;
 
 import org.graalvm.polyglot.proxy.ProxyObject;
 
-import com.google.common.collect.Lists;
+import com.wl4g.rengine.common.entity.Rule;
 import com.wl4g.rengine.common.entity.Scenes;
 import com.wl4g.rengine.common.entity.UploadObject.ExtensionType;
 import com.wl4g.rengine.common.entity.UploadObject.UploadType;
+import com.wl4g.rengine.common.graph.ExecutionGraphContext;
 import com.wl4g.rengine.common.model.Evaluation;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptContext;
-import com.wl4g.rengine.evaluator.execution.sdk.ScriptContext.ScriptEventLocation;
-import com.wl4g.rengine.evaluator.execution.sdk.ScriptContext.ScriptEventSource;
-import com.wl4g.rengine.evaluator.execution.sdk.ScriptContext.ScriptRengineEvent;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptDataService;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptHttpClient;
 import com.wl4g.rengine.evaluator.metrics.EvaluatorMeterService;
@@ -72,53 +68,33 @@ public abstract class AbstractScriptEngine implements IEngine {
     @Inject
     AggregationService aggregationService;
 
-    protected @NotNull List<ObjectResource> loadScriptResources(
-            @NotNull UploadType type,
-            @NotBlank Scenes scenes,
-            boolean useCache) {
-        notNullOf(type, "uploadType");
-        notNullOf(scenes, "scenes");
-        log.debug("Loading script by {} of scenesCode: {} ...", type, scenes.getScenesCode());
-
-        List<ObjectResource> scripts = Lists.newArrayList();
+    protected @NotNull List<ObjectResource> loadScriptResources(@NotBlank Scenes scenes, @NotNull Rule rule, boolean useCache) {
+        notNullOf(rule, "rule");
+        log.debug("Loading script {} by scenesCode: {}, ruleId: {}", scenes.getScenesCode(), rule.getId());
 
         // Add upload object script dependencies all by scenes.workflow.rules
-        safeList(scenes.getWorkflow().getRules()).forEach(rule -> {
-            safeList(rule.getUploads()).forEach(upload -> {
-                try {
-                    scripts.add(minioManager.loadObject(UploadType.of(upload.getUploadType()), upload.getObjectPrefix(),
-                            scenes.getScenesCode(), ExtensionType.of(upload.getExtension()).isBinary(), useCache));
-                } catch (Exception e) {
-                    log.error(format("Unable to load dependency script from MinIO: %s", upload.getObjectPrefix()), e);
-                    throw new IllegalStateException(e); // fast-fail:Stay-Strongly-Consistent
-                }
-            });
-        });
-
-        return scripts;
+        return safeList(rule.getUploads()).stream().map(upload -> {
+            try {
+                return minioManager.loadObject(UploadType.of(upload.getUploadType()), upload.getObjectPrefix(),
+                        scenes.getScenesCode(), ExtensionType.of(upload.getExtension()).isBinary(), useCache);
+            } catch (Exception e) {
+                log.error(format("Unable to load dependency script from MinIO: %s", upload.getObjectPrefix()), e);
+                throw new IllegalStateException(e); // fast-fail:Stay-Strongly-Consistent
+            }
+        }).collect(toList());
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected @NotNull ScriptContext newScriptContext(Evaluation model) {
-        // TODO dynamic setup more parameters
-
-        ScriptRengineEvent event = new ScriptRengineEvent("generic_device_temp_warning",
-                ScriptEventSource.builder()
-                        .time(currentTimeMillis())
-                        .principals(singletonList("admin"))
-                        .location(ScriptEventLocation.builder().zipcode("20500").build())
-                        .build(),
-                "A serious alarm occurs when the device temperature is greater than 52℃", singletonMap("objId", "1010012"));
-
-        // Map<String, Object> attributes = new HashMap<>();
-        // attributes.put("objId", "1010012");
-        // attributes.put("remark", "The test js call to java ...");
+    protected @NotNull ScriptContext newScriptContext(
+            @NotNull final ExecutionGraphContext graphContext,
+            @NotNull final Evaluation evaluation) {
+        notNullOf(graphContext, "graphContext");
+        notNullOf(evaluation, "evaluation");
 
         return ScriptContext.builder()
-                .id("100101")
+                .id(graphContext.getCurrentNode().getId())
                 .type("iot_warning")
-                .args(ProxyObject.fromMap((Map) model.getArgs()))
-                .event(event)
+                .args(ProxyObject.fromMap((Map) evaluation.getArgs()))
                 // .attributes(ProxyObject.fromMap(attributes))
                 .minioManager(minioManager)
                 .dataService(new ScriptDataService(aggregationService))
@@ -126,7 +102,7 @@ public abstract class AbstractScriptEngine implements IEngine {
                 .build();
     }
 
-    // TODO handcode for 'process' ???
+    // TODO handcode for 'process'
     public static final String DEFAULT_MAIN_FUNCTION = "process";
 
 }

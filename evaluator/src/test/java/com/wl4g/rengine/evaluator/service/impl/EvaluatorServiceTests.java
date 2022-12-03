@@ -56,8 +56,13 @@ public class EvaluatorServiceTests {
 
     @Test
     public void testLoadScenesWithCascade() {
-        Scenes scenes = evaluatorService.loadScenesWithCascade("iot_generic_temp_warning");
-        System.out.println(toJSONString(scenes));
+        try {
+            Scenes scenes = evaluatorService.loadScenesWithCascade("ecommerce_trade_gift");
+            System.out.println(toJSONString(scenes));
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
 }

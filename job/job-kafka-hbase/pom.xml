@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>rengine-job-kafka-hbase</artifactId>
     <packaging>jar</packaging>
-    <name>Rengine Job Flink-Kafka-HBase</name>
+    <name>Rengine Job Flink Kafka HBase</name>
     <description>Rengine Job Analytic with Flink from Kafka to HBase</description>
     <url>http://rengine.wl4g.com</url>
     <parent>

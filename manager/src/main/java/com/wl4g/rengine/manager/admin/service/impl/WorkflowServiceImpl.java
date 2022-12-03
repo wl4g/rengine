@@ -94,10 +94,10 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .id(model.getId())
                 .name(model.getName())
                 .orgCode(model.getOrgCode())
-                .labels(model.getLabels())
-                .ruleIds(model.getRuleIds())
                 .enable(model.getEnable())
+                .labels(model.getLabels())
                 .remark(model.getRemark())
+                .graph(model.getGraph())
                 .build();
 
         if (isNull(workflow.getId())) {

@@ -15,16 +15,23 @@
  */
 package com.wl4g.rengine.evaluator.execution;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static java.lang.String.valueOf;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toMap;
+
+import java.util.Map;
 
 import javax.inject.Inject;
 
+import com.wl4g.rengine.common.entity.Rule;
 import com.wl4g.rengine.common.entity.Rule.RuleEngine;
 import com.wl4g.rengine.common.entity.Scenes;
+import com.wl4g.rengine.common.entity.Workflow;
 import com.wl4g.rengine.common.graph.ExecutionGraph;
+import com.wl4g.rengine.common.graph.ExecutionGraph.IRunOperator;
 import com.wl4g.rengine.common.graph.ExecutionGraphContext;
 import com.wl4g.rengine.common.graph.ExecutionGraphParameter;
 import com.wl4g.rengine.common.graph.ExecutionGraphResult;
@@ -53,9 +60,10 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
 
     @Override
     public EvaluationResult execute(final Evaluation evaluation, final Scenes scenes) {
-        IEngine engine = getEngine(scenes.getWorkflow().getRuleEngine());
+        final Workflow workflow = scenes.getWorkflow();
+        final IEngine engine = getEngine(workflow.getRuleEngine());
 
-        ExecutionGraphParameter parameter = ExecutionGraphParameter.builder()
+        final ExecutionGraphParameter parameter = ExecutionGraphParameter.builder()
                 .requestTime(currentTimeMillis())
                 .traceId(evaluation.getRequestId())
                 .trace(true)
@@ -64,17 +72,19 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
                 .args(evaluation.getArgs())
                 .build();
 
-        ExecutionGraphContext context = new ExecutionGraphContext(parameter, ctx -> {
-            // TODO 应该分别调用 GraalJSEngine.execute()，应该改成每调用一次只会执行一个 rule 脚本
-            ScriptResult result = engine.execute(evaluation, scenes);
+        final Map<String, Rule> ruleMap = safeList(workflow.getRules()).stream().collect(toMap(r -> valueOf(r.getId()), r -> r));
+
+        final ExecutionGraphContext context = new ExecutionGraphContext(parameter, ctx -> {
+            final Rule rule = ruleMap.get(((IRunOperator) ctx.getCurrentNode()).getRuleId());
+            final ScriptResult result = engine.execute(ctx, evaluation, scenes, rule);
             if (nonNull(result)) {
                 return ReturnState.of(result.getState());
             }
             return ReturnState.FALSE;
         });
 
-        ExecutionGraph<?> graph = ExecutionGraph.from(scenes.getWorkflow().getGraph());
-        ExecutionGraphResult result = graph.apply(context);
+        final ExecutionGraph<?> graph = ExecutionGraph.from(workflow.getGraph());
+        final ExecutionGraphResult result = graph.apply(context);
 
         // TODO 支持批量 evaluation 返回
         return EvaluationResult.builder()

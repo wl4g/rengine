@@ -17,6 +17,7 @@ package com.wl4g.rengine.evaluator.service.impl;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
+import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RULES;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SCENESES;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.UPLOADS;
@@ -34,6 +35,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.validation.constraints.NotBlank;
 
+import org.bson.BsonDocument;
 import org.bson.BsonString;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -52,17 +54,18 @@ import com.wl4g.rengine.common.entity.Rule.RuleEngine;
 import com.wl4g.rengine.common.entity.Scenes;
 import com.wl4g.rengine.common.entity.UploadObject;
 import com.wl4g.rengine.common.entity.Workflow;
+import com.wl4g.rengine.common.entity.WorkflowGraph;
 import com.wl4g.rengine.common.model.Evaluation;
 import com.wl4g.rengine.common.model.EvaluationResult;
-import com.wl4g.rengine.evaluator.execution.WorkflowExecution;
 import com.wl4g.rengine.evaluator.execution.LifecycleExecutionFactory;
+import com.wl4g.rengine.evaluator.execution.WorkflowExecution;
 import com.wl4g.rengine.evaluator.metrics.EvaluatorMeterService;
 import com.wl4g.rengine.evaluator.metrics.EvaluatorMeterService.MetricsTag;
 import com.wl4g.rengine.evaluator.repository.MongoRepository;
 import com.wl4g.rengine.evaluator.service.EvaluatorService;
 
 import io.smallrye.mutiny.Uni;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 
 /**
  * {@link EvaluatorServiceImpl}
@@ -73,7 +76,7 @@ import lombok.extern.slf4j.Slf4j;
  * @see https://quarkus.io/guides/resteasy-reactive#asyncreactive-support
  */
 // @ApplicationScoped
-@Slf4j
+@CustomLog
 @Singleton
 public class EvaluatorServiceImpl implements EvaluatorService {
 
@@ -134,50 +137,50 @@ public class EvaluatorServiceImpl implements EvaluatorService {
      * Load query collection dependencies:
      * 
      * <pre>
-     * sceneses —one-to-one(workflowId)—>  workflow —one-to-many(ruleIds)—> rules —one-to-many(uploadIds)—> uploads
+     *   sceneses —> one-to-one(workflowId) —> workflow —> one-to-many(graph.nodes[].ruleId) —> rules —> one-to-many(uploadIds) —> uploads
      * </pre>
      * 
      * Equivalent bson query codes example:
      * 
      * <pre>
-     *    // 在线 mongodb 查询模拟器: https://mongoplayground.net/p/bPKYXCJwXdl
-     *    db.getCollection('sceneses').aggregate([
-     *        // 首先过滤 scenes (rengine-evaluator 接收 biz-app 请求每次只能处理一个)
-     *        { $match: { "scenesCode": "iot_generic_temp_warning" } },
-     *        { $lookup: {
-     *             from: "workflows", // 关联 workflows 表
-     *             let: { workflowId: "$workflowId" }, // 定义外键关联变量
-     *             pipeline: [
-     *                  { $match: { $expr: { $eq: [ "$_id",  "$$workflowId" ] } } }, // 外键等于关联
-     *                  //{ $unwind: { path: "$ruleIds", preserveNullAndEmptyArrays: true } }, // 不应该用平铺,否则会按左连接乘积的平面结构输出(期望是:深度结构)
-     *                  { $lookup: {
-     *                         from: "rules", // 继续关联 rules 表
-     *                         let: { ruleIds: "$ruleIds" }, // 定义外键关联变量
-     *                         pipeline: [
-     *                              { $match: { $expr: { $in: [ "$_id",  "$$ruleIds" ] } } }, // 由于父级未使用 UNWIND 因此这里使用 IN 外键关联
-     *                              //{ $unwind: { path: "$uploadIds", preserveNullAndEmptyArrays: true } }, // 不应该用平铺,否则会按左连接乘积的平面结构输出(期望是:深度结构)
-     *                              { $lookup: {
-     *                                       from: "uploads", // 继续关联 uploads 表
-     *                                       let: { uploadIds: "$uploadIds" }, // 定义外键关联变量
-     *                                       pipeline: [
-     *                                              { $match: { $expr: { $in: [ "$_id",  "$$uploadIds" ] } } }, //由于父级未使用 UNWIND 因此这里使用 IN 外键关联
-     *                                              { $project: { "_class": 0, "delFlag": 0 } } // 控制 uploads 集返回列(投射)
-     *                                       ],
-     *                                       as: "uploads"
-     *                                  }
-     *                              },
-     *                              { $project: { "_class": 0, "delFlag": 0 } } // 控制 rules 集返回列(投射)
-     *                         ],
-     *                         as: "rules"
-     *                    }
-     *                 },
-     *                 { $project: { "_class": 0, "delFlag": 0 } } // 控制 workflow 集返回列(投射)
-     *             ],
-     *             as: "workflow"
-     *           }
-     *        },
-     *        { $project: { "_class": 0, "delFlag": 0 } } // 控制 sceneses 集返回列(投射)
-     *    ])
+     *   // 在线 mongodb 查询模拟器: https://mongoplayground.net/p/bPKYXCJwXdl
+     *   db.getCollection('sceneses').aggregate([
+     *       // 首先过滤 scenes (rengine-evaluator 接收 biz-app 请求每次只能处理一个)
+     *       { $match: { "scenesCode": "iot_generic_temp_warning" } },
+     *       { $lookup: {
+     *            from: "workflows", // 关联 workflows 表
+     *            let: { workflowId: { $toLong: "$workflowId" } }, // 定义外键关联变量
+     *            pipeline: [
+     *                 { $match: { $expr: { $eq: [ "$_id",  "$$workflowId" ] } } }, // 外键等于关联
+     *                 //{ $unwind: { path: "$ruleIds", preserveNullAndEmptyArrays: true } }, // 不应该用平铺,否则会按左连接乘积的平面结构输出(期望是:深度结构)
+     *                 { $lookup: {
+     *                        from: "rules", // 继续关联 rules 表
+     *                        let: { ruleIds: { $map: { input: "$graph.nodes", in: { $toLong: "$$this.ruleId" } } } }, // 定义外键关联变量(引用嵌入对象数组的字段时, 需使用 $map 函数转换. 注:一定要转为Long类型, 否则无法与集合字段 rules._id 不匹配会关联不上)
+     *                        pipeline: [
+     *                             { $match: { $expr: { $in: [ "$_id",  "$$ruleIds" ] } } }, // 由于父级未使用 UNWIND 因此这里使用 IN 外键关联
+     *                             //{ $unwind: { path: "$uploadIds", preserveNullAndEmptyArrays: true } }, // 不应该用平铺,否则会按左连接乘积的平面结构输出(期望是:深度结构)
+     *                             { $lookup: {
+     *                                      from: "uploads", // 继续关联 uploads 表
+     *                                      let: { uploadIds: "$uploadIds" }, // 定义外键关联变量
+     *                                      pipeline: [
+     *                                             { $match: { $expr: { $in: [ "$_id",  "$$uploadIds" ] } } }, // 由于父级未使用 UNWIND 因此这里使用 IN 外键关联
+     *                                             { $project: { "_class": 0, "delFlag": 0 } } // 控制 uploads 集返回列(投射)
+     *                                      ],
+     *                                      as: "uploads"
+     *                                 }
+     *                             },
+     *                             { $project: { "_class": 0, "delFlag": 0 } } // 控制 rules 集返回列(投射)
+     *                        ],
+     *                        as: "rules"
+     *                   }
+     *                },
+     *                { $project: { "_class": 0, "delFlag": 0 } } // 控制 workflow 集返回列(投射)
+     *            ],
+     *            as: "workflow"
+     *          }
+     *       },
+     *       { $project: { "_class": 0, "delFlag": 0 } } // 控制 sceneses 集返回列(投射)
+     *   ])
      * </pre>
      * 
      * @see https://www.notion.so/scenesworkflow-rules-uploads-f8e5a6f14fb64f858479b6565fb52142
@@ -193,11 +196,11 @@ public class EvaluatorServiceImpl implements EvaluatorService {
         List<Bson> aggregates = Lists.newArrayList();
         aggregates.add(Aggregates.match(Filters.eq("scenesCode", scenesCode)));
         aggregates
-                .add(Aggregates.lookup(
-                        WORKFLOWS.getName(), asList(new Variable<>("workflowId",
-                                "$workflowId")),
+                .add(Aggregates.lookup(WORKFLOWS.getName(), asList(new Variable<>("workflowId", "$workflowId")),
                         asList(Aggregates.match(Filters.expr(Filters.eq("_id", "$$workflowId"))),
-                                Aggregates.lookup(RULES.getName(), asList(new Variable<>("ruleIds", "$ruleIds")),
+                                Aggregates.lookup(RULES.getName(),
+                                        asList(new Variable<>("ruleIds", BsonDocument.parse(
+                                                "{ $map: { input: \"$graph.nodes\", in: { $toLong: \"$$this.ruleId\" } } }"))),
                                         // IN 匹配表达式应该直接创建Document对象? 否则:
                                         // issue1.若使用:Filters.in("$_id","$$ruleIds")=>则会生成为:{$expr:{$in:["$$ruleIds"]}}}=>报错至少2个参数
                                         // issue2.若使用:Filters.in("_id","$_id","$$ruleIds")=>则会生成为:{$expr:{"_id":{$in:["$_id","$$ruleIds"]}}}}=>查询结果集不对(rules[]重复关联了uploads)
@@ -221,9 +224,7 @@ public class EvaluatorServiceImpl implements EvaluatorService {
         return collection.aggregate(aggregates).batchSize(1024).map(new Function<Document, Scenes>() {
             @Override
             public Scenes apply(Document scenesDoc) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Found scenes object by scenesCode: {} to json: {}", scenesCode, scenesDoc.toJson());
-                }
+                log.debug("Found scenes object by scenesCode: {} to json: {}", scenesCode, scenesDoc.toJson());
                 Scenes scenes = new Scenes();
                 scenes.setId(scenesDoc.getLong("_id"));
                 scenes.setName(scenesDoc.getString("name"));
@@ -242,7 +243,6 @@ public class EvaluatorServiceImpl implements EvaluatorService {
                     scenes.setWorkflow(Workflow.builder()
                             .id(workflowsDoc.getLong("_id"))
                             .name(workflowsDoc.getString("name"))
-                            .ruleIds(workflowsDoc.getList("ruleIds", Long.class))
                             .orgCode(workflowsDoc.getString("orgCode"))
                             .enable(workflowsDoc.getInteger("enable"))
                             .labels(workflowsDoc.getList("labels", String.class))
@@ -251,7 +251,11 @@ public class EvaluatorServiceImpl implements EvaluatorService {
                             .createDate(workflowsDoc.getDate("createDate"))
                             .updateBy(workflowsDoc.getLong("updateBy"))
                             .updateDate(workflowsDoc.getDate("updateDate"))
+                            // .graph(workflowsDoc.get("graph",WorkflowGraph.class))
                             .build());
+                    Document graphDoc = workflowsDoc.get("graph", Document.class);
+                    scenes.getWorkflow().setGraph(parseJSON(graphDoc.toJson(), WorkflowGraph.class));
+
                     scenes.getWorkflow()
                             .setRules(safeList(workflowsDoc.getList("rules", Document.class)).stream().map(rulesDoc -> {
                                 Rule rule = Rule.builder()

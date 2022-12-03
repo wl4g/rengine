@@ -45,9 +45,10 @@ import com.wl4g.infra.common.graalvm.GraalPolyglotManager;
 import com.wl4g.infra.common.graalvm.GraalPolyglotManager.ContextWrapper;
 import com.wl4g.infra.common.lang.EnvironmentUtil;
 import com.wl4g.infra.common.lang.StringUtils2;
+import com.wl4g.rengine.common.entity.Rule;
 import com.wl4g.rengine.common.entity.Scenes;
-import com.wl4g.rengine.common.entity.UploadObject.UploadType;
 import com.wl4g.rengine.common.exception.ExecutionException;
+import com.wl4g.rengine.common.graph.ExecutionGraphContext;
 import com.wl4g.rengine.common.model.Evaluation;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptHttpClient;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptResult;
@@ -111,12 +112,16 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
     }
 
     @Override
-    public ScriptResult execute(final Evaluation evaluation, final Scenes scenes) {
+    public ScriptResult execute(
+            @NotNull final ExecutionGraphContext graphContext,
+            @NotNull final Evaluation evaluation,
+            @NotNull final Scenes scenes,
+            @NotNull final Rule rule) {
         log.debug("Execution JS script for scenesCode: {} ...", scenes.getScenesCode());
 
-        try (ContextWrapper context = graalPolyglotManager.getContext();) {
+        try (ContextWrapper graalContext = graalPolyglotManager.getContext();) {
             // Load all scripts dependencies.
-            List<ObjectResource> scripts = safeList(loadScriptResources(UploadType.USER_LIBRARY_WITH_JS, scenes, true));
+            List<ObjectResource> scripts = safeList(loadScriptResources(scenes, rule, true));
             for (ObjectResource script : scripts) {
                 isTrue(!script.isBinary(), "Invalid JS dependency library binary type");
                 log.debug("Evaling js-dependencys: {}", script.getObjectPrefix());
@@ -124,7 +129,7 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
                 String scriptName = StringUtils2.getFilename(script.getObjectPrefix()).concat("@").concat(scenes.getScenesCode());
                 try {
                     // merge JS library with dependency.
-                    context.eval(Source.newBuilder("js", script.readToString(), scriptName).build());
+                    graalContext.eval(Source.newBuilder("js", script.readToString(), scriptName).build());
                 } catch (PolyglotException e) {
                     throw new ExecutionException(evaluation.getRequestId(), scenes.getScenesCode(),
                             format("Unable to parse JS dependency of '%s', scenesCode: %s", scriptName, scenes.getScenesCode()),
@@ -132,9 +137,9 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
                 }
             }
 
-            Value bindings = context.getBindings("js");
+            Value bindings = graalContext.getBindings("js");
             // Try not to bind implicit objects, let users create new objects by
-            // self or get default objects from the context.
+            // self or get default objects from the graal context.
             bindings.putMember(ScriptHttpClient.class.getSimpleName(), ScriptHttpClient.class);
             bindings.putMember(ScriptResult.class.getSimpleName(), ScriptResult.class);
 
@@ -149,7 +154,7 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
                     MetricsTag.LIBRARY, scriptFileNames.toString());
 
             final long begin = currentTimeMillis();
-            Value result = mainFunction.execute(newScriptContext(evaluation));
+            Value result = mainFunction.execute(newScriptContext(graphContext, evaluation));
             final long costTime = currentTimeMillis() - begin;
             executeTimer.record(costTime, MILLISECONDS);
 

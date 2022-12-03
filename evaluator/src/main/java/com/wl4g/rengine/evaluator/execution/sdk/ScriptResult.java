@@ -39,7 +39,7 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class ScriptResult {
     private Boolean state;
-    private Map<String, Object> valueMap = new LinkedHashMap<>(4);
+    private Map<String, Object> valueMap;
 
     public @HostAccess.Export ScriptResult() {
     }
@@ -56,7 +56,7 @@ public class ScriptResult {
         if (isNull(valueMap)) {
             synchronized (this) {
                 if (isNull(valueMap)) {
-                    valueMap = new LinkedHashMap<>();
+                    valueMap = new LinkedHashMap<>(4);
                 }
             }
         }

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>rengine-job-rabbitmq-hbase</artifactId>
 	<packaging>jar</packaging>
-	<name>Rengine Job Flink-RabbitMQ-HBase</name>
+	<name>Rengine Job Flink RabbitMQ HBase</name>
     <description>Rengine Job Analytic with Flink from RabbitMQ to HBase</description>
 	<url>http://rengine.wl4g.com</url>
 	<parent>

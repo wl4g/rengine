@@ -323,7 +323,7 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
     @Getter
     @Setter
     @ToString(callSuper = true)
-    public static class ProcessOperator extends SingleOperator<ProcessOperator> {
+    public static class ProcessOperator extends SingleOperator<ProcessOperator> implements IRunOperator {
         private @NotBlank String ruleId;
 
         public ProcessOperator(@NotNull ProcessNode node) {
@@ -335,8 +335,8 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
         public ExecutionGraphResult execute(@NotNull final ExecutionGraphContext context) {
             notNullOf(context, "context");
 
-            // setup current script rule ID.
-            context.setRuleId(getRuleId());
+            // Setup current node info.
+            context.setCurrentNode(this);
 
             // Run script rule handler.
             final ReturnState result = context.getHandler().apply(context);
@@ -368,7 +368,7 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
     @Getter
     @Setter
     @ToString(callSuper = true)
-    public static class FailbackOperator extends SingleOperator<FailbackOperator> {
+    public static class FailbackOperator extends SingleOperator<FailbackOperator> implements IRunOperator {
         private @NotBlank String ruleId;
 
         public FailbackOperator(@NotNull FailbackNode node) {
@@ -386,8 +386,8 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
                 return getNext().apply(context);
             } catch (Throwable e) {
                 log.debug("Failback to execute of caused by : {}", e.getMessage());
-                // setup current script rule ID.
-                context.setRuleId(getRuleId());
+                // Setup current node info.
+                context.setCurrentNode(this);
                 return new ExecutionGraphResult(context.getHandler().apply(context));
             }
         }
@@ -512,6 +512,10 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
         }
     }
 
+    public static interface IRunOperator {
+        String getRuleId();
+    }
+
     /**
      * The similar equivalent pseudocode such as:
      * 
@@ -524,7 +528,7 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
     @Getter
     @Setter
     @ToString(callSuper = true)
-    public static class RunOperator extends BaseOperator<RunOperator> {
+    public static class RunOperator extends BaseOperator<RunOperator> implements IRunOperator {
         private @NotBlank String ruleId;
 
         public RunOperator(@NotNull RunNode node) {
@@ -536,8 +540,8 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
         public ExecutionGraphResult execute(@NotNull final ExecutionGraphContext context) {
             notNullOf(context, "context");
 
-            // Setup current script rule ID.
-            context.setRuleId(getRuleId());
+            // Setup current node info.
+            context.setCurrentNode(this);
 
             // Actual execution rule script.
             return new ExecutionGraphResult(context.getHandler().apply(context));

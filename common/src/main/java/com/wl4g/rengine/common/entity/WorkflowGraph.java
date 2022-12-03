@@ -75,9 +75,11 @@ public class WorkflowGraph {
      * @since v1.0.0
      */
     @SuppressWarnings("unchecked")
-    @Schema(oneOf = { BootNode.class, LogicalNode.class, RunNode.class }, discriminatorProperty = "@type")
+    @Schema(oneOf = { BootNode.class, ProcessNode.class, FailbackNode.class, LogicalNode.class, RunNode.class },
+            discriminatorProperty = "@type")
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type", visible = true)
-    @JsonSubTypes({ @Type(value = BootNode.class, name = "BOOT"), @Type(value = LogicalNode.class, name = "LOGICAL"),
+    @JsonSubTypes({ @Type(value = BootNode.class, name = "BOOT"), @Type(value = ProcessNode.class, name = "PROCESS"),
+            @Type(value = FailbackNode.class, name = "FAILBACK"), @Type(value = LogicalNode.class, name = "LOGICAL"),
             @Type(value = RunNode.class, name = "RUN") })
     @Getter
     @Setter
@@ -112,6 +114,24 @@ public class WorkflowGraph {
 
         public E withAttributes(Map<String, Object> attributes) {
             this.attributes = attributes;
+            return (E) this;
+        }
+    }
+
+    @Getter
+    @Setter
+    @ToString(callSuper = true)
+    public static abstract class BaseRunNode<E extends BaseRunNode<?>> extends BaseNode<E> {
+        private static final long serialVersionUID = 42226526447799065L;
+
+        /**
+         * The current this node corresponding script rule ID.
+         */
+        private @NotBlank String ruleId;
+
+        @SuppressWarnings("unchecked")
+        public E withRuleId(String ruleId) {
+            setRuleId(ruleId);
             return (E) this;
         }
     }
@@ -164,24 +184,6 @@ public class WorkflowGraph {
         public LogicalNode withLogical(LogicalType logical) {
             setLogical(logical);
             return this;
-        }
-    }
-
-    @Getter
-    @Setter
-    @ToString(callSuper = true)
-    public static abstract class BaseRunNode<E extends BaseRunNode<?>> extends BaseNode<E> {
-        private static final long serialVersionUID = 42226526447799065L;
-
-        /**
-         * The current this node corresponding script rule ID.
-         */
-        private @NotBlank String ruleId;
-
-        @SuppressWarnings("unchecked")
-        public E withRuleId(String ruleId) {
-            setRuleId(ruleId);
-            return (E) this;
         }
     }
 

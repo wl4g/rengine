@@ -47,18 +47,12 @@ public class Workflow extends BaseBean {
     private static final long serialVersionUID = 1L;
     private @NotBlank String name;
     private @NotNull RuleEngine ruleEngine;
-    private @Nullable List<Long> ruleIds;
+    private @Nullable WorkflowGraph graph;
 
     //
     // Temporary fields.
     //
 
-    // TODO??
     @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
     private @Nullable transient List<Rule> rules;
-
-    // TODO??
-    @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
-    private @Nullable transient WorkflowGraph graph;
-
 }
