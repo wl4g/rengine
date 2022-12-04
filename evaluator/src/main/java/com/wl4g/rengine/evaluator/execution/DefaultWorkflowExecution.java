@@ -90,6 +90,7 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
 
         // TODO 支持批量 evaluation 返回
         return EvaluationResult.builder()
+                .requestId(evaluation.getRequestId())
                 .results(singletonList(ResultDescription.builder()
                         .scenesCode(evaluation.getScenesCode())
                         .valueMap(result.getValueMap())

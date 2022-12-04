@@ -16,5 +16,26 @@
   "methods":[
     {"name":"of","parameterTypes":["java.lang.String"] }
   ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.WorkflowGraph",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] },
+    {"name":"<init>","parameterTypes":["java.util.List", "java.util.List"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.graph.ExecutionGraph",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] },
+    {"name":"<init>","parameterTypes":["com.wl4g.rengine.common.entity.WorkflowGraph$BaseNode"] },
+    {"name":"from","parameterTypes":["com.wl4g.rengine.common.entity.WorkflowGraph"] }
+  ]
 }
 ]

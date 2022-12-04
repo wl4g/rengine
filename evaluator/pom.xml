@@ -533,7 +533,7 @@ and see:https://github.com/apache/groovy/blob/GROOVY_4_0_5/build.gradle#L98 -->
         </profile>
         <!-- Packaging for native (The use of JVM attach(arthas) cannot be supported in native mode) -->
         <profile>
-            <id>build:native</id>
+            <id>native</id>
             <activation>
                 <property>
                     <name>native</name>

@@ -24,6 +24,9 @@ cd rengine/evaluator
 
 ```bash
 export JAVA_HOME=/usr/local/jdk-11.0.10/ # Must java11+
+
+./mvnw clean install -U -T 4C
+
 ./mvnw package -f evaluator/pom.xml \
 -Dmaven.test.skip=true -DskipTests -Dnative \
 -Dquarkus.native.container-build=true \
@@ -36,6 +39,9 @@ export JAVA_HOME=/usr/local/jdk-11.0.10/ # Must java11+
 
 ```bash
 export JAVA_HOME=/usr/local/jdk-11.0.10/ # Must java11+
+
+./mvnw clean install -U -T 4C
+
 ./mvnw package -f evaluator/pom.xml \
 -Dmaven.test.skip=true -DskipTests -Dnative \
 -Dquarkus.native.container-build=true \
