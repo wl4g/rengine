@@ -82,14 +82,12 @@ curl -v -XPOST \
 -H 'Content-Type: application/json' \
 'localhost:28002/evaluator/evaluate' \
 -d '{
-  "@kind": "GENERIC",
-  "@engine": "JS",
-  "scenesCode": "iot_generic_temp_warning",
-  "service": "collector",
-  "attributes": {},
-  "scripting": {
-    "mainFun": "process",
-    "args": []
+  "requestId": "b9bc3e0e-d705-4ff2-9edf-970dcf95dea5",
+  "clientId": "JVqEpEwIaqkEkeD5",
+  "clientSecret": "Uf6nJDyJQHKRP43ycl9vZ9zs7s1nyu77",
+  "scenesCode": "ecommerce_trade_gift",
+  "args": {
+    "foo": "bar"
   }
 }'
 ```

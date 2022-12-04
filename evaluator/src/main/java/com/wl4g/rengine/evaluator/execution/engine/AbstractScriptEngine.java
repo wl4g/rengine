@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import org.graalvm.polyglot.proxy.ProxyObject;
@@ -68,7 +67,7 @@ public abstract class AbstractScriptEngine implements IEngine {
     @Inject
     AggregationService aggregationService;
 
-    protected @NotNull List<ObjectResource> loadScriptResources(@NotBlank Scenes scenes, @NotNull Rule rule, boolean useCache) {
+    protected @NotNull List<ObjectResource> loadScriptResources(@NotNull Scenes scenes, @NotNull Rule rule, boolean useCache) {
         notNullOf(rule, "rule");
         log.debug("Loading script {} by scenesCode: {}, ruleId: {}", scenes.getScenesCode(), rule.getId());
 

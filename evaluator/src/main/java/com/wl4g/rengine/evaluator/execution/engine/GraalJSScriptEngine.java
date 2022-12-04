@@ -150,8 +150,8 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
             Set<String> scriptFileNames = scripts.stream().map(s -> getFilename(s.getObjectPrefix())).collect(toSet());
             Timer executeTimer = meterService.timer(evaluation_execute_time.getName(), evaluation_execute_time.getHelp(),
                     new double[] { 0.5, 0.9, 0.95 }, MetricsTag.CLIENT_ID, evaluation.getClientId(), MetricsTag.SCENESCODE,
-                    evaluation.getScenesCode(), MetricsTag.ENGINE, scenes.getWorkflow().getRuleEngine().name(),
-                    MetricsTag.LIBRARY, scriptFileNames.toString());
+                    evaluation.getScenesCode(), MetricsTag.ENGINE, scenes.getWorkflow().getEngine().name(), MetricsTag.LIBRARY,
+                    scriptFileNames.toString());
 
             final long begin = currentTimeMillis();
             Value result = mainFunction.execute(newScriptContext(graphContext, evaluation));
@@ -162,7 +162,9 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
             return result.as(ScriptResult.class);
         } catch (Exception e) {
             throw new ExecutionException(evaluation.getRequestId(), scenes.getScenesCode(),
-                    format("Failed to execution for scenesCode: %s", scenes.getScenesCode()), e);
+                    format("Failed to execution for scenesCode: %s, ruleId: %s, reason: %s", scenes.getScenesCode(), rule.getId(),
+                            e.getMessage()),
+                    e);
         }
     }
 

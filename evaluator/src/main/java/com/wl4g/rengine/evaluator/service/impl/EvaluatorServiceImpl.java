@@ -96,7 +96,8 @@ public class EvaluatorServiceImpl implements EvaluatorService {
 
             // Load deep workflow scenes by code.
             final Scenes scenes = loadScenesWithCascade(evaluation.getScenesCode());
-            final RuleEngine engine = scenes.getWorkflow().getRuleEngine();
+            final RuleEngine engine = scenes.getWorkflow().getEngine();
+            notNull(engine, "Please check if the configuration is correct, rule engine type of workflow is null.");
 
             // Buried-point: total evaluation.
             meterService.counter(evaluation_total.getName(), evaluation_total.getHelp(), MetricsTag.CLIENT_ID,
@@ -243,6 +244,7 @@ public class EvaluatorServiceImpl implements EvaluatorService {
                     scenes.setWorkflow(Workflow.builder()
                             .id(workflowsDoc.getLong("_id"))
                             .name(workflowsDoc.getString("name"))
+                            .engine(RuleEngine.valueOf(workflowsDoc.getString("engine")))
                             .orgCode(workflowsDoc.getString("orgCode"))
                             .enable(workflowsDoc.getInteger("enable"))
                             .labels(workflowsDoc.getList("labels", String.class))
@@ -261,6 +263,7 @@ public class EvaluatorServiceImpl implements EvaluatorService {
                                 Rule rule = Rule.builder()
                                         .id(rulesDoc.getLong("_id"))
                                         .name(rulesDoc.getString("name"))
+                                        .engine(RuleEngine.valueOf(workflowsDoc.getString("engine")))
                                         .uploadIds(rulesDoc.getList("uploadIds", Long.class))
                                         .orgCode(rulesDoc.getString("orgCode"))
                                         .enable(rulesDoc.getInteger("enable"))

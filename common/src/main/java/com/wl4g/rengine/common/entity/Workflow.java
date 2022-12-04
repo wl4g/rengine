@@ -46,7 +46,7 @@ import lombok.experimental.SuperBuilder;
 public class Workflow extends BaseBean {
     private static final long serialVersionUID = 1L;
     private @NotBlank String name;
-    private @NotNull RuleEngine ruleEngine;
+    private @NotNull RuleEngine engine;
     private @Nullable WorkflowGraph graph;
 
     //

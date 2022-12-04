@@ -33,5 +33,5 @@ function process(context) {
 
     // return response2;
     // return "ok...";
-    return new ScriptResult(true).withValue(response2).addAttribute("key11111", "value1111");
+    return new ScriptResult(true).addValue("response2", response2);
 }

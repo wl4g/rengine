@@ -15,12 +15,7 @@
  */
 package com.wl4g.rengine.evaluator.execution;
 
-import static java.lang.String.format;
-import static java.util.Objects.nonNull;
-
-import java.lang.annotation.Annotation;
-
-import javax.enterprise.inject.spi.CDI;
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import com.wl4g.rengine.common.entity.Rule.RuleEngine;
@@ -39,23 +34,30 @@ public class LifecycleExecutionFactory {
     // @Inject
     // BeanManager beanManager;
 
+    @Inject
+    DefaultWorkflowExecution workflowExecution;
+
     public WorkflowExecution getExecution(RuleEngine engine) {
         switch (engine) {
         default:
-            return getBean(DefaultWorkflowExecution.class);
+            // return getBean(DefaultWorkflowExecution.class);
+            return workflowExecution;
         }
     }
 
-    private <T> T getBean(Class<T> subtype, Annotation... qualifiers) {
-        // Set<Bean<?>> beans = beanManager.getBeans(beanType, qualifiers);
-        // if (!beans.isEmpty()) {
-        // return (T) beans.iterator().next();
-        // }
-        T bean = CDI.current().select(subtype, qualifiers).get();
-        if (nonNull(bean)) {
-            return bean;
-        }
-        throw new IllegalStateException(format("Could not obtain bean by '%s, %s'", subtype, qualifiers));
-    }
+// @formatter:off
+//    private <T> T getBean(Class<T> subtype, Annotation... qualifiers) {
+//        // Set<Bean<?>> beans = beanManager.getBeans(beanType, qualifiers);
+//        // if (!beans.isEmpty()) {
+//        // return (T) beans.iterator().next();
+//        // }
+//        // 必须有其他地方注入引用，这里才能获取，否则报错 UnsatisfiedResolution
+//        T bean = CDI.current().select(subtype).get();
+//        if (nonNull(bean)) {
+//            return bean;
+//        }
+//        throw new IllegalStateException(format("Could not obtain bean by '%s, %s'", subtype, qualifiers));
+//    }
+// @formatter:on
 
 }

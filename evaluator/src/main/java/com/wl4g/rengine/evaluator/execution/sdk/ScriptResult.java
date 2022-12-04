@@ -80,12 +80,4 @@ public class ScriptResult {
         getValueMap().clear();
         return this;
     }
-
-    public @HostAccess.Export static ScriptResult newTrue() {
-        return new ScriptResult(true);
-    }
-
-    public @HostAccess.Export static ScriptResult newFalse() {
-        return new ScriptResult(false);
-    }
 }

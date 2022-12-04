@@ -45,7 +45,7 @@ import lombok.experimental.SuperBuilder;
 public class Rule extends BaseBean {
     private static final long serialVersionUID = 1L;
     private @NotBlank String name;
-    private @NotNull RuleEngine kind;
+    private @NotNull RuleEngine engine;
     private @Nullable List<Long> uploadIds;
 
     //

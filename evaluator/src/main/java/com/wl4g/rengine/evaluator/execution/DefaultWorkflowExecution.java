@@ -25,6 +25,7 @@ import static java.util.stream.Collectors.toMap;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import com.wl4g.rengine.common.entity.Rule;
 import com.wl4g.rengine.common.entity.Rule.RuleEngine;
@@ -50,6 +51,7 @@ import com.wl4g.rengine.evaluator.execution.sdk.ScriptResult;
  * @version 2022-09-17
  * @since v1.0.0
  */
+@Singleton
 public class DefaultWorkflowExecution implements WorkflowExecution {
 
     // @Inject
@@ -61,7 +63,7 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
     @Override
     public EvaluationResult execute(final Evaluation evaluation, final Scenes scenes) {
         final Workflow workflow = scenes.getWorkflow();
-        final IEngine engine = getEngine(workflow.getRuleEngine());
+        final IEngine engine = getEngine(workflow.getEngine());
 
         final ExecutionGraphParameter parameter = ExecutionGraphParameter.builder()
                 .requestTime(currentTimeMillis())

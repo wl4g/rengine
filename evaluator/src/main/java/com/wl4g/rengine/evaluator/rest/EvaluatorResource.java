@@ -61,18 +61,18 @@ public class EvaluatorResource {
 
     /**
      * Process requests from business applications are evaluated against a rules
-     * model.
+     * evaluation.
      * 
-     * @param model
+     * @param evaluation
      * @return
      * @throws SystemException
      * @see https://quarkus.io/guides/resteasy-reactive#asyncreactive-support
      */
     @POST
     @Path(RengineConstants.API_EVALUATOR_EVALUATE)
-    public Uni<RespBase<EvaluationResult>> evaluate(Evaluation model) throws SystemException {
-        log.debug("Evaluating of {}", model);
-        return evaluatorService.evaluate(model);
+    public Uni<RespBase<EvaluationResult>> evaluate(Evaluation evaluation) throws SystemException {
+        log.debug("Evaluating of : {}", evaluation);
+        return evaluatorService.evaluate(evaluation);
     }
 
 }

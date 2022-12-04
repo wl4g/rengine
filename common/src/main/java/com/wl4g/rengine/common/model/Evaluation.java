@@ -24,6 +24,7 @@ import javax.validation.constraints.NotNull;
 
 import lombok.Builder.Default;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -39,6 +40,7 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @SuperBuilder
 @ToString
+@NoArgsConstructor
 public class Evaluation extends EvaluationBase {
 
     @NotBlank
