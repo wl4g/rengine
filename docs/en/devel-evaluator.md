@@ -7,7 +7,7 @@
 ```bash
 git clone git@github.com/wl4g/rengine.git
 cd rengine/evaluator
-./mvnw clean install -DskipTests -Dmaven.test.skip=true -T 2C
+./mvnw clean install -U -DskipTests -Dmaven.test.skip=true -T 4C
 ```
 
 ## Build for native image
@@ -24,11 +24,12 @@ cd rengine/evaluator
 
 ```bash
 export JAVA_HOME=/usr/local/jdk-11.0.10/ # Must java11+
-
 ./mvnw clean install -U -T 4C
 
 ./mvnw package -f evaluator/pom.xml \
--Dmaven.test.skip=true -DskipTests -Dnative \
+-Dmaven.test.skip=true \
+-DskipTests \
+-Dnative \
 -Dquarkus.native.container-build=true \
 -Dquarkus.native.container-runtime=docker
 ```
@@ -39,11 +40,12 @@ export JAVA_HOME=/usr/local/jdk-11.0.10/ # Must java11+
 
 ```bash
 export JAVA_HOME=/usr/local/jdk-11.0.10/ # Must java11+
-
 ./mvnw clean install -U -T 4C
 
 ./mvnw package -f evaluator/pom.xml \
--Dmaven.test.skip=true -DskipTests -Dnative \
+-Dmaven.test.skip=true \
+-DskipTests \
+-Dnative \
 -Dquarkus.native.container-build=true \
 -Dquarkus.native.container-runtime=docker \
 -Dquarkus.container-image.build=true
@@ -60,7 +62,8 @@ docker build -f build/docker/Dockerfile.native -t wl4g/rengine-evaluator .
 
 ```bash
 ./mvnw package -f evaluator/pom.xml \
--Dmaven.test.skip=true -DskipTests \
+-Dmaven.test.skip=true \
+-DskipTests \
 -Dquarkus.container-image.build=true
 ```
 
@@ -93,6 +96,7 @@ curl -v -XPOST \
   "clientSecret": "Uf6nJDyJQHKRP43ycl9vZ9zs7s1nyu77",
   "scenesCode": "ecommerce_trade_gift",
   "args": {
+    "userId": "u10010101",
     "foo": "bar"
   }
 }'
@@ -104,7 +108,7 @@ curl -v -XPOST \
 
 ## FAQ
 
-### Manual testing Groovy as a dynamic script execution engine?
+### Mock testing dynamic `groovy` script execution?
 
 - Source codes see: [TestGroovyResource.java](src/main/java/com/wl4g/rengine/evaluator/rest/TestGroovyResource.java)
 
@@ -135,7 +139,7 @@ curl -v -XPOST -H 'Content-Type: application/json' 'http://localhost:28002/test/
 tail -f /tmp/rengine/evaluator.log | jq -r '.message'
 ```
 
-### Manual testing Javascript as a dynamic script execution engine?
+### Mock testing dynamic `js` script execution?
 
 - Source codes see: [TestJavascriptResource.java](src/main/java/com/wl4g/rengine/evaluator/rest/TestJavascriptResource.java)
 

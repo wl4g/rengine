@@ -24,7 +24,131 @@
   "queryAllDeclaredConstructors":true,
   "methods":[
     {"name":"<init>","parameterTypes":[] },
-    {"name":"<init>","parameterTypes":["java.util.List", "java.util.List"] }
+    {"name":"<init>","parameterTypes":["java.util.List", "java.util.List"] },
+    {"name":"getNodes","parameterTypes":[] },
+    {"name":"setNodes","parameterTypes":["java.util.List"] },
+    {"name":"getConnections","parameterTypes":[] },
+    {"name":"setConnections","parameterTypes":["java.util.List"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.WorkflowGraph$BaseNode",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] },
+    {"name":"getType","parameterTypes":[] },
+    {"name":"setType","parameterTypes":["java.lang.String"] },
+    {"name":"getId","parameterTypes":[] },
+    {"name":"setId","parameterTypes":["java.lang.String"] },
+    {"name":"withId","parameterTypes":["java.lang.String"] },
+    {"name":"getName","parameterTypes":[] },
+    {"name":"setName","parameterTypes":["java.lang.String"] },
+    {"name":"withName","parameterTypes":["java.lang.String"] },
+    {"name":"getAttributes","parameterTypes":[] },
+    {"name":"setAttributes","parameterTypes":["java.util.Map"] },
+    {"name":"withAttributes","parameterTypes":["java.util.Map"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.WorkflowGraph$BaseRunNode",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] },
+    {"name":"getRuleId","parameterTypes":[] },
+    {"name":"setRuleId","parameterTypes":["java.lang.String"] },
+    {"name":"withRuleId","parameterTypes":["java.lang.String"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.WorkflowGraph$BootNode",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.WorkflowGraph$ProcessNode",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.WorkflowGraph$FailbackNode",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.WorkflowGraph$LogicalNode",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] },
+    {"name":"getLogical","parameterTypes":[] },
+    {"name":"setLogical","parameterTypes":["com.wl4g.rengine.common.entity.WorkflowGraph$LogicalType"] },
+    {"name":"withLogical","parameterTypes":["com.wl4g.rengine.common.entity.WorkflowGraph$LogicalType"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.WorkflowGraph$RunNode",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.WorkflowGraph$LogicalType",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] },
+    {"name":"getDescription","parameterTypes":[] },
+    {"name":"of","parameterTypes":["java.lang.String"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.WorkflowGraph$NodeType",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] },
+    {"name":"of","parameterTypes":["java.lang.String"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.WorkflowGraph$NodeConnection",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] },
+    {"name":"<init>","parameterTypes":["java.lang.String","java.lang.String"] },
+    {"name":"<init>","parameterTypes":["java.lang.String","java.lang.String","java.lang.String"] },
+    {"name":"getName","parameterTypes":[] },
+    {"name":"setName","parameterTypes":["java.lang.String"] },
+    {"name":"getTo","parameterTypes":[] },
+    {"name":"setTo","parameterTypes":["java.lang.String"] },
+    {"name":"getFrom","parameterTypes":[] },
+    {"name":"setFrom","parameterTypes":["java.lang.String"] },
+    {"name":"getAttributes","parameterTypes":[] },
+    {"name":"setAttributes","parameterTypes":["java.util.Map"] }
   ]
 },
 {

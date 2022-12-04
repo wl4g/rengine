@@ -37,7 +37,6 @@ import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder.Default;
 import lombok.Getter;
@@ -90,7 +89,7 @@ public class WorkflowGraph {
 
         @Schema(name = "@type", implementation = NodeType.class)
         @JsonProperty(value = "@type", access = Access.WRITE_ONLY)
-        private @NotBlank @Setter(AccessLevel.PROTECTED) String type;
+        private @NotBlank String type;
         private @NotBlank String id;
         private @NotBlank String name = DEFAULT_NODE_NAME;
         private @Nullable Map<String, Object> attributes = new HashMap<String, Object>() {
