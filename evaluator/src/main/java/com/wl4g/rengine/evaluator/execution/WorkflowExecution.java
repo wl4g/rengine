@@ -19,7 +19,7 @@ import javax.validation.constraints.NotNull;
 
 import com.wl4g.rengine.common.entity.Scenes;
 import com.wl4g.rengine.common.model.Evaluation;
-import com.wl4g.rengine.common.model.EvaluationResult;
+import com.wl4g.rengine.common.model.EvaluationResult.ResultDescription;
 
 /**
  * {@link WorkflowExecution}
@@ -29,5 +29,5 @@ import com.wl4g.rengine.common.model.EvaluationResult;
  * @since v1.0.0
  */
 public interface WorkflowExecution {
-    EvaluationResult execute(@NotNull final Evaluation evaluation, @NotNull final Scenes scenes);
+    ResultDescription execute(@NotNull final Evaluation evaluation, @NotNull final Scenes scenes);
 }

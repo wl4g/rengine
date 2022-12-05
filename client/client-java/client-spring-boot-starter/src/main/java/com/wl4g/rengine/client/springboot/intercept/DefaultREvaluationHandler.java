@@ -25,6 +25,7 @@ import static com.wl4g.infra.common.lang.ClassUtils2.getMethod;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.invokeMethod;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.contains;
@@ -88,12 +89,13 @@ public class DefaultREvaluationHandler implements REvaluationHandler<REvaluation
         final Function<Throwable, EvaluationResult> failback = getFailback(failbackClazz);
         final Map<String, Object> args = buildEvaluateParams(jp, annotation, paramsTemplate);
 
-        final EvaluationResult result = rengineClient.evaluate(requestId, scenesCode, timeoutMs, bestEffort, args, failback);
+        final EvaluationResult result = rengineClient.evaluate(requestId, singletonList(scenesCode), timeoutMs, bestEffort, args,
+                failback);
         log.debug("Evaluated of result: {}, {} => {}", result, scenesCode, args);
 
         // Assertion evaluation result.
         if (result.getErrorCount() > 0) {
-            throw new ClientEvaluationException(requestId, scenesCode, timeoutMs, bestEffort,
+            throw new ClientEvaluationException(requestId, singletonList(scenesCode), timeoutMs, bestEffort,
                     format("Unable to operation, detected risk in your environment."));
         }
 

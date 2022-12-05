@@ -56,6 +56,7 @@ public class EvaluationResult extends EvaluationBase {
     @SuperBuilder
     @NoArgsConstructor
     public static class ResultDescription {
+
         // TODO 目前设计为场景ID
         // 未来演进为通用特征平台，是否可将此字段表示为 feature?
         // 特征平台的 feature 其实 rengine 就是 eventType (即前者一切数据类型揭:特征，后者一切数据类型揭:事件)
@@ -70,4 +71,6 @@ public class EvaluationResult extends EvaluationBase {
         Map<String, Object> valueMap;
     }
 
+    public static final String STATUS_PARTIALLY_COMPLETED = "PartiallyCompleted";
+    public static final String STATUS_ALL_COMPLETED = "AllCompleted";
 }

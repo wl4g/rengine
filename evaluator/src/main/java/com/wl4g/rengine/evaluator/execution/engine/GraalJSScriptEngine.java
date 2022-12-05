@@ -150,7 +150,7 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
             Set<String> scriptFileNames = scripts.stream().map(s -> getFilename(s.getObjectPrefix())).collect(toSet());
             Timer executeTimer = meterService.timer(evaluation_execute_time.getName(), evaluation_execute_time.getHelp(),
                     new double[] { 0.5, 0.9, 0.95 }, MetricsTag.CLIENT_ID, evaluation.getClientId(), MetricsTag.SCENESCODE,
-                    evaluation.getScenesCode(), MetricsTag.ENGINE, scenes.getWorkflow().getEngine().name(), MetricsTag.LIBRARY,
+                    scenes.getScenesCode(), MetricsTag.ENGINE, scenes.getWorkflow().getEngine().name(), MetricsTag.LIBRARY,
                     scriptFileNames.toString());
 
             final long begin = currentTimeMillis();

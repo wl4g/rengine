@@ -94,7 +94,9 @@ curl -v -XPOST \
   "requestId": "b9bc3e0e-d705-4ff2-9edf-970dcf95dea5",
   "clientId": "JVqEpEwIaqkEkeD5",
   "clientSecret": "Uf6nJDyJQHKRP43ycl9vZ9zs7s1nyu77",
-  "scenesCode": "ecommerce_trade_gift",
+  "scenesCodes": ["ecommerce_trade_gift"],
+  "timeout": 3000,
+  "bestEffort": true,
   "args": {
     "userId": "u10010101",
     "foo": "bar"

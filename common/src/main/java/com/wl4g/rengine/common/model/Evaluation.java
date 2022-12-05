@@ -15,11 +15,15 @@
  */
 package com.wl4g.rengine.common.model;
 
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import lombok.Builder.Default;
@@ -49,8 +53,9 @@ public class Evaluation extends EvaluationBase {
     @NotBlank
     String clientSecret;
 
-    @NotBlank
-    String scenesCode;
+    @NotEmpty
+    @Default
+    List<String> scenesCodes = new LinkedList<>();
 
     /**
      * That is, the maximum execution time, and the user determines the
@@ -82,7 +87,8 @@ public class Evaluation extends EvaluationBase {
      * BuyerId+UserId to execute it.
      */
     @Nullable
-    Map<String, Object> args;
+    @Default
+    Map<String, Object> args = new LinkedHashMap<>(4);
 
     public static final long DEFAULT_TIMEOUT = 3_000L;
     public static final boolean DEFAULT_BESTEFFORT = false;

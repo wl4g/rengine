@@ -75,7 +75,7 @@ public class RengineClientTests {
     @Test
     public void testNewRengineClientEvaluationWithDefault() {
         Map<String, Object> args = new HashMap<>();
-        final EvaluationResult result = defaultClient.evaluate("iot_temp_warn", args);
+        final EvaluationResult result = defaultClient.evaluate(singletonList("ecommerce_trade_gift"), args);
         System.out.println("Evaluation result: " + result);
     }
 
@@ -86,7 +86,8 @@ public class RengineClientTests {
             return defaultFailbackResult;
         }).build();
 
-        final EvaluationResult result = timeoutClient.evaluate(IdGenUtil.next(), "iot_temp_warn", 1000L, false, emptyMap());
+        final EvaluationResult result = timeoutClient.evaluate(IdGenUtil.next(), singletonList("ecommerce_trade_gift"), 1000L,
+                false, emptyMap());
         System.out.println("Evaluated result: " + result);
     }
 
@@ -97,7 +98,8 @@ public class RengineClientTests {
             return defaultFailbackResult;
         }).build();
 
-        final var result = timeoutClient.evaluate(IdGenUtil.next(), "iot_temp_warn", 1000L, true, emptyMap());
+        final var result = timeoutClient.evaluate(IdGenUtil.next(), singletonList("ecommerce_trade_gift"), 1000L, true,
+                emptyMap());
         System.out.println("Evaluated result: " + result);
         Assertions.assertEquals(defaultFailbackResult, result);
     }

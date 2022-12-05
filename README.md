@@ -4,7 +4,7 @@ A generic real-time rule engine, such as bank transfer real-time risk control, t
 
 ## Architectures
 
-- ![Global](./docs/shots/rengine_architecture.png)
+- ![Global](./docs/shots/architecture.png)
 
 ## Requirements
 
@@ -19,8 +19,6 @@ A generic real-time rule engine, such as bank transfer real-time risk control, t
 - Quarkus 2.12.2
 
 - Redis Cluster 5 +
-
-- MySQL 5.7 +
 
 - MongoDB 4.6.x +
 

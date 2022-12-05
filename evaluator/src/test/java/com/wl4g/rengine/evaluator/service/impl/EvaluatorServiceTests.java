@@ -16,6 +16,9 @@
 package com.wl4g.rengine.evaluator.service.impl;
 
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+import static java.util.Collections.singletonList;
+
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -55,10 +58,10 @@ public class EvaluatorServiceTests {
     }
 
     @Test
-    public void testLoadScenesWithCascade() {
+    public void testFindScenesWithCascade() {
         try {
-            Scenes scenes = evaluatorService.loadScenesWithCascade("ecommerce_trade_gift");
-            System.out.println(toJSONString(scenes));
+            List<Scenes> sceneses = evaluatorService.findScenesWithCascade(singletonList("ecommerce_trade_gift"));
+            System.out.println(toJSONString(sceneses, true));
         } catch (Exception e) {
             e.printStackTrace();
             throw e;

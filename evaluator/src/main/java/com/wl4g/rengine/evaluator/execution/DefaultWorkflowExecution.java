@@ -18,7 +18,6 @@ package com.wl4g.rengine.evaluator.execution;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static java.lang.String.valueOf;
 import static java.lang.System.currentTimeMillis;
-import static java.util.Collections.singletonList;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toMap;
 
@@ -38,7 +37,6 @@ import com.wl4g.rengine.common.graph.ExecutionGraphParameter;
 import com.wl4g.rengine.common.graph.ExecutionGraphResult;
 import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
 import com.wl4g.rengine.common.model.Evaluation;
-import com.wl4g.rengine.common.model.EvaluationResult;
 import com.wl4g.rengine.common.model.EvaluationResult.ResultDescription;
 import com.wl4g.rengine.evaluator.execution.engine.GraalJSScriptEngine;
 import com.wl4g.rengine.evaluator.execution.engine.IEngine;
@@ -61,7 +59,7 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
     GraalJSScriptEngine graalJSScriptEngine;
 
     @Override
-    public EvaluationResult execute(final Evaluation evaluation, final Scenes scenes) {
+    public ResultDescription execute(final Evaluation evaluation, final Scenes scenes) {
         final Workflow workflow = scenes.getWorkflow();
         final IEngine engine = getEngine(workflow.getEngine());
 
@@ -87,14 +85,10 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
 
         final ExecutionGraph<?> graph = ExecutionGraph.from(workflow.getGraph());
         final ExecutionGraphResult result = graph.apply(context);
-
-        // TODO 支持批量 evaluation 返回
-        return EvaluationResult.builder()
-                .requestId(evaluation.getRequestId())
-                .results(singletonList(ResultDescription.builder()
-                        .scenesCode(evaluation.getScenesCode())
-                        .valueMap(result.getValueMap())
-                        .build()))
+        return ResultDescription.builder()
+                .scenesCode(scenes.getScenesCode())
+                .success(true)
+                .valueMap(result.getValueMap())
                 .build();
     }
 

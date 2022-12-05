@@ -42,7 +42,6 @@ import io.minio.BucketExistsArgs;
  * @see https://quarkus.io/guides/smallrye-health
  */
 @Readiness
-// @ApplicationScoped
 @Singleton
 public class MinioReadyHealthCheck implements HealthCheck {
 
