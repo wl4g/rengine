@@ -60,6 +60,7 @@ import org.bson.BsonString;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.mongodb.Function;
 import com.mongodb.client.MongoCollection;
@@ -156,7 +157,7 @@ public class EvaluatorServiceImpl implements EvaluatorService {
                                 taskRunner.getWorker().submit(new EvaluationWorker(latch, evaluation, scenes))))
                         .collect(toMap(kv -> kv.getKey(), kv -> (Future) kv.getValue()));
 
-                // Execution check for completed or timeout.
+                // Collect for uncompleted results.
                 final List<ResultDescription> uncompleteds = new LinkedList<>();
                 if (!latch.await(evaluation.getTimeout(), MILLISECONDS)) { // Partially-completed
                     final Iterator<Entry<String, Future<ResultDescription>>> it = futures.entrySet().iterator();
@@ -186,8 +187,8 @@ public class EvaluatorServiceImpl implements EvaluatorService {
 
                 resp.setData(EvaluationResult.builder()
                         .requestId(evaluation.getRequestId())
-                        .errorCount(completeds.size())
-                        .results(completeds)
+                        .errorCount(uncompleteds.size())
+                        .results(Lists.newArrayList(Iterables.concat(completeds, uncompleteds)))
                         .build());
             } catch (Throwable e) {
                 String errmsg = format("Could not to execution evaluate of clientId: '%s', reason: %s", evaluation.getClientId(),
