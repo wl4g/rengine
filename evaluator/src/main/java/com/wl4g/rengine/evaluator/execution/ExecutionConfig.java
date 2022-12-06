@@ -51,6 +51,13 @@ public interface ExecutionConfig {
     @Max(10_0000)
     Integer maxQueryBatch();
 
+    @WithDefault(DEFAULT_TIMEOUT_OFFSET_RATE + "")
+    @NotNull
+    @Min(0)
+    @Max(1)
+    Float evaluateTimeoutOffsetRate();
+
     public static final int DEFAULT_THREAD_POOLS = 3;
     public static final int DEFAULT_MAX_QUERY_BATCH = 1024;
+    public static final float DEFAULT_TIMEOUT_OFFSET_RATE = 0.1f;
 }

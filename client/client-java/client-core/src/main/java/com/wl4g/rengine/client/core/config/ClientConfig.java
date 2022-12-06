@@ -21,6 +21,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.wl4g.infra.common.minio.OkHttpClientConfig;
 import com.wl4g.rengine.common.model.Evaluation;
 
 import lombok.Builder.Default;
@@ -54,4 +55,5 @@ public class ClientConfig {
 
     private @NotNull @Min(1) @Default Boolean defaultBestEffort = Evaluation.DEFAULT_BESTEFFORT;
 
+    private @NotNull @Default OkHttpClientConfig okHttpClient = new OkHttpClientConfig();
 }

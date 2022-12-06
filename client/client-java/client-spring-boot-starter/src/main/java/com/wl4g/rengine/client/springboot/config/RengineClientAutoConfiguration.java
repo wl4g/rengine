@@ -35,6 +35,8 @@ import com.wl4g.rengine.client.springboot.intercept.REvaluationHandler;
 import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.common.model.EvaluationResult;
 
+import okhttp3.OkHttpClient;
+
 /**
  * {@link RengineClientAutoConfiguration}
  * 
@@ -61,7 +63,8 @@ public class RengineClientAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public RengineClient rengineClient(ClientCoreProperties config, Function<Throwable, EvaluationResult> defaultFailback) {
-        return RengineClient.builder().config(config).defaultFailback(defaultFailback).build();
+        final OkHttpClient httpClient = config.getOkHttpClient().newOkHttpClient();
+        return RengineClient.builder().config(config).httpClient(httpClient).defaultFailback(defaultFailback).build();
     }
 
     @Bean

@@ -252,6 +252,7 @@ rengine:
     execution:
       thread-pools: 3
       max-query-batch: 1024
+      evaluate-timeout-offset-rate: 0.1f
     minio:
       endpoint: http://localhost:9000
       region: us-east-1

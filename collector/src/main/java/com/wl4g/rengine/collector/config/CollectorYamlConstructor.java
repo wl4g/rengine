@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.collector.config.yaml;
+package com.wl4g.rengine.collector.config;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 
@@ -28,7 +28,7 @@ import com.wl4g.rengine.collector.job.CollectJobExecutor.EventJobType;
  * 
  * @author James Wong
  * @version 2022-10-27
- * @since v3.0.0
+ * @since v1.0.0
  */
 public class CollectorYamlConstructor extends Constructor {
 
@@ -36,12 +36,12 @@ public class CollectorYamlConstructor extends Constructor {
         configure(this);
     }
 
-    public static void configure(BaseConstructor constructor) {
+    static void configure(BaseConstructor constructor) {
         notNullOf(constructor, "constructor");
         for (EventJobType type : EventJobType.values()) {
-            // TODO Notice: For example, PrometheusCollectJobExecutor inherits the
-            // SimpleHttpCollectJobExecutor and is temporarily treated as the
-            // latter class.
+            // Notice: For example, PrometheusCollectJobExecutor inherits
+            // the SimpleHttpCollectJobExecutor and is temporarily treated as
+            // the latter class.
             constructor.addTypeDescription(new TypeDescription(type.getJobConfigClass(), "!".concat(type.name())));
         }
     }

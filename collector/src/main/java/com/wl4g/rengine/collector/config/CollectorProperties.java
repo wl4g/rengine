@@ -40,6 +40,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -460,8 +461,29 @@ public class CollectorProperties {
                     .description(description)
                     .jobParams(getJobParams())
                     .build();
-            ensureMap(eventAttributes).forEach((key, value) -> result.getProps().setProperty(key, value));
+            ensureMap(eventAttributes).entrySet()
+                    .stream()
+                    .filter(e -> !isBlank(e.getKey()) && !isBlank(e.getValue()))
+                    .forEach(e -> result.getProps().setProperty(e.getKey(), e.getValue()));
             return result;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(name);
+        }
+
+        @SuppressWarnings("rawtypes")
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            ScrapeJobProperties other = (ScrapeJobProperties) obj;
+            return Objects.equals(name, other.name);
         }
     }
 

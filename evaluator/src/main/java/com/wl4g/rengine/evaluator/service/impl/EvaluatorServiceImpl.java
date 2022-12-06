@@ -15,6 +15,7 @@
  */
 package com.wl4g.rengine.evaluator.service.impl;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
@@ -164,7 +165,8 @@ public class EvaluatorServiceImpl implements EvaluatorService {
 
                 // Collect for uncompleted results.
                 final List<ResultDescription> uncompleteds = new ArrayList<>(futures.size());
-                if (!latch.await(evaluation.getTimeout(), MILLISECONDS)) { // Timeout?
+                final long timeoutMs = (long) ((long) evaluation.getTimeout() * (1 - config.evaluateTimeoutOffsetRate()));
+                if (!latch.await(timeoutMs, MILLISECONDS)) { // Timeout?
                     final Iterator<Entry<String, Future<ResultDescription>>> it = futures.entrySet().iterator();
                     while (it.hasNext()) {
                         final Entry<String, Future<ResultDescription>> entry = it.next();
@@ -181,9 +183,9 @@ public class EvaluatorServiceImpl implements EvaluatorService {
                                     .build());
                         }
                     }
-                    resp.setStatus(EvaluationResult.STATUS_PARTIALLY_COMPLETED);
+                    resp.setStatus(EvaluationResult.STATUS_PART_SUCCESS);
                 } else { // All-completed
-                    resp.setStatus(EvaluationResult.STATUS_ALL_COMPLETED);
+                    resp.setStatus(EvaluationResult.STATUS_ALL_SUCCESS);
                 }
 
                 // Collect for completed results.
@@ -198,7 +200,7 @@ public class EvaluatorServiceImpl implements EvaluatorService {
                 resp.setData(EvaluationResult.builder()
                         .requestId(evaluation.getRequestId())
                         .errorCount(uncompleteds.size())
-                        .results(Lists.newArrayList(Iterables.concat(completeds, uncompleteds)))
+                        .results(newArrayList(Iterables.concat(completeds, uncompleteds)))
                         .build());
             } catch (Throwable e) {
                 String errmsg = format("Could not to execution evaluate of clientId: '%s', reason: %s", evaluation.getClientId(),

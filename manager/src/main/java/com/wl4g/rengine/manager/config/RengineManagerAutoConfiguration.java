@@ -31,7 +31,7 @@ import com.wl4g.rengine.manager.minio.MinioClientAutoConfiguration;
  * @since v1.0.0
  */
 @Configuration
-@Import({ MinioClientAutoConfiguration.class })
+@Import({ MinioClientAutoConfiguration.class, CustomMongoConfigure.class })
 public class RengineManagerAutoConfiguration {
 
     @Bean

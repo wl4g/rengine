@@ -1,5 +1,29 @@
 [
 {
+  "name":"org.apache.shardingsphere.elasticjob.infra.spi.SPIPostProcessor",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+  ]
+},
+{
+  "name":"org.apache.shardingsphere.elasticjob.infra.spi.TypedSPI",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+  ]
+},
+{
+  "name":"org.apache.shardingsphere.elasticjob.executor.item.impl.TypedJobItemExecutor",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+  ]
+},
+{
   "name":"org.apache.shardingsphere.elasticjob.lite.spring.core.setup.QuarkusProxyJobClassNameProvider",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
@@ -16,7 +40,7 @@
   ]
 },
 {
-  "name":"com.wl4g.rengine.client.collector.job.EventJobExecutor",
+  "name":"com.wl4g.rengine.client.collector.job.CollectJobExecutor",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
@@ -24,7 +48,7 @@
   ]
 },
 {
-  "name":"com.wl4g.rengine.client.collector.job.EventJobExecutor$BodyConverter",
+  "name":"com.wl4g.rengine.client.collector.job.CollectJobExecutor$BodyConverter",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
@@ -32,7 +56,7 @@
   ]
 },
 {
-  "name":"com.wl4g.rengine.client.collector.job.SimpleHttpEventJobExecutor",
+  "name":"com.wl4g.rengine.client.collector.job.PrometheusCollectJobExecutor",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
@@ -40,7 +64,7 @@
   ]
 },
 {
-  "name":"com.wl4g.rengine.client.collector.job.PrometheusEventJobExecutor",
+  "name":"com.wl4g.rengine.client.collector.job.SimpleHttpCollectJobExecutor",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
@@ -48,7 +72,7 @@
   ]
 },
 {
-  "name":"com.wl4g.rengine.client.collector.job.SimpleJdbcEventJobExecutor",
+  "name":"com.wl4g.rengine.client.collector.job.SimpleJdbcCollectJobExecutor",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
@@ -56,7 +80,7 @@
   ]
 },
 {
-  "name":"com.wl4g.rengine.client.collector.job.SimpleRedisEventJobExecutor",
+  "name":"com.wl4g.rengine.client.collector.job.SimpleRedisCollectJobExecutor",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
@@ -64,7 +88,7 @@
   ]
 },
 {
-  "name":"com.wl4g.rengine.client.collector.job.SimpleTcpEventJobExecutor",
+  "name":"com.wl4g.rengine.client.collector.job.SimpleSSHCollectJobExecutor",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
@@ -72,11 +96,127 @@
   ]
 },
 {
-  "name":"com.wl4g.rengine.client.collector.job.SSHEventJobExecutor",
+  "name":"com.wl4g.rengine.client.collector.job.SimpleTcpCollectJobExecutor",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
   "methods":[
+  ]
+},
+{
+  "name":"com.wl4g.rengine.collector.config.CollectorProperties",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.collector.config.CollectorProperties$ZookeeperProperties",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] },
+    {"name":"setServerLists","parameterTypes":["java.lang.String"] },
+    {"name":"setNamespace","parameterTypes":["java.lang.String"] },
+    {"name":"setBaseSleepTimeMilliseconds","parameterTypes":["java.lang.Integer"] },
+    {"name":"setMaxSleepTimeMilliseconds","parameterTypes":["java.lang.Integer"] },
+    {"name":"setMaxRetries","parameterTypes":["java.lang.Integer"] },
+    {"name":"setSessionTimeoutMilliseconds","parameterTypes":["java.lang.Integer"] },
+    {"name":"setConnectionTimeoutMilliseconds","parameterTypes":["java.lang.String"] },
+    {"name":"setDigest","parameterTypes":["java.lang.String"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.collector.config.CollectorProperties$TracingProperties",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.collector.config.CollectorProperties$SnapshotDumpProperties",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.collector.config.CollectorProperties$GlobalScrapeJobProperties",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.collector.config.CollectorProperties$ScrapeJobProperties",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.collector.config.CollectorProperties$SimpleHttpScrapeJobProperties",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.collector.config.CollectorProperties$SimpleJdbcScrapeJobProperties",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.collector.config.CollectorProperties$SimpleRedisScrapeJobProperties",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.collector.config.CollectorProperties$SimpleTcpScrapeJobProperties",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.collector.config.CollectorProperties$SimpleSSHScrapeJobProperties",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.zaxxer.hikari.HikariConfig",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
   ]
 }
 ]

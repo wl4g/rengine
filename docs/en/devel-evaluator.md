@@ -25,7 +25,7 @@ export JAVA_HOME=/usr/local/jdk-11.0.10/
 
 ```bash
 export JAVA_HOME=/usr/local/jdk-11.0.10/ # Must java11+
-./mvnw clean install -U -T 4C
+./mvnw clean install -DskipTests -Dmaven.test.skip=true -U -T 4C
 
 ./mvnw package -f evaluator/pom.xml \
 -Dmaven.test.skip=true \
@@ -41,7 +41,7 @@ export JAVA_HOME=/usr/local/jdk-11.0.10/ # Must java11+
 
 ```bash
 export JAVA_HOME=/usr/local/jdk-11.0.10/ # Must java11+
-./mvnw clean install -U -T 4C
+./mvnw clean install -DskipTests -Dmaven.test.skip=true -U -T 4C
 
 ./mvnw package -f evaluator/pom.xml \
 -Dmaven.test.skip=true \

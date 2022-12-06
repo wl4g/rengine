@@ -10,7 +10,6 @@
 
 # #### Collector Job configuration. ####
 #
-
 rengine:
   collector:
     zookeeper:
@@ -28,7 +27,6 @@ rengine:
       includeJobNames: []
       excludeJobNames: []
     dump:
-      enabled: true
       port: 9888
     globalScrapeJobConfig:
       ## The custom event type, which should correspond to Rengine manager, evaluator, jobs.
@@ -72,28 +70,18 @@ rengine:
           connectTimeoutMs: 3000
           readTimeoutMs: 5000
         simpleJdbc:
-          ## If this variable is false, we will throw exceptions on SQL warnings.
-          ignoreWarnings: true
-          ## If this variable is set to a non-negative value, it will be used for setting the fetchSize property 
-          ## on statements used for query processing.
+          ## The direction for fetching rows from database tables.
+          fetchDirection: -1
+          ## The number of rows that should be fetched from the database when more rows are needed.
           fetchSize: -1
-          ## If this variable is set to a non-negative value, it will be used for setting the maxRows property on
-          ## statements used for query processing.
-          maxRows: -1
-          ## If this variable is set to a non-negative value, it will be used for setting the queryTimeout property
-          ## on statements used for query processing.
-          queryTimeout: -1
-          ## If this variable is set to true, then all results checking will be bypassed for any callable statement
-          ## processing. This can be used to avoid a bug in some older Oracle JDBC drivers like 10.1.0.2.
-          skipResultsProcessing: false
-          ## If this variable is set to true then all results from a stored procedure call that don't have a 
-          ## corresponding SqlOutParameter declaration will be bypassed. All other results processing will 
-          ## be take place unless the variable skipResultsProcessing is set true
-          skipUndeclaredResults: false
-          ## If this variable is set to true then execution of a CallableStatement will return the results in a Map
-          ## that uses case-insensitive names for the parameters.
-          resultsMapCaseInsensitive: false
-          sql: "SELECT 1" ## The collect to target JDBC SQL.
+          ## The maximum number of bytes that can be returned for character and binary column values.
+          maxFieldSize: 64
+          ## The maximum number of rows that a ResultSet can produce.
+          maxRows: 1024
+          ## The number of mills the driver will wait for execution.
+          queryTimeoutMs: 15000
+          ## The collect to target JDBC SQL.
+          sql: "SELECT 1"
           ## The properties for HikariConfig
           hikariConfig:
             #jdbcUrl: ""

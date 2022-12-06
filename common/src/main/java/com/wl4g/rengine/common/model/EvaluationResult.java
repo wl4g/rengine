@@ -71,6 +71,6 @@ public class EvaluationResult extends EvaluationBase {
         Map<String, Object> valueMap;
     }
 
-    public static final String STATUS_PARTIALLY_COMPLETED = "PartiallyCompleted";
-    public static final String STATUS_ALL_COMPLETED = "AllCompleted";
+    public static final String STATUS_PART_SUCCESS = "PartSuccess";
+    public static final String STATUS_ALL_SUCCESS = "AllSuccess";
 }

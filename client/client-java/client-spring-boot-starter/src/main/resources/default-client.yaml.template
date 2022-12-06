@@ -7,9 +7,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-#
-# #### Rengine client default configuration template. ####
-#
+# ## Rengine client default configuration template. ##
 #
 rengine:
   ## see:com.wl4g.rengine.client.springboot.config.ClientCoreAutoConfiguration.ClientCoreProperties

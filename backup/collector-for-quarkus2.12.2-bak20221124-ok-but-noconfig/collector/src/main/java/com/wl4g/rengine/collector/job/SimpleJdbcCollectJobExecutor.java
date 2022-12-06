@@ -116,7 +116,7 @@ public class SimpleJdbcCollectJobExecutor extends CollectJobExecutor<SimpleJdbcC
                 if (isNull(jdbcHelper)) {
                     jdbcHelper = new HikariJdbcHelper(new StatementConfiguration(shardingParam.getFetchDirection(),
                             shardingParam.getFetchSize(), shardingParam.getMaxFieldSize(), shardingParam.getMaxRows(),
-                            safeLongToInt(shardingParam.getQueryTimeout().toSeconds())), shardingParam.getHikariConfig());
+                            safeLongToInt(shardingParam.getQueryTimeoutMs())), shardingParam.getHikariConfig());
                     jdbcHelperCaches.put(shardingParam.getName(), jdbcHelper);
                 }
             }
@@ -167,19 +167,19 @@ public class SimpleJdbcCollectJobExecutor extends CollectJobExecutor<SimpleJdbcC
         private Integer maxRows = 1024;
 
         /**
-         * The number of seconds the driver will wait for execution.
+         * The number of milis the driver will wait for execution.
          */
-        private Duration queryTimeout = Duration.ofSeconds(15);
-
-        /**
-         * The properties for {@link HikariConfig}
-         */
-        private HikariConfig hikariConfig = new HikariConfig();
+        private Long queryTimeoutMs = Duration.ofSeconds(15).toMillis();
 
         /**
          * The collect to target JDBC SQL.
          */
         private @NotBlank String sql = "SELECT 1";
+
+        /**
+         * The properties for {@link HikariConfig}
+         */
+        private HikariConfig hikariConfig = new HikariConfig();
 
         /**
          * 注: 不能在这里设置默认值, 经测试发现, 启动服务初始化时调用 snakeyaml 解析后最终的属性值并非此处设置的值, 还是父类

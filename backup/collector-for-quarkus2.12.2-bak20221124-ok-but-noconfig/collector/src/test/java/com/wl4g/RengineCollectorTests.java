@@ -31,7 +31,7 @@ public class RengineCollectorTests {
     }
 
     public static void main(String[] args) {
-        RengineColletor.main(args);
+        RengineCollector.main(args);
     }
 
 }
