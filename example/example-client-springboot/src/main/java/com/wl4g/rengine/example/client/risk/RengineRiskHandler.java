@@ -16,6 +16,7 @@
 package com.wl4g.rengine.example.client.risk;
 
 import static java.lang.String.format;
+import static java.util.Collections.singletonList;
 
 import java.util.Map;
 
@@ -44,7 +45,7 @@ public class RengineRiskHandler {
     public void checkRiskFor(String scenesCode, Map<String, Object> args) {
         log.info("Risk checking for : {} => {}", scenesCode, args);
 
-        EvaluationResult result = rengineClient.evaluate(scenesCode, true, args);
+        EvaluationResult result = rengineClient.evaluate(singletonList(scenesCode), true, args);
         log.info("Risk checked for result: {}, {} => {}", result, scenesCode, args);
 
         // Assertion risk evaluation result.
