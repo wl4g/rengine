@@ -7,6 +7,7 @@
 ```bash
 git clone git@github.com/wl4g/rengine.git
 cd rengine/evaluator
+export JAVA_HOME=/usr/local/jdk-11.0.10/
 ./mvnw clean install -U -DskipTests -Dmaven.test.skip=true -T 4C
 ```
 

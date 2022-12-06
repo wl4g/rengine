@@ -34,8 +34,8 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -84,6 +84,7 @@ import com.wl4g.rengine.common.entity.WorkflowGraph;
 import com.wl4g.rengine.common.model.Evaluation;
 import com.wl4g.rengine.common.model.EvaluationResult;
 import com.wl4g.rengine.common.model.EvaluationResult.ResultDescription;
+import com.wl4g.rengine.evaluator.execution.ExecutionConfig;
 import com.wl4g.rengine.evaluator.execution.LifecycleExecutionFactory;
 import com.wl4g.rengine.evaluator.execution.WorkflowExecution;
 import com.wl4g.rengine.evaluator.metrics.EvaluatorMeterService;
@@ -103,10 +104,12 @@ import lombok.CustomLog;
  * @since v1.0.0
  * @see https://quarkus.io/guides/resteasy-reactive#asyncreactive-support
  */
-// @ApplicationScoped
 @CustomLog
 @Singleton
 public class EvaluatorServiceImpl implements EvaluatorService {
+
+    @Inject
+    ExecutionConfig config;
 
     @Inject
     EvaluatorMeterService meterService;
@@ -121,7 +124,9 @@ public class EvaluatorServiceImpl implements EvaluatorService {
 
     @PostConstruct
     void init() {
-        this.taskRunner = new GenericTaskRunner<RunnerProperties>(new RunnerProperties(StartupMode.NOSTARTUP, 3)) {
+        final int threadPools = config.threadPools();
+        log.info("Initialzing execution threads pool for : {}", threadPools);
+        this.taskRunner = new GenericTaskRunner<RunnerProperties>(new RunnerProperties(StartupMode.NOSTARTUP, threadPools)) {
             @Override
             protected String getThreadNamePrefix() {
                 return EvaluatorServiceImpl.class.getSimpleName();
@@ -158,12 +163,17 @@ public class EvaluatorServiceImpl implements EvaluatorService {
                         .collect(toMap(kv -> kv.getKey(), kv -> (Future) kv.getValue()));
 
                 // Collect for uncompleted results.
-                final List<ResultDescription> uncompleteds = new LinkedList<>();
-                if (!latch.await(evaluation.getTimeout(), MILLISECONDS)) { // Partially-completed
+                final List<ResultDescription> uncompleteds = new ArrayList<>(futures.size());
+                if (!latch.await(evaluation.getTimeout(), MILLISECONDS)) { // Timeout?
                     final Iterator<Entry<String, Future<ResultDescription>>> it = futures.entrySet().iterator();
                     while (it.hasNext()) {
-                        Entry<String, Future<ResultDescription>> entry = it.next();
-                        if (!entry.getValue().isDone() || entry.getValue().isCancelled()) {
+                        final Entry<String, Future<ResultDescription>> entry = it.next();
+                        final Future<ResultDescription> future = entry.getValue();
+                        // Collect for uncompleted results.
+                        if (future.isCancelled() || !future.isDone()) {
+                            // Not need to execution continue.
+                            future.cancel(true);
+                            it.remove();
                             uncompleteds.add(ResultDescription.builder()
                                     .scenesCode(entry.getKey())
                                     .success(false)
@@ -291,7 +301,7 @@ public class EvaluatorServiceImpl implements EvaluatorService {
 
         // Document scenesDoc = aggregateIt.first();
         final MongoCursor<Scenes> cursor = collection.aggregate(aggregates)
-                .batchSize(MAX_QUERY_BATCH_SCENES)
+                .batchSize(config.threadPools())
                 .map(new Function<Document, Scenes>() {
                     @Override
                     public Scenes apply(Document scenesDoc) {
@@ -387,14 +397,12 @@ public class EvaluatorServiceImpl implements EvaluatorService {
 
         @Override
         public ResultDescription call() {
-            // Load deep workflow scenes by code.
             final RuleEngine engine = scenes.getWorkflow().getEngine();
             notNull(engine, "Please check if the configuration is correct, rule engine type of workflow is null.");
 
             try {
                 // Buried-point: total evaluation.
-                meterService.counter(evaluation_total.getName(), evaluation_total.getHelp(), MetricsTag.CLIENT_ID,
-                        evaluation.getClientId(), MetricsTag.SCENESCODE, scenes.getScenesCode(), MetricsTag.ENGINE, engine.name())
+                meterService.counter(evaluation_total.getName(), evaluation_total.getHelp(), MetricsTag.ENGINE, engine.name())
                         .increment();
 
                 final WorkflowExecution execution = lifecycleExecutionFactory.getExecution(engine);
@@ -403,25 +411,22 @@ public class EvaluatorServiceImpl implements EvaluatorService {
                 final ResultDescription result = execution.execute(evaluation, scenes);
 
                 // Buried-point: success evaluation.
-                meterService.counter(evaluation_success.getName(), evaluation_success.getHelp(), MetricsTag.CLIENT_ID,
-                        evaluation.getClientId(), MetricsTag.SCENESCODE, scenes.getScenesCode(), MetricsTag.ENGINE, engine.name())
+                meterService.counter(evaluation_success.getName(), evaluation_success.getHelp(), MetricsTag.ENGINE, engine.name())
                         .increment();
 
                 return result;
             } catch (Exception e) {
                 // Buried-point: failed evaluation.
-                meterService.counter(evaluation_failure.getName(), evaluation_failure.getHelp(), MetricsTag.CLIENT_ID,
-                        evaluation.getClientId(), MetricsTag.SCENESCODE, scenes.getScenesCode(), MetricsTag.ENGINE, engine.name())
+                meterService.counter(evaluation_failure.getName(), evaluation_failure.getHelp(), MetricsTag.ENGINE, engine.name())
                         .increment();
 
-                final String errmsg = format("Could not to execution evaluate of clientId: '%s', engine: '%s'. reason: %s",
-                        evaluation.getClientId(), engine.name(), e.getMessage());
-                throw new IllegalStateException(errmsg);
+                throw new IllegalStateException(
+                        format("Could not to execution evaluate of clientId: '%s', engine: '%s'. reason: %s",
+                                evaluation.getClientId(), engine.name(), e.getMessage()));
             } finally {
                 latch.countDown();
             }
         }
     }
 
-    public static final int MAX_QUERY_BATCH_SCENES = 1024;
 }

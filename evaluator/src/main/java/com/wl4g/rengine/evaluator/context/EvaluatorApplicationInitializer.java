@@ -38,7 +38,6 @@ import lombok.extern.slf4j.Slf4j;
  * @see https://quarkus.io/guides/lifecycle#listening-for-startup-and-shutdown-events
  */
 @Slf4j
-// @ApplicationScoped
 @Singleton
 public class EvaluatorApplicationInitializer {
 

@@ -90,5 +90,5 @@ public class ScriptHttpClient {
     public static final int DEFAULT_MAX_READ_TIMEOUT = 15 * 60 * 1000; // Default:max(15min)
     public static final int DEFAULT_MIN_RESPONSE_SIZE = 1; // Default:min(1B)
     public static final int DEFAULT_MAX_RESPONSE_SIZE = 10 * 1024 * 1024; // Default:max(10M)
-
+    public static final ScriptHttpClient DEFAULT_CLIENT = new ScriptHttpClient();
 }

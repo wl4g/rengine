@@ -15,13 +15,18 @@
  */
 package com.wl4g.rengine.evaluator.minio;
 
+import static com.wl4g.rengine.common.constants.RengineConstants.CONF_PREFIX_EVALUATOR;
+import static com.wl4g.rengine.common.constants.RengineConstants.DEF_MINIO_BUCKET;
+import static com.wl4g.rengine.common.constants.RengineConstants.DEF_MINIO_ENDPOINT;
+import static com.wl4g.rengine.common.constants.RengineConstants.DEF_MINIO_REGION;
+
 import java.net.Proxy;
 import java.time.Duration;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import com.wl4g.rengine.common.constants.RengineConstants;
+import com.wl4g.rengine.evaluator.execution.ExecutionConfig;
 
 import io.quarkus.runtime.annotations.StaticInitSafe;
 import io.smallrye.config.ConfigMapping;
@@ -29,7 +34,7 @@ import io.smallrye.config.ConfigMapping.NamingStrategy;
 import io.smallrye.config.WithDefault;
 
 /**
- * {@link MinioConfig}
+ * {@link ExecutionConfig}
  * 
  * @author James Wong
  * @version 2022-09-18
@@ -38,18 +43,18 @@ import io.smallrye.config.WithDefault;
  * @see https://quarkus.io/guides/config-extending-support#custom-config-source
  */
 @StaticInitSafe
-@ConfigMapping(prefix = RengineConstants.CONF_PREFIX_EVALUATOR + ".minio", namingStrategy = NamingStrategy.KEBAB_CASE)
+@ConfigMapping(prefix = CONF_PREFIX_EVALUATOR + ".minio", namingStrategy = NamingStrategy.KEBAB_CASE)
 public interface MinioConfig {
 
-    @WithDefault(RengineConstants.DEF_MINIO_ENDPOINT)
+    @WithDefault(DEF_MINIO_ENDPOINT)
     @NotBlank
     String endpoint();
 
-    @WithDefault(RengineConstants.DEF_MINIO_REGION)
+    @WithDefault(DEF_MINIO_REGION)
     @NotBlank
     String region();
 
-    @WithDefault(RengineConstants.DEF_MINIO_BUCKET)
+    @WithDefault(DEF_MINIO_BUCKET)
     @NotBlank
     String bucket();
 

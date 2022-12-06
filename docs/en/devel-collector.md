@@ -1,6 +1,17 @@
 # Rengine for Collector Development Guide
 
-## Codes Directories
+## Building
+
+```bash
+git clone git@github.com/wl4g/rengine.git
+cd rengine/
+export JAVA_HOME=/usr/local/jdk-11.0.10/
+./mvnw clean install -DskipTests -Dmaven.test.skip=true -Pwith:eventbus-kafka -T 2C
+```
+
+- ***Notice:*** For the eventbus module, one of the following MQs is supported. build profiles are: `with:eventbus-kafka` (the default), `with:eventbus-pulsar`, `with:eventbus-rabbitmq`
+
+## Directories
 
 ```bash
 + rengine/
@@ -34,13 +45,3 @@
         + SimpleTcpCollectJobExecutor.java
         + ...
 ```
-
-## Building
-
-```bash
-git clone git@github.com/wl4g/rengine.git
-cd rengine/
-./mvnw clean install -DskipTests -Dmaven.test.skip=true -Pwith:eventbus-kafka -T 2C
-```
-
-- ***Notice:*** For the eventbus module, one of the following MQs is supported. build profiles are: `with:eventbus-kafka` (the default), `with:eventbus-pulsar`, `with:eventbus-rabbitmq`

@@ -97,11 +97,11 @@ public abstract class AbstractScriptEngine implements IEngine {
                 // .attributes(ProxyObject.fromMap(attributes))
                 .minioManager(minioManager)
                 .dataService(new ScriptDataService(aggregationService))
-                .defaultHttpClient(new ScriptHttpClient())
+                .defaultHttpClient(ScriptHttpClient.DEFAULT_CLIENT)
                 .build();
     }
 
-    // TODO handcode for 'process'
+    // TODO handcode default entrypoint funciton for 'process'
     public static final String DEFAULT_MAIN_FUNCTION = "process";
 
 }

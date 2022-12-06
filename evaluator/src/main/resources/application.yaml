@@ -249,6 +249,9 @@ quarkus:
 ## Rengine evaluator configuration.
 rengine:
   evaluator:
+    execution:
+      thread-pools: 3
+      max-query-batch: 1024
     minio:
       endpoint: http://localhost:9000
       region: us-east-1
