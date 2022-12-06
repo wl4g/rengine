@@ -1,6 +1,6 @@
 # Rengine
 
-A real-time + quasi-real-time general rule engine platform, suitable for such as financial risk control, real-time alarm of Iot temperature indicators, online data cleaning and filtering, etc.
+A real-time + near real-time general rule engine platform, suitable for such as financial risk control, real-time alarm of Iot temperature indicators, online data cleaning and filtering, etc.
 
 ## Architectures
 
@@ -72,9 +72,11 @@ A real-time + quasi-real-time general rule engine platform, suitable for such as
 
 - [Operation quide](./docs/en/operation.md)
 
+- [Best aplicaciones cases](./docs/en/best-aplicaciones-cases.md)
+
 ## RoadMap
 
-- [roadmap-2022](./docs/en/roadmap-2022.md)
+- [roadmap](./docs/en/roadmap-2022-23.md)
 
 ## FAQ
 
