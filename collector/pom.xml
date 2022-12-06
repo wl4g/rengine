@@ -49,9 +49,19 @@
         </developer>
     </developers>
     <properties>
-        <repackage.classifier />
-        <elastic-logback.version>1.5.0</elastic-logback.version>
-        <bootstrap-classname>com.wl4g.RengineCollector</bootstrap-classname>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <commons-dbutils.version>1.7</commons-dbutils.version>
+        <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
+        <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
+        <!-- see:https://github.com/quarkusio/quarkus-quickstarts/blob/2.12.2.Final/getting-started/pom.xml -->
+        <quarkus.platform.version>2.12.2.Final</quarkus.platform.version>
+        <!-- <groovy.version>4.0.4</groovy.version>-->
+        <!-- <graalvm.version>22.1.0</graalvm.version>-->
+        <compiler-plugin.version>3.8.1</compiler-plugin.version>
+        <surefire-plugin.version>3.0.0-M7</surefire-plugin.version>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.parameters>true</maven.compiler.parameters>
         <final.name>rengine-collector</final.name>
     </properties>
     <parent>
@@ -68,6 +78,13 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>${quarkus.platform.group-id}</groupId>
+                <artifactId>${quarkus.platform.artifact-id}</artifactId>
+                <version>${quarkus.platform.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <dependencies>
@@ -77,32 +94,160 @@
         </dependency>
         <dependency>
             <groupId>com.wl4g</groupId>
-            <artifactId>infra-context</artifactId>
+            <artifactId>infra-common-java11</artifactId>
         </dependency>
         <dependency>
             <groupId>com.wl4g</groupId>
-            <artifactId>infra-support</artifactId>
+            <artifactId>rengine-eventbus-kafka</artifactId>
         </dependency>
         <dependency>
             <groupId>com.wl4g</groupId>
-            <artifactId>rengine-client-spring-boot-starter</artifactId>
+            <artifactId>rengine-eventbus-pulsar</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
-        <!-- Spring Webflux(Non default requires) -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webflux</artifactId>
+            <groupId>com.wl4g</groupId>
+            <artifactId>rengine-eventbus-rabbitmq</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
-        <!-- Spring Boot -->
+        <!-- QUARKUS -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-oidc</artifactId>
         </dependency>
-        <!-- Native -->
         <dependency>
-            <groupId>org.springframework.experimental</groupId>
-            <artifactId>spring-native</artifactId>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-config-yaml-deployment</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-config-yaml</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logmanager</groupId>
+            <artifactId>log4j2-jboss-logmanager</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-logging-json-deployment</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-logging-json</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-health</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-resteasy-reactive-deployment</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-resteasy-reactive</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-resteasy-reactive-jackson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-rest-client-deployment</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-rest-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-rest-client-jackson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-openapi</artifactId>
+        </dependency>
+        <!-- see:https://github.com/quarkusio/quarkus/issues/8250 -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-hibernate-validator</artifactId>
+        </dependency>
+        <!-- QUTE(expression) -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-resteasy-reactive-qute</artifactId>
+        </dependency>
+        <!-- OTEL -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-opentelemetry-exporter-otlp-deployment</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-opentelemetry-exporter-otlp</artifactId>
+        </dependency>
+        <!-- <dependency>-->
+        <!--     <groupId>io.quarkus</groupId>-->
+        <!--     <artifactId>quarkus-opentelemetry-exporter-jaeger-deployment</artifactId>-->
+        <!-- </dependency>-->
+        <!-- <dependency>-->
+        <!--     <groupId>io.quarkus</groupId>-->
+        <!--     <artifactId>quarkus-opentelemetry-exporter-jaeger</artifactId>-->
+        <!-- </dependency>-->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-micrometer</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-micrometer-registry-prometheus-deployment</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-micrometer-registry-prometheus</artifactId>
+        </dependency>
+        <!-- <dependency>-->
+        <!--     <groupId>io.quarkus</groupId>-->
+        <!--     <artifactId>quarkus-micrometer-registry-stackdriver</artifactId>-->
+        <!-- </dependency>-->
+        <!-- <dependency>-->
+        <!--     <groupId>com.acme</groupId>-->
+        <!--     <artifactId>custom-micrometer-registry</artifactId>-->
+        <!-- </dependency>-->
+
+        <!-- Graal -->
+        <dependency>
+            <groupId>org.graalvm.nativeimage</groupId>
+            <artifactId>svm</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Arthas (The use of JVM attach(arthas) cannot be supported in native mode) -->
+        <dependency>
+            <groupId>com.taobao.arthas</groupId>
+            <artifactId>arthas-agent-attach</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.taobao.arthas</groupId>
+            <artifactId>arthas-packaging</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <!-- Devel tools -->
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
         </dependency>
         <!-- DB -->
+        <dependency>
+            <groupId>commons-dbutils</groupId>
+            <artifactId>commons-dbutils</artifactId>
+            <version>${commons-dbutils.version}</version> <!--$NO-MVN-MAN-VER$-->
+        </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
@@ -120,61 +265,59 @@
         <dependency>
             <groupId>org.apache.shardingsphere.elasticjob</groupId>
             <artifactId>elasticjob-lite-core</artifactId>
+            <!-- https://github1s.com/quarkusio/quarkus/blob/2.12.2.Final/extensions/quartz/runtime/pom.xml#L30-L31 -->
+            <exclusions>
+                <exclusion>
+                    <groupId>com.zaxxer</groupId>
+                    <artifactId>HikariCP</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.zaxxer</groupId>
+                    <artifactId>HikariCP-java7</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.mchange</groupId>
+                    <artifactId>c3p0</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-        <!-- Logging -->
-        <!-- see:https://loki4j.github.io/loki-logback-appender/#quick-start -->
-        <!-- see:https://www.elastic.co/guide/en/ecs-logging/java/current/setup.html#setup -->
-        <!-- <dependency>-->
-        <!--     <groupId>co.elastic.logging</groupId>-->
-        <!--     <artifactId>logback-ecs-encoder</artifactId>-->
-        <!--     <version>${elastic-logback.version}</version>-->
-        <!-- </dependency>-->
+
+        <!-- Testing -->
         <dependency>
-            <groupId>net.logstash.logback</groupId>
-            <artifactId>logstash-logback-encoder</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-actuator-autoconfigure</artifactId>
-        </dependency>
-        <!-- Metrics -->
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-registry-jmx</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-registry-prometheus</artifactId>
-        </dependency>
-        <!-- Devel -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-junit5</artifactId>
             <scope>test</scope>
-            <optional>true</optional>
-        </dependency>
-        <!-- Tests -->
-        <dependency>
-            <groupId>com.github.spotbugs</groupId>
-            <artifactId>spotbugs-annotations</artifactId>
-            <scope>runtime</scope>
-            <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-junit5-mockito</artifactId>
             <scope>test</scope>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-test</artifactId>
             <scope>test</scope>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>
@@ -199,70 +342,42 @@
                 <directory>src/main/resources</directory>
                 <filtering>false</filtering>
                 <includes>
-                    <include>META-INF/**</include>
                     <include>static/**</include>
                 </includes>
             </resource>
         </resources>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                </configuration>
+                <!-- <version>${compiler-plugin.version}</version>-->
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <!-- <version>${surefire-plugin.version}</version>-->
                 <configuration>
-                    <includes>
-                        <include>**/*Tests.java</include>
-                    </includes>
+                    <systemPropertyVariables>
+                        <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                        <maven.home>${maven.home}</maven.home>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
+                <groupId>${quarkus.platform.group-id}</groupId>
+                <artifactId>quarkus-maven-plugin</artifactId>
+                <version>${quarkus.platform.version}</version>
+                <extensions>true</extensions>
                 <configuration>
-                    <configLocation>/../tools/checkstyle/google_checks.xml</configLocation>
+                    <!-- invalid? Not really added to the JVM at compile time -->
+                    <!-- see:https://stackoverflow.com/questions/69631653/quarkus-optaplanner-illegal-reflective-call -->
+                    <compilerArgs>
+                        <arg>--enable-preview --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.text=ALL-UNNAMED --add-opens java.desktop/java.awt.font=ALL-UNNAMED</arg>
+                    </compilerArgs>
+                    <jvmArgs>--enable-preview --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.text=ALL-UNNAMED --add-opens java.desktop/java.awt.font=ALL-UNNAMED</jvmArgs>
                 </configuration>
                 <executions>
-                    <!-- Solutions to maven checkstyle errors in Eclipse: https://gitee.com/wl4g/blogs/blob/master/articles/maven.checkstyle-eclipse-error/README_CN.md -->
-                    <!-- <execution> -->
-                    <!-- <id>checkstyle</id> -->
-                    <!-- <phase>validate</phase> -->
-                    <!-- <goals> -->
-                    <!-- <goal>check</goal> -->
-                    <!-- </goals> -->
-                    <!-- <configuration> -->
-                    <!-- <failOnViolation>true</failOnViolation> -->
-                    <!-- </configuration> -->
-                    <!-- </execution> -->
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-maven-plugin</artifactId>
-                <executions>
                     <execution>
-                        <id>integration-test</id>
                         <goals>
-                            <goal>generate</goal>
+                            <goal>build</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -272,6 +387,9 @@
     <profiles>
         <profile>
             <id>build:tar</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <build>
                 <plugins>
                     <plugin>
@@ -291,155 +409,6 @@
                                 <goals>
                                     <goal>single</goal>
                                 </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>build:native</id>
-            <properties>
-                <repackage.classifier>exec</repackage.classifier>
-                <native-buildtools.version>0.9.13</native-buildtools.version>
-                <native.buildmemory>8G</native.buildmemory>
-            </properties>
-            <dependencies>
-                <dependency>
-                    <groupId>org.junit.platform</groupId>
-                    <artifactId>junit-platform-launcher</artifactId>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <configuration>
-                            <finalName>${final.name}-${project.version}-bin</finalName>
-                            <appendAssemblyId>false</appendAssemblyId>
-                            <descriptors>
-                                <descriptor>src/main/assemble/package.xml</descriptor>
-                            </descriptors>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>make-assembly</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>single</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <!-- <plugin> -->
-                    <!--     <groupId>org.springframework.boot</groupId> -->
-                    <!--     <artifactId>spring-boot-maven-plugin</artifactId> -->
-                    <!--     <configuration> -->
-                    <!--         <excludes> -->
-                    <!--             <exclude> -->
-                    <!--                 <groupId>org.projectlombok</groupId> -->
-                    <!--                 <artifactId>lombok</artifactId> -->
-                    <!--             </exclude> -->
-                    <!--         </excludes> -->
-                    <!--         <classifier>${repackage.classifier}</classifier> -->
-                    <!--         <image> -->
-                    <!--             <builder>paketobuildpacks/builder:tiny</builder> -->
-                    <!--             <env> -->
-                    <!--                 <BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE> -->
-                    <!--             </env> -->
-                    <!--         </image> -->
-                    <!--     </configuration> -->
-                    <!-- </plugin> -->
-                    <!-- <plugin> -->
-                    <!--     <groupId>org.springframework.experimental</groupId> -->
-                    <!--     <artifactId>spring-aot-maven-plugin</artifactId> -->
-                    <!--     <version>${spring-native.version}</version> -->
-                    <!--     <executions> -->
-                    <!--         <execution> -->
-                    <!--             <id>test-generate</id> -->
-                    <!--             <goals> -->
-                    <!--                 <goal>test-generate</goal> -->
-                    <!--             </goals> -->
-                    <!--         </execution> -->
-                    <!--         <execution> -->
-                    <!--             <id>generate</id> -->
-                    <!--             <goals> -->
-                    <!--                 <goal>generate</goal> -->
-                    <!--             </goals> -->
-                    <!--         </execution> -->
-                    <!--     </executions> -->
-                    <!-- </plugin> -->
-                    <!-- see:https://www.graalvm.org/dev/reference-manual/native-image/guides/use-native-image-maven-plugin/ -->
-                    <!-- <plugin> -->
-                    <!--     <groupId>org.graalvm.buildtools</groupId> -->
-                    <!--     <artifactId>native-maven-plugin</artifactId> -->
-                    <!--     <version>${native-buildtools.version}</version> -->
-                    <!--     <extensions>true</extensions> -->
-                    <!--     <executions> -->
-                    <!--         <execution> -->
-                    <!--             <id>test-native</id> -->
-                    <!--             <phase>test</phase> -->
-                    <!--             <goals> -->
-                    <!--                 <goal>test</goal> -->
-                    <!--             </goals> -->
-                    <!--         </execution> -->
-                    <!--         <execution> -->
-                    <!--             <id>build-native</id> -->
-                    <!--             <phase>package</phase> -->
-                    <!--             <goals> -->
-                    <!--                 <goal>build</goal> -->
-                    <!--             </goals> -->
-                    <!--         </execution> -->
-                    <!--     </executions> -->
-                    <!--     <configuration> -->
-                    <!--         <fallback>false</fallback> -->
-                    <!--     </configuration> -->
-                    <!-- </plugin> -->
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>unpack-tar</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>tar</executable>
-                                    <arguments>
-                                        <argument>-xvf</argument>
-                                        <argument>${final.name}-${project.version}-bin.tar</argument>
-                                        <argument>-C</argument>
-                                        <argument>${project.basedir}/target/</argument>
-                                    </arguments>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>build-native-with-docker</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>docker</executable>
-                                    <arguments>
-                                        <argument>run</argument>
-                                        <argument>--rm</argument>
-                                        <argument>--memory=${native.buildmemory}</argument>
-                                        <argument>--memory-swap=-1</argument>
-                                        <argument>-v</argument>
-                                        <argument>${project.basedir}/target/${final.name}-${project.version}-bin:/workspace</argument>
-                                        <argument>registry.cn-shenzhen.aliyuncs.com/wl4g/graalvm-ce:22.1.0-java11</argument>
-                                        <argument>native-image</argument>
-                                        <argument>-H:+ReportExceptionStackTraces</argument>
-                                        <argument>-cp</argument>
-                                        <argument>conf/*:lib/${final.name}.jar:lib/*</argument>
-                                        <argument>${bootstrap-classname}</argument>
-                                    </arguments>
-                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
@@ -491,7 +460,7 @@
                         <configuration>
                             <!-- see:https://github.com/spotify/dockerfile-maven/issues/154 -->
                             <contextDirectory>${project.basedir}</contextDirectory>
-                            <dockerfile>${project.basedir}/build/docker/Dockerfile.springtar</dockerfile>
+                            <dockerfile>${project.basedir}/build/docker/Dockerfile.quarkustar</dockerfile>
                             <repository>wl4g/${project.build.finalName}</repository>
                             <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
                             <tag>${project.version}</tag>
@@ -509,121 +478,13 @@
                 </plugins>
             </build>
         </profile>
-        <!-- TODO 暂时 Dockerfile 还不支持 native 执行文件 -->
+        <!-- Packaging for JVM -->
         <profile>
-            <id>build:native:docker</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-maven-plugin</artifactId>
-                        <configuration>
-                            <excludes>
-                                <exclude>
-                                    <groupId>org.projectlombok</groupId>
-                                    <artifactId>lombok</artifactId>
-                                </exclude>
-                            </excludes>
-                            <classifier>${repackage.classifier}</classifier>
-                            <image>
-                                <builder>paketobuildpacks/builder:tiny</builder>
-                                <env>
-                                    <BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
-                                </env>
-                            </image>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.springframework.experimental</groupId>
-                        <artifactId>spring-aot-maven-plugin</artifactId>
-                        <version>${spring-native.version}</version>
-                        <executions>
-                            <execution>
-                                <id>test-generate</id>
-                                <goals>
-                                    <goal>test-generate</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>generate</id>
-                                <goals>
-                                    <goal>generate</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.graalvm.buildtools</groupId>
-                        <artifactId>native-maven-plugin</artifactId>
-                        <version>${native-buildtools.version}</version>
-                        <extensions>true</extensions>
-                        <executions>
-                            <execution>
-                                <id>test-native</id>
-                                <phase>test</phase>
-                                <goals>
-                                    <goal>test</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>build-native</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>build</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <!-- Usages examples: -->
-                    <!-- export DOCKER_HOST=tcp://localhost:2375 -->
-                    <!-- [build]: mvn -Pbuild:tar:docker -->
-                    <!-- [push]: mvn -Pbuild:tar:docker -->
-                    <!-- [push]: mvn -Pbuild:tar:docker dockerfile:build dockerfile:push -Ddockerfile.username=wl4g -Ddockerfile.password=xxx -->
-                    <plugin>
-                        <groupId>com.spotify</groupId>
-                        <artifactId>dockerfile-maven-plugin</artifactId>
-                        <version>1.4.13</version>
-                        <executions>
-                            <execution>
-                                <id>default</id>
-                                <goals>
-                                    <goal>build</goal>
-                                    <!-- <goal>push</goal> -->
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <!-- see:https://github.com/spotify/dockerfile-maven/issues/154 -->
-                            <contextDirectory>${project.basedir}</contextDirectory>
-                            <dockerfile>${project.basedir}/build/docker/Dockerfile.springnative</dockerfile>
-                            <repository>wl4g/${project.build.finalName}</repository>
-                            <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
-                            <tag>${project.version}</tag>
-                            <readTimeoutMillis>60000</readTimeoutMillis>
-                            <connectTimeoutMillis>20000</connectTimeoutMillis>
-                            <buildArgs>
-                                <!-- Addidtion librarys. -->
-                                <!-- <ADD_LIBRARY></ADD_LIBRARY> -->
-                                <APP_NAME>${project.build.finalName}</APP_NAME>
-                                <APP_VERSION>${project.version}</APP_VERSION>
-                                <APP_MAINCLASS>${bootstrap-classname}</APP_MAINCLASS>
-                            </buildArgs>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>with:arthas</id>
+            <id>default</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
             <dependencies>
-                <!-- Arthas (The use of JVM attach(arthas) cannot be supported in native mode) -->
-                <dependency>
-                    <groupId>com.taobao.arthas</groupId>
-                    <artifactId>arthas-spring-boot-starter</artifactId>
-                </dependency>
                 <dependency>
                     <groupId>com.taobao.arthas</groupId>
                     <artifactId>arthas-agent-attach</artifactId>
@@ -634,35 +495,41 @@
                 </dependency>
             </dependencies>
         </profile>
+        <!-- Packaging for native (The use of JVM attach(arthas) cannot be supported in native mode) -->
         <profile>
-            <id>with:eventbus-kafka</id>
+            <id>native</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>native</name>
+                </property>
             </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.wl4g</groupId>
-                    <artifactId>rengine-eventbus-kafka</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>with:eventbus-pulsar</id>
-            <dependencies>
-                <dependency>
-                    <groupId>com.wl4g</groupId>
-                    <artifactId>rengine-eventbus-pulsar</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>with:eventbus-rabbitmq</id>
-            <dependencies>
-                <dependency>
-                    <groupId>com.wl4g</groupId>
-                    <artifactId>rengine-eventbus-rabbitmq</artifactId>
-                </dependency>
-            </dependencies>
+            <properties>
+                <quarkus.package.type>native</quarkus.package.type>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>${surefire-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                                <configuration>
+                                    <!-- see:https://stackoverflow.com/questions/69631653/quarkus-optaplanner-illegal-reflective-call -->
+                                    <!-- <systemPropertyVariables>-->
+                                    <!--     <native.image.path>${project.build.directory}/${project.build.finalName}-native</native.image.path>-->
+                                    <!--     <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>-->
+                                    <!--     <maven.home>${maven.home}</maven.home>-->
+                                    <!-- </systemPropertyVariables>-->
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>

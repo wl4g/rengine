@@ -161,6 +161,7 @@ rengine:
             jedisConfig:
               nodes: [localhost:6379,localhost:6380,localhost:6381,localhost:7379,localhost:7380,localhost:7381]
               passwd: 'zzx!@#$%'
+            ## see:https://redis.io/docs/manual/programmability/eval-intro/
             luaScript: |-
               local testKey = KEYS[1]
               local defaultVal = tonumber(ARGV[1])
@@ -175,7 +176,7 @@ rengine:
               redis.call("setex", testKey, ttl, value)
               return { message, value }
             luaKeys: ["test:pi"]
-            luaArgs: ["3.141592653", "{{yesterday}}", "60"]
+            luaArgs: ["3.141592653", "{{getDate('')}}", "60"]
       - !SIMPLE_SSH
         name: ssh-example-job
         jobParams:

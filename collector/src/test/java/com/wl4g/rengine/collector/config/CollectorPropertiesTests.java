@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -24,7 +24,8 @@ import java.util.TimeZone;
 import org.junit.jupiter.api.Test;
 import org.yaml.snakeyaml.Yaml;
 
-import com.wl4g.infra.context.utils.expression.SpelExpressions;
+//import com.wl4g.infra.context.utils.expression.SpelExpressions;
+import com.wl4g.rengine.collector.config.yaml.CollectorYamlConstructor;
 
 /**
  * {@link CollectorPropertiesTests}
@@ -70,14 +71,16 @@ public class CollectorPropertiesTests {
         System.out.println(toJSONString(config, true));
     }
 
-    @Test
-    public void testSpelExpression() throws Exception {
-        //@formatter:off
-        //String expression = "#{T(com.wl4g.infra.common.lang.DateUtils2).getDateOf(T(com.wl4g.infra.common.lang.DateUtils2).addDays(new java.util.Date(),-1),\"yyyy-MM-dd\")}";
-        //@formatter:on
-        String expression = "#{T(com.wl4g.infra.common.lang.DateUtils2).getDateOf(5, -1, \"yyyy-MM-dd\")}";
-        Object result = SpelExpressions.create().resolve(expression);
-        System.out.println(result);
-    }
+    // @Test
+    // public void testSpelExpression() throws Exception {
+//        //@formatter:off
+//        //String expression = "#{T(com.wl4g.infra.common.lang.DateUtils2).getDateOf(T(com.wl4g.infra.common.lang.DateUtils2).addDays(new java.util.Date(),-1),\"yyyy-MM-dd\")}";
+//        //@formatter:on
+    // String expression =
+    // "#{T(com.wl4g.infra.common.lang.DateUtils2).getDateOf(5, -1,
+    // \"yyyy-MM-dd\")}";
+    // Object result = SpelExpressions.create().resolve(expression);
+    // System.out.println(result);
+    // }
 
 }

@@ -35,7 +35,7 @@ public class RengineCollector implements QuarkusApplication {
     public static void main(String[] args) {
         ArthasAttacher.attachIfNecessary("rengine-collector");
         System.setProperty("org.apache.commons.logging.LogFactory", "org.apache.commons.logging.impl.JBossLogFactory");
-        Quarkus.run(RengineColletor.class, args);
+        Quarkus.run(RengineCollector.class, args);
     }
 
     @Override

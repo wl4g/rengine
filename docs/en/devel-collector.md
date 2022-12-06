@@ -6,7 +6,7 @@
 git clone git@github.com/wl4g/rengine.git
 cd rengine/
 export JAVA_HOME=/usr/local/jdk-11.0.10/
-./mvnw clean install -DskipTests -Dmaven.test.skip=true -Pwith:eventbus-kafka -T 2C
+./mvnw clean install -DskipTests -Dmaven.test.skip=true -Pwith:eventbus-kafka -U -T 4C
 ```
 
 - ***Notice:*** For the eventbus module, one of the following MQs is supported. build profiles are: `with:eventbus-kafka` (the default), `with:eventbus-pulsar`, `with:eventbus-rabbitmq`

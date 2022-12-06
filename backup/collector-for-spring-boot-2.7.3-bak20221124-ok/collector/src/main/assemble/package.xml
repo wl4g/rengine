@@ -55,6 +55,10 @@
 			<excludes>
 				<exclude>*-sources.jar</exclude>
 				<exclude>*-docker-info.jar</exclude>
+				<exclude>*-exec.jar</exclude>
+				<exclude>*-executable.jar</exclude>
+				<exclude>*-runner.jar</exclude>
+				<exclude>*-native.jar</exclude>
 			</excludes>
 		</fileSet>
 		<fileSet>

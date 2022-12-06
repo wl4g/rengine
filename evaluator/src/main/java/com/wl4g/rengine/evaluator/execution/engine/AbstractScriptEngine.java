@@ -67,6 +67,8 @@ public abstract class AbstractScriptEngine implements IEngine {
     @Inject
     AggregationService aggregationService;
 
+    final ScriptHttpClient defaultClient = new ScriptHttpClient();
+
     protected @NotNull List<ObjectResource> loadScriptResources(@NotNull Scenes scenes, @NotNull Rule rule, boolean useCache) {
         notNullOf(rule, "rule");
         log.debug("Loading script {} by scenesCode: {}, ruleId: {}", scenes.getScenesCode(), rule.getId());
@@ -97,11 +99,12 @@ public abstract class AbstractScriptEngine implements IEngine {
                 // .attributes(ProxyObject.fromMap(attributes))
                 .minioManager(minioManager)
                 .dataService(new ScriptDataService(aggregationService))
-                .defaultHttpClient(ScriptHttpClient.DEFAULT_CLIENT)
+                .defaultHttpClient(defaultClient)
+                // .defaultHttpClient(new ScriptHttpClient())
                 .build();
     }
 
-    // TODO handcode default entrypoint funciton for 'process'
+    // Handcode default entrypoint funciton for 'process'
     public static final String DEFAULT_MAIN_FUNCTION = "process";
 
 }

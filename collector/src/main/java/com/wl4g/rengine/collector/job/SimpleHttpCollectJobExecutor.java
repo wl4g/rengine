@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
+import javax.inject.Singleton;
 import javax.validation.constraints.NotBlank;
 
 import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
@@ -58,7 +59,7 @@ import lombok.ToString;
  * @since v1.0.0
  * @see {@link org.apache.shardingsphere.elasticjob.http.executor.HttpJobExecutor}
  */
-@Getter
+@Singleton
 public class SimpleHttpCollectJobExecutor extends CollectJobExecutor<SimpleHttpCollectJobExecutor.SimpleHttpJobParam> {
 
     @Override

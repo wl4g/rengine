@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -19,6 +19,7 @@ import static com.wl4g.infra.common.bean.ConfigBeanUtils.configureWithDefault;
 import static com.wl4g.infra.common.collection.CollectionUtils2.ensureMap;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.isTrue;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.getField;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.isGenericModifier;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.setField;
@@ -45,12 +46,10 @@ import javax.annotation.Nullable;
 import javax.validation.Validator;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
 import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperConfiguration;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wl4g.infra.common.reflect.ReflectionUtils2;
@@ -70,7 +69,7 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link CollectorProperties}
+ * {@link CollectorProperties2}
  * 
  * @author James Wong
  * @version 2022-10-16
@@ -82,10 +81,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @ToString
 @NoArgsConstructor
-public class CollectorProperties implements InitializingBean {
-
-    private @Autowired Validator validator;
-    private @Autowired Environment environment;
+public class CollectorProperties {
 
     private ZookeeperProperties zookeeper = new ZookeeperProperties();
 
@@ -97,12 +93,11 @@ public class CollectorProperties implements InitializingBean {
 
     private List<ScrapeJobProperties<JobParamBase>> scrapeJobConfigs = new ArrayList<>();
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
+    public void init(@NotNull Validator validator) throws Exception {
+        notNullOf(validator, "validator");
         applyDefaultToProperties();
-        validateProperties();
+        validateProperties(validator);
         resolveJobScrapeProperties();
-        // parseJobVariables();
     }
 
     protected void applyDefaultToProperties() {
@@ -221,7 +216,7 @@ public class CollectorProperties implements InitializingBean {
         });
     }
 
-    protected void validateProperties() {
+    protected void validateProperties(@NotNull Validator validator) {
         validator.validate(this);
         validateForSafeConstraints();
     }
@@ -269,36 +264,36 @@ public class CollectorProperties implements InitializingBean {
 
     protected void resolveJobScrapeProperties() {
         safeList(scrapeJobConfigs).forEach(jobConf -> {
-            jobConf.setName(environment.resolvePlaceholders(jobConf.getName()));
-            jobConf.setEventType(environment.resolvePlaceholders(jobConf.getEventType()));
+            jobConf.setName(resolveString(jobConf.getName()));
+            jobConf.setEventType(resolveString(jobConf.getEventType()));
 
             // Resolve event attributes.
             Map<String, String> attributes = ensureMap(jobConf.getEventAttributes());
             new HashMap<>(ensureMap(jobConf.getEventAttributes()))
-                    .forEach((key, value) -> attributes.put(key, environment.resolvePlaceholders(value)));
+                    .forEach((key, value) -> attributes.put(key, resolveString(value)));
 
-            jobConf.setCron(resolveString(environment, jobConf.getCron()));
-            jobConf.setTimeZone(resolveString(environment, jobConf.getTimeZone()));
-            jobConf.setJobBootstrapBeanName(resolveString(environment, jobConf.getJobBootstrapBeanName()));
-            jobConf.setShardingItemParameters(resolveString(environment, jobConf.getShardingItemParameters()));
-            jobConf.setJobParameter(resolveString(environment, jobConf.getJobParameter()));
-            jobConf.setJobShardingStrategyType(resolveString(environment, jobConf.getJobShardingStrategyType()));
-            jobConf.setJobExecutorServiceHandlerType(resolveString(environment, jobConf.getJobExecutorServiceHandlerType()));
-            jobConf.setJobErrorHandlerType(resolveString(environment, jobConf.getJobErrorHandlerType()));
+            jobConf.setCron(resolveString(jobConf.getCron()));
+            jobConf.setTimeZone(resolveString(jobConf.getTimeZone()));
+            jobConf.setJobBootstrapBeanName(resolveString(jobConf.getJobBootstrapBeanName()));
+            jobConf.setShardingItemParameters(resolveString(jobConf.getShardingItemParameters()));
+            jobConf.setJobParameter(resolveString(jobConf.getJobParameter()));
+            jobConf.setJobShardingStrategyType(resolveString(jobConf.getJobShardingStrategyType()));
+            jobConf.setJobExecutorServiceHandlerType(resolveString(jobConf.getJobExecutorServiceHandlerType()));
+            jobConf.setJobErrorHandlerType(resolveString(jobConf.getJobErrorHandlerType()));
 
             List<String> jobListenerTypes = safeList(jobConf.getJobListenerTypes());
             for (int i = 0; i < jobListenerTypes.size(); i++) {
-                jobListenerTypes.set(i, environment.resolvePlaceholders(jobListenerTypes.get(i)));
+                jobListenerTypes.set(i, resolveString(jobListenerTypes.get(i)));
             }
 
-            jobConf.setDescription(environment.resolvePlaceholders(jobConf.getDescription()));
+            jobConf.setDescription(resolveString(jobConf.getDescription()));
 
             // Resolve jobParams values.
             safeList(jobConf.getJobParams()).forEach(p -> {
                 ReflectionUtils2.doFullWithFields(p, targetField -> isGenericModifier(targetField.getModifiers()),
                         (field, objOfField) -> {
                             if (String.class.isAssignableFrom(field.getType()) && !Modifier.isFinal(field.getModifiers())) {
-                                setField(field, objOfField, resolveString(environment, getField(field, objOfField, true)), true);
+                                setField(field, objOfField, resolveString(getField(field, objOfField, true)), true);
                             }
                         });
             });
@@ -476,6 +471,8 @@ public class CollectorProperties implements InitializingBean {
     public static class GlobalScrapeJobProperties extends ScrapeJobProperties<JobParamBase> {
 
         private Map<String, String> jobVariables = new HashMap<>();
+
+        private int oneOffJobThreadPools = 3;
 
         private GlobalJobParamsProperties jobParamConfigs = new GlobalJobParamsProperties();
 
