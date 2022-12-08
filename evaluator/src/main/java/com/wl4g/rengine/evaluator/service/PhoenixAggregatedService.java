@@ -1,6 +1,6 @@
-/// *
-// * Copyright 2017 ~ 2025 the original author or authors. James Wong
-/// <jameswong1376@gmail.com>
+//@formatter:off
+///**
+// * Copyright 2017 ~ 2025 the original author or authors. James Wong  <jameswong1376@gmail.com>
 // *
 // * Licensed under the Apache License, Version 2.0 (the "License");
 // * you may not use this file except in compliance with the License.
@@ -14,26 +14,24 @@
 // * See the License for the specific language governing permissions and
 // * limitations under the License.
 // */
-// package com.wl4g.rengine.evaluator.service;
+//package com.wl4g.rengine.evaluator.service;
 //
-// import java.util.List;
+//import java.util.List;
+//import java.util.Map;
 //
-// import com.wl4g.rengine.common.entity.Job;
-// import com.wl4g.rengine.evaluator.service.impl.JobServiceImpl;
+//import javax.validation.constraints.NotBlank;
+//import javax.validation.constraints.NotNull;
 //
-// import io.smallrye.mutiny.Uni;
-//
-/// **
-// * {@link JobServiceImpl}
+///**
+// * {@link PhoenixAggregatedService}
 // *
 // * @author James Wong
 // * @version 2022-09-17
 // * @since v1.0.0
 // */
-// public interface JobService {
+//public interface PhoenixAggregatedService {
 //
-// Uni<List<Job>> listAll();
+//    List<Map<String, Object>> findList(@NotBlank String sql, @NotNull Map<String, Object> queryParams);
 //
-// Uni<Void> save(Job job);
-//
-// }
+//}
+//@formatter:on

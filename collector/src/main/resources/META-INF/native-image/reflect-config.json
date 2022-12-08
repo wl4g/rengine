@@ -106,117 +106,236 @@
 {
   "name":"com.wl4g.rengine.collector.config.CollectorProperties",
   "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true,
+  "queryAllPublicMethods":true,
   "methods":[
-    {"name":"<init>","parameterTypes":[] }
-  ]
-},
-{
-  "name":"com.wl4g.rengine.collector.config.CollectorProperties$ZookeeperProperties",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true,
-  "methods":[
-    {"name":"<init>","parameterTypes":[] },
-    {"name":"setServerLists","parameterTypes":["java.lang.String"] },
-    {"name":"setNamespace","parameterTypes":["java.lang.String"] },
-    {"name":"setBaseSleepTimeMilliseconds","parameterTypes":["java.lang.Integer"] },
-    {"name":"setMaxSleepTimeMilliseconds","parameterTypes":["java.lang.Integer"] },
-    {"name":"setMaxRetries","parameterTypes":["java.lang.Integer"] },
-    {"name":"setSessionTimeoutMilliseconds","parameterTypes":["java.lang.Integer"] },
-    {"name":"setConnectionTimeoutMilliseconds","parameterTypes":["java.lang.String"] },
-    {"name":"setDigest","parameterTypes":["java.lang.String"] }
-  ]
-},
-{
-  "name":"com.wl4g.rengine.collector.config.CollectorProperties$TracingProperties",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true,
-  "methods":[
-    {"name":"<init>","parameterTypes":[] }
-  ]
-},
-{
-  "name":"com.wl4g.rengine.collector.config.CollectorProperties$SnapshotDumpProperties",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true,
-  "methods":[
-    {"name":"<init>","parameterTypes":[] }
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setDump","parameterTypes":["com.wl4g.rengine.collector.config.CollectorProperties$SnapshotDumpProperties"] }, 
+    {"name":"setGlobalScrapeJobConfig","parameterTypes":["com.wl4g.rengine.collector.config.CollectorProperties$GlobalScrapeJobProperties"] }, 
+    {"name":"setScrapeJobConfigs","parameterTypes":["java.util.List"] }, 
+    {"name":"setTracing","parameterTypes":["com.wl4g.rengine.collector.config.CollectorProperties$TracingProperties"] }, 
+    {"name":"setZookeeper","parameterTypes":["com.wl4g.rengine.collector.config.CollectorProperties$ZookeeperProperties"] }
   ]
 },
 {
   "name":"com.wl4g.rengine.collector.config.CollectorProperties$GlobalScrapeJobProperties",
   "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true,
+  "queryAllPublicMethods":true,
   "methods":[
-    {"name":"<init>","parameterTypes":[] }
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setJobParamConfigs","parameterTypes":["com.wl4g.rengine.collector.config.CollectorProperties$GlobalScrapeJobProperties$GlobalJobParamsProperties"] }, 
+    {"name":"setJobVariables","parameterTypes":["java.util.Map"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.collector.config.CollectorProperties$GlobalScrapeJobProperties$GlobalJobParamsProperties",
+  "allDeclaredFields":true,
+  "queryAllPublicMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setSimpleHttp","parameterTypes":["com.wl4g.rengine.collector.job.SimpleHttpCollectJobExecutor$SimpleHttpJobParam"] }, 
+    {"name":"setSimpleJdbc","parameterTypes":["com.wl4g.rengine.collector.job.SimpleJdbcCollectJobExecutor$SimpleJdbcJobParam"] }, 
+    {"name":"setSimpleRedis","parameterTypes":["com.wl4g.rengine.collector.job.SimpleRedisCollectJobExecutor$SimpleRedisJobParam"] }, 
+    {"name":"setSimpleSsh","parameterTypes":["com.wl4g.rengine.collector.job.SimpleSSHCollectJobExecutor$SimpleSSHJobParam"] }, 
+    {"name":"setSimpleTcp","parameterTypes":["com.wl4g.rengine.collector.job.SimpleTcpCollectJobExecutor$SimpleTcpJobParam"] }
   ]
 },
 {
   "name":"com.wl4g.rengine.collector.config.CollectorProperties$ScrapeJobProperties",
   "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true,
+  "queryAllPublicMethods":true,
   "methods":[
-    {"name":"<init>","parameterTypes":[] }
+    {"name":"setAutoShardingTotalCount","parameterTypes":["java.lang.Boolean"] }, 
+    {"name":"setCron","parameterTypes":["java.lang.String"] }, 
+    {"name":"setDescription","parameterTypes":["java.lang.String"] }, 
+    {"name":"setDisabled","parameterTypes":["java.lang.Boolean"] }, 
+    {"name":"setEventAttributes","parameterTypes":["java.util.Map"] }, 
+    {"name":"setEventType","parameterTypes":["java.lang.String"] }, 
+    {"name":"setFailover","parameterTypes":["java.lang.Boolean"] }, 
+    {"name":"setJobErrorHandlerType","parameterTypes":["java.lang.String"] }, 
+    {"name":"setJobExecutorServiceHandlerType","parameterTypes":["java.lang.String"] }, 
+    {"name":"setJobListenerTypes","parameterTypes":["java.util.Collection"] }, 
+    {"name":"setJobShardingStrategyType","parameterTypes":["java.lang.String"] }, 
+    {"name":"setMaxTimeDiffSeconds","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"setMisfire","parameterTypes":["java.lang.Boolean"] }, 
+    {"name":"setMonitorExecution","parameterTypes":["java.lang.Boolean"] }, 
+    {"name":"setName","parameterTypes":["java.lang.String"] }, 
+    {"name":"setOverwrite","parameterTypes":["java.lang.Boolean"] }, 
+    {"name":"setReconcileIntervalMinutes","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"setShardingItemParameters","parameterTypes":["java.lang.String"] }, 
+    {"name":"setShardingTotalCount","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"setTimeZone","parameterTypes":["java.lang.String"] }
   ]
 },
 {
   "name":"com.wl4g.rengine.collector.config.CollectorProperties$SimpleHttpScrapeJobProperties",
   "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true,
+  "queryAllPublicMethods":true,
   "methods":[
-    {"name":"<init>","parameterTypes":[] }
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setJobParams","parameterTypes":["java.util.List"] }
   ]
 },
 {
   "name":"com.wl4g.rengine.collector.config.CollectorProperties$SimpleJdbcScrapeJobProperties",
   "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true,
+  "queryAllPublicMethods":true,
   "methods":[
-    {"name":"<init>","parameterTypes":[] }
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setJobParams","parameterTypes":["java.util.List"] }
   ]
 },
 {
   "name":"com.wl4g.rengine.collector.config.CollectorProperties$SimpleRedisScrapeJobProperties",
   "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true,
+  "queryAllPublicMethods":true,
   "methods":[
-    {"name":"<init>","parameterTypes":[] }
-  ]
-},
-{
-  "name":"com.wl4g.rengine.collector.config.CollectorProperties$SimpleTcpScrapeJobProperties",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true,
-  "methods":[
-    {"name":"<init>","parameterTypes":[] }
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setJobParams","parameterTypes":["java.util.List"] }
   ]
 },
 {
   "name":"com.wl4g.rengine.collector.config.CollectorProperties$SimpleSSHScrapeJobProperties",
   "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true,
+  "queryAllPublicMethods":true,
   "methods":[
-    {"name":"<init>","parameterTypes":[] }
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setJobParams","parameterTypes":["java.util.List"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.collector.config.CollectorProperties$SnapshotDumpProperties",
+  "allDeclaredFields":true,
+  "queryAllPublicMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setPort","parameterTypes":["int"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.collector.config.CollectorProperties$TracingProperties",
+  "allDeclaredFields":true,
+  "queryAllPublicMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setExcludeJobNames","parameterTypes":["java.util.Set"] }, 
+    {"name":"setIncludeJobNames","parameterTypes":["java.util.Set"] }, 
+    {"name":"setType","parameterTypes":["java.lang.String"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.collector.config.CollectorProperties$ZookeeperProperties",
+  "allDeclaredFields":true,
+  "queryAllPublicMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setBaseSleepTimeMilliseconds","parameterTypes":["int"] }, 
+    {"name":"setConnectionTimeoutMilliseconds","parameterTypes":["int"] }, 
+    {"name":"setMaxRetries","parameterTypes":["int"] }, 
+    {"name":"setMaxSleepTimeMilliseconds","parameterTypes":["int"] }, 
+    {"name":"setNamespace","parameterTypes":["java.lang.String"] }, 
+    {"name":"setServerLists","parameterTypes":["java.lang.String"] }, 
+    {"name":"setSessionTimeoutMilliseconds","parameterTypes":["int"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.collector.context.CollectorApplicationInitializer",
+  "queriedMethods":[
+    {"name":"initEventBus","parameterTypes":[] }, 
+    {"name":"initEventBusConfiguration","parameterTypes":[] }, 
+    {"name":"initJobConfiguration","parameterTypes":[] }, 
+    {"name":"initJobScheduling","parameterTypes":[] }, 
+    {"name":"lambda$2","parameterTypes":["java.lang.String","org.apache.shardingsphere.elasticjob.lite.api.bootstrap.JobBootstrap"] }, 
+    {"name":"onStop","parameterTypes":["io.quarkus.runtime.ShutdownEvent"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.collector.job.CollectJobExecutor$JobParamBase",
+  "allDeclaredFields":true,
+  "queryAllPublicMethods":true,
+  "methods":[
+    {"name":"setConnectTimeoutMs","parameterTypes":["long"] }, 
+    {"name":"setName","parameterTypes":["java.lang.String"] }, 
+    {"name":"setReadTimeoutMs","parameterTypes":["long"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.collector.job.SimpleHttpCollectJobExecutor$SimpleHttpJobParam",
+  "allDeclaredFields":true,
+  "queryAllPublicMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setBody","parameterTypes":["java.lang.String"] }, 
+    {"name":"setHeaders","parameterTypes":["java.util.Map"] }, 
+    {"name":"setMethod","parameterTypes":["java.lang.String"] }, 
+    {"name":"setUrl","parameterTypes":["java.lang.String"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.collector.job.SimpleJdbcCollectJobExecutor$SimpleJdbcJobParam",
+  "allDeclaredFields":true,
+  "queryAllPublicMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setFetchDirection","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"setFetchSize","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"setHikariConfig","parameterTypes":["com.zaxxer.hikari.HikariConfig"] }, 
+    {"name":"setMaxFieldSize","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"setMaxRows","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"setQueryTimeoutMs","parameterTypes":["java.lang.Long"] }, 
+    {"name":"setSql","parameterTypes":["java.lang.String"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.collector.job.SimpleRedisCollectJobExecutor$SimpleRedisJobParam",
+  "allDeclaredFields":true,
+  "queryAllPublicMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setJedisConfig","parameterTypes":["com.wl4g.infra.common.jedis.JedisClientBuilder$JedisConfig"] }, 
+    {"name":"setLuaArgs","parameterTypes":["java.util.List"] }, 
+    {"name":"setLuaKeys","parameterTypes":["java.util.List"] }, 
+    {"name":"setLuaScript","parameterTypes":["java.lang.String"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.collector.job.SimpleSSHCollectJobExecutor$SimpleSSHJobParam",
+  "allDeclaredFields":true,
+  "queryAllPublicMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setCommand","parameterTypes":["java.lang.String"] }, 
+    {"name":"setHost","parameterTypes":["java.lang.String"] }, 
+    {"name":"setPassword","parameterTypes":["java.lang.String"] }, 
+    {"name":"setPort","parameterTypes":["int"] }, 
+    {"name":"setUser","parameterTypes":["java.lang.String"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.collector.job.SimpleTcpCollectJobExecutor$SimpleTcpJobParam",
+  "allDeclaredFields":true,
+  "queryAllPublicMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setBase64Message","parameterTypes":["java.lang.String"] }
   ]
 },
 {
   "name":"com.zaxxer.hikari.HikariConfig",
   "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true,
+  "queryAllPublicMethods":true,
   "methods":[
-    {"name":"<init>","parameterTypes":[] }
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setConnectionTimeout","parameterTypes":["long"] }, 
+    {"name":"setIdleTimeout","parameterTypes":["long"] }, 
+    {"name":"setInitializationFailTimeout","parameterTypes":["long"] }, 
+    {"name":"setJdbcUrl","parameterTypes":["java.lang.String"] }, 
+    {"name":"setLeakDetectionThreshold","parameterTypes":["long"] }, 
+    {"name":"setMaxLifetime","parameterTypes":["long"] }, 
+    {"name":"setMaximumPoolSize","parameterTypes":["int"] }, 
+    {"name":"setMinimumIdle","parameterTypes":["int"] }, 
+    {"name":"setPassword","parameterTypes":["java.lang.String"] }, 
+    {"name":"setUsername","parameterTypes":["java.lang.String"] }, 
+    {"name":"setValidationTimeout","parameterTypes":["long"] }
   ]
 }
 ]

@@ -18,21 +18,26 @@ package com.wl4g.rengine.evaluator.util;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.findField;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.setField;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoDriverInformation;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.internal.MongoClientImpl;
+import com.wl4g.rengine.evaluator.execution.ExecutionConfig;
 import com.wl4g.rengine.evaluator.repository.MongoRepository;
 
 /**
- * {@link TestMongoUtil}
+ * {@link TestSetupDefaults}
  * 
  * @author James Wong
  * @version 2022-10-10
  * @since v1.0.0
  */
-public abstract class TestMongoUtil {
+public abstract class TestSetupDefaults {
 
     public static MongoRepository createMongoRepository() {
         MongoClient mongoClient = new MongoClientImpl(MongoClientSettings.builder()
@@ -45,4 +50,24 @@ public abstract class TestMongoUtil {
         return mongoRepository;
     }
 
+    public static ExecutionConfig createExecutionConfig() {
+        return new ExecutionConfig() {
+
+            @Override
+            public @NotNull @Min(0) @Max(65535) Integer threadPools() {
+                return ExecutionConfig.DEFAULT_THREAD_POOLS;
+            }
+
+            @Override
+            public @NotNull @Min(0) @Max(100000) Integer maxQueryBatch() {
+                return ExecutionConfig.DEFAULT_MAX_QUERY_BATCH;
+            }
+
+            @Override
+            public @NotNull @Min(0) @Max(1) Float evaluateTimeoutOffsetRate() {
+                return ExecutionConfig.DEFAULT_TIMEOUT_OFFSET_RATE;
+            }
+        };
+    }
+    
 }

@@ -63,7 +63,6 @@ import org.bson.conversions.Bson;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.mongodb.Function;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Aggregates;
@@ -160,7 +159,7 @@ public class EvaluatorServiceImpl implements EvaluatorService {
                 // Submit to execution workers.
                 final Map<String, Future<ResultDescription>> futures = sceneses.stream()
                         .map(scenes -> new KeyValue(scenes.getScenesCode(),
-                                taskRunner.getWorker().submit(new EvaluationWorker(latch, evaluation, scenes))))
+                                taskRunner.getWorker().submit(new ExecutionRunner(latch, evaluation, scenes))))
                         .collect(toMap(kv -> kv.getKey(), kv -> (Future) kv.getValue()));
 
                 // Collect for uncompleted results.
@@ -299,90 +298,84 @@ public class EvaluatorServiceImpl implements EvaluatorService {
                                 project),
                         "workflow"));
         aggregates.add(project);
-        aggregates.add(Aggregates.merge("_tmp_load_scenes_with_cascade"));
+        // The temporary collections are automatically created.
+        // aggregates.add(Aggregates.merge("_tmp_load_scenes_with_cascade"));
 
         // Document scenesDoc = aggregateIt.first();
-        final MongoCursor<Scenes> cursor = collection.aggregate(aggregates)
-                .batchSize(config.threadPools())
-                .map(new Function<Document, Scenes>() {
-                    @Override
-                    public Scenes apply(Document scenesDoc) {
-                        log.debug("Found scenes object by scenesCodes: {} to json: {}", scenesCodes, scenesDoc.toJson());
-                        Scenes scenes = new Scenes();
-                        scenes.setId(scenesDoc.getLong("_id"));
-                        scenes.setName(scenesDoc.getString("name"));
-                        scenes.setScenesCode(scenesDoc.getString("scenesCode"));
-                        scenes.setWorkflowId(scenesDoc.getLong("workflowId"));
-                        scenes.setOrgCode(scenesDoc.getString("orgCode"));
-                        scenes.setEnable(scenesDoc.getInteger("enable"));
-                        scenes.setLabels(scenesDoc.getList("labels", String.class));
-                        scenes.setRemark(scenesDoc.getString("remark"));
-                        scenes.setCreateBy(scenesDoc.getLong("createBy"));
-                        scenes.setCreateDate(scenesDoc.getDate("createDate"));
-                        scenes.setUpdateBy(scenesDoc.getLong("updateBy"));
-                        scenes.setUpdateDate(scenesDoc.getDate("updateDate"));
+        final MongoCursor<Scenes> cursor = collection.aggregate(aggregates).batchSize(config.threadPools()).map(scenesDoc -> {
+            log.debug("Found scenes object by scenesCodes: {} to json: {}", scenesCodes, scenesDoc.toJson());
+            Scenes scenes = new Scenes();
+            scenes.setId(scenesDoc.getLong("_id"));
+            scenes.setName(scenesDoc.getString("name"));
+            scenes.setScenesCode(scenesDoc.getString("scenesCode"));
+            scenes.setWorkflowId(scenesDoc.getLong("workflowId"));
+            scenes.setOrgCode(scenesDoc.getString("orgCode"));
+            scenes.setEnable(scenesDoc.getInteger("enable"));
+            scenes.setLabels(scenesDoc.getList("labels", String.class));
+            scenes.setRemark(scenesDoc.getString("remark"));
+            scenes.setCreateBy(scenesDoc.getLong("createBy"));
+            scenes.setCreateDate(scenesDoc.getDate("createDate"));
+            scenes.setUpdateBy(scenesDoc.getLong("updateBy"));
+            scenes.setUpdateDate(scenesDoc.getDate("updateDate"));
 
-                        safeList(scenesDoc.getList("workflow", Document.class)).stream().findFirst().ifPresent(workflowsDoc -> {
-                            scenes.setWorkflow(Workflow.builder()
-                                    .id(workflowsDoc.getLong("_id"))
-                                    .name(workflowsDoc.getString("name"))
-                                    .engine(RuleEngine.valueOf(workflowsDoc.getString("engine")))
-                                    .orgCode(workflowsDoc.getString("orgCode"))
-                                    .enable(workflowsDoc.getInteger("enable"))
-                                    .labels(workflowsDoc.getList("labels", String.class))
-                                    .remark(workflowsDoc.getString("remark"))
-                                    .createBy(workflowsDoc.getLong("createBy"))
-                                    .createDate(workflowsDoc.getDate("createDate"))
-                                    .updateBy(workflowsDoc.getLong("updateBy"))
-                                    .updateDate(workflowsDoc.getDate("updateDate"))
-                                    // .graph(workflowsDoc.get("graph",WorkflowGraph.class))
-                                    .build());
-                            Document graphDoc = workflowsDoc.get("graph", Document.class);
-                            scenes.getWorkflow().setGraph(parseJSON(graphDoc.toJson(), WorkflowGraph.class));
+            safeList(scenesDoc.getList("workflow", Document.class)).stream().findFirst().ifPresent(workflowsDoc -> {
+                scenes.setWorkflow(Workflow.builder()
+                        .id(workflowsDoc.getLong("_id"))
+                        .name(workflowsDoc.getString("name"))
+                        .engine(RuleEngine.valueOf(workflowsDoc.getString("engine")))
+                        .orgCode(workflowsDoc.getString("orgCode"))
+                        .enable(workflowsDoc.getInteger("enable"))
+                        .labels(workflowsDoc.getList("labels", String.class))
+                        .remark(workflowsDoc.getString("remark"))
+                        .createBy(workflowsDoc.getLong("createBy"))
+                        .createDate(workflowsDoc.getDate("createDate"))
+                        .updateBy(workflowsDoc.getLong("updateBy"))
+                        .updateDate(workflowsDoc.getDate("updateDate"))
+                        // .graph(workflowsDoc.get("graph",WorkflowGraph.class))
+                        .build());
+                Document graphDoc = workflowsDoc.get("graph", Document.class);
+                scenes.getWorkflow().setGraph(parseJSON(graphDoc.toJson(), WorkflowGraph.class));
 
-                            scenes.getWorkflow()
-                                    .setRules(safeList(workflowsDoc.getList("rules", Document.class)).stream().map(rulesDoc -> {
-                                        Rule rule = Rule.builder()
-                                                .id(rulesDoc.getLong("_id"))
-                                                .name(rulesDoc.getString("name"))
-                                                .engine(RuleEngine.valueOf(workflowsDoc.getString("engine")))
-                                                .uploadIds(rulesDoc.getList("uploadIds", Long.class))
-                                                .orgCode(rulesDoc.getString("orgCode"))
-                                                .enable(rulesDoc.getInteger("enable"))
-                                                .labels(rulesDoc.getList("labels", String.class))
-                                                .remark(rulesDoc.getString("remark"))
-                                                .createBy(rulesDoc.getLong("createBy"))
-                                                .createDate(rulesDoc.getDate("createDate"))
-                                                .updateBy(rulesDoc.getLong("updateBy"))
-                                                .updateDate(rulesDoc.getDate("updateDate"))
-                                                .build();
-                                        rule.setUploads(safeList(rulesDoc.getList("uploads", Document.class)).stream()
-                                                .map(uploadsDoc -> UploadObject.builder()
-                                                        .id(uploadsDoc.getLong("_id"))
-                                                        .filename(uploadsDoc.getString("filename"))
-                                                        .uploadType(uploadsDoc.getString("uploadType"))
-                                                        .objectPrefix(uploadsDoc.getString("objectPrefix"))
-                                                        .extension(uploadsDoc.getString("extension"))
-                                                        .size(uploadsDoc.getLong("size"))
-                                                        .md5sum(uploadsDoc.getString("md5sum"))
-                                                        .sha1sum(uploadsDoc.getString("sha1sum"))
-                                                        .orgCode(uploadsDoc.getString("orgCode"))
-                                                        .enable(uploadsDoc.getInteger("enable"))
-                                                        .labels(uploadsDoc.getList("labels", String.class))
-                                                        .remark(uploadsDoc.getString("remark"))
-                                                        .createBy(uploadsDoc.getLong("createBy"))
-                                                        .createDate(uploadsDoc.getDate("createDate"))
-                                                        .updateBy(uploadsDoc.getLong("updateBy"))
-                                                        .updateDate(uploadsDoc.getDate("updateDate"))
-                                                        .build())
-                                                .collect(toList()));
-                                        return rule;
-                                    }).collect(toList()));
-                        });
-                        return scenes;
-                    }
-                })
-                .iterator();
+                scenes.getWorkflow().setRules(safeList(workflowsDoc.getList("rules", Document.class)).stream().map(rulesDoc -> {
+                    Rule rule = Rule.builder()
+                            .id(rulesDoc.getLong("_id"))
+                            .name(rulesDoc.getString("name"))
+                            .engine(RuleEngine.valueOf(workflowsDoc.getString("engine")))
+                            .uploadIds(rulesDoc.getList("uploadIds", Long.class))
+                            .orgCode(rulesDoc.getString("orgCode"))
+                            .enable(rulesDoc.getInteger("enable"))
+                            .labels(rulesDoc.getList("labels", String.class))
+                            .remark(rulesDoc.getString("remark"))
+                            .createBy(rulesDoc.getLong("createBy"))
+                            .createDate(rulesDoc.getDate("createDate"))
+                            .updateBy(rulesDoc.getLong("updateBy"))
+                            .updateDate(rulesDoc.getDate("updateDate"))
+                            .build();
+                    rule.setUploads(safeList(rulesDoc.getList("uploads", Document.class)).stream()
+                            .map(uploadsDoc -> UploadObject.builder()
+                                    .id(uploadsDoc.getLong("_id"))
+                                    .filename(uploadsDoc.getString("filename"))
+                                    .uploadType(uploadsDoc.getString("uploadType"))
+                                    .objectPrefix(uploadsDoc.getString("objectPrefix"))
+                                    .extension(uploadsDoc.getString("extension"))
+                                    .size(uploadsDoc.getLong("size"))
+                                    .md5sum(uploadsDoc.getString("md5sum"))
+                                    .sha1sum(uploadsDoc.getString("sha1sum"))
+                                    .orgCode(uploadsDoc.getString("orgCode"))
+                                    .enable(uploadsDoc.getInteger("enable"))
+                                    .labels(uploadsDoc.getList("labels", String.class))
+                                    .remark(uploadsDoc.getString("remark"))
+                                    .createBy(uploadsDoc.getLong("createBy"))
+                                    .createDate(uploadsDoc.getDate("createDate"))
+                                    .updateBy(uploadsDoc.getLong("updateBy"))
+                                    .updateDate(uploadsDoc.getDate("updateDate"))
+                                    .build())
+                            .collect(toList()));
+                    return rule;
+                }).collect(toList()));
+            });
+            return scenes;
+        }).iterator();
 
         try {
             return IteratorUtils.toList(cursor);
@@ -392,7 +385,7 @@ public class EvaluatorServiceImpl implements EvaluatorService {
     }
 
     @AllArgsConstructor
-    class EvaluationWorker implements Callable<ResultDescription> {
+    class ExecutionRunner implements Callable<ResultDescription> {
         final @NotNull CountDownLatch latch;
         final @NotNull Evaluation evaluation;
         final @NotNull Scenes scenes;

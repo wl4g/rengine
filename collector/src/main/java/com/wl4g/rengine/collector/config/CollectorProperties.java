@@ -77,6 +77,8 @@ import lombok.extern.slf4j.Slf4j;
  * @since v1.0.0
  * @see {@link org.apache.shardingsphere.elasticjob.lite.spring.boot.job.ElasticJobProperties}
  */
+// https://github.com/quarkiverse/quarkus-zookeeper-client/blob/main/runtime/src/main/java/io/quarkiverse/zookeeper/config/ClientConfig.java
+// @ConfigGroup
 @Getter
 @Setter
 @Slf4j
@@ -84,6 +86,7 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor
 public class CollectorProperties {
 
+    // @ConfigItem
     private ZookeeperProperties zookeeper = new ZookeeperProperties();
 
     private TracingProperties tracing = new TracingProperties();

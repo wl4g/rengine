@@ -25,7 +25,7 @@ import org.junit.Test;
 
 import com.wl4g.rengine.common.entity.Scenes;
 import com.wl4g.rengine.evaluator.service.EvaluatorService;
-import com.wl4g.rengine.evaluator.util.TestMongoUtil;
+import com.wl4g.rengine.evaluator.util.TestSetupDefaults;
 
 /**
  * {@link EvaluatorServiceTests}
@@ -53,7 +53,8 @@ public class EvaluatorServiceTests {
 
         // Manual setup/inject depends.
         EvaluatorServiceImpl evaluatorService = new EvaluatorServiceImpl();
-        evaluatorService.mongoRepository = TestMongoUtil.createMongoRepository();
+        evaluatorService.mongoRepository = TestSetupDefaults.createMongoRepository();
+        evaluatorService.config = TestSetupDefaults.createExecutionConfig();
         this.evaluatorService = evaluatorService;
     }
 

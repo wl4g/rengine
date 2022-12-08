@@ -15,19 +15,9 @@
  */
 package com.wl4g.rengine.evaluator.execution.sdk;
 
-import static com.wl4g.infra.common.collection.CollectionUtils2.isEmpty;
-import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotBlank;
-
 import org.graalvm.polyglot.HostAccess;
 
-import com.wl4g.rengine.evaluator.service.AggregationService;
+import com.wl4g.rengine.evaluator.service.MongoAggregatedService;
 
 import lombok.AllArgsConstructor;
 import lombok.ToString;
@@ -43,23 +33,18 @@ import lombok.ToString;
 @AllArgsConstructor
 public class ScriptDataService {
 
-    private final AggregationService aggregationService;
+    private final MongoAggregatedService mongoAggregatedService;
 
-    public @HostAccess.Export List<Map<String, Object>> findAggregates(
-            @NotBlank String eventType,
-            @Nullable Map<String, Object> query) {
-        hasTextOf(eventType, "eventType");
-
-        // Merge query parameters.
-        Map<String, Object> _query = new HashMap<>();
-        if (!isEmpty(query)) {
-            _query.putAll(query);
-        }
-
-        // TODO other parameters
-        _query.put("eventType", eventType);
-
-        return aggregationService.findList(_query);
+    public @HostAccess.Export MongoAggregatedService mongoService() {
+        return mongoAggregatedService;
     }
+
+    // public @HostAccess.Export MongoAggregatedService phoenixService() {
+    // return mongoAggregatedService;
+    // }
+
+    // public @HostAccess.Export MongoAggregatedService opentsdbService() {
+    // return opentsdbAggregatedService;
+    // }
 
 }

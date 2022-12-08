@@ -18,17 +18,20 @@ package com.wl4g.rengine.evaluator.service;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nullable;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
- * {@link AggregationService}
+ * {@link MongoAggregatedService}
  * 
  * @author James Wong
  * @version 2022-09-17
  * @since v1.0.0
  */
-public interface AggregationService {
+public interface MongoAggregatedService {
 
-    List<Map<String, Object>> findList(@Nullable Map<String, Object> query);
+    List<JsonNode> findList(@NotBlank String tableName, @NotNull List<Map<String, Object>> bsonQueryParams);
 
 }

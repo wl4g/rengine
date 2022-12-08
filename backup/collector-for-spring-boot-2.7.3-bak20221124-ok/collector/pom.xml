@@ -49,7 +49,6 @@
         </developer>
     </developers>
     <properties>
-        <repackage.classifier />
         <elastic-logback.version>1.5.0</elastic-logback.version>
         <bootstrap-classname>com.wl4g.RengineCollector</bootstrap-classname>
         <final.name>rengine-collector</final.name>
@@ -298,174 +297,41 @@
             </build>
         </profile>
         <profile>
-            <id>build:native</id>
+            <id>build:springjar</id>
             <properties>
                 <repackage.classifier>exec</repackage.classifier>
-                <native-buildtools.version>0.9.13</native-buildtools.version>
-                <native.buildmemory>8G</native.buildmemory>
             </properties>
-            <dependencies>
-                <dependency>
-                    <groupId>org.junit.platform</groupId>
-                    <artifactId>junit-platform-launcher</artifactId>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-assembly-plugin</artifactId>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
                         <configuration>
+                            <mainClass>${bootstrap-classname}</mainClass>
                             <finalName>${final.name}-${project.version}-bin</finalName>
-                            <appendAssemblyId>false</appendAssemblyId>
-                            <descriptors>
-                                <descriptor>src/main/assemble/package.xml</descriptor>
-                            </descriptors>
+                            <!-- for using: java -cp myapp.jar -Dloader.main=com.MyApp org.springframework.boot.loader.PropertiesLauncher -->
+                            <!-- @see:https://www.baeldung.com/spring-boot-main-class -->
+                            <!-- @see:https://www.jianshu.com/p/66a101c85485 -->
+                            <layout>ZIP</layout>
+                            <excludes>
+                                <exclude>
+                                    <groupId>org.projectlombok</groupId>
+                                    <artifactId>lombok</artifactId>
+                                </exclude>
+                            </excludes>
+                            <classifier>${repackage.classifier}</classifier>
+                            <image>
+                                <builder>paketobuildpacks/builder:tiny</builder>
+                                <env>
+                                    <BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
+                                </env>
+                            </image>
                         </configuration>
                         <executions>
                             <execution>
-                                <id>make-assembly</id>
-                                <phase>package</phase>
                                 <goals>
-                                    <goal>single</goal>
+                                    <goal>repackage</goal>
                                 </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <!-- <plugin> -->
-                    <!--     <groupId>org.springframework.boot</groupId> -->
-                    <!--     <artifactId>spring-boot-maven-plugin</artifactId> -->
-                    <!--     <configuration> -->
-                    <!--         <excludes> -->
-                    <!--             <exclude> -->
-                    <!--                 <groupId>org.projectlombok</groupId> -->
-                    <!--                 <artifactId>lombok</artifactId> -->
-                    <!--             </exclude> -->
-                    <!--         </excludes> -->
-                    <!--         <classifier>${repackage.classifier}</classifier> -->
-                    <!--         <image> -->
-                    <!--             <builder>paketobuildpacks/builder:tiny</builder> -->
-                    <!--             <env> -->
-                    <!--                 <BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE> -->
-                    <!--             </env> -->
-                    <!--         </image> -->
-                    <!--     </configuration> -->
-                    <!-- </plugin> -->
-                    <!-- <plugin> -->
-                    <!--     <groupId>org.springframework.experimental</groupId> -->
-                    <!--     <artifactId>spring-aot-maven-plugin</artifactId> -->
-                    <!--     <version>${spring-native.version}</version> -->
-                    <!--     <executions> -->
-                    <!--         <execution> -->
-                    <!--             <id>test-generate</id> -->
-                    <!--             <goals> -->
-                    <!--                 <goal>test-generate</goal> -->
-                    <!--             </goals> -->
-                    <!--         </execution> -->
-                    <!--         <execution> -->
-                    <!--             <id>generate</id> -->
-                    <!--             <goals> -->
-                    <!--                 <goal>generate</goal> -->
-                    <!--             </goals> -->
-                    <!--         </execution> -->
-                    <!--     </executions> -->
-                    <!-- </plugin> -->
-                    <!-- see:https://www.graalvm.org/dev/reference-manual/native-image/guides/use-native-image-maven-plugin/ -->
-                    <!-- <plugin> -->
-                    <!--     <groupId>org.graalvm.buildtools</groupId> -->
-                    <!--     <artifactId>native-maven-plugin</artifactId> -->
-                    <!--     <version>${native-buildtools.version}</version> -->
-                    <!--     <extensions>true</extensions> -->
-                    <!--     <executions> -->
-                    <!--         <execution> -->
-                    <!--             <id>test-native</id> -->
-                    <!--             <phase>test</phase> -->
-                    <!--             <goals> -->
-                    <!--                 <goal>test</goal> -->
-                    <!--             </goals> -->
-                    <!--         </execution> -->
-                    <!--         <execution> -->
-                    <!--             <id>build-native</id> -->
-                    <!--             <phase>package</phase> -->
-                    <!--             <goals> -->
-                    <!--                 <goal>build</goal> -->
-                    <!--             </goals> -->
-                    <!--         </execution> -->
-                    <!--     </executions> -->
-                    <!--     <configuration> -->
-                    <!--         <fallback>false</fallback> -->
-                    <!--     </configuration> -->
-                    <!-- </plugin> -->
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>unpack-tar</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>tar</executable>
-                                    <arguments>
-                                        <argument>-xvf</argument>
-                                        <argument>${project.basedir}/target/${final.name}-${project.version}-bin.tar</argument>
-                                        <argument>-C</argument>
-                                        <argument>${project.basedir}/target/</argument>
-                                    </arguments>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>build-native-with-docker</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>docker</executable>
-                                    <arguments>
-                                        <argument>run</argument>
-                                        <argument>--rm</argument>
-                                        <argument>--memory=${native.buildmemory}</argument>
-                                        <argument>--memory-swap=-1</argument>
-                                        <argument>-v</argument>
-                                        <argument>${project.basedir}/target/${final.name}-${project.version}-bin:/workspace</argument>
-                                        <argument>registry.cn-shenzhen.aliyuncs.com/wl4g/graalvm-ce:22.1.0-java11</argument>
-                                        <argument>native-image</argument>
-                                        <argument>-J--add-exports=java.security.jgss/sun.security.krb5=ALL-UNNAMED</argument>
-                                        <argument>-J--add-opens=java.base/java.text=ALL-UNNAMED</argument>
-                                        <argument>-J--add-opens=java.base/java.io=ALL-UNNAMED</argument>
-                                        <argument>-J--add-opens=java.base/java.lang.invoke=ALL-UNNAMED</argument>
-                                        <argument>-J--add-opens=java.base/java.util=ALL-UNNAMED</argument>
-                                        <argument>-J-Dsun.nio.ch.maxUpdateArraySize=100</argument>
-                                        <argument>-J-Djava.util.logging.manager=org.jboss.logmanager.LogManager</argument>
-                                        <argument>-J-Dio.netty.leakDetection.level=DISABLED</argument>
-                                        <argument>-J-Dio.netty.allocator.maxOrder=3</argument>
-                                        <argument>-J-Djava.awt.headless=true</argument>
-                                        <argument>-J-Xmx${native.buildmemory}</argument>
-                                        <argument>--language:js</argument>
-                                        <argument>--link-at-build-time</argument>
-                                        <argument>--no-fallback</argument>
-                                        <argument>--report-unsupported-elements-at-runtime</argument>
-                                        <argument>--initialize-at-run-time=groovy.grape.GrapeIvy</argument>
-                                        <argument>--trace-class-initialization=io.netty.util.concurrent.GlobalEventExecutor,io.netty.util.concurrent.ScheduledFutureTask</argument>
-                                        <argument>--trace-class-initialization=org.springframework.util.ClassUtils,org.springframework.util.ConcurrentReferenceHashMap</argument>
-                                        <argument>-H:InitialCollectionPolicy=com.oracle.svm.core.genscavenge.CollectionPolicy\$BySpaceAndTime</argument>
-                                        <argument>-H:-ParseOnce</argument>
-                                        <argument>-H:-AddAllCharsets</argument>
-                                        <argument>-H:-UseServiceLoaderFeature</argument>
-                                        <argument>-H:FallbackThreshold=0</argument>
-                                        <argument>-H:DebugInfoSourceSearchPath=app-sources</argument>
-                                        <argument>-H:EnableURLProtocols=http,https</argument>
-                                        <argument>-H:+AllowFoldMethods</argument>
-                                        <argument>-H:+ReportExceptionStackTraces</argument>
-                                        <argument>-cp</argument>
-                                        <argument>conf/*:lib/${final.name}.jar:lib/*</argument>
-                                        <argument>${bootstrap-classname}</argument>
-                                    </arguments>
-                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
@@ -535,19 +401,48 @@
                 </plugins>
             </build>
         </profile>
-        <!-- TODO 暂时 Dockerfile 还不支持 native 执行文件 -->
         <profile>
-            <id>build:native:docker</id>
+            <id>build:native</id>
+            <properties>
+                <repackage.classifier>exec</repackage.classifier>
+                <native-buildtools.version>0.9.13</native-buildtools.version>
+                <native.buildmemory>8G</native.buildmemory>
+            </properties>
+            <dependencies>
+                <!-- see:https://github.com/oracle/graal/issues/3093#issuecomment-779812080 -->
+                <!-- <dependency> -->
+                <!--     <groupId>org.graalvm.nativeimage</groupId> -->
+                <!--     <artifactId>svm-hosted-native-linux-amd64</artifactId> -->
+                <!--     <version>22.0.0.2</version> -->
+                <!--     <type>tar.gz</type> -->
+                <!--     <scope>provided</scope> -->
+                <!-- </dependency> -->
+                <dependency>
+                    <groupId>org.junit.platform</groupId>
+                    <artifactId>junit-platform-launcher</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-maven-plugin</artifactId>
                         <configuration>
+                            <mainClass>${bootstrap-classname}</mainClass>
+                            <finalName>${final.name}-${project.version}-bin</finalName>
+                            <!-- for using: java -cp myapp.jar -Dloader.main=com.MyApp org.springframework.boot.loader.PropertiesLauncher -->
+                            <!-- @see:https://www.baeldung.com/spring-boot-main-class -->
+                            <!-- @see:https://www.jianshu.com/p/66a101c85485 -->
+                            <layout>ZIP</layout>
                             <excludes>
                                 <exclude>
                                     <groupId>org.projectlombok</groupId>
                                     <artifactId>lombok</artifactId>
+                                </exclude>
+                                <exclude>
+                                    <groupId>com.fasterxml.jackson.core</groupId>
+                                    <artifactId>jackson-databind</artifactId>
                                 </exclude>
                             </excludes>
                             <classifier>${repackage.classifier}</classifier>
@@ -558,6 +453,13 @@
                                 </env>
                             </image>
                         </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>repackage</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                     </plugin>
                     <plugin>
                         <groupId>org.springframework.experimental</groupId>
@@ -578,6 +480,7 @@
                             </execution>
                         </executions>
                     </plugin>
+                    <!-- see:https://www.graalvm.org/dev/reference-manual/native-image/guides/use-native-image-maven-plugin/ -->
                     <plugin>
                         <groupId>org.graalvm.buildtools</groupId>
                         <artifactId>native-maven-plugin</artifactId>
@@ -599,43 +502,18 @@
                                 </goals>
                             </execution>
                         </executions>
-                    </plugin>
-                    <!-- Usages examples: -->
-                    <!-- export DOCKER_HOST=tcp://localhost:2375 -->
-                    <!-- [build]: mvn -Pbuild:tar:docker -->
-                    <!-- [push]: mvn -Pbuild:tar:docker -->
-                    <!-- [push]: mvn -Pbuild:tar:docker dockerfile:build dockerfile:push -Ddockerfile.username=wl4g -Ddockerfile.password=xxx -->
-                    <plugin>
-                        <groupId>com.spotify</groupId>
-                        <artifactId>dockerfile-maven-plugin</artifactId>
-                        <version>1.4.13</version>
-                        <executions>
-                            <execution>
-                                <id>default</id>
-                                <goals>
-                                    <goal>build</goal>
-                                    <!-- <goal>push</goal> -->
-                                </goals>
-                            </execution>
-                        </executions>
                         <configuration>
-                            <!-- see:https://github.com/spotify/dockerfile-maven/issues/154 -->
-                            <contextDirectory>${project.basedir}</contextDirectory>
-                            <dockerfile>${project.basedir}/build/docker/Dockerfile.springnative</dockerfile>
-                            <repository>wl4g/${project.build.finalName}</repository>
-                            <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
-                            <tag>${project.version}</tag>
-                            <readTimeoutMillis>60000</readTimeoutMillis>
-                            <connectTimeoutMillis>20000</connectTimeoutMillis>
-                            <buildArgs>
-                                <!-- Addidtion librarys. -->
-                                <!-- <ADD_LIBRARY></ADD_LIBRARY> -->
-                                <APP_NAME>${project.build.finalName}</APP_NAME>
-                                <APP_VERSION>${project.version}</APP_VERSION>
-                                <APP_MAINCLASS>${bootstrap-classname}</APP_MAINCLASS>
-                            </buildArgs>
+                            <fallback>false</fallback>
                         </configuration>
                     </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <!-- TODO 暂时 Dockerfile 还不支持 native 执行文件 -->
+        <profile>
+            <id>build:native:docker</id>
+            <build>
+                <plugins>
                 </plugins>
             </build>
         </profile>

@@ -84,11 +84,11 @@ public class CollectorApplicationInitializer {
     void onStart(@Observes StartupEvent event, @ConfigProperty(name = "quarkus.application.name") String appName) {
         RespBase.ErrorPromptMessageBuilder.setPrompt(appName.substring(Math.max(appName.lastIndexOf("-") + 1, 0)));
 
-        // The collector initializing
+        // Initializing collector job
         initJobConfiguration();
         initJobScheduling();
 
-        // The eventBus initializing
+        // Initializing eventBus
         initEventBusConfiguration();
         initEventBus();
     }
@@ -126,44 +126,49 @@ public class CollectorApplicationInitializer {
             }
 
             this.collectorConfig.init(validator);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             throw new IllegalStateException(
                     format("Failed to load resolve collector configuration. - classpath: %s", SystemUtils.JAVA_CLASS_PATH), e);
         }
     }
 
     void initJobScheduling() {
-        // @formatter:off
-        // log.info("Initializing tracing collectorConfiguration ...");
-        // List<TracingConfiguration<?>> tracingConfiguration = singletonList(new TracingConfiguration<>("RDB", null));
-        // @formatter:on
+        try {
+            // @formatter:off
+            // log.info("Initializing tracing collectorConfiguration ...");
+            // List<TracingConfiguration<?>> tracingConfiguration = singletonList(new TracingConfiguration<>("RDB", null));
+            // @formatter:on
 
-        // Initialzing one-off oneoffExecutor
-        String prefix = getClass().getSimpleName();
-        final AtomicInteger counter = new AtomicInteger(0);
-        this.oneoffExecutor = Executors.newFixedThreadPool(
-                (collectorConfig.getGlobalScrapeJobConfig().getOneOffJobThreadPools() <= 1) ? 1
-                        : collectorConfig.getGlobalScrapeJobConfig().getOneOffJobThreadPools(),
-                r -> new Thread(r, prefix.concat("-" + counter.incrementAndGet())));
+            // Initialzing one-off oneoffExecutor
+            String prefix = getClass().getSimpleName();
+            final AtomicInteger counter = new AtomicInteger(0);
+            this.oneoffExecutor = Executors.newFixedThreadPool(
+                    (collectorConfig.getGlobalScrapeJobConfig().getOneOffJobThreadPools() <= 1) ? 1
+                            : collectorConfig.getGlobalScrapeJobConfig().getOneOffJobThreadPools(),
+                    r -> new Thread(r, prefix.concat("-" + counter.incrementAndGet())));
 
-        log.info("Initializing coordinator registry center ...");
-        CoordinatorRegistryCenter registryCenter = new ZookeeperRegistryCenter(
-                collectorConfig.getZookeeper().toZookeeperConfiguration());
+            log.info("Initializing coordinator registry center ...");
+            CoordinatorRegistryCenter registryCenter = new ZookeeperRegistryCenter(
+                    collectorConfig.getZookeeper().toZookeeperConfiguration());
+            registryCenter.init();
 
-        log.info("Startup to all job scheduler ...");
-        Map<String, JobBootstrap> bootstraps = new ElasticJobBootstrapBuilder(collectorConfig, registryCenter, null).build();
-        safeMap(bootstraps).forEach((beanName, bootstrap) -> {
-            if (bootstrap instanceof ScheduleJobBootstrap) {
-                log.info("Scheduling job for {} -> {}", beanName, bootstrap);
-                ((ScheduleJobBootstrap) bootstrap).schedule();
-            } else if (bootstrap instanceof OneOffJobBootstrap) {
-                log.info("Execution job for {} -> {}", beanName, bootstrap);
-                oneoffExecutor.execute(() -> ((OneOffJobBootstrap) bootstrap).execute());
-            }
-        });
+            log.info("Startup to all job scheduler ...");
+            Map<String, JobBootstrap> bootstraps = new ElasticJobBootstrapBuilder(collectorConfig, registryCenter, null).build();
+            safeMap(bootstraps).forEach((beanName, bootstrap) -> {
+                if (bootstrap instanceof ScheduleJobBootstrap) {
+                    log.info("Scheduling job for {} -> {}", beanName, bootstrap);
+                    ((ScheduleJobBootstrap) bootstrap).schedule();
+                } else if (bootstrap instanceof OneOffJobBootstrap) {
+                    log.info("Execution job for {} -> {}", beanName, bootstrap);
+                    oneoffExecutor.execute(() -> ((OneOffJobBootstrap) bootstrap).execute());
+                }
+            });
 
-        // Reject receiving new tasks and continue executing old tasks.
-        oneoffExecutor.shutdown();
+            // Reject receiving new tasks and continue executing old tasks.
+            oneoffExecutor.shutdown();
+        } catch (Throwable e) {
+            throw new IllegalStateException(format("Failed to init collector job scheduler."), e);
+        }
     }
 
     void initEventBusConfiguration() {
@@ -177,14 +182,14 @@ public class CollectorApplicationInitializer {
                             format("Not found eventbus configuration for '%s'", CONF_EVENTBUS_LOCATION)));
             this.eventBusConfig = YamlUtils.parse(Resources.toString(conf.getURL(), UTF_8), CONF_EVENTBUS_PREFIX,
                     ClientEventBusConfig.class);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             throw new IllegalStateException(
                     format("Failed to load resolve eventbus configuration. - classpath: %s", SystemUtils.JAVA_CLASS_PATH), e);
         }
     }
 
     void initEventBus() {
-
+        // TODO
     }
 
     public static final String CONF_COLLECTOR_PREFIX = getStringProperty("CONF_COLLECTOR_PREFIX", "/rengine/collector");

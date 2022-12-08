@@ -17,6 +17,7 @@ package com.wl4g;
 
 import com.wl4g.infra.common.arthas.ArthasAttacher;
 
+import io.quarkus.bootstrap.classloading.QuarkusClassLoader;
 import io.quarkus.runtime.ApplicationLifecycleManager;
 import io.quarkus.runtime.Quarkus;
 import io.quarkus.runtime.QuarkusApplication;
@@ -33,7 +34,9 @@ import io.quarkus.runtime.annotations.QuarkusMain;
 public class RengineCollector implements QuarkusApplication {
 
     public static void main(String[] args) {
-        ArthasAttacher.attachIfNecessary("rengine-collector");
+        // After opening and running, an error will be reported ?
+        // NoClassDefFoundError:org/apache/shardingsphere/elasticjob/api/JobConfiguration
+        ArthasAttacher.attachIfNecessary("rengine-collector", QuarkusClassLoader.class);
         System.setProperty("org.apache.commons.logging.LogFactory", "org.apache.commons.logging.impl.JBossLogFactory");
         Quarkus.run(RengineCollector.class, args);
     }

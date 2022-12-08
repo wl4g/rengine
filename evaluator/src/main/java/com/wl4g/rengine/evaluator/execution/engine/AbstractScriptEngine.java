@@ -40,8 +40,7 @@ import com.wl4g.rengine.evaluator.execution.sdk.ScriptHttpClient;
 import com.wl4g.rengine.evaluator.metrics.EvaluatorMeterService;
 import com.wl4g.rengine.evaluator.minio.MinioManager;
 import com.wl4g.rengine.evaluator.minio.MinioManager.ObjectResource;
-import com.wl4g.rengine.evaluator.service.AggregationService;
-import com.wl4g.rengine.evaluator.service.JobService;
+import com.wl4g.rengine.evaluator.service.MongoAggregatedService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -61,11 +60,11 @@ public abstract class AbstractScriptEngine implements IEngine {
     @Inject
     MinioManager minioManager;
 
-    @Inject
-    JobService jobService;
+    // @Inject
+    // JobService jobService;
 
     @Inject
-    AggregationService aggregationService;
+    MongoAggregatedService mongoAggregatedService;
 
     final ScriptHttpClient defaultClient = new ScriptHttpClient();
 
@@ -98,7 +97,7 @@ public abstract class AbstractScriptEngine implements IEngine {
                 .args(ProxyObject.fromMap((Map) evaluation.getArgs()))
                 // .attributes(ProxyObject.fromMap(attributes))
                 .minioManager(minioManager)
-                .dataService(new ScriptDataService(aggregationService))
+                .dataService(new ScriptDataService(mongoAggregatedService))
                 .defaultHttpClient(defaultClient)
                 // .defaultHttpClient(new ScriptHttpClient())
                 .build();
