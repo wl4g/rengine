@@ -15,37 +15,40 @@
  */
 package com.wl4g.rengine.common.exception;
 
-import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-
-import com.wl4g.rengine.common.graph.ExecutionGraph;
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 
 import lombok.Getter;
 
 /**
- * {@link ExecutionException}
+ * {@link EvaluateException}
  * 
  * @author James Wong
  * @version 2022-09-22
  * @since v1.0.0
  */
 @Getter
-public class ExecutionException extends RengineException {
+public class EvaluateException extends RengineException {
     private static final long serialVersionUID = 5177120828249689148L;
 
-    private ExecutionGraph<?> node;
+    private String scenesCode;
+    private String requestId;
 
-    public ExecutionException(ExecutionGraph<?> node, String message) {
+    public EvaluateException(String requestId, String scenesCode, String message) {
         super(message);
-        this.node = notNullOf(node, "node");
+        this.requestId = hasTextOf(requestId, "requestId");
+        this.scenesCode = hasTextOf(scenesCode, "scenesCode");
     }
 
-    public ExecutionException(ExecutionGraph<?> node, String message, Throwable cause) {
+    public EvaluateException(String requestId, String scenesCode, String message, Throwable cause) {
         super(message, cause);
-        this.node = notNullOf(node, "node");
+        this.requestId = hasTextOf(requestId, "requestId");
+        this.scenesCode = hasTextOf(scenesCode, "scenesCode");
     }
 
-    public ExecutionException(ExecutionGraph<?> node, Throwable cause) {
+    public EvaluateException(String requestId, String scenesCode, Throwable cause) {
         super(cause);
-        this.node = notNullOf(node, "node");
+        this.requestId = hasTextOf(requestId, "requestId");
+        this.scenesCode = hasTextOf(scenesCode, "scenesCode");
     }
+
 }

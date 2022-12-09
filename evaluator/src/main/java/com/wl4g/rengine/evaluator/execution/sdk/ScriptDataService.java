@@ -39,11 +39,11 @@ public class ScriptDataService {
         return mongoAggregatedService;
     }
 
-    // public @HostAccess.Export MongoAggregatedService phoenixService() {
+    // public @HostAccess.Export PhoenixAggregatedService phoenixService() {
     // return mongoAggregatedService;
     // }
 
-    // public @HostAccess.Export MongoAggregatedService opentsdbService() {
+    // public @HostAccess.Export OpenTSDBAggregatedService openTSDBService() {
     // return opentsdbAggregatedService;
     // }
 

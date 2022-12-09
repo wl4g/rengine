@@ -7,6 +7,10 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+
 import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,12 +36,17 @@ public final class ExecutionGraphParameter implements Serializable {
     /**
      * The execution request time-stamp.
      */
-    private @Default long requestTime = currentTimeMillis();
+    private @Default @Min(0) long requestTime = currentTimeMillis();
+
+    /**
+     * The execution executing client ID.
+     */
+    private @NotBlank String clientId;
 
     /**
      * The execution executing trace ID.
      */
-    private @Default String traceId = UUID.randomUUID().toString().replaceAll("-", "");
+    private @Default @NotBlank String traceId = UUID.randomUUID().toString().replaceAll("-", "");
 
     /**
      * The execution enable tracing mode.
@@ -45,18 +54,18 @@ public final class ExecutionGraphParameter implements Serializable {
     private @Default boolean trace = true;
 
     /**
-     * The execution enable debuging mode.
+     * The execution scenes code.
      */
-    private @Default boolean debug = true;
+    private @NotBlank String scenesCode;
 
     /**
      * The execution workflow ID.
      */
-    private String workflowId;
+    private @NotBlank String workflowId;
 
     /**
      * The execution workflow arguments.
      */
-    private @Default Map<String, Object> args = emptyMap();
+    private @Default @Nullable Map<String, Object> args = emptyMap();
 
 }

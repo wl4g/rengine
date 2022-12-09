@@ -30,7 +30,7 @@ import java.util.function.Function;
 
 import javax.validation.constraints.NotNull;
 
-import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
+import com.wl4g.rengine.common.graph.ExecutionGraph.BaseOperator;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -59,7 +59,7 @@ public final class ExecutionGraphContext implements Serializable {
     /**
      * The execution handler.
      */
-    private final Function<ExecutionGraphContext, ReturnState> handler;
+    private final Function<ExecutionGraphContext, ExecutionGraphResult> handler;
 
     /**
      * The processing flow nodes trace spans.
@@ -69,7 +69,12 @@ public final class ExecutionGraphContext implements Serializable {
     /**
      * The execution graph operator node.
      */
-    private ExecutionGraph<?> currentNode;
+    private volatile ExecutionGraph<?> currentNode;
+
+    /**
+     * The execution graph operator node last result.
+     */
+    private volatile ExecutionGraphResult lastResult;
 
     /**
      * The handler executing start time.
@@ -82,7 +87,7 @@ public final class ExecutionGraphContext implements Serializable {
     private Long endTime;
 
     public ExecutionGraphContext(@NotNull final ExecutionGraphParameter parameter,
-            @NotNull final Function<ExecutionGraphContext, ReturnState> handler) {
+            @NotNull final Function<ExecutionGraphContext, ExecutionGraphResult> handler) {
         this.parameter = notNullOf(parameter, "parameter");
         this.handler = notNullOf(handler, "handler");
         this.traceSpans = new LinkedHashMap<>(8);
@@ -139,7 +144,7 @@ public final class ExecutionGraphContext implements Serializable {
                     traceText.append("\n");
                 }
                 for (int i = 0, size = stacks++; i < size; i++) {
-                    traceText.append("    ");
+                    traceText.append("   ");
                 }
             }
             if (isPretty) {
@@ -150,7 +155,8 @@ public final class ExecutionGraphContext implements Serializable {
                     .append("\", ")
                     .append(traceSpan.getNode().getId())
                     .append("@")
-                    .append(traceSpan.getNode().getClass().getSimpleName())
+                    // .append(traceSpan.getNode().getClass().getSimpleName())
+                    .append(((BaseOperator<?>) traceSpan.getNode()).getType())
                     .append(":")
                     .append(traceSpan.getResult().getReturnState().getAlias())
                     .append("}");

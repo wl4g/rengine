@@ -19,8 +19,8 @@ import static java.util.Collections.singletonMap;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
@@ -41,7 +41,7 @@ import lombok.ToString;
 @ToString
 public class ExecutionGraphResult {
     private final ReturnState returnState;
-    private final Map<String, Object> valueMap = new LinkedHashMap<>(4);
+    private final Map<String, Object> valueMap = new ConcurrentHashMap<>(2);
 
     public ExecutionGraphResult(@NotNull final ReturnState returnState) {
         this(returnState, null);

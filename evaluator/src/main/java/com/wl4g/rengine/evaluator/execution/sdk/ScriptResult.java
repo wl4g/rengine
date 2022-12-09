@@ -23,6 +23,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.graalvm.polyglot.HostAccess;
@@ -45,7 +46,14 @@ public class ScriptResult {
     }
 
     public @HostAccess.Export ScriptResult(@NotNull Boolean state) {
+        this(state, null);
+    }
+
+    public @HostAccess.Export ScriptResult(@NotNull Boolean state, @Nullable Map<String, Object> valueMap) {
         this.state = notNullOf(state, "state");
+        if (nonNull(valueMap)) {
+            getValueMap().putAll(valueMap);
+        }
     }
 
     public @HostAccess.Export Boolean getState() {

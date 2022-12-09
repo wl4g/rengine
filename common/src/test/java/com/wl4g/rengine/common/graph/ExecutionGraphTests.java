@@ -16,8 +16,11 @@
 package com.wl4g.rengine.common.graph;
 
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+import static java.lang.String.format;
+import static java.lang.String.valueOf;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.singletonMap;
+import static java.util.Objects.nonNull;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -34,6 +37,7 @@ import com.wl4g.rengine.common.entity.WorkflowGraph.LogicalType;
 import com.wl4g.rengine.common.entity.WorkflowGraph.NodeConnection;
 import com.wl4g.rengine.common.entity.WorkflowGraph.ProcessNode;
 import com.wl4g.rengine.common.entity.WorkflowGraph.RunNode;
+import com.wl4g.rengine.common.graph.ExecutionGraph.BaseOperator;
 import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
 
 /**
@@ -84,15 +88,26 @@ public class ExecutionGraphTests {
         ExecutionGraphParameter parameter = ExecutionGraphParameter.builder()
                 .requestTime(currentTimeMillis())
                 .traceId(UUID.randomUUID().toString())
-                .debug(true)
+                .trace(true)
+                .scenesCode("s1234567890")
                 .workflowId("wf1234567890")
                 .args(singletonMap("deviceId", "12345678"))
                 .build();
-        ExecutionGraphContext context = new ExecutionGraphContext(parameter, ctx -> ReturnState.TRUE);
+        ExecutionGraphContext context = new ExecutionGraphContext(parameter, ctx -> { // 模拟(PROCESS/RUN)类型的node执行script
+            final String nodeId = ctx.getCurrentNode().getId(); // 当前执行script的节点ID
+            final String nodeType = ((BaseOperator<?>) ctx.getCurrentNode()).getType(); // 当前执行script的节点Type
+            System.out.println(format("nodeId: %s@%s, last result: %s", nodeId, nodeType, toJSONString(ctx.getLastResult())));
+            // 1. 在之后支持执行script的节点的规则代码中, 可使用 ctx.getLastResult() 获取前一个节点的返回值.
+            // 2. 当前节点返回值会覆盖上一个节点的返回值.
+            return new ExecutionGraphResult(ReturnState.TRUE, singletonMap("foo" + nodeId, "bar" + nodeId));
+        });
         ExecutionGraph<?> graph = ExecutionGraph.from(workflow);
         ExecutionGraphResult result = graph.apply(context);
         System.out.println("    Executed Result : " + toJSONString(result));
+        System.out.println("--------------------------------");
         System.out.println("Executed Trace Text : \n" + context.asTraceText(true));
+        assert nonNull(result);
+        assert valueOf(result.getValueMap().get("foo63")).equals("bar63");
     }
 
 }

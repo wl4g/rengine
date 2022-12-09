@@ -67,7 +67,7 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
                 .requestTime(currentTimeMillis())
                 .traceId(evaluation.getRequestId())
                 .trace(true)
-                .debug(true)
+                .scenesCode(valueOf(scenes.getScenesCode()))
                 .workflowId(valueOf(scenes.getWorkflowId()))
                 .args(evaluation.getArgs())
                 .build();
@@ -76,11 +76,11 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
 
         final ExecutionGraphContext context = new ExecutionGraphContext(parameter, ctx -> {
             final Rule rule = ruleMap.get(((IRunOperator) ctx.getCurrentNode()).getRuleId());
-            final ScriptResult result = engine.execute(ctx, evaluation, scenes, rule);
+            final ScriptResult result = engine.execute(ctx, rule);
             if (nonNull(result)) {
-                return ReturnState.of(result.getState());
+                return new ExecutionGraphResult(ReturnState.of(result.getState()), result.getValueMap());
             }
-            return ReturnState.FALSE;
+            return new ExecutionGraphResult(ReturnState.FALSE);
         });
 
         final ExecutionGraph<?> graph = ExecutionGraph.from(workflow.getGraph());

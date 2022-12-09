@@ -46,10 +46,8 @@ import com.wl4g.infra.common.graalvm.GraalPolyglotManager.ContextWrapper;
 import com.wl4g.infra.common.lang.EnvironmentUtil;
 import com.wl4g.infra.common.lang.StringUtils2;
 import com.wl4g.rengine.common.entity.Rule;
-import com.wl4g.rengine.common.entity.Scenes;
-import com.wl4g.rengine.common.exception.ExecutionException;
+import com.wl4g.rengine.common.exception.EvaluateException;
 import com.wl4g.rengine.common.graph.ExecutionGraphContext;
-import com.wl4g.rengine.common.model.Evaluation;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptHttpClient;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptResult;
 import com.wl4g.rengine.evaluator.metrics.EvaluatorMeterService.MetricsTag;
@@ -112,28 +110,26 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
     }
 
     @Override
-    public ScriptResult execute(
-            @NotNull final ExecutionGraphContext graphContext,
-            @NotNull final Evaluation evaluation,
-            @NotNull final Scenes scenes,
-            @NotNull final Rule rule) {
-        log.debug("Execution JS script for scenesCode: {} ...", scenes.getScenesCode());
+    public ScriptResult execute(@NotNull final ExecutionGraphContext graphContext, @NotNull final Rule rule) {
+        final String scenesCode = graphContext.getParameter().getScenesCode();
+        final String clientId = graphContext.getParameter().getClientId();
+        final String traceId = graphContext.getParameter().getTraceId();
 
+        log.debug("Execution JS script for scenesCode: {} ...", scenesCode);
         try (ContextWrapper graalContext = graalPolyglotManager.getContext();) {
             // Load all scripts dependencies.
-            List<ObjectResource> scripts = safeList(loadScriptResources(scenes, rule, true));
+            List<ObjectResource> scripts = safeList(loadScriptResources(scenesCode, rule, true));
             for (ObjectResource script : scripts) {
                 isTrue(!script.isBinary(), "Invalid JS dependency library binary type");
                 log.debug("Evaling js-dependencys: {}", script.getObjectPrefix());
 
-                String scriptName = StringUtils2.getFilename(script.getObjectPrefix()).concat("@").concat(scenes.getScenesCode());
+                String scriptName = StringUtils2.getFilename(script.getObjectPrefix()).concat("@").concat(scenesCode);
                 try {
                     // merge JS library with dependency.
                     graalContext.eval(Source.newBuilder("js", script.readToString(), scriptName).build());
                 } catch (PolyglotException e) {
-                    throw new ExecutionException(evaluation.getRequestId(), scenes.getScenesCode(),
-                            format("Unable to parse JS dependency of '%s', scenesCode: %s", scriptName, scenes.getScenesCode()),
-                            e);
+                    throw new EvaluateException(traceId, scenesCode,
+                            format("Unable to parse JS dependency of '%s', scenesCode: %s", scriptName, scenesCode), e);
                 }
             }
 
@@ -143,26 +139,25 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
             bindings.putMember(ScriptHttpClient.class.getSimpleName(), ScriptHttpClient.class);
             bindings.putMember(ScriptResult.class.getSimpleName(), ScriptResult.class);
 
-            log.debug("Loading js-script ...");
+            log.trace("Loading js-script ...");
             Value mainFunction = bindings.getMember(DEFAULT_MAIN_FUNCTION);
 
             // Buried-point: execute cost-time.
             Set<String> scriptFileNames = scripts.stream().map(s -> getFilename(s.getObjectPrefix())).collect(toSet());
             Timer executeTimer = meterService.timer(evaluation_execute_time.getName(), evaluation_execute_time.getHelp(),
-                    new double[] { 0.5, 0.9, 0.95 }, MetricsTag.CLIENT_ID, evaluation.getClientId(), MetricsTag.SCENESCODE,
-                    scenes.getScenesCode(), MetricsTag.ENGINE, scenes.getWorkflow().getEngine().name(), MetricsTag.LIBRARY,
-                    scriptFileNames.toString());
+                    new double[] { 0.5, 0.9, 0.95 }, MetricsTag.CLIENT_ID, clientId, MetricsTag.SCENESCODE, scenesCode,
+                    MetricsTag.ENGINE, rule.getEngine().name(), MetricsTag.LIBRARY, scriptFileNames.toString());
 
             final long begin = currentTimeMillis();
-            Value result = mainFunction.execute(newScriptContext(graphContext, evaluation));
+            Value result = mainFunction.execute(newScriptContext(graphContext));
             final long costTime = currentTimeMillis() - begin;
             executeTimer.record(costTime, MILLISECONDS);
 
-            log.info("Executed for scenesCode: {}, cost: {}ms, result: {}", scenes.getScenesCode(), costTime, result);
+            log.info("Executed for scenesCode: {}, cost: {}ms, result: {}", scenesCode, costTime, result);
             return result.as(ScriptResult.class);
         } catch (Exception e) {
-            throw new ExecutionException(evaluation.getRequestId(), scenes.getScenesCode(),
-                    format("Failed to execution for scenesCode: %s, ruleId: %s, reason: %s", scenes.getScenesCode(), rule.getId(),
+            throw new EvaluateException(traceId, scenesCode,
+                    format("Failed to execution for scenesCode: %s, ruleId: %s, reason: %s", scenesCode, rule.getId(),
                             e.getMessage()),
                     e);
         }

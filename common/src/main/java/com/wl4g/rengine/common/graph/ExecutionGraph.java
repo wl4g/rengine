@@ -46,6 +46,7 @@ import com.wl4g.rengine.common.entity.WorkflowGraph.NodeConnection;
 import com.wl4g.rengine.common.entity.WorkflowGraph.NodeType;
 import com.wl4g.rengine.common.entity.WorkflowGraph.ProcessNode;
 import com.wl4g.rengine.common.entity.WorkflowGraph.RunNode;
+import com.wl4g.rengine.common.exception.ExecutionException;
 import com.wl4g.rengine.common.exception.InvalidNodeRelationshipException;
 import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
 
@@ -245,6 +246,8 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
             super(node);
         }
 
+        public abstract String getType();
+
         @Override
         public ExecutionGraphResult apply(ExecutionGraphContext context) {
             beforeExecution(context);
@@ -254,18 +257,33 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
         }
 
         void beforeExecution(ExecutionGraphContext context) {
+            // Add tracing
             if (context.getParameter().isTrace()) {
                 context.beginTrace(this);
             }
         }
 
         void afterExecution(ExecutionGraphContext context, ExecutionGraphResult result) {
+            // Add tracing..
             if (context.getParameter().isTrace()) {
                 context.endTrace(this, result);
             }
+            // Sets last result.
+            context.setLastResult(result);
         }
 
         abstract ExecutionGraphResult execute(@NotNull final ExecutionGraphContext context);
+
+        protected ExecutionGraphResult doExecute(@NotNull final ExecutionGraphContext context) {
+            try {
+                // Setup current node info.
+                context.setCurrentNode(this);
+                // Actual execution rule script.
+                return context.getHandler().apply(context);
+            } catch (Exception e) {
+                throw new ExecutionException(this, e);
+            }
+        }
     }
 
     @Getter
@@ -288,6 +306,11 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
     public static class BootOperator extends SingleOperator<BootOperator> {
         public BootOperator(@NotNull BootNode node) {
             super(node);
+        }
+
+        @Override
+        public String getType() {
+            return "BOOT";
         }
 
         @Override
@@ -332,22 +355,24 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
         }
 
         @Override
+        public String getType() {
+            return "PROCESS";
+        }
+
+        @Override
         public ExecutionGraphResult execute(@NotNull final ExecutionGraphContext context) {
             notNullOf(context, "context");
 
-            // Setup current node info.
-            context.setCurrentNode(this);
-
             // Run script rule handler.
-            final ReturnState result = context.getHandler().apply(context);
-            if (result == ReturnState.TRUE) {
+            final ExecutionGraphResult result = doExecute(context);
+            if (result.getReturnState() == ReturnState.TRUE) {
                 if (nonNull(getNext())) {
                     return getNext().apply(context);
                 }
-                return new ExecutionGraphResult(result);
+                return result;
             }
 
-            return new ExecutionGraphResult(ReturnState.FALSE);
+            return new ExecutionGraphResult(ReturnState.FALSE, result.getValueMap());
         }
     }
 
@@ -377,6 +402,11 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
         }
 
         @Override
+        public String getType() {
+            return "FAILBACK";
+        }
+
+        @Override
         public ExecutionGraphResult execute(@NotNull final ExecutionGraphContext context) {
             notNullOf(context, "context");
             notNull(getNext(), "The next is missing of current id : %s", getId());
@@ -386,9 +416,7 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
                 return getNext().apply(context);
             } catch (Throwable e) {
                 log.debug("Failback to execute of caused by : {}", e.getMessage());
-                // Setup current node info.
-                context.setCurrentNode(this);
-                return new ExecutionGraphResult(context.getHandler().apply(context));
+                return doExecute(context);
             }
         }
     }
@@ -413,18 +441,24 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
         }
 
         @Override
+        public String getType() {
+            return "AND";
+        }
+
+        @Override
         public ExecutionGraphResult execute(@NotNull final ExecutionGraphContext context) {
             notNullOf(context, "context");
+            ExecutionGraphResult result = null;
             for (BaseOperator<?> sub : safeList(getNexts())) {
-                final ExecutionGraphResult result = sub.apply(context);
+                result = sub.apply(context);
                 // If all children return true, true is finally
                 // returned. If any node returns false, it ends and
                 // returns.
                 if (result.getReturnState() == ReturnState.FALSE) {
-                    return new ExecutionGraphResult(ReturnState.FALSE);
+                    return new ExecutionGraphResult(ReturnState.FALSE, result.getValueMap());
                 }
             }
-            return new ExecutionGraphResult(ReturnState.TRUE);
+            return new ExecutionGraphResult(ReturnState.TRUE, result.getValueMap());
         }
     }
 
@@ -437,17 +471,23 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
         }
 
         @Override
+        public String getType() {
+            return "OR";
+        }
+
+        @Override
         public ExecutionGraphResult execute(@NotNull final ExecutionGraphContext context) {
             notNullOf(context, "context");
+            ExecutionGraphResult result = null;
             for (BaseOperator<?> sub : safeList(getNexts())) {
-                final ExecutionGraphResult result = sub.apply(context);
+                result = sub.apply(context);
                 // If any child returns true, it will eventually return
                 // true.
                 if (result.getReturnState() == ReturnState.TRUE) {
-                    return new ExecutionGraphResult(ReturnState.TRUE);
+                    return new ExecutionGraphResult(ReturnState.TRUE, result.getValueMap());
                 }
             }
-            return new ExecutionGraphResult(ReturnState.FALSE);
+            return new ExecutionGraphResult(ReturnState.FALSE, result.getValueMap());
         }
     }
 
@@ -460,11 +500,17 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
         }
 
         @Override
+        public String getType() {
+            return "ALL_AND";
+        }
+
+        @Override
         public ExecutionGraphResult execute(@NotNull final ExecutionGraphContext context) {
             notNullOf(context, "context");
             Boolean hasFalse = null;
+            ExecutionGraphResult result = null;
             for (BaseOperator<?> sub : safeList(getNexts())) {
-                final ExecutionGraphResult result = sub.apply(context);
+                result = sub.apply(context);
                 // If all children return true, true is finally
                 // returned. If any node returns false, it ends and
                 // returns. (If the current node returns false, the
@@ -476,9 +522,9 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
             // false if there are no child nodes, or if any child nodes return
             // false.
             if (nonNull(hasFalse) && hasFalse) {
-                return new ExecutionGraphResult(ReturnState.FALSE);
+                return new ExecutionGraphResult(ReturnState.FALSE, result.getValueMap());
             }
-            return new ExecutionGraphResult(ReturnState.TRUE);
+            return new ExecutionGraphResult(ReturnState.TRUE, result.getValueMap());
         }
     }
 
@@ -491,11 +537,17 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
         }
 
         @Override
+        public String getType() {
+            return "ALL_OR";
+        }
+
+        @Override
         public ExecutionGraphResult execute(@NotNull final ExecutionGraphContext context) {
             notNullOf(context, "context");
             Boolean hasTrue = null;
+            ExecutionGraphResult result = null;
             for (BaseOperator<?> sub : safeList(getNexts())) {
-                final ExecutionGraphResult result = sub.apply(context);
+                result = sub.apply(context);
                 // If any child returns true, it will eventually return
                 // true. (If the current node returns true, the
                 // subsequent nodes will still the execution)
@@ -506,9 +558,9 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
             // true if there are no child nodes, or if any child nodes return
             // true.
             if (nonNull(hasTrue) && hasTrue) {
-                return new ExecutionGraphResult(ReturnState.TRUE);
+                return new ExecutionGraphResult(ReturnState.TRUE, result.getValueMap());
             }
-            return new ExecutionGraphResult(ReturnState.FALSE);
+            return new ExecutionGraphResult(ReturnState.FALSE, result.getValueMap());
         }
     }
 
@@ -537,14 +589,14 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
         }
 
         @Override
+        public String getType() {
+            return "RUN";
+        }
+
+        @Override
         public ExecutionGraphResult execute(@NotNull final ExecutionGraphContext context) {
             notNullOf(context, "context");
-
-            // Setup current node info.
-            context.setCurrentNode(this);
-
-            // Actual execution rule script.
-            return new ExecutionGraphResult(context.getHandler().apply(context));
+            return doExecute(context);
         }
     }
 

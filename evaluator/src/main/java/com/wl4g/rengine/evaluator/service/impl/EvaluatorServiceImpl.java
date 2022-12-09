@@ -171,7 +171,7 @@ public class EvaluatorServiceImpl implements EvaluatorService {
                         final Entry<String, Future<ResultDescription>> entry = it.next();
                         final Future<ResultDescription> future = entry.getValue();
                         // Collect for uncompleted results.
-                        if (future.isCancelled() || !future.isDone()) {
+                        if (!future.isDone() || future.isCancelled()) {
                             // Not need to execution continue.
                             future.cancel(true);
                             it.remove();
