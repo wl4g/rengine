@@ -67,6 +67,7 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
                 .requestTime(currentTimeMillis())
                 .traceId(evaluation.getRequestId())
                 .trace(true)
+                .clientId(evaluation.getClientId())
                 .scenesCode(valueOf(scenes.getScenesCode()))
                 .workflowId(valueOf(scenes.getWorkflowId()))
                 .args(evaluation.getArgs())

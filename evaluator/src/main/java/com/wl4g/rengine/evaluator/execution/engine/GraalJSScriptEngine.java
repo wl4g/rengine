@@ -16,6 +16,7 @@
 package com.wl4g.rengine.evaluator.execution.engine;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getBooleanProperty;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getIntProperty;
@@ -114,6 +115,9 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
         final String scenesCode = graphContext.getParameter().getScenesCode();
         final String clientId = graphContext.getParameter().getClientId();
         final String traceId = graphContext.getParameter().getTraceId();
+        hasTextOf(scenesCode, "scenesCode");
+        hasTextOf(clientId, "clientId");
+        hasTextOf(traceId, "traceId");
 
         log.debug("Execution JS script for scenesCode: {} ...", scenesCode);
         try (ContextWrapper graalContext = graalPolyglotManager.getContext();) {
