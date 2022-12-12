@@ -26,10 +26,11 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import com.wl4g.rengine.common.entity.Rule;
 import com.wl4g.rengine.common.entity.Rule.RuleEngine;
-import com.wl4g.rengine.common.entity.Scenes;
-import com.wl4g.rengine.common.entity.Workflow;
+import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
+import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
+import com.wl4g.rengine.common.entity.Workflow.WorkflowGraphWrapper;
+import com.wl4g.rengine.common.entity.Workflow.WorkflowWrapper;
 import com.wl4g.rengine.common.graph.ExecutionGraph;
 import com.wl4g.rengine.common.graph.ExecutionGraph.IRunOperator;
 import com.wl4g.rengine.common.graph.ExecutionGraphContext;
@@ -59,8 +60,9 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
     GraalJSScriptEngine graalJSScriptEngine;
 
     @Override
-    public ResultDescription execute(final Evaluation evaluation, final Scenes scenes) {
-        final Workflow workflow = scenes.getWorkflow();
+    public ResultDescription execute(final Evaluation evaluation, final ScenesWrapper scenes) {
+        final WorkflowWrapper workflow = scenes.getEffectivePriorityWorkflow();
+        final WorkflowGraphWrapper workflowGraph = workflow.getEffectiveLatestGraph();
         final IEngine engine = getEngine(workflow.getEngine());
 
         final ExecutionGraphParameter parameter = ExecutionGraphParameter.builder()
@@ -69,14 +71,15 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
                 .trace(true)
                 .clientId(evaluation.getClientId())
                 .scenesCode(valueOf(scenes.getScenesCode()))
-                .workflowId(valueOf(scenes.getWorkflowId()))
+                .workflowId(valueOf(workflow.getId()))
                 .args(evaluation.getArgs())
                 .build();
 
-        final Map<String, Rule> ruleMap = safeList(workflow.getRules()).stream().collect(toMap(r -> valueOf(r.getId()), r -> r));
+        final Map<String, RuleWrapper> ruleMap = safeList(workflowGraph.getRules()).stream()
+                .collect(toMap(r -> valueOf(r.getId()), r -> r));
 
         final ExecutionGraphContext context = new ExecutionGraphContext(parameter, ctx -> {
-            final Rule rule = ruleMap.get(((IRunOperator) ctx.getCurrentNode()).getRuleId());
+            final RuleWrapper rule = ruleMap.get(((IRunOperator) ctx.getCurrentNode()).getRuleId());
             final ScriptResult result = engine.execute(ctx, rule);
             if (nonNull(result)) {
                 return new ExecutionGraphResult(ReturnState.of(result.getState()), result.getValueMap());
@@ -84,7 +87,7 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
             return new ExecutionGraphResult(ReturnState.FALSE);
         });
 
-        final ExecutionGraph<?> graph = ExecutionGraph.from(workflow.getGraph());
+        final ExecutionGraph<?> graph = ExecutionGraph.from(workflowGraph);
         final ExecutionGraphResult result = graph.apply(context);
         return ResultDescription.builder()
                 .scenesCode(scenes.getScenesCode())

@@ -18,11 +18,13 @@ package com.wl4g.rengine.evaluator.service;
 import java.util.List;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.common.entity.Scenes;
+import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
 import com.wl4g.rengine.common.model.Evaluation;
 import com.wl4g.rengine.common.model.EvaluationResult;
 
@@ -39,6 +41,6 @@ public interface EvaluatorService {
 
     Uni<RespBase<EvaluationResult>> evaluate(final @Valid @NotNull Evaluation model);
 
-    List<Scenes> findScenesWithCascade(final @NotEmpty List<String> scenesCodes);
+    List<ScenesWrapper> findScenesWorkflowGraphRules(@NotEmpty List<String> scenesCodes, @Min(1) @Max(1024) int revisions);
 
 }

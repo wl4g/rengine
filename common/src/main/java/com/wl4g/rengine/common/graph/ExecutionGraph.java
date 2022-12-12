@@ -19,6 +19,16 @@ import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.rengine.common.entity.WorkflowGraph.LogicalType.ALL_AND;
+import static com.wl4g.rengine.common.entity.WorkflowGraph.LogicalType.ALL_OR;
+import static com.wl4g.rengine.common.entity.WorkflowGraph.LogicalType.AND;
+import static com.wl4g.rengine.common.entity.WorkflowGraph.LogicalType.OR;
+import static com.wl4g.rengine.common.entity.WorkflowGraph.NodeType.BOOT;
+import static com.wl4g.rengine.common.entity.WorkflowGraph.NodeType.FAILBACK;
+import static com.wl4g.rengine.common.entity.WorkflowGraph.NodeType.LOGICAL;
+import static com.wl4g.rengine.common.entity.WorkflowGraph.NodeType.PROCESS;
+import static com.wl4g.rengine.common.entity.WorkflowGraph.NodeType.RELATION;
+import static com.wl4g.rengine.common.entity.WorkflowGraph.NodeType.RUN;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -45,6 +55,7 @@ import com.wl4g.rengine.common.entity.WorkflowGraph.LogicalNode;
 import com.wl4g.rengine.common.entity.WorkflowGraph.NodeConnection;
 import com.wl4g.rengine.common.entity.WorkflowGraph.NodeType;
 import com.wl4g.rengine.common.entity.WorkflowGraph.ProcessNode;
+import com.wl4g.rengine.common.entity.WorkflowGraph.RelationNode;
 import com.wl4g.rengine.common.entity.WorkflowGraph.RunNode;
 import com.wl4g.rengine.common.exception.ExecutionException;
 import com.wl4g.rengine.common.exception.InvalidNodeRelationshipException;
@@ -147,6 +158,8 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
                 return new BootOperator((BootNode) n);
             case PROCESS:
                 return new ProcessOperator((ProcessNode) n);
+            case RELATION:
+                return new RelationOperator((RelationNode) n);
             case FAILBACK:
                 return new FailbackOperator((FailbackNode) n);
             case LOGICAL:
@@ -207,7 +220,7 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
                     if (prev instanceof LogicalOperator) {
                         ((LogicalOperator<?>) prev).getNexts().add(current);
                     }
-                    if (prev instanceof SingleOperator) {
+                    if (prev instanceof SingleNextOperator) {
                         // @formatter:off
 //                        if (nonNull(prev.getNext())) {
 //                            throw new InvalidNodeRelationshipException(format(
@@ -215,7 +228,7 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
 //                                    prev.getId()));
 //                        }
                         // @formatter:on
-                        ((SingleOperator<?>) prev).setNext(current);
+                        ((SingleNextOperator<?>) prev).setNext(current);
                     }
                     treeNodes.put(prevId, prev);
                     treeNodes.put(current.getId(), current);
@@ -226,8 +239,8 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
         // find the root. (start/boot node)
         ExecutionGraph<?> root = null;
         for (ExecutionGraph<?> node : treeNodes.values()) {
-            if (node instanceof SingleOperator) {
-                if (isNull(((SingleOperator<?>) node).getPrev())) {
+            if (node instanceof SingleNextOperator) {
+                if (isNull(((SingleNextOperator<?>) node).getPrev())) {
                     root = node;
                     break;
                 }
@@ -289,10 +302,10 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
     @Getter
     @Setter
     @ToString(callSuper = true, exclude = { "next" })
-    public static abstract class SingleOperator<E extends SingleOperator<?>> extends BaseOperator<E> {
+    public static abstract class SingleNextOperator<E extends SingleNextOperator<?>> extends BaseOperator<E> {
         private BaseOperator<?> next;
 
-        public SingleOperator(@NotNull BaseNode<?> node) {
+        public SingleNextOperator(@NotNull BaseNode<?> node) {
             super(node);
         }
     }
@@ -303,14 +316,14 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
     @Getter
     @Setter
     @ToString(callSuper = true)
-    public static class BootOperator extends SingleOperator<BootOperator> {
+    public static class BootOperator extends SingleNextOperator<BootOperator> {
         public BootOperator(@NotNull BootNode node) {
             super(node);
         }
 
         @Override
         public String getType() {
-            return "BOOT";
+            return BOOT.name();
         }
 
         @Override
@@ -346,7 +359,7 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
     @Getter
     @Setter
     @ToString(callSuper = true)
-    public static class ProcessOperator extends SingleOperator<ProcessOperator> implements IRunOperator {
+    public static class ProcessOperator extends SingleNextOperator<ProcessOperator> implements IRunOperator {
         private @NotBlank String ruleId;
 
         public ProcessOperator(@NotNull ProcessNode node) {
@@ -356,7 +369,7 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
 
         @Override
         public String getType() {
-            return "PROCESS";
+            return PROCESS.name();
         }
 
         @Override
@@ -373,6 +386,20 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
             }
 
             return new ExecutionGraphResult(ReturnState.FALSE, result.getValueMap());
+        }
+    }
+
+    @Getter
+    @Setter
+    @ToString(callSuper = true)
+    public static class RelationOperator extends ProcessOperator {
+        public RelationOperator(@NotNull RelationNode node) {
+            super(node);
+        }
+
+        @Override
+        public String getType() {
+            return RELATION.name();
         }
     }
 
@@ -393,17 +420,15 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
     @Getter
     @Setter
     @ToString(callSuper = true)
-    public static class FailbackOperator extends SingleOperator<FailbackOperator> implements IRunOperator {
-        private @NotBlank String ruleId;
+    public static class FailbackOperator extends ProcessOperator {
 
         public FailbackOperator(@NotNull FailbackNode node) {
             super(node);
-            this.ruleId = hasTextOf(node.getRuleId(), "ruleId");
         }
 
         @Override
         public String getType() {
-            return "FAILBACK";
+            return FAILBACK.name();
         }
 
         @Override
@@ -430,6 +455,11 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
         public LogicalOperator(@NotNull BaseNode<?> node) {
             super(node);
         }
+
+        @Override
+        public String getType() {
+            return LOGICAL.name();
+        }
     }
 
     @Getter
@@ -442,7 +472,7 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
 
         @Override
         public String getType() {
-            return "AND";
+            return AND.name();
         }
 
         @Override
@@ -472,7 +502,7 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
 
         @Override
         public String getType() {
-            return "OR";
+            return OR.name();
         }
 
         @Override
@@ -501,7 +531,7 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
 
         @Override
         public String getType() {
-            return "ALL_AND";
+            return ALL_AND.name();
         }
 
         @Override
@@ -538,7 +568,7 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
 
         @Override
         public String getType() {
-            return "ALL_OR";
+            return ALL_OR.name();
         }
 
         @Override
@@ -590,7 +620,7 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
 
         @Override
         public String getType() {
-            return "RUN";
+            return RUN.name();
         }
 
         @Override

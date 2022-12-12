@@ -30,7 +30,7 @@ import javax.validation.constraints.NotNull;
 
 import org.graalvm.polyglot.proxy.ProxyObject;
 
-import com.wl4g.rengine.common.entity.Rule;
+import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
 import com.wl4g.rengine.common.entity.UploadObject.ExtensionType;
 import com.wl4g.rengine.common.entity.UploadObject.UploadType;
 import com.wl4g.rengine.common.graph.ExecutionGraph.BaseOperator;
@@ -74,13 +74,13 @@ public abstract class AbstractScriptEngine implements IEngine {
 
     protected @NotNull List<ObjectResource> loadScriptResources(
             @NotBlank String scenesCode,
-            @NotNull Rule rule,
+            @NotNull RuleWrapper rule,
             boolean useCache) {
         notNullOf(rule, "rule");
         log.debug("Loading script {} by scenesCode: {}, ruleId: {}", scenesCode, rule.getId());
 
         // Add upload object script dependencies all by scenes.workflow.rules
-        return safeList(rule.getUploads()).stream().map(upload -> {
+        return safeList(rule.getEffectiveLatestScript().getUploads()).stream().map(upload -> {
             try {
                 return minioManager.loadObject(UploadType.of(upload.getUploadType()), upload.getObjectPrefix(), scenesCode,
                         ExtensionType.of(upload.getExtension()).isBinary(), useCache);

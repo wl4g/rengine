@@ -15,11 +15,10 @@
  */
 package com.wl4g.rengine.manager.admin.service.impl;
 
-import static com.wl4g.infra.common.lang.TypeConverts.safeLongToInt;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,23 +64,8 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         List<Workflow> workflows = mongoTemplate.find(query, Workflow.class, MongoCollectionDefinition.WORKFLOWS.getName());
 
-        Collections.sort(workflows, (o1, o2) -> safeLongToInt(o2.getUpdateDate().getTime() - o1.getUpdateDate().getTime()));
-
-        // QueryWorkflowResult.builder()
-        // .workflows(safeList(workflows).stream()
-        // .map(p -> Workflow.builder()
-        // .id(p.getId())
-        // .name(p.getName())
-        // .labels(p.getLabels())
-        // .enable(p.getEnable())
-        // .remark(p.getRemark())
-        // .updateBy(p.getUpdateBy())
-        // .updateDate(p.getUpdateDate())
-        // .createBy(p.getCreateBy())
-        // .createDate(p.getCreateDate())
-        // .build())
-        // .collect(toList()))
-        // .build();
+        // Collections.sort(workflows, (o1, o2) ->
+        // safeLongToInt(o2.getUpdateDate().getTime()-o1.getUpdateDate().getTime()));
 
         return new PageHolder<Workflow>(model.getPageNum(), model.getPageSize())
                 .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.WORKFLOWS.getName()))
@@ -90,15 +74,18 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     public SaveWorkflowResult save(SaveWorkflow model) {
-        Workflow workflow = Workflow.builder()
-                .id(model.getId())
-                .name(model.getName())
-                .orgCode(model.getOrgCode())
-                .enable(model.getEnable())
-                .labels(model.getLabels())
-                .remark(model.getRemark())
-                .graph(model.getGraph())
-                .build();
+        final Workflow workflow = model;
+        // @formatter:off
+        //final Workflow workflow = Workflow.builder()
+        //        .id(model.getId())
+        //        .name(model.getName())
+        //        .orgCode(model.getOrgCode())
+        //        .enable(model.getEnable())
+        //        .labels(model.getLabels())
+        //        .remark(model.getRemark())
+        //        .build();
+        // @formatter:on
+        notNullOf(workflow.getScenesId(), "scenesId");
 
         if (isNull(workflow.getId())) {
             workflow.setId(IdGenUtil.nextLong());

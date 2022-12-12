@@ -86,7 +86,6 @@ public abstract class BsonUtils {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static Map<String, Object> asMap(Bson bson) {
-
         if (bson instanceof Document) {
             return (Document) bson;
         }
@@ -96,7 +95,6 @@ public abstract class BsonUtils {
         if (bson instanceof DBObject) {
             return ((DBObject) bson).toMap();
         }
-
         return (Map) bson.toBsonDocument(Document.class, MongoClientSettings.getDefaultCodecRegistry());
     }
 

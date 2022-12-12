@@ -94,7 +94,6 @@ public class ScenesServiceImpl implements ScenesService {
                 .orgCode(model.getOrgCode())
                 .labels(model.getLabels())
                 .enable(model.getEnable())
-                .workflowId(model.getWorkflowId())
                 .remark(model.getRemark())
                 .build();
 

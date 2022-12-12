@@ -30,24 +30,28 @@ import lombok.Getter;
 public class EvaluateException extends RengineException {
     private static final long serialVersionUID = 5177120828249689148L;
 
-    private String scenesCode;
     private String requestId;
+    private String clientId;
+    private String scenesCode;
 
-    public EvaluateException(String requestId, String scenesCode, String message) {
+    public EvaluateException(String requestId, String clientId, String scenesCode, String message) {
         super(message);
         this.requestId = hasTextOf(requestId, "requestId");
+        this.clientId = hasTextOf(clientId, "clientId");
         this.scenesCode = hasTextOf(scenesCode, "scenesCode");
     }
 
-    public EvaluateException(String requestId, String scenesCode, String message, Throwable cause) {
+    public EvaluateException(String requestId, String clientId, String scenesCode, String message, Throwable cause) {
         super(message, cause);
         this.requestId = hasTextOf(requestId, "requestId");
+        this.clientId = hasTextOf(clientId, "clientId");
         this.scenesCode = hasTextOf(scenesCode, "scenesCode");
     }
 
-    public EvaluateException(String requestId, String scenesCode, Throwable cause) {
+    public EvaluateException(String requestId, String clientId, String scenesCode, Throwable cause) {
         super(cause);
         this.requestId = hasTextOf(requestId, "requestId");
+        this.clientId = hasTextOf(clientId, "clientId");
         this.scenesCode = hasTextOf(scenesCode, "scenesCode");
     }
 

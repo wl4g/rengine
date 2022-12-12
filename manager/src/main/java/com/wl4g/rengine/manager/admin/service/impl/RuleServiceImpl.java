@@ -15,11 +15,9 @@
  */
 package com.wl4g.rengine.manager.admin.service.impl;
 
-import static com.wl4g.infra.common.lang.TypeConverts.safeLongToInt;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,23 +62,10 @@ public class RuleServiceImpl implements RuleService {
         query.with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
 
         List<Rule> rules = mongoTemplate.find(query, Rule.class, MongoCollectionDefinition.RULES.getName());
-        // List<Rule> rules = mongoTemplate.findAll(Rule.class,
-        // MongoCollectionDefinition.RULES.getName());
-        Collections.sort(rules, (o1, o2) -> safeLongToInt(o2.getUpdateDate().getTime() - o1.getUpdateDate().getTime()));
 
-        // QueryRuleResult.builder()
-        // .rules(safeList(rules).stream()
-        // .map(p -> Rule.builder()
-        // .id(p.getId())
-        // .name(p.getName())
-        // .labels(p.getLabels())
-        // .enable(p.getEnable())
-        // .remark(p.getRemark())
-        // .updateBy(p.getUpdateBy())
-        // .updateDate(p.getUpdateDate())
-        // .build())
-        // .collect(toList()))
-        // .build();
+        // @formatter:off
+        //Collections.sort(rules, (o1, o2) -> safeLongToInt(o2.getUpdateDate().getTime() - o1.getUpdateDate().getTime()));
+        // @formatter:on
 
         return new PageHolder<Rule>(model.getPageNum(), model.getPageSize())
                 .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.RULES.getName()))
@@ -94,7 +79,6 @@ public class RuleServiceImpl implements RuleService {
                 .name(model.getName())
                 .orgCode(model.getOrgCode())
                 .labels(model.getLabels())
-                .uploadIds(model.getUploadIds())
                 .enable(model.getEnable())
                 .remark(model.getRemark())
                 .build();

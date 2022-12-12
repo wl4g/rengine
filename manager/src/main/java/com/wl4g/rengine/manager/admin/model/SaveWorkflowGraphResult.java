@@ -13,21 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.evaluator.execution.engine;
+package com.wl4g.rengine.manager.admin.model;
 
-import javax.validation.constraints.NotNull;
-
-import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
-import com.wl4g.rengine.common.graph.ExecutionGraphContext;
-import com.wl4g.rengine.evaluator.execution.sdk.ScriptResult;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 /**
- * {@link IEngine}
+ * {@link SaveWorkflowGraphResult}
  * 
  * @author James Wong
- * @version 2022-09-22
+ * @version 2022-08-28
  * @since v1.0.0
  */
-public interface IEngine {
-    ScriptResult execute(@NotNull final ExecutionGraphContext graphContext, @NotNull final RuleWrapper rule);
+@Getter
+@Setter
+@SuperBuilder
+@ToString
+@NoArgsConstructor
+public class SaveWorkflowGraphResult extends SaveResultBase {
 }

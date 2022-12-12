@@ -19,6 +19,7 @@ import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.lang.System.currentTimeMillis;
+import static java.lang.System.out;
 import static java.util.Collections.singletonMap;
 import static java.util.Objects.nonNull;
 
@@ -36,6 +37,7 @@ import com.wl4g.rengine.common.entity.WorkflowGraph.LogicalNode;
 import com.wl4g.rengine.common.entity.WorkflowGraph.LogicalType;
 import com.wl4g.rengine.common.entity.WorkflowGraph.NodeConnection;
 import com.wl4g.rengine.common.entity.WorkflowGraph.ProcessNode;
+import com.wl4g.rengine.common.entity.WorkflowGraph.RelationNode;
 import com.wl4g.rengine.common.entity.WorkflowGraph.RunNode;
 import com.wl4g.rengine.common.graph.ExecutionGraph.BaseOperator;
 import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
@@ -54,15 +56,15 @@ public class ExecutionGraphTests {
         List<BaseNode<?>> nodes = new LinkedList<>();
         nodes.add(new BootNode().withId("0").withName("The Boot"));
         nodes.add(new ProcessNode().withId("11").withName("预处理(如篡改当前时间以用于测试目的)").withRuleId("r100100"));
-        nodes.add(new ProcessNode().withId("21").withName("当前时间是否满足(10.1~10.8)").withRuleId("r100222"));
+        nodes.add(new RelationNode().withId("21").withName("当前时间是否满足(10.1~10.8)").withRuleId("r100222"));
         nodes.add(new LogicalNode().withId("31").withName("ALL_AND逻辑运算").withLogical(LogicalType.ALL_AND));
         nodes.add(new LogicalNode().withId("41").withName("AND逻辑运算").withLogical(LogicalType.AND));
         nodes.add(new LogicalNode().withId("42").withName("AND逻辑运算").withLogical(LogicalType.AND));
-        nodes.add(new ProcessNode().withId("51").withName("充值是否>=120元").withRuleId("r100101"));
+        nodes.add(new RelationNode().withId("51").withName("充值是否>=120元").withRuleId("r100101"));
         nodes.add(new LogicalNode().withId("52").withName("AND逻辑运算").withLogical(LogicalType.AND));
-        nodes.add(new ProcessNode().withId("53").withName("当前时间是否满足(10.5~10.8)").withRuleId("r100223"));
-        nodes.add(new ProcessNode().withId("54").withName("充值是否>=50元").withRuleId("r100104"));
-        nodes.add(new ProcessNode().withId("61").withName("赠送库存是否<=100").withRuleId("r100102"));
+        nodes.add(new RelationNode().withId("53").withName("当前时间是否满足(10.5~10.8)").withRuleId("r100223"));
+        nodes.add(new RelationNode().withId("54").withName("充值是否>=50元").withRuleId("r100104"));
+        nodes.add(new RelationNode().withId("61").withName("赠送库存是否<=100").withRuleId("r100102"));
         nodes.add(new FailbackNode().withId("62").withName("如果赠送余额失败则执行回退规则").withRuleId("r111111"));
         nodes.add(new RunNode().withId("63").withName("赠送20积分").withRuleId("r100105"));
         nodes.add(new RunNode().withId("71").withName("赠送10元余额").withRuleId("r100103"));
@@ -83,7 +85,7 @@ public class ExecutionGraphTests {
         collections.add(new NodeConnection("71", "62"));
 
         WorkflowGraph workflow = new WorkflowGraph(nodes, collections);
-        System.out.println("Workflow Nodes Json : " + toJSONString(workflow));
+        out.println("Workflow Nodes Json : " + toJSONString(workflow));
 
         ExecutionGraphParameter parameter = ExecutionGraphParameter.builder()
                 .requestTime(currentTimeMillis())
@@ -93,19 +95,24 @@ public class ExecutionGraphTests {
                 .workflowId("wf1234567890")
                 .args(singletonMap("deviceId", "12345678"))
                 .build();
-        ExecutionGraphContext context = new ExecutionGraphContext(parameter, ctx -> { // 模拟(PROCESS/RUN)类型的node执行script
+
+        ExecutionGraphContext context = new ExecutionGraphContext(parameter, ctx -> { // 模拟(PROCESS/RELATION/RUN)类型的node执行script,也只有这几种类型才需要执行script
             final String nodeId = ctx.getCurrentNode().getId(); // 当前执行script的节点ID
             final String nodeType = ((BaseOperator<?>) ctx.getCurrentNode()).getType(); // 当前执行script的节点Type
-            System.out.println(format("nodeId: %s@%s, last result: %s", nodeId, nodeType, toJSONString(ctx.getLastResult())));
+            out.println(format("current nodeId: %s@%s, lastResult : %s", nodeId, nodeType, toJSONString(ctx.getLastResult())));
             // 1. 在之后支持执行script的节点的规则代码中, 可使用 ctx.getLastResult() 获取前一个节点的返回值.
             // 2. 当前节点返回值会覆盖上一个节点的返回值.
             return new ExecutionGraphResult(ReturnState.TRUE, singletonMap("foo" + nodeId, "bar" + nodeId));
         });
+
         ExecutionGraph<?> graph = ExecutionGraph.from(workflow);
         ExecutionGraphResult result = graph.apply(context);
-        System.out.println("    Executed Result : " + toJSONString(result));
-        System.out.println("--------------------------------");
-        System.out.println("Executed Trace Text : \n" + context.asTraceText(true));
+
+        out.println("-------------------------------------------------------");
+        out.println("                           Final result : " + toJSONString(result));
+        out.println("-------------------------------------------------------");
+        out.println("Executed tracing info : \n" + context.asTraceText(true));
+
         assert nonNull(result);
         assert valueOf(result.getValueMap().get("foo63")).equals("bar63");
     }

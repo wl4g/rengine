@@ -23,7 +23,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.wl4g.rengine.common.entity.Scenes;
+import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
 import com.wl4g.rengine.evaluator.service.EvaluatorService;
 import com.wl4g.rengine.evaluator.util.TestSetupDefaults;
 
@@ -59,9 +59,10 @@ public class EvaluatorServiceTests {
     }
 
     @Test
-    public void testFindScenesWithCascade() {
+    public void testFindScenesWorkflowGraphRules() {
         try {
-            List<Scenes> sceneses = evaluatorService.findScenesWithCascade(singletonList("ecommerce_trade_gift"));
+            List<ScenesWrapper> sceneses = evaluatorService.findScenesWorkflowGraphRules(singletonList("ecommerce_trade_gift"),
+                    1);
             System.out.println(toJSONString(sceneses, true));
         } catch (Exception e) {
             e.printStackTrace();

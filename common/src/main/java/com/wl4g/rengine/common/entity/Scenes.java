@@ -15,12 +15,18 @@
  */
 package com.wl4g.rengine.common.entity;
 
+import static com.wl4g.infra.common.lang.Assert2.isTrue;
+import static com.wl4g.infra.common.lang.Assert2.notEmpty;
+
+import java.util.List;
+
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wl4g.infra.common.bean.BaseBean;
+import com.wl4g.rengine.common.entity.Workflow.WorkflowWrapper;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -43,12 +49,35 @@ public class Scenes extends BaseBean {
     private static final long serialVersionUID = -5069149346132378733L;
     private @NotBlank String scenesCode;
     private @NotBlank String name;
-    private @Nullable Long workflowId;
 
-    //
-    // Temporary fields.
-    //
+    @Getter
+    @Setter
+    @SuperBuilder
+    @ToString
+    @NoArgsConstructor
+    public static class ScenesWrapper extends Scenes {
+        private static final long serialVersionUID = 1718299975342519740L;
+        private @Nullable List<WorkflowWrapper> workflows;
 
-    @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
-    private @Nullable transient Workflow workflow;
+        /**
+         * Notice: The temporarily designed to be one-to-one, i.e. the array
+         * should have exactly one workflow element, using the first priority
+         * workflow as a valid value. The advantage of using
+         * List&lt;{@link WorkflowWrapper}&gt; here is to prepare for future
+         * expansion into multiple priorities.
+         * 
+         * @return
+         */
+        @JsonIgnore
+        public WorkflowWrapper getEffectivePriorityWorkflow() {
+            return workflows.get(0);
+        }
+
+        public static ScenesWrapper validate(ScenesWrapper scenes) {
+            notEmpty(scenes.getWorkflows(), "workflows");
+            isTrue(scenes.getWorkflows().size() == 1, "workflows size must is 1, but size is %s", scenes.getWorkflows().size());
+            WorkflowWrapper.validate(scenes.getEffectivePriorityWorkflow());
+            return scenes;
+        }
+    }
 }

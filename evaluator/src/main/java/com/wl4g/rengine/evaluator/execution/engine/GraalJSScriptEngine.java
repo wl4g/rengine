@@ -46,7 +46,7 @@ import com.wl4g.infra.common.graalvm.GraalPolyglotManager;
 import com.wl4g.infra.common.graalvm.GraalPolyglotManager.ContextWrapper;
 import com.wl4g.infra.common.lang.EnvironmentUtil;
 import com.wl4g.infra.common.lang.StringUtils2;
-import com.wl4g.rengine.common.entity.Rule;
+import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
 import com.wl4g.rengine.common.exception.EvaluateException;
 import com.wl4g.rengine.common.graph.ExecutionGraphContext;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptHttpClient;
@@ -111,7 +111,7 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
     }
 
     @Override
-    public ScriptResult execute(@NotNull final ExecutionGraphContext graphContext, @NotNull final Rule rule) {
+    public ScriptResult execute(@NotNull final ExecutionGraphContext graphContext, @NotNull final RuleWrapper rule) {
         final String scenesCode = graphContext.getParameter().getScenesCode();
         final String clientId = graphContext.getParameter().getClientId();
         final String traceId = graphContext.getParameter().getTraceId();
@@ -159,11 +159,8 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
 
             log.info("Executed for scenesCode: {}, cost: {}ms, result: {}", scenesCode, costTime, result);
             return result.as(ScriptResult.class);
-        } catch (Exception e) {
-            throw new EvaluateException(traceId, scenesCode,
-                    format("Failed to execution for scenesCode: %s, ruleId: %s, reason: %s", scenesCode, rule.getId(),
-                            e.getMessage()),
-                    e);
+        } catch (Throwable e) {
+            throw new EvaluateException(traceId, clientId, scenesCode, "Failed to execution js script", e);
         }
     }
 

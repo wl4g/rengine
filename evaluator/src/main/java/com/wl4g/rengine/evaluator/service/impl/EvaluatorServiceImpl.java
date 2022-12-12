@@ -15,43 +15,28 @@
  */
 package com.wl4g.rengine.evaluator.service.impl;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
-import static com.wl4g.infra.common.lang.Assert2.notNull;
+import static com.wl4g.infra.common.lang.Assert2.isTrue;
+import static com.wl4g.infra.common.lang.Assert2.notEmpty;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
+import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RULES;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RULE_SCRIPTS;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SCENESES;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.UPLOADS;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.WORKFLOWS;
-import static com.wl4g.rengine.evaluator.metrics.EvaluatorMeterService.MetricsName.evaluation_failure;
-import static com.wl4g.rengine.evaluator.metrics.EvaluatorMeterService.MetricsName.evaluation_success;
-import static com.wl4g.rengine.evaluator.metrics.EvaluatorMeterService.MetricsName.evaluation_total;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.WORKFLOW_GRAPHS;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyMap;
-import static java.util.Objects.nonNull;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Future;
 
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.BeforeDestroyed;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.servlet.ServletContext;
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -61,7 +46,6 @@ import org.bson.BsonString;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
@@ -69,31 +53,19 @@ import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.Variable;
-import com.wl4g.infra.common.bean.KeyValue;
-import com.wl4g.infra.common.task.GenericTaskRunner;
-import com.wl4g.infra.common.task.RunnerProperties;
-import com.wl4g.infra.common.task.RunnerProperties.StartupMode;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.common.web.rest.RespBase.RetCode;
-import com.wl4g.rengine.common.entity.Rule;
-import com.wl4g.rengine.common.entity.Rule.RuleEngine;
-import com.wl4g.rengine.common.entity.Scenes;
-import com.wl4g.rengine.common.entity.UploadObject;
-import com.wl4g.rengine.common.entity.Workflow;
-import com.wl4g.rengine.common.entity.WorkflowGraph;
+import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
 import com.wl4g.rengine.common.model.Evaluation;
 import com.wl4g.rengine.common.model.EvaluationResult;
-import com.wl4g.rengine.common.model.EvaluationResult.ResultDescription;
 import com.wl4g.rengine.evaluator.execution.ExecutionConfig;
-import com.wl4g.rengine.evaluator.execution.LifecycleExecutionFactory;
-import com.wl4g.rengine.evaluator.execution.WorkflowExecution;
+import com.wl4g.rengine.evaluator.execution.LifecycleExecutionService;
 import com.wl4g.rengine.evaluator.metrics.EvaluatorMeterService;
-import com.wl4g.rengine.evaluator.metrics.EvaluatorMeterService.MetricsTag;
 import com.wl4g.rengine.evaluator.repository.MongoRepository;
 import com.wl4g.rengine.evaluator.service.EvaluatorService;
+import com.wl4g.rengine.evaluator.util.BsonUtils;
 
 import io.smallrye.mutiny.Uni;
-import lombok.AllArgsConstructor;
 import lombok.CustomLog;
 
 /**
@@ -115,151 +87,116 @@ public class EvaluatorServiceImpl implements EvaluatorService {
     EvaluatorMeterService meterService;
 
     @Inject
-    LifecycleExecutionFactory lifecycleExecutionFactory;
+    LifecycleExecutionService lifecycleExecutionService;
 
     @Inject
     MongoRepository mongoRepository;
 
-    GenericTaskRunner<RunnerProperties> taskRunner;
-
-    @PostConstruct
-    void init() {
-        final int threadPools = config.threadPools();
-        log.info("Initialzing execution threads pool for : {}", threadPools);
-        this.taskRunner = new GenericTaskRunner<RunnerProperties>(new RunnerProperties(StartupMode.NOSTARTUP, threadPools)) {
-            @Override
-            protected String getThreadNamePrefix() {
-                return EvaluatorServiceImpl.class.getSimpleName();
-            }
-        };
-        this.taskRunner.start();
-    }
-
-    void destroy(@Observes @BeforeDestroyed(ApplicationScoped.class) ServletContext init) {
-        if (nonNull(taskRunner)) {
-            try {
-                this.taskRunner.close();
-            } catch (IOException e) {
-                log.error("Failed to closing evaluation runner", e);
-            }
-        }
-    }
-
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public Uni<RespBase<EvaluationResult>> evaluate(final @NotNull @Valid Evaluation evaluation) {
         return Uni.createFrom().item(() -> {
             RespBase<EvaluationResult> resp = RespBase.<EvaluationResult> create();
-
             try {
-                // Query the scene list of depth cascade by scenesCode.
-                final List<Scenes> sceneses = safeList(findScenesWithCascade(evaluation.getScenesCodes()));
-                final CountDownLatch latch = new CountDownLatch(sceneses.size());
+                // Query the sceneses of cascade by scenesCode.
+                final List<ScenesWrapper> sceneses = safeList(findScenesWorkflowGraphRules(evaluation.getScenesCodes(), 1));
 
-                // Submit to execution workers.
-                final Map<String, Future<ResultDescription>> futures = sceneses.stream()
-                        .map(scenes -> new KeyValue(scenes.getScenesCode(),
-                                taskRunner.getWorker().submit(new ExecutionRunner(latch, evaluation, scenes))))
-                        .collect(toMap(kv -> kv.getKey(), kv -> (Future) kv.getValue()));
+                // Execution to workflow graphs.
+                final EvaluationResult result = lifecycleExecutionService.execute(evaluation, sceneses);
 
-                // Collect for uncompleted results.
-                final List<ResultDescription> uncompleteds = new ArrayList<>(futures.size());
-                final long timeoutMs = (long) ((long) evaluation.getTimeout() * (1 - config.evaluateTimeoutOffsetRate()));
-                if (!latch.await(timeoutMs, MILLISECONDS)) { // Timeout?
-                    final Iterator<Entry<String, Future<ResultDescription>>> it = futures.entrySet().iterator();
-                    while (it.hasNext()) {
-                        final Entry<String, Future<ResultDescription>> entry = it.next();
-                        final Future<ResultDescription> future = entry.getValue();
-                        // Collect for uncompleted results.
-                        if (!future.isDone() || future.isCancelled()) {
-                            // Not need to execution continue.
-                            future.cancel(true);
-                            it.remove();
-                            uncompleteds.add(ResultDescription.builder()
-                                    .scenesCode(entry.getKey())
-                                    .success(false)
-                                    .valueMap(emptyMap())
-                                    .build());
-                        }
-                    }
-                    resp.setStatus(EvaluationResult.STATUS_PART_SUCCESS);
-                } else { // All-completed
+                // Check for success completes.
+                if (safeList(result.getResults()).stream().filter(res -> res.getSuccess()).count() == sceneses.size()) {
                     resp.setStatus(EvaluationResult.STATUS_ALL_SUCCESS);
+                } else {
+                    resp.setStatus(EvaluationResult.STATUS_PART_SUCCESS);
                 }
 
-                // Collect for completed results.
-                final List<ResultDescription> completeds = futures.values().stream().map(f -> {
-                    try {
-                        return f.get();
-                    } catch (Exception e) {
-                        throw new IllegalStateException(e);
-                    }
-                }).collect(toList());
-
-                resp.setData(EvaluationResult.builder()
-                        .requestId(evaluation.getRequestId())
-                        .errorCount(uncompleteds.size())
-                        .results(newArrayList(Iterables.concat(completeds, uncompleteds)))
-                        .build());
+                return resp.withData(result);
             } catch (Throwable e) {
                 String errmsg = format("Could not to execution evaluate of clientId: '%s', reason: %s", evaluation.getClientId(),
                         e.getMessage());
                 log.error(errmsg, e);
                 resp.withCode(RetCode.SYS_ERR).withMessage(errmsg);
             }
-
             return resp;
         });
     }
 
+    // TODO using cache
     /**
-     * Query collection dependencies:
+     * Query collection dependencies with equivalent bson query codes example:
      * 
      * <pre>
-     *   sceneses —> one-to-one(workflowId) —> workflow —> one-to-many(graph.nodes[].ruleId) —> rules —> one-to-many(uploadIds) —> uploads
-     * </pre>
-     * 
-     * Equivalent bson query codes example:
-     * 
-     * <pre>
-     *   // 在线 mongodb 查询模拟器: https://mongoplayground.net/p/bPKYXCJwXdl
-     *   db.getCollection('sceneses').aggregate([
-     *       // 首先过滤 scenes (rengine-evaluator 接收 biz-app 请求每次只能处理一个)
-     *       { $match: { "scenesCode": "iot_generic_temp_warning" } },
-     *       { $lookup: {
-     *            from: "workflows", // 关联 workflows 表
-     *            let: { workflowId: { $toLong: "$workflowId" } }, // 定义外键关联变量
-     *            pipeline: [
-     *                 { $match: { $expr: { $eq: [ "$_id",  "$$workflowId" ] } } }, // 外键等于关联
-     *                 //{ $unwind: { path: "$ruleIds", preserveNullAndEmptyArrays: true } }, // 不应该用平铺,否则会按左连接乘积的平面结构输出(期望是:深度结构)
-     *                 { $lookup: {
-     *                        from: "rules", // 继续关联 rules 表
-     *                        let: { ruleIds: { $map: { input: "$graph.nodes", in: { $toLong: "$$this.ruleId" } } } }, // 定义外键关联变量(引用嵌入对象数组的字段时, 需使用 $map 函数转换. 注:一定要转为Long类型, 否则无法与集合字段 rules._id 不匹配会关联不上)
-     *                        pipeline: [
-     *                             { $match: { $expr: { $in: [ "$_id",  "$$ruleIds" ] } } }, // 由于父级未使用 UNWIND 因此这里使用 IN 外键关联
-     *                             //{ $unwind: { path: "$uploadIds", preserveNullAndEmptyArrays: true } }, // 不应该用平铺,否则会按左连接乘积的平面结构输出(期望是:深度结构)
-     *                             { $lookup: {
-     *                                      from: "uploads", // 继续关联 uploads 表
-     *                                      let: { uploadIds: "$uploadIds" }, // 定义外键关联变量
-     *                                      pipeline: [
-     *                                             { $match: { $expr: { $in: [ "$_id",  "$$uploadIds" ] } } }, // 由于父级未使用 UNWIND 因此这里使用 IN 外键关联
-     *                                             { $project: { "_class": 0, "delFlag": 0 } } // 控制 uploads 集返回列(投射)
-     *                                      ],
-     *                                      as: "uploads"
-     *                                 }
-     *                             },
-     *                             { $project: { "_class": 0, "delFlag": 0 } } // 控制 rules 集返回列(投射)
-     *                        ],
-     *                        as: "rules"
-     *                   }
-     *                },
-     *                { $project: { "_class": 0, "delFlag": 0 } } // 控制 workflow 集返回列(投射)
-     *            ],
-     *            as: "workflow"
+     *  // Tools: online mongodb aggregate: https://mongoplayground.net/p/bPKYXCJwXdl
+     *  //
+     *  // Query collections dependencies:
+     *  //                                  request evaluate scenesCodes:         —> sceneses
+     *  // ↳ one-to-one (workflows.scenesId = sceneses._id)                       —> workflows
+     *  // ↳ one-to-many (workflow_graphs.workflowId = workflows._id)             —> workflow_graphs
+     *  // ↳ many-to-many (rules._id in workflow_graphs[].nodes[].ruleId)         —> rules
+     *  // ↳ one-to-many (rule_scripts.rule_id = rules[]._id)                     —> rule_scripts
+     *  // ↳ many-to-many (uploads._id in rule_scripts[].uploadIds)               —> uploads
+     *  //
+     *  db.getCollection('sceneses').aggregate([
+     *      // 首先过滤 scenesCode (evaluator 接收 client(biz-app) 请求支持批量处理)
+     *      { $match: { "scenesCode": { $in: ["ecommerce_trade_gift"] } } },
+     *      { $project: { "_class": 0, "delFlag": 0 } }, // 控制 sceneses 集返回列(投射)
+     *      { $lookup: {
+     *          from: "workflows", // 关联 workflows 表
+     *          let: { scenesId: { $toLong: "$_id" } }, // 定义外键关联变量
+     *          pipeline: [
+     *              { $match: { $expr: { $eq: [ "$scenesId",  "$$scenesId" ] } } }, // 外键等于关联
+     *              { $project: { "_class": 0, "delFlag": 0 } },
+     *              { $lookup: {
+     *                  from: "workflow_graphs", // 继续关联 workflow_graphs 表
+     *                  let: { workflowId: { $toLong: "$workflowId" } },
+     *                  pipeline: [
+     *                      { $match: { $expr: { $eq: [ "$workflowId", "$workflowId" ] } } },
+     *                      { $sort: { "revision": -1 } }, // 倒序排序, 取 revision(version) 最大的 graph 即最新版
+     *                      { $limit: 2 },
+     *                      { $project: { "_class": 0, "delFlag": 0 } },
+     *                      { $lookup: {
+     *                          from: "rules",
+     *                          // 定义外键关联变量, 并通过 $map 函数提取 ruleIds(int64) 列表
+     *                          let: { ruleIds: { $map: { input: "$nodes", in: { $toLong: "$$this.ruleId" } } } },
+     *                          pipeline: [
+     *                              { $match: { $expr: { $in: [ "$_id",  "$$ruleIds" ] } } },
+     *                              { $project: { "_class": 0, "delFlag": 0 } },
+     *                              { $lookup: {
+     *                                  from: "rule_scripts",
+     *                                  let: { ruleId: { $toLong: "$_id" } },
+     *                                  pipeline: [
+     *                                      { $match: { $expr: { $eq: [ "$ruleId",  "$ruleId" ] } } },
+     *                                      { $sort: { "revision": -1 } }, // 倒序排序, 取 revision(version) 最大的 ruleScript 即最新版
+     *                                      { $limit: 2 },
+     *                                      { $project: { "_class": 0, "delFlag": 0 } },
+     *                                      { $lookup: {
+     *                                          from: "uploads", // 继续关联 uploads 表
+     *                                          // 定义外键关联变量 uploadIds(int64), 并通过 $map 函数进行类型转换以确保匹配安全
+     *                                          let: { uploadIds: { $map: { input: "$uploadIds", in: { $toLong: "$$this"} } } },
+     *                                          pipeline: [
+     *                                              { $match: { $expr: { $in: [ "$_id",  "$$uploadIds" ] } } }, // 由于父级未使用 UNWIND 因此这里使用 IN 外键关联
+     *                                              { $project: { "_class": 0, "delFlag": 0 } }
+     *                                          ],
+     *                                          as: "uploads"
+     *                                          }
+     *                                      }
+     *                                  ],
+     *                                  as: "scripts"
+     *                                  }
+     *                              }
+     *                          ],
+     *                          as: "rules"
+     *                          }
+     *                      }
+     *                  ],
+     *                  as: "graphs" // 倒序后第一个为最新版
+     *                  }
+     *              }
+     *          ],
+     *          as: "workflows"
      *          }
-     *       },
-     *       { $project: { "_class": 0, "delFlag": 0 } } // 控制 sceneses 集返回列(投射)
-     *   ])
+     *      }
+     *  ])
      * </pre>
      * 
      * @see https://www.notion.so/scenesworkflow-rules-uploads-f8e5a6f14fb64f858479b6565fb52142
@@ -267,160 +204,74 @@ public class EvaluatorServiceImpl implements EvaluatorService {
      */
     @SuppressWarnings("unchecked")
     @Override
-    public List<Scenes> findScenesWithCascade(@NotEmpty List<String> scenesCodes) {
+    public List<ScenesWrapper> findScenesWorkflowGraphRules(
+            @NotEmpty List<String> scenesCodes,
+            @Min(1) @Max(1024) int revisions) {
+        notEmpty(scenesCodes, "scenesCodes");
+        isTrue(revisions >= 1 && revisions <= 1024, "revision %s must >= 1 and <= 1024", revisions);
+
         final MongoCollection<Document> collection = mongoRepository.getCollection(SCENESES);
 
-        // Common exclude projection.
+        // Common show projection.
         final Bson project = Aggregates.project(Projections.fields(Projections.exclude("_class", "delFlag")));
+
+        Bson uploadsLookup = Aggregates.lookup(UPLOADS.getName(), asList(new Variable<>("uploadIds", "$uploadIds")),
+                asList(Aggregates
+                        .match(Filters.expr(new Document("$in", asList(new BsonString("$_id"), new BsonString("$$uploadIds"))))),
+                        project),
+                "uploads");
+
+        Bson ruleScriptsLookup = Aggregates.lookup(RULE_SCRIPTS.getName(),
+                asList(new Variable<>("ruleId", BsonDocument.parse("{ $toLong: \"$_id\" }"))),
+                asList(Aggregates.match(Filters.expr(Filters.eq("ruleId", "$ruleId"))),
+                        Aggregates.sort(new Document("revision", -1)), Aggregates.limit(revisions), project, uploadsLookup),
+                "scripts");
+
+        Bson rulesLookup = Aggregates.lookup(RULES.getName(), asList(new Variable<>("ruleIds",
+                BsonDocument.parse("{ $map: { input: \"$nodes\", in: { $toLong: \"$$this.ruleId\" } } }"))),
+        // @formatter:off
+        // $in 表达式匹配应直接使用 Document 对象? 否则:
+        // Issue1: 若使用 Filters.in("$_id","$$ruleIds") 则会生成为: {$expr:{$in:["$$ruleIds"]}}} 它会报错至少需要2个参数
+        // Issue2: 若使用 Filters.in("_id","$_id","$$ruleIds") 则会生成: {$expr:{"_id":{$in:["$_id","$$ruleIds"]}}}} 查询结果集不对, 即 rules[] 重复关联了uploads
+        // @formatter:on
+                asList(Aggregates
+                        .match(Filters.expr(new Document("$in", asList(new BsonString("$_id"), new BsonString("$$ruleIds"))))),
+                        project, ruleScriptsLookup),
+                "rules");
+
+        Bson workflowGraphLookup = Aggregates.lookup(WORKFLOW_GRAPHS.getName(),
+                asList(new Variable<>("workflowId", BsonDocument.parse("{ $toLong: \"$workflowId\" }"))),
+                asList(Aggregates.match(Filters.expr(Filters.eq("scenesId", "$$scenesId"))),
+                        Aggregates.sort(new Document("revision", -1)), Aggregates.limit(revisions), project, rulesLookup),
+                "graphs");
+
+        Bson workflowLookup = Aggregates.lookup(WORKFLOWS.getName(), asList(new Variable<>("scenesId", "$_id")),
+                asList(workflowGraphLookup), "workflows");
 
         final List<Bson> aggregates = Lists.newArrayList();
         aggregates.add(Aggregates.match(Filters.in("scenesCode", scenesCodes)));
-        aggregates
-                .add(Aggregates.lookup(WORKFLOWS.getName(), asList(new Variable<>("workflowId", "$workflowId")),
-                        asList(Aggregates.match(Filters.expr(Filters.eq("_id", "$$workflowId"))),
-                                Aggregates.lookup(RULES.getName(),
-                                        asList(new Variable<>("ruleIds", BsonDocument.parse(
-                                                "{ $map: { input: \"$graph.nodes\", in: { $toLong: \"$$this.ruleId\" } } }"))),
-                                        // IN 匹配表达式应该直接创建Document对象? 否则:
-                                        // issue1.若使用:Filters.in("$_id","$$ruleIds")=>则会生成为:{$expr:{$in:["$$ruleIds"]}}}=>报错至少2个参数
-                                        // issue2.若使用:Filters.in("_id","$_id","$$ruleIds")=>则会生成为:{$expr:{"_id":{$in:["$_id","$$ruleIds"]}}}}=>查询结果集不对(rules[]重复关联了uploads)
-                                        asList(Aggregates.match(Filters.expr(new Document("$in",
-                                                asList(new BsonString("$_id"), new BsonString("$$ruleIds"))))), Aggregates
-                                                        .lookup(UPLOADS.getName(),
-                                                                asList(new Variable<>("uploadIds", "$uploadIds")), asList(
-                                                                        Aggregates.match(Filters.expr(new Document("$in",
-                                                                                asList(new BsonString("$_id"),
-                                                                                        new BsonString("$$uploadIds"))))),
-                                                                        project),
-                                                                "uploads"),
-                                                project),
-                                        "rules"),
-                                project),
-                        "workflow"));
         aggregates.add(project);
+        aggregates.add(workflowLookup);
         // The temporary collections are automatically created.
         // aggregates.add(Aggregates.merge("_tmp_load_scenes_with_cascade"));
 
         // Document scenesDoc = aggregateIt.first();
-        final MongoCursor<Scenes> cursor = collection.aggregate(aggregates).batchSize(config.threadPools()).map(scenesDoc -> {
-            log.debug("Found scenes object by scenesCodes: {} to json: {}", scenesCodes, scenesDoc.toJson());
-            Scenes scenes = new Scenes();
-            scenes.setId(scenesDoc.getLong("_id"));
-            scenes.setName(scenesDoc.getString("name"));
-            scenes.setScenesCode(scenesDoc.getString("scenesCode"));
-            scenes.setWorkflowId(scenesDoc.getLong("workflowId"));
-            scenes.setOrgCode(scenesDoc.getString("orgCode"));
-            scenes.setEnable(scenesDoc.getInteger("enable"));
-            scenes.setLabels(scenesDoc.getList("labels", String.class));
-            scenes.setRemark(scenesDoc.getString("remark"));
-            scenes.setCreateBy(scenesDoc.getLong("createBy"));
-            scenes.setCreateDate(scenesDoc.getDate("createDate"));
-            scenes.setUpdateBy(scenesDoc.getLong("updateBy"));
-            scenes.setUpdateDate(scenesDoc.getDate("updateDate"));
-
-            safeList(scenesDoc.getList("workflow", Document.class)).stream().findFirst().ifPresent(workflowsDoc -> {
-                scenes.setWorkflow(Workflow.builder()
-                        .id(workflowsDoc.getLong("_id"))
-                        .name(workflowsDoc.getString("name"))
-                        .engine(RuleEngine.valueOf(workflowsDoc.getString("engine")))
-                        .orgCode(workflowsDoc.getString("orgCode"))
-                        .enable(workflowsDoc.getInteger("enable"))
-                        .labels(workflowsDoc.getList("labels", String.class))
-                        .remark(workflowsDoc.getString("remark"))
-                        .createBy(workflowsDoc.getLong("createBy"))
-                        .createDate(workflowsDoc.getDate("createDate"))
-                        .updateBy(workflowsDoc.getLong("updateBy"))
-                        .updateDate(workflowsDoc.getDate("updateDate"))
-                        // .graph(workflowsDoc.get("graph",WorkflowGraph.class))
-                        .build());
-                Document graphDoc = workflowsDoc.get("graph", Document.class);
-                scenes.getWorkflow().setGraph(parseJSON(graphDoc.toJson(), WorkflowGraph.class));
-
-                scenes.getWorkflow().setRules(safeList(workflowsDoc.getList("rules", Document.class)).stream().map(rulesDoc -> {
-                    Rule rule = Rule.builder()
-                            .id(rulesDoc.getLong("_id"))
-                            .name(rulesDoc.getString("name"))
-                            .engine(RuleEngine.valueOf(workflowsDoc.getString("engine")))
-                            .uploadIds(rulesDoc.getList("uploadIds", Long.class))
-                            .orgCode(rulesDoc.getString("orgCode"))
-                            .enable(rulesDoc.getInteger("enable"))
-                            .labels(rulesDoc.getList("labels", String.class))
-                            .remark(rulesDoc.getString("remark"))
-                            .createBy(rulesDoc.getLong("createBy"))
-                            .createDate(rulesDoc.getDate("createDate"))
-                            .updateBy(rulesDoc.getLong("updateBy"))
-                            .updateDate(rulesDoc.getDate("updateDate"))
-                            .build();
-                    rule.setUploads(safeList(rulesDoc.getList("uploads", Document.class)).stream()
-                            .map(uploadsDoc -> UploadObject.builder()
-                                    .id(uploadsDoc.getLong("_id"))
-                                    .filename(uploadsDoc.getString("filename"))
-                                    .uploadType(uploadsDoc.getString("uploadType"))
-                                    .objectPrefix(uploadsDoc.getString("objectPrefix"))
-                                    .extension(uploadsDoc.getString("extension"))
-                                    .size(uploadsDoc.getLong("size"))
-                                    .md5sum(uploadsDoc.getString("md5sum"))
-                                    .sha1sum(uploadsDoc.getString("sha1sum"))
-                                    .orgCode(uploadsDoc.getString("orgCode"))
-                                    .enable(uploadsDoc.getInteger("enable"))
-                                    .labels(uploadsDoc.getList("labels", String.class))
-                                    .remark(uploadsDoc.getString("remark"))
-                                    .createBy(uploadsDoc.getLong("createBy"))
-                                    .createDate(uploadsDoc.getDate("createDate"))
-                                    .updateBy(uploadsDoc.getLong("updateBy"))
-                                    .updateDate(uploadsDoc.getDate("updateDate"))
-                                    .build())
-                            .collect(toList()));
-                    return rule;
-                }).collect(toList()));
-            });
-            return scenes;
-        }).iterator();
-
+        final MongoCursor<ScenesWrapper> cursor = collection.aggregate(aggregates)
+                .batchSize(config.maxQueryBatch())
+                .map(scenesDoc -> {
+                    log.debug("Found scenes object by scenesCodes: {} to json: {}", scenesCodes, scenesDoc.toJson());
+                    final Map<String, Object> scenesMap = BsonUtils.asMap(scenesDoc);
+                    // Notice: When the manager uses spring-data-mongo to save
+                    // the entity by default, it will set the id to '_id'
+                    final String scenesJson = toJSONString(scenesMap).replaceAll("\"_id\":", "\"id\":");
+                    final ScenesWrapper scenes = parseJSON(scenesJson, ScenesWrapper.class);
+                    return ScenesWrapper.validate(scenes);
+                })
+                .iterator();
         try {
             return IteratorUtils.toList(cursor);
         } finally {
             cursor.close();
-        }
-    }
-
-    @AllArgsConstructor
-    class ExecutionRunner implements Callable<ResultDescription> {
-        final @NotNull CountDownLatch latch;
-        final @NotNull Evaluation evaluation;
-        final @NotNull Scenes scenes;
-
-        @Override
-        public ResultDescription call() {
-            final RuleEngine engine = scenes.getWorkflow().getEngine();
-            notNull(engine, "Please check if the configuration is correct, rule engine type of workflow is null.");
-
-            try {
-                // Buried-point: total evaluation.
-                meterService.counter(evaluation_total.getName(), evaluation_total.getHelp(), MetricsTag.ENGINE, engine.name())
-                        .increment();
-
-                final WorkflowExecution execution = lifecycleExecutionFactory.getExecution(engine);
-                notNull(execution, "Could not load execution rule engine via %s of '%s'", engine.name(),
-                        evaluation.getClientId());
-                final ResultDescription result = execution.execute(evaluation, scenes);
-
-                // Buried-point: success evaluation.
-                meterService.counter(evaluation_success.getName(), evaluation_success.getHelp(), MetricsTag.ENGINE, engine.name())
-                        .increment();
-
-                return result;
-            } catch (Exception e) {
-                // Buried-point: failed evaluation.
-                meterService.counter(evaluation_failure.getName(), evaluation_failure.getHelp(), MetricsTag.ENGINE, engine.name())
-                        .increment();
-
-                throw new IllegalStateException(
-                        format("Could not to execution evaluate of clientId: '%s', engine: '%s'. reason: %s",
-                                evaluation.getClientId(), engine.name(), e.getMessage()));
-            } finally {
-                latch.countDown();
-            }
         }
     }
 

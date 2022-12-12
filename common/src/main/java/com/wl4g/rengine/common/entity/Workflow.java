@@ -15,16 +15,21 @@
  */
 package com.wl4g.rengine.common.entity;
 
+import static com.wl4g.infra.common.lang.Assert2.notEmpty;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.rengine.common.entity.Rule.RuleEngine;
+import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -44,15 +49,55 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @NoArgsConstructor
 public class Workflow extends BaseBean {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -8038218208189261648L;
+    private @NotBlank Long scenesId;
     private @NotBlank String name;
     private @NotNull RuleEngine engine;
-    private @Nullable WorkflowGraph graph;
 
-    //
-    // Temporary fields.
-    //
+    @Getter
+    @Setter
+    @SuperBuilder
+    @ToString
+    @NoArgsConstructor
+    public static class WorkflowWrapper extends Workflow {
+        private static final long serialVersionUID = 1L;
+        private @Nullable @Default List<WorkflowGraphWrapper> graphs = new ArrayList<>(4);
 
-    @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
-    private @Nullable transient List<Rule> rules;
+        // The latest revision(version) is the first one after the aggregation
+        // query in reverse order.
+        @JsonIgnore
+        public WorkflowGraphWrapper getEffectiveLatestGraph() {
+            validate(this);
+            return getGraphs().get(0);
+        }
+
+        public static WorkflowWrapper validate(WorkflowWrapper workflow) {
+            notEmpty(workflow.getGraphs(), "graphs");
+            for (WorkflowGraphWrapper graph : workflow.getGraphs()) {
+                WorkflowGraphWrapper.validate(graph);
+            }
+            return workflow;
+        }
+
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    @NoArgsConstructor
+    public static class WorkflowGraphWrapper extends WorkflowGraph {
+        private static final long serialVersionUID = 1L;
+        private @Nullable List<RuleWrapper> rules = new ArrayList<>(4);
+
+        public static WorkflowGraphWrapper validate(WorkflowGraphWrapper graph) {
+            notEmpty(graph.getNodes(), "graph.nodes");
+            notEmpty(graph.getConnections(), "graph.connections");
+            notEmpty(graph.getRules(), "graph.rules");
+            for (RuleWrapper rule : graph.getRules()) {
+                RuleWrapper.validate(rule);
+            }
+            return graph;
+        }
+    }
+
 }

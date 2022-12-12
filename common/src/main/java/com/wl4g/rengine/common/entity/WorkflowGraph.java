@@ -34,9 +34,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+import com.wl4g.infra.common.bean.BaseBean;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder.Default;
 import lombok.Getter;
@@ -55,8 +57,12 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @ToString
-@NoArgsConstructor
-public class WorkflowGraph {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class WorkflowGraph extends BaseBean {
+    private static final long serialVersionUID = 1917204508937266181L;
+
+    private Integer revision;
+    private Long workflowId;
     private @NotEmpty List<BaseNode<?>> nodes = new LinkedList<>();
     private @NotEmpty List<NodeConnection> connections = new LinkedList<>();
 
@@ -78,8 +84,8 @@ public class WorkflowGraph {
             discriminatorProperty = "@type")
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type", visible = true)
     @JsonSubTypes({ @Type(value = BootNode.class, name = "BOOT"), @Type(value = ProcessNode.class, name = "PROCESS"),
-            @Type(value = FailbackNode.class, name = "FAILBACK"), @Type(value = LogicalNode.class, name = "LOGICAL"),
-            @Type(value = RunNode.class, name = "RUN") })
+            @Type(value = RelationNode.class, name = "RELATION"), @Type(value = FailbackNode.class, name = "FAILBACK"),
+            @Type(value = LogicalNode.class, name = "LOGICAL"), @Type(value = RunNode.class, name = "RUN") })
     @Getter
     @Setter
     @ToString
@@ -120,24 +126,6 @@ public class WorkflowGraph {
     @Getter
     @Setter
     @ToString(callSuper = true)
-    public static abstract class BaseRunNode<E extends BaseRunNode<?>> extends BaseNode<E> {
-        private static final long serialVersionUID = 42226526447799065L;
-
-        /**
-         * The current this node corresponding script rule ID.
-         */
-        private @NotBlank String ruleId;
-
-        @SuppressWarnings("unchecked")
-        public E withRuleId(String ruleId) {
-            setRuleId(ruleId);
-            return (E) this;
-        }
-    }
-
-    @Getter
-    @Setter
-    @ToString(callSuper = true)
     public static class BootNode extends BaseNode<BootNode> {
         private static final long serialVersionUID = 422265264435899065L;
 
@@ -149,7 +137,7 @@ public class WorkflowGraph {
     @Getter
     @Setter
     @ToString(callSuper = true)
-    public static class ProcessNode extends BaseRunNode<ProcessNode> {
+    public static class ProcessNode extends RunNode {
         private static final long serialVersionUID = 422265264435899065L;
 
         public ProcessNode() {
@@ -160,7 +148,18 @@ public class WorkflowGraph {
     @Getter
     @Setter
     @ToString(callSuper = true)
-    public static class FailbackNode extends BaseRunNode<FailbackNode> {
+    public static class RelationNode extends ProcessNode {
+        private static final long serialVersionUID = 422265264435899065L;
+
+        public RelationNode() {
+            setType(NodeType.RELATION.name());
+        }
+    }
+
+    @Getter
+    @Setter
+    @ToString(callSuper = true)
+    public static class FailbackNode extends ProcessNode {
         private static final long serialVersionUID = 422265264435899065L;
 
         public FailbackNode() {
@@ -189,11 +188,21 @@ public class WorkflowGraph {
     @Getter
     @Setter
     @ToString(callSuper = true)
-    public static class RunNode extends BaseRunNode<RunNode> {
+    public static class RunNode extends BaseNode<RunNode> {
         private static final long serialVersionUID = 42226526447799065L;
+
+        /**
+         * The current this node corresponding script rule ID.
+         */
+        private @NotBlank String ruleId;
 
         public RunNode() {
             setType(NodeType.RUN.name());
+        }
+
+        public RunNode withRuleId(String ruleId) {
+            setRuleId(ruleId);
+            return this;
         }
     }
 
@@ -234,6 +243,8 @@ public class WorkflowGraph {
         BOOT(BootNode.class),
 
         PROCESS(ProcessNode.class),
+
+        RELATION(RelationNode.class),
 
         FAILBACK(FailbackNode.class),
 

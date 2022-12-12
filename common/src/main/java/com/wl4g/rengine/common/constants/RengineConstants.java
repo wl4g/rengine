@@ -60,7 +60,11 @@ public abstract class RengineConstants extends EnvironmentUtil {
 
         WORKFLOWS("workflows", true),
 
+        WORKFLOW_GRAPHS("workflow_graphs", true),
+
         RULES("rules", true),
+
+        RULE_SCRIPTS("rule_scripts", true),
 
         UPLOADS("uploads", true),
 
