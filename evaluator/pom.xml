@@ -48,55 +48,12 @@
             <timezone>+8</timezone>
         </developer>
     </developers>
-    <!-- see:https://swenfang.github.io/2018/06/03/Maven-Priority/ -->
-    <repositories>
-        <repository>
-            <id>public</id>
-            <name>Aliyun maven public</name>
-            <url>https://maven.aliyun.com/repository/public</url>
-        </repository>
-        <repository>
-            <id>grails-core</id>
-            <name>Aliyun maven grails core</name>
-            <url>https://maven.aliyun.com/repository/grails-core</url>
-        </repository>
-        <repository>
-            <id>central</id>
-            <name>Aliyun maven central</name>
-            <url>https://maven.aliyun.com/repository/central</url>
-        </repository>
-        <repository>
-            <id>spring</id>
-            <name>Aliyun maven spring</name>
-            <url>https://maven.aliyun.com/repository/spring</url>
-        </repository>
-        <repository>
-            <id>spring-release</id>
-            <name>Spring release</name>
-            <url>https://repo.spring.io/release</url>
-        </repository>
-        <repository>
-            <id>google</id>
-            <name>Aliyun maven google</name>
-            <url>https://maven.aliyun.com/repository/google</url>
-        </repository>
-        <repository>
-            <id>spring-milestones</id>
-            <name>Spring milestone</name>
-            <url>https://repo.spring.io/milestone</url>
-        </repository>
-        <repository>
-            <id>cloudera</id>
-            <name>Cloudera maven</name>
-            <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
-        </repository>
-    </repositories>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
-        <!-- see:https://github.com/quarkusio/quarkus-quickstarts/blob/2.12.2.Final/getting-started/pom.xml -->
-        <quarkus.platform.version>2.12.2.Final</quarkus.platform.version>
+        <!-- see:https://github.com/quarkusio/quarkus-quickstarts/blob/2.14.3.Final/getting-started/pom.xml -->
+        <quarkus.platform.version>2.14.3.Final</quarkus.platform.version>
         <!-- <groovy.version>4.0.4</groovy.version>-->
         <!-- <graalvm.version>22.1.0</graalvm.version>-->
         <compiler-plugin.version>3.8.1</compiler-plugin.version>
@@ -133,17 +90,32 @@
         <dependency>
             <groupId>com.wl4g</groupId>
             <artifactId>rengine-common</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.wl4g</groupId>
             <artifactId>infra-common-java11</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-
         <!-- Bridge with spring -->
         <!-- <dependency>-->
         <!--     <groupId>io.quarkus</groupId>-->
         <!--     <artifactId>quarkus-spring-web</artifactId>-->
         <!-- </dependency>-->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-oidc-deployment</artifactId>
+        </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-oidc</artifactId>
@@ -335,6 +307,12 @@ and see:https://github.com/apache/groovy/blob/GROOVY_4_0_5/build.gradle#L98 -->
             <optional>true</optional>
         </dependency>
 
+        <!-- Fix: NoDefineClassFound:io.quarkus.bootstrap.resolver.maven.BootstrapMavenContext with io.quarkus.bootstrap.IDELauncherImpl#L84 -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-bootstrap-maven-resolver</artifactId>
+        </dependency>
+
         <!-- Testing -->
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -418,7 +396,6 @@ and see:https://github.com/apache/groovy/blob/GROOVY_4_0_5/build.gradle#L98 -->
                 <groupId>${quarkus.platform.group-id}</groupId>
                 <artifactId>quarkus-maven-plugin</artifactId>
                 <version>${quarkus.platform.version}</version>
-                <extensions>true</extensions>
                 <configuration>
                     <!-- invalid? Not really added to the JVM at compile time -->
                     <!-- see:https://stackoverflow.com/questions/69631653/quarkus-optaplanner-illegal-reflective-call -->

@@ -53,6 +53,7 @@
     </developers>
     <!-- see:https://swenfang.github.io/2018/06/03/Maven-Priority/ -->
     <repositories>
+        <!--
         <repository>
             <id>public</id>
             <name>Aliyun maven public</name>
@@ -93,6 +94,7 @@
             <name>Cloudera maven</name>
             <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
         </repository>
+        -->
     </repositories>
     <pluginRepositories>
         <pluginRepository>
