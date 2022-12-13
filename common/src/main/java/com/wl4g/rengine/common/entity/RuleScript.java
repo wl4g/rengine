@@ -21,7 +21,6 @@ import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -58,7 +57,7 @@ public class RuleScript extends BaseBean {
     @NoArgsConstructor
     public static class RuleScriptWrapper extends RuleScript {
         private static final long serialVersionUID = 1L;
-        private @Nullable List<UploadObject> uploads;
+        private List<UploadObject> uploads;
 
         public static RuleScriptWrapper validate(RuleScriptWrapper rule) {
             notNullOf(rule.getRevision(), "revision");

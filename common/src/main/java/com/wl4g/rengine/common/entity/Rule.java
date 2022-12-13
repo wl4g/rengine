@@ -19,7 +19,6 @@ import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -76,7 +75,7 @@ public class Rule extends BaseBean {
     @NoArgsConstructor
     public static class RuleWrapper extends Rule {
         private static final long serialVersionUID = 1L;
-        private @Nullable List<RuleScriptWrapper> scripts;
+        private List<RuleScriptWrapper> scripts;
 
         /**
          * Notice: The latest revision(version) is the first one after the

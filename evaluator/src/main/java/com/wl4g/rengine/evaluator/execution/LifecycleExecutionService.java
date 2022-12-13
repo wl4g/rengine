@@ -241,7 +241,7 @@ public class LifecycleExecutionService {
 
                 final String errmsg = ExceptionUtils.getRootCauseMessage(e);
                 throw new RengineException(format(
-                        "Failed to execution '%s' engine of requestId: '%s', clientId: '%s', scenesCode: '%s'. reason: %s",
+                        "Failed to execution %s engine of requestId: '%s', clientId: '%s', scenesCode: '%s'. reason: %s",
                         engine.name(), evaluation.getRequestId(), evaluation.getClientId(), scenes.getScenesCode(), errmsg), e);
             } finally {
                 latch.countDown();

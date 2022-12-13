@@ -112,17 +112,17 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
 
     @Override
     public ScriptResult execute(@NotNull final ExecutionGraphContext graphContext, @NotNull final RuleWrapper rule) {
-        final String scenesCode = graphContext.getParameter().getScenesCode();
-        final String clientId = graphContext.getParameter().getClientId();
         final String traceId = graphContext.getParameter().getTraceId();
-        hasTextOf(scenesCode, "scenesCode");
-        hasTextOf(clientId, "clientId");
+        final String clientId = graphContext.getParameter().getClientId();
+        final String scenesCode = graphContext.getParameter().getScenesCode();
         hasTextOf(traceId, "traceId");
+        hasTextOf(clientId, "clientId");
+        hasTextOf(scenesCode, "scenesCode");
 
         log.debug("Execution JS script for scenesCode: {} ...", scenesCode);
         try (ContextWrapper graalContext = graalPolyglotManager.getContext();) {
             // Load all scripts dependencies.
-            List<ObjectResource> scripts = safeList(loadScriptResources(scenesCode, rule, true));
+            final List<ObjectResource> scripts = safeList(loadScriptResources(scenesCode, rule, true));
             for (ObjectResource script : scripts) {
                 isTrue(!script.isBinary(), "Invalid JS dependency library binary type");
                 log.debug("Evaling js-dependencys: {}", script.getObjectPrefix());
@@ -137,23 +137,23 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
                 }
             }
 
-            Value bindings = graalContext.getBindings("js");
+            final Value bindings = graalContext.getBindings("js");
             // Try not to bind implicit objects, let users create new objects by
             // self or get default objects from the graal context.
             bindings.putMember(ScriptHttpClient.class.getSimpleName(), ScriptHttpClient.class);
             bindings.putMember(ScriptResult.class.getSimpleName(), ScriptResult.class);
 
             log.trace("Loading js-script ...");
-            Value mainFunction = bindings.getMember(DEFAULT_MAIN_FUNCTION);
+            final Value mainFunction = bindings.getMember(DEFAULT_MAIN_FUNCTION);
 
             // Buried-point: execute cost-time.
-            Set<String> scriptFileNames = scripts.stream().map(s -> getFilename(s.getObjectPrefix())).collect(toSet());
-            Timer executeTimer = meterService.timer(evaluation_execute_time.getName(), evaluation_execute_time.getHelp(),
+            final Set<String> scriptFileNames = scripts.stream().map(s -> getFilename(s.getObjectPrefix())).collect(toSet());
+            final Timer executeTimer = meterService.timer(evaluation_execute_time.getName(), evaluation_execute_time.getHelp(),
                     new double[] { 0.5, 0.9, 0.95 }, MetricsTag.CLIENT_ID, clientId, MetricsTag.SCENESCODE, scenesCode,
                     MetricsTag.ENGINE, rule.getEngine().name(), MetricsTag.LIBRARY, scriptFileNames.toString());
 
             final long begin = currentTimeMillis();
-            Value result = mainFunction.execute(newScriptContext(graphContext));
+            final Value result = mainFunction.execute(newScriptContext(graphContext));
             final long costTime = currentTimeMillis() - begin;
             executeTimer.record(costTime, MILLISECONDS);
 
