@@ -26,6 +26,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import com.wl4g.infra.common.lang.Assert2;
 import com.wl4g.rengine.common.entity.Rule.RuleEngine;
 import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
 import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
@@ -77,13 +78,17 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
 
         final Map<String, RuleWrapper> ruleMap = safeList(workflowGraph.getRules()).stream()
                 .collect(toMap(r -> valueOf(r.getId()), r -> r));
-
         final ExecutionGraphContext context = new ExecutionGraphContext(parameter, ctx -> {
-            final RuleWrapper rule = ruleMap.get(((IRunOperator) ctx.getCurrentNode()).getRuleId());
+            final String ruleId = ((IRunOperator) ctx.getCurrentNode()).getRuleId();
+
+            final RuleWrapper rule = Assert2.notNull(ruleMap.get(ruleId),
+                    "The rule '%s' is missing. please check workflow graph rules configuration.", ruleId);
+
             final ScriptResult result = engine.execute(ctx, rule);
             if (nonNull(result)) {
                 return new ExecutionGraphResult(ReturnState.of(result.getState()), result.getValueMap());
             }
+
             return new ExecutionGraphResult(ReturnState.FALSE);
         });
 

@@ -16,6 +16,8 @@
 package com.wl4g.rengine.common.entity;
 
 import static com.wl4g.infra.common.lang.Assert2.notEmpty;
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toSet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,6 +95,22 @@ public class Workflow extends BaseBean {
             notEmpty(graph.getNodes(), "graph.nodes");
             notEmpty(graph.getConnections(), "graph.connections");
             notEmpty(graph.getRules(), "graph.rules");
+
+            // Check for graph rules number.
+            final long expectedRuleIdNodes = graph.getNodes()
+                    .stream()
+                    .filter(n -> n instanceof RunNode)
+                    .map(n -> ((RunNode) n).getRuleId())
+                    .collect(toSet())
+                    .size();
+            final long existingRuleIdNodes = graph.getRules().size();
+            if (expectedRuleIdNodes != existingRuleIdNodes) {
+                throw new IllegalArgumentException(
+                        format("Invalid workflow graph rules configuration, expected number of rules: %s, but actual rules: %s",
+                                expectedRuleIdNodes, existingRuleIdNodes));
+            }
+
+            // Check for rule script.
             for (RuleWrapper rule : graph.getRules()) {
                 RuleWrapper.validate(rule);
             }

@@ -95,7 +95,7 @@ public class EvaluatorServiceImpl implements EvaluatorService {
     @Override
     public Uni<RespBase<EvaluationResult>> evaluate(final @NotNull @Valid Evaluation evaluation) {
         return Uni.createFrom().item(() -> {
-            RespBase<EvaluationResult> resp = RespBase.<EvaluationResult> create();
+            RespBase<EvaluationResult> resp = RespBase.create();
             try {
                 // Query the sceneses of cascade by scenesCode.
                 final List<ScenesWrapper> sceneses = safeList(findScenesWorkflowGraphRules(evaluation.getScenesCodes(), 1));
@@ -109,15 +109,13 @@ public class EvaluatorServiceImpl implements EvaluatorService {
                 } else {
                     resp.setStatus(EvaluationResult.STATUS_PART_SUCCESS);
                 }
-
-                return resp.withData(result);
             } catch (Throwable e) {
-                String errmsg = format("Could not to execution evaluate of clientId: '%s', reason: %s", evaluation.getClientId(),
-                        e.getMessage());
+                final String errmsg = format("Could not to execution evaluate of requestId: '%s', reason: %s",
+                        evaluation.getRequestId(), e.getMessage());
                 log.error(errmsg, e);
                 resp.withCode(RetCode.SYS_ERR).withMessage(errmsg);
             }
-            return resp;
+            return resp.withRequestId(evaluation.getRequestId());
         });
     }
 
