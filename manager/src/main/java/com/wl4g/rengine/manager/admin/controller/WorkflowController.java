@@ -79,7 +79,7 @@ public class WorkflowController {
     }
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Delete project.")
+    @Operation(description = "Delete workflow.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
     public RespBase<DeleteWorkflowResult> delete(@Validated @RequestBody DeleteWorkflow model) {

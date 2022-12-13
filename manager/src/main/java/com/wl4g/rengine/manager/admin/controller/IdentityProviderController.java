@@ -64,7 +64,7 @@ public class IdentityProviderController {
     }
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Save Identity Provider model.")
+    @Operation(description = "Save identity provider")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
     public RespBase<SaveIdentityProviderResult> save(@Validated @RequestBody SaveIdentityProvider model) {

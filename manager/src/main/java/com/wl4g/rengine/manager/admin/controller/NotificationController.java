@@ -64,7 +64,7 @@ public class NotificationController {
     }
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Save notification model.")
+    @Operation(description = "Save notification")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
     public RespBase<SaveNotificationResult> save(@Validated @RequestBody SaveNotification model) {

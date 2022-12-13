@@ -47,12 +47,12 @@
 // public class JobServiceImpl implements JobService {
 //
 // @Inject
-// MongoRepository mongoRepository;
+// MongoSourceFacade mongoFacade;
 //
 // @Override
 // public Uni<List<Job>> listAll() {
 // // TODO hello world
-// return mongoRepository.getReactiveCollection(JOBS).find().map(doc -> {
+// return mongoFacade.getReactiveCollection(JOBS).find().map(doc -> {
 // Job job = Job.builder().id(doc.getLong("id")).build();
 // return job;
 // }).collect().asList();
@@ -65,7 +65,7 @@
 // Document document = new Document().append("id",
 // job.getId())/* .append("labels", rule.getLabels()) */;
 // return
-/// mongoRepository.getReactiveCollection(JOBS).insertOne(document).onItem().ignore().andContinueWithNull();
+/// mongoFacade.getReactiveCollection(JOBS).insertOne(document).onItem().ignore().andContinueWithNull();
 // }
 //
 // }

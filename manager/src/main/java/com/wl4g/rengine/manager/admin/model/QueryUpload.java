@@ -38,8 +38,8 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @NoArgsConstructor
 public class QueryUpload extends QueryBase<UploadObject> {
-    private @Nullable String uploadId;
-    private @Nullable String scenesId;
+    private @Nullable Long uploadId;
+    private @Nullable Long scenesId;
     private @Nullable UploadObject.UploadType UploadType;
     private @Nullable String extension;
 }

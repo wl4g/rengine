@@ -175,7 +175,8 @@ quarkus:
     add-runner-suffix: true
   ## see:https://quarkus.io/guides/writing-native-applications-tips#supporting-native-in-your-application
   native:
-    builder-image: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image:22.1-java11
+    #builder-image: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image:22.3-java11
+    builder-image: registry.cn-shenzhen.aliyuncs.com/wl4g/ubi-quarkus-native-image:22.3-java11
     file-encoding: UTF-8
     inline-before-analysis: true
     ## see:https://quarkus.io/guides/native-reference#i-get-an-outofmemoryerror-oome-building-native-executables-what-can-i-do

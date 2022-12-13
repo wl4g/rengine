@@ -75,6 +75,28 @@
         <dependency>
             <groupId>com.wl4g</groupId>
             <artifactId>infra-common</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.mail</groupId>
+                    <artifactId>javax.mail-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sun.mail</groupId>
+                    <artifactId>javax.mail</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.hierynomus</groupId>
+                    <artifactId>sshj</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>io.protostuff</groupId>
+                    <artifactId>protostuff-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>io.protostuff</groupId>
+                    <artifactId>protostuff-runtime</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
@@ -96,6 +118,10 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
         <!-- <dependency>-->
         <!--     <groupId>io.grpc</groupId>-->

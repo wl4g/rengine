@@ -15,6 +15,8 @@
  */
 package com.wl4g.rengine.manager.admin.service;
 
+import javax.validation.constraints.NotNull;
+
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.entity.Scenes;
 import com.wl4g.rengine.manager.admin.model.DeleteScenes;
@@ -32,10 +34,10 @@ import com.wl4g.rengine.manager.admin.model.SaveScenesResult;
  */
 public interface ScenesService {
 
-    PageHolder<Scenes> query(QueryScenes model);
+    PageHolder<Scenes> query(@NotNull QueryScenes model);
 
-    SaveScenesResult save(SaveScenes model);
+    SaveScenesResult save(@NotNull SaveScenes model);
 
-    DeleteScenesResult delete(DeleteScenes model);
+    DeleteScenesResult delete(@NotNull DeleteScenes model);
 
 }

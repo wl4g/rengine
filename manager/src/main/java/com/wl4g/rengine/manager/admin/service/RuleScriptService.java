@@ -13,25 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.evaluator.service;
+package com.wl4g.rengine.manager.admin.service;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.wl4g.infra.common.bean.page.PageHolder;
+import com.wl4g.rengine.common.entity.RuleScript;
+import com.wl4g.rengine.manager.admin.model.DeleteRuleScript;
+import com.wl4g.rengine.manager.admin.model.DeleteRuleScriptResult;
+import com.wl4g.rengine.manager.admin.model.QueryRuleScript;
+import com.wl4g.rengine.manager.admin.model.SaveRuleScript;
+import com.wl4g.rengine.manager.admin.model.SaveRuleScriptResult;
 
 /**
- * {@link MongoAggregatedService}
+ * {@link RuleScriptScriptService}
  * 
  * @author James Wong
- * @version 2022-09-17
+ * @version 2022-08-29
  * @since v1.0.0
  */
-public interface MongoAggregatedService {
+public interface RuleScriptService {
 
-    List<JsonNode> findList(@NotBlank String tableName, @NotNull List<Map<String, Object>> bsonQueryParams);
+    PageHolder<RuleScript> query(@NotNull QueryRuleScript model);
 
+    SaveRuleScriptResult save(@NotNull SaveRuleScript model);
+
+    DeleteRuleScriptResult delete(@NotNull DeleteRuleScript model);
 }

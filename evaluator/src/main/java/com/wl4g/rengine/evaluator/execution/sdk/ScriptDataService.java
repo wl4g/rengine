@@ -15,9 +15,13 @@
  */
 package com.wl4g.rengine.evaluator.execution.sdk;
 
+import javax.annotation.Nullable;
+
 import org.graalvm.polyglot.HostAccess;
 
-import com.wl4g.rengine.evaluator.service.MongoAggregatedService;
+import com.wl4g.rengine.evaluator.execution.datasource.DataSourceFacade;
+import com.wl4g.rengine.evaluator.execution.datasource.DataSourceFacade.DataSourceType;
+import com.wl4g.rengine.evaluator.execution.datasource.GlobalDataSourceManager;
 
 import lombok.AllArgsConstructor;
 import lombok.ToString;
@@ -33,10 +37,10 @@ import lombok.ToString;
 @AllArgsConstructor
 public class ScriptDataService {
 
-    private final MongoAggregatedService mongoAggregatedService;
+    private final GlobalDataSourceManager globalDataSourceManager;
 
-    public @HostAccess.Export MongoAggregatedService mongoService() {
-        return mongoAggregatedService;
+    public @HostAccess.Export DataSourceFacade mongoService(final @Nullable String dataSourceName) {
+        return globalDataSourceManager.loadDataSource(DataSourceType.MONGO, dataSourceName);
     }
 
     // public @HostAccess.Export PhoenixAggregatedService phoenixService() {

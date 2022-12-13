@@ -43,7 +43,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
-@ToString
+@ToString(callSuper = true)
 @NoArgsConstructor
 public class Scenes extends BaseBean {
     private static final long serialVersionUID = -5069149346132378733L;

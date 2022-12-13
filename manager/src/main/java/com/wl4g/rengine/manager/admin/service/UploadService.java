@@ -15,6 +15,8 @@
  */
 package com.wl4g.rengine.manager.admin.service;
 
+import javax.validation.constraints.NotNull;
+
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.entity.UploadObject;
 import com.wl4g.rengine.manager.admin.model.DeleteUpload;
@@ -32,9 +34,9 @@ import com.wl4g.rengine.manager.admin.model.SaveUploadResult;
  */
 public interface UploadService {
 
-    PageHolder<UploadObject> query(QueryUpload model);
+    PageHolder<UploadObject> query(@NotNull QueryUpload model);
 
-    SaveUploadResult apply(SaveUpload model);
+    SaveUploadResult apply(@NotNull SaveUpload model);
 
-    DeleteUploadResult delete(DeleteUpload model);
+    DeleteUploadResult delete(@NotNull DeleteUpload model);
 }

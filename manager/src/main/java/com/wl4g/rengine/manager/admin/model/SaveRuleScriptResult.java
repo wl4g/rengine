@@ -13,26 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.manager.admin.service;
+package com.wl4g.rengine.manager.admin.model;
 
-import javax.validation.constraints.NotNull;
-
-import com.wl4g.rengine.manager.admin.model.QueryIdentityProvider;
-import com.wl4g.rengine.manager.admin.model.QueryIdentityProviderResult;
-import com.wl4g.rengine.manager.admin.model.SaveIdentityProvider;
-import com.wl4g.rengine.manager.admin.model.SaveIdentityProviderResult;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 /**
- * {@link IdentityProviderService}
+ * {@link SaveRuleScriptResult}
  * 
  * @author James Wong
- * @version 2022-08-29
+ * @version 2022-08-28
  * @since v1.0.0
  */
-public interface IdentityProviderService {
-
-    QueryIdentityProviderResult query(@NotNull QueryIdentityProvider model);
-
-    SaveIdentityProviderResult save(@NotNull SaveIdentityProvider model);
-
+@Getter
+@Setter
+@SuperBuilder
+@ToString
+@NoArgsConstructor
+public class SaveRuleScriptResult extends SaveResultBase {
 }

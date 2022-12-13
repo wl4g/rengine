@@ -27,13 +27,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.common.entity.Rule;
-import com.wl4g.rengine.manager.admin.model.DeleteRule;
-import com.wl4g.rengine.manager.admin.model.DeleteRuleResult;
-import com.wl4g.rengine.manager.admin.model.QueryRule;
-import com.wl4g.rengine.manager.admin.model.SaveRule;
-import com.wl4g.rengine.manager.admin.model.SaveRuleResult;
-import com.wl4g.rengine.manager.admin.service.RuleService;
+import com.wl4g.rengine.common.entity.RuleScript;
+import com.wl4g.rengine.manager.admin.model.DeleteRuleScript;
+import com.wl4g.rengine.manager.admin.model.DeleteRuleScriptResult;
+import com.wl4g.rengine.manager.admin.model.QueryRuleScript;
+import com.wl4g.rengine.manager.admin.model.SaveRuleScript;
+import com.wl4g.rengine.manager.admin.model.SaveRuleScriptResult;
+import com.wl4g.rengine.manager.admin.service.RuleScriptService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -43,51 +43,51 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link RuleController}
+ * {@link RuleScriptScriptController}
  * 
  * @author James Wong
  * @version 2022-08-28
  * @since v1.0.0
  */
-@Tag(name = "RuleAPI", description = "The rule models management API")
+@Tag(name = "RuleScriptAPI", description = "The rule script models management API")
 @Slf4j
 @RestController
-@RequestMapping("/admin/rule")
-public class RuleController {
+@RequestMapping("/admin/rulescript")
+public class RuleScriptController {
 
-    private @Autowired RuleService ruleService;
+    private @Autowired RuleScriptService ruleScriptService;
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Query rules model list.")
+    @Operation(description = "Query rule scripts model list.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful",
             content = { @Content(mediaType = "application/json") }) })
     @RequestMapping(path = { "query" }, method = { GET })
-    public RespBase<PageHolder<Rule>> query(@Validated QueryRule model) {
+    public RespBase<PageHolder<RuleScript>> query(@Validated QueryRuleScript model) {
         log.info("called: model={}", model);
-        RespBase<PageHolder<Rule>> resp = RespBase.create();
-        resp.setData(ruleService.query(model));
+        RespBase<PageHolder<RuleScript>> resp = RespBase.create();
+        resp.setData(ruleScriptService.query(model));
         return resp;
     }
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Save rules model.")
+    @Operation(description = "Save rule scripts model.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    public RespBase<SaveRuleResult> save(@Validated @RequestBody SaveRule model) {
+    public RespBase<SaveRuleScriptResult> save(@Validated @RequestBody SaveRuleScript model) {
         log.info("called: model={}", model);
-        RespBase<SaveRuleResult> resp = RespBase.create();
-        resp.setData(ruleService.save(model));
+        RespBase<SaveRuleScriptResult> resp = RespBase.create();
+        resp.setData(ruleScriptService.save(model));
         return resp;
     }
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Delete rule.")
+    @Operation(description = "Delete rule script.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
-    public RespBase<DeleteRuleResult> delete(@Validated @RequestBody DeleteRule model) {
+    public RespBase<DeleteRuleScriptResult> delete(@Validated @RequestBody DeleteRuleScript model) {
         log.info("called: model={}", model);
-        RespBase<DeleteRuleResult> resp = RespBase.create();
-        resp.setData(ruleService.delete(model));
+        RespBase<DeleteRuleScriptResult> resp = RespBase.create();
+        resp.setData(ruleScriptService.delete(model));
         return resp;
     }
 

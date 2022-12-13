@@ -38,5 +38,5 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @NoArgsConstructor
 public class QueryScenes extends QueryBase<Scenes> {
-    private @Nullable String scenesId;
+    private @Nullable Long scenesId;
 }

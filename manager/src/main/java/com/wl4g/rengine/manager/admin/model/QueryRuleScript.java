@@ -15,12 +15,11 @@
  */
 package com.wl4g.rengine.manager.admin.model;
 
-import java.util.List;
-
 import javax.annotation.Nullable;
 
-import com.wl4g.rengine.common.entity.Workflow;
+import com.wl4g.rengine.common.entity.RuleScript;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,7 +27,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link QueryWorkflowResult}
+ * {@link QueryRuleScript}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -39,6 +38,14 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class QueryWorkflowResult {
-    private @Nullable List<Workflow> workflows;
+public class QueryRuleScript extends QueryBase<RuleScript> {
+    private @Nullable Long ruleId;
+    private @Nullable Long scriptId;
+
+    // Notice: The disable reading and writing of the name field in the swagger
+    // document. (because the rule script does not have a name field)
+    @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
+    public String getName() {
+        return super.getName();
+    }
 }

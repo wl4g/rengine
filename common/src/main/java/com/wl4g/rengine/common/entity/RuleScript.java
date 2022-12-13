@@ -25,6 +25,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.bean.BaseBean;
+import com.wl4g.rengine.common.validation.ValidForEntityMarker;
 
 import lombok.Builder.Default;
 import lombok.Getter;
@@ -43,11 +44,11 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
-@ToString
+@ToString(callSuper = true)
 @NoArgsConstructor
 public class RuleScript extends BaseBean {
     private static final long serialVersionUID = -4525858823849417654L;
-    private @NotNull Integer revision;
+    private @NotNull(groups = ValidForEntityMarker.class) Long revision;
     private @NotNull Long ruleId;
     private @NotEmpty @Default List<Long> uploadIds = new ArrayList<>(1);
 

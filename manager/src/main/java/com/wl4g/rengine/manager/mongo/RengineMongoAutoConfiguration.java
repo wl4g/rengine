@@ -15,10 +15,13 @@
  */
 package com.wl4g.rengine.manager.mongo;
 
+import javax.validation.constraints.NotNull;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoAction;
+import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.WriteConcernResolver;
 
@@ -39,6 +42,11 @@ public class RengineMongoAutoConfiguration {
     @ConditionalOnClass(MongoTemplate.class)
     public WriteConcernResolver rengineWriteConcernResolver(MongoTemplate mongoTemplate) {
         return new RengineWriteConcernResolver(mongoTemplate);
+    }
+
+    @Bean
+    public GlobalMongoSequenceFacade globalMongoSequenceFacade(@NotNull final MongoOperations mongoOperations) {
+        return new GlobalMongoSequenceFacade(mongoOperations);
     }
 
     public static class RengineWriteConcernResolver implements WriteConcernResolver {

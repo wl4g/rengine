@@ -37,6 +37,7 @@ import com.wl4g.rengine.common.graph.ExecutionGraph.BaseOperator;
 import com.wl4g.rengine.common.graph.ExecutionGraphContext;
 import com.wl4g.rengine.common.graph.ExecutionGraphResult;
 import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
+import com.wl4g.rengine.evaluator.execution.datasource.GlobalDataSourceManager;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptContext;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptDataService;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptHttpClient;
@@ -44,7 +45,6 @@ import com.wl4g.rengine.evaluator.execution.sdk.ScriptResult;
 import com.wl4g.rengine.evaluator.metrics.EvaluatorMeterService;
 import com.wl4g.rengine.evaluator.minio.MinioManager;
 import com.wl4g.rengine.evaluator.minio.MinioManager.ObjectResource;
-import com.wl4g.rengine.evaluator.service.MongoAggregatedService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -66,11 +66,8 @@ public abstract class AbstractScriptEngine implements IEngine {
     @Inject
     MinioManager minioManager;
 
-    // @Inject
-    // JobService jobService;
-
     @Inject
-    MongoAggregatedService mongoAggregatedService;
+    GlobalDataSourceManager globalDataSourceManager;
 
     protected @NotNull List<ObjectResource> loadScriptResources(
             @NotBlank String scenesCode,
@@ -103,7 +100,7 @@ public abstract class AbstractScriptEngine implements IEngine {
                 .lastResult(isNull(result) ? null
                         : new ScriptResult(ReturnState.isTrue(result.getReturnState()), result.getValueMap()))
                 .minioManager(minioManager)
-                .dataService(new ScriptDataService(mongoAggregatedService))
+                .dataService(new ScriptDataService(globalDataSourceManager))
                 .defaultHttpClient(defaultClient)
                 // .attributes(ProxyObject.fromMap(attributes))
                 .build();

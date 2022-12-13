@@ -48,7 +48,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
-@ToString
+@ToString(callSuper = true)
 @NoArgsConstructor
 public abstract class IdentityProvider extends BaseBean {
     private static final long serialVersionUID = 1L;

@@ -83,7 +83,7 @@ public class UploadController {
     }
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Delete project.")
+    @Operation(description = "Delete upload.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
     public RespBase<DeleteUploadResult> delete(@Validated @RequestBody DeleteUpload model) {

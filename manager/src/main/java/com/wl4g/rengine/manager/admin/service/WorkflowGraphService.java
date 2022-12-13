@@ -15,6 +15,8 @@
  */
 package com.wl4g.rengine.manager.admin.service;
 
+import javax.validation.constraints.NotNull;
+
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.entity.WorkflowGraph;
 import com.wl4g.rengine.manager.admin.model.DeleteWorkflowGraph;
@@ -32,7 +34,7 @@ import com.wl4g.rengine.manager.admin.model.SaveWorkflowGraphResult;
  */
 public interface WorkflowGraphService {
 
-    PageHolder<WorkflowGraph> query(QueryWorkflowGraph model);
+    PageHolder<WorkflowGraph> query(@NotNull QueryWorkflowGraph model);
 
     SaveWorkflowGraphResult save(SaveWorkflowGraph model);
 

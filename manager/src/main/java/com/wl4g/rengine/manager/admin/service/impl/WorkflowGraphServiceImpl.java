@@ -16,7 +16,6 @@
 package com.wl4g.rengine.manager.admin.service.impl;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static java.util.Objects.isNull;
 
 import java.util.List;
 
@@ -40,6 +39,7 @@ import com.wl4g.rengine.manager.admin.model.QueryWorkflowGraph;
 import com.wl4g.rengine.manager.admin.model.SaveWorkflowGraph;
 import com.wl4g.rengine.manager.admin.model.SaveWorkflowGraphResult;
 import com.wl4g.rengine.manager.admin.service.WorkflowGraphService;
+import com.wl4g.rengine.manager.mongo.GlobalMongoSequenceFacade;
 
 /**
  * {@link WorkflowGraphServiceImpl}
@@ -51,7 +51,11 @@ import com.wl4g.rengine.manager.admin.service.WorkflowGraphService;
 @Service
 public class WorkflowGraphServiceImpl implements WorkflowGraphService {
 
-    private @Autowired MongoTemplate mongoTemplate;
+    @Autowired
+    MongoTemplate mongoTemplate;
+
+    @Autowired
+    GlobalMongoSequenceFacade sequenceFacade;
 
     @Override
     public PageHolder<WorkflowGraph> query(QueryWorkflowGraph model) {
@@ -74,27 +78,38 @@ public class WorkflowGraphServiceImpl implements WorkflowGraphService {
     @Override
     public SaveWorkflowGraphResult save(SaveWorkflowGraph model) {
         WorkflowGraph graph = model;
-        // @formatter:off
-        // WorkflowGraph graph = new WorkflowGraph(model.getNodes(), model.getConnections());
-        // @formatter:on
+        notNullOf(graph, "graph");
         notNullOf(graph.getWorkflowId(), "workflowId");
 
-        // Sets increasing revision(version)
-        if (isNull(graph.getRevision())) {
-            graph.setRevision(0);
-        } else {
-            graph.setRevision(graph.getRevision() + 1);
-        }
-
-        if (isNull(graph.getId())) {
-            graph.setId(IdGenUtil.nextLong());
-            graph.preInsert();
-        }
         // The workflow graph only increments the revision and does not allow
-        // modification
-        /*
-         * else { graph.preUpdate(); }
-         */
+        // modification.
+        // @formatter:off
+        // if (isNull(graph.getId())) {
+        //     graph.setId(IdGenUtil.nextLong());
+        //     graph.preInsert();
+        // } else {
+        //     graph.preUpdate();
+        // }
+        // @formatter:on
+
+        graph.setId(IdGenUtil.nextLong()); // ignore frontend model 'id'
+        graph.preInsert();
+
+        // Sets the current revision number, +1 according to the previous max
+        // revision.
+        // @formatter:off
+        // final Query query = new Query(new Criteria().orOperator(Criteria.where("ruleId").is(graph.getWorkflowId()),
+        //         Criteria.where("orgCode").is(model.getOrgCode()))).with(Sort.by(Direction.DESC, "revision")).limit(1);
+        // final Long maxRevision = safeList(
+        //         mongoTemplate.find(query, Long.class, MongoCollectionDefinition.WORKFLOW_GRAPHS.getName())).stream()
+        //                 .findFirst()
+        //                 .orElseThrow(() -> new IllegalStateException(
+        //                         format("Could not get max revision by workflowId: %s, orgCode: %s", graph.getWorkflowId(),
+        //                                 graph.getOrgCode())));
+        // graph.setRevision(1 + maxRevision);
+        // @formatter:on
+
+        graph.setRevision(sequenceFacade.getNextSequence(GlobalMongoSequenceFacade.GRAPHS_REVISION_SEQ));
 
         WorkflowGraph saved = mongoTemplate.insert(graph, MongoCollectionDefinition.WORKFLOW_GRAPHS.getName());
         return SaveWorkflowGraphResult.builder().id(saved.getId()).build();

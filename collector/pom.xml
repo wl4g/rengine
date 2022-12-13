@@ -53,8 +53,8 @@
         <commons-dbutils.version>1.7</commons-dbutils.version>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
-        <!-- see:https://github.com/quarkusio/quarkus-quickstarts/blob/2.12.2.Final/getting-started/pom.xml -->
-        <quarkus.platform.version>2.12.2.Final</quarkus.platform.version>
+        <!-- see:https://github.com/quarkusio/quarkus-quickstarts/blob/2.14.3.Final/getting-started/pom.xml -->
+        <quarkus.platform.version>2.14.3.Final</quarkus.platform.version>
         <!-- <groovy.version>4.0.4</groovy.version>-->
         <!-- <graalvm.version>22.1.0</graalvm.version>-->
         <compiler-plugin.version>3.8.1</compiler-plugin.version>
@@ -113,6 +113,10 @@
             <optional>true</optional>
         </dependency>
         <!-- QUARKUS -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-oidc-deployment</artifactId>
+        </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-oidc</artifactId>
@@ -365,7 +369,6 @@
                 <groupId>${quarkus.platform.group-id}</groupId>
                 <artifactId>quarkus-maven-plugin</artifactId>
                 <version>${quarkus.platform.version}</version>
-                <extensions>true</extensions>
                 <configuration>
                     <!-- invalid? Not really added to the JVM at compile time -->
                     <!-- see:https://stackoverflow.com/questions/69631653/quarkus-optaplanner-illegal-reflective-call -->

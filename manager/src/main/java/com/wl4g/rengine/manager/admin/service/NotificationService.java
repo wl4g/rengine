@@ -15,10 +15,12 @@
  */
 package com.wl4g.rengine.manager.admin.service;
 
-import com.wl4g.rengine.manager.admin.model.SaveNotification;
-import com.wl4g.rengine.manager.admin.model.SaveNotificationResult;
+import javax.validation.constraints.NotNull;
+
 import com.wl4g.rengine.manager.admin.model.QueryNotification;
 import com.wl4g.rengine.manager.admin.model.QueryNotificationResult;
+import com.wl4g.rengine.manager.admin.model.SaveNotification;
+import com.wl4g.rengine.manager.admin.model.SaveNotificationResult;
 
 /**
  * {@link NotificationService}
@@ -29,8 +31,8 @@ import com.wl4g.rengine.manager.admin.model.QueryNotificationResult;
  */
 public interface NotificationService {
 
-    QueryNotificationResult query(QueryNotification model);
+    QueryNotificationResult query(@NotNull QueryNotification model);
 
-    SaveNotificationResult save(SaveNotification model);
+    SaveNotificationResult save(@NotNull SaveNotification model);
 
 }

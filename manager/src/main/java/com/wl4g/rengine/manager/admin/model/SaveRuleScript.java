@@ -13,32 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.common.entity;
+package com.wl4g.rengine.manager.admin.model;
 
-import com.wl4g.infra.common.bean.BaseBean;
+import com.wl4g.rengine.common.entity.RuleScript;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * {@link SaveRuleScript}
+ * 
+ * @author James Wong
+ * @version 2022-08-28
+ * @since v1.0.0
+ */
 @Getter
 @Setter
 @SuperBuilder
-@ToString(callSuper = true)
+@ToString
 @NoArgsConstructor
-public class User extends BaseBean {
-    private static final long serialVersionUID = -5762348176963349685L;
+public class SaveRuleScript extends RuleScript {
+    private static final long serialVersionUID = -8089363065684705215L;
 
-    private Integer type;
-
-    private String username;
-
-    private String password;
-
-    private String email;
-
-    private String attrJson;
+    // Notice: The disable reading and writing of the revision field in the
+    // swagger document. (because the rule script does not have a revision
+    // field)
+    @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
+    public Long getRevision() {
+        return super.getRevision();
+    }
 
 }

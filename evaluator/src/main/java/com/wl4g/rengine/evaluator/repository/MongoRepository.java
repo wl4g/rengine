@@ -29,7 +29,7 @@ import io.quarkus.mongodb.reactive.ReactiveMongoClient;
 import io.quarkus.mongodb.reactive.ReactiveMongoCollection;
 
 /**
- * {@link MongoRepository}
+ * {@link MongoSourceFacade}
  * 
  * @author James Wong
  * @version 2022-09-17

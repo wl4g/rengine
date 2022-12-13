@@ -26,8 +26,10 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -35,6 +37,7 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.wl4g.infra.common.bean.BaseBean;
+import com.wl4g.rengine.common.validation.ValidForEntityMarker;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -56,13 +59,13 @@ import lombok.experimental.SuperBuilder;
  */
 @Getter
 @Setter
-@ToString
+@ToString(callSuper = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class WorkflowGraph extends BaseBean {
     private static final long serialVersionUID = 1917204508937266181L;
 
-    private Integer revision;
-    private Long workflowId;
+    private @NotNull(groups = ValidForEntityMarker.class) @Min(value = 0, groups = ValidForEntityMarker.class) Long revision;
+    private @NotNull @Min(0) Long workflowId;
     private @NotEmpty List<BaseNode<?>> nodes = new LinkedList<>();
     private @NotEmpty List<NodeConnection> connections = new LinkedList<>();
 
@@ -80,8 +83,8 @@ public class WorkflowGraph extends BaseBean {
      * @since v1.0.0
      */
     @SuppressWarnings("unchecked")
-    @Schema(oneOf = { BootNode.class, ProcessNode.class, FailbackNode.class, LogicalNode.class, RunNode.class },
-            discriminatorProperty = "@type")
+    @Schema(oneOf = { BootNode.class, ProcessNode.class, FailbackNode.class, RelationNode.class, LogicalNode.class,
+            RunNode.class }, discriminatorProperty = "@type")
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type", visible = true)
     @JsonSubTypes({ @Type(value = BootNode.class, name = "BOOT"), @Type(value = ProcessNode.class, name = "PROCESS"),
             @Type(value = RelationNode.class, name = "RELATION"), @Type(value = FailbackNode.class, name = "FAILBACK"),
@@ -271,13 +274,13 @@ public class WorkflowGraph extends BaseBean {
     @SuperBuilder
     @NoArgsConstructor
     public static class NodeConnection {
-        private @NotBlank @Default String name = DEFAULT_CONNECTION_NAME;
+        private @Nullable String name;
         private @NotBlank String to;
         private @NotBlank String from;
-        private @Nullable @Default Map<String, Object> attributes = new HashMap<>();
+        private @Nullable @Default Map<String, Object> attributes = new HashMap<>(2);
 
         public NodeConnection(final @NotBlank String to, final @NotBlank String from) {
-            this(DEFAULT_CONNECTION_NAME, from, to);
+            this(null, from, to);
         }
 
         public NodeConnection(final @NotBlank String name, final @NotBlank String from, final @NotBlank String to) {
@@ -288,5 +291,4 @@ public class WorkflowGraph extends BaseBean {
     }
 
     public static final String DEFAULT_NODE_NAME = "Unnamed Node";
-    public static final String DEFAULT_CONNECTION_NAME = "Unnamed Connection";
 }

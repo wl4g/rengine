@@ -38,6 +38,6 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @NoArgsConstructor
 public class QueryWorkflow extends QueryBase<Workflow> {
-    private @Nullable String workflowId;
-    private @Nullable String scenesId;
+    private @Nullable Long workflowId;
+    private @Nullable Long scenesId;
 }

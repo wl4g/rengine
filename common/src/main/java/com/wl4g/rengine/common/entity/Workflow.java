@@ -48,7 +48,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
-@ToString
+@ToString(callSuper = true)
 @NoArgsConstructor
 public class Workflow extends BaseBean {
     private static final long serialVersionUID = -8038218208189261648L;

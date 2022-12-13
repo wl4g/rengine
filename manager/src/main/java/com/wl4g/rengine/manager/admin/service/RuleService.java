@@ -15,6 +15,8 @@
  */
 package com.wl4g.rengine.manager.admin.service;
 
+import javax.validation.constraints.NotNull;
+
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.entity.Rule;
 import com.wl4g.rengine.manager.admin.model.DeleteRule;
@@ -32,10 +34,10 @@ import com.wl4g.rengine.manager.admin.model.SaveRuleResult;
  */
 public interface RuleService {
 
-    PageHolder<Rule> query(QueryRule model);
+    PageHolder<Rule> query(@NotNull QueryRule model);
 
-    SaveRuleResult save(SaveRule model);
+    SaveRuleResult save(@NotNull SaveRule model);
 
-    DeleteRuleResult delete(DeleteRule model);
+    DeleteRuleResult delete(@NotNull DeleteRule model);
 
 }

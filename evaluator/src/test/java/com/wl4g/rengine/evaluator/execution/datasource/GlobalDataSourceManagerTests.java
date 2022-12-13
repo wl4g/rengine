@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.evaluator.service.impl;
+package com.wl4g.rengine.evaluator.execution.datasource;
 
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+import static java.util.Collections.singletonList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,41 +28,45 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
-import com.wl4g.rengine.evaluator.service.MongoAggregatedService;
+import com.wl4g.rengine.evaluator.execution.ExecutionConfig;
+import com.wl4g.rengine.evaluator.execution.datasource.DataSourceFacade.DataSourceType;
 import com.wl4g.rengine.evaluator.util.BsonUtils;
 import com.wl4g.rengine.evaluator.util.TestSetupDefaults;
 
 /**
- * {@link MongoAggregatedServiceTests}
+ * {@link GlobalDataSourceManagerTests}
  * 
  * @author James Wong
  * @version 2022-09-27
  * @since v1.0.0
  */
-public class MongoAggregatedServiceTests {
+public class GlobalDataSourceManagerTests {
 
-    MongoAggregatedService mongoAggregatedService;
+    GlobalDataSourceManager globalDataSourceManager;
 
     @Before
     public void setup() {
         // Manual setup/inject depends.
-        MongoAggregatedServiceImpl aggregationService = new MongoAggregatedServiceImpl();
-        aggregationService.mongoRepository = TestSetupDefaults.createMongoRepository();
-        aggregationService.config = TestSetupDefaults.createExecutionConfig();
-        this.mongoAggregatedService = aggregationService;
+        ExecutionConfig config = TestSetupDefaults.createExecutionConfig();
+        this.globalDataSourceManager = new GlobalDataSourceManager();
+        this.globalDataSourceManager.config = config;
+        this.globalDataSourceManager.builders = singletonList(new MongoSourceFacade.MongoSourceFacadeBuilder());
+        this.globalDataSourceManager.init();
     }
 
     @Test
-    public void testFindList() {
+    public void testMongoSourceFacadeFindList() {
+        final MongoSourceFacade mongoSourceFacade = globalDataSourceManager.loadDataSource(DataSourceType.MONGO, "default");
+
         // @formatter:off
-        final String queryBson = "{ $match: { \"eventType\": \"ecommerce_trade_gift\" } },"
+        final String queryBson = ""
+                + "{ $match: { \"eventType\": \"ecommerce_trade_gift\" } },"
                 + "{ $project: { \"delFlag\": 0 } }";
         // @formatter:on
+        final List<Map<String, Object>> bsonFilters = new ArrayList<>();
+        bsonFilters.add(BsonUtils.asMap(BsonDocument.parse(queryBson)));
 
-        final List<Map<String, Object>> bsonQueryParams = new ArrayList<>();
-        bsonQueryParams.add(BsonUtils.asMap(BsonDocument.parse(queryBson)));
-
-        List<JsonNode> result = mongoAggregatedService.findList(MongoCollectionDefinition.AGGREGATES.getName(), bsonQueryParams);
+        List<JsonNode> result = mongoSourceFacade.findList(MongoCollectionDefinition.AGGREGATES.getName(), bsonFilters);
         System.out.println(toJSONString(result));
     }
 

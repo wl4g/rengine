@@ -79,7 +79,7 @@ public class ScenesController {
     }
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Delete project.")
+    @Operation(description = "Delete scenes.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
     public RespBase<DeleteScenesResult> delete(@Validated @RequestBody DeleteScenes model) {

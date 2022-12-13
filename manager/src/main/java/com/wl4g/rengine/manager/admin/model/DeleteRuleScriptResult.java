@@ -15,12 +15,6 @@
  */
 package com.wl4g.rengine.manager.admin.model;
 
-import java.util.List;
-
-import javax.annotation.Nullable;
-
-import com.wl4g.rengine.common.entity.WorkflowGraph;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,7 +22,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link QueryWorkflowGraphResult}
+ * {@link DeleteRuleScriptResult}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -39,6 +33,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class QueryWorkflowGraphResult {
-    private @Nullable List<WorkflowGraph> graphs;
+public class DeleteRuleScriptResult extends DeleteResultBase {
 }

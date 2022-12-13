@@ -2,7 +2,11 @@ package com.wl4g.rengine.manager.config;
 
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 
+import java.util.Date;
+
 import org.bson.Document;
+import org.bson.json.JsonWriterSettings;
+import org.bson.json.StrictJsonWriter;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.data.convert.WritingConverter;
@@ -19,7 +23,10 @@ import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 //import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions.MongoConverterConfigurationAdapter;
 
+import com.wl4g.infra.common.lang.DateUtils2;
 import com.wl4g.rengine.common.entity.WorkflowGraph;
+
+import lombok.CustomLog;
 
 /**
  * {@link CustomMongoConfigure}
@@ -71,6 +78,7 @@ public class CustomMongoConfigure extends AbstractMongoClientConfiguration {
     protected void configureConverters(MongoConverterConfigurationAdapter adapter) {
         adapter.registerConverter(new WorkflowGraphToDocumentConverter());
         adapter.registerConverter(new DocumentToWorkflowGraphConverter());
+
     }
 
     @WritingConverter
@@ -85,8 +93,30 @@ public class CustomMongoConfigure extends AbstractMongoClientConfiguration {
     static class DocumentToWorkflowGraphConverter implements Converter<Document, WorkflowGraph> {
         @Override
         public WorkflowGraph convert(Document source) {
-            return parseJSON(source.toJson(), WorkflowGraph.class);
+            return parseJSON(source.toJson(JsonDateTimeConverter.defaultJsonWriterSettings), WorkflowGraph.class);
         }
+    }
+
+    @CustomLog
+    public static class JsonDateTimeConverter implements org.bson.json.Converter<Long> {
+        // static final DateTimeFormatter DATE_TIME_FORMATTER =
+        // DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC+8"));
+
+        @Override
+        public void convert(Long value, StrictJsonWriter writer) {
+            try {
+                // Instant instant = new Date(value).toInstant();
+                // String s = DATE_TIME_FORMATTER.format(instant);
+                // writer.writeString(s);
+                writer.writeString(DateUtils2.formatDate(new Date(value), "yyyy-MM-dd HH:mm:ss"));
+            } catch (Exception e) {
+                log.error(String.format("Failed to convert offset %d to JSON date", value), e);
+            }
+        }
+
+        public static final JsonWriterSettings defaultJsonWriterSettings = JsonWriterSettings.builder()
+                .dateTimeConverter(new JsonDateTimeConverter())
+                .build();
     }
 
 }

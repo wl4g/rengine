@@ -1,3 +1,4 @@
+package com.wl4g.rengine.evaluator.execution.datasource;
 //@formatter:off
 ///**
 // * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>
@@ -30,7 +31,7 @@
 //import lombok.extern.slf4j.Slf4j;
 //
 ///**
-// * {@link PhoenixAggregatedServiceImpl}
+// * {@link PhoenixSourceFacade}
 // *
 // * @author James Wong
 // * @version 2022-10-10
@@ -38,12 +39,11 @@
 // */
 //@Slf4j
 //@Singleton
-//public class PhoenixAggregatedServiceImpl implements PhoenixAggregatedService {
+//public class PhoenixSourceFacade extends DataSourceBuilder {
 //
 //    @Inject
 //    PhoenixRepository phoenixRepository;
 //
-//    @Override
 //    public List<Map<String, Object>> findList(@NotBlank String sql, @NotNull Map<String, Object> queryParams) {
 //        log.debug("Find '{}' by '{}'", tableName, queryParams);
 //

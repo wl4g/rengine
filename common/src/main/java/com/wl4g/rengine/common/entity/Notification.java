@@ -59,7 +59,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
-@ToString
+@ToString(callSuper = true)
 @NoArgsConstructor
 public abstract class Notification extends BaseBean {
     private static final long serialVersionUID = 1L;
