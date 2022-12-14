@@ -58,12 +58,12 @@ import com.wl4g.infra.common.web.rest.RespBase.RetCode;
 import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
 import com.wl4g.rengine.common.model.Evaluation;
 import com.wl4g.rengine.common.model.EvaluationResult;
+import com.wl4g.rengine.common.util.BsonUtils2;
 import com.wl4g.rengine.evaluator.execution.ExecutionConfig;
 import com.wl4g.rengine.evaluator.execution.LifecycleExecutionService;
 import com.wl4g.rengine.evaluator.metrics.EvaluatorMeterService;
 import com.wl4g.rengine.evaluator.repository.MongoRepository;
 import com.wl4g.rengine.evaluator.service.EvaluatorService;
-import com.wl4g.rengine.evaluator.util.BsonUtils;
 
 import io.smallrye.mutiny.Uni;
 import lombok.CustomLog;
@@ -124,77 +124,77 @@ public class EvaluatorServiceImpl implements EvaluatorService {
      * Query collection dependencies with equivalent bson query codes example:
      * 
      * <pre>
-     *  // Tools: online mongodb aggregate: https://mongoplayground.net/p/bPKYXCJwXdl
-     *  //
-     *  // Query collections dependencies:
-     *  //                                  request evaluate scenesCodes:         —> sceneses
-     *  // ↳ one-to-one (workflows.scenesId = sceneses._id)                       —> workflows
-     *  // ↳ one-to-many (workflow_graphs.workflowId = workflows._id)             —> workflow_graphs
-     *  // ↳ many-to-many (rules._id in workflow_graphs[].nodes[].ruleId)         —> rules
-     *  // ↳ one-to-many (rule_scripts.rule_id = rules[]._id)                     —> rule_scripts
-     *  // ↳ many-to-many (uploads._id in rule_scripts[].uploadIds)               —> uploads
-     *  //
-     *  db.getCollection('sceneses').aggregate([
-     *      // 首先过滤 scenesCode (evaluator 接收 client(biz-app) 请求支持批量处理)
-     *      { $match: { "scenesCode": { $in: ["ecommerce_trade_gift"] } } },
-     *      { $project: { "_class": 0, "delFlag": 0 } }, // 控制 sceneses 集返回列(投射)
-     *      { $lookup: {
-     *          from: "workflows", // 关联 workflows 表
-     *          let: { scenesId: { $toLong: "$_id" } }, // 定义外键关联变量
-     *          pipeline: [
-     *              { $match: { $expr: { $eq: [ "$scenesId",  "$$scenesId" ] } } }, // 外键等于关联
-     *              { $project: { "_class": 0, "delFlag": 0 } },
-     *              { $lookup: {
-     *                  from: "workflow_graphs", // 继续关联 workflow_graphs 表
-     *                  let: { workflowId: { $toLong: "$workflowId" } },
-     *                  pipeline: [
-     *                      { $match: { $expr: { $eq: [ "$workflowId", "$workflowId" ] } } },
-     *                      { $sort: { "revision": -1 } }, // 倒序排序, 取 revision(version) 最大的 graph 即最新版
-     *                      { $limit: 2 },
-     *                      { $project: { "_class": 0, "delFlag": 0 } },
-     *                      { $lookup: {
-     *                          from: "rules",
-     *                          // 定义外键关联变量, 并通过 $map 函数提取 ruleIds(int64) 列表
-     *                          let: { ruleIds: { $map: { input: "$nodes", in: { $toLong: "$$this.ruleId" } } } },
-     *                          pipeline: [
-     *                              { $match: { $expr: { $in: [ "$_id",  "$$ruleIds" ] } } },
-     *                              { $project: { "_class": 0, "delFlag": 0 } },
-     *                              { $lookup: {
-     *                                  from: "rule_scripts",
-     *                                  let: { ruleId: { $toLong: "$_id" } },
-     *                                  pipeline: [
-     *                                      { $match: { $expr: { $eq: [ "$ruleId",  "$ruleId" ] } } },
-     *                                      { $sort: { "revision": -1 } }, // 倒序排序, 取 revision(version) 最大的 ruleScript 即最新版
-     *                                      { $limit: 2 },
-     *                                      { $project: { "_class": 0, "delFlag": 0 } },
-     *                                      { $lookup: {
-     *                                          from: "uploads", // 继续关联 uploads 表
-     *                                          // 定义外键关联变量 uploadIds(int64), 并通过 $map 函数进行类型转换以确保匹配安全
-     *                                          let: { uploadIds: { $map: { input: "$uploadIds", in: { $toLong: "$$this"} } } },
-     *                                          pipeline: [
-     *                                              { $match: { $expr: { $in: [ "$_id",  "$$uploadIds" ] } } }, // 由于父级未使用 UNWIND 因此这里使用 IN 外键关联
-     *                                              { $project: { "_class": 0, "delFlag": 0 } }
-     *                                          ],
-     *                                          as: "uploads"
-     *                                          }
-     *                                      }
-     *                                  ],
-     *                                  as: "scripts"
-     *                                  }
-     *                              }
-     *                          ],
-     *                          as: "rules"
-     *                          }
-     *                      }
-     *                  ],
-     *                  as: "graphs" // 倒序后第一个为最新版
-     *                  }
-     *              }
-     *          ],
-     *          as: "workflows"
-     *          }
-     *      }
-     *  ])
+     *    // Tools: online mongodb aggregate: https://mongoplayground.net/p/bPKYXCJwXdl
+     *    //
+     *    // Query collections dependencies:
+     *    //                                  request evaluate scenesCodes:         —> sceneses
+     *    // ↳ one-to-one (workflows.scenesId = sceneses._id)                       —> workflows
+     *    // ↳ one-to-many (workflow_graphs.workflowId = workflows._id)             —> workflow_graphs
+     *    // ↳ many-to-many (rules._id in workflow_graphs[].nodes[].ruleId)         —> rules
+     *    // ↳ one-to-many (rule_scripts.rule_id = rules[]._id)                     —> rule_scripts
+     *    // ↳ many-to-many (uploads._id in rule_scripts[].uploadIds)               —> uploads
+     *    //
+     *    db.getCollection('t_sceneses').aggregate([
+     *        // 首先过滤 scenesCode (evaluator 接收 client(biz-app) 请求支持批量处理)
+     *        { $match: { "scenesCode": { $in: ["ecommerce_trade_gift"] } } },
+     *        { $project: { "_class": 0, "delFlag": 0 } }, // 控制 sceneses 集返回列(投射)
+     *        { $lookup: {
+     *            from: "t_workflows", // 关联 workflows 表
+     *            let: { scenesId: { $toLong: "$_id" } }, // 定义外键关联变量
+     *            pipeline: [
+     *                { $match: { $expr: { $eq: [ "$scenesId",  "$$scenesId" ] } } }, // 外键等于关联
+     *                { $project: { "_class": 0, "delFlag": 0 } },
+     *                { $lookup: {
+     *                    from: "t_workflow_graphs", // 继续关联 workflow_graphs 表
+     *                    let: { workflowId: { $toLong: "$workflowId" } },
+     *                    pipeline: [
+     *                        { $match: { $expr: { $eq: [ "$workflowId", "$workflowId" ] } } },
+     *                        { $sort: { "revision": -1 } }, // 倒序排序, 取 revision(version) 最大的 graph 即最新版
+     *                        { $limit: 2 },
+     *                        { $project: { "_class": 0, "delFlag": 0 } },
+     *                        { $lookup: {
+     *                            from: "t_rules",
+     *                            // 定义外键关联变量, 并通过 $map 函数提取 ruleIds(int64) 列表
+     *                            let: { ruleIds: { $map: { input: "$nodes", in: { $toLong: "$$this.ruleId" } } } },
+     *                            pipeline: [
+     *                                { $match: { $expr: { $in: [ "$_id",  "$$ruleIds" ] } } },
+     *                                { $project: { "_class": 0, "delFlag": 0 } },
+     *                                { $lookup: {
+     *                                    from: "t_rule_scripts",
+     *                                    let: { ruleId: { $toLong: "$_id" } },
+     *                                    pipeline: [
+     *                                        { $match: { $expr: { $eq: [ "$ruleId",  "$ruleId" ] } } },
+     *                                        { $sort: { "revision": -1 } }, // 倒序排序, 取 revision(version) 最大的 ruleScript 即最新版
+     *                                        { $limit: 2 },
+     *                                        { $project: { "_class": 0, "delFlag": 0 } },
+     *                                        { $lookup: {
+     *                                            from: "t_uploads", // 继续关联 uploads 表
+     *                                            // 定义外键关联变量 uploadIds(int64), 并通过 $map 函数进行类型转换以确保匹配安全
+     *                                            let: { uploadIds: { $map: { input: "$uploadIds", in: { $toLong: "$$this"} } } },
+     *                                            pipeline: [
+     *                                                { $match: { $expr: { $in: [ "$_id",  "$$uploadIds" ] } } }, // 由于父级未使用 UNWIND 因此这里使用 IN 外键关联
+     *                                                { $project: { "_class": 0, "delFlag": 0 } }
+     *                                            ],
+     *                                            as: "uploads"
+     *                                            }
+     *                                        }
+     *                                    ],
+     *                                    as: "scripts"
+     *                                    }
+     *                                }
+     *                            ],
+     *                            as: "rules"
+     *                            }
+     *                        }
+     *                    ],
+     *                    as: "graphs" // 倒序后第一个为最新版
+     *                    }
+     *                }
+     *            ],
+     *            as: "workflows"
+     *            }
+     *        }
+     *    ])
      * </pre>
      * 
      * @see https://www.notion.so/scenesworkflow-rules-uploads-f8e5a6f14fb64f858479b6565fb52142
@@ -258,7 +258,7 @@ public class EvaluatorServiceImpl implements EvaluatorService {
                 .batchSize(config.maxQueryBatch())
                 .map(scenesDoc -> {
                     log.debug("Found scenes object by scenesCodes: {} to json: {}", scenesCodes, scenesDoc.toJson());
-                    final Map<String, Object> scenesMap = BsonUtils.asMap(scenesDoc);
+                    final Map<String, Object> scenesMap = BsonUtils2.asMap(scenesDoc);
                     // Notice: When the manager uses spring-data-mongo to save
                     // the entity by default, it will set the id to '_id'
                     final String scenesJson = toJSONString(scenesMap).replaceAll("\"_id\":", "\"id\":");

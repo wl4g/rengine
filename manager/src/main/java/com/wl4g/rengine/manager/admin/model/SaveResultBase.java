@@ -33,7 +33,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
-@ToString
+@ToString(callSuper = true)
 @NoArgsConstructor
 public abstract class SaveResultBase {
     private @NotNull Long id;

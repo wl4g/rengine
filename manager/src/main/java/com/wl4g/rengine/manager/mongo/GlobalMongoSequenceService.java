@@ -38,14 +38,14 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * {@link GlobalMongoSequenceFacade}
+ * {@link GlobalMongoSequenceService}
  * 
  * @author James Wong
  * @version 2022-12-14
  * @since v1.0.0
  */
 @AllArgsConstructor
-public class GlobalMongoSequenceFacade {
+public class GlobalMongoSequenceService {
 
     final MongoOperations mongoOperations;
 

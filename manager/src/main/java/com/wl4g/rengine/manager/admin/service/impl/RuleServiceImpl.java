@@ -15,6 +15,7 @@
  */
 package com.wl4g.rengine.manager.admin.service.impl;
 
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 
@@ -74,14 +75,18 @@ public class RuleServiceImpl implements RuleService {
 
     @Override
     public SaveRuleResult save(SaveRule model) {
-        Rule rule = Rule.builder()
-                .id(model.getId())
-                .name(model.getName())
-                .orgCode(model.getOrgCode())
-                .labels(model.getLabels())
-                .enable(model.getEnable())
-                .remark(model.getRemark())
-                .build();
+        Rule rule = model;
+        // @formatter:off
+        //Rule rule = Rule.builder()
+        //        .id(model.getId())
+        //        .name(model.getName())
+        //        .orgCode(model.getOrgCode())
+        //        .labels(model.getLabels())
+        //        .enable(model.getEnable())
+        //        .remark(model.getRemark())
+        //        .build();
+        // @formatter:off
+        notNullOf(rule, "rule");
 
         if (isNull(rule.getId())) {
             rule.setId(IdGenUtil.nextLong());

@@ -35,7 +35,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
-@ToString
+@ToString(callSuper = true)
 @NoArgsConstructor
 public class QueryRule extends QueryBase<Rule> {
     private @Nullable Long ruleId;

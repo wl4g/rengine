@@ -231,7 +231,6 @@
             <groupId>io.minio</groupId>
             <artifactId>minio</artifactId>
         </dependency>
-
         <!-- START: Integration for Groovy script engine -->
         <dependency>
             <groupId>org.apache.groovy</groupId>
@@ -272,7 +271,6 @@ and see:https://github.com/apache/groovy/blob/GROOVY_4_0_5/build.gradle#L98 -->
             <optional>true</optional>
         </dependency>
         <!-- END: Integration for Groovy script engine -->
-
         <!-- START: Integration for Javascript(graal.js/nashorn) script engine -->
         <!-- see: https://github.com/graalvm/graal-js-jdk11-maven-demo/blob/master/pom.xml -->
         <dependency>
@@ -298,7 +296,6 @@ and see:https://github.com/apache/groovy/blob/GROOVY_4_0_5/build.gradle#L98 -->
             <scope>runtime</scope>
         </dependency>
         <!-- END: Integration for Javascript(graal.js/nashorn) script engine -->
-
         <!-- Devel tools -->
         <dependency>
             <groupId>com.github.spotbugs</groupId>
@@ -306,13 +303,11 @@ and see:https://github.com/apache/groovy/blob/GROOVY_4_0_5/build.gradle#L98 -->
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
-
         <!-- Fix: NoDefineClassFound:io.quarkus.bootstrap.resolver.maven.BootstrapMavenContext with io.quarkus.bootstrap.IDELauncherImpl#L84 -->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-bootstrap-maven-resolver</artifactId>
         </dependency>
-
         <!-- Testing -->
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -348,6 +343,11 @@ and see:https://github.com/apache/groovy/blob/GROOVY_4_0_5/build.gradle#L98 -->
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>mongodb</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

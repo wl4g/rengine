@@ -209,8 +209,11 @@ public class WorkflowGraph extends BaseBean {
         }
     }
 
+    // Notice: It is recommended to disable the toString method, otherwise
+    // swagger will generate the name of the example long enumeration type by
+    // default.
+    // @ToString
     @Getter
-    @ToString
     @AllArgsConstructor
     public static enum LogicalType {
 
@@ -238,8 +241,11 @@ public class WorkflowGraph extends BaseBean {
 
     }
 
+    // Notice: It is recommended to disable the toString method, otherwise
+    // swagger will generate the name of the example long enumeration type by
+    // default.
+    // @ToString
     @Getter
-    @ToString
     @AllArgsConstructor
     public static enum NodeType {
 

@@ -33,7 +33,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
-@ToString
+@ToString(callSuper = true)
 @NoArgsConstructor
 public class SaveScenes extends Scenes {
     private static final long serialVersionUID = 1L;

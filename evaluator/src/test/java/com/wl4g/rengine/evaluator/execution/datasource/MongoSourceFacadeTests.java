@@ -15,12 +15,7 @@
  */
 package com.wl4g.rengine.evaluator.execution.datasource;
 
-import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
-import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
-
 import org.junit.Test;
-
-import com.wl4g.rengine.evaluator.execution.datasource.MongoSourceFacade.MongoSourceBuildConfig;
 
 /**
  * {@link MongoSourceFacadeTests}
@@ -32,14 +27,7 @@ import com.wl4g.rengine.evaluator.execution.datasource.MongoSourceFacade.MongoSo
 public class MongoSourceFacadeTests {
 
     @Test
-    public void testSerializeMongoSourceBuildConfig() {
-        final MongoSourceBuildConfig config = new MongoSourceBuildConfig("mongodb://localhost:27017/rengine");
-
-        final String json = toJSONString(config);
-        System.out.println("    Serialized : " + json);
-
-        final MongoSourceBuildConfig config2 = parseJSON(json, MongoSourceBuildConfig.class);
-        System.out.println("  DeSerialized : " + config2);
+    public void test() {
     }
 
 }

@@ -35,7 +35,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
-@ToString
+@ToString(callSuper = true)
 @NoArgsConstructor
 public class QueryWorkflow extends QueryBase<Workflow> {
     private @Nullable Long workflowId;

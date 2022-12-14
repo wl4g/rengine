@@ -17,20 +17,23 @@ package com.wl4g.rengine.evaluator.execution.datasource;
 
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.util.Collections.singletonList;
+import static java.util.Objects.isNull;
+//import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.bson.BsonDocument;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.RepeatedTest;
+import org.testcontainers.containers.MongoDBContainer;
+//import org.testcontainers.utility.DockerImageName;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
-import com.wl4g.rengine.evaluator.execution.ExecutionConfig;
-import com.wl4g.rengine.evaluator.execution.datasource.DataSourceFacade.DataSourceType;
-import com.wl4g.rengine.evaluator.util.BsonUtils;
+import com.wl4g.rengine.common.entity.DataSource.DataSourceType;
+import com.wl4g.rengine.common.util.BsonUtils2;
 import com.wl4g.rengine.evaluator.util.TestSetupDefaults;
 
 /**
@@ -42,21 +45,46 @@ import com.wl4g.rengine.evaluator.util.TestSetupDefaults;
  */
 public class GlobalDataSourceManagerTests {
 
-    GlobalDataSourceManager globalDataSourceManager;
+    // see:https://www.testcontainers.org/modules/databases/mongodb/#usage-example
+    static MongoDBContainer mongoDBContainer;
+    static GlobalDataSourceManager globalDataSourceManager;
 
-    @Before
-    public void setup() {
-        // Manual setup/inject depends.
-        ExecutionConfig config = TestSetupDefaults.createExecutionConfig();
-        this.globalDataSourceManager = new GlobalDataSourceManager();
-        this.globalDataSourceManager.config = config;
-        this.globalDataSourceManager.builders = singletonList(new MongoSourceFacade.MongoSourceFacadeBuilder());
-        this.globalDataSourceManager.init();
+    // @BeforeClass // invalid?
+    public static void setup() throws Exception {
+        // @formatter:off
+        //if (!isBlank(System.getenv("TEST_USE_DEFAULT_MONGODB")) && isNull(mongoDBContainer)) {
+        //    synchronized (GlobalDataSourceManagerTests.class) {
+        //        if (isNull(mongoDBContainer)) {
+        //            mongoDBContainer = new MongoDBContainer(
+        //                    DockerImageName.parse("bitnami/mongodb:4.4.6").asCompatibleSubstituteFor("mongo:4.4.6"));
+        //            new Thread(() -> mongoDBContainer.start()).start();
+        //            Thread.sleep(100000l);
+        //        }
+        //    }
+        //}
+        // @formatter:on
+
+        // Mock manual inject depends.
+        if (isNull(globalDataSourceManager)) {
+            synchronized (GlobalDataSourceManagerTests.class) {
+                if (isNull(globalDataSourceManager)) {
+                    globalDataSourceManager = new GlobalDataSourceManager();
+                    globalDataSourceManager.config = TestSetupDefaults.createExecutionConfig();
+                    globalDataSourceManager.mongoRepository = TestSetupDefaults.createMongoRepository();
+                    globalDataSourceManager.builders = singletonList(new MongoSourceFacade.MongoSourceFacadeBuilder());
+                    globalDataSourceManager.init();
+                }
+            }
+        }
     }
 
     @Test
-    public void testMongoSourceFacadeFindList() {
+    @RepeatedTest(10)
+    public void testMongoSourceFacadeFindList() throws Exception {
+        setup();
+
         final MongoSourceFacade mongoSourceFacade = globalDataSourceManager.loadDataSource(DataSourceType.MONGO, "default");
+        System.out.println("mongoSourceFacade : " + mongoSourceFacade);
 
         // @formatter:off
         final String queryBson = ""
@@ -64,7 +92,7 @@ public class GlobalDataSourceManagerTests {
                 + "{ $project: { \"delFlag\": 0 } }";
         // @formatter:on
         final List<Map<String, Object>> bsonFilters = new ArrayList<>();
-        bsonFilters.add(BsonUtils.asMap(BsonDocument.parse(queryBson)));
+        bsonFilters.add(BsonUtils2.asMap(BsonDocument.parse(queryBson)));
 
         List<JsonNode> result = mongoSourceFacade.findList(MongoCollectionDefinition.AGGREGATES.getName(), bsonFilters);
         System.out.println(toJSONString(result));

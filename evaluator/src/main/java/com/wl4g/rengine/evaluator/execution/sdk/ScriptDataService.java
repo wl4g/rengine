@@ -19,8 +19,8 @@ import javax.annotation.Nullable;
 
 import org.graalvm.polyglot.HostAccess;
 
+import com.wl4g.rengine.common.entity.DataSource.DataSourceType;
 import com.wl4g.rengine.evaluator.execution.datasource.DataSourceFacade;
-import com.wl4g.rengine.evaluator.execution.datasource.DataSourceFacade.DataSourceType;
 import com.wl4g.rengine.evaluator.execution.datasource.GlobalDataSourceManager;
 
 import lombok.AllArgsConstructor;
@@ -43,11 +43,18 @@ public class ScriptDataService {
         return globalDataSourceManager.loadDataSource(DataSourceType.MONGO, dataSourceName);
     }
 
-    // public @HostAccess.Export PhoenixAggregatedService phoenixService() {
+    // public @HostAccess.Export DataSourceFacade jdbcService(final @Nullable
+    // String dataSourceName) {
+    // return opentsdbAggregatedService;
+    // }
+
+    // public @HostAccess.Export DataSourceFacade phoenixService(final @Nullable
+    // String dataSourceName) {
     // return mongoAggregatedService;
     // }
 
-    // public @HostAccess.Export OpenTSDBAggregatedService openTSDBService() {
+    // public @HostAccess.Export DataSourceFacade openTSDBService(final
+    // @Nullable String dataSourceName) {
     // return opentsdbAggregatedService;
     // }
 

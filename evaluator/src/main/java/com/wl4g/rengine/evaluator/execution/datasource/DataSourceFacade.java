@@ -15,14 +15,14 @@
  */
 package com.wl4g.rengine.evaluator.execution.datasource;
 
+import java.io.Closeable;
+import java.util.Map;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.wl4g.rengine.common.entity.DataSource.DataSourceType;
 import com.wl4g.rengine.evaluator.execution.ExecutionConfig;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.ToString;
 
 /**
  * {@link DataSourceFacade}
@@ -31,27 +31,15 @@ import lombok.ToString;
  * @version 2022-12-14
  * @since v1.0.0
  */
-public interface DataSourceFacade {
+public interface DataSourceFacade extends Closeable {
+    String getDataSourceName();
 
-    public static interface DataSourceFacadeBuilder<C extends BuildConfig> {
+    public static interface DataSourceFacadeBuilder {
         DataSourceFacade newInstnace(
                 final @NotNull ExecutionConfig config,
                 final @NotBlank String dataSourceName,
-                final @NotNull C buildConfig);
+                final @NotNull Map<String, Object> dataSourceProperties);
 
         DataSourceType sourceType();
     }
-
-    @Getter
-    @ToString
-    @AllArgsConstructor
-    public static enum DataSourceType {
-        MONGO("mongo");
-
-        final String alias;
-    }
-
-    public static interface BuildConfig {
-    }
-
 }

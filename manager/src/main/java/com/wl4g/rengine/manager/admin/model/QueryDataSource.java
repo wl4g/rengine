@@ -15,11 +15,10 @@
  */
 package com.wl4g.rengine.manager.admin.model;
 
-import java.util.List;
-
 import javax.annotation.Nullable;
 
-import com.wl4g.rengine.common.entity.Scenes;
+import com.wl4g.rengine.common.entity.DataSource;
+import com.wl4g.rengine.common.entity.DataSource.DataSourceType;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +27,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link QueryScenesResult}
+ * {@link QueryDataSource}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -37,8 +36,9 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
-@ToString
+@ToString(callSuper = true)
 @NoArgsConstructor
-public class QueryScenesResult {
-    private @Nullable List<Scenes> sceneses;
+public class QueryDataSource extends QueryBase<DataSource> {
+    private @Nullable Long dataSourceId;
+    private @Nullable DataSourceType type;
 }

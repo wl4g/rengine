@@ -20,8 +20,12 @@ import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseToNode;
+import static java.lang.String.format;
+import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,13 +53,14 @@ import com.mongodb.client.result.InsertManyResult;
 import com.mongodb.client.result.UpdateResult;
 import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
+import com.wl4g.rengine.common.entity.DataSource.DataSourceType;
+import com.wl4g.rengine.common.exception.RengineException;
+import com.wl4g.rengine.common.util.BsonUtils2;
 import com.wl4g.rengine.evaluator.execution.ExecutionConfig;
-import com.wl4g.rengine.evaluator.util.BsonUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
 import lombok.Getter;
-import lombok.ToString;
 
 /**
  * {@link MongoSourceFacade}
@@ -64,6 +69,7 @@ import lombok.ToString;
  * @version 2022-10-10
  * @since v1.0.0
  */
+@Getter
 @CustomLog
 @AllArgsConstructor
 public class MongoSourceFacade implements DataSourceFacade {
@@ -71,6 +77,14 @@ public class MongoSourceFacade implements DataSourceFacade {
     final String dataSourceName;
     final ExecutionConfig config;
     final MongoClient mongoClient;
+
+    @Override
+    public void close() throws IOException {
+        if (nonNull(mongoClient)) {
+            log.info("Closing to mongo data source for {} ...", dataSourceName);
+            mongoClient.close();
+        }
+    }
 
     @SuppressWarnings("unchecked")
     public List<JsonNode> findList(@NotBlank String tableName, @NotNull List<Map<String, Object>> bsonFilters) {
@@ -83,7 +97,7 @@ public class MongoSourceFacade implements DataSourceFacade {
         final List<Bson> aggregateQuery = safeList(bsonFilters).stream()
                 .flatMap(p -> safeMap(p).entrySet()
                         .stream()
-                        .map(e -> new BsonDocument(e.getKey(), BsonDocument.parse(BsonUtils.toJson(e.getValue())))))
+                        .map(e -> new BsonDocument(e.getKey(), BsonDocument.parse(BsonUtils2.toJson(e.getValue())))))
                 .collect(toList());
 
         final MongoCursor<JsonNode> cursor = collection.aggregate(aggregateQuery)
@@ -126,7 +140,7 @@ public class MongoSourceFacade implements DataSourceFacade {
         final List<Bson> updateBsons = safeList(bsonEntitys).stream().map(b -> new Document(b)).collect(toList());
 
         final UpdateOptions options = new UpdateOptions().upsert(true);
-        final UpdateResult result = collection.updateMany(BsonUtils.asBson(bsonFilter), updateBsons, options);
+        final UpdateResult result = collection.updateMany(BsonUtils2.asBson(bsonFilter), updateBsons, options);
 
         return result.getModifiedCount();
     }
@@ -149,18 +163,24 @@ public class MongoSourceFacade implements DataSourceFacade {
     }
 
     @Singleton
-    public static class MongoSourceFacadeBuilder implements DataSourceFacadeBuilder<MongoSourceBuildConfig> {
+    public static class MongoSourceFacadeBuilder implements DataSourceFacadeBuilder {
 
         @Override
         public DataSourceFacade newInstnace(
                 final @NotNull ExecutionConfig config,
                 final @NotBlank String dataSourceName,
-                final @NotNull MongoSourceBuildConfig buildConfig) {
+                final @NotNull Map<String, Object> dataSourceProperties) {
             notNullOf(config, "config");
             hasTextOf(dataSourceName, "dataSourceName");
 
+            final String connectionString = (String) dataSourceProperties.get(KEY_CONNECTION_STRING);
+            if (isBlank(connectionString)) {
+                throw new RengineException(
+                        format("No found mongo dataSource properties.connectionString of %s", dataSourceProperties));
+            }
+
             final MongoClient mongoClient = new MongoClientImpl(
-                    MongoClientSettings.builder().applyConnectionString(buildConfig).build(),
+                    MongoClientSettings.builder().applyConnectionString(new ConnectionString(connectionString)).build(),
                     MongoDriverInformation.builder().build());
 
             return new MongoSourceFacade(dataSourceName, config, mongoClient);
@@ -170,18 +190,8 @@ public class MongoSourceFacade implements DataSourceFacade {
         public DataSourceType sourceType() {
             return DataSourceType.MONGO;
         }
-    }
 
-    @Getter
-    @ToString(callSuper = true)
-    public static class MongoSourceBuildConfig extends ConnectionString implements BuildConfig {
-        public MongoSourceBuildConfig() {
-            this("mongodb://localhost:27017/rengine");
-        }
-
-        public MongoSourceBuildConfig(final @NotBlank String connectionString) {
-            super(connectionString);
-        }
+        public static final String KEY_CONNECTION_STRING = "connectionString";
     }
 
 }

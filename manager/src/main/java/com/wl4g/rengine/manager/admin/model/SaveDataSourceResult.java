@@ -15,16 +15,14 @@
  */
 package com.wl4g.rengine.manager.admin.model;
 
-import com.wl4g.rengine.common.entity.WorkflowGraph;
-
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 /**
- * {@link SaveWorkflowGraph}
+ * {@link SaveDataSourceResult}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -32,15 +30,8 @@ import lombok.ToString;
  */
 @Getter
 @Setter
+@SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class SaveWorkflowGraph extends WorkflowGraph {
-    private static final long serialVersionUID = -3757548755594409403L;
-
-    // Notice: The disable reading and writing of the revision field in the swagger
-    // document. (because the workflow graph does not have a revision field)
-    @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
-    public Long getRevision() {
-        return super.getRevision();
-    }
+public class SaveDataSourceResult extends SaveResultBase {
 }

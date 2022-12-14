@@ -33,7 +33,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
-@ToString
+@ToString(callSuper = true)
 @NoArgsConstructor
 public class SaveUpload extends UploadObject {
     private static final long serialVersionUID = 6571225686501179120L;

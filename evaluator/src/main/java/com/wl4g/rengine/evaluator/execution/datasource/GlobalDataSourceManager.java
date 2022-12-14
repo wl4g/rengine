@@ -16,28 +16,45 @@
 package com.wl4g.rengine.evaluator.execution.datasource;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
+import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toMap;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.BeforeDestroyed;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.servlet.ServletContext;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.collections.IteratorUtils;
+import org.bson.Document;
+
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.model.Filters;
+import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
+import com.wl4g.rengine.common.entity.DataSource;
+import com.wl4g.rengine.common.entity.DataSource.DataSourceType;
+import com.wl4g.rengine.common.exception.RengineException;
+import com.wl4g.rengine.common.util.BsonUtils2;
 import com.wl4g.rengine.evaluator.execution.ExecutionConfig;
-import com.wl4g.rengine.evaluator.execution.datasource.DataSourceFacade.BuildConfig;
 import com.wl4g.rengine.evaluator.execution.datasource.DataSourceFacade.DataSourceFacadeBuilder;
-import com.wl4g.rengine.evaluator.execution.datasource.DataSourceFacade.DataSourceType;
 import com.wl4g.rengine.evaluator.repository.MongoRepository;
 
 import io.quarkus.arc.All;
@@ -65,11 +82,11 @@ public final class GlobalDataSourceManager {
     @NotNull
     @All
     @Inject
-    List<DataSourceFacadeBuilder<? extends BuildConfig>> builders;
+    List<DataSourceFacadeBuilder> builders;
 
-    Map<DataSourceType, DataSourceFacadeBuilder<? extends BuildConfig>> builderMap = emptyMap();
+    Map<DataSourceType, DataSourceFacadeBuilder> builderMap = emptyMap();
 
-    Map<DataSourceType, Map<String, DataSourceFacade>> sourceCaching = new ConcurrentHashMap<>(4);
+    Map<DataSourceType, Map<String, DataSourceFacade>> dataSourceCaches = new ConcurrentHashMap<>(4);
 
     @PostConstruct
     public void init() {
@@ -78,36 +95,81 @@ public final class GlobalDataSourceManager {
         log.debug("Registered to builders : {}", builderMap);
     }
 
+    void destroy(@Observes @BeforeDestroyed(ApplicationScoped.class) ServletContext init) {
+        safeMap(dataSourceCaches).values().stream().flatMap(e -> e.values().stream()).forEach(ds -> {
+            try {
+                ds.close();
+            } catch (IOException e) {
+                log.error(format("Unable to closing data source of %s", ds.getDataSourceName()), e);
+            }
+        });
+    }
+
+    @SuppressWarnings("unchecked")
     public <T extends DataSourceFacade> T loadDataSource(
             final @NotNull DataSourceType dataSourceType,
             final @NotBlank String dataSourceName) {
         notNullOf(dataSourceType, "dataSourceType");
         hasTextOf(dataSourceName, "dataSourceName");
 
-        DataSourceFacade sourceFacade = null;
-        synchronized (dataSourceType) {
-            Map<String, DataSourceFacade> sources = sourceCaching.get(dataSourceType);
-            if (isNull(sources)) {
-                sources = new ConcurrentHashMap<>(4);
-            }
-            if (isNull(sourceFacade = sources.get(dataSourceName))) {
-                final DataSourceFacadeBuilder<? extends BuildConfig> builder = notNull(builderMap.get(dataSourceType),
-                        "Unsupported dataSource facade type for : %s/%s", dataSourceType, dataSourceName);
-                // New init data source facade.
-                sources.put(dataSourceName, sourceFacade = builder.newInstnace(config, dataSourceName,
-                        findBuildConfig(dataSourceType, dataSourceName)));
+        Map<String, DataSourceFacade> dataSourceFacades = dataSourceCaches.get(dataSourceType);
+        if (isNull(dataSourceFacades)) {
+            synchronized (dataSourceType) {
+                dataSourceFacades = dataSourceCaches.get(dataSourceType);
+                if (isNull(dataSourceFacades)) {
+                    dataSourceCaches.put(dataSourceType, dataSourceFacades = new ConcurrentHashMap<>(4));
+                }
             }
         }
 
-        log.debug("Determined source facade : {} of : {}", sourceFacade, dataSourceName);
-        return null;
+        DataSourceFacade dataSourceFacade = dataSourceFacades.get(dataSourceName);
+        if (isNull(dataSourceFacade)) {
+            synchronized (dataSourceName) {
+                dataSourceFacade = dataSourceFacades.get(dataSourceName);
+                if (isNull(dataSourceFacade)) {
+                    final DataSourceFacadeBuilder builder = notNull(builderMap.get(dataSourceType),
+                            "Unsupported to data source facade handler type of : %s/%s", dataSourceType, dataSourceName);
+                    // New init data source facade.
+                    dataSourceFacades.put(dataSourceName, dataSourceFacade = builder.newInstnace(config, dataSourceName,
+                            findDataSourceProperties(dataSourceType, dataSourceName)));
+                }
+            }
+        }
+
+        log.debug("Determined source facade : {} of : {}", dataSourceFacade, dataSourceName);
+        return (T) dataSourceFacade;
     }
 
-    <C extends BuildConfig> C findBuildConfig(
+    @SuppressWarnings("unchecked")
+    @NotNull
+    Map<String, Object> findDataSourceProperties(
             final @NotNull DataSourceType dataSourceType,
             final @NotBlank String dataSourceName) {
-        // TODO
-        return null;
+        notNullOf(dataSourceType, "dataSourceType");
+        hasTextOf(dataSourceName, "dataSourceName");
+
+        final MongoCollection<Document> collection = mongoRepository.getCollection(MongoCollectionDefinition.DATASOURCES);
+
+        try (final MongoCursor<DataSource> cursor = collection
+                .find(Filters.and(Filters.eq("type", dataSourceType), Filters.eq("name", dataSourceName)))
+                .batchSize(2)
+                .limit(2)
+                .map(doc -> parseJSON(doc.toJson(BsonUtils2.DEFAULT_JSON_WRITER_SETTINGS), DataSource.class))
+                .iterator();) {
+
+            // Check should have only one.
+            final List<DataSource> dss = safeList(IteratorUtils.toList(cursor));
+            if (dss.isEmpty()) {
+                throw new RengineException(format("Could not found data source of %s, %s", dataSourceType, dataSourceName));
+            } else if (dss.size() > 1) {
+                throw new RengineException(format("The multiple data sources of the same type and name were found of %s, %s",
+                        dataSourceType, dataSourceName));
+            }
+
+            return dss.get(0).getProperties();
+        } catch (Throwable e) {
+            throw new RengineException(e);
+        }
     }
 
 }

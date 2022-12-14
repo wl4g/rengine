@@ -15,11 +15,7 @@
  */
 package com.wl4g.rengine.manager.admin.model;
 
-import java.util.List;
-
-import javax.annotation.Nullable;
-
-import com.wl4g.rengine.common.entity.Rule;
+import com.wl4g.rengine.common.entity.DataSource;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +24,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link QueryRuleResult}
+ * {@link SaveDataSource}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -37,8 +33,8 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
-@ToString
+@ToString(callSuper = true)
 @NoArgsConstructor
-public class QueryRuleResult {
-    private @Nullable List<Rule> rules;
+public class SaveDataSource extends DataSource {
+    private static final long serialVersionUID = -8089363065684705215L;
 }

@@ -13,28 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.manager.admin.model;
+package com.wl4g.rengine.manager.admin.service;
 
 import javax.validation.constraints.NotNull;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.SuperBuilder;
+import com.wl4g.infra.common.bean.page.PageHolder;
+import com.wl4g.rengine.common.entity.DataSource;
+import com.wl4g.rengine.manager.admin.model.DeleteDataSource;
+import com.wl4g.rengine.manager.admin.model.DeleteDataSourceResult;
+import com.wl4g.rengine.manager.admin.model.QueryDataSource;
+import com.wl4g.rengine.manager.admin.model.SaveDataSource;
+import com.wl4g.rengine.manager.admin.model.SaveDataSourceResult;
 
 /**
- * {@link DeleteBase}
+ * {@link DataSourceService}
  * 
  * @author James Wong
- * @version 2022-08-28
+ * @version 2022-08-29
  * @since v1.0.0
  */
-@Getter
-@Setter
-@SuperBuilder
-@ToString(callSuper = true)
-@NoArgsConstructor
-public class DeleteBase {
-    private @NotNull Long id;
+public interface DataSourceService {
+
+    PageHolder<DataSource> query(@NotNull QueryDataSource model);
+
+    SaveDataSourceResult save(@NotNull SaveDataSource model);
+
+    DeleteDataSourceResult delete(@NotNull DeleteDataSource model);
+
 }

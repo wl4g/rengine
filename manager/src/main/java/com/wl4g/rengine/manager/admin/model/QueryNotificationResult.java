@@ -37,7 +37,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
-@ToString
+@ToString(callSuper = true)
 @NoArgsConstructor
 public class QueryNotificationResult {
     private @Nullable List<Notification> providers;

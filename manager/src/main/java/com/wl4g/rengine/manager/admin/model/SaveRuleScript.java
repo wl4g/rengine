@@ -34,7 +34,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
-@ToString
+@ToString(callSuper = true)
 @NoArgsConstructor
 public class SaveRuleScript extends RuleScript {
     private static final long serialVersionUID = -8089363065684705215L;

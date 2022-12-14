@@ -37,7 +37,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
-@ToString
+@ToString(callSuper = true)
 @NoArgsConstructor
 public abstract class QueryBase<Q> {
     private @Nullable String name;

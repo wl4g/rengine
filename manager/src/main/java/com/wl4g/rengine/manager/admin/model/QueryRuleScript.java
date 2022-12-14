@@ -36,7 +36,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
-@ToString
+@ToString(callSuper = true)
 @NoArgsConstructor
 public class QueryRuleScript extends QueryBase<RuleScript> {
     private @Nullable Long ruleId;

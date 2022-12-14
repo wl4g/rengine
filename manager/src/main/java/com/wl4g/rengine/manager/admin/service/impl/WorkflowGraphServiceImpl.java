@@ -39,7 +39,7 @@ import com.wl4g.rengine.manager.admin.model.QueryWorkflowGraph;
 import com.wl4g.rengine.manager.admin.model.SaveWorkflowGraph;
 import com.wl4g.rengine.manager.admin.model.SaveWorkflowGraphResult;
 import com.wl4g.rengine.manager.admin.service.WorkflowGraphService;
-import com.wl4g.rengine.manager.mongo.GlobalMongoSequenceFacade;
+import com.wl4g.rengine.manager.mongo.GlobalMongoSequenceService;
 
 /**
  * {@link WorkflowGraphServiceImpl}
@@ -55,7 +55,7 @@ public class WorkflowGraphServiceImpl implements WorkflowGraphService {
     MongoTemplate mongoTemplate;
 
     @Autowired
-    GlobalMongoSequenceFacade sequenceFacade;
+    GlobalMongoSequenceService mongoSequenceService;
 
     @Override
     public PageHolder<WorkflowGraph> query(QueryWorkflowGraph model) {
@@ -109,7 +109,7 @@ public class WorkflowGraphServiceImpl implements WorkflowGraphService {
         // graph.setRevision(1 + maxRevision);
         // @formatter:on
 
-        graph.setRevision(sequenceFacade.getNextSequence(GlobalMongoSequenceFacade.GRAPHS_REVISION_SEQ));
+        graph.setRevision(mongoSequenceService.getNextSequence(GlobalMongoSequenceService.GRAPHS_REVISION_SEQ));
 
         WorkflowGraph saved = mongoTemplate.insert(graph, MongoCollectionDefinition.WORKFLOW_GRAPHS.getName());
         return SaveWorkflowGraphResult.builder().id(saved.getId()).build();

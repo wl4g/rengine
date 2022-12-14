@@ -45,8 +45,8 @@ public class RengineMongoAutoConfiguration {
     }
 
     @Bean
-    public GlobalMongoSequenceFacade globalMongoSequenceFacade(@NotNull final MongoOperations mongoOperations) {
-        return new GlobalMongoSequenceFacade(mongoOperations);
+    public GlobalMongoSequenceService globalMongoSequenceService(@NotNull final MongoOperations mongoOperations) {
+        return new GlobalMongoSequenceService(mongoOperations);
     }
 
     public static class RengineWriteConcernResolver implements WriteConcernResolver {

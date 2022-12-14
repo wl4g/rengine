@@ -15,6 +15,7 @@
  */
 package com.wl4g.rengine.common.entity;
 
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang3.StringUtils.equalsAnyIgnoreCase;
@@ -114,7 +115,8 @@ public class UploadObject extends BaseBean {
         private final List<ExtensionType> extensions;
 
         @JsonCreator
-        public static UploadType of(String type) {
+        public static UploadType of(final @NotBlank String type) {
+            hasTextOf(type, "type");
             for (UploadType a : values()) {
                 if (a.name().equalsIgnoreCase(type)) {
                     return a;

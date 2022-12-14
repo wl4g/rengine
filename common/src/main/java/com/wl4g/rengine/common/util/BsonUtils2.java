@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.evaluator.util;
+package com.wl4g.rengine.common.util;
+
+import static java.util.Objects.nonNull;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -40,6 +42,8 @@ import org.bson.BsonValue;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.json.JsonParseException;
+import org.bson.json.JsonWriterSettings;
+import org.bson.json.StrictJsonWriter;
 import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBObject;
@@ -48,8 +52,11 @@ import com.mongodb.DBRef;
 import com.mongodb.MongoClientSettings;
 import com.wl4g.infra.common.collection.CollectionUtils2;
 import com.wl4g.infra.common.lang.Assert2;
+import com.wl4g.infra.common.lang.DateUtils2;
 import com.wl4g.infra.common.lang.ObjectUtils2;
 import com.wl4g.infra.common.lang.StringUtils2;
+
+import lombok.CustomLog;
 
 /**
  * Internal API for operations on {@link Bson} elements that can be either
@@ -59,9 +66,9 @@ import com.wl4g.infra.common.lang.StringUtils2;
  * @author Mark Paluch
  * @since 2.0
  * @since Modification based on
- *        {@link org.springframework.data.mongodb.util.BsonUtils}
+ *        {@link com.wl4g.rengine.common.util.BsonUtils2.data.mongodb.util.BsonUtils}
  */
-public abstract class BsonUtils {
+public abstract class BsonUtils2 {
 
     /**
      * The empty document (immutable). This document is serializable.
@@ -416,17 +423,43 @@ public abstract class BsonUtils {
      */
     @Nullable
     public static String toJson(@Nullable Document source) {
-
         if (source == null) {
             return null;
         }
-
         try {
             return source.toJson();
         } catch (Exception e) {
             return toJson((Object) source);
         }
     }
+
+    //
+    // [BEING] ADD json bson convert FEATURE
+    //
+
+    /**
+     * Serialize the given {@link Document} as Json applying default codecs if
+     * necessary.
+     *
+     * @param source
+     * @return
+     * @since 2.2.1
+     */
+    @Nullable
+    public static String toJson(@Nullable final JsonWriterSettings writerSettings, @Nullable Document source) {
+        if (source == null) {
+            return null;
+        }
+        try {
+            return nonNull(writerSettings) ? source.toJson(writerSettings) : source.toJson();
+        } catch (Exception e) {
+            return toJson((Object) source);
+        }
+    }
+
+    //
+    // [END] ADD json bson convert FEATURE
+    //
 
     /**
      * Check if a given String looks like {@link Document#parse(String)
@@ -676,7 +709,7 @@ public abstract class BsonUtils {
     }
 
     private static String toString(Collection<?> source) {
-        return iterableToDelimitedString(source, "[ ", " ]", BsonUtils::toJson);
+        return iterableToDelimitedString(source, "[ ", " ]", BsonUtils2::toJson);
     }
 
     private static <T> String iterableToDelimitedString(
@@ -807,4 +840,28 @@ public abstract class BsonUtils {
 
     }
 
+    /**
+     * @see https://www.baeldung.com/java-convert-bson-to-json
+     */
+    @CustomLog
+    public static class JsonDateTimeConverter implements org.bson.json.Converter<Long> {
+        // static final DateTimeFormatter DATE_TIME_FORMATTER =
+        // DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC+8"));
+
+        @Override
+        public void convert(Long value, StrictJsonWriter writer) {
+            try {
+                // Instant instant = new Date(value).toInstant();
+                // String s = DATE_TIME_FORMATTER.format(instant);
+                // writer.writeString(s);
+                writer.writeString(DateUtils2.formatDate(new Date(value), "yyyy-MM-dd HH:mm:ss"));
+            } catch (Exception e) {
+                log.error(String.format("Failed to convert offset %d to JSON date", value), e);
+            }
+        }
+    }
+
+    public static final JsonWriterSettings DEFAULT_JSON_WRITER_SETTINGS = JsonWriterSettings.builder()
+            .dateTimeConverter(new JsonDateTimeConverter())
+            .build();
 }

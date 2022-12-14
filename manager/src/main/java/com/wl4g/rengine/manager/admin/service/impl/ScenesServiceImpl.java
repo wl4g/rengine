@@ -15,6 +15,7 @@
  */
 package com.wl4g.rengine.manager.admin.service.impl;
 
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.TypeConverts.safeLongToInt;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
@@ -87,15 +88,19 @@ public class ScenesServiceImpl implements ScenesService {
 
     @Override
     public SaveScenesResult save(SaveScenes model) {
-        Scenes scenes = Scenes.builder()
-                .id(model.getId())
-                .name(model.getName())
-                .scenesCode(model.getScenesCode())
-                .orgCode(model.getOrgCode())
-                .labels(model.getLabels())
-                .enable(model.getEnable())
-                .remark(model.getRemark())
-                .build();
+        Scenes scenes = model;
+        // @formatter:off
+        //Scenes scenes = Scenes.builder()
+        //        .id(model.getId())
+        //        .name(model.getName())
+        //        .scenesCode(model.getScenesCode())
+        //        .orgCode(model.getOrgCode())
+        //        .labels(model.getLabels())
+        //        .enable(model.getEnable())
+        //        .remark(model.getRemark())
+        //        .build();
+        // @formatter:on
+        notNullOf(scenes, "scenes");
 
         if (isNull(scenes.getId())) {
             scenes.setId(IdGenUtil.nextLong());

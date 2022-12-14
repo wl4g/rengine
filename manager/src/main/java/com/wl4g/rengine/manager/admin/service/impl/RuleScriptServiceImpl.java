@@ -39,7 +39,7 @@ import com.wl4g.rengine.manager.admin.model.QueryRuleScript;
 import com.wl4g.rengine.manager.admin.model.SaveRuleScript;
 import com.wl4g.rengine.manager.admin.model.SaveRuleScriptResult;
 import com.wl4g.rengine.manager.admin.service.RuleScriptService;
-import com.wl4g.rengine.manager.mongo.GlobalMongoSequenceFacade;
+import com.wl4g.rengine.manager.mongo.GlobalMongoSequenceService;
 
 /**
  * {@link RuleScriptScriptServiceImpl}
@@ -55,7 +55,7 @@ public class RuleScriptServiceImpl implements RuleScriptService {
     MongoTemplate mongoTemplate;
 
     @Autowired
-    GlobalMongoSequenceFacade sequenceFacade;
+    GlobalMongoSequenceService sequenceFacade;
 
     @Override
     public PageHolder<RuleScript> query(QueryRuleScript model) {
@@ -105,7 +105,7 @@ public class RuleScriptServiceImpl implements RuleScriptService {
         //script.setRevision(1 + maxRevision);
         // @formatter:on
 
-        script.setRevision(sequenceFacade.getNextSequence(GlobalMongoSequenceFacade.SCRIPTS_REVISION_SEQ));
+        script.setRevision(sequenceFacade.getNextSequence(GlobalMongoSequenceService.SCRIPTS_REVISION_SEQ));
 
         RuleScript saved = mongoTemplate.insert(script, MongoCollectionDefinition.RULE_SCRIPTS.getName());
         return SaveRuleScriptResult.builder().id(saved.getId()).build();

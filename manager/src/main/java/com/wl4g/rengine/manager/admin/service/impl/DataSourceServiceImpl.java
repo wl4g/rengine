@@ -33,78 +33,76 @@ import org.springframework.stereotype.Service;
 import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
-import com.wl4g.rengine.common.entity.Workflow;
+import com.wl4g.rengine.common.entity.DataSource;
 import com.wl4g.rengine.common.util.IdGenUtil;
-import com.wl4g.rengine.manager.admin.model.DeleteWorkflow;
-import com.wl4g.rengine.manager.admin.model.DeleteWorkflowResult;
-import com.wl4g.rengine.manager.admin.model.QueryWorkflow;
-import com.wl4g.rengine.manager.admin.model.SaveWorkflow;
-import com.wl4g.rengine.manager.admin.model.SaveWorkflowResult;
-import com.wl4g.rengine.manager.admin.service.WorkflowService;
+import com.wl4g.rengine.manager.admin.model.DeleteDataSource;
+import com.wl4g.rengine.manager.admin.model.DeleteDataSourceResult;
+import com.wl4g.rengine.manager.admin.model.QueryDataSource;
+import com.wl4g.rengine.manager.admin.model.SaveDataSource;
+import com.wl4g.rengine.manager.admin.model.SaveDataSourceResult;
+import com.wl4g.rengine.manager.admin.service.DataSourceService;
 
 /**
- * {@link WorkflowServiceImpl}
+ * {@link DataSourceServiceImpl}
  * 
  * @author James Wong
  * @version 2022-08-29
  * @since v1.0.0
  */
 @Service
-public class WorkflowServiceImpl implements WorkflowService {
+public class DataSourceServiceImpl implements DataSourceService {
 
     private @Autowired MongoTemplate mongoTemplate;
 
     @Override
-    public PageHolder<Workflow> query(QueryWorkflow model) {
-        Query query = new Query(new Criteria().orOperator(Criteria.where("_id").is(model.getWorkflowId()),
-                Criteria.where("scenesId").is(model.getScenesId()),
-                Criteria.where("name").regex(format("(%s)+", model.getName())), Criteria.where("enable").is(model.getEnable()),
-                Criteria.where("orgCode").is(model.getOrgCode()), Criteria.where("labels").in(model.getLabels())));
+    public PageHolder<DataSource> query(QueryDataSource model) {
+        Query query = new Query(new Criteria().orOperator(Criteria.where("_id").is(model.getDataSourceId()),
+                Criteria.where("type").is(model.getType().name()), Criteria.where("name").regex(format("(%s)+", model.getName())),
+                Criteria.where("enable").is(model.getEnable()), Criteria.where("labels").in(model.getLabels()),
+                Criteria.where("orgCode").is(model.getOrgCode())));
         query.with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
 
-        List<Workflow> workflows = mongoTemplate.find(query, Workflow.class, MongoCollectionDefinition.WORKFLOWS.getName());
+        List<DataSource> dataSources = mongoTemplate.find(query, DataSource.class,
+                MongoCollectionDefinition.DATASOURCES.getName());
 
-        // Collections.sort(workflows, (o1, o2) ->
-        // safeLongToInt(o2.getUpdateDate().getTime()-o1.getUpdateDate().getTime()));
-
-        return new PageHolder<Workflow>(model.getPageNum(), model.getPageSize())
-                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.WORKFLOWS.getName()))
-                .withRecords(workflows);
+        return new PageHolder<DataSource>(model.getPageNum(), model.getPageSize())
+                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.DATASOURCES.getName()))
+                .withRecords(dataSources);
     }
 
     @Override
-    public SaveWorkflowResult save(SaveWorkflow model) {
-        final Workflow workflow = model;
+    public SaveDataSourceResult save(SaveDataSource model) {
+        DataSource dataSource = model;
         // @formatter:off
-        //final Workflow workflow = Workflow.builder()
+        //DataSource dataSource = DataSource.builder()
         //        .id(model.getId())
+        //        .type(model.getType())
         //        .name(model.getName())
         //        .orgCode(model.getOrgCode())
-        //        .enable(model.getEnable())
         //        .labels(model.getLabels())
+        //        .enable(model.getEnable())
         //        .remark(model.getRemark())
         //        .build();
         // @formatter:on
-        notNullOf(workflow, "workflow");
-        notNullOf(workflow.getScenesId(), "scenesId");
+        notNullOf(dataSource, "datasource");
 
-        if (isNull(workflow.getId())) {
-            workflow.setId(IdGenUtil.nextLong());
-            workflow.preInsert();
+        if (isNull(dataSource.getId())) {
+            dataSource.setId(IdGenUtil.nextLong());
+            dataSource.preInsert();
         } else {
-            workflow.preUpdate();
+            dataSource.preUpdate();
         }
 
-        Workflow saved = mongoTemplate.insert(workflow, MongoCollectionDefinition.WORKFLOWS.getName());
-        return SaveWorkflowResult.builder().id(saved.getId()).build();
+        DataSource saved = mongoTemplate.insert(dataSource, MongoCollectionDefinition.DATASOURCES.getName());
+        return SaveDataSourceResult.builder().id(saved.getId()).build();
     }
 
     @Override
-    public DeleteWorkflowResult delete(DeleteWorkflow model) {
+    public DeleteDataSourceResult delete(DeleteDataSource model) {
         // 'id' is a keyword, it will be automatically converted to '_id'
         DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
-                MongoCollectionDefinition.WORKFLOWS.getName());
-        return DeleteWorkflowResult.builder().deletedCount(result.getDeletedCount()).build();
+                MongoCollectionDefinition.DATASOURCES.getName());
+        return DeleteDataSourceResult.builder().deletedCount(result.getDeletedCount()).build();
     }
 
 }

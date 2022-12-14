@@ -36,7 +36,7 @@ public interface WorkflowGraphService {
 
     PageHolder<WorkflowGraph> query(@NotNull QueryWorkflowGraph model);
 
-    SaveWorkflowGraphResult save(SaveWorkflowGraph model);
+    SaveWorkflowGraphResult save(@NotNull SaveWorkflowGraph model);
 
-    DeleteWorkflowGraphResult delete(DeleteWorkflowGraph model);
+    DeleteWorkflowGraphResult delete(@NotNull DeleteWorkflowGraph model);
 }

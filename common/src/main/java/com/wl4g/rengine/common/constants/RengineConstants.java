@@ -56,21 +56,24 @@ public abstract class RengineConstants extends EnvironmentUtil {
     @AllArgsConstructor
     public static enum MongoCollectionDefinition {
 
-        SCENESES("sceneses", true),
+        SCENESES("t_sceneses", true),
 
-        WORKFLOWS("workflows", true),
+        WORKFLOWS("t_workflows", true),
 
-        WORKFLOW_GRAPHS("workflow_graphs", true),
+        WORKFLOW_GRAPHS("t_workflow_graphs", true),
 
-        RULES("rules", true),
+        RULES("t_rules", true),
 
-        RULE_SCRIPTS("rule_scripts", true),
+        RULE_SCRIPTS("t_rule_scripts", true),
 
-        UPLOADS("uploads", true),
+        UPLOADS("t_uploads", true),
 
-        JOBS("jobs", true),
+        DATASOURCES("t_datasources", true),
 
-        AGGREGATES("aggregates", true),
+        @Deprecated
+        JOBS("t_jobs", true),
+
+        AGGREGATES("t_aggregates", true),
 
         SYS_NOTIFICATION_CONFIG("sys_notification_config", true),
 

@@ -22,6 +22,7 @@ import org.springframework.context.annotation.Import;
 
 import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.manager.minio.MinioClientAutoConfiguration;
+import com.wl4g.rengine.manager.mongo.CustomMongoConfigure;
 
 /**
  * {@link RengineManagerAutoConfiguration}
