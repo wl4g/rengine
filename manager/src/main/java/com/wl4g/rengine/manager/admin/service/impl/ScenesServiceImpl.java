@@ -58,9 +58,12 @@ public class ScenesServiceImpl implements ScenesService {
 
     @Override
     public PageHolder<Scenes> query(QueryScenes model) {
-        Query query = new Query(new Criteria().orOperator(Criteria.where("_id").is(model.getScenesId()),
-                Criteria.where("name").regex(format("(%s)+", model.getName())), Criteria.where("enable").is(model.getEnable()),
-                Criteria.where("orgCode").is(model.getOrgCode()), Criteria.where("labels").in(model.getLabels())));
+        Query query = new Query(new Criteria().andOperator(Criteria.where("enable").is(1), Criteria.where("delFlag").is(0),
+                new Criteria().orOperator(Criteria.where("_id").is(model.getScenesId()),
+                        Criteria.where("name").regex(format("(%s)+", model.getName())),
+                        Criteria.where("enable").is(model.getEnable()), Criteria.where("orgCode").is(model.getOrgCode()),
+                        Criteria.where("labels").in(model.getLabels()))));
+
         query.with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
 
         List<Scenes> sceneses = mongoTemplate.find(query, Scenes.class, MongoCollectionDefinition.SCENESES.getName());

@@ -56,10 +56,13 @@ public class DataSourceServiceImpl implements DataSourceService {
 
     @Override
     public PageHolder<DataSource> query(QueryDataSource model) {
-        Query query = new Query(new Criteria().orOperator(Criteria.where("_id").is(model.getDataSourceId()),
-                Criteria.where("type").is(model.getType().name()), Criteria.where("name").regex(format("(%s)+", model.getName())),
-                Criteria.where("enable").is(model.getEnable()), Criteria.where("labels").in(model.getLabels()),
-                Criteria.where("orgCode").is(model.getOrgCode())));
+        Query query = new Query(new Criteria().andOperator(Criteria.where("enable").is(1), Criteria.where("delFlag").is(0),
+                new Criteria().orOperator(Criteria.where("_id").is(model.getDataSourceId()),
+                        Criteria.where("type").is(model.getType().name()),
+                        Criteria.where("name").regex(format("(%s)+", model.getName())),
+                        Criteria.where("enable").is(model.getEnable()), Criteria.where("labels").in(model.getLabels()),
+                        Criteria.where("orgCode").is(model.getOrgCode()))));
+
         query.with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
 
         List<DataSource> dataSources = mongoTemplate.find(query, DataSource.class,

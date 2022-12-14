@@ -53,6 +53,7 @@ import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.Variable;
+import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.infra.common.lang.Exceptions;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.common.web.rest.RespBase.RetCode;
@@ -139,18 +140,24 @@ public class EvaluatorServiceImpl implements EvaluatorService {
      *    db.getCollection('t_sceneses').aggregate([
      *        // 首先过滤 scenesCode (evaluator 接收 client(biz-app) 请求支持批量处理)
      *        { $match: { "scenesCode": { $in: ["ecommerce_trade_gift"] } } },
+     *        { $match: { "enable": { $eq: 1 } } },
+     *        { $match: { "delFlag": { $eq: 0 } } },
      *        { $project: { "_class": 0, "delFlag": 0 } }, // 控制 sceneses 集返回列(投射)
      *        { $lookup: {
      *            from: "t_workflows", // 关联 workflows 表
      *            let: { scenesId: { $toLong: "$_id" } }, // 定义外键关联变量
      *            pipeline: [
      *                { $match: { $expr: { $eq: [ "$scenesId",  "$$scenesId" ] } } }, // 外键等于关联
+     *                { $match: { "enable": { $eq: 1 } } },
+     *                { $match: { "delFlag": { $eq: 0 } } },
      *                { $project: { "_class": 0, "delFlag": 0 } },
      *                { $lookup: {
      *                    from: "t_workflow_graphs", // 继续关联 workflow_graphs 表
      *                    let: { workflowId: { $toLong: "$workflowId" } },
      *                    pipeline: [
      *                        { $match: { $expr: { $eq: [ "$workflowId", "$workflowId" ] } } },
+     *                        { $match: { "enable": { $eq: 1 } } },
+     *                        { $match: { "delFlag": { $eq: 0 } } },
      *                        { $sort: { "revision": -1 } }, // 倒序排序, 取 revision(version) 最大的 graph 即最新版
      *                        { $limit: 2 },
      *                        { $project: { "_class": 0, "delFlag": 0 } },
@@ -160,12 +167,16 @@ public class EvaluatorServiceImpl implements EvaluatorService {
      *                            let: { ruleIds: { $map: { input: "$nodes", in: { $toLong: "$$this.ruleId" } } } },
      *                            pipeline: [
      *                                { $match: { $expr: { $in: [ "$_id",  "$$ruleIds" ] } } },
+     *                                { $match: { "enable": { $eq: 1 } } },
+     *                                { $match: { "delFlag": { $eq: 0 } } },
      *                                { $project: { "_class": 0, "delFlag": 0 } },
      *                                { $lookup: {
      *                                    from: "t_rule_scripts",
      *                                    let: { ruleId: { $toLong: "$_id" } },
      *                                    pipeline: [
      *                                        { $match: { $expr: { $eq: [ "$ruleId",  "$ruleId" ] } } },
+     *                                        { $match: { "enable": { $eq: 1 } } },
+     *                                        { $match: { "delFlag": { $eq: 0 } } },
      *                                        { $sort: { "revision": -1 } }, // 倒序排序, 取 revision(version) 最大的 ruleScript 即最新版
      *                                        { $limit: 2 },
      *                                        { $project: { "_class": 0, "delFlag": 0 } },
@@ -175,6 +186,8 @@ public class EvaluatorServiceImpl implements EvaluatorService {
      *                                            let: { uploadIds: { $map: { input: "$uploadIds", in: { $toLong: "$$this"} } } },
      *                                            pipeline: [
      *                                                { $match: { $expr: { $in: [ "$_id",  "$$uploadIds" ] } } }, // 由于父级未使用 UNWIND 因此这里使用 IN 外键关联
+     *                                                { $match: { "enable": { $eq: 1 } } },
+     *                                                { $match: { "delFlag": { $eq: 0 } } },
      *                                                { $project: { "_class": 0, "delFlag": 0 } }
      *                                            ],
      *                                            as: "uploads"
@@ -213,17 +226,19 @@ public class EvaluatorServiceImpl implements EvaluatorService {
         final MongoCollection<Document> collection = mongoRepository.getCollection(SCENESES);
 
         // Common show projection.
+        final Bson enableFilter = Aggregates.match(Filters.eq("enable", BaseBean.ENABLED));
+        final Bson delFlagFilter = Aggregates.match(Filters.eq("delFlag", BaseBean.DEL_FLAG_NORMAL));
         final Bson project = Aggregates.project(Projections.fields(Projections.exclude("_class", "delFlag")));
 
         Bson uploadsLookup = Aggregates.lookup(UPLOADS.getName(), asList(new Variable<>("uploadIds", "$uploadIds")),
                 asList(Aggregates
                         .match(Filters.expr(new Document("$in", asList(new BsonString("$_id"), new BsonString("$$uploadIds"))))),
-                        project),
+                        enableFilter, delFlagFilter, project),
                 "uploads");
 
         Bson ruleScriptsLookup = Aggregates.lookup(RULE_SCRIPTS.getName(),
                 asList(new Variable<>("ruleId", BsonDocument.parse("{ $toLong: \"$_id\" }"))),
-                asList(Aggregates.match(Filters.expr(Filters.eq("ruleId", "$ruleId"))),
+                asList(Aggregates.match(Filters.expr(Filters.eq("ruleId", "$ruleId"))), enableFilter, delFlagFilter,
                         Aggregates.sort(new Document("revision", -1)), Aggregates.limit(revisions), project, uploadsLookup),
                 "scripts");
 
@@ -236,12 +251,12 @@ public class EvaluatorServiceImpl implements EvaluatorService {
         // @formatter:on
                 asList(Aggregates
                         .match(Filters.expr(new Document("$in", asList(new BsonString("$_id"), new BsonString("$$ruleIds"))))),
-                        project, ruleScriptsLookup),
+                        enableFilter, delFlagFilter, project, ruleScriptsLookup),
                 "rules");
 
         Bson workflowGraphLookup = Aggregates.lookup(WORKFLOW_GRAPHS.getName(),
                 asList(new Variable<>("workflowId", BsonDocument.parse("{ $toLong: \"$workflowId\" }"))),
-                asList(Aggregates.match(Filters.expr(Filters.eq("scenesId", "$$scenesId"))),
+                asList(Aggregates.match(Filters.expr(Filters.eq("scenesId", "$$scenesId"))), enableFilter, delFlagFilter,
                         Aggregates.sort(new Document("revision", -1)), Aggregates.limit(revisions), project, rulesLookup),
                 "graphs");
 
@@ -250,6 +265,8 @@ public class EvaluatorServiceImpl implements EvaluatorService {
 
         final List<Bson> aggregates = Lists.newArrayList();
         aggregates.add(Aggregates.match(Filters.in("scenesCode", scenesCodes)));
+        aggregates.add(enableFilter);
+        aggregates.add(delFlagFilter);
         aggregates.add(project);
         aggregates.add(workflowLookup);
         // The temporary collections are automatically created.

@@ -37,6 +37,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import com.mongodb.client.result.DeleteResult;
+import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
@@ -72,11 +73,13 @@ public class UploadServiceImpl implements UploadService {
 
     @Override
     public PageHolder<UploadObject> query(QueryUpload model) {
-        Query query = new Query(new Criteria().orOperator(Criteria.where("_id").is(model.getUploadId()),
-                Criteria.where("scenesId").is(model.getScenesId()),
-                Criteria.where("name").regex(format("(%s)+", model.getName())), Criteria.where("enable").is(model.getEnable()),
-                Criteria.where("orgCode").is(model.getOrgCode()), Criteria.where("labels").in(model.getLabels()),
-                Criteria.where("UploadType").is(model.getUploadType())));
+        Query query = new Query(new Criteria().andOperator(Criteria.where("enable").is(BaseBean.ENABLED),
+                Criteria.where("delFlag").is(BaseBean.DEL_FLAG_NORMAL),
+                new Criteria().orOperator(Criteria.where("_id").is(model.getUploadId()),
+                        Criteria.where("scenesId").is(model.getScenesId()),
+                        Criteria.where("name").regex(format("(%s)+", model.getName())),
+                        Criteria.where("enable").is(model.getEnable()), Criteria.where("orgCode").is(model.getOrgCode()),
+                        Criteria.where("labels").in(model.getLabels()), Criteria.where("UploadType").is(model.getUploadType()))));
 
         query.with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
 

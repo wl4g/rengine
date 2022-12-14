@@ -31,6 +31,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import com.mongodb.client.result.DeleteResult;
+import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.Workflow;
@@ -56,10 +57,14 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     public PageHolder<Workflow> query(QueryWorkflow model) {
-        Query query = new Query(new Criteria().orOperator(Criteria.where("_id").is(model.getWorkflowId()),
-                Criteria.where("scenesId").is(model.getScenesId()),
-                Criteria.where("name").regex(format("(%s)+", model.getName())), Criteria.where("enable").is(model.getEnable()),
-                Criteria.where("orgCode").is(model.getOrgCode()), Criteria.where("labels").in(model.getLabels())));
+        Query query = new Query(new Criteria().andOperator(Criteria.where("enable").is(BaseBean.ENABLED),
+                Criteria.where("delFlag").is(BaseBean.DEL_FLAG_NORMAL),
+                new Criteria().orOperator(Criteria.where("_id").is(model.getWorkflowId()),
+                        Criteria.where("scenesId").is(model.getScenesId()),
+                        Criteria.where("name").regex(format("(%s)+", model.getName())),
+                        Criteria.where("enable").is(model.getEnable()), Criteria.where("orgCode").is(model.getOrgCode()),
+                        Criteria.where("labels").in(model.getLabels()))));
+
         query.with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
 
         List<Workflow> workflows = mongoTemplate.find(query, Workflow.class, MongoCollectionDefinition.WORKFLOWS.getName());
