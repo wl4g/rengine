@@ -115,8 +115,10 @@
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
   "methods":[
-    {"name":"findAggregates","parameterTypes":["java.lang.String","java.util.Map"] }, 
-    {"name":"toString","parameterTypes":[] }
+    {"name":"mongoService","parameterTypes":["java.lang.String"] }, 
+    {"name":"jdbcService","parameterTypes":["java.lang.String"] }, 
+    {"name":"phoenixService","parameterTypes":["java.lang.String"] }, 
+    {"name":"opentsdbService","parameterTypes":["java.lang.String"] }
   ]
 },
 {
