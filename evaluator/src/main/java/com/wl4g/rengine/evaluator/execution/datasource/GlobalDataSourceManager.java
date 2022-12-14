@@ -160,7 +160,8 @@ public final class GlobalDataSourceManager {
             // Check should have only one.
             final List<DataSource> dss = safeList(IteratorUtils.toList(cursor));
             if (dss.isEmpty()) {
-                throw new RengineException(format("Could not found data source of %s, %s", dataSourceType, dataSourceName));
+                throw new RengineException(
+                        format("Unable found data source identifier of '%s (%s)'", dataSourceName, dataSourceType));
             } else if (dss.size() > 1) {
                 throw new RengineException(format("The multiple data sources of the same type and name were found of %s, %s",
                         dataSourceType, dataSourceName));

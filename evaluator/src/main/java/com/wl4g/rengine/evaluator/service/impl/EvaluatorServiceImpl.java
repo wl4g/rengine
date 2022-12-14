@@ -53,6 +53,7 @@ import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.Variable;
+import com.wl4g.infra.common.lang.Exceptions;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.common.web.rest.RespBase.RetCode;
 import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
@@ -109,9 +110,10 @@ public class EvaluatorServiceImpl implements EvaluatorService {
                 } else {
                     resp.setStatus(EvaluationResult.STATUS_PART_SUCCESS);
                 }
+                resp.setData(result);
             } catch (Throwable e) {
                 final String errmsg = format("Could not to execution evaluate of requestId: '%s', reason: %s",
-                        evaluation.getRequestId(), e.getMessage());
+                        evaluation.getRequestId(), Exceptions.getRootCausesString(e, true));
                 log.error(errmsg, e);
                 resp.withCode(RetCode.SYS_ERR).withMessage(errmsg);
             }
