@@ -234,6 +234,15 @@
         <!--     <groupId>io.quarkus</groupId>-->
         <!--     <artifactId>quarkus-mongodb-panache</artifactId>-->
         <!-- </dependency>-->
+        <!-- Redis -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-redis-client-deployment</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-redis-client</artifactId>
+        </dependency>
         <!-- OTEL -->
         <dependency>
             <groupId>io.quarkus</groupId>

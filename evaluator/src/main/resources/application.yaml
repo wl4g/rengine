@@ -239,6 +239,20 @@ quarkus:
     #max-connection-life-time: 30m
     tls: false
     tls-insecure: true
+  ## see:https://quarkus.io/version/2.13/guides/all-config#quarkus-redis-client_quarkus-redis-client-redis-client
+  redis:
+    client-type: CLUSTER # Options(CLUSTER, REPLICATION, SENTINEL)
+    hosts:
+      - redis://localhost:6379
+      - redis://localhost:6380
+      - redis://localhost:6381
+      - redis://localhost:7379
+      - redis://localhost:7380
+      - redis://localhost:7381
+    timeout: 10s
+    password: 'zzx!@#$%'
+    health:
+      enabled: true
   kubernetes:
     remote-debug:
       enabled: true
