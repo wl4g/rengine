@@ -20,6 +20,7 @@ import static com.wl4g.infra.common.reflect.ReflectionUtils2.setField;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.mongodb.ConnectionString;
@@ -54,6 +55,16 @@ public abstract class TestSetupDefaults {
         return new ExecutionConfig() {
 
             @Override
+            public @NotBlank String scenesRulesCachedPrefix() {
+                return ExecutionConfig.DEFAULT_SCENES_RULES_CACHED_PREFIX;
+            }
+
+            @Override
+            public @NotNull @Min(0) Long scenesRulesCachedExpire() {
+                return ExecutionConfig.DEFAULT_SCENES_RULES_CACHED_EXPIRE;
+            }
+
+            @Override
             public @NotNull @Min(0) @Max(65535) Integer threadPools() {
                 return ExecutionConfig.DEFAULT_THREAD_POOLS;
             }
@@ -69,5 +80,5 @@ public abstract class TestSetupDefaults {
             }
         };
     }
-    
+
 }

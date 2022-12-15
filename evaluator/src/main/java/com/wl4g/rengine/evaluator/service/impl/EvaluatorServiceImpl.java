@@ -15,6 +15,7 @@
  */
 package com.wl4g.rengine.evaluator.service.impl;
 
+import static com.google.common.base.Charsets.UTF_8;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.lang.Assert2.notEmpty;
@@ -28,9 +29,12 @@ import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollection
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.WORKFLOW_GRAPHS;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.joining;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -46,7 +50,9 @@ import org.bson.BsonString;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
+import com.google.common.hash.Hashing;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Aggregates;
@@ -67,6 +73,10 @@ import com.wl4g.rengine.evaluator.metrics.EvaluatorMeterService;
 import com.wl4g.rengine.evaluator.repository.MongoRepository;
 import com.wl4g.rengine.evaluator.service.EvaluatorService;
 
+import io.quarkus.redis.datasource.ReactiveRedisDataSource;
+import io.quarkus.redis.datasource.RedisDataSource;
+import io.quarkus.redis.datasource.string.ReactiveStringCommands;
+import io.quarkus.redis.datasource.string.StringCommands;
 import io.smallrye.mutiny.Uni;
 import lombok.CustomLog;
 
@@ -94,14 +104,48 @@ public class EvaluatorServiceImpl implements EvaluatorService {
     @Inject
     MongoRepository mongoRepository;
 
+    // see:https://quarkus.io/guides/redis#creating-the-maven-project
+    final StringCommands<String, String> redisStringCommands;
+    final ReactiveStringCommands<String, String> reactiveRedisStringCommands;
+
+    public EvaluatorServiceImpl(RedisDataSource redisDS, ReactiveRedisDataSource reactiveRedisDS) {
+        this.redisStringCommands = redisDS.string(String.class);
+        this.reactiveRedisStringCommands = reactiveRedisDS.string(String.class);
+    }
+
     @Override
     public Uni<RespBase<EvaluationResult>> evaluate(final @NotNull @Valid Evaluation evaluation) {
-        return Uni.createFrom().item(() -> {
-            RespBase<EvaluationResult> resp = RespBase.create();
-            try {
-                // Query the sceneses of cascade by scenesCode.
-                final List<ScenesWrapper> sceneses = safeList(findScenesWorkflowGraphRules(evaluation.getScenesCodes(), 1));
+        // @formatter:off
+        //return Uni.createFrom().item(() -> {
+        //    RespBase<EvaluationResult> resp = RespBase.create();
+        //    try {
+        //        // Query the sceneses of cascade by scenesCode.
+        //        final List<ScenesWrapper> sceneses = safeList(
+        //                findScenesWorkflowGraphRulesWithCaching(evaluation, 1));
+        //
+        //        // Execution to workflow graphs.
+        //        final EvaluationResult result = lifecycleExecutionService.execute(evaluation, sceneses);
+        //
+        //        // Check for success completes.
+        //        if (safeList(result.getResults()).stream().filter(res -> res.getSuccess()).count() == sceneses.size()) {
+        //            resp.setStatus(EvaluationResult.STATUS_ALL_SUCCESS);
+        //        } else {
+        //            resp.setStatus(EvaluationResult.STATUS_PART_SUCCESS);
+        //        }
+        //        resp.setData(result);
+        //    } catch (Throwable e) {
+        //        final String errmsg = format("Could not to execution evaluate of requestId: '%s', reason: %s",
+        //                evaluation.getRequestId(), Exceptions.getRootCausesString(e, true));
+        //        log.error(errmsg, e);
+        //        resp.withCode(RetCode.SYS_ERR).withMessage(errmsg);
+        //    }
+        //    return resp.withRequestId(evaluation.getRequestId());
+        //});
+        // @formatter:on
 
+        return findScenesWorkflowGraphRulesWithCaching(evaluation, 1).chain(sceneses -> {
+            final RespBase<EvaluationResult> resp = RespBase.create();
+            try {
                 // Execution to workflow graphs.
                 final EvaluationResult result = lifecycleExecutionService.execute(evaluation, sceneses);
 
@@ -118,11 +162,11 @@ public class EvaluatorServiceImpl implements EvaluatorService {
                 log.error(errmsg, e);
                 resp.withCode(RetCode.SYS_ERR).withMessage(errmsg);
             }
-            return resp.withRequestId(evaluation.getRequestId());
+            resp.withRequestId(evaluation.getRequestId());
+            return Uni.createFrom().item(() -> resp);
         });
     }
 
-    // TODO using cache
     /**
      * Query collection dependencies with equivalent bson query codes example:
      * 
@@ -290,5 +334,81 @@ public class EvaluatorServiceImpl implements EvaluatorService {
             cursor.close();
         }
     }
+
+    @SuppressWarnings("deprecation")
+    Uni<List<ScenesWrapper>> findScenesWorkflowGraphRulesWithCaching(
+            final @NotNull Evaluation evaluation,
+            final @Min(1) @Max(1024) int revisions) {
+        //
+        // Notice: Since the bottom layer of ordinary blocking redisCommands is
+        // also implemented using non-blocking redisReactiveCommands + await,
+        // when the return type of the service main method is Uni, redisCommands
+        // cannot be used, and an error will be reported such as: The current
+        // thread cannot be blocked: vert.x-eventloop-thread-2.
+        //
+        // @formatter:off
+        //final List<ScenesWrapper> cachedSceneses = safeList(evaluation.getScenesCodes()).stream()
+        //        .map(scenesCode -> parseJSON(redisStringCommands.get(config.scenesRulesCachedPrefix().concat(scenesCode)),
+        //                ScenesWrapper.class))
+        //        .filter(s -> nonNull(s))
+        //        .collect(toList());
+        //
+        //final List<String> cachedScenesCodes = cachedSceneses.stream().map(s -> s.getScenesCode()).collect(toList());
+        //final List<String> uncachedScenesCodes = safeList(evaluation.getScenesCodes()).stream()
+        //        .filter(scenesCode -> !cachedScenesCodes.contains(scenesCode))
+        //        .collect(toList());
+        //
+        //final List<ScenesWrapper> mergedSceneses = cachedSceneses;
+        //if (!uncachedScenesCodes.isEmpty()) {
+        //    final List<ScenesWrapper> sceneses = findScenesWorkflowGraphRules(uncachedScenesCodes, revisions);
+        //    sceneses.stream()
+        //            .forEach(s -> redisStringCommands.setex(config.scenesRulesCachedPrefix().concat(s.getScenesCode()),
+        //                    config.scenesRulesCachedExpire(), toJSONString(s)));
+        //    mergedSceneses.addAll(sceneses);
+        //}
+        //
+        //return mergedSceneses;
+        // @formatter:on
+
+        //
+        // Notice: The due using to reactiveCommands, it currently only supports
+        // batch querying of sceneses based on scenesCodes once, and does not
+        // support splitting into multiple scenesCode for separate query.
+        //
+        // In fact, it can be split into multiple scenesCode to query separately
+        // and then merged, so as to hit the cache more accurately, because each
+        // request may have scenesCodes array intersect.
+        //
+
+        final String scenesCodesHash = Hashing.md5()
+                .hashBytes(safeList(evaluation.getScenesCodes()).stream().collect(joining("-")).getBytes(UTF_8))
+                .toString();
+        final String batchQueryingKey = config.scenesRulesCachedPrefix().concat(scenesCodesHash);
+
+        final Uni<List<ScenesWrapper>> cachedScenesUnis = reactiveRedisStringCommands.get(batchQueryingKey).flatMap(json -> {
+            if (Objects.isNull(json)) {
+                // Querying from database.
+                final List<ScenesWrapper> sceneses = findScenesWorkflowGraphRules(evaluation.getScenesCodes(), revisions);
+                // Save to redis cache.
+                return reactiveRedisStringCommands
+                        .setex(batchQueryingKey, config.scenesRulesCachedExpire(), toJSONString(sceneses))
+                        .chain(() -> Uni.createFrom().item(() -> sceneses));
+            }
+            return Uni.createFrom().item(() -> parseJSON(json, SCENES_TYPE_REF));
+        })
+                // If querying an workflow rules takes more than 85% of
+                // the total timeout time, then the execution graph may
+                // not have enough time to allow early abandonment of
+                // execution.
+                .ifNoItem()
+                .after(Duration.ofMillis((long) (evaluation.getTimeout() / 0.85)))
+                .fail();
+
+        // return Uni.combine().all().unis(cachedScenesUnis);
+        return cachedScenesUnis;
+    }
+
+    public static final TypeReference<List<ScenesWrapper>> SCENES_TYPE_REF = new TypeReference<List<ScenesWrapper>>() {
+    };
 
 }

@@ -19,6 +19,7 @@ import static com.wl4g.rengine.common.constants.RengineConstants.CONF_PREFIX_EVA
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import io.quarkus.runtime.annotations.StaticInitSafe;
@@ -39,6 +40,15 @@ import io.smallrye.config.WithDefault;
 @ConfigMapping(prefix = CONF_PREFIX_EVALUATOR + ".execution", namingStrategy = NamingStrategy.KEBAB_CASE)
 public interface ExecutionConfig {
 
+    @WithDefault(DEFAULT_SCENES_RULES_CACHED_PREFIX)
+    @NotBlank
+    String scenesRulesCachedPrefix();
+
+    @WithDefault(DEFAULT_SCENES_RULES_CACHED_EXPIRE + "")
+    @NotNull
+    @Min(0)
+    Long scenesRulesCachedExpire();
+
     @WithDefault(DEFAULT_THREAD_POOLS + "")
     @NotNull
     @Min(0)
@@ -57,6 +67,8 @@ public interface ExecutionConfig {
     @Max(1)
     Float evaluateTimeoutOffsetRate();
 
+    public static final String DEFAULT_SCENES_RULES_CACHED_PREFIX = "rengine:scenes:rules:cached:";
+    public static final long DEFAULT_SCENES_RULES_CACHED_EXPIRE = 15 * 60 * 1000;
     public static final int DEFAULT_THREAD_POOLS = 3;
     public static final int DEFAULT_MAX_QUERY_BATCH = 1024;
     public static final float DEFAULT_TIMEOUT_OFFSET_RATE = 0.1f;

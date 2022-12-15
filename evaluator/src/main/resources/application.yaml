@@ -251,6 +251,15 @@ quarkus:
       - redis://localhost:7381
     timeout: 10s
     password: 'zzx!@#$%'
+    max-pool-size: 6
+    max-pool-waiting: 24
+    max-waiting-handlers: 2048
+    max-nested-arrays: 32
+    pool-cleaner-interval: 30m
+    pool-recycle-timeout: 15s
+    reconnect-attempts: 3
+    reconnect-interval: 1s
+    protocol-negotiation: true
     health:
       enabled: true
   kubernetes:
@@ -266,6 +275,8 @@ quarkus:
 rengine:
   evaluator:
     execution:
+      scenes-rules-cached-prefix: 'rengine:scenes:rules:cached:'
+      scenes-rules-cached-expire: 900000
       thread-pools: 3
       max-query-batch: 1024
       evaluate-timeout-offset-rate: 0.1f

@@ -20,14 +20,14 @@ function process(context) {
     console.info("context.getEvent().getSource().getLocation().getZipcode():", context.getEvent().getSource().getLocation().getZipcode());
 
     // for case2:
-    const response1 = new ScriptHttpClient().postForJson("http://httpbin.org/post", "");
-    console.info("http response1:", response1);
-    console.info("http response1('/headers'):", response1.at("/headers").toString());
+    const httpResult1 = new ScriptHttpClient().postForJson("http://httpbin.org/post", "");
+    console.info("http httpResult1:", httpResult1);
+    console.info("http httpResult1('/headers'):", httpResult1.at("/headers").toString());
 
     // for case3:
-    const response2 = context.getDataService().getDefaultHttpClient().getForText("http://httpbin.org/get");
-    console.info("http response2:", response2);
-    console.info("http response2('/headers'):", response2.at("/headers"));
+    const httpResult2 = context.getDataService().getDefaultHttpClient().getForText("http://httpbin.org/get");
+    console.info("http httpResult2:", httpResult2);
+    console.info("http httpResult2('/headers'):", httpResult2.at("/headers"));
 
     // for case4:
     var mongoQuery = [
@@ -49,9 +49,9 @@ function process(context) {
     console.info("redis cluster result: " + redisResult);
 
     return new ScriptResult(true)
-                .addValue("response1", response1)
-                .addValue("response2", response2)
-                .addValue("mongoResult", mongoResult)
-                .addValue("jdbcResult", jdbcResult)
-                .addValue("redisResult", redisResult);
+        .addValue("httpResult1", httpResult1)
+        .addValue("httpResult2", httpResult2)
+        .addValue("mongoResult", mongoResult)
+        .addValue("jdbcResult", jdbcResult)
+        .addValue("redisResult", redisResult);
 }
