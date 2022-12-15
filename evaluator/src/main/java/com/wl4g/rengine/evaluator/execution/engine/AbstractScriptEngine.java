@@ -28,6 +28,7 @@ import javax.inject.Inject;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import org.graalvm.polyglot.Value;
 import org.graalvm.polyglot.proxy.ProxyObject;
 
 import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
@@ -42,6 +43,9 @@ import com.wl4g.rengine.evaluator.execution.sdk.ScriptContext;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptDataService;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptHttpClient;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptResult;
+import com.wl4g.rengine.evaluator.execution.sdk.ScriptSSHClient;
+import com.wl4g.rengine.evaluator.execution.sdk.ScriptTCPClient;
+import com.wl4g.rengine.evaluator.execution.sdk.extension.ScriptPrometheusParser;
 import com.wl4g.rengine.evaluator.metrics.EvaluatorMeterService;
 import com.wl4g.rengine.evaluator.minio.MinioManager;
 import com.wl4g.rengine.evaluator.minio.MinioManager.ObjectResource;
@@ -58,7 +62,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class AbstractScriptEngine implements IEngine {
 
-    ScriptHttpClient defaultClient = new ScriptHttpClient();
+    final ScriptHttpClient defaultHttpClient = new ScriptHttpClient();
+
+    final ScriptSSHClient defaultSSHClient = new ScriptSSHClient();
+
+    final ScriptTCPClient defaultTCPClient = new ScriptTCPClient();
 
     @Inject
     EvaluatorMeterService meterService;
@@ -69,10 +77,8 @@ public abstract class AbstractScriptEngine implements IEngine {
     @Inject
     GlobalDataSourceManager globalDataSourceManager;
 
-    protected @NotNull List<ObjectResource> loadScriptResources(
-            @NotBlank String scenesCode,
-            @NotNull RuleWrapper rule,
-            boolean useCache) {
+    @NotNull
+    List<ObjectResource> loadScriptResources(@NotBlank String scenesCode, @NotNull RuleWrapper rule, boolean useCache) {
         notNullOf(rule, "rule");
         log.debug("Loading script {} by scenesCode: {}, ruleId: {}", scenesCode, rule.getId());
 
@@ -88,11 +94,25 @@ public abstract class AbstractScriptEngine implements IEngine {
         }).collect(toList());
     }
 
+    void registerMembers(final @NotNull Value bindings) {
+        // Try not to bind implicit objects, let users create new objects by
+        // self or get default objects from the graal context.
+        bindings.putMember(ScriptHttpClient.class.getSimpleName(), ScriptHttpClient.class);
+        bindings.putMember(ScriptSSHClient.class.getSimpleName(), ScriptSSHClient.class);
+        bindings.putMember(ScriptTCPClient.class.getSimpleName(), ScriptTCPClient.class);
+        bindings.putMember(ScriptPrometheusParser.class.getSimpleName(), ScriptPrometheusParser.class);
+        bindings.putMember(ScriptResult.class.getSimpleName(), ScriptResult.class);
+    }
+
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected @NotNull ScriptContext newScriptContext(@NotNull final ExecutionGraphContext graphContext) {
+    @NotNull
+    ScriptContext newScriptContext(@NotNull final ExecutionGraphContext graphContext) {
         notNullOf(graphContext, "graphContext");
 
+        final ScriptDataService dataService = new ScriptDataService(defaultHttpClient, defaultSSHClient, defaultTCPClient,
+                globalDataSourceManager);
         final ExecutionGraphResult result = graphContext.getLastResult();
+
         return ScriptContext.builder()
                 .id(graphContext.getCurrentNode().getId())
                 .type(((BaseOperator<?>) graphContext.getCurrentNode()).getType())
@@ -100,8 +120,7 @@ public abstract class AbstractScriptEngine implements IEngine {
                 .lastResult(isNull(result) ? null
                         : new ScriptResult(ReturnState.isTrue(result.getReturnState()), result.getValueMap()))
                 .minioManager(minioManager)
-                .dataService(new ScriptDataService(globalDataSourceManager))
-                .defaultHttpClient(defaultClient)
+                .dataService(dataService)
                 // .attributes(ProxyObject.fromMap(attributes))
                 .build();
     }

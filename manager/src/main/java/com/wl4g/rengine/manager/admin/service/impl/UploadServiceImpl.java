@@ -133,7 +133,7 @@ public class UploadServiceImpl implements UploadService {
                     .id(upload.getId())
                     .endpoint(config.getEndpoint())
                     .region(config.getRegion())
-                    // .bucket(config.getBucket())
+                    // .bucket(properties.getBucket())
                     .bucket(RengineConstants.DEF_MINIO_BUCKET)
                     .accessKey(credentials.accessKey())
                     .secretKey(credentials.secretKey())

@@ -50,7 +50,6 @@
     </developers>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <commons-dbutils.version>1.7</commons-dbutils.version>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
         <!-- see:https://github.com/quarkusio/quarkus-quickstarts/blob/2.14.3.Final/getting-started/pom.xml -->
@@ -250,7 +249,6 @@
         <dependency>
             <groupId>commons-dbutils</groupId>
             <artifactId>commons-dbutils</artifactId>
-            <version>${commons-dbutils.version}</version> <!--$NO-MVN-MAN-VER$-->
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>

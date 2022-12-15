@@ -36,7 +36,7 @@ public class ScriptHttpClientTests {
         ScriptHttpClient httpClient = new ScriptHttpClient(5000, 10000, 10240);
         // A connection timeout occurs when trying to connect to a non-existent
         // address
-        String result = httpClient.getAsText("https://www.google12345678.com");
+        String result = httpClient.getForText("https://www.google12345678.com");
         System.out.println(result);
         System.out.println("end: " + currentTimeMillis());
     }
@@ -47,7 +47,7 @@ public class ScriptHttpClientTests {
         ScriptHttpClient httpClient = new ScriptHttpClient(5000, 10000, 10240);
         // The mainland network can connect to google, but the returned
         // data cannot be read by TCP.reset
-        String result = httpClient.getAsText("https://www.google.com");
+        String result = httpClient.getForText("https://www.google.com");
         System.out.println(result);
         System.out.println("end: " + currentTimeMillis());
     }

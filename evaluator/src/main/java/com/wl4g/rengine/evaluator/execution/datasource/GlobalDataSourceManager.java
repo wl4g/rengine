@@ -49,8 +49,9 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
-import com.wl4g.rengine.common.entity.DataSource;
-import com.wl4g.rengine.common.entity.DataSource.DataSourceType;
+import com.wl4g.rengine.common.entity.DataSourceProperties;
+import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
+import com.wl4g.rengine.common.exception.ConfigRengineException;
 import com.wl4g.rengine.common.exception.RengineException;
 import com.wl4g.rengine.common.util.BsonUtils2;
 import com.wl4g.rengine.evaluator.execution.ExecutionConfig;
@@ -91,7 +92,7 @@ public final class GlobalDataSourceManager {
     @PostConstruct
     public void init() {
         notEmptyOf(builders, "builders");
-        this.builderMap = safeList(builders).stream().collect(toMap(b -> b.sourceType(), b -> b));
+        this.builderMap = safeList(builders).stream().collect(toMap(b -> b.type(), b -> b));
         log.debug("Registered to builders : {}", builderMap);
     }
 
@@ -142,7 +143,7 @@ public final class GlobalDataSourceManager {
 
     @SuppressWarnings("unchecked")
     @NotNull
-    Map<String, Object> findDataSourceProperties(
+    DataSourceProperties findDataSourceProperties(
             final @NotNull DataSourceType dataSourceType,
             final @NotBlank String dataSourceName) {
         notNullOf(dataSourceType, "dataSourceType");
@@ -150,24 +151,25 @@ public final class GlobalDataSourceManager {
 
         final MongoCollection<Document> collection = mongoRepository.getCollection(MongoCollectionDefinition.DATASOURCES);
 
-        try (final MongoCursor<DataSource> cursor = collection
+        try (final MongoCursor<DataSourceProperties> cursor = collection
                 .find(Filters.and(Filters.eq("type", dataSourceType), Filters.eq("name", dataSourceName)))
                 .batchSize(2)
                 .limit(2)
-                .map(doc -> parseJSON(doc.toJson(BsonUtils2.DEFAULT_JSON_WRITER_SETTINGS), DataSource.class))
+                .map(doc -> parseJSON(doc.toJson(BsonUtils2.DEFAULT_JSON_WRITER_SETTINGS), DataSourceProperties.class))
                 .iterator();) {
 
             // Check should have only one.
-            final List<DataSource> dss = safeList(IteratorUtils.toList(cursor));
+            final List<DataSourceProperties> dss = safeList(IteratorUtils.toList(cursor));
             if (dss.isEmpty()) {
-                throw new RengineException(
+                throw new ConfigRengineException(
                         format("Unable found data source identifier of '%s (%s)'", dataSourceName, dataSourceType));
             } else if (dss.size() > 1) {
-                throw new RengineException(format("The multiple data sources of the same type and name were found of %s, %s",
-                        dataSourceType, dataSourceName));
+                throw new ConfigRengineException(
+                        format("The multiple data sources of the same type and name were found of %s, %s", dataSourceType,
+                                dataSourceName));
             }
 
-            return dss.get(0).getProperties();
+            return dss.get(0).validate();
         } catch (Throwable e) {
             throw new RengineException(e);
         }

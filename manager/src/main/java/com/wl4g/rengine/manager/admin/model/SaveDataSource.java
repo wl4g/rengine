@@ -15,7 +15,7 @@
  */
 package com.wl4g.rengine.manager.admin.model;
 
-import com.wl4g.rengine.common.entity.DataSource;
+import com.wl4g.rengine.common.entity.DataSourceProperties;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,6 +35,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class SaveDataSource extends DataSource {
+public class SaveDataSource extends DataSourceProperties {
     private static final long serialVersionUID = -8089363065684705215L;
 }

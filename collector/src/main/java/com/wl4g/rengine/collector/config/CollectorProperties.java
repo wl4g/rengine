@@ -77,7 +77,7 @@ import lombok.extern.slf4j.Slf4j;
  * @since v1.0.0
  * @see {@link org.apache.shardingsphere.elasticjob.lite.spring.boot.job.ElasticJobProperties}
  */
-// https://github.com/quarkiverse/quarkus-zookeeper-client/blob/main/runtime/src/main/java/io/quarkiverse/zookeeper/config/ClientConfig.java
+// https://github.com/quarkiverse/quarkus-zookeeper-client/blob/main/runtime/src/main/java/io/quarkiverse/zookeeper/properties/ClientConfig.java
 // @ConfigGroup
 @Getter
 @Setter

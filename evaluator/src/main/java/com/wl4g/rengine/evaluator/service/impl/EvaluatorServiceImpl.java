@@ -272,7 +272,6 @@ public class EvaluatorServiceImpl implements EvaluatorService {
         // The temporary collections are automatically created.
         // aggregates.add(Aggregates.merge("_tmp_load_scenes_with_cascade"));
 
-        // Document scenesDoc = aggregateIt.first();
         final MongoCursor<ScenesWrapper> cursor = collection.aggregate(aggregates)
                 .batchSize(config.maxQueryBatch())
                 .map(scenesDoc -> {

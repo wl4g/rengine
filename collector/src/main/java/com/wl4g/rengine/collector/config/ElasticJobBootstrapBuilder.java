@@ -58,7 +58,7 @@ public class ElasticJobBootstrapBuilder {
 
     public ElasticJobBootstrapBuilder(@NotNull CollectorProperties config, @NotNull CoordinatorRegistryCenter registryCenter,
             List<TracingConfiguration<?>> tracingConfigurations) {
-        this.config = notNullOf(config, "config");
+        this.config = notNullOf(config, "properties");
         this.registryCenter = notNullOf(registryCenter, "registryCenter");
         this.tracingConfigurations = tracingConfigurations;
     }

@@ -32,8 +32,8 @@ import io.smallrye.config.WithDefault;
  * @author James Wong
  * @version 2022-09-18
  * @since v1.0.0
- * @see https://quarkus.io/guides/config-mappings
- * @see https://quarkus.io/guides/config-extending-support#custom-config-source
+ * @see https://quarkus.io/guides/properties-mappings
+ * @see https://quarkus.io/guides/properties-extending-support#custom-properties-source
  */
 @StaticInitSafe
 @ConfigMapping(prefix = CONF_PREFIX_EVALUATOR + ".execution", namingStrategy = NamingStrategy.KEBAB_CASE)

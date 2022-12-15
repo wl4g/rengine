@@ -57,8 +57,8 @@ import com.wl4g.rengine.common.entity.WorkflowGraph.NodeType;
 import com.wl4g.rengine.common.entity.WorkflowGraph.ProcessNode;
 import com.wl4g.rengine.common.entity.WorkflowGraph.RelationNode;
 import com.wl4g.rengine.common.entity.WorkflowGraph.RunNode;
-import com.wl4g.rengine.common.exception.ExecutionException;
-import com.wl4g.rengine.common.exception.InvalidNodeRelationshipException;
+import com.wl4g.rengine.common.exception.ExecutionGraphRengineException;
+import com.wl4g.rengine.common.exception.InvalidNodeRelationRengineException;
 import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
 
 import lombok.CustomLog;
@@ -103,23 +103,23 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
                 .filter(e -> safeList(e.getValue()).size() > 1)
                 .findAny()
                 .ifPresent(e -> {
-                    throw new InvalidNodeRelationshipException(format("Duplicate node id of : %s", e.getKey()));
+                    throw new InvalidNodeRelationRengineException(format("Duplicate node id of : %s", e.getKey()));
                 });
 
         // @formatter:off
 //        // Check for start node.
 //        List<ExecutionGraph<?>> startNodes = nodes.stream().filter(n -> n instanceof BootOperator).collect(toList());
 //        if (safeList(startNodes).size() != 1) {
-//            throw new InvalidNodeRelationshipException(format("There must be one and only one start node of : %s", startNodes));
+//            throw new InvalidNodeRelationRengineException(format("There must be one and only one start node of : %s", startNodes));
 //        }
 //        if (!isBlank(safeList(startNodes).get(0).getPrevId())) {
-//            throw new InvalidNodeRelationshipException("The prevId value of start node must be empty.");
+//            throw new InvalidNodeRelationRengineException("The prevId value of start node must be empty.");
 //        }
 //
 //        // Check for end node.
 //        List<ExecutionGraph<?>> endNodes = nodes.stream().filter(n -> n instanceof EndOperator).collect(toList());
 //        if (safeList(endNodes).size() != 1) {
-//            throw new InvalidNodeRelationshipException(format("There must be one and only one end node of : %s", endNodes));
+//            throw new InvalidNodeRelationRengineException(format("There must be one and only one end node of : %s", endNodes));
 //        }
 //
 //        // Check for start-to-end reachable continuity.
@@ -127,7 +127,7 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
 //        for (Entry<String, ExecutionGraph<?>> ent : nodeMap.entrySet()) {
 //            ExecutionGraph<?> n = ent.getValue();
 //            if (!(n instanceof BootOperator) && isNull(nodeMap.get(n.getPrevId()))) {
-//                throw new InvalidNodeRelationshipException(format("Invalid node unreachable orphaned of : %s", n));
+//                throw new InvalidNodeRelationRengineException(format("Invalid node unreachable orphaned of : %s", n));
 //            }
 //        }
         // @formatter:on
@@ -196,7 +196,7 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
                 // @formatter:off
 //                ExecutionGraph<?> end = flatNodeMap.get(link.getTo());
 //                if (!(end instanceof EndOperator)) {
-//                    throw new InvalidNodeRelationshipException(format(
+//                    throw new InvalidNodeRelationRengineException(format(
 //                            "Invalid node connection relationship, only end nodes support multiple inputs. - ", end.getId()));
 //                }
                 // @formatter:on
@@ -223,7 +223,7 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
                     if (prev instanceof SingleNextOperator) {
                         // @formatter:off
 //                        if (nonNull(prev.getNext())) {
-//                            throw new InvalidNodeRelationshipException(format(
+//                            throw new InvalidNodeRelationRengineException(format(
 //                                    "The next node of a non-relationship node is not allowed to have more than one of prev.id : %s",
 //                                    prev.getId()));
 //                        }
@@ -294,7 +294,7 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
                 // Actual execution rule script.
                 return context.getHandler().apply(context);
             } catch (Exception e) {
-                throw new ExecutionException(this, e);
+                throw new ExecutionGraphRengineException(this, e);
             }
         }
     }

@@ -51,7 +51,7 @@ public abstract class AbstractEventBusService<R> implements RengineEventBusServi
     protected final GenericTaskRunner<RunnerProperties> compactScheduler;
 
     public AbstractEventBusService(ClientEventBusConfig config, EventRecorder recorder) {
-        this.config = notNullOf(config, "config");
+        this.config = notNullOf(config, "properties");
         this.recorder = notNullOf(recorder, "recorder");
         this.compactScheduler = new GenericTaskRunner<RunnerProperties>(new RunnerProperties(StartupMode.ASYNC, 1)) {
         };

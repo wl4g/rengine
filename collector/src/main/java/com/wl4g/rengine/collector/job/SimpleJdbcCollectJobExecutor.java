@@ -37,8 +37,8 @@ import org.apache.shardingsphere.elasticjob.api.ShardingContext;
 import org.apache.shardingsphere.elasticjob.executor.JobFacade;
 
 import com.wl4g.infra.common.bean.ConfigBeanUtils;
-import com.wl4g.rengine.collector.util.HikariJdbcHelper;
 import com.wl4g.rengine.common.event.RengineEvent.EventLocation;
+import com.wl4g.rengine.common.util.HikariJDBCHelper;
 import com.zaxxer.hikari.HikariConfig;
 
 import lombok.Getter;
@@ -57,7 +57,7 @@ import lombok.ToString;
 public class SimpleJdbcCollectJobExecutor extends CollectJobExecutor<SimpleJdbcCollectJobExecutor.SimpleJdbcJobParam>
         implements Closeable {
 
-    private Map<String, HikariJdbcHelper> jdbcHelperCaches;
+    private Map<String, HikariJDBCHelper> jdbcHelperCaches;
 
     @Override
     protected EventJobType type() {
@@ -72,7 +72,7 @@ public class SimpleJdbcCollectJobExecutor extends CollectJobExecutor<SimpleJdbcC
             JobFacade jobFacade,
             ShardingContext context) throws Exception {
 
-        HikariJdbcHelper jdbcHelper = obtainShardingJdbcHelper(shardingParam, currentShardingTotalCount, jobConfig, context);
+        HikariJDBCHelper jdbcHelper = obtainShardingJdbcHelper(shardingParam, currentShardingTotalCount, jobConfig, context);
         List<Map<String, Object>> result = jdbcHelper.queryForList(shardingParam.getSql());
         log.debug("Collect to result: {}", result);
 
@@ -95,7 +95,7 @@ public class SimpleJdbcCollectJobExecutor extends CollectJobExecutor<SimpleJdbcC
         return EventLocation.builder().ipAddress(URI.create(shardingParam.getHikariConfig().getJdbcUrl()).getHost()).build();
     }
 
-    protected HikariJdbcHelper obtainShardingJdbcHelper(
+    protected HikariJDBCHelper obtainShardingJdbcHelper(
             SimpleJdbcJobParam shardingParam,
             int currentShardingTotalCount,
             JobConfiguration jobConfig,
@@ -109,12 +109,12 @@ public class SimpleJdbcCollectJobExecutor extends CollectJobExecutor<SimpleJdbcC
             }
         }
 
-        HikariJdbcHelper jdbcHelper = jdbcHelperCaches.get(shardingParam.getName());
+        HikariJDBCHelper jdbcHelper = jdbcHelperCaches.get(shardingParam.getName());
         if (isNull(jdbcHelper)) {
             synchronized (this) {
                 jdbcHelper = jdbcHelperCaches.get(shardingParam.getName());
                 if (isNull(jdbcHelper)) {
-                    jdbcHelper = new HikariJdbcHelper(new StatementConfiguration(shardingParam.getFetchDirection(),
+                    jdbcHelper = new HikariJDBCHelper(new StatementConfiguration(shardingParam.getFetchDirection(),
                             shardingParam.getFetchSize(), shardingParam.getMaxFieldSize(), shardingParam.getMaxRows(),
                             safeLongToInt(shardingParam.getQueryTimeoutMs())), shardingParam.getHikariConfig());
                     jdbcHelperCaches.put(shardingParam.getName(), jdbcHelper);

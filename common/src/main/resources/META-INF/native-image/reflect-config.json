@@ -1,10 +1,425 @@
 [
 {
+  "name":"com.wl4g.rengine.common.entity.DataSourceProperties",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getType","parameterTypes":[] }, 
+    {"name":"setType","parameterTypes":["com.wl4g.rengine.common.entity.DataSourceProperties$DataSourceType"] },  
+    {"name":"getName","parameterTypes":[] }, 
+    {"name":"setName","parameterTypes":["java.lang.String"] }, 
+    {"name":"validate","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.DataSourceProperties$DataSourceType",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"getPropertiesClass","parameterTypes":[] }, 
+    {"name":"of","parameterTypes":["java.lang.String"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.DataSourceProperties$MongoDataSourceProperties",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getConnectionString","parameterTypes":[] }, 
+    {"name":"setConnectionString","parameterTypes":["java.lang.String"] }, 
+    {"name":"validate","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.DataSourceProperties$JDBCDataSourceProperties",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getFetchDirection","parameterTypes":[] }, 
+    {"name":"setFetchDirection","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"getFetchSize","parameterTypes":[] }, 
+    {"name":"setFetchSize","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"getMaxFieldSize","parameterTypes":[] }, 
+    {"name":"setMaxFieldSize","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"getMaxRows","parameterTypes":[] }, 
+    {"name":"setMaxRows","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"getQueryTimeoutMs","parameterTypes":[] }, 
+    {"name":"setQueryTimeoutMs","parameterTypes":["java.lang.Long"] }, 
+    {"name":"getCatalog","parameterTypes":[] }, 
+    {"name":"setCatalog","parameterTypes":["java.lang.String"] }, 
+    {"name":"getConnectionTimeout","parameterTypes":[] }, 
+    {"name":"setConnectionTimeout","parameterTypes":["long"] }, 
+    {"name":"getIdleTimeout","parameterTypes":[] }, 
+    {"name":"setIdleTimeout","parameterTypes":["long"] }, 
+    {"name":"getLeakDetectionThreshold","parameterTypes":[] }, 
+    {"name":"setLeakDetectionThreshold","parameterTypes":["long"] }, 
+    {"name":"getMaxLifetime","parameterTypes":[] }, 
+    {"name":"setMaxLifetime","parameterTypes":["long"] }, 
+    {"name":"getMaximumPoolSize","parameterTypes":[] }, 
+    {"name":"setMaximumPoolSize","parameterTypes":["int"] }, 
+    {"name":"getMinimumIdle","parameterTypes":[] }, 
+    {"name":"setMinimumIdle","parameterTypes":["int"] }, 
+    {"name":"getPassword","parameterTypes":[] }, 
+    {"name":"setPassword","parameterTypes":["java.lang.String"] }, 
+    {"name":"getUsername","parameterTypes":[] }, 
+    {"name":"setUsername","parameterTypes":["java.lang.String"] }, 
+    {"name":"getValidationTimeout","parameterTypes":[] }, 
+    {"name":"setValidationTimeout","parameterTypes":["long"] }, 
+    {"name":"getConnectionTestQuery","parameterTypes":[] }, 
+    {"name":"setConnectionTestQuery","parameterTypes":["java.lang.String"] }, 
+    {"name":"getConnectionInitSql","parameterTypes":[] }, 
+    {"name":"setConnectionInitSql","parameterTypes":["java.lang.String"] }, 
+    {"name":"getDataSourceClassName","parameterTypes":[] }, 
+    {"name":"setDataSourceClassName","parameterTypes":["java.lang.String"] }, 
+    {"name":"getDataSourceProperties","parameterTypes":[] }, 
+    {"name":"setDataSourceProperties","parameterTypes":["java.util.Properties"] }, 
+    {"name":"getDriverClassName","parameterTypes":[] }, 
+    {"name":"setDriverClassName","parameterTypes":["java.lang.String"] }, 
+    {"name":"getJdbcUrl","parameterTypes":[] }, 
+    {"name":"setJdbcUrl","parameterTypes":["java.lang.String"] }, 
+    {"name":"isAutoCommit","parameterTypes":[] }, 
+    {"name":"setAutoCommit","parameterTypes":["boolean"] }, 
+    {"name":"isAllowPoolSuspension","parameterTypes":[] }, 
+    {"name":"setAllowPoolSuspension","parameterTypes":["boolean"] }, 
+    {"name":"getInitializationFailTimeout","parameterTypes":[] }, 
+    {"name":"setInitializationFailTimeout","parameterTypes":["long"] }, 
+    {"name":"isIsolateInternalQueries","parameterTypes":[] }, 
+    {"name":"setIsolateInternalQueries","parameterTypes":["boolean"] }, 
+    {"name":"getHealthCheckProperties","parameterTypes":[] }, 
+    {"name":"setHealthCheckProperties","parameterTypes":["java.lang.Properties"] }, 
+    {"name":"getKeepaliveTime","parameterTypes":[] }, 
+    {"name":"setKeepaliveTime","parameterTypes":["long"] }, 
+    {"name":"isReadOnly","parameterTypes":[] }, 
+    {"name":"setReadOnly","parameterTypes":["boolean"] }, 
+    {"name":"getPoolName","parameterTypes":[] }, 
+    {"name":"setPoolName","parameterTypes":["java.lang.String"] }, 
+    {"name":"getTransactionIsolation","parameterTypes":[] }, 
+    {"name":"setTransactionIsolation","parameterTypes":["java.lang.String"] }, 
+    {"name":"getSchema","parameterTypes":[] }, 
+    {"name":"setSchema","parameterTypes":["java.lang.String"] }, 
+    {"name":"getExceptionOverrideClassName","parameterTypes":[] }, 
+    {"name":"setExceptionOverrideClassName","parameterTypes":["java.lang.String"] }, 
+    {"name":"toHikariConfig","parameterTypes":[] }, 
+    {"name":"validate","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.zaxxer.hikari.HikariConfig",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getCatalog","parameterTypes":[] }, 
+    {"name":"setCatalog","parameterTypes":["java.lang.String"] }, 
+    {"name":"getConnectionTimeout","parameterTypes":[] }, 
+    {"name":"setConnectionTimeout","parameterTypes":["long"] }, 
+    {"name":"getIdleTimeout","parameterTypes":[] }, 
+    {"name":"setIdleTimeout","parameterTypes":["long"] }, 
+    {"name":"getLeakDetectionThreshold","parameterTypes":[] }, 
+    {"name":"setLeakDetectionThreshold","parameterTypes":["long"] }, 
+    {"name":"getMaxLifetime","parameterTypes":[] }, 
+    {"name":"setMaxLifetime","parameterTypes":["long"] }, 
+    {"name":"getMaximumPoolSize","parameterTypes":[] }, 
+    {"name":"setMaximumPoolSize","parameterTypes":["int"] }, 
+    {"name":"getMinimumIdle","parameterTypes":[] }, 
+    {"name":"setMinimumIdle","parameterTypes":["int"] }, 
+    {"name":"getPassword","parameterTypes":[] }, 
+    {"name":"setPassword","parameterTypes":["java.lang.String"] }, 
+    {"name":"getUsername","parameterTypes":[] }, 
+    {"name":"setUsername","parameterTypes":["java.lang.String"] }, 
+    {"name":"getValidationTimeout","parameterTypes":[] }, 
+    {"name":"setValidationTimeout","parameterTypes":["long"] }, 
+    {"name":"getConnectionTestQuery","parameterTypes":[] }, 
+    {"name":"setConnectionTestQuery","parameterTypes":["java.lang.String"] }, 
+    {"name":"getConnectionInitSql","parameterTypes":[] }, 
+    {"name":"setConnectionInitSql","parameterTypes":["java.lang.String"] }, 
+    {"name":"getDataSourceClassName","parameterTypes":[] }, 
+    {"name":"setDataSourceClassName","parameterTypes":["java.lang.String"] }, 
+    {"name":"getDataSourceProperties","parameterTypes":[] }, 
+    {"name":"setDataSourceProperties","parameterTypes":["java.util.Properties"] }, 
+    {"name":"getDriverClassName","parameterTypes":[] }, 
+    {"name":"setDriverClassName","parameterTypes":["java.lang.String"] }, 
+    {"name":"getJdbcUrl","parameterTypes":[] }, 
+    {"name":"setJdbcUrl","parameterTypes":["java.lang.String"] }, 
+    {"name":"isAutoCommit","parameterTypes":[] }, 
+    {"name":"setAutoCommit","parameterTypes":["boolean"] }, 
+    {"name":"isAllowPoolSuspension","parameterTypes":[] }, 
+    {"name":"setAllowPoolSuspension","parameterTypes":["boolean"] }, 
+    {"name":"getInitializationFailTimeout","parameterTypes":[] }, 
+    {"name":"setInitializationFailTimeout","parameterTypes":["long"] }, 
+    {"name":"isIsolateInternalQueries","parameterTypes":[] }, 
+    {"name":"setIsolateInternalQueries","parameterTypes":["boolean"] }, 
+    {"name":"getHealthCheckProperties","parameterTypes":[] }, 
+    {"name":"setHealthCheckProperties","parameterTypes":["java.lang.Properties"] }, 
+    {"name":"getKeepaliveTime","parameterTypes":[] }, 
+    {"name":"setKeepaliveTime","parameterTypes":["long"] }, 
+    {"name":"isReadOnly","parameterTypes":[] }, 
+    {"name":"setReadOnly","parameterTypes":["boolean"] }, 
+    {"name":"getPoolName","parameterTypes":[] }, 
+    {"name":"setPoolName","parameterTypes":["java.lang.String"] }, 
+    {"name":"getTransactionIsolation","parameterTypes":[] }, 
+    {"name":"setTransactionIsolation","parameterTypes":["java.lang.String"] }, 
+    {"name":"getSchema","parameterTypes":[] }, 
+    {"name":"setSchema","parameterTypes":["java.lang.String"] }, 
+    {"name":"getExceptionOverrideClassName","parameterTypes":[] }, 
+    {"name":"setExceptionOverrideClassName","parameterTypes":["java.lang.String"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.DataSourceProperties$RedisClusterDataSourceProperties",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getJedisConfig","parameterTypes":[] }, 
+    {"name":"setJedisConfig","parameterTypes":["com.wl4g.infra.common.jedis.JedisClientBuilder$JedisConfig"] }, 
+    {"name":"validate","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.IdentityProvider",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getKind","parameterTypes":[] }, 
+    {"name":"setKind","parameterTypes":["java.lang.String"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.IdentityProvider$OAuth2Config",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getAuthorizationUrl","parameterTypes":[] }, 
+    {"name":"setAuthorizationUrl","parameterTypes":["java.lang.String"] }, 
+    {"name":"getTokenUrl","parameterTypes":[] }, 
+    {"name":"setTokenUrl","parameterTypes":["java.lang.String"] }, 
+    {"name":"getUserinfoUrl","parameterTypes":[] }, 
+    {"name":"setUserinfoUrl","parameterTypes":["java.lang.String"] }, 
+    {"name":"getClientId","parameterTypes":[] }, 
+    {"name":"setClientId","parameterTypes":["java.lang.String"] }, 
+    {"name":"getClientSecret","parameterTypes":[] }, 
+    {"name":"setClientSecret","parameterTypes":["java.lang.String"] }, 
+    {"name":"getUserId","parameterTypes":[] }, 
+    {"name":"setUserId","parameterTypes":["java.lang.String"] }, 
+    {"name":"getUserName","parameterTypes":[] }, 
+    {"name":"setUserName","parameterTypes":["java.lang.String"] }, 
+    {"name":"getScopes","parameterTypes":[] }, 
+    {"name":"setScopes","parameterTypes":["java.lang.String"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.IdentityProvider$Saml2Config",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getSpMetadataUrl","parameterTypes":[] }, 
+    {"name":"setSpMetadataUrl","parameterTypes":["java.lang.String"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.Notification",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getKind","parameterTypes":[] }, 
+    {"name":"setKind","parameterTypes":["java.lang.String"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.Notification$EmailConfig",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getSmtpHost","parameterTypes":[] }, 
+    {"name":"setSmtpHost","parameterTypes":["java.lang.String"] }, 
+    {"name":"getSmtpPort","parameterTypes":[] }, 
+    {"name":"setSmtpPort","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"getSendMail","parameterTypes":[] }, 
+    {"name":"setSendMail","parameterTypes":["java.lang.String"] }, 
+    {"name":"getUsername","parameterTypes":[] }, 
+    {"name":"setUsername","parameterTypes":["java.lang.String"] }, 
+    {"name":"getPassword","parameterTypes":[] }, 
+    {"name":"setPassword","parameterTypes":["java.lang.String"] }, 
+    {"name":"getUseSSL","parameterTypes":[] }, 
+    {"name":"setUseSSL","parameterTypes":["java.lang.Boolean"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.Notification$DingtalkConfig",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getAppKey","parameterTypes":[] }, 
+    {"name":"setAppKey","parameterTypes":["java.lang.String"] }, 
+    {"name":"getAppSecret","parameterTypes":[] }, 
+    {"name":"setAppSecret","parameterTypes":["java.lang.String"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.Notification$WeComConfig",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.Notification$AliyunSmsConfig",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getAccessKey","parameterTypes":[] }, 
+    {"name":"setAccessKey","parameterTypes":["java.lang.String"] }, 
+    {"name":"getAccessSecret","parameterTypes":[] }, 
+    {"name":"setAccessSecret","parameterTypes":["java.lang.String"] }, 
+    {"name":"getRegionId","parameterTypes":[] }, 
+    {"name":"setRegionId","parameterTypes":["java.lang.String"] }, 
+    {"name":"getSignName","parameterTypes":[] }, 
+    {"name":"setSignName","parameterTypes":["java.lang.String"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.Notification$AliyunVmsConfig",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getAccessKey","parameterTypes":[] }, 
+    {"name":"setAccessKey","parameterTypes":["java.lang.String"] }, 
+    {"name":"getAccessSecret","parameterTypes":[] }, 
+    {"name":"setAccessSecret","parameterTypes":["java.lang.String"] }, 
+    {"name":"getRegionId","parameterTypes":[] }, 
+    {"name":"setRegionId","parameterTypes":["java.lang.String"] }, 
+    {"name":"getCalledShowNumber","parameterTypes":[] }, 
+    {"name":"setCalledShowNumber","parameterTypes":["java.lang.String"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.Notification$WebhookConfig",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getUrls","parameterTypes":[] }, 
+    {"name":"setUrls","parameterTypes":["java.util.List"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.Rule",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getName","parameterTypes":["java.lang.String"] }, 
+    {"name":"setName","parameterTypes":["java.lang.String"] }, 
+    {"name":"getEngine","parameterTypes":[] }, 
+    {"name":"setEngine","parameterTypes":["com.wl4g.rengine.common.entity.Rule$RuleEngine"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.Rule$RuleEngine",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"com.wl4g.rengine.common.entity.Rule$RuleWrapper",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setScripts","parameterTypes":["java.util.List"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.RuleScript",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getRevision","parameterTypes":[] }, 
+    {"name":"setRevision","parameterTypes":["java.lang.Long"] }, 
+    {"name":"getRuleId","parameterTypes":[] }, 
+    {"name":"setRuleId","parameterTypes":["java.lang.Long"] }, 
+    {"name":"getUploadIds","parameterTypes":[] }, 
+    {"name":"setUploadIds","parameterTypes":["java.util.List"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.RuleScript$RuleScriptWrapper",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setUploads","parameterTypes":["java.util.List"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.Scenes",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getName","parameterTypes":[] }, 
+    {"name":"setName","parameterTypes":["java.lang.String"] }, 
+    {"name":"getScenesCode","parameterTypes":[] }, 
+    {"name":"setScenesCode","parameterTypes":["java.lang.String"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.Scenes$ScenesWrapper",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getWorkflows","parameterTypes":[] }, 
+    {"name":"setWorkflows","parameterTypes":["java.util.List"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.UploadObject",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getExtension","parameterTypes":[] }, 
+    {"name":"setExtension","parameterTypes":["java.lang.String"] }, 
+    {"name":"getFilename","parameterTypes":[] }, 
+    {"name":"setFilename","parameterTypes":["java.lang.String"] }, 
+    {"name":"getObjectPrefix","parameterTypes":[] }, 
+    {"name":"setObjectPrefix","parameterTypes":["java.lang.String"] }, 
+    {"name":"getSize","parameterTypes":[] }, 
+    {"name":"setSize","parameterTypes":["java.lang.Long"] }, 
+    {"name":"getMd5","parameterTypes":[] }, 
+    {"name":"setMd5","parameterTypes":["java.lang.Long"] }, 
+    {"name":"getSha1","parameterTypes":[] }, 
+    {"name":"setSha1","parameterTypes":["java.lang.Long"] }, 
+    {"name":"getUploadType","parameterTypes":[] }, 
+    {"name":"setUploadType","parameterTypes":["java.lang.String"] }
+  ]
+},
+{
   "name":"com.wl4g.rengine.common.entity.UploadObject$ExtensionType",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
   "methods":[
+    {"name":"getBinary","parameterTypes":[] }, 
+    {"name":"getSuffix","parameterTypes":[] }, 
     {"name":"of","parameterTypes":["java.lang.String"] }
   ]
 },
@@ -14,21 +429,61 @@
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
   "methods":[
+    {"name":"getPrefix","parameterTypes":[] }, 
+    {"name":"getExtensions","parameterTypes":[] }, 
     {"name":"of","parameterTypes":["java.lang.String"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.Workflow",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getEngine","parameterTypes":[] }, 
+    {"name":"setEngine","parameterTypes":["com.wl4g.rengine.common.entity.Rule$RuleEngine"] }, 
+    {"name":"getName","parameterTypes":[] }, 
+    {"name":"setName","parameterTypes":["java.lang.String"] }, 
+    {"name":"getScenesId","parameterTypes":[] }, 
+    {"name":"setScenesId","parameterTypes":["java.lang.Long"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.Workflow$WorkflowGraphWrapper",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getRules","parameterTypes":[] }, 
+    {"name":"setRules","parameterTypes":["java.util.List"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.Workflow$WorkflowWrapper",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getGraphs","parameterTypes":[] }, 
+    {"name":"setGraphs","parameterTypes":["java.util.List"] }
   ]
 },
 {
   "name":"com.wl4g.rengine.common.entity.WorkflowGraph",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true,
   "methods":[
-    {"name":"<init>","parameterTypes":[] },
-    {"name":"<init>","parameterTypes":["java.util.List", "java.util.List"] },
-    {"name":"getNodes","parameterTypes":[] },
-    {"name":"setNodes","parameterTypes":["java.util.List"] },
-    {"name":"getConnections","parameterTypes":[] },
-    {"name":"setConnections","parameterTypes":["java.util.List"] }
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getConnections","parameterTypes":[] }, 
+    {"name":"setConnections","parameterTypes":["java.util.List"] }, 
+    {"name":"getNodes","parameterTypes":[] }, 
+    {"name":"setNodes","parameterTypes":["java.util.List"] }, 
+    {"name":"getRevision","parameterTypes":[] }, 
+    {"name":"setRevision","parameterTypes":["java.lang.Long"] }, 
+    {"name":"getWorkflowId","parameterTypes":[] }, 
+    {"name":"setWorkflowId","parameterTypes":["java.lang.Long"] }
   ]
 },
 {
@@ -37,30 +492,15 @@
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
   "methods":[
-    {"name":"<init>","parameterTypes":[] },
-    {"name":"getType","parameterTypes":[] },
-    {"name":"setType","parameterTypes":["java.lang.String"] },
-    {"name":"getId","parameterTypes":[] },
-    {"name":"setId","parameterTypes":["java.lang.String"] },
-    {"name":"withId","parameterTypes":["java.lang.String"] },
-    {"name":"getName","parameterTypes":[] },
-    {"name":"setName","parameterTypes":["java.lang.String"] },
-    {"name":"withName","parameterTypes":["java.lang.String"] },
-    {"name":"getAttributes","parameterTypes":[] },
-    {"name":"setAttributes","parameterTypes":["java.util.Map"] },
-    {"name":"withAttributes","parameterTypes":["java.util.Map"] }
-  ]
-},
-{
-  "name":"com.wl4g.rengine.common.entity.WorkflowGraph$BaseRunNode",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true,
-  "methods":[
-    {"name":"<init>","parameterTypes":[] },
-    {"name":"getRuleId","parameterTypes":[] },
-    {"name":"setRuleId","parameterTypes":["java.lang.String"] },
-    {"name":"withRuleId","parameterTypes":["java.lang.String"] }
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getAttributes","parameterTypes":[] }, 
+    {"name":"setAttributes","parameterTypes":["java.util.Map"] }, 
+    {"name":"getId","parameterTypes":[] }, 
+    {"name":"setId","parameterTypes":["java.lang.String"] }, 
+    {"name":"getName","parameterTypes":[] }, 
+    {"name":"setName","parameterTypes":["java.lang.String"] }, 
+    {"name":"getType","parameterTypes":[] }, 
+    {"name":"setType","parameterTypes":["java.lang.String"] }
   ]
 },
 {
@@ -68,27 +508,14 @@
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
-  "methods":[
-    {"name":"<init>","parameterTypes":[] }
-  ]
-},
-{
-  "name":"com.wl4g.rengine.common.entity.WorkflowGraph$ProcessNode",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true,
-  "methods":[
-    {"name":"<init>","parameterTypes":[] }
-  ]
+  "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
   "name":"com.wl4g.rengine.common.entity.WorkflowGraph$FailbackNode",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
-  "methods":[
-    {"name":"<init>","parameterTypes":[] }
-  ]
+  "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
   "name":"com.wl4g.rengine.common.entity.WorkflowGraph$LogicalNode",
@@ -96,11 +523,47 @@
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
   "methods":[
-    {"name":"<init>","parameterTypes":[] },
-    {"name":"getLogical","parameterTypes":[] },
-    {"name":"setLogical","parameterTypes":["com.wl4g.rengine.common.entity.WorkflowGraph$LogicalType"] },
-    {"name":"withLogical","parameterTypes":["com.wl4g.rengine.common.entity.WorkflowGraph$LogicalType"] }
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getLogical","parameterTypes":[] }, 
+    {"name":"setLogical","parameterTypes":["com.wl4g.rengine.common.entity.WorkflowGraph$LogicalType"] }
   ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.WorkflowGraph$LogicalType",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"of","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.WorkflowGraph$NodeConnection",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getAttributes","parameterTypes":[] }, 
+    {"name":"setAttributes","parameterTypes":["java.util.Map"] }, 
+    {"name":"getFrom","parameterTypes":[] }, 
+    {"name":"setFrom","parameterTypes":["java.lang.String"] }, 
+    {"name":"getName","parameterTypes":[] }, 
+    {"name":"setName","parameterTypes":["java.lang.String"] }, 
+    {"name":"getTo","parameterTypes":[] }, 
+    {"name":"setTo","parameterTypes":["java.lang.String"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.WorkflowGraph$ProcessNode",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.WorkflowGraph$RelationNode",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
   "name":"com.wl4g.rengine.common.entity.WorkflowGraph$RunNode",
@@ -108,17 +571,9 @@
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
   "methods":[
-    {"name":"<init>","parameterTypes":[] }
-  ]
-},
-{
-  "name":"com.wl4g.rengine.common.entity.WorkflowGraph$LogicalType",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true,
-  "methods":[
-    {"name":"getDescription","parameterTypes":[] },
-    {"name":"of","parameterTypes":["java.lang.String"] }
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getRuleId","parameterTypes":[] }, 
+    {"name":"setRuleId","parameterTypes":["java.lang.String"] }
   ]
 },
 {
@@ -159,5 +614,38 @@
     {"name":"<init>","parameterTypes":["com.wl4g.rengine.common.entity.WorkflowGraph$BaseNode"] },
     {"name":"from","parameterTypes":["com.wl4g.rengine.common.entity.WorkflowGraph"] }
   ]
+},
+{
+  "name":"com.wl4g.rengine.common.model.Evaluation",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getClientId","parameterTypes":[] }, 
+    {"name":"setClientId","parameterTypes":["java.lang.String"] }, 
+    {"name":"getClientSecret","parameterTypes":[] }, 
+    {"name":"setClientSecret","parameterTypes":["java.lang.String"] }, 
+    {"name":"getScenesCodes","parameterTypes":[] }, 
+    {"name":"setScenesCodes","parameterTypes":["java.util.List"] }, 
+    {"name":"getBestEffort","parameterTypes":[] }, 
+    {"name":"setBestEffort","parameterTypes":["java.lang.Boolean"] }, 
+    {"name":"getTimeout","parameterTypes":[] }, 
+    {"name":"setTimeout","parameterTypes":["java.lang.Long"] }, 
+    {"name":"getArgs","parameterTypes":[] }, 
+    {"name":"setArgs","parameterTypes":["java.util.Map"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.model.EvaluationBase",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"setRequestId","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"com.wl4g.rengine.common.model.EvaluationResult"
+},
+{
+  "name":"com.wl4g.rengine.common.model.EvaluationResult$ResultDescription"
 }
 ]

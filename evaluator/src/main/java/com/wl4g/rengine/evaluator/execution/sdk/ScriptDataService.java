@@ -15,11 +15,11 @@
  */
 package com.wl4g.rengine.evaluator.execution.sdk;
 
-import javax.annotation.Nullable;
+import javax.validation.constraints.NotBlank;
 
 import org.graalvm.polyglot.HostAccess;
 
-import com.wl4g.rengine.common.entity.DataSource.DataSourceType;
+import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
 import com.wl4g.rengine.evaluator.execution.datasource.DataSourceFacade;
 import com.wl4g.rengine.evaluator.execution.datasource.GlobalDataSourceManager;
 
@@ -37,16 +37,34 @@ import lombok.ToString;
 @AllArgsConstructor
 public class ScriptDataService {
 
-    private final GlobalDataSourceManager globalDataSourceManager;
+    final ScriptHttpClient defaultHttpClient;
+    final ScriptSSHClient defaultSSHClient;
+    final ScriptTCPClient defaultTCPClient;
+    final GlobalDataSourceManager globalDataSourceManager;
 
-    public @HostAccess.Export DataSourceFacade mongoService(final @Nullable String dataSourceName) {
+    public @HostAccess.Export ScriptHttpClient getDefaultHttpClient() {
+        return defaultHttpClient;
+    }
+
+    public @HostAccess.Export ScriptSSHClient getDefaultSSHClient() {
+        return defaultSSHClient;
+    }
+
+    public @HostAccess.Export ScriptTCPClient getDefaultTCPClient() {
+        return defaultTCPClient;
+    }
+
+    public @HostAccess.Export DataSourceFacade getMongoService(final @NotBlank String dataSourceName) {
         return globalDataSourceManager.loadDataSource(DataSourceType.MONGO, dataSourceName);
     }
 
-    // public @HostAccess.Export DataSourceFacade jdbcService(final @Nullable
-    // String dataSourceName) {
-    // return opentsdbAggregatedService;
-    // }
+    public @HostAccess.Export DataSourceFacade getJDBCService(final @NotBlank String dataSourceName) {
+        return globalDataSourceManager.loadDataSource(DataSourceType.JDBC, dataSourceName);
+    }
+
+    public @HostAccess.Export DataSourceFacade getRedisClusterService(final @NotBlank String dataSourceName) {
+        return globalDataSourceManager.loadDataSource(DataSourceType.REDIS_CLUSTER, dataSourceName);
+    }
 
     // public @HostAccess.Export DataSourceFacade phoenixService(final @Nullable
     // String dataSourceName) {

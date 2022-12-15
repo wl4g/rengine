@@ -32,7 +32,7 @@ import org.testcontainers.containers.MongoDBContainer;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
-import com.wl4g.rengine.common.entity.DataSource.DataSourceType;
+import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
 import com.wl4g.rengine.common.util.BsonUtils2;
 import com.wl4g.rengine.evaluator.util.TestSetupDefaults;
 

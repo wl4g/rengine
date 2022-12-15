@@ -33,7 +33,7 @@ import org.springframework.stereotype.Service;
 import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
-import com.wl4g.rengine.common.entity.DataSource;
+import com.wl4g.rengine.common.entity.DataSourceProperties;
 import com.wl4g.rengine.common.util.IdGenUtil;
 import com.wl4g.rengine.manager.admin.model.DeleteDataSource;
 import com.wl4g.rengine.manager.admin.model.DeleteDataSourceResult;
@@ -55,7 +55,7 @@ public class DataSourceServiceImpl implements DataSourceService {
     private @Autowired MongoTemplate mongoTemplate;
 
     @Override
-    public PageHolder<DataSource> query(QueryDataSource model) {
+    public PageHolder<DataSourceProperties> query(QueryDataSource model) {
         Query query = new Query(new Criteria().andOperator(Criteria.where("enable").is(1), Criteria.where("delFlag").is(0),
                 new Criteria().orOperator(Criteria.where("_id").is(model.getDataSourceId()),
                         Criteria.where("type").is(model.getType().name()),
@@ -65,19 +65,19 @@ public class DataSourceServiceImpl implements DataSourceService {
 
         query.with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
 
-        List<DataSource> dataSources = mongoTemplate.find(query, DataSource.class,
+        List<DataSourceProperties> dataSourceProperties = mongoTemplate.find(query, DataSourceProperties.class,
                 MongoCollectionDefinition.DATASOURCES.getName());
 
-        return new PageHolder<DataSource>(model.getPageNum(), model.getPageSize())
+        return new PageHolder<DataSourceProperties>(model.getPageNum(), model.getPageSize())
                 .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.DATASOURCES.getName()))
-                .withRecords(dataSources);
+                .withRecords(dataSourceProperties);
     }
 
     @Override
     public SaveDataSourceResult save(SaveDataSource model) {
-        DataSource dataSource = model;
+        DataSourceProperties dataSourceProperties = model;
         // @formatter:off
-        //DataSource dataSource = DataSource.builder()
+        //DataSourceProperties dataSource = DataSourceProperties.builder()
         //        .id(model.getId())
         //        .type(model.getType())
         //        .name(model.getName())
@@ -87,16 +87,16 @@ public class DataSourceServiceImpl implements DataSourceService {
         //        .remark(model.getRemark())
         //        .build();
         // @formatter:on
-        notNullOf(dataSource, "datasource");
+        notNullOf(dataSourceProperties, "datasource");
 
-        if (isNull(dataSource.getId())) {
-            dataSource.setId(IdGenUtil.nextLong());
-            dataSource.preInsert();
+        if (isNull(dataSourceProperties.getId())) {
+            dataSourceProperties.setId(IdGenUtil.nextLong());
+            dataSourceProperties.preInsert();
         } else {
-            dataSource.preUpdate();
+            dataSourceProperties.preUpdate();
         }
 
-        DataSource saved = mongoTemplate.insert(dataSource, MongoCollectionDefinition.DATASOURCES.getName());
+        DataSourceProperties saved = mongoTemplate.insert(dataSourceProperties, MongoCollectionDefinition.DATASOURCES.getName());
         return SaveDataSourceResult.builder().id(saved.getId()).build();
     }
 

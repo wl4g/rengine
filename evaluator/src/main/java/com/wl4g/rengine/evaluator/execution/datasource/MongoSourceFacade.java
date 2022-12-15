@@ -53,8 +53,10 @@ import com.mongodb.client.result.InsertManyResult;
 import com.mongodb.client.result.UpdateResult;
 import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
-import com.wl4g.rengine.common.entity.DataSource.DataSourceType;
-import com.wl4g.rengine.common.exception.RengineException;
+import com.wl4g.rengine.common.entity.DataSourceProperties;
+import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
+import com.wl4g.rengine.common.entity.DataSourceProperties.MongoDataSourceProperties;
+import com.wl4g.rengine.common.exception.ConfigRengineException;
 import com.wl4g.rengine.common.util.BsonUtils2;
 import com.wl4g.rengine.evaluator.execution.ExecutionConfig;
 
@@ -74,8 +76,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public class MongoSourceFacade implements DataSourceFacade {
 
+    final ExecutionConfig executionConfig;
     final String dataSourceName;
-    final ExecutionConfig config;
     final MongoClient mongoClient;
 
     @Override
@@ -101,7 +103,7 @@ public class MongoSourceFacade implements DataSourceFacade {
                 .collect(toList());
 
         final MongoCursor<JsonNode> cursor = collection.aggregate(aggregateQuery)
-                .batchSize(config.maxQueryBatch())
+                .batchSize(getExecutionConfig().maxQueryBatch())
                 .map(doc -> parseToNode(doc.toJson(), null))
                 .iterator();
         try {
@@ -169,29 +171,27 @@ public class MongoSourceFacade implements DataSourceFacade {
         public DataSourceFacade newInstnace(
                 final @NotNull ExecutionConfig config,
                 final @NotBlank String dataSourceName,
-                final @NotNull Map<String, Object> dataSourceProperties) {
-            notNullOf(config, "config");
+                final @NotNull DataSourceProperties dataSourceProperties) {
+            notNullOf(config, "properties");
             hasTextOf(dataSourceName, "dataSourceName");
 
-            final String connectionString = (String) dataSourceProperties.get(KEY_CONNECTION_STRING);
+            final String connectionString = ((MongoDataSourceProperties) dataSourceProperties).getConnectionString();
             if (isBlank(connectionString)) {
-                throw new RengineException(
-                        format("No found mongo dataSource properties.connectionString of %s", dataSourceProperties));
+                throw new ConfigRengineException(format("No found mongo dataSource properties : %s", dataSourceProperties));
             }
 
             final MongoClient mongoClient = new MongoClientImpl(
                     MongoClientSettings.builder().applyConnectionString(new ConnectionString(connectionString)).build(),
                     MongoDriverInformation.builder().build());
 
-            return new MongoSourceFacade(dataSourceName, config, mongoClient);
+            return new MongoSourceFacade(config, dataSourceName, mongoClient);
         }
 
         @Override
-        public DataSourceType sourceType() {
+        public DataSourceType type() {
             return DataSourceType.MONGO;
         }
 
-        public static final String KEY_CONNECTION_STRING = "connectionString";
     }
 
 }

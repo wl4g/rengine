@@ -27,7 +27,7 @@
 //import com.wl4g.infra.common.lang.StringUtils2;
 //import com.wl4g.rengine.common.entity.Scenes;
 //import com.wl4g.rengine.common.entity.UploadObject.UploadType;
-//import com.wl4g.rengine.common.exception.EvaluateException;
+//import com.wl4g.rengine.common.exception.EvaluationRengineException;
 //import com.wl4g.rengine.common.model.Evaluation;
 //import com.wl4g.rengine.evaluator.execution.sdk.ScriptContext;
 //import com.wl4g.rengine.evaluator.execution.sdk.ScriptResult;
@@ -106,7 +106,7 @@
 //                        }
 //                    }
 //                } catch (Throwable e) {
-//                    throw new EvaluateException(evaluation.getRequestId(), scenes.getScenesCode(),
+//                    throw new EvaluationRengineException(evaluation.getRequestId(), scenes.getScenesCode(),
 //                            format("Failed to load groovy dependency '%s'", scriptName), e);
 //                }
 //            }
@@ -117,7 +117,7 @@
 //            // TODO re-wrap result object
 //            return new ScriptResult(null);
 //        } catch (Exception e) {
-//            throw new EvaluateException(evaluation.getRequestId(), scenes.getScenesCode(),
+//            throw new EvaluationRengineException(evaluation.getRequestId(), scenes.getScenesCode(),
 //                    format("Failed to execution Groovy script for scenesCode: %s", scenes.getScenesCode()), e);
 //        }
 //    }

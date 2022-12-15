@@ -47,9 +47,8 @@ import com.wl4g.infra.common.graalvm.GraalPolyglotManager.ContextWrapper;
 import com.wl4g.infra.common.lang.EnvironmentUtil;
 import com.wl4g.infra.common.lang.StringUtils2;
 import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
-import com.wl4g.rengine.common.exception.EvaluateException;
+import com.wl4g.rengine.common.exception.EvaluationRengineException;
 import com.wl4g.rengine.common.graph.ExecutionGraphContext;
-import com.wl4g.rengine.evaluator.execution.sdk.ScriptHttpClient;
 import com.wl4g.rengine.evaluator.execution.sdk.ScriptResult;
 import com.wl4g.rengine.evaluator.metrics.EvaluatorMeterService.MetricsTag;
 import com.wl4g.rengine.evaluator.minio.MinioManager.ObjectResource;
@@ -132,16 +131,13 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
                     // merge JS library with dependency.
                     graalContext.eval(Source.newBuilder("js", script.readToString(), scriptName).build());
                 } catch (PolyglotException e) {
-                    throw new EvaluateException(traceId, scenesCode,
+                    throw new EvaluationRengineException(traceId, scenesCode,
                             format("Unable to parse JS dependency of '%s', scenesCode: %s", scriptName, scenesCode), e);
                 }
             }
 
             final Value bindings = graalContext.getBindings("js");
-            // Try not to bind implicit objects, let users create new objects by
-            // self or get default objects from the graal context.
-            bindings.putMember(ScriptHttpClient.class.getSimpleName(), ScriptHttpClient.class);
-            bindings.putMember(ScriptResult.class.getSimpleName(), ScriptResult.class);
+            registerMembers(bindings);
 
             log.trace("Loading js-script ...");
             final Value mainFunction = bindings.getMember(DEFAULT_MAIN_FUNCTION);
@@ -160,7 +156,7 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
             log.info("Executed for scenesCode: {}, cost: {}ms, result: {}", scenesCode, costTime, result);
             return result.as(ScriptResult.class);
         } catch (Throwable e) {
-            throw new EvaluateException(traceId, clientId, scenesCode, "Failed to execution js script", e);
+            throw new EvaluationRengineException(traceId, clientId, scenesCode, "Failed to execution js script", e);
         }
     }
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.collector.util;
+package com.wl4g.rengine.common.util;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.util.Objects.nonNull;
@@ -36,7 +36,7 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link HikariJdbcHelper}
+ * {@link HikariJDBCHelper}
  * 
  * @author James Wong
  * @version 2022-11-24
@@ -45,12 +45,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 @ToString
-public class HikariJdbcHelper implements Closeable {
+public class HikariJDBCHelper implements Closeable {
 
     private final HikariDataSource dataSource;
     private final QueryRunner queryRunner;
 
-    public HikariJdbcHelper(StatementConfiguration stmtConfig, HikariConfig hikariConfig) {
+    public HikariJDBCHelper(StatementConfiguration stmtConfig, HikariConfig hikariConfig) {
         this.dataSource = new HikariDataSource(notNullOf(hikariConfig, "hikariConfig"));
         this.queryRunner = new QueryRunner(dataSource, false, stmtConfig);
     }

@@ -15,37 +15,28 @@
  */
 package com.wl4g.rengine.common.exception;
 
-import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-
-import com.wl4g.rengine.common.graph.ExecutionGraph;
-
 import lombok.Getter;
 
 /**
- * {@link ExecutionException}
+ * {@link ExecutionScriptRengineException}
  * 
  * @author James Wong
  * @version 2022-09-22
  * @since v1.0.0
  */
 @Getter
-public class ExecutionException extends RengineException {
+public class ExecutionScriptRengineException extends RengineException {
     private static final long serialVersionUID = 5177120828249689148L;
 
-    private ExecutionGraph<?> node;
-
-    public ExecutionException(ExecutionGraph<?> node, String message) {
+    public ExecutionScriptRengineException(String message) {
         super(message);
-        this.node = notNullOf(node, "node");
     }
 
-    public ExecutionException(ExecutionGraph<?> node, String message, Throwable cause) {
+    public ExecutionScriptRengineException(String message, Throwable cause) {
         super(message, cause);
-        this.node = notNullOf(node, "node");
     }
 
-    public ExecutionException(ExecutionGraph<?> node, Throwable cause) {
+    public ExecutionScriptRengineException(Throwable cause) {
         super(cause);
-        this.node = notNullOf(node, "node");
     }
 }

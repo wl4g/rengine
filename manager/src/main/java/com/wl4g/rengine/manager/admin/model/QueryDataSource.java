@@ -17,8 +17,8 @@ package com.wl4g.rengine.manager.admin.model;
 
 import javax.annotation.Nullable;
 
-import com.wl4g.rengine.common.entity.DataSource;
-import com.wl4g.rengine.common.entity.DataSource.DataSourceType;
+import com.wl4g.rengine.common.entity.DataSourceProperties;
+import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,7 +38,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class QueryDataSource extends QueryBase<DataSource> {
+public class QueryDataSource extends QueryBase<DataSourceProperties> {
     private @Nullable Long dataSourceId;
     private @Nullable DataSourceType type;
 }

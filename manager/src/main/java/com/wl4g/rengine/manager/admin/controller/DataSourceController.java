@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.common.entity.DataSource;
+import com.wl4g.rengine.common.entity.DataSourceProperties;
 import com.wl4g.rengine.manager.admin.model.DeleteDataSource;
 import com.wl4g.rengine.manager.admin.model.DeleteDataSourceResult;
 import com.wl4g.rengine.manager.admin.model.QueryDataSource;
@@ -62,9 +62,9 @@ public class DataSourceController {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful",
             content = { @Content(mediaType = "application/json") }) })
     @RequestMapping(path = { "query" }, method = { GET })
-    public RespBase<PageHolder<DataSource>> query(@Validated QueryDataSource model) {
+    public RespBase<PageHolder<DataSourceProperties>> query(@Validated QueryDataSource model) {
         log.info("called: model={}", model);
-        RespBase<PageHolder<DataSource>> resp = RespBase.create();
+        RespBase<PageHolder<DataSourceProperties>> resp = RespBase.create();
         resp.setData(dataSourceService.query(model));
         return resp;
     }

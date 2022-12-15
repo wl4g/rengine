@@ -68,19 +68,19 @@ public class ScriptHttpClient {
         this.restClient = new RestClient(debug, connectTimeout, readTimeout, maxResponseSize);
     }
 
-    public @HostAccess.Export String getAsText(String url) {
+    public @HostAccess.Export String getForText(String url) {
         return restClient.getForObject(url, String.class);
     }
 
-    public @HostAccess.Export String postAsText(String url, Object request) {
+    public @HostAccess.Export String postForText(String url, Object request) {
         return restClient.postForObject(url, request, String.class);
     }
 
-    public @HostAccess.Export JsonNode getAsJson(String url) {
+    public @HostAccess.Export JsonNode getForJson(String url) {
         return restClient.getForObject(url, JsonNode.class);
     }
 
-    public @HostAccess.Export JsonNode postAsJson(String url, Object request) {
+    public @HostAccess.Export JsonNode postForJson(String url, Object request) {
         return restClient.postForObject(url, request, JsonNode.class);
     }
 

@@ -13,12 +13,11 @@
     {"name":"getLastResult","parameterTypes":[] },
     {"name":"getLogger","parameterTypes":[] },
     {"name":"getDataService","parameterTypes":[] },
-    {"name":"getDefaultHttpClient","parameterTypes":[] },
     {"name":"toString","parameterTypes":[] }
   ]
 },
 {
-  "name":"com.wl4g.rengine.evaluator.execution.sdk.ScriptContext$ScriptRengineEvent",
+  "name":"com.wl4g.rengine.evaluator.execution.sdk.ScriptRengineEvent",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
@@ -32,7 +31,7 @@
   ]
 },
 {
-  "name":"com.wl4g.rengine.evaluator.execution.sdk.ScriptContext$ScriptEventSource",
+  "name":"com.wl4g.rengine.evaluator.execution.sdk.ScriptRengineEvent$ScriptEventSource",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
@@ -45,7 +44,7 @@
   ]
 },
 {
-  "name":"com.wl4g.rengine.evaluator.execution.sdk.ScriptContext$ScriptEventLocation",
+  "name":"com.wl4g.rengine.evaluator.execution.sdk.ScriptRengineEvent$ScriptEventLocation",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
@@ -85,11 +84,33 @@
     {"name":"<init>","parameterTypes":[] }, 
     {"name":"<init>","parameterTypes":["java.lang.Integer","java.lang.Integer","java.lang.Integer"] }, 
     {"name":"<init>","parameterTypes":["java.lang.Boolean","java.lang.Integer","java.lang.Integer","java.lang.Integer"] }, 
-    {"name":"getAsText","parameterTypes":["java.lang.String"] }, 
-    {"name":"postAsText","parameterTypes":["java.lang.String","java.lang.Object"] }, 
-    {"name":"getAsJson","parameterTypes":["java.lang.String"] }, 
-    {"name":"postAsJson","parameterTypes":["java.lang.String","java.lang.Object"] }, 
+    {"name":"getForText","parameterTypes":["java.lang.String"] }, 
+    {"name":"postForText","parameterTypes":["java.lang.String","java.lang.Object"] }, 
+    {"name":"getForJson","parameterTypes":["java.lang.String"] }, 
+    {"name":"postForJson","parameterTypes":["java.lang.String","java.lang.Object"] }, 
     {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.evaluator.execution.sdk.ScriptSSHClient",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"execute","parameterTypes":["java.lang.String","java.lang.Object"] }, 
+    {"name":"execute","parameterTypes":["java.lang.String","int","java.lang.String","java.lang.String","java.lang.String","java.lang.String","long"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.evaluator.execution.sdk.ScriptTCPClient",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"execute","parameterTypes":["java.lang.String","int","java.lang.String"] }, 
+    {"name":"execute","parameterTypes":["java.lang.String","int","java.lang.String","long"] }
   ]
 },
 {
@@ -115,11 +136,52 @@
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
   "methods":[
-    {"name":"mongoService","parameterTypes":["java.lang.String"] }, 
-    {"name":"jdbcService","parameterTypes":["java.lang.String"] }, 
-    {"name":"phoenixService","parameterTypes":["java.lang.String"] }, 
-    {"name":"opentsdbService","parameterTypes":["java.lang.String"] }
+    {"name":"getDefaultHttpClient","parameterTypes":[] }, 
+    {"name":"getDefaultSSHClient","parameterTypes":[] }, 
+    {"name":"getDefaultTCPClient","parameterTypes":[] }, 
+    {"name":"getMongoService","parameterTypes":["java.lang.String"] }, 
+    {"name":"getJDBCService","parameterTypes":["java.lang.String"] }, 
+    {"name":"getRedisClusterService","parameterTypes":["java.lang.String"] }, 
+    {"name":"getPhoenixService","parameterTypes":["java.lang.String"] }, 
+    {"name":"getOpentTSDBService","parameterTypes":["java.lang.String"] }
   ]
+},
+{
+  "name":"com.wl4g.rengine.evaluator.execution.sdk.extension.ScriptPrometheusParser",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"parse","parameterTypes":["java.lang.String"] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.evaluator.execution.sdk.extension.ScriptPrometheusParser$PrometheusMetrics",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getHelp","parameterTypes":[] }, 
+    {"name":"setHelp","parameterTypes":["java.lang.String"] }, 
+    {"name":"getType","parameterTypes":[] }, 
+    {"name":"setType","parameterTypes":["java.lang.String"] }, 
+    {"name":"getSubType","parameterTypes":[] }, 
+    {"name":"setSubType","parameterTypes":["java.lang.String"] }, 
+    {"name":"getName","parameterTypes":[] }, 
+    {"name":"setName","parameterTypes":["java.lang.String"] }, 
+    {"name":"getValue","parameterTypes":[] }, 
+    {"name":"setValue","parameterTypes":["java.lang.String"] }, 
+    {"name":"getTags","parameterTypes":[] }, 
+    {"name":"setTags","parameterTypes":["java.util.Map"] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.evaluator.rest.interceptor.CustomValid",
+  "queryAllDeclaredMethods":true
 },
 {
   "name":"com.wl4g.rengine.evaluator.rest.TestGroovyResource$GroovyExecution"

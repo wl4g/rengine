@@ -16,12 +16,12 @@
 package com.wl4g.rengine.evaluator.execution.datasource;
 
 import java.io.Closeable;
-import java.util.Map;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import com.wl4g.rengine.common.entity.DataSource.DataSourceType;
+import com.wl4g.rengine.common.entity.DataSourceProperties;
+import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
 import com.wl4g.rengine.evaluator.execution.ExecutionConfig;
 
 /**
@@ -32,14 +32,17 @@ import com.wl4g.rengine.evaluator.execution.ExecutionConfig;
  * @since v1.0.0
  */
 public interface DataSourceFacade extends Closeable {
+
+    ExecutionConfig getExecutionConfig();
+
     String getDataSourceName();
 
     public static interface DataSourceFacadeBuilder {
         DataSourceFacade newInstnace(
                 final @NotNull ExecutionConfig config,
                 final @NotBlank String dataSourceName,
-                final @NotNull Map<String, Object> dataSourceProperties);
+                final @NotNull DataSourceProperties dataSourceProperties);
 
-        DataSourceType sourceType();
+        DataSourceType type();
     }
 }

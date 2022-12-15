@@ -110,7 +110,7 @@ rengine:
         simpleRedis:
           jedisConfig:
             nodes: [localhost:6379,localhost:6380,localhost:6381,localhost:7379,localhost:7380,localhost:7381]
-            passwd: 'zzx!@#$%'
+            password: 'zzx!@#$%'
             #clientName: 
             connTimeout: 10000
             soTimeout: 10000
@@ -160,7 +160,7 @@ rengine:
           - name: redis-local
             jedisConfig:
               nodes: [localhost:6379,localhost:6380,localhost:6381,localhost:7379,localhost:7380,localhost:7381]
-              passwd: 'zzx!@#$%'
+              password: 'zzx!@#$%'
             luaScript: |-
               local testKey = KEYS[1]
               local defaultVal = tonumber(ARGV[1])

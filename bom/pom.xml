@@ -84,6 +84,8 @@
         <logstash.version>7.2</logstash.version>
         <!-- Notice: quarkus-2.12.2-netty-4.1.79.Final, quarkus-2.14.3-netty-4.1.82.Final -->
         <netty.version>4.1.82.Final</netty.version>
+        <commons-dbutils.version>1.7</commons-dbutils.version>
+        <hikaricp.version>4.0.3</hikaricp.version>
         <junit.version>4.13.2</junit.version>
         <testcontainers.version>1.16.2</testcontainers.version>
     </properties>
@@ -417,6 +419,17 @@
                 <groupId>io.netty</groupId>
                 <artifactId>netty-codec-socks</artifactId>
                 <version>${netty.version}</version>
+            </dependency>
+            <!-- DB -->
+            <dependency>
+                <groupId>commons-dbutils</groupId>
+                <artifactId>commons-dbutils</artifactId>
+                <version>${commons-dbutils.version}</version> <!--$NO-MVN-MAN-VER$-->
+            </dependency>
+            <dependency>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP</artifactId>
+                <version>${hikaricp.version}</version>
             </dependency>
             <!-- Testing-->
             <dependency>

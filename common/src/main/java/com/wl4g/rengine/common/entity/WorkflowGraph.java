@@ -289,8 +289,8 @@ public class WorkflowGraph extends BaseBean {
             this(null, from, to);
         }
 
-        public NodeConnection(final @NotBlank String name, final @NotBlank String from, final @NotBlank String to) {
-            this.name = hasTextOf(name, "name");
+        public NodeConnection(final @Nullable String name, final @NotBlank String from, final @NotBlank String to) {
+            this.name = name;
             this.to = hasTextOf(to, "to");
             this.from = hasTextOf(from, "from");
         }

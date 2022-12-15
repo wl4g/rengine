@@ -46,30 +46,30 @@ public class MinioClientAutoConfiguration {
     }
 
     // @Bean
-    // public MinioClient minioClient(MinioClientProperties config,
+    // public MinioClient minioClient(MinioClientProperties properties,
     // @Qualifier(BEAN_MINIO_OKHTTPCLIENT) OkHttpClient httpClient) {
     // Builder builder = MinioClient.builder()
-    // .endpoint(config.getEndpoint())
+    // .endpoint(properties.getEndpoint())
     // /* .credentialsProvider(provider)
-    // */.credentials(config.getTenantAccessKey(), config.getTenantSecretKey())
+    // */.credentials(properties.getTenantAccessKey(), properties.getTenantSecretKey())
     // .httpClient(httpClient);
-    // if (isBlank(config.getRegion())) {
-    // builder.region(config.getRegion());
+    // if (isBlank(properties.getRegion())) {
+    // builder.region(properties.getRegion());
     // }
     // return builder.build();
     // }
     //
     // @Bean
     // public MinioAdminClient minioAdminClient(
-    // MinioClientProperties config,
+    // MinioClientProperties properties,
     // @Qualifier(BEAN_MINIO_OKHTTPCLIENT) OkHttpClient httpClient) {
     // MinioAdminClient.Builder builder = MinioAdminClient.builder()
-    // .endpoint(config.getEndpoint())
+    // .endpoint(properties.getEndpoint())
     // /* .credentialsProvider(provider)
-    // */.credentials(config.getTenantAccessKey(), config.getTenantSecretKey())
+    // */.credentials(properties.getTenantAccessKey(), properties.getTenantSecretKey())
     // .httpClient(httpClient);
-    // if (isBlank(config.getRegion())) {
-    // builder.region(config.getRegion());
+    // if (isBlank(properties.getRegion())) {
+    // builder.region(properties.getRegion());
     // }
     // return builder.build();
     // }

@@ -18,7 +18,7 @@ package com.wl4g.rengine.manager.admin.service;
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
-import com.wl4g.rengine.common.entity.DataSource;
+import com.wl4g.rengine.common.entity.DataSourceProperties;
 import com.wl4g.rengine.manager.admin.model.DeleteDataSource;
 import com.wl4g.rengine.manager.admin.model.DeleteDataSourceResult;
 import com.wl4g.rengine.manager.admin.model.QueryDataSource;
@@ -34,7 +34,7 @@ import com.wl4g.rengine.manager.admin.model.SaveDataSourceResult;
  */
 public interface DataSourceService {
 
-    PageHolder<DataSource> query(@NotNull QueryDataSource model);
+    PageHolder<DataSourceProperties> query(@NotNull QueryDataSource model);
 
     SaveDataSourceResult save(@NotNull SaveDataSource model);
 

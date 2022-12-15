@@ -15,37 +15,33 @@
  */
 package com.wl4g.rengine.common.exception;
 
-import lombok.Getter;
-
 /**
- * {@link InvalidNodeRelationshipException}
+ * {@link ConfigRengineException}
  * 
  * @author James Wong
  * @version 2022-09-22
  * @since v1.0.0
  */
-@Getter
-public class InvalidNodeRelationshipException extends RengineException {
-    private static final long serialVersionUID = 5177120828249689118L;
+public class ConfigRengineException extends RengineException {
+    private static final long serialVersionUID = 5177120828249689148L;
 
-    public InvalidNodeRelationshipException() {
+    public ConfigRengineException() {
         super();
     }
 
-    public InvalidNodeRelationshipException(String message) {
+    public ConfigRengineException(String message) {
         super(message);
     }
 
-    public InvalidNodeRelationshipException(String message, Throwable cause) {
+    public ConfigRengineException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public InvalidNodeRelationshipException(Throwable cause) {
+    public ConfigRengineException(Throwable cause) {
         super(cause);
     }
 
-    public InvalidNodeRelationshipException(String message, Throwable cause, boolean enableSuppression,
-            boolean writableStackTrace) {
+    public ConfigRengineException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 
