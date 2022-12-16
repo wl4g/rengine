@@ -184,7 +184,7 @@ quarkus:
     file-encoding: UTF-8
     inline-before-analysis: true
     ## see:https://quarkus.io/guides/native-reference#i-get-an-outofmemoryerror-oome-building-native-executables-what-can-i-do
-    native-image-xmx: 10g
+    native-image-xmx: 12g
     #resources:
     #  includes: foo/**,bar/**/*.txt
     #  excludes: foo/private/**
