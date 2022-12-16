@@ -1,0 +1,237 @@
+# Copyright (c) 2017 ~ 2025, the original authors individual Inc,
+# All rights reserved. Contact us James Wong <jameswong1376@gmail.com>
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# see: https://quarkus.io/guides/all-config
+# see: https://quarkus.io/guides/config-yaml
+#
+quarkus:
+  application:
+    name: rengine-scheduler
+  banner:
+    enabled: true
+    path: META-INF/banner.txt
+  default-locale: zh_CN
+  locales: en-US,zh_CN
+  ## see:https://quarkus.io/guides/lifecycle#listening-for-startup-and-shutdown-events
+  shutdown:
+    timeout: 60s
+  http:
+    http2: true
+    host: 0.0.0.0
+    port: 28003
+    ssl-port: 28013
+    test-ssl-port: 28023
+    root-path: /
+    insecure-requests: enabled ## enabled|redirect|disabled
+    cors: false
+  tls:
+    trust-all: false
+  thread-pool:
+    core-threads: 4
+    max-threads: 128
+    queue-size: 4
+    keep-alive-time: 30s
+  log:
+    level: INFO
+    min-level: TRACE
+    #handler:
+    #  console:
+    #    STRUCTURED_LOGGING:
+    #      enable: false
+    #  file:
+    #    STRUCTURED_LOGGING_FILE:
+    #      enable: true
+    #      format: '%e%n'
+    #handlers:
+    ## see:https://quarkus.io/guides/logging#logging-categories
+    category:
+      io.quarkus:
+        level: INFO
+        min-level: DEBUG
+        handlers: STRUCTURED_LOGGING,STRUCTURED_LOGGING_FILE
+      ## When an exception occurs in the RESTEasy Reactive request parameter handling code, the exception
+      ## is not printed to the log by default (for security reasons). This can sometimes make it difficult
+      ## to understand why certain HTTP status codes are being returned (as JAX-RS requires non-intuitive
+      ## error codes in various situations). In this case the user is encouraged to set the log level to debug.
+      ## see:https://quarkus.io/guides/resteasy-reactive#declaring-endpoints-representation-content-types
+      org.jboss.resteasy.reactive.server.handlers.ParameterHandler:
+        level: DEBUG
+        handlers: STRUCTURED_LOGGING,STRUCTURED_LOGGING_FILE
+      com.wl4g:
+        level: INFO
+        min-level: DEBUG
+        handlers: STRUCTURED_LOGGING,STRUCTURED_LOGGING_FILE
+    console:
+      enable: true
+      format: '%d{yyyy-dd-mm HH:mm:ss} %-5p [%c{2.}] (%t) %s%e%n'
+      color: true
+      async: false
+        #queue-length: 128
+        #overflow: block # block,discard
+    file:
+      enable: true
+      format: '%d{yyyy-dd-mm HH:mm:ss} %-5p [%c{2.}] (%t) %s%e%n'
+      path: /tmp/rengine/scheduler.log
+      async: false
+        #queue-length: 128
+        #overflow: block # block,discard
+      json:
+        date-format: yyyy-MM-dd HH:mm:ss.SSS
+        pretty-print: false
+        zone-id: default
+        print-details: true
+      exception-output-type: formatted
+      #key-overrides: []
+      #excluded-keys: []
+      additional-field:
+        logger_group: main
+      rotation:
+        max-file-size: 200M
+        max-backup-index: 100
+        file-suffix: yyyy-MM-dd
+        rotate-on-boot: true
+  #health:
+  #  extensions:
+  #    enabled: true
+  #  openapi:
+  #    included: true
+  ## see:https://quarkus.io/guides/smallrye-health
+  smallrye-health:
+    root-path: /healthz
+    liveness-path: ${quarkus.smallrye-health.root-path:healthz}/live
+    readiness-path: ${quarkus.smallrye-health.root-path:healthz}/ready
+    startup-path: ${quarkus.smallrye-health.root-path:healthz}/started
+  micrometer:
+    enabled: true
+    registry-enabled-default: true
+    binder-enabled-default: true
+    binder:
+      #http-client.enabled: false
+      #http-server.enabled: true
+      jvm: true
+      system: true
+    export:
+      json:
+        path: /metrics
+      prometheus:
+        enabled: true
+        path: /metrics
+  opentelemetry:
+    enabled: true
+    propagators: [tracecontext,baggage]
+    tracer:
+      resource-attributes: {}
+      sampler:
+        ratio: 0.99
+        parent-based: true
+      exporter:
+        otlp:
+          endpoint: http://localhost:4317
+          headers: {}
+          export-timeout: 10s
+          compression: gzip
+        #jaeger:
+        #  endpoint: http://localhost:14250
+        #  export-timeout: 10s
+  ## see:https://quarkus.io/guides/openapi-swaggerui#quarkus-smallrye-openapi_configuration
+  swagger-ui:
+    enable: true
+    path: /swagger-ui
+    always-include: true
+    title: Rengine Evaluator APIs
+    #layout:
+    theme: original # original, feeling-blue, flattop, material, monokai, muted, newspaper, outline
+    supported-submit-methods: [PUT, POST]
+    #with-credentials:
+    #urls:
+    #  local: http://localhost:${quarkus.http.port}${quarkus.http.root-apth}/openapi
+    #oauth2-redirect-url:
+    #oauth-client-id:
+    #oauth-client-secret:
+    #oauth-realm:
+    #oauth-scope-separator: ','
+    #oauth-scopes: 'profile,openid,read,write'
+    #oauth-additional-query-string-params:
+  smallrye-openapi:
+    path: /openapi
+    info-title: "Rengine Evaluator APIs"
+    info-version: 1.0.0
+    info-description: "Rengine Evaluator APIs Documention"
+    info-terms-of-service: http://swagger.io/terms/
+    info-contact-name: "James Wong"
+    info-contact-email: "rengine@wl4g.com"
+    info-contact-url: "http://rengine.wl4g.com/contact"
+    info-license-name: "Apache 2.0"
+    info-license-url: "http://www.apache.org/licenses/LICENSE-2.0"
+  package:
+    type: jar
+    runner-suffix: "-native"
+    add-runner-suffix: true
+  ## see:https://quarkus.io/guides/writing-native-applications-tips#supporting-native-in-your-application
+  native:
+    #builder-image: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image:22.3-java11
+    builder-image: registry.cn-shenzhen.aliyuncs.com/wl4g/ubi-quarkus-native-image:22.3-java11
+    file-encoding: UTF-8
+    inline-before-analysis: true
+    ## see:https://quarkus.io/guides/native-reference#i-get-an-outofmemoryerror-oome-building-native-executables-what-can-i-do
+    native-image-xmx: 8g
+    #resources:
+    #  includes: foo/**,bar/**/*.txt
+    #  excludes: foo/private/**
+    ## see:https://quarkus.io/guides/writing-native-applications-tips#delay-class-init-in-your-app
+    #additional-build-args: "--initialize-at-run-time=com.wl4g.infra.common.lang.Assert2\\,org.codehaus.groovy.control.XStreamUtils"
+    #additional-build-args: "--link-at-build-time=org.codehaus.groovy.control.XStreamUtils"
+    ## [Notice]: As of GraalVM 22.2 the language:js plugin has been removed from the default plugin list, and needs to be installed manually by run $GRAALVM_HOME/bin/gu install js
+    ## Run this command to check if the image is supports: docker run --rm quay.io/quarkus/ubi-quarkus-native-image:22.1-java11 --help | grep 'language'
+    ## [Notice]: Required option: "--initialize-at-run-time=org.apache.commons.lang3.RandomUtils" is already set in the (com.wl4g:infra-common-java11) dependency module.
+    ## see:https://www.graalvm.org/22.1/reference-manual/native-image/Resources/
+    additional-build-args: "--language:js,--no-fallback,--report-unsupported-elements-at-runtime,-H:Log=registerResource:3,\
+--initialize-at-run-time=groovy.grape.GrapeIvy\\,\
+com.wl4g.infra.common.resource.VfsUtils2\\,\
+org.apache.shardingsphere.elasticjob.executor.item.JobItemExecutorFactory\\,\
+org.apache.zookeeper.Login,\
+--trace-class-initialization=io.netty.util.concurrent.GlobalEventExecutor\\,io.netty.util.concurrent.ScheduledFutureTask,\
+--trace-object-instantiation=java.security.SecureRandom\\,java.util.Random\\,org.apache.zookeeper.Login.Login"
+    #compression:
+    #  level: 5 # 1-10 The larger the higher the compression ratio, the longer the build time.
+    #  additional-args: --ultra-brute,-v
+    ## [Notice]: Tried enabling this option, in order to allow its javax.script.ScriptEngineManager to automatically register such as:
+    ## com.oracle.truffle.js.scriptengine.GraalJSEngineFactory when building the native package, but the result is invalid. We should use --language:js option to support graal.js
+    #auto-service-loader-registration: true
+    enable-fallback-images: false
+    #enable-reports: true
+    #debug-build-process: true
+    #publish-debug-build-process-port: 38002
+    debug:
+      enabled: true
+      enable-dashboard-dump: true
+  ## We do not want running dev services in distribution
+  devservices:
+    enabled: false
+  ## Default transaction timeout
+  transaction-manager:
+    default-transaction-timeout: 300
+  ## see:https://quarkus.io/guides/security-keycloak-authorization
+  oidc:
+    connection-timeout: 10s
+    max-pool-size: 10
+    auth-server-url: http://localhost:8080/realms/rengine
+    client-id: ${quarkus.application.name}
+    credentials:
+      secret: abcdefghijklmnopqrstuvwzyx
+    tls:
+      verification: none
+  kubernetes:
+    remote-debug:
+      enabled: true
+      transport: dt_socket
+      suspend: n
+      address-port: 5005
+      lables: {}
+      annotations: {}

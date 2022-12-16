@@ -143,9 +143,9 @@
         <module>bom</module>
         <module>common</module>
         <module>eventbus</module>
-        <module>collector</module>
-        <module>evaluator</module>
-        <module>manager</module>
+        <module>scheduler</module>
+        <module>executor</module>
+        <module>apiserver</module>
         <module>job</module>
         <module>client</module>
         <!-- <module>example</module> -->
