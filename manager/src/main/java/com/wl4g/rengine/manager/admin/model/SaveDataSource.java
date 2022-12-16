@@ -37,4 +37,9 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class SaveDataSource extends DataSourceProperties {
     private static final long serialVersionUID = -8089363065684705215L;
+
+    @Override
+    public DataSourceProperties validate() {
+        throw new UnsupportedOperationException();
+    }
 }

@@ -184,6 +184,30 @@
   "queryAllDeclaredMethods":true
 },
 {
+  "name":"com.mysql.jdbc.Driver",
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"com.mysql.cj.jdbc.Driver",
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"com.microsoft.sqlserver.jdbc.SQLServerDriver",
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"org.postgresql.Driver",
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"oracle.jdbc.driver.OracleDriver",
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"com.ibm.db2.jcc.DB2Driver",
+  "queryAllDeclaredMethods":true
+},
+{
   "name":"com.wl4g.rengine.evaluator.rest.TestGroovyResource$GroovyExecution"
 },
 {
