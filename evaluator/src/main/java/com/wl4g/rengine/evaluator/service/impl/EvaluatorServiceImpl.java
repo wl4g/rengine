@@ -74,9 +74,7 @@ import com.wl4g.rengine.evaluator.repository.MongoRepository;
 import com.wl4g.rengine.evaluator.service.EvaluatorService;
 
 import io.quarkus.redis.datasource.ReactiveRedisDataSource;
-import io.quarkus.redis.datasource.RedisDataSource;
 import io.quarkus.redis.datasource.string.ReactiveStringCommands;
-import io.quarkus.redis.datasource.string.StringCommands;
 import io.smallrye.mutiny.Uni;
 import lombok.CustomLog;
 
@@ -105,11 +103,11 @@ public class EvaluatorServiceImpl implements EvaluatorService {
     MongoRepository mongoRepository;
 
     // see:https://quarkus.io/guides/redis#creating-the-maven-project
-    final StringCommands<String, String> redisStringCommands;
+    // final StringCommands<String, String> redisStringCommands;
     final ReactiveStringCommands<String, String> reactiveRedisStringCommands;
 
-    public EvaluatorServiceImpl(RedisDataSource redisDS, ReactiveRedisDataSource reactiveRedisDS) {
-        this.redisStringCommands = redisDS.string(String.class);
+    public EvaluatorServiceImpl(/* RedisDataSource redisDS, */ ReactiveRedisDataSource reactiveRedisDS) {
+        // this.redisStringCommands = redisDS.string(String.class);
         this.reactiveRedisStringCommands = reactiveRedisDS.string(String.class);
     }
 
