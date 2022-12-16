@@ -53,8 +53,11 @@
         <metrics.version>3.2.5</metrics.version>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
-        <!-- see:https://github.com/quarkusio/quarkus-quickstarts/blob/2.14.3.Final/getting-started/pom.xml -->
+        <!-- see:https://github.com/quarkusio/quarkus-quickstarts/blob/2.12.2.Final/getting-started/pom.xml -->
+        <!-- see:ubi-quarkus-native-image:22.1-java11 -->
         <quarkus.platform.version>2.12.2.Final</quarkus.platform.version>
+        <!-- see:ubi-quarkus-native-image:22.3-java11 -->
+        <!-- <quarkus.platform.version>2.14.3.Final</quarkus.platform.version>-->
         <!-- <groovy.version>4.0.4</groovy.version>-->
         <!-- <graalvm.version>22.1.0</graalvm.version>-->
         <compiler-plugin.version>3.8.1</compiler-plugin.version>
@@ -117,11 +120,47 @@
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
         </dependency>
+        <!-- Fix for native image building: Fatal error: org.graalvm.compiler.debug.GraalError: com.oracle.graal.pointsto.constraints.UnsupportedFeatureException:
+        Detected a started Thread in the image heap. Threads running in the image generator are no longer running at image runtime. 
+        To see how this object got instantiated use -trace-object-instantiation=java.lang.Thread. The object was probably created by a class
+        initializer and is reachable from a static field. You can request class initialization at image runtime by using the option 
+        -initialize-at-run-time=<class-name>. Or you can write your own initialization methods and call them explicitly from your main entry point. -->
         <!-- MySQL -->
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-jdbc-mysql-deployment</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-jdbc-mysql</artifactId>
+        </dependency>
+        <!-- PostgreSQL -->
+        <!-- <dependency>-->
+        <!--     <groupId>io.quarkus</groupId>-->
+        <!--     <artifactId>quarkus-jdbc-postgresql-deployment</artifactId>-->
+        <!-- </dependency>-->
+        <!-- <dependency>-->
+        <!--     <groupId>io.quarkus</groupId>-->
+        <!--     <artifactId>quarkus-jdbc-postgresql</artifactId>-->
+        <!-- </dependency>-->
+        <!-- Oracle -->
+        <!-- <dependency>-->
+        <!--     <groupId>io.quarkus</groupId>-->
+        <!--     <artifactId>quarkus-jdbc-oracle-deployment</artifactId>-->
+        <!-- </dependency>-->
+        <!-- <dependency>-->
+        <!--     <groupId>io.quarkus</groupId>-->
+        <!--     <artifactId>quarkus-jdbc-oracle</artifactId>-->
+        <!-- </dependency>-->
+        <!-- DB2 -->
+        <!-- <dependency>-->
+        <!--     <groupId>io.quarkus</groupId>-->
+        <!--     <artifactId>quarkus-jdbc-db2-deployment</artifactId>-->
+        <!-- </dependency>-->
+        <!-- <dependency>-->
+        <!--     <groupId>io.quarkus</groupId>-->
+        <!--     <artifactId>quarkus-jdbc-db2</artifactId>-->
+        <!-- </dependency>-->
         <!-- SSHJ -->
         <dependency>
             <groupId>com.hierynomus</groupId>

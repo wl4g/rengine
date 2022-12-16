@@ -184,10 +184,6 @@
   "queryAllDeclaredMethods":true
 },
 {
-  "name":"com.mysql.jdbc.Driver",
-  "queryAllDeclaredMethods":true
-},
-{
   "name":"com.mysql.cj.jdbc.Driver",
   "queryAllDeclaredMethods":true
 },

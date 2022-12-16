@@ -175,13 +175,16 @@ quarkus:
     add-runner-suffix: true
   ## see:https://quarkus.io/guides/writing-native-applications-tips#supporting-native-in-your-application
   native:
-    #builder-image: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image:22.3-java11
+    #builder-image: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image22.1-java11
     builder-image: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image@sha256:addda81229f6894774eab0e5159448726952c5e2692f7cf18bda60f86a2a5f7e
+    # The graal.js component is not installed. (quarkus-2.12.2)
+    #builder-image: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image:22.3-java11
+    # The graal.js component is installed. (quarkus-2.14.3)
     #builder-image: registry.cn-shenzhen.aliyuncs.com/wl4g/ubi-quarkus-native-image:22.3-java11
     file-encoding: UTF-8
     inline-before-analysis: true
     ## see:https://quarkus.io/guides/native-reference#i-get-an-outofmemoryerror-oome-building-native-executables-what-can-i-do
-    native-image-xmx: 8g
+    native-image-xmx: 10g
     #resources:
     #  includes: foo/**,bar/**/*.txt
     #  excludes: foo/private/**
@@ -191,7 +194,7 @@ quarkus:
     ## [Notice]: As of GraalVM 22.2 the language:js plugin has been removed from the default plugin list, and needs to be installed manually by run $GRAALVM_HOME/bin/gu install js
     ## Run this command to check if the image is supports: docker run --rm quay.io/quarkus/ubi-quarkus-native-image:22.1-java11 --help | grep 'language'
     ## [Notice]: Required option: "--initialize-at-run-time=org.apache.commons.lang3.RandomUtils" is already set in the (com.wl4g:infra-common-java11) dependency module.
-    additional-build-args: "--language:js,--no-fallback,--report-unsupported-elements-at-runtime,--initialize-at-run-time=groovy.grape.GrapeIvy,--trace-class-initialization=io.netty.util.concurrent.GlobalEventExecutor\\,io.netty.util.concurrent.ScheduledFutureTask"
+    additional-build-args: "--language:js,--no-fallback,--report-unsupported-elements-at-runtime,--initialize-at-run-time=groovy.grape.GrapeIvy,--trace-class-initialization=java.lang.Thread\\,io.netty.util.concurrent.GlobalEventExecutor\\,io.netty.util.concurrent.ScheduledFutureTask"
     #compression:
     #  level: 5 # 1-10 The larger the higher the compression ratio, the longer the build time.
     #  additional-args: --ultra-brute,-v

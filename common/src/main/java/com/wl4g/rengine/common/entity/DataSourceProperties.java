@@ -187,9 +187,9 @@ public abstract class DataSourceProperties extends BaseBean {
         @Default
         long maxLifetime = MINUTES.toMillis(30);
         @Default
-        int maxPoolSize = 5;
+        int maximumPoolSize = 5;
         @Default
-        int minIdle = 1;
+        int minimumIdle = 1;
         @NotBlank
         String username;
         @NotBlank
@@ -231,8 +231,8 @@ public abstract class DataSourceProperties extends BaseBean {
                         hikariConfig.setIdleTimeout(getIdleTimeout());
                         hikariConfig.setLeakDetectionThreshold(getLeakDetectionThreshold());
                         hikariConfig.setMaxLifetime(getMaxLifetime());
-                        hikariConfig.setMaximumPoolSize(getMaxPoolSize());
-                        hikariConfig.setMinimumIdle(getMinIdle());
+                        hikariConfig.setMaximumPoolSize(getMaximumPoolSize());
+                        hikariConfig.setMinimumIdle(getMinimumIdle());
                         hikariConfig.setPassword(getPassword());
                         hikariConfig.setUsername(getUsername());
                         hikariConfig.setValidationTimeout(getValidationTimeout());

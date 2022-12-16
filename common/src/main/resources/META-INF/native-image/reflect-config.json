@@ -386,7 +386,8 @@
   "methods":[
     {"name":"<init>","parameterTypes":[] }, 
     {"name":"getWorkflows","parameterTypes":[] }, 
-    {"name":"setWorkflows","parameterTypes":["java.util.List"] }
+    {"name":"setWorkflows","parameterTypes":["java.util.List"] }, 
+    {"name":"toString","parameterTypes":[] }
   ]
 },
 {
@@ -404,12 +405,19 @@
     {"name":"setObjectPrefix","parameterTypes":["java.lang.String"] }, 
     {"name":"getSize","parameterTypes":[] }, 
     {"name":"setSize","parameterTypes":["java.lang.Long"] }, 
+    {"name":"getOnwer","parameterTypes":[] }, 
+    {"name":"setOnwer","parameterTypes":["java.lang.String"] }, 
+    {"name":"getGroup","parameterTypes":[] }, 
+    {"name":"setGroup","parameterTypes":["java.lang.String"] }, 
+    {"name":"getAccessMode","parameterTypes":[] }, 
+    {"name":"setAccessMode","parameterTypes":["java.lang.String"] }, 
     {"name":"getMd5","parameterTypes":[] }, 
-    {"name":"setMd5","parameterTypes":["java.lang.Long"] }, 
+    {"name":"setMd5","parameterTypes":["java.lang.String"] }, 
     {"name":"getSha1","parameterTypes":[] }, 
-    {"name":"setSha1","parameterTypes":["java.lang.Long"] }, 
+    {"name":"setSha1","parameterTypes":["java.lang.String"] }, 
     {"name":"getUploadType","parameterTypes":[] }, 
-    {"name":"setUploadType","parameterTypes":["java.lang.String"] }
+    {"name":"setUploadType","parameterTypes":["java.lang.String"] }, 
+    {"name":"toString","parameterTypes":[] }
   ]
 },
 {
@@ -445,7 +453,8 @@
     {"name":"getName","parameterTypes":[] }, 
     {"name":"setName","parameterTypes":["java.lang.String"] }, 
     {"name":"getScenesId","parameterTypes":[] }, 
-    {"name":"setScenesId","parameterTypes":["java.lang.Long"] }
+    {"name":"setScenesId","parameterTypes":["java.lang.Long"] }, 
+    {"name":"toString","parameterTypes":[] }
   ]
 },
 {
@@ -456,7 +465,9 @@
   "methods":[
     {"name":"<init>","parameterTypes":[] }, 
     {"name":"getRules","parameterTypes":[] }, 
-    {"name":"setRules","parameterTypes":["java.util.List"] }
+    {"name":"setRules","parameterTypes":["java.util.List"] }, 
+    {"name":"validate","parameterTypes":[] }, 
+    {"name":"toString","parameterTypes":[] }
   ]
 },
 {
@@ -467,7 +478,9 @@
   "methods":[
     {"name":"<init>","parameterTypes":[] }, 
     {"name":"getGraphs","parameterTypes":[] }, 
-    {"name":"setGraphs","parameterTypes":["java.util.List"] }
+    {"name":"setGraphs","parameterTypes":["java.util.List"] }, 
+    {"name":"validate","parameterTypes":[] }, 
+    {"name":"toString","parameterTypes":[] }
   ]
 },
 {
@@ -483,7 +496,8 @@
     {"name":"getRevision","parameterTypes":[] }, 
     {"name":"setRevision","parameterTypes":["java.lang.Long"] }, 
     {"name":"getWorkflowId","parameterTypes":[] }, 
-    {"name":"setWorkflowId","parameterTypes":["java.lang.Long"] }
+    {"name":"setWorkflowId","parameterTypes":["java.lang.Long"] }, 
+    {"name":"toString","parameterTypes":[] }
   ]
 },
 {
@@ -500,7 +514,8 @@
     {"name":"getName","parameterTypes":[] }, 
     {"name":"setName","parameterTypes":["java.lang.String"] }, 
     {"name":"getType","parameterTypes":[] }, 
-    {"name":"setType","parameterTypes":["java.lang.String"] }
+    {"name":"setType","parameterTypes":["java.lang.String"] }, 
+    {"name":"toString","parameterTypes":[] }
   ]
 },
 {
@@ -525,7 +540,8 @@
   "methods":[
     {"name":"<init>","parameterTypes":[] }, 
     {"name":"getLogical","parameterTypes":[] }, 
-    {"name":"setLogical","parameterTypes":["com.wl4g.rengine.common.entity.WorkflowGraph$LogicalType"] }
+    {"name":"setLogical","parameterTypes":["com.wl4g.rengine.common.entity.WorkflowGraph$LogicalType"] }, 
+    {"name":"toString","parameterTypes":[] }
   ]
 },
 {
@@ -573,7 +589,8 @@
   "methods":[
     {"name":"<init>","parameterTypes":[] }, 
     {"name":"getRuleId","parameterTypes":[] }, 
-    {"name":"setRuleId","parameterTypes":["java.lang.String"] }
+    {"name":"setRuleId","parameterTypes":["java.lang.String"] }, 
+    {"name":"toString","parameterTypes":[] }
   ]
 },
 {
@@ -601,7 +618,8 @@
     {"name":"getFrom","parameterTypes":[] },
     {"name":"setFrom","parameterTypes":["java.lang.String"] },
     {"name":"getAttributes","parameterTypes":[] },
-    {"name":"setAttributes","parameterTypes":["java.util.Map"] }
+    {"name":"setAttributes","parameterTypes":["java.util.Map"] }, 
+    {"name":"toString","parameterTypes":[] }
   ]
 },
 {
@@ -612,7 +630,8 @@
   "methods":[
     {"name":"<init>","parameterTypes":[] },
     {"name":"<init>","parameterTypes":["com.wl4g.rengine.common.entity.WorkflowGraph$BaseNode"] },
-    {"name":"from","parameterTypes":["com.wl4g.rengine.common.entity.WorkflowGraph"] }
+    {"name":"from","parameterTypes":["com.wl4g.rengine.common.entity.WorkflowGraph"] }, 
+    {"name":"toString","parameterTypes":[] }
   ]
 },
 {
@@ -633,7 +652,8 @@
     {"name":"getTimeout","parameterTypes":[] }, 
     {"name":"setTimeout","parameterTypes":["java.lang.Long"] }, 
     {"name":"getArgs","parameterTypes":[] }, 
-    {"name":"setArgs","parameterTypes":["java.util.Map"] }
+    {"name":"setArgs","parameterTypes":["java.util.Map"] }, 
+    {"name":"toString","parameterTypes":[] }
   ]
 },
 {

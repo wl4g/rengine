@@ -65,12 +65,12 @@ public class UploadObject extends BaseBean {
 
     private @NotBlank String filename;
     private @NotBlank String extension;
-    private @NotNull @Min(1) Long size;
-    // private @Nullable String owner;
-    // private @NotBlank String group;
-    // private @Nullable String accessMode;
-    private @Nullable String md5sum;
-    private @Nullable String sha1sum;
+    private @NotNull @Min(0) Long size;
+    private @Nullable String owner;
+    private @Nullable String group;
+    private @Nullable String accessMode;
+    private @Nullable String md5;
+    private @Nullable String sha1;
 
     @Getter
     @AllArgsConstructor
