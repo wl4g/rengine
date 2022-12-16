@@ -1,6 +1,6 @@
 # Rengine for Architectures
 
-- ![Global](../shots/rengine_architecture.png)
+- ![Global](../shots/architecture.png)
 
 ## Collector/Eventbus collect Event to MQ (Model definition)
 

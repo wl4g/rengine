@@ -52,27 +52,27 @@ A real-time + near real-time general rule engine platform, suitable for such as 
 
 ## Quick start
 
-- [Rengine architecture](./docs/en/architecture.md)
+- [Rengine Architecture](./docs/en/architecture.md)
 
-- [Deploy quide for standalone](./docs/en/deploy-standalone.md)
+- [Deploy for standalone](./docs/en/deploy-standalone.md)
 
-- [Deploy quide for production](./docs/en/deploy-production.md)
+- [Deploy for production](./docs/en/deploy-production.md)
 
-- [Configuration for client](./docs/en/configuration-client.md)
+- [Configuration for Clients](./docs/en/configuration-client.md)
 
-- [Configuration for collector](./docs/en/configuration-collector.md)
+- [Configuration for ApiServer](./docs/en/configuration-apiserver.md)
 
-- [Configuration for manager](./docs/en/configuration-manager.md)
+- [Configuration for Scheduler](./docs/en/configuration-scheduler.md)
 
-- [Configuration for evaluator](./docs/en/configuration-evaluator.md)
+- [Configuration for Executor](./docs/en/configuration-executor.md)
 
-- [Configuration for job](./docs/en/configuration-job.md)
+- [Configuration for Job](./docs/en/configuration-job.md)
 
-- [Development quide](./docs/en/devel.md)
+- [Development Quide](./docs/en/devel.md)
 
-- [Operation quide](./docs/en/operation.md)
+- [Operation Quide](./docs/en/operation.md)
 
-- [Best aplicaciones cases](./docs/en/best-aplicaciones-cases.md)
+- [Best Cases examples](./docs/en/best-cases.md)
 
 ## RoadMap
 

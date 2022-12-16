@@ -1,4 +1,4 @@
-# Rengine for Evaluator Development Guide
+# Rengine for Executor Development Guide
 
 ## Build for JAR
 
@@ -6,7 +6,7 @@
 
 ```bash
 git clone git@github.com/wl4g/rengine.git
-cd rengine/evaluator
+cd rengine/executor
 export JAVA_HOME=/usr/local/jdk-11.0.10/
 ./mvnw clean install -DskipTests -Dmaven.test.skip=true -U -T 4C
 ```
@@ -27,7 +27,7 @@ export JAVA_HOME=/usr/local/jdk-11.0.10/
 export JAVA_HOME=/usr/local/jdk-11.0.10/ # Must java11+
 ./mvnw clean install -DskipTests -Dmaven.test.skip=true -U -T 4C
 
-./mvnw package -f evaluator/pom.xml \
+./mvnw package -f executor/pom.xml \
 -Dmaven.test.skip=true \
 -DskipTests \
 -Dnative \
@@ -43,7 +43,7 @@ export JAVA_HOME=/usr/local/jdk-11.0.10/ # Must java11+
 export JAVA_HOME=/usr/local/jdk-11.0.10/ # Must java11+
 ./mvnw clean install -DskipTests -Dmaven.test.skip=true -U -T 4C
 
-./mvnw package -f evaluator/pom.xml \
+./mvnw package -f executor/pom.xml \
 -Dmaven.test.skip=true \
 -DskipTests \
 -Dnative \
@@ -55,14 +55,14 @@ export JAVA_HOME=/usr/local/jdk-11.0.10/ # Must java11+
 - Case2: Build with raw commands.
 
 ```bash
-docker build -f build/docker/Dockerfile.jvm -t wl4g/rengine-evaluator .
-docker build -f build/docker/Dockerfile.native -t wl4g/rengine-evaluator .
+docker build -f build/docker/Dockerfile.jvm -t wl4g/rengine-executor .
+docker build -f build/docker/Dockerfile.native -t wl4g/rengine-executor .
 ```
 
 ## Build for container(JVM) image
 
 ```bash
-./mvnw package -f evaluator/pom.xml \
+./mvnw package -f executor/pom.xml \
 -Dmaven.test.skip=true \
 -DskipTests \
 -Dquarkus.container-image.build=true
@@ -113,18 +113,18 @@ curl -v -XPOST \
 
 ### Mock testing dynamic `groovy` script execution?
 
-- Source codes see: [TestGroovyResource.java](src/main/java/com/wl4g/rengine/evaluator/rest/TestGroovyResource.java)
+- Source codes see: [TestGroovyResource.java](src/main/java/com/wl4g/rengine/executor/rest/TestGroovyResource.java)
 
 - Generate testing script to local path.
 
 ```bash
-curl -L -o /tmp/test.groovy 'https://raw.githubusercontent.com/wl4g/rengine/master/evaluator/testdata/testscript/test.groovy'
+curl -L -o /tmp/test.groovy 'https://raw.githubusercontent.com/wl4g/rengine/master/executor/testdata/testscript/test.groovy'
 ```
 
 - Run native
 
 ```bash
-./evaluator/target/rengine-evaluator-native -Dtest.rest=true
+./executor/target/rengine-executor-native -Dtest.rest=true
 ```
 
 - Mocking request execution
@@ -139,23 +139,23 @@ curl -v -XPOST -H 'Content-Type: application/json' 'http://localhost:28002/test/
 - Tail logs
 
 ```bash
-tail -f /tmp/rengine/evaluator.log | jq -r '.message'
+tail -f /tmp/rengine/executor.log | jq -r '.message'
 ```
 
 ### Mock testing dynamic `js` script execution?
 
-- Source codes see: [TestJavascriptResource.java](src/main/java/com/wl4g/rengine/evaluator/rest/TestJavascriptResource.java)
+- Source codes see: [TestJavascriptResource.java](src/main/java/com/wl4g/rengine/executor/rest/TestJavascriptResource.java)
 
 - Generate testing script to local path.
 
 ```bash
-curl -L -o /tmp/test-js2java.js 'https://raw.githubusercontent.com/wl4g/rengine/master/evaluator/testdata/testscript/test-js2java.js'
+curl -L -o /tmp/test-js2java.js 'https://raw.githubusercontent.com/wl4g/rengine/master/executor/testdata/testscript/test-js2java.js'
 ```
 
 - Run native
 
 ```bash
-./evaluator/target/rengine-evaluator-native -Dtest.rest=true
+./executor/target/rengine-executor-native -Dtest.rest=true
 ```
 
 - Mocking request execution
@@ -170,7 +170,7 @@ curl -v -XPOST -H 'Content-Type: application/json' 'http://localhost:28002/test/
 - Tail logs
 
 ```bash
-tail -f /tmp/rengine/evaluator.log | jq -r '.message'
+tail -f /tmp/rengine/executor.log | jq -r '.message'
 ```
 
 ### Use the Groovy evaluation engine support native executable mode ?

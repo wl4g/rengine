@@ -1,14 +1,14 @@
-# Rengine configuration for Collector
+# Rengine configuration for Scheduler
 
 ## Configuration
 
 - for example:
-  - [collect-job.yaml](../../collector/src/main/resources/collector-job.yaml)
-  - [collect-job-safecloud.yaml](../../collector/src/main/resources/collector-job-safecloud.yaml)
+  - [collect-job.yaml](../../scheduler/src/main/resources/scheduler-job.yaml)
+  - [collect-job-safecloud.yaml](../../scheduler/src/main/resources/scheduler-job-safecloud.yaml)
 
 |  Property  |  Default | Example |  Description |
 | ------------ | ------------ | ------------ | ------------ |
-|  <b>rengine.client.collector.zookeeper</b> |   |   |   |
+|  <b>rengine.client.scheduler.zookeeper</b> |   |   |   |
 |  &nbsp;&nbsp;.serviceLists |  localhost:2181 | 192.168.8.2:2181,192.168.8.3:2181,192.168.8.4:2181 |   |
 |  &nbsp;.namespace  |  rengine |   |   |
 |  &nbsp;.baseSleepTimeMilliseconds  |  1000 |   |   |
@@ -17,11 +17,11 @@
 |  &nbsp;.sessionTimeoutMilliseconds  |  0 |   |   |
 |  &nbsp;.connectionTimeoutMilliseconds  |  5 |   |   |
 |  &nbsp;.digest  |  null |   |   |
-|  <b>rengine.client.collector.tracing</b>  |   |   |   |
+|  <b>rengine.client.scheduler.tracing</b>  |   |   |   |
 |  &nbsp;.type  | RDB  |   |   |
 |  &nbsp;.includeJobNames  | []  |   |   |
 |  &nbsp;.excludeJobNames  | []  |   |   |
-|  <b>rengine.client.collector.globalScrapeJobConfig</b>  |   |   |   |
+|  <b>rengine.client.scheduler.globalScrapeJobConfig</b>  |   |   |   |
 |  &nbsp;&nbsp;.eventType  | PROM |   |   |
 |  &nbsp;&nbsp;.eventAttributes  | {}  |   |   |
 |  &nbsp;&nbsp;.disabled  | false |   |   |
@@ -40,7 +40,7 @@
 |  &nbsp;&nbsp;.jobExecutorServiceHandlerType  | null |   |   |
 |  &nbsp;&nbsp;.jobErrorHandlerType  | null |   |   |
 |  &nbsp;&nbsp;.jobListenerTypes  | null |   |   |
-|  <b>&nbsp;&nbsp;.jobVariables</b>  |  |  |  The define global variables of SPEL expression, which can be used for job dynamic input arguemnts. see:com.wl4g.rengine.client.collector.job.CollectJobExecutor#resolveVariables() <b>Note: If you run in grailvm native image mode, you can only call META-INF/native-image/reflect-config.json defined fields and methods, because the SPEL needs reflection calls, or the user-defined extension reflect-config.json recompiles and packages.</b> |
+|  <b>&nbsp;&nbsp;.jobVariables</b>  |  |  |  The define global variables of SPEL expression, which can be used for job dynamic input arguemnts. see:com.wl4g.rengine.client.scheduler.job.CollectJobExecutor#resolveVariables() <b>Note: If you run in grailvm native image mode, you can only call META-INF/native-image/reflect-config.json defined fields and methods, because the SPEL needs reflection calls, or the user-defined extension reflect-config.json recompiles and packages.</b> |
 |  &nbsp;&nbsp;&nbsp;&nbsp;.yesterday  | "#{T(com.wl4g.infra.common.lang.DateUtils2).getDateOf(5,-1,\\"yyyy-MM-dd\\")}" |   |   |
 |  <b>&nbsp;&nbsp;.jobParamConfigs</b>  |   |   |   |
 |  <b>&nbsp;&nbsp;&nbsp;&nbsp;.simpleHttp</b>  |   |   |   |

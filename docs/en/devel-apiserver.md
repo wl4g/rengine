@@ -1,4 +1,4 @@
-# Rengine for Manager Development Guide
+# Rengine for ApiServer Development Guide
 
 ## Building
 
@@ -6,5 +6,5 @@
 git clone git@github.com/wl4g/rengine.git
 cd rengine/
 export JAVA_HOME=/usr/local/jdk-11.0.10/
-./mvnw clean install -DskipTests -Dmaven.test.skip=true -T 2C
+./mvnw clean install -DskipTests -Dmaven.test.skip=true -T 4C
 ```
