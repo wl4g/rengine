@@ -34,9 +34,9 @@ import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.wl4g.infra.common.jedis.JedisClient;
 import com.wl4g.infra.common.jedis.JedisClientBuilder;
-import com.wl4g.rengine.common.entity.DataSourceProperties;
+import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourcePropertiesBase;
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
-import com.wl4g.rengine.common.entity.DataSourceProperties.RedisClusterDataSourceProperties;
+import com.wl4g.rengine.common.entity.DataSourceProperties.RedisDataSourceProperties;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
 
 import lombok.AllArgsConstructor;
@@ -44,7 +44,7 @@ import lombok.CustomLog;
 import lombok.Getter;
 
 /**
- * {@link RedisClusterSourceFacade}
+ * {@link RedisSourceFacade}
  *
  * @author James Wong
  * @version 2022-10-10
@@ -53,7 +53,7 @@ import lombok.Getter;
 @Getter
 @CustomLog
 @AllArgsConstructor
-public class RedisClusterSourceFacade implements DataSourceFacade {
+public class RedisSourceFacade implements DataSourceFacade {
 
     final ExecutionConfig executionConfig;
     final String dataSourceName;
@@ -62,7 +62,7 @@ public class RedisClusterSourceFacade implements DataSourceFacade {
     @Override
     public void close() throws IOException {
         if (nonNull(jedisClient)) {
-            log.info("Closing to redis cluster data source for {} ...", dataSourceName);
+            log.info("Closing to redis single or cluster data source for {} ...", dataSourceName);
             jedisClient.close();
         }
     }
@@ -145,25 +145,25 @@ public class RedisClusterSourceFacade implements DataSourceFacade {
     }
 
     @Singleton
-    public static class RedisClusterSourceFacadeBuilder implements DataSourceFacadeBuilder {
+    public static class RedisSourceFacadeBuilder implements DataSourceFacadeBuilder {
 
         @Override
         public DataSourceFacade newInstnace(
                 final @NotNull ExecutionConfig config,
                 final @NotBlank String dataSourceName,
-                final @NotNull DataSourceProperties dataSourceProperties) {
+                final @NotNull DataSourcePropertiesBase dataSourceProperties) {
             notNullOf(config, "properties");
             hasTextOf(dataSourceName, "dataSourceName");
 
-            final RedisClusterDataSourceProperties _config = (RedisClusterDataSourceProperties) dataSourceProperties;
+            final RedisDataSourceProperties _config = (RedisDataSourceProperties) dataSourceProperties;
             final JedisClient jedisClient = new JedisClientBuilder(_config.getJedisConfig()).build();
 
-            return new RedisClusterSourceFacade(config, dataSourceName, jedisClient);
+            return new RedisSourceFacade(config, dataSourceName, jedisClient);
         }
 
         @Override
         public DataSourceType type() {
-            return DataSourceType.REDIS_CLUSTER;
+            return DataSourceType.REDIS;
         }
 
     }

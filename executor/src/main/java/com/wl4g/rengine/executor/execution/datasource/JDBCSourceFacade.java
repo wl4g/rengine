@@ -34,7 +34,7 @@ import org.apache.commons.dbutils.StatementConfiguration;
 import org.apache.commons.dbutils.handlers.MapHandler;
 import org.apache.commons.dbutils.handlers.MapListHandler;
 
-import com.wl4g.rengine.common.entity.DataSourceProperties;
+import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourcePropertiesBase;
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
 import com.wl4g.rengine.common.entity.DataSourceProperties.JDBCDataSourceProperties;
 import com.wl4g.rengine.common.util.HikariJDBCHelper;
@@ -110,7 +110,7 @@ public class JDBCSourceFacade implements DataSourceFacade {
         public DataSourceFacade newInstnace(
                 final @NotNull ExecutionConfig config,
                 final @NotBlank String dataSourceName,
-                final @NotNull DataSourceProperties dataSourceProperties) {
+                final @NotNull DataSourcePropertiesBase dataSourceProperties) {
             notNullOf(config, "properties");
             hasTextOf(dataSourceName, "dataSourceName");
 

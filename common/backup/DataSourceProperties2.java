@@ -59,7 +59,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link DataSourceProperties}
+ * {@link DataSourceProperties2}
  * 
  * @author James Wong
  * @version 2022-08-29
@@ -70,7 +70,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class DataSourceProperties extends BaseBean {
+public class DataSourceProperties2 extends BaseBean {
     static final long serialVersionUID = -7441054887057231030L;
 
     @NotBlank

@@ -99,7 +99,9 @@ public class ExecutionGraphTests {
         ExecutionGraphContext context = new ExecutionGraphContext(parameter, ctx -> { // 模拟(PROCESS/RELATION/RUN)类型的node执行script,也只有这几种类型才需要执行script
             final String nodeId = ctx.getCurrentNode().getId(); // 当前执行script的节点ID
             final String nodeType = ((BaseOperator<?>) ctx.getCurrentNode()).getType(); // 当前执行script的节点Type
+
             out.println(format("current nodeId: %s@%s, lastResult : %s", nodeId, nodeType, toJSONString(ctx.getLastResult())));
+
             // 1. 在之后支持执行script的节点的规则代码中, 可使用 ctx.getLastResult() 获取前一个节点的返回值.
             // 2. 当前节点返回值会覆盖上一个节点的返回值.
             return new ExecutionGraphResult(ReturnState.TRUE, singletonMap("foo" + nodeId, "bar" + nodeId));

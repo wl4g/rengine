@@ -58,7 +58,7 @@ public final class EmbedZookeeperServer {
                     Thread.sleep(1000L);
                     testingServer.close();
                 } catch (InterruptedException | IOException e2) {
-                    log.debug("Closing testing zookeeper server failure. - {}", e2.getMessage());
+                    log.debug("Closing testing zookeeper server failure. - {}", e2.getStdout());
                 }
             }));
         }

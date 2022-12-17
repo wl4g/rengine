@@ -20,7 +20,7 @@ import java.io.Closeable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import com.wl4g.rengine.common.entity.DataSourceProperties;
+import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourcePropertiesBase;
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
 
@@ -41,7 +41,7 @@ public interface DataSourceFacade extends Closeable {
         DataSourceFacade newInstnace(
                 final @NotNull ExecutionConfig config,
                 final @NotBlank String dataSourceName,
-                final @NotNull DataSourceProperties dataSourceProperties);
+                final @NotNull DataSourcePropertiesBase dataSourceProperties);
 
         DataSourceType type();
     }

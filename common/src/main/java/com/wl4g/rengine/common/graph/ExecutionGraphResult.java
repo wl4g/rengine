@@ -15,6 +15,7 @@
  */
 package com.wl4g.rengine.common.graph;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static java.util.Collections.singletonMap;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -54,9 +55,11 @@ public class ExecutionGraphResult {
 
     public ExecutionGraphResult(@NotNull final ReturnState returnState, @Nullable final Map<String, Object> valueMap) {
         this.returnState = returnState;
-        if (nonNull(valueMap)) {
-            this.valueMap.putAll(valueMap);
-        }
+        safeMap(valueMap).forEach((key, value) -> {
+            if (!isBlank(key)) {
+                this.valueMap.put(key, value);
+            }
+        });
     }
 
     public ExecutionGraphResult addValue(String key, Object value) {

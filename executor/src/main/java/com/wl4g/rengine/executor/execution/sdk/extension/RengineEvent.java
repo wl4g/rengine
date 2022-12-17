@@ -1,4 +1,4 @@
-package com.wl4g.rengine.executor.execution.sdk;
+package com.wl4g.rengine.executor.execution.sdk.extension;
 
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
@@ -29,36 +29,36 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link ScriptRengineEvent}
+ * {@link RengineEvent}
  * 
  * @author James Wong
  * @version 2022-11-15
  * @since v1.0.0
  */
 @ToString
-public class ScriptRengineEvent extends EventObject {
+public class RengineEvent extends EventObject {
     private static final long serialVersionUID = -63891594867432009L;
     private @NotBlank String type;
     private @NotNull @Min(0) @NotNull Long observedTime;
     private @NotNull String body;
     private @NotNull ProxyObject attributes = ProxyObject.fromMap(new HashMap<>());
 
-    public ScriptRengineEvent(@NotBlank String type, @NotNull ScriptEventSource source) {
+    public RengineEvent(@NotBlank String type, @NotNull EventSource source) {
         this(type, currentTimeMillis(), source, null, new HashMap<>());
     }
 
-    public ScriptRengineEvent(@NotBlank String type, @NotNull ScriptEventSource source, @Nullable String body) {
+    public RengineEvent(@NotBlank String type, @NotNull EventSource source, @Nullable String body) {
         this(type, currentTimeMillis(), source, body, emptyMap());
     }
 
-    public ScriptRengineEvent(@NotBlank String type, @NotNull ScriptEventSource source, @Nullable String body,
+    public RengineEvent(@NotBlank String type, @NotNull EventSource source, @Nullable String body,
             @Nullable Map<String, String> attributes) {
         this(type, currentTimeMillis(), source, body, attributes);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public ScriptRengineEvent(@NotBlank String type, @Min(0) Long observedTime, @NotNull ScriptEventSource source,
-            @Nullable String body, @Nullable Map<String, String> attributes) {
+    public RengineEvent(@NotBlank String type, @Min(0) Long observedTime, @NotNull EventSource source, @Nullable String body,
+            @Nullable Map<String, String> attributes) {
         super(notNullOf(source, "eventSource"));
         this.type = hasTextOf(type, "eventType");
         isTrueOf(observedTime > 0, format("observedTime > 0, but is: %s", observedTime));
@@ -79,8 +79,8 @@ public class ScriptRengineEvent extends EventObject {
         return body;
     }
 
-    public @HostAccess.Export ScriptEventSource getSource() {
-        return (ScriptEventSource) super.getSource();
+    public @HostAccess.Export EventSource getSource() {
+        return (EventSource) super.getSource();
     }
 
     public @HostAccess.Export ProxyObject getAttributes() {
@@ -90,11 +90,11 @@ public class ScriptRengineEvent extends EventObject {
     @ToString
     @SuperBuilder
     @NoArgsConstructor
-    public static class ScriptEventSource implements Serializable {
+    public static class EventSource implements Serializable {
         private static final long serialVersionUID = -63891594867432011L;
         private @NotNull @Min(0) Long time;
         private @NotEmpty @Default List<String> principals = new ArrayList<>();
-        private @NotNull @Default ScriptEventLocation location = ScriptEventLocation.builder().build();
+        private @NotNull @Default EventLocation location = EventLocation.builder().build();
 
         public @HostAccess.Export Long getTime() {
             return time;
@@ -104,7 +104,7 @@ public class ScriptRengineEvent extends EventObject {
             return principals;
         }
 
-        public @HostAccess.Export ScriptEventLocation getLocation() {
+        public @HostAccess.Export EventLocation getLocation() {
             return location;
         }
     }
@@ -112,7 +112,7 @@ public class ScriptRengineEvent extends EventObject {
     @ToString
     @SuperBuilder
     @NoArgsConstructor
-    public static class ScriptEventLocation implements Serializable {
+    public static class EventLocation implements Serializable {
         private static final long serialVersionUID = -63891594867422209L;
         private @NotBlank String ipAddress;
         private @NotNull Boolean ipv6;

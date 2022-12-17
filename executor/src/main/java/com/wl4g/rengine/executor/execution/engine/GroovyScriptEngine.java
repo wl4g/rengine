@@ -1,4 +1,3 @@
-package com.wl4g.rengine.executor.execution.engine;
 ///*
 // * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>
 // *
@@ -28,7 +27,7 @@ package com.wl4g.rengine.executor.execution.engine;
 //import com.wl4g.infra.common.lang.StringUtils2;
 //import com.wl4g.rengine.common.entity.Scenes;
 //import com.wl4g.rengine.common.entity.UploadObject.UploadType;
-//import com.wl4g.rengine.common.exception.EvaluationRengineException;
+//import com.wl4g.rengine.common.exception.EvaluationException;
 //import com.wl4g.rengine.common.model.Evaluation;
 //import com.wl4g.rengine.executor.execution.sdk.ScriptContext;
 //import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
@@ -76,7 +75,7 @@ package com.wl4g.rengine.executor.execution.engine;
 //    @SuppressWarnings("unchecked")
 //    @Override
 //    public ScriptResult execute(final Evaluation evaluation, final Scenes scenes) {
-//        log.debug("Execution JS script for scenesCode: {} ...", scenes.getScenesCode());
+//        log.debug("Execution Groovy script for scenesCode: {} ...", scenes.getScenesCode());
 //
 //        try {
 //            // Load all scripts dependencies.
@@ -107,7 +106,7 @@ package com.wl4g.rengine.executor.execution.engine;
 //                        }
 //                    }
 //                } catch (Throwable e) {
-//                    throw new EvaluationRengineException(evaluation.getRequestId(), scenes.getScenesCode(),
+//                    throw new EvaluationException(evaluation.getRequestId(), scenes.getScenesCode(),
 //                            format("Failed to load groovy dependency '%s'", scriptName), e);
 //                }
 //            }
@@ -118,7 +117,7 @@ package com.wl4g.rengine.executor.execution.engine;
 //            // TODO re-wrap result object
 //            return new ScriptResult(null);
 //        } catch (Exception e) {
-//            throw new EvaluationRengineException(evaluation.getRequestId(), scenes.getScenesCode(),
+//            throw new EvaluationException(evaluation.getRequestId(), scenes.getScenesCode(),
 //                    format("Failed to execution Groovy script for scenesCode: %s", scenes.getScenesCode()), e);
 //        }
 //    }

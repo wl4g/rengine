@@ -160,6 +160,17 @@
         <!--     <groupId>io.grpc</groupId>-->
         <!--     <artifactId>grpc-protobuf</artifactId>-->
         <!-- </dependency>-->
+        <!-- Cache(Jedis) -->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

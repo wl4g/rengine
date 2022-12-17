@@ -78,6 +78,7 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
 
         final Map<String, RuleWrapper> ruleMap = safeList(workflowGraph.getRules()).stream()
                 .collect(toMap(r -> valueOf(r.getId()), r -> r));
+
         final ExecutionGraphContext context = new ExecutionGraphContext(parameter, ctx -> {
             final String ruleId = ((IRunOperator) ctx.getCurrentNode()).getRuleId();
 

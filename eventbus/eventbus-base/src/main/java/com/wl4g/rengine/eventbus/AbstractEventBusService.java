@@ -16,7 +16,6 @@
 package com.wl4g.rengine.eventbus;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static com.wl4g.infra.common.log.SmartLoggerFactory.getLogger;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 
@@ -25,7 +24,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.wl4g.infra.common.log.SmartLogger;
 import com.wl4g.infra.common.task.GenericTaskRunner;
 import com.wl4g.infra.common.task.RunnerProperties;
 import com.wl4g.infra.common.task.RunnerProperties.StartupMode;
@@ -33,6 +31,7 @@ import com.wl4g.rengine.common.event.RengineEvent;
 import com.wl4g.rengine.eventbus.config.ClientEventBusConfig;
 import com.wl4g.rengine.eventbus.recorder.EventRecorder;
 
+import lombok.CustomLog;
 import lombok.Getter;
 
 /**
@@ -42,10 +41,9 @@ import lombok.Getter;
  * @version 2022-05-30 v3.0.0
  * @since v1.0.0
  */
+@CustomLog
 @Getter
 public abstract class AbstractEventBusService<R> implements RengineEventBusService<R>, Closeable {
-    protected final SmartLogger log = getLogger(getClass());
-
     protected final ClientEventBusConfig config;
     protected final EventRecorder recorder;
     protected final GenericTaskRunner<RunnerProperties> compactScheduler;

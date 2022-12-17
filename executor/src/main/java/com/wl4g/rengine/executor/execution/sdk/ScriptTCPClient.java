@@ -28,7 +28,7 @@ import org.graalvm.polyglot.HostAccess;
 
 import com.google.common.io.ByteStreams;
 import com.wl4g.infra.common.codec.CodecSource;
-import com.wl4g.rengine.common.exception.ExecutionScriptRengineException;
+import com.wl4g.rengine.common.exception.ExecutionScriptException;
 
 import lombok.ToString;
 
@@ -65,7 +65,7 @@ public class ScriptTCPClient {
             final byte[] result = ByteStreams.toByteArray(socket.getInputStream());
             return new CodecSource(result).toBase64();
         } catch (Exception e) {
-            throw new ExecutionScriptRengineException(format(
+            throw new ExecutionScriptException(format(
                     "Failed to write to tcp channal for host: %s, port: %s, base64Message: '%s'", host, port, base64Message), e);
         }
     }

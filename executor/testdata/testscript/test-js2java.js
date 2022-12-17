@@ -20,38 +20,121 @@ function process(context) {
     console.info("context.getEvent().getSource().getLocation().getZipcode():", context.getEvent().getSource().getLocation().getZipcode());
 
     // for case2:
-    const httpResult1 = new ScriptHttpClient().postForJson("http://httpbin.org/post", "");
-    console.info("http httpResult1:", httpResult1);
-    console.info("http httpResult1('/headers'):", httpResult1.at("/headers").toString());
+    const httpResult1 = testForHttpRequest1(context);
 
     // for case3:
-    const httpResult2 = context.getDataService().getDefaultHttpClient().getForText("http://httpbin.org/get");
-    console.info("http httpResult2:", httpResult2);
-    console.info("http httpResult2('/headers'):", httpResult2.at("/headers"));
+    const httpResult2 = testForHttpRequest2(context);
 
     // for case4:
-    var mongoQuery = [
-        { $match: { "eventType": "ecommerce_trade_gift" } },
-        { $project: { "delFlag": 0 } }
-    ];
-    var mongoResult = context.getDataService().getMongoService("default").findList("aggregates", mongoQuery);
-    console.info("mongo result: " + mongoResult);
+    const mongoResult = testForMongoQuery(context);
 
     // for case5:
-    var sql = "select * from user where user='root'";
-    var jdbcResult = context.getDataService().getJDBCService("default").findList(sql, []);
-    console.info("jdbc result: " + jdbcResult);
+    const redisResult = testForRedisOperation(context);
 
     // for case6:
-    var redisService = context.getDataService().getRedisClusterService("default");
-    redisService.set("key111", "value111");
-    var redisResult = redisService.get("key111");
-    console.info("redis cluster result: " + redisResult);
+    const jdbcResult = testForJdbcSql(context);
+
+    // for case7:
+    const sshResult = testForSshExec(context);
+
+    // for case8:
+    const kafkaResult = testForKafkaPublish(context);
 
     return new ScriptResult(true)
         .addValue("httpResult1", httpResult1)
         .addValue("httpResult2", httpResult2)
         .addValue("mongoResult", mongoResult)
+        .addValue("redisResult", redisResult)
         .addValue("jdbcResult", jdbcResult)
-        .addValue("redisResult", redisResult);
+        .addValue("sshResult", sshResult)
+        .addValue("kafkaResult", kafkaResult);
+}
+
+function testForHttpRequest1(context) {
+    try {
+        const httpResult1 = new ScriptHttpClient().postForJson("http://httpbin.org/post", "");
+        console.info("httpResult1:", httpResult1);
+        console.info("httpResult1('/headers'):", httpResult1.at("/headers").toString());
+        return httpResult1;
+    } catch(e) {
+        console.error(">>>", e);
+    }
+}
+
+function testForHttpRequest2(context) {
+    try {
+        const httpResult2 = context.getDataService().getDefaultHttpClient().getForText("http://httpbin.org/get");
+        console.info("httpResult2:", httpResult2);
+        console.info("httpResult2('/headers'):", httpResult2.at("/headers"));
+        return httpResult2;
+    } catch(e) {
+        console.error(">>>", e);
+    }
+}
+
+function testForMongoQuery(context) {
+    try {
+        const mongoQuery = [
+            { $match: { "eventType": "ecommerce_trade_gift" } },
+            { $project: { "delFlag": 0 } }
+        ];
+        const mongoService = context.getDataService().getMongoService("default");
+        console.info("mongoService: " + mongoService);
+        var mongoResult = mongoService.findList("aggregates", mongoQuery);
+        console.info("mongoResult: " + mongoResult);
+        return mongoResult;
+    } catch(e) {
+        console.error(">>>", e);
+    }
+}
+
+function testForRedisOperation(context) {
+    try {
+        const redisService = context.getDataService().getRedisService("default");
+        console.info("redisService: " + redisService);
+        redisService.set("key111", "value111");
+        var redisResult = redisService.get("key111");
+        console.info("redisResult: " + redisResult);
+        return redisResult;
+    } catch(e) {
+        console.error(">>>", e);
+    }
+}
+
+function testForJdbcSql(context) {
+    try {
+        var sql = "select * from user where user='root'";
+        const jdbcService = context.getDataService().getJDBCService("default");
+        console.info("jdbcService: " + jdbcService);
+        var jdbcResult = jdbcService.findList(sql, []);
+        console.info("jdbcResult: " + jdbcResult);
+        return jdbcResult;
+    } catch(e) {
+        console.error(">>>", e);
+    }
+}
+
+function testForSshExec(context) {
+    try {
+        const sshService = context.getDataService().getDefaultSSHClient();
+        var sshResult = sshService.execute("localhost", 22, "prometheus", "123456", "ls -al /tmp/");
+        console.info("sshResult:", sshResult);
+        return sshResult;
+    } catch(e) {
+        console.error(">>>", e);
+    }
+}
+
+// docker exec -it kafka1 /opt/bitnami/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test_topic
+function testForKafkaPublish(context) {
+    try {
+        const topic = "test_topic";
+        const kafkaService = context.getDataService().getKafkaService("default");
+        kafkaService.publish(topic, {"foo1":"bar1"});
+        const kafkaResult = "none";
+        console.info("kafkaResult: " + kafkaResult);
+        return kafkaResult;
+    } catch(e) {
+        console.error(">>>", e);
+    }
 }

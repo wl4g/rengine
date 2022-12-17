@@ -25,9 +25,9 @@ import javax.validation.constraints.NotBlank;
 
 import org.graalvm.polyglot.HostAccess;
 
-import com.wl4g.infra.common.cli.ssh2.SSH2Holders;
-import com.wl4g.infra.common.cli.ssh2.SSH2Holders.Ssh2ExecResult;
-import com.wl4g.rengine.common.exception.ExecutionScriptRengineException;
+import com.wl4g.infra.common.cli.ssh.SshHelperBase.SSHExecResult;
+import com.wl4g.infra.common.cli.ssh.SshdHelper;
+import com.wl4g.rengine.common.exception.ExecutionScriptException;
 
 import lombok.ToString;
 
@@ -44,7 +44,7 @@ public class ScriptSSHClient {
     public @HostAccess.Export ScriptSSHClient() {
     }
 
-    public @HostAccess.Export Ssh2ExecResult execute(
+    public @HostAccess.Export SSHExecResult execute(
             @NotBlank String host,
             @NotBlank String user,
             String password,
@@ -52,7 +52,16 @@ public class ScriptSSHClient {
         return execute(host, 22, user, null, password, command, DEFAULT_COMMAND_TIMEOUT_MS);
     }
 
-    public @HostAccess.Export Ssh2ExecResult execute(
+    public @HostAccess.Export SSHExecResult execute(
+            @NotBlank String host,
+            @Min(1) int port,
+            @NotBlank String user,
+            String password,
+            @NotBlank String command) {
+        return execute(host, port, user, null, password, command, DEFAULT_COMMAND_TIMEOUT_MS);
+    }
+
+    public @HostAccess.Export SSHExecResult execute(
             @NotBlank String host,
             @Min(1) int port,
             @NotBlank String user,
@@ -63,13 +72,14 @@ public class ScriptSSHClient {
         hasTextOf(host, "host");
         isTrueOf(port >= 1, "port>=1");
         hasTextOf(user, "user");
-        isTrueOf(timeoutMs >= 1, "port>=1");
+        isTrueOf(timeoutMs >= 1, "timeoutMs>=1");
         try {
             final char[] pemPrivateKeyChars = nonNull(pemPrivateKey) ? pemPrivateKey.toCharArray() : null;
-            return SSH2Holders.getDefault()
+            return SshdHelper.getInstance()
                     .execWaitForResponse(host, port, user, pemPrivateKeyChars, password, command, timeoutMs);
         } catch (Exception e) {
-            throw new ExecutionScriptRengineException(
+            e.printStackTrace();
+            throw new ExecutionScriptException(
                     format("Failed to execute ssh command for equivalent : ssh -p %s %s@%s '%s'", port, user, host, command), e);
         }
     }

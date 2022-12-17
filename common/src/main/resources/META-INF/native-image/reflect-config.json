@@ -5,11 +5,11 @@
   "queryAllDeclaredMethods":true,
   "methods":[
     {"name":"<init>","parameterTypes":[] }, 
-    {"name":"getType","parameterTypes":[] }, 
-    {"name":"setType","parameterTypes":["com.wl4g.rengine.common.entity.DataSourceProperties$DataSourceType"] },  
     {"name":"getName","parameterTypes":[] }, 
     {"name":"setName","parameterTypes":["java.lang.String"] }, 
-    {"name":"validate","parameterTypes":[] }
+    {"name":"getProperties","parameterTypes":[""] }, 
+    {"name":"setProperties","parameterTypes":["com.wl4g.rengine.common.entity.DataSourceProperties$DataSourcePropertiesBase"] }, 
+    {"name":"toString","parameterTypes":[] }
   ]
 },
 {
@@ -19,6 +19,18 @@
   "methods":[
     {"name":"getPropertiesClass","parameterTypes":[] }, 
     {"name":"of","parameterTypes":["java.lang.String"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.DataSourceProperties$DataSourcePropertiesBase",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getType","parameterTypes":[] }, 
+    {"name":"setType","parameterTypes":["com.wl4g.rengine.common.entity.DataSourceProperties$DataSourceType"] },  
+    {"name":"setType","parameterTypes":["java.lang.String"] },  
+    {"name":"validate","parameterTypes":[] }
   ]
 },
 {
@@ -96,8 +108,8 @@
     {"name":"setReadOnly","parameterTypes":["boolean"] }, 
     {"name":"getPoolName","parameterTypes":[] }, 
     {"name":"setPoolName","parameterTypes":["java.lang.String"] }, 
-    {"name":"getTransactionIsolation","parameterTypes":[] }, 
-    {"name":"setTransactionIsolation","parameterTypes":["java.lang.String"] }, 
+    {"name":"getTransactionIsolationName","parameterTypes":[] }, 
+    {"name":"setTransactionIsolationName","parameterTypes":["java.lang.String"] }, 
     {"name":"getSchema","parameterTypes":[] }, 
     {"name":"setSchema","parameterTypes":["java.lang.String"] }, 
     {"name":"getExceptionOverrideClassName","parameterTypes":[] }, 
@@ -107,13 +119,71 @@
   ]
 },
 {
-  "name":"com.wl4g.rengine.common.entity.DataSourceProperties$RedisClusterDataSourceProperties",
+  "name":"com.wl4g.rengine.common.entity.DataSourceProperties$RedisDataSourceProperties",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "methods":[
     {"name":"<init>","parameterTypes":[] }, 
     {"name":"getJedisConfig","parameterTypes":[] }, 
     {"name":"setJedisConfig","parameterTypes":["com.wl4g.infra.common.jedis.JedisClientBuilder$JedisConfig"] }, 
+    {"name":"validate","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.entity.DataSourceProperties$KafkaDataSourceProperties",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getKeySerializer","parameterTypes":[] }, 
+    {"name":"getValueSerializer","parameterTypes":[] }, 
+    {"name":"getBootstrapServers","parameterTypes":[] }, 
+    {"name":"getBufferMemory","parameterTypes":[] }, 
+    {"name":"getRetries","parameterTypes":[] }, 
+    {"name":"getAcks","parameterTypes":[] }, 
+    {"name":"getCompressionType","parameterTypes":[] }, 
+    {"name":"getBatchSize","parameterTypes":[] }, 
+    {"name":"getLingerMs","parameterTypes":[] }, 
+    {"name":"getDeliveryTimeoutMs","parameterTypes":[] }, 
+    {"name":"getSendBuffer","parameterTypes":[] }, 
+    {"name":"getReceiveBuffer","parameterTypes":[] }, 
+    {"name":"getMaxRequestSize","parameterTypes":[] }, 
+    {"name":"getReconnectBackoffMs","parameterTypes":[] }, 
+    {"name":"getReconnectBackoffMaxMs","parameterTypes":[] }, 
+    {"name":"getRetryBackoffMs","parameterTypes":[] }, 
+    {"name":"getMaxBlockMs","parameterTypes":[] }, 
+    {"name":"getRequestTimeoutMs","parameterTypes":[] }, 
+    {"name":"getMetadataMaxAge","parameterTypes":[] }, 
+    {"name":"getMetricsSampleWindowMs","parameterTypes":[] }, 
+    {"name":"getMetricsRecordingLevel","parameterTypes":[] }, 
+    {"name":"getMaxInFlightRequestsPerConnection","parameterTypes":[] }, 
+    {"name":"getConnectionsMaxIdleMs","parameterTypes":[] }, 
+    {"name":"getTransactionTimeout","parameterTypes":[] }, 
+    {"name":"setKeySerializer","parameterTypes":["java.lang.String"] }, 
+    {"name":"setValueSerializer","parameterTypes":["java.lang.String"] }, 
+    {"name":"setBootstrapServers","parameterTypes":["java.lang.String"] }, 
+    {"name":"setBufferMemory","parameterTypes":["java.lang.Long"] }, 
+    {"name":"setRetries","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"setAcks","parameterTypes":["java.lang.String"] }, 
+    {"name":"setCompressionType","parameterTypes":["java.lang.String"] }, 
+    {"name":"setBatchSize","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"setLingerMs","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"setDeliveryTimeoutMs","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"setSendBuffer","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"setReceiveBuffer","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"setMaxRequestSize","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"setReconnectBackoffMs","parameterTypes":["java.lang.Long"] }, 
+    {"name":"setReconnectBackoffMaxMs","parameterTypes":["java.lang.Long"] }, 
+    {"name":"setRetryBackoffMs","parameterTypes":["java.lang.Long"] }, 
+    {"name":"setMaxBlockMs","parameterTypes":["java.lang.Long"] }, 
+    {"name":"setRequestTimeoutMs","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"setMetadataMaxAge","parameterTypes":["java.lang.Long"] }, 
+    {"name":"setMetricsSampleWindowMs","parameterTypes":["java.lang.Long"] }, 
+    {"name":"setMetricsRecordingLevel","parameterTypes":["java.lang.String"] }, 
+    {"name":"setMaxInFlightRequestsPerConnection","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"setConnectionsMaxIdleMs","parameterTypes":["java.lang.Long"] }, 
+    {"name":"setTransactionTimeout","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"toConfigMap","parameterTypes":[] }, 
     {"name":"validate","parameterTypes":[] }
   ]
 },

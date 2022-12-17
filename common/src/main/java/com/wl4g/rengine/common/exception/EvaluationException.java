@@ -20,35 +20,35 @@ import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import lombok.Getter;
 
 /**
- * {@link EvaluationRengineException}
+ * {@link EvaluationException}
  * 
  * @author James Wong
  * @version 2022-09-22
  * @since v1.0.0
  */
 @Getter
-public class EvaluationRengineException extends RengineException {
+public class EvaluationException extends RengineException {
     private static final long serialVersionUID = 5177120828249689148L;
 
     private String requestId;
     private String clientId;
     private String scenesCode;
 
-    public EvaluationRengineException(String requestId, String clientId, String scenesCode, String message) {
+    public EvaluationException(String requestId, String clientId, String scenesCode, String message) {
         super(message);
         this.requestId = hasTextOf(requestId, "requestId");
         this.clientId = hasTextOf(clientId, "clientId");
         this.scenesCode = hasTextOf(scenesCode, "scenesCode");
     }
 
-    public EvaluationRengineException(String requestId, String clientId, String scenesCode, String message, Throwable cause) {
+    public EvaluationException(String requestId, String clientId, String scenesCode, String message, Throwable cause) {
         super(message, cause);
         this.requestId = hasTextOf(requestId, "requestId");
         this.clientId = hasTextOf(clientId, "clientId");
         this.scenesCode = hasTextOf(scenesCode, "scenesCode");
     }
 
-    public EvaluationRengineException(String requestId, String clientId, String scenesCode, Throwable cause) {
+    public EvaluationException(String requestId, String clientId, String scenesCode, Throwable cause) {
         super(cause);
         this.requestId = hasTextOf(requestId, "requestId");
         this.clientId = hasTextOf(clientId, "clientId");

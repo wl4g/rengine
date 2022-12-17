@@ -17,8 +17,6 @@ package com.wl4g.rengine.executor.rest;
 
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
-import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
 
 import java.net.URI;
 import java.nio.charset.Charset;
@@ -26,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
@@ -50,11 +49,9 @@ import com.wl4g.infra.common.runtime.JvmRuntimeTool;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.executor.execution.engine.GraalJSScriptEngine;
 import com.wl4g.rengine.executor.execution.sdk.ScriptContext;
+import com.wl4g.rengine.executor.execution.sdk.ScriptContext.ScriptParameter;
 import com.wl4g.rengine.executor.execution.sdk.ScriptHttpClient;
-import com.wl4g.rengine.executor.execution.sdk.ScriptRengineEvent;
 import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
-import com.wl4g.rengine.executor.execution.sdk.ScriptRengineEvent.ScriptEventLocation;
-import com.wl4g.rengine.executor.execution.sdk.ScriptRengineEvent.ScriptEventSource;
 import com.wl4g.rengine.executor.rest.interceptor.CustomValid;
 
 import io.quarkus.runtime.StartupEvent;
@@ -127,13 +124,15 @@ public class TestJavascriptResource {
             System.out.println(format("cost(loadJSScript): %sms", (currentTimeMillis() - begin)));
             log.info("Loaded JSScript codes: {}", codes);
 
-            ScriptRengineEvent event = new ScriptRengineEvent("generic_device_temp_warning",
-                    ScriptEventSource.builder()
-                            .time(currentTimeMillis())
-                            .principals(singletonList("admin"))
-                            .location(ScriptEventLocation.builder().zipcode("20500").build())
-                            .build(),
-                    "A serious alarm occurs when the device temperature is greater than 52℃", singletonMap("objId", "1010012"));
+            // @formatter:off
+            //RengineEvent event = new RengineEvent("generic_device_temp_warning",
+            //        EventSource.builder()
+            //                .time(currentTimeMillis())
+            //                .principals(singletonList("admin"))
+            //                .location(EventLocation.builder().zipcode("20500").build())
+            //                .build(),
+            //        "A serious alarm occurs when the device temperature is greater than 52℃", singletonMap("objId", "1010012"));
+            // @formatter:on
 
             Map<String, Object> attributes = new HashMap<>();
             attributes.put("objId", "1010012");
@@ -142,8 +141,11 @@ public class TestJavascriptResource {
             ScriptContext scriptContext = ScriptContext.builder()
                     .id("100101")
                     .type("iot_warning")
-                    .args(ProxyObject.fromMap(model.getArgs()))
-                    .event(event)
+                    .parameter(ScriptParameter.builder()
+                            .requestTime(currentTimeMillis())
+                            .traceId(UUID.randomUUID().toString())
+                            .args(ProxyObject.fromMap(model.getArgs()))
+                            .build())
                     .attributes(ProxyObject.fromMap(attributes))
                     .build();
 

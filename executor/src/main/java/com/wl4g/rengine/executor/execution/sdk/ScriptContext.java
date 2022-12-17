@@ -21,13 +21,13 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import org.graalvm.polyglot.HostAccess;
 import org.graalvm.polyglot.proxy.ProxyObject;
 
-import com.wl4g.rengine.executor.execution.sdk.ScriptRengineEvent.ScriptEventSource;
 import com.wl4g.rengine.executor.minio.MinioManager;
 
 import lombok.Builder.Default;
@@ -52,11 +52,10 @@ public class ScriptContext implements Serializable {
     //
     private final @NotBlank String id;
     private final @NotBlank String type;
-    private final @NotNull @Default ProxyObject args = ProxyObject.fromMap(new HashMap<>());
-    private final @NotNull @Default ScriptRengineEvent event = new ScriptRengineEvent("__default_empty_event",
-            ScriptEventSource.builder().build());
+    private final @NotNull @Default ScriptParameter parameter = ScriptParameter.builder().build();
     private final @NotNull @Default ProxyObject attributes = ProxyObject.fromMap(new HashMap<>());
     private final @Nullable ScriptResult lastResult;
+
     //
     // Helper attributes.
     //
@@ -75,16 +74,12 @@ public class ScriptContext implements Serializable {
         return type;
     }
 
-    public @HostAccess.Export ProxyObject getArgs() {
-        return args;
+    public @HostAccess.Export ScriptParameter getParameter() {
+        return parameter;
     }
 
     public @HostAccess.Export ProxyObject getAttributes() {
         return attributes;
-    }
-
-    public @HostAccess.Export ScriptRengineEvent getEvent() {
-        return event;
     }
 
     public @HostAccess.Export ScriptResult getLastResult() {
@@ -110,4 +105,43 @@ public class ScriptContext implements Serializable {
         return dataService;
     }
 
+    @ToString
+    @SuperBuilder
+    public static class ScriptParameter {
+        private final @Min(1) long requestTime;
+        private final @NotBlank String clientId;
+        private final @NotBlank String traceId;
+        private final @Default boolean trace = true;
+        private final @NotBlank String scenesCode;
+        private final @NotBlank String workflowId;
+        private final @NotNull @Default ProxyObject args = ProxyObject.fromMap(new HashMap<>());
+
+        public @HostAccess.Export long getRequestTime() {
+            return requestTime;
+        }
+
+        public @HostAccess.Export String getClientId() {
+            return clientId;
+        }
+
+        public @HostAccess.Export String getTraceId() {
+            return traceId;
+        }
+
+        public @HostAccess.Export boolean isTrace() {
+            return trace;
+        }
+
+        public @HostAccess.Export String getScenesCode() {
+            return scenesCode;
+        }
+
+        public @HostAccess.Export String getWorkflowId() {
+            return workflowId;
+        }
+
+        public @HostAccess.Export ProxyObject getArgs() {
+            return args;
+        }
+    }
 }

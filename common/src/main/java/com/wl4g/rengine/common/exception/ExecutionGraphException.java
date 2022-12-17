@@ -22,29 +22,29 @@ import com.wl4g.rengine.common.graph.ExecutionGraph;
 import lombok.Getter;
 
 /**
- * {@link ExecutionGraphRengineException}
+ * {@link ExecutionGraphException}
  * 
  * @author James Wong
  * @version 2022-09-22
  * @since v1.0.0
  */
 @Getter
-public class ExecutionGraphRengineException extends RengineException {
+public class ExecutionGraphException extends RengineException {
     private static final long serialVersionUID = 5177120828249689148L;
 
     private ExecutionGraph<?> node;
 
-    public ExecutionGraphRengineException(ExecutionGraph<?> node, String message) {
+    public ExecutionGraphException(ExecutionGraph<?> node, String message) {
         super(message);
         this.node = notNullOf(node, "node");
     }
 
-    public ExecutionGraphRengineException(ExecutionGraph<?> node, String message, Throwable cause) {
+    public ExecutionGraphException(ExecutionGraph<?> node, String message, Throwable cause) {
         super(message, cause);
         this.node = notNullOf(node, "node");
     }
 
-    public ExecutionGraphRengineException(ExecutionGraph<?> node, Throwable cause) {
+    public ExecutionGraphException(ExecutionGraph<?> node, Throwable cause) {
         super(cause);
         this.node = notNullOf(node, "node");
     }

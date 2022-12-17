@@ -18,25 +18,25 @@ package com.wl4g.rengine.common.exception;
 import lombok.Getter;
 
 /**
- * {@link ExecutionScriptRengineException}
+ * {@link ExecutionScriptException}
  * 
  * @author James Wong
  * @version 2022-09-22
  * @since v1.0.0
  */
 @Getter
-public class ExecutionScriptRengineException extends RengineException {
+public class ExecutionScriptException extends RengineException {
     private static final long serialVersionUID = 5177120828249689148L;
 
-    public ExecutionScriptRengineException(String message) {
+    public ExecutionScriptException(String message) {
         super(message);
     }
 
-    public ExecutionScriptRengineException(String message, Throwable cause) {
+    public ExecutionScriptException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public ExecutionScriptRengineException(Throwable cause) {
+    public ExecutionScriptException(Throwable cause) {
         super(cause);
     }
 }

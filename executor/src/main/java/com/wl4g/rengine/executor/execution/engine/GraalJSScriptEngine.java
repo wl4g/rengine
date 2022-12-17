@@ -22,7 +22,7 @@ import static com.wl4g.infra.common.lang.EnvironmentUtil.getBooleanProperty;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getIntProperty;
 import static com.wl4g.infra.common.lang.FastTimeClock.currentTimeMillis;
 import static com.wl4g.infra.common.lang.StringUtils2.getFilename;
-import static com.wl4g.rengine.executor.metrics.EvaluatorMeterService.MetricsName.evaluation_execute_time;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.evaluation_execute_time;
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toSet;
@@ -47,10 +47,10 @@ import com.wl4g.infra.common.graalvm.GraalPolyglotManager.ContextWrapper;
 import com.wl4g.infra.common.lang.EnvironmentUtil;
 import com.wl4g.infra.common.lang.StringUtils2;
 import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
-import com.wl4g.rengine.common.exception.EvaluationRengineException;
+import com.wl4g.rengine.common.exception.EvaluationException;
 import com.wl4g.rengine.common.graph.ExecutionGraphContext;
 import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
-import com.wl4g.rengine.executor.metrics.EvaluatorMeterService.MetricsTag;
+import com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsTag;
 import com.wl4g.rengine.executor.minio.MinioManager.ObjectResource;
 
 import io.micrometer.core.instrument.Timer;
@@ -92,6 +92,8 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
                             .allowValueSharing(getBooleanProperty("graaljs.allowValueSharing", true))
                             .allowPolyglotAccess(PolyglotAccess.ALL)
                             .useSystemExit(getBooleanProperty("graaljs.useSystemExit", false))
+                            .out(System.out) // TODO custom OutputStream
+                            .err(System.err)
                             .options(graaljsOptions)
                             .build());
         } catch (Exception e) {
@@ -119,6 +121,7 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
         hasTextOf(scenesCode, "scenesCode");
 
         log.debug("Execution JS script for scenesCode: {} ...", scenesCode);
+        // see:https://github.com/oracle/graaljs/blob/vm-ee-22.1.0/graal-js/src/com.oracle.truffle.js.test.threading/src/com/oracle/truffle/js/test/threading/AsyncTaskTests.java#L283
         try (ContextWrapper graalContext = graalPolyglotManager.getContext();) {
             // Load all scripts dependencies.
             final List<ObjectResource> scripts = safeList(loadScriptResources(scenesCode, rule, true));
@@ -126,20 +129,20 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
                 isTrue(!script.isBinary(), "Invalid JS dependency library binary type");
                 log.debug("Evaling js-dependencys: {}", script.getObjectPrefix());
 
-                String scriptName = StringUtils2.getFilename(script.getObjectPrefix()).concat("@").concat(scenesCode);
+                final String scriptName = StringUtils2.getFilename(script.getObjectPrefix()).concat("@").concat(scenesCode);
                 try {
                     // merge JS library with dependency.
                     graalContext.eval(Source.newBuilder("js", script.readToString(), scriptName).build());
                 } catch (PolyglotException e) {
-                    throw new EvaluationRengineException(traceId, scenesCode,
+                    throw new EvaluationException(traceId, scenesCode,
                             format("Unable to parse JS dependency of '%s', scenesCode: %s", scriptName, scenesCode), e);
                 }
             }
 
             final Value bindings = graalContext.getBindings("js");
-            registerMembers(bindings);
+            bindingMembers(bindings);
 
-            log.trace("Loading js-script ...");
+            log.trace("Loading js script ...");
             final Value mainFunction = bindings.getMember(DEFAULT_MAIN_FUNCTION);
 
             // Buried-point: execute cost-time.
@@ -156,7 +159,7 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
             log.info("Executed for scenesCode: {}, cost: {}ms, result: {}", scenesCode, costTime, result);
             return result.as(ScriptResult.class);
         } catch (Throwable e) {
-            throw new EvaluationRengineException(traceId, clientId, scenesCode, "Failed to execution js script", e);
+            throw new EvaluationException(traceId, clientId, scenesCode, "Failed to execution js script", e);
         }
     }
 

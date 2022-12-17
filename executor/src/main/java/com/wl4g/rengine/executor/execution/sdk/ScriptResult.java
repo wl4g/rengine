@@ -72,7 +72,7 @@ public class ScriptResult {
     }
 
     public @HostAccess.Export ScriptResult addValue(String key, Object value) {
-        if (!isBlank(key) && nonNull(value)) {
+        if (!isBlank(key)) {
             getValueMap().put(key, value);
         }
         return this;

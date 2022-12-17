@@ -19,6 +19,7 @@ import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
+import static java.util.Collections.synchronizedMap;
 import static java.util.Objects.isNull;
 
 import java.io.Serializable;
@@ -32,6 +33,7 @@ import javax.validation.constraints.NotNull;
 
 import com.wl4g.rengine.common.graph.ExecutionGraph.BaseOperator;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -49,7 +51,13 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @ToString(callSuper = true)
 public final class ExecutionGraphContext implements Serializable {
-    private static final long serialVersionUID = -7452442617432048671L;
+
+    private final static long serialVersionUID = -7452442617432048671L;
+
+    /**
+     * The execution graph operator node thread local.
+     */
+    private final static ThreadLocal<ExecutionGraph<?>> currentNodeLocal = new InheritableThreadLocal<>();
 
     /**
      * The handler paramaeter.
@@ -69,7 +77,7 @@ public final class ExecutionGraphContext implements Serializable {
     /**
      * The execution graph operator node.
      */
-    private volatile ExecutionGraph<?> currentNode;
+    private volatile @Getter(AccessLevel.NONE) @Setter(AccessLevel.NONE) ExecutionGraph<?> currentNode;
 
     /**
      * The execution graph operator node last result.
@@ -90,7 +98,7 @@ public final class ExecutionGraphContext implements Serializable {
             @NotNull final Function<ExecutionGraphContext, ExecutionGraphResult> handler) {
         this.parameter = notNullOf(parameter, "parameter");
         this.handler = notNullOf(handler, "handler");
-        this.traceSpans = new LinkedHashMap<>(8);
+        this.traceSpans = synchronizedMap(new LinkedHashMap<>(8));
         this.endTime = null;
     }
 
@@ -111,7 +119,22 @@ public final class ExecutionGraphContext implements Serializable {
     public ExecutionGraphContext end(final long endTime) {
         isTrue(endTime > 0, "endTime>0 miss, but is %s", endTime);
         setEndTime(endTime);
+
+        // Clean up the local thread cache of the current node and transfer to
+        // normal properties to prevent memory leaks.
+        this.currentNode = currentNodeLocal.get();
+        currentNodeLocal.remove();
+
         return this;
+    }
+
+    public ExecutionGraph<?> getCurrentNode() {
+        final ExecutionGraph<?> currentNode = currentNodeLocal.get();
+        return isNull(currentNode) ? this.currentNode : currentNode;
+    }
+
+    public void setCurrentNode(ExecutionGraph<?> currentNode) {
+        currentNodeLocal.set(currentNode);
     }
 
     public ExecutionGraphContext beginTrace(@NotNull final ExecutionGraph<?> node) {

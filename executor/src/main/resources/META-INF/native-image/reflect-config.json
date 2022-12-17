@@ -17,51 +17,18 @@
   ]
 },
 {
-  "name":"com.wl4g.rengine.executor.execution.sdk.ScriptRengineEvent",
+  "name":"com.wl4g.rengine.executor.execution.sdk.ScriptContext$ScriptParameter",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
   "methods":[
-    {"name":"getType","parameterTypes":[] }, 
-    {"name":"getObservedTime","parameterTypes":[] }, 
-    {"name":"getBody","parameterTypes":[] }, 
-    {"name":"getSource","parameterTypes":[] },
-    {"name":"getAttributes","parameterTypes":[] },
-    {"name":"toString","parameterTypes":[] }
-  ]
-},
-{
-  "name":"com.wl4g.rengine.executor.execution.sdk.ScriptRengineEvent$ScriptEventSource",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true,
-  "methods":[
-    {"name":"<init>","parameterTypes":[] }, 
-    {"name":"getTime","parameterTypes":[] },
-    {"name":"getPrincipals","parameterTypes":[] }, 
-    {"name":"getLocation","parameterTypes":[] }, 
-    {"name":"toString","parameterTypes":[] }
-  ]
-},
-{
-  "name":"com.wl4g.rengine.executor.execution.sdk.ScriptRengineEvent$ScriptEventLocation",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true,
-  "methods":[
-    {"name":"<init>","parameterTypes":[] }, 
-    {"name":"getIpAddress","parameterTypes":[] }, 
-    {"name":"getIpv6","parameterTypes":[] }, 
-    {"name":"getIsp","parameterTypes":[] }, 
-    {"name":"getDomain","parameterTypes":[] }, 
-    {"name":"getCountry","parameterTypes":[] }, 
-    {"name":"getRegion","parameterTypes":[] }, 
-    {"name":"getCity","parameterTypes":[] }, 
-    {"name":"getLatitude","parameterTypes":[] }, 
-    {"name":"getLongitude","parameterTypes":[] }, 
-    {"name":"getTimezone","parameterTypes":[] }, 
-    {"name":"getZipcode","parameterTypes":[] }, 
-    {"name":"getElevation","parameterTypes":[] }, 
+    {"name":"getRequestTime","parameterTypes":[] }, 
+    {"name":"getClientId","parameterTypes":[] }, 
+    {"name":"getTraceId","parameterTypes":[] }, 
+    {"name":"isTrace","parameterTypes":[] }, 
+    {"name":"getScenesCode","parameterTypes":[] }, 
+    {"name":"getWorkflowId","parameterTypes":[] }, 
+    {"name":"getArgs","parameterTypes":[] }, 
     {"name":"toString","parameterTypes":[] }
   ]
 },
@@ -98,7 +65,8 @@
   "queryAllDeclaredConstructors":true,
   "methods":[
     {"name":"<init>","parameterTypes":[] }, 
-    {"name":"execute","parameterTypes":["java.lang.String","java.lang.Object"] }, 
+    {"name":"execute","parameterTypes":["java.lang.String","java.lang.String","java.lang.String","java.lang.String"] }, 
+    {"name":"execute","parameterTypes":["java.lang.String","int","java.lang.String","java.lang.String","java.lang.String"] }, 
     {"name":"execute","parameterTypes":["java.lang.String","int","java.lang.String","java.lang.String","java.lang.String","java.lang.String","long"] }
   ]
 },
@@ -141,13 +109,76 @@
     {"name":"getDefaultTCPClient","parameterTypes":[] }, 
     {"name":"getMongoService","parameterTypes":["java.lang.String"] }, 
     {"name":"getJDBCService","parameterTypes":["java.lang.String"] }, 
-    {"name":"getRedisClusterService","parameterTypes":["java.lang.String"] }, 
+    {"name":"getRedisService","parameterTypes":["java.lang.String"] }, 
+    {"name":"getKafkaService","parameterTypes":["java.lang.String"] }, 
     {"name":"getPhoenixService","parameterTypes":["java.lang.String"] }, 
     {"name":"getOpentTSDBService","parameterTypes":["java.lang.String"] }
   ]
 },
 {
-  "name":"com.wl4g.rengine.executor.execution.sdk.extension.ScriptPrometheusParser",
+  "name":"com.wl4g.rengine.executor.execution.sdk.extension.JSON",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"parse","parameterTypes":["java.lang.String"] }, 
+    {"name":"stringify","parameterTypes":["java.lang.Object"] }, 
+    {"name":"stringify","parameterTypes":["java.lang.Object","boolean"] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.executor.execution.sdk.extension.RengineEvent",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"getType","parameterTypes":[] }, 
+    {"name":"getObservedTime","parameterTypes":[] }, 
+    {"name":"getBody","parameterTypes":[] }, 
+    {"name":"getSource","parameterTypes":[] },
+    {"name":"getAttributes","parameterTypes":[] },
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.executor.execution.sdk.extension.RengineEvent$EventSource",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getTime","parameterTypes":[] },
+    {"name":"getPrincipals","parameterTypes":[] }, 
+    {"name":"getLocation","parameterTypes":[] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.executor.execution.sdk.extension.RengineEvent$EventLocation",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getIpAddress","parameterTypes":[] }, 
+    {"name":"getIpv6","parameterTypes":[] }, 
+    {"name":"getIsp","parameterTypes":[] }, 
+    {"name":"getDomain","parameterTypes":[] }, 
+    {"name":"getCountry","parameterTypes":[] }, 
+    {"name":"getRegion","parameterTypes":[] }, 
+    {"name":"getCity","parameterTypes":[] }, 
+    {"name":"getLatitude","parameterTypes":[] }, 
+    {"name":"getLongitude","parameterTypes":[] }, 
+    {"name":"getTimezone","parameterTypes":[] }, 
+    {"name":"getZipcode","parameterTypes":[] }, 
+    {"name":"getElevation","parameterTypes":[] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.executor.execution.sdk.extension.PrometheusParser",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
@@ -158,7 +189,7 @@
   ]
 },
 {
-  "name":"com.wl4g.rengine.executor.execution.sdk.extension.ScriptPrometheusParser$PrometheusMetrics",
+  "name":"com.wl4g.rengine.executor.execution.sdk.extension.PrometheusParser$PrometheusMetrics",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,

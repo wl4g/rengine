@@ -28,8 +28,8 @@ import org.apache.shardingsphere.elasticjob.infra.exception.JobSystemException;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.wl4g.infra.common.cli.ssh2.SSH2Holders;
-import com.wl4g.infra.common.cli.ssh2.SSH2Holders.Ssh2ExecResult;
+import com.wl4g.infra.common.cli.ssh.SshHelperBase;
+import com.wl4g.infra.common.cli.ssh.SshHelperBase.SSHExecResult;
 import com.wl4g.rengine.common.event.RengineEvent.EventLocation;
 
 import lombok.Getter;
@@ -72,10 +72,10 @@ public class SimpleSSHCollectJobExecutor extends CollectJobExecutor<SimpleSSHCol
             throw new JobConfigurationException("Cannot find script command line, job is not executed.");
         }
         try {
-            Ssh2ExecResult result = SSH2Holders.getDefault()
+            SSHExecResult result = SshHelperBase.getDefault()
                     .execWaitForResponse(host, port, user, privateKey, password, command, timeoutMs);
 
-            offer(shardingParam, jobConfig, jobFacade, context, result.getMessage());
+            offer(shardingParam, jobConfig, jobFacade, context, result.getStdout());
         } catch (Exception ex) {
             throw new JobSystemException("Failed to ssh execute.", ex);
         }

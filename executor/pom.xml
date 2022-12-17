@@ -101,6 +101,14 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- <dependency>-->
+        <!--     <groupId>com.wl4g</groupId>-->
+        <!--     <artifactId>rengine-eventbus-base</artifactId>-->
+        <!-- </dependency>-->
+        <!-- <dependency>-->
+        <!--     <groupId>com.wl4g</groupId>-->
+        <!--     <artifactId>rengine-eventbus-kafka</artifactId>-->
+        <!-- </dependency>-->
         <dependency>
             <groupId>com.wl4g</groupId>
             <artifactId>infra-common-java11</artifactId>
@@ -161,10 +169,15 @@
         <!--     <groupId>io.quarkus</groupId>-->
         <!--     <artifactId>quarkus-jdbc-db2</artifactId>-->
         <!-- </dependency>-->
-        <!-- SSHJ -->
+        <!-- SSH -->
         <dependency>
-            <groupId>com.hierynomus</groupId>
-            <artifactId>sshj</artifactId>
+            <groupId>org.apache.sshd</groupId>
+            <artifactId>sshd-netty</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.i2p.crypto</groupId>
+            <artifactId>eddsa</artifactId>
+            <version>0.3.0</version>
         </dependency>
         <!-- Commons(see:com.wl4g.infra.common.remoting.parse.FormHttpMessageParser) -->
         <dependency>
@@ -190,6 +203,15 @@
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
+        </dependency>
+        <!-- KAFKA -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-kafka-client-deployment</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-kafka-client</artifactId>
         </dependency>
         <!-- Bridge for spring -->
         <!-- <dependency>-->

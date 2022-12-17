@@ -53,7 +53,7 @@ import com.mongodb.client.result.InsertManyResult;
 import com.mongodb.client.result.UpdateResult;
 import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
-import com.wl4g.rengine.common.entity.DataSourceProperties;
+import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourcePropertiesBase;
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
 import com.wl4g.rengine.common.entity.DataSourceProperties.MongoDataSourceProperties;
 import com.wl4g.rengine.common.exception.ConfigRengineException;
@@ -171,7 +171,7 @@ public class MongoSourceFacade implements DataSourceFacade {
         public DataSourceFacade newInstnace(
                 final @NotNull ExecutionConfig config,
                 final @NotBlank String dataSourceName,
-                final @NotNull DataSourceProperties dataSourceProperties) {
+                final @NotNull DataSourcePropertiesBase dataSourceProperties) {
             notNullOf(config, "properties");
             hasTextOf(dataSourceName, "dataSourceName");
 

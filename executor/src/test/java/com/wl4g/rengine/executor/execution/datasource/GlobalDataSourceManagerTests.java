@@ -16,7 +16,8 @@
 package com.wl4g.rengine.executor.execution.datasource;
 
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
-import static java.util.Collections.singletonList;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonMap;
 import static java.util.Objects.isNull;
 //import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -34,6 +35,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
 import com.wl4g.rengine.common.util.BsonUtils2;
+import com.wl4g.rengine.executor.execution.datasource.JDBCSourceFacade.JDBCSourceFacadeBuilder;
+import com.wl4g.rengine.executor.execution.datasource.KafkaSourceFacade.KafkaSourceFacadeBuilder;
+import com.wl4g.rengine.executor.execution.datasource.MongoSourceFacade.MongoSourceFacadeBuilder;
+import com.wl4g.rengine.executor.execution.datasource.RedisSourceFacade.RedisSourceFacadeBuilder;
 import com.wl4g.rengine.executor.util.TestSetupDefaults;
 
 /**
@@ -71,7 +76,8 @@ public class GlobalDataSourceManagerTests {
                     globalDataSourceManager = new GlobalDataSourceManager();
                     globalDataSourceManager.config = TestSetupDefaults.createExecutionConfig();
                     globalDataSourceManager.mongoRepository = TestSetupDefaults.createMongoRepository();
-                    globalDataSourceManager.builders = singletonList(new MongoSourceFacade.MongoSourceFacadeBuilder());
+                    globalDataSourceManager.builders = asList(new MongoSourceFacadeBuilder(), new JDBCSourceFacadeBuilder(),
+                            new RedisSourceFacadeBuilder(), new KafkaSourceFacadeBuilder());
                     globalDataSourceManager.init();
                 }
             }
@@ -96,6 +102,45 @@ public class GlobalDataSourceManagerTests {
 
         List<JsonNode> result = mongoSourceFacade.findList(MongoCollectionDefinition.AGGREGATES.getName(), bsonFilters);
         System.out.println(toJSONString(result));
+    }
+
+    @Test
+    @RepeatedTest(10)
+    public void testJDBCSourceFacadeFindList() throws Exception {
+        setup();
+
+        final JDBCSourceFacade jdbcSourceFacade = globalDataSourceManager.loadDataSource(DataSourceType.JDBC, "default");
+        System.out.println("jdbcSourceFacade : " + jdbcSourceFacade);
+
+        final String sql = "select * from user where user='root'";
+        final List<Map<String, Object>> result = jdbcSourceFacade.findList(sql);
+        System.out.println(result);
+    }
+
+    @Test
+    @RepeatedTest(10)
+    public void testRedisSourceFacadeFindList() throws Exception {
+        setup();
+
+        final RedisSourceFacade redisSourceFacade = globalDataSourceManager.loadDataSource(DataSourceType.REDIS, "default");
+        System.out.println("redisSourceFacade : " + redisSourceFacade);
+
+        redisSourceFacade.set("foo11", singletonMap("bar11", 123));
+        final JsonNode value = redisSourceFacade.get("foo11");
+        System.out.println(value);
+
+        assert value.get("bar11").asInt() == 123;
+    }
+
+    @Test
+    @RepeatedTest(10)
+    public void testKafkaSourceFacadeFindList() throws Exception {
+        setup();
+
+        final KafkaSourceFacade kafkaSourceFacade = globalDataSourceManager.loadDataSource(DataSourceType.KAFKA, "default");
+        System.out.println("kafkaSourceFacade : " + kafkaSourceFacade);
+
+        kafkaSourceFacade.publish("test", singletonMap("foo11", "bar11"));
     }
 
 }

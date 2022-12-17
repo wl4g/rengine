@@ -44,6 +44,7 @@ import com.wl4g.rengine.eventbus.config.ClientEventBusConfig;
 import com.wl4g.rengine.eventbus.recorder.EventRecorder;
 
 import lombok.AllArgsConstructor;
+import lombok.CustomLog;
 import lombok.Getter;
 
 /**
@@ -53,6 +54,7 @@ import lombok.Getter;
  * @version 2022-05-30 v3.0.0
  * @since v1.0.0
  */
+@CustomLog
 @Getter
 public class KafkaEventBusService extends AbstractEventBusService<Future<ProducerResult>> implements Closeable {
 

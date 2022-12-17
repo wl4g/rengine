@@ -50,6 +50,7 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.DataSourceProperties;
+import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourcePropertiesBase;
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
 import com.wl4g.rengine.common.exception.ConfigRengineException;
 import com.wl4g.rengine.common.exception.RengineException;
@@ -143,7 +144,7 @@ public final class GlobalDataSourceManager {
 
     @SuppressWarnings("unchecked")
     @NotNull
-    DataSourceProperties findDataSourceProperties(
+    DataSourcePropertiesBase findDataSourceProperties(
             final @NotNull DataSourceType dataSourceType,
             final @NotBlank String dataSourceName) {
         notNullOf(dataSourceType, "dataSourceType");
@@ -152,7 +153,7 @@ public final class GlobalDataSourceManager {
         final MongoCollection<Document> collection = mongoRepository.getCollection(MongoCollectionDefinition.DATASOURCES);
 
         try (final MongoCursor<DataSourceProperties> cursor = collection
-                .find(Filters.and(Filters.eq("type", dataSourceType), Filters.eq("name", dataSourceName)))
+                .find(Filters.and(Filters.eq("properties.type", dataSourceType), Filters.eq("name", dataSourceName)))
                 .batchSize(2)
                 .limit(2)
                 .map(doc -> parseJSON(doc.toJson(BsonUtils2.DEFAULT_JSON_WRITER_SETTINGS), DataSourceProperties.class))
@@ -168,8 +169,13 @@ public final class GlobalDataSourceManager {
                         format("The multiple data sources of the same type and name were found of %s, %s", dataSourceType,
                                 dataSourceName));
             }
+            final DataSourcePropertiesBase properties = dss.get(0).getProperties();
+            if (isNull(properties)) {
+                throw new ConfigRengineException(
+                        format("The data source configuration properties is missing. %s, %s", dataSourceType, dataSourceName));
+            }
 
-            return dss.get(0).validate();
+            return properties.validate();
         } catch (Throwable e) {
             throw new RengineException(e);
         }

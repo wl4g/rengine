@@ -40,10 +40,10 @@ import lombok.Getter;
  */
 // @ApplicationScoped
 @Singleton
-public class EvaluatorMeterService extends PrometheusMeterFacade {
+public class ExecutorMeterService extends PrometheusMeterFacade {
 
     @Inject
-    public EvaluatorMeterService(PrometheusMeterRegistry meterRegistry,
+    public ExecutorMeterService(PrometheusMeterRegistry meterRegistry,
             @ConfigProperty(name = "quarkus.application.name") String serviceId,
             @ConfigProperty(name = "quarkus.http.port") int port) {
         super(meterRegistry, serviceId, false, new InetUtils(new InetUtilsProperties()), port);

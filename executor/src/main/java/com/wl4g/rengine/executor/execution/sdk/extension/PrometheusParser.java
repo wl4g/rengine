@@ -36,13 +36,13 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link ScriptPrometheusParser}
+ * {@link PrometheusParser}
  * 
  * @author James Wong
  * @version 2022-12-15
  * @since v1.0.0
  */
-public class ScriptPrometheusParser {
+public class PrometheusParser {
 
     /**
      * Conversion to Prometheus(0.0.4/OpenMetrics1.0) to Event.Body JSON

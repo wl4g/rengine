@@ -1,4 +1,3 @@
-package com.wl4g.rengine.executor.graal;
 ///*
 // * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>
 // *
@@ -25,7 +24,8 @@ package com.wl4g.rengine.executor.graal;
 ///**
 // * {@link RuntimeReflectionRegistrationFeature}
 // * 
-// * Usages: -Dquarkus.native.additional-build-args="--features=com.wl4g.rengine.executor.graal.RuntimeReflectionRegistrationFeature"
+// * Usages:
+// * -Dquarkus.native.additional-build-args="--features=com.wl4g.rengine.executor.graal.RuntimeReflectionRegistrationFeature"
 // * 
 // * @author James Wong
 // * @version 2022-09-25

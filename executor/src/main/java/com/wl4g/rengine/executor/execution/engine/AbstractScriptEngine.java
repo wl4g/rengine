@@ -18,9 +18,11 @@ package com.wl4g.rengine.executor.execution.engine;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.lang.String.format;
+import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toList;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,17 +38,21 @@ import com.wl4g.rengine.common.entity.UploadObject.ExtensionType;
 import com.wl4g.rengine.common.entity.UploadObject.UploadType;
 import com.wl4g.rengine.common.graph.ExecutionGraph.BaseOperator;
 import com.wl4g.rengine.common.graph.ExecutionGraphContext;
+import com.wl4g.rengine.common.graph.ExecutionGraphParameter;
 import com.wl4g.rengine.common.graph.ExecutionGraphResult;
 import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
 import com.wl4g.rengine.executor.execution.datasource.GlobalDataSourceManager;
 import com.wl4g.rengine.executor.execution.sdk.ScriptContext;
+import com.wl4g.rengine.executor.execution.sdk.ScriptContext.ScriptParameter;
 import com.wl4g.rengine.executor.execution.sdk.ScriptDataService;
 import com.wl4g.rengine.executor.execution.sdk.ScriptHttpClient;
 import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
 import com.wl4g.rengine.executor.execution.sdk.ScriptSSHClient;
 import com.wl4g.rengine.executor.execution.sdk.ScriptTCPClient;
-import com.wl4g.rengine.executor.execution.sdk.extension.ScriptPrometheusParser;
-import com.wl4g.rengine.executor.metrics.EvaluatorMeterService;
+import com.wl4g.rengine.executor.execution.sdk.extension.JSON;
+import com.wl4g.rengine.executor.execution.sdk.extension.PrometheusParser;
+import com.wl4g.rengine.executor.execution.sdk.extension.RengineEvent;
+import com.wl4g.rengine.executor.metrics.ExecutorMeterService;
 import com.wl4g.rengine.executor.minio.MinioManager;
 import com.wl4g.rengine.executor.minio.MinioManager.ObjectResource;
 
@@ -62,14 +68,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class AbstractScriptEngine implements IEngine {
 
-    final ScriptHttpClient defaultHttpClient = new ScriptHttpClient();
-
-    final ScriptSSHClient defaultSSHClient = new ScriptSSHClient();
-
-    final ScriptTCPClient defaultTCPClient = new ScriptTCPClient();
-
     @Inject
-    EvaluatorMeterService meterService;
+    ExecutorMeterService meterService;
 
     @Inject
     MinioManager minioManager;
@@ -94,14 +94,10 @@ public abstract class AbstractScriptEngine implements IEngine {
         }).collect(toList());
     }
 
-    void registerMembers(final @NotNull Value bindings) {
+    void bindingMembers(final @NotNull Value bindings) {
         // Try not to bind implicit objects, let users create new objects by
         // self or get default objects from the graal context.
-        bindings.putMember(ScriptHttpClient.class.getSimpleName(), ScriptHttpClient.class);
-        bindings.putMember(ScriptSSHClient.class.getSimpleName(), ScriptSSHClient.class);
-        bindings.putMember(ScriptTCPClient.class.getSimpleName(), ScriptTCPClient.class);
-        bindings.putMember(ScriptPrometheusParser.class.getSimpleName(), ScriptPrometheusParser.class);
-        bindings.putMember(ScriptResult.class.getSimpleName(), ScriptResult.class);
+        REGISTER_MEMBERS.forEach((name, member) -> bindings.putMember(name, member));
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -111,12 +107,21 @@ public abstract class AbstractScriptEngine implements IEngine {
 
         final ScriptDataService dataService = new ScriptDataService(defaultHttpClient, defaultSSHClient, defaultTCPClient,
                 globalDataSourceManager);
+        final ExecutionGraphParameter parameter = graphContext.getParameter();
         final ExecutionGraphResult result = graphContext.getLastResult();
 
         return ScriptContext.builder()
                 .id(graphContext.getCurrentNode().getId())
                 .type(((BaseOperator<?>) graphContext.getCurrentNode()).getType())
-                .args(ProxyObject.fromMap((Map) graphContext.getParameter().getArgs()))
+                .parameter(ScriptParameter.builder()
+                        .requestTime(parameter.getRequestTime())
+                        .clientId(graphContext.getParameter().getClientId())
+                        .traceId(graphContext.getParameter().getTraceId())
+                        .trace(graphContext.getParameter().isTrace())
+                        .scenesCode(graphContext.getParameter().getScenesCode())
+                        .workflowId(graphContext.getParameter().getWorkflowId())
+                        .args(ProxyObject.fromMap((Map) graphContext.getParameter().getArgs()))
+                        .build())
                 .lastResult(isNull(result) ? null
                         : new ScriptResult(ReturnState.isTrue(result.getReturnState()), result.getValueMap()))
                 .minioManager(minioManager)
@@ -127,5 +132,22 @@ public abstract class AbstractScriptEngine implements IEngine {
 
     // Handcode default entrypoint funciton for 'process'
     public static final String DEFAULT_MAIN_FUNCTION = "process";
+    public static final Map<String, Class<?>> REGISTER_MEMBERS;
+
+    final ScriptHttpClient defaultHttpClient = new ScriptHttpClient();
+    final ScriptSSHClient defaultSSHClient = new ScriptSSHClient();
+    final ScriptTCPClient defaultTCPClient = new ScriptTCPClient();
+
+    static {
+        final Map<String, Class<?>> bindingMembers = new HashMap<>();
+        bindingMembers.put(ScriptResult.class.getSimpleName(), ScriptResult.class);
+        bindingMembers.put(ScriptHttpClient.class.getSimpleName(), ScriptHttpClient.class);
+        bindingMembers.put(ScriptSSHClient.class.getSimpleName(), ScriptSSHClient.class);
+        bindingMembers.put(ScriptTCPClient.class.getSimpleName(), ScriptTCPClient.class);
+        bindingMembers.put(JSON.class.getSimpleName(), JSON.class);
+        bindingMembers.put(RengineEvent.class.getSimpleName(), RengineEvent.class);
+        bindingMembers.put(PrometheusParser.class.getSimpleName(), PrometheusParser.class);
+        REGISTER_MEMBERS = unmodifiableMap(bindingMembers);
+    }
 
 }

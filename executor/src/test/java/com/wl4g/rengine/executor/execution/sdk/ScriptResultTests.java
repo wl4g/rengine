@@ -9,33 +9,30 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.apiserver.admin.model;
+package com.wl4g.rengine.executor.execution.sdk;
 
-import com.wl4g.rengine.common.entity.DataSourceProperties;
-
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.SuperBuilder;
+import org.junit.Test;
 
 /**
- * {@link SaveDataSource}
+ * {@link ScriptResultTests}
  * 
  * @author James Wong
- * @version 2022-08-28
+ * @version 2022-12-25
  * @since v1.0.0
  */
-@Getter
-@Setter
-@SuperBuilder
-@ToString(callSuper = true)
-@NoArgsConstructor
-public class SaveDataSource extends DataSourceProperties {
-    private static final long serialVersionUID = -8089363065684705215L;
+public class ScriptResultTests {
+
+    @Test
+    public void testAddValues() {
+        ScriptResult result = new ScriptResult(false).addValue("foo", "bar")
+                .addValue("foo1", null)
+                .addValue("foo2", null)
+                .addValue("foo3", null);
+        System.out.println(result);
+    }
 
 }

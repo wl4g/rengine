@@ -62,8 +62,12 @@ public class ScriptDataService {
         return globalDataSourceManager.loadDataSource(DataSourceType.JDBC, dataSourceName);
     }
 
-    public @HostAccess.Export DataSourceFacade getRedisClusterService(final @NotBlank String dataSourceName) {
-        return globalDataSourceManager.loadDataSource(DataSourceType.REDIS_CLUSTER, dataSourceName);
+    public @HostAccess.Export DataSourceFacade getRedisService(final @NotBlank String dataSourceName) {
+        return globalDataSourceManager.loadDataSource(DataSourceType.REDIS, dataSourceName);
+    }
+
+    public @HostAccess.Export DataSourceFacade getKafkaService(final @NotBlank String dataSourceName) {
+        return globalDataSourceManager.loadDataSource(DataSourceType.KAFKA, dataSourceName);
     }
 
     // public @HostAccess.Export DataSourceFacade phoenixService(final @Nullable

@@ -43,6 +43,7 @@ import com.wl4g.rengine.eventbus.config.ClientEventBusConfig.PulsarEventBusConfi
 import com.wl4g.rengine.eventbus.recorder.EventRecorder;
 
 import lombok.AllArgsConstructor;
+import lombok.CustomLog;
 import lombok.Getter;
 
 /**
@@ -55,6 +56,7 @@ import lombok.Getter;
  * @see https://github.com/wl4g-collect/Pulsar-analysis/blob/master/pulsar-client.md
  * @see 待发送队列源码分析:https://github1s.com/apache/pulsar/blob/branch-2.11/pulsar-client/src/main/java/org/apache/pulsar/client/impl/ProducerImpl.java#L1938-L1939
  */
+@CustomLog
 @Getter
 public class PulsarEventBusService extends AbstractEventBusService<Future<ProducerResult>> implements Closeable {
     private final PulsarEventBusConfig pulsarConfig;
