@@ -45,6 +45,7 @@ import javax.validation.constraints.NotNull;
 import com.google.common.io.Resources;
 import com.wl4g.infra.common.io.FileIOUtils;
 import com.wl4g.rengine.common.entity.UploadObject.UploadType;
+import com.wl4g.rengine.executor.execution.engine.AbstractScriptEngine;
 import com.wl4g.rengine.executor.minio.MinioConfig.IOkHttpClientConfig;
 
 import io.minio.GetObjectArgs;
@@ -164,7 +165,8 @@ public class MinioManager {
         hasTextOf(objectPrefix, "objectPrefix");
         hasTextOf(scenesCode, "scenesCode");
 
-        File localFile = new File("/tmp/__tmp_rengine_files_caches/".concat(uploadType.name())
+        final File localFile = new File(AbstractScriptEngine.DEFAULT_TMP_CACHE_ROOT_DIR.concat("/")
+                .concat(uploadType.name())
                 .concat("/")
                 .concat(scenesCode)
                 .concat("/")

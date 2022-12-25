@@ -196,24 +196,25 @@ public class DataSourceProperties extends BaseBean {
         // Properties changeable at runtime through the HikariConfigMXBean
         String catalog;
         @Default
-        long connectionTimeout = SECONDS.toMillis(10); // must >=250ms
+        Long connectionTimeout = SECONDS.toMillis(10); // must >=250ms
         @Default
-        long validationTimeout = SECONDS.toMillis(5); // must >=250ms
+        Long validationTimeout = SECONDS.toMillis(5); // must >=250ms
         @Default
-        long idleTimeout = MINUTES.toMillis(10);
-        long leakDetectionThreshold;
+        Long idleTimeout = MINUTES.toMillis(10);
+        Long leakDetectionThreshold;
         @Default
-        long maxLifetime = MINUTES.toMillis(30);
+        Long maxLifetime = MINUTES.toMillis(30);
         @Default
-        int maximumPoolSize = 5;
+        Integer maximumPoolSize = 5;
         @Default
-        int minimumIdle = 1;
+        Integer minimumIdle = 1;
         @NotBlank
         String username;
         @NotBlank
         String password;
+
         // Properties NOT changeable at runtimez
-        long initializationFailTimeout;
+        Long initializationFailTimeout;
         String connectionInitSql;
         String connectionTestQuery;
         String dataSourceClassName;
@@ -225,16 +226,15 @@ public class DataSourceProperties extends BaseBean {
         String poolName;
         String schema;
         String transactionIsolationName;
-        boolean isAutoCommit;
-        boolean isReadOnly;
-        boolean isIsolateInternalQueries;
-        boolean isRegisterMbeans;
-        boolean isAllowPoolSuspension;
+        Boolean autoCommit;
+        Boolean readOnly;
+        Boolean isolateInternalQueries;
+        Boolean registerMbeans;
+        Boolean allowPoolSuspension;
         Properties dataSourceProperties;
         Properties healthCheckProperties;
-        @Default
-        long keepaliveTime = 0L;
-        boolean sealed;
+        Long keepaliveTime;
+        Boolean sealed;
 
         @JsonIgnore
         volatile transient HikariConfig hikariConfig;
@@ -244,35 +244,81 @@ public class DataSourceProperties extends BaseBean {
                 synchronized (this) {
                     if (isNull(hikariConfig)) {
                         hikariConfig = new HikariConfig();
-                        hikariConfig.setCatalog(getCatalog());
-                        hikariConfig.setConnectionTimeout(getConnectionTimeout());
-                        hikariConfig.setIdleTimeout(getIdleTimeout());
-                        hikariConfig.setLeakDetectionThreshold(getLeakDetectionThreshold());
-                        hikariConfig.setMaxLifetime(getMaxLifetime());
-                        hikariConfig.setMaximumPoolSize(getMaximumPoolSize());
-                        hikariConfig.setMinimumIdle(getMinimumIdle());
-                        hikariConfig.setPassword(getPassword());
-                        hikariConfig.setUsername(getUsername());
-                        hikariConfig.setValidationTimeout(getValidationTimeout());
-                        hikariConfig.setConnectionTestQuery(getConnectionTestQuery());
-                        hikariConfig.setConnectionInitSql(getConnectionInitSql());
-                        hikariConfig.setDataSourceClassName(getDataSourceClassName());
+                        if (nonNull(getCatalog())) {
+                            hikariConfig.setCatalog(getCatalog());
+                        }
+                        if (nonNull(getConnectionTimeout())) {
+                            hikariConfig.setConnectionTimeout(getConnectionTimeout());
+                        }
+                        if (nonNull(getIdleTimeout())) {
+                            hikariConfig.setIdleTimeout(getIdleTimeout());
+                        }
+                        if (nonNull(getLeakDetectionThreshold())) {
+                            hikariConfig.setLeakDetectionThreshold(getLeakDetectionThreshold());
+                        }
+                        if (nonNull(getMaxLifetime())) {
+                            hikariConfig.setMaxLifetime(getMaxLifetime());
+                        }
+                        if (nonNull(getMaximumPoolSize())) {
+                            hikariConfig.setMaximumPoolSize(getMaximumPoolSize());
+                        }
+                        if (nonNull(getMinimumIdle())) {
+                            hikariConfig.setMinimumIdle(getMinimumIdle());
+                        }
+                        if (nonNull(getDataSourceClassName())) {
+                            hikariConfig.setDataSourceClassName(getDataSourceClassName());
+                        }
+                        if (nonNull(getUsername())) {
+                            hikariConfig.setUsername(getUsername());
+                        }
+                        if (nonNull(getPassword())) {
+                            hikariConfig.setPassword(getPassword());
+                        }
+                        if (nonNull(getValidationTimeout())) {
+                            hikariConfig.setValidationTimeout(getValidationTimeout());
+                        }
+                        if (nonNull(getConnectionTestQuery())) {
+                            hikariConfig.setConnectionTestQuery(getConnectionTestQuery());
+                        }
+                        if (nonNull(getConnectionInitSql())) {
+                            hikariConfig.setConnectionInitSql(getConnectionInitSql());
+                        }
                         if (nonNull(getDataSourceProperties())) {
                             hikariConfig.setDataSourceProperties(getDataSourceProperties());
                         }
-                        hikariConfig.setDriverClassName(getDriverClassName());
-                        hikariConfig.setJdbcUrl(getJdbcUrl());
-                        hikariConfig.setAutoCommit(isAutoCommit());
-                        hikariConfig.setAllowPoolSuspension(isAllowPoolSuspension());
-                        hikariConfig.setInitializationFailTimeout(getInitializationFailTimeout());
-                        hikariConfig.setIsolateInternalQueries(isIsolateInternalQueries());
+                        if (nonNull(getDriverClassName())) {
+                            hikariConfig.setDriverClassName(getDriverClassName());
+                        }
+                        if (nonNull(getDriverClassName())) {
+                            hikariConfig.setJdbcUrl(getJdbcUrl());
+                        }
+                        if (nonNull(getAutoCommit())) {
+                            hikariConfig.setAutoCommit(getAutoCommit());
+                        }
+                        if (nonNull(getAllowPoolSuspension())) {
+                            hikariConfig.setAllowPoolSuspension(getAllowPoolSuspension());
+                        }
+                        if (nonNull(getInitializationFailTimeout())) {
+                            hikariConfig.setInitializationFailTimeout(getInitializationFailTimeout());
+                        }
+                        if (nonNull(getIsolateInternalQueries())) {
+                            hikariConfig.setIsolateInternalQueries(getIsolateInternalQueries());
+                        }
                         if (nonNull(getHealthCheckProperties())) {
                             hikariConfig.setHealthCheckProperties(getHealthCheckProperties());
                         }
-                        hikariConfig.setKeepaliveTime(getKeepaliveTime());
-                        hikariConfig.setReadOnly(isReadOnly());
-                        hikariConfig.setPoolName(getPoolName());
-                        hikariConfig.setSchema(getSchema());
+                        if (nonNull(getKeepaliveTime())) {
+                            hikariConfig.setKeepaliveTime(getKeepaliveTime());
+                        }
+                        if (nonNull(getReadOnly())) {
+                            hikariConfig.setReadOnly(getReadOnly());
+                        }
+                        if (nonNull(getPoolName())) {
+                            hikariConfig.setPoolName(getPoolName());
+                        }
+                        if (nonNull(getSchema())) {
+                            hikariConfig.setSchema(getSchema());
+                        }
                         if (!isBlank(getExceptionOverrideClassName())) {
                             hikariConfig.setExceptionOverrideClassName(getExceptionOverrideClassName());
                         }

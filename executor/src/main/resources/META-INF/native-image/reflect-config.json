@@ -7,12 +7,12 @@
   "methods":[
     {"name":"getId","parameterTypes":[] }, 
     {"name":"getType","parameterTypes":[] }, 
-    {"name":"getArgs","parameterTypes":[] },
-    {"name":"getEvent","parameterTypes":[] },
+    {"name":"getParameter","parameterTypes":[] },
     {"name":"getAttributes","parameterTypes":[] },
     {"name":"getLastResult","parameterTypes":[] },
-    {"name":"getLogger","parameterTypes":[] },
     {"name":"getDataService","parameterTypes":[] },
+    {"name":"getLogger","parameterTypes":[] },
+    {"name":"getExecutor","parameterTypes":[] },
     {"name":"toString","parameterTypes":[] }
   ]
 },
@@ -43,6 +43,19 @@
   ]
 },
 {
+  "name":"com.wl4g.rengine.executor.execution.sdk.ScriptExecutor",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"submit","parameterTypes":["java.util.concurrent.Callable"] }, 
+    {"name":"submitForComplete","parameterTypes":["java.util.concurrent.Callable","long"] }, 
+    {"name":"submitForComplete","parameterTypes":["java.util.List","long"] }, 
+    {"name":"submitForComplete","parameterTypes":["java.util.List","com.wl4g.infra.common.task.CompleteTaskListener","long"] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
   "name":"com.wl4g.rengine.executor.execution.sdk.ScriptHttpClient",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
@@ -68,6 +81,17 @@
     {"name":"execute","parameterTypes":["java.lang.String","java.lang.String","java.lang.String","java.lang.String"] }, 
     {"name":"execute","parameterTypes":["java.lang.String","int","java.lang.String","java.lang.String","java.lang.String"] }, 
     {"name":"execute","parameterTypes":["java.lang.String","int","java.lang.String","java.lang.String","java.lang.String","java.lang.String","long"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.executor.execution.sdk.ScriptProcessClient",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"execute","parameterTypes":["java.lang.String"] }, 
+    {"name":"execute","parameterTypes":["java.lang.String","long"] }
   ]
 },
 {
@@ -107,12 +131,90 @@
     {"name":"getDefaultHttpClient","parameterTypes":[] }, 
     {"name":"getDefaultSSHClient","parameterTypes":[] }, 
     {"name":"getDefaultTCPClient","parameterTypes":[] }, 
+    {"name":"getDefaultProcessClient","parameterTypes":[] }, 
     {"name":"getMongoService","parameterTypes":["java.lang.String"] }, 
     {"name":"getJDBCService","parameterTypes":["java.lang.String"] }, 
     {"name":"getRedisService","parameterTypes":["java.lang.String"] }, 
     {"name":"getKafkaService","parameterTypes":["java.lang.String"] }, 
     {"name":"getPhoenixService","parameterTypes":["java.lang.String"] }, 
     {"name":"getOpentTSDBService","parameterTypes":["java.lang.String"] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.executor.execution.sdk.extension.AES",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"encrypt256CbcPkcs7ToBase64","parameterTypes":["java.lang.String","java.lang.String","java.lang.String"] }, 
+    {"name":"decrypt256CbcPkcs7FromBase64","parameterTypes":["java.lang.String","java.lang.String","java.lang.String"] }, 
+    {"name":"generateKeyToBase64","parameterTypes":[] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.executor.execution.sdk.extension.RSA",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"encryptToBase64","parameterTypes":["boolean","java.lang.String","java.lang.String"] }, 
+    {"name":"decryptFromBase64","parameterTypes":["boolean","java.lang.String","java.lang.String"] }, 
+    {"name":"generateKeyToBase64","parameterTypes":[] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.executor.execution.sdk.extension.Coding",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"toBase58","parameterTypes":["java.lang.String"] }, 
+    {"name":"fromBase58","parameterTypes":["java.lang.String"] }, 
+    {"name":"toBase64","parameterTypes":["java.lang.String"] }, 
+    {"name":"fromBase64","parameterTypes":["java.lang.String"] }, 
+    {"name":"toHex","parameterTypes":["java.lang.String"] }, 
+    {"name":"fromHex","parameterTypes":["java.lang.String"] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.executor.execution.sdk.extension.DateUtil",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"currentMillis","parameterTypes":["java.lang.String"] }, 
+    {"name":"currentNanoTime","parameterTypes":["java.lang.String"] }, 
+    {"name":"parseDate","parameterTypes":["java.lang.String","java.lang.String"] }, 
+    {"name":"formatDate","parameterTypes":["java.lang.String"] }, 
+    {"name":"getDateOf","parameterTypes":["int","int","java.lang.String"] }, 
+    {"name":"getFormatDateOf","parameterTypes":["int","int","java.lang.String"] }, 
+    {"name":"getDistanceOf","parameterTypes":["java.util.Date","java.util.Date","java.lang.String"] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.executor.execution.sdk.extension.Hashing",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"md5","parameterTypes":["java.lang.String"] }, 
+    {"name":"sha1","parameterTypes":["java.lang.String"] }, 
+    {"name":"sha256","parameterTypes":["java.lang.String"] }, 
+    {"name":"sha384","parameterTypes":["java.lang.String"] }, 
+    {"name":"sha512","parameterTypes":["java.lang.String"] }, 
+    {"name":"hmacSha1","parameterTypes":["java.lang.String"] }, 
+    {"name":"hmacSha256","parameterTypes":["java.lang.String"] }, 
+    {"name":"hmacSha512","parameterTypes":["java.lang.String"] }, 
+    {"name":"toString","parameterTypes":[] }
   ]
 },
 {

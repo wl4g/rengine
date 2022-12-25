@@ -16,6 +16,7 @@
 package com.wl4g.rengine.executor.execution.sdk;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static java.util.Collections.synchronizedMap;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -64,7 +65,7 @@ public class ScriptResult {
         if (isNull(valueMap)) {
             synchronized (this) {
                 if (isNull(valueMap)) {
-                    valueMap = new LinkedHashMap<>(4);
+                    valueMap = synchronizedMap(new LinkedHashMap<>(4));
                 }
             }
         }

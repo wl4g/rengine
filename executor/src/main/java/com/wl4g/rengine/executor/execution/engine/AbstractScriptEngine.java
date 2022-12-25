@@ -30,27 +30,33 @@ import javax.inject.Inject;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import org.graalvm.polyglot.Value;
 import org.graalvm.polyglot.proxy.ProxyObject;
 
+import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
 import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
 import com.wl4g.rengine.common.entity.UploadObject.ExtensionType;
 import com.wl4g.rengine.common.entity.UploadObject.UploadType;
 import com.wl4g.rengine.common.graph.ExecutionGraph.BaseOperator;
 import com.wl4g.rengine.common.graph.ExecutionGraphContext;
 import com.wl4g.rengine.common.graph.ExecutionGraphParameter;
-import com.wl4g.rengine.common.graph.ExecutionGraphResult;
 import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
 import com.wl4g.rengine.executor.execution.datasource.GlobalDataSourceManager;
 import com.wl4g.rengine.executor.execution.sdk.ScriptContext;
 import com.wl4g.rengine.executor.execution.sdk.ScriptContext.ScriptParameter;
 import com.wl4g.rengine.executor.execution.sdk.ScriptDataService;
+import com.wl4g.rengine.executor.execution.sdk.ScriptExecutor;
 import com.wl4g.rengine.executor.execution.sdk.ScriptHttpClient;
+import com.wl4g.rengine.executor.execution.sdk.ScriptLogger;
+import com.wl4g.rengine.executor.execution.sdk.ScriptProcessClient;
 import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
 import com.wl4g.rengine.executor.execution.sdk.ScriptSSHClient;
 import com.wl4g.rengine.executor.execution.sdk.ScriptTCPClient;
+import com.wl4g.rengine.executor.execution.sdk.extension.AES;
+import com.wl4g.rengine.executor.execution.sdk.extension.Coding;
+import com.wl4g.rengine.executor.execution.sdk.extension.Hashing;
 import com.wl4g.rengine.executor.execution.sdk.extension.JSON;
 import com.wl4g.rengine.executor.execution.sdk.extension.PrometheusParser;
+import com.wl4g.rengine.executor.execution.sdk.extension.RSA;
 import com.wl4g.rengine.executor.execution.sdk.extension.RengineEvent;
 import com.wl4g.rengine.executor.metrics.ExecutorMeterService;
 import com.wl4g.rengine.executor.minio.MinioManager;
@@ -77,6 +83,9 @@ public abstract class AbstractScriptEngine implements IEngine {
     @Inject
     GlobalDataSourceManager globalDataSourceManager;
 
+    @Inject
+    GlobalExecutorManager globalExecutorManager;
+
     @NotNull
     List<ObjectResource> loadScriptResources(@NotBlank String scenesCode, @NotNull RuleWrapper rule, boolean useCache) {
         notNullOf(rule, "rule");
@@ -94,21 +103,17 @@ public abstract class AbstractScriptEngine implements IEngine {
         }).collect(toList());
     }
 
-    void bindingMembers(final @NotNull Value bindings) {
-        // Try not to bind implicit objects, let users create new objects by
-        // self or get default objects from the graal context.
-        REGISTER_MEMBERS.forEach((name, member) -> bindings.putMember(name, member));
-    }
-
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @NotNull
-    ScriptContext newScriptContext(@NotNull final ExecutionGraphContext graphContext) {
+    ScriptContext newScriptContext(final @NotNull ExecutionGraphContext graphContext) {
         notNullOf(graphContext, "graphContext");
 
         final ScriptDataService dataService = new ScriptDataService(defaultHttpClient, defaultSSHClient, defaultTCPClient,
-                globalDataSourceManager);
+                defaultProcessClient, globalDataSourceManager);
         final ExecutionGraphParameter parameter = graphContext.getParameter();
-        final ExecutionGraphResult result = graphContext.getLastResult();
+        final ScriptResult lastResult = isNull(graphContext.getLastResult()) ? null
+                : new ScriptResult(ReturnState.isTrue(graphContext.getLastResult().getReturnState()),
+                        graphContext.getLastResult().getValueMap());
 
         return ScriptContext.builder()
                 .id(graphContext.getCurrentNode().getId())
@@ -122,21 +127,27 @@ public abstract class AbstractScriptEngine implements IEngine {
                         .workflowId(graphContext.getParameter().getWorkflowId())
                         .args(ProxyObject.fromMap((Map) graphContext.getParameter().getArgs()))
                         .build())
-                .lastResult(isNull(result) ? null
-                        : new ScriptResult(ReturnState.isTrue(result.getReturnState()), result.getValueMap()))
-                .minioManager(minioManager)
+                .lastResult(lastResult)
                 .dataService(dataService)
-                // .attributes(ProxyObject.fromMap(attributes))
+                .logger(new ScriptLogger(minioManager))
+                .executor(createScriptExecutor(globalExecutorManager.getExecutor(parameter.getScenesCode(), 2))) // TODO-use-config
+                // .attributes(ProxyObject.fromMap(emptyMap()))
                 .build();
     }
 
-    // Handcode default entrypoint funciton for 'process'
+    @NotNull
+    abstract ScriptExecutor createScriptExecutor(final @NotNull SafeScheduledTaskPoolExecutor executor);
+
+    // Notice: The handcode entrypoint function is 'process'
     public static final String DEFAULT_MAIN_FUNCTION = "process";
+    public static final String DEFAULT_TMP_CACHE_ROOT_DIR = "/tmp/__rengine_script_files_caches";
+
     public static final Map<String, Class<?>> REGISTER_MEMBERS;
 
     final ScriptHttpClient defaultHttpClient = new ScriptHttpClient();
     final ScriptSSHClient defaultSSHClient = new ScriptSSHClient();
     final ScriptTCPClient defaultTCPClient = new ScriptTCPClient();
+    final ScriptProcessClient defaultProcessClient = new ScriptProcessClient();
 
     static {
         final Map<String, Class<?>> bindingMembers = new HashMap<>();
@@ -144,6 +155,11 @@ public abstract class AbstractScriptEngine implements IEngine {
         bindingMembers.put(ScriptHttpClient.class.getSimpleName(), ScriptHttpClient.class);
         bindingMembers.put(ScriptSSHClient.class.getSimpleName(), ScriptSSHClient.class);
         bindingMembers.put(ScriptTCPClient.class.getSimpleName(), ScriptTCPClient.class);
+        bindingMembers.put(ScriptProcessClient.class.getSimpleName(), ScriptProcessClient.class);
+        bindingMembers.put(AES.class.getSimpleName(), AES.class);
+        bindingMembers.put(RSA.class.getSimpleName(), RSA.class);
+        bindingMembers.put(Coding.class.getSimpleName(), Coding.class);
+        bindingMembers.put(Hashing.class.getSimpleName(), Hashing.class);
         bindingMembers.put(JSON.class.getSimpleName(), JSON.class);
         bindingMembers.put(RengineEvent.class.getSimpleName(), RengineEvent.class);
         bindingMembers.put(PrometheusParser.class.getSimpleName(), PrometheusParser.class);

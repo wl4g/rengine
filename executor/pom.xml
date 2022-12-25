@@ -128,6 +128,17 @@
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
         </dependency>
+        <!-- HikariCP depends -->
+        <dependency>
+            <groupId>com.codahale.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.codahale.metrics</groupId>
+            <artifactId>metrics-healthchecks</artifactId>
+            <version>3.0.2</version>
+        </dependency>
         <!-- Fix for native image building: Fatal error: org.graalvm.compiler.debug.GraalError: com.oracle.graal.pointsto.constraints.UnsupportedFeatureException:
         Detected a started Thread in the image heap. Threads running in the image generator are no longer running at image runtime. 
         To see how this object got instantiated use -trace-object-instantiation=java.lang.Thread. The object was probably created by a class
@@ -187,17 +198,6 @@
         <dependency>
             <groupId>com.sun.mail</groupId>
             <artifactId>javax.mail</artifactId>
-        </dependency>
-        <!-- HikariCP depends -->
-        <dependency>
-            <groupId>com.codahale.metrics</groupId>
-            <artifactId>metrics-core</artifactId>
-            <version>3.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.codahale.metrics</groupId>
-            <artifactId>metrics-healthchecks</artifactId>
-            <version>3.0.2</version>
         </dependency>
         <!-- Cache(Jedis) -->
         <dependency>

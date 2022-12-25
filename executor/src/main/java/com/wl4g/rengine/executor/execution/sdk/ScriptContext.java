@@ -15,8 +15,6 @@
  */
 package com.wl4g.rengine.executor.execution.sdk;
 
-import static java.util.Objects.isNull;
-
 import java.io.Serializable;
 import java.util.HashMap;
 
@@ -27,8 +25,6 @@ import javax.validation.constraints.NotNull;
 
 import org.graalvm.polyglot.HostAccess;
 import org.graalvm.polyglot.proxy.ProxyObject;
-
-import com.wl4g.rengine.executor.minio.MinioManager;
 
 import lombok.Builder.Default;
 import lombok.Getter;
@@ -45,8 +41,9 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @ToString
 @SuperBuilder
-public class ScriptContext implements Serializable {
+public class ScriptContext implements /* Closeable, */Serializable {
     private static final long serialVersionUID = 1106545214350173531L;
+
     //
     // Runtime context attributes.
     //
@@ -59,12 +56,9 @@ public class ScriptContext implements Serializable {
     //
     // Helper attributes.
     //
-    private transient ScriptLogger logger;
     private transient ScriptDataService dataService;
-    //
-    // Internal attributes.
-    //
-    private transient MinioManager minioManager;
+    private transient ScriptLogger logger;
+    private transient ScriptExecutor executor;
 
     public @HostAccess.Export String getId() {
         return id;
@@ -90,19 +84,16 @@ public class ScriptContext implements Serializable {
     // Helper functions.
     //
 
+    public @HostAccess.Export ScriptDataService getDataService() {
+        return dataService;
+    }
+
     public @HostAccess.Export ScriptLogger getLogger() {
-        if (isNull(logger)) {
-            synchronized (this) {
-                if (isNull(logger)) {
-                    logger = new ScriptLogger(this);
-                }
-            }
-        }
         return logger;
     }
 
-    public @HostAccess.Export ScriptDataService getDataService() {
-        return dataService;
+    public @HostAccess.Export ScriptExecutor getExecutor() {
+        return executor;
     }
 
     @ToString
@@ -144,4 +135,5 @@ public class ScriptContext implements Serializable {
             return args;
         }
     }
+
 }

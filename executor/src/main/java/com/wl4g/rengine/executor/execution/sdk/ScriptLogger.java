@@ -17,6 +17,8 @@ package com.wl4g.rengine.executor.execution.sdk;
 
 import org.graalvm.polyglot.HostAccess;
 
+import com.wl4g.rengine.executor.minio.MinioManager;
+
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
 
@@ -31,7 +33,7 @@ import lombok.CustomLog;
 @AllArgsConstructor
 public class ScriptLogger {
 
-    private final transient ScriptContext context;
+    private final MinioManager minioManager;
 
     public @HostAccess.Export void trace(String format, Object... args) {
         write(1, format, args);
@@ -62,7 +64,7 @@ public class ScriptLogger {
             log.debug("Script logging write to MinIO. - level: %s, '%s'", level, String.format(format, args));
         }
         try {
-            context.getMinioManager().writeObject(format);
+            minioManager.writeObject(format);
         } catch (Exception e) {
             log.error(String.format("Unable not script logging write to MinIO. - level: %s, '%s'", level,
                     String.format(format, args)), e);

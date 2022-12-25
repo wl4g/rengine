@@ -17,11 +17,12 @@ package com.wl4g.rengine.common.graph;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static java.util.Collections.singletonMap;
+import static java.util.Collections.synchronizedMap;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
@@ -42,7 +43,7 @@ import lombok.ToString;
 @ToString
 public class ExecutionGraphResult {
     private final ReturnState returnState;
-    private final Map<String, Object> valueMap = new ConcurrentHashMap<>(2);
+    private final Map<String, Object> valueMap = synchronizedMap(new LinkedHashMap<>(2));
 
     public ExecutionGraphResult(@NotNull final ReturnState returnState) {
         this(returnState, null);
@@ -55,15 +56,11 @@ public class ExecutionGraphResult {
 
     public ExecutionGraphResult(@NotNull final ReturnState returnState, @Nullable final Map<String, Object> valueMap) {
         this.returnState = returnState;
-        safeMap(valueMap).forEach((key, value) -> {
-            if (!isBlank(key)) {
-                this.valueMap.put(key, value);
-            }
-        });
+        safeMap(valueMap).forEach((key, value) -> addValue(key, value));
     }
 
     public ExecutionGraphResult addValue(String key, Object value) {
-        if (!isBlank(key) && nonNull(value)) {
+        if (!isBlank(key)) {
             getValueMap().put(key, value);
         }
         return this;

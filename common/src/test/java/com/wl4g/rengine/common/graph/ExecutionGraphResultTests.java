@@ -9,38 +9,32 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.executor.execution.sdk;
+package com.wl4g.rengine.common.graph;
 
-import org.junit.Before;
 import org.junit.Test;
 
-import com.wl4g.rengine.executor.minio.MinioManager;
-import com.wl4g.rengine.executor.minio.MinioManagerTests;
+import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
 
 /**
- * {@link ScriptLoggerTests}
+ * {@link ExecutionGraphResultTests}
  * 
  * @author James Wong
- * @version 2022-10-14
+ * @version 2022-12-25
  * @since v1.0.0
  */
-public class ScriptLoggerTests {
-
-    MinioManager minioManager;
-
-    @Before
-    public void setup() {
-        minioManager = MinioManagerTests.createDefaultMinioManager();
-    }
+public class ExecutionGraphResultTests {
 
     @Test
-    public void testInfoWrite() {
-        final ScriptLogger logger = new ScriptLogger(minioManager);
-        logger.info("test message! name: ", "jack01");
+    public void testAddValues() {
+        final ExecutionGraphResult result = new ExecutionGraphResult(ReturnState.FALSE).addValue("foo", "bar")
+                .addValue("foo1", null)
+                .addValue("foo2", null)
+                .addValue("foo3", null);
+        System.out.println(result);
     }
 
 }

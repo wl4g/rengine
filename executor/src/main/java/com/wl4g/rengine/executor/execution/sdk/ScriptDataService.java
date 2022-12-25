@@ -40,6 +40,7 @@ public class ScriptDataService {
     final ScriptHttpClient defaultHttpClient;
     final ScriptSSHClient defaultSSHClient;
     final ScriptTCPClient defaultTCPClient;
+    final ScriptProcessClient defaultProcessClient;
     final GlobalDataSourceManager globalDataSourceManager;
 
     public @HostAccess.Export ScriptHttpClient getDefaultHttpClient() {
@@ -52,6 +53,10 @@ public class ScriptDataService {
 
     public @HostAccess.Export ScriptTCPClient getDefaultTCPClient() {
         return defaultTCPClient;
+    }
+
+    public @HostAccess.Export ScriptProcessClient getDefaultProcessClient() {
+        return defaultProcessClient;
     }
 
     public @HostAccess.Export DataSourceFacade getMongoService(final @NotBlank String dataSourceName) {

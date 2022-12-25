@@ -28,8 +28,8 @@ import org.apache.shardingsphere.elasticjob.infra.exception.JobSystemException;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.wl4g.infra.common.cli.ssh.SshHelperBase;
 import com.wl4g.infra.common.cli.ssh.SshHelperBase.SSHExecResult;
+import com.wl4g.infra.common.cli.ssh.SshdHelper;
 import com.wl4g.rengine.common.event.RengineEvent.EventLocation;
 
 import lombok.Getter;
@@ -72,7 +72,7 @@ public class SimpleSSHCollectJobExecutor extends CollectJobExecutor<SimpleSSHCol
             throw new JobConfigurationException("Cannot find script command line, job is not executed.");
         }
         try {
-            SSHExecResult result = SshHelperBase.getDefault()
+            SSHExecResult result = SshdHelper.getInstance()
                     .execWaitForResponse(host, port, user, privateKey, password, command, timeoutMs);
 
             offer(shardingParam, jobConfig, jobFacade, context, result.getStdout());
@@ -99,7 +99,10 @@ public class SimpleSSHCollectJobExecutor extends CollectJobExecutor<SimpleSSHCol
     }
 
     @Override
-    protected EventLocation getEventLocation(SimpleSSHJobParam shardingParam, JobConfiguration jobConfig, ShardingContext context) {
+    protected EventLocation getEventLocation(
+            SimpleSSHJobParam shardingParam,
+            JobConfiguration jobConfig,
+            ShardingContext context) {
         return EventLocation.builder().ipAddress(shardingParam.getHost()).build();
     }
 

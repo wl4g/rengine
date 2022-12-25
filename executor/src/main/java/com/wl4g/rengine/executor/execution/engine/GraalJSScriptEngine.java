@@ -27,6 +27,7 @@ import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toSet;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,11 +45,15 @@ import org.graalvm.polyglot.Value;
 
 import com.wl4g.infra.common.graalvm.GraalPolyglotManager;
 import com.wl4g.infra.common.graalvm.GraalPolyglotManager.ContextWrapper;
+import com.wl4g.infra.common.io.FileIOUtils;
 import com.wl4g.infra.common.lang.EnvironmentUtil;
 import com.wl4g.infra.common.lang.StringUtils2;
+import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
 import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
 import com.wl4g.rengine.common.exception.EvaluationException;
 import com.wl4g.rengine.common.graph.ExecutionGraphContext;
+import com.wl4g.rengine.executor.execution.sdk.ScriptContext;
+import com.wl4g.rengine.executor.execution.sdk.ScriptExecutor;
 import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
 import com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsTag;
 import com.wl4g.rengine.executor.minio.MinioManager.ObjectResource;
@@ -75,10 +80,17 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
 
     void onStart(@Observes StartupEvent event) {
         try {
-            log.info("Initialzing graal scriptEngine ...");
+            log.info("Initialzing graal JS script engine ...");
 
             // Extraction graal.js from environment.
-            Map<String, String> graaljsOptions = EnvironmentUtil.getConfigProperties("GRAALJS_OPTIONS_");
+            Map<String, String> graalOptions = EnvironmentUtil.getConfigProperties("GRAALJS_OPTIONS_");
+            // see:https://www.graalvm.org/22.0/reference-manual/js/Modules/
+            // Enable CommonJS experimental support.
+            graalOptions.put("js.commonjs-require", "true");
+            // (optional) folder where the NPM modules to be loaded are located.
+            final File commonjsDir = new File(DEFAULT_TMP_CACHE_ROOT_DIR + "/commonjs-root");
+            FileIOUtils.forceMkdir(commonjsDir);
+            graalOptions.put("js.commonjs-require-cwd", commonjsDir.getAbsolutePath());
 
             graalPolyglotManager = new GraalPolyglotManager(getIntProperty("graaljs.context.pool.min", 1),
                     getIntProperty("graaljs.context.pool.max", 10), () -> Context.newBuilder("js") // Only-allowed-JS-language
@@ -94,10 +106,10 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
                             .useSystemExit(getBooleanProperty("graaljs.useSystemExit", false))
                             .out(System.out) // TODO custom OutputStream
                             .err(System.err)
-                            .options(graaljsOptions)
+                            .options(graalOptions)
                             .build());
         } catch (Exception e) {
-            log.error("Failed to init graal JSScript Engine.", e);
+            log.error("Failed to init graal JS Script Engine.", e);
         }
     }
 
@@ -123,6 +135,9 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
         log.debug("Execution JS script for scenesCode: {} ...", scenesCode);
         // see:https://github.com/oracle/graaljs/blob/vm-ee-22.1.0/graal-js/src/com.oracle.truffle.js.test.threading/src/com/oracle/truffle/js/test/threading/AsyncTaskTests.java#L283
         try (ContextWrapper graalContext = graalPolyglotManager.getContext();) {
+            // New construct script context.
+            final ScriptContext scriptContext = newScriptContext(graphContext);
+
             // Load all scripts dependencies.
             final List<ObjectResource> scripts = safeList(loadScriptResources(scenesCode, rule, true));
             for (ObjectResource script : scripts) {
@@ -140,7 +155,7 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
             }
 
             final Value bindings = graalContext.getBindings("js");
-            bindingMembers(bindings);
+            bindingMembers(scriptContext, bindings);
 
             log.trace("Loading js script ...");
             final Value mainFunction = bindings.getMember(DEFAULT_MAIN_FUNCTION);
@@ -152,7 +167,7 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
                     MetricsTag.ENGINE, rule.getEngine().name(), MetricsTag.LIBRARY, scriptFileNames.toString());
 
             final long begin = currentTimeMillis();
-            final Value result = mainFunction.execute(newScriptContext(graphContext));
+            final Value result = mainFunction.execute(scriptContext);
             final long costTime = currentTimeMillis() - begin;
             executeTimer.record(costTime, MILLISECONDS);
 
@@ -161,6 +176,17 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
         } catch (Throwable e) {
             throw new EvaluationException(traceId, clientId, scenesCode, "Failed to execution js script", e);
         }
+    }
+
+    void bindingMembers(final @NotNull ScriptContext scriptContext, final @NotNull Value bindings) {
+        // Try not to bind implicit objects, let users create new objects by
+        // self or get default objects from the graal context.
+        REGISTER_MEMBERS.forEach((name, member) -> bindings.putMember(name, member));
+    }
+
+    @Override
+    ScriptExecutor createScriptExecutor(@NotNull SafeScheduledTaskPoolExecutor executor) {
+        return new ScriptExecutor(executor, graalPolyglotManager);
     }
 
 }

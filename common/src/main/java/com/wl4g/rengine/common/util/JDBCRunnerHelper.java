@@ -16,27 +16,30 @@
 package com.wl4g.rengine.common.util;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.findMethodNullable;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.invokeMethod;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.makeAccessible;
 import static java.util.Objects.nonNull;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import javax.sql.DataSource;
+
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.StatementConfiguration;
 import org.apache.commons.dbutils.handlers.MapListHandler;
-
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 
 import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link HikariJDBCHelper}
+ * {@link JDBCRunnerHelper}
  * 
  * @author James Wong
  * @version 2022-11-24
@@ -45,21 +48,29 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 @ToString
-public class HikariJDBCHelper implements Closeable {
+public class JDBCRunnerHelper implements Closeable {
 
-    private final HikariDataSource dataSource;
+    private final DataSource dataSource;
     private final QueryRunner queryRunner;
 
-    public HikariJDBCHelper(StatementConfiguration stmtConfig, HikariConfig hikariConfig) {
-        this.dataSource = new HikariDataSource(notNullOf(hikariConfig, "hikariConfig"));
+    public JDBCRunnerHelper(final StatementConfiguration stmtConfig, final DataSource dataSource) {
+        this.dataSource = notNullOf(dataSource, "dataSource");
         this.queryRunner = new QueryRunner(dataSource, false, stmtConfig);
     }
 
     @Override
     public void close() throws IOException {
-        if (nonNull(dataSource) && !dataSource.isClosed()) {
-            log.info("Closing dataSource of jdbc url: {}", dataSource.getJdbcUrl());
-            dataSource.close();
+        if (nonNull(dataSource)) {
+            final Method closeMethod = findMethodNullable(dataSource.getClass(), "close");
+            if (nonNull(closeMethod)) {
+                makeAccessible(closeMethod);
+                final Method getJdbcUrlMethod = findMethodNullable(dataSource.getClass(), "getJdbcUrl");
+                if (nonNull(getJdbcUrlMethod)) {
+                    makeAccessible(getJdbcUrlMethod);
+                    log.info("Closing dataSource of jdbc url: {}", invokeMethod(getJdbcUrlMethod, dataSource));
+                }
+                invokeMethod(closeMethod, dataSource);
+            }
         }
     }
 

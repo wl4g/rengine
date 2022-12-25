@@ -37,8 +37,9 @@ import org.apache.commons.dbutils.handlers.MapListHandler;
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourcePropertiesBase;
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
 import com.wl4g.rengine.common.entity.DataSourceProperties.JDBCDataSourceProperties;
-import com.wl4g.rengine.common.util.HikariJDBCHelper;
+import com.wl4g.rengine.common.util.JDBCRunnerHelper;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
@@ -58,48 +59,53 @@ public class JDBCSourceFacade implements DataSourceFacade {
 
     final ExecutionConfig executionConfig;
     final String dataSourceName;
-    final HikariJDBCHelper jdbcHelper;
+    final JDBCRunnerHelper helper;
 
     @Override
     public void close() throws IOException {
-        if (nonNull(jdbcHelper)) {
+        if (nonNull(helper)) {
             log.info("Closing to mysql data source for {} ...", dataSourceName);
-            jdbcHelper.close();
+            helper.close();
         }
     }
 
     public List<Map<String, Object>> findList(final @NotBlank String sql, final Object... params) throws SQLException {
         hasTextOf(sql, "sql");
-        try (Connection conn = jdbcHelper.getDataSource().getConnection();) {
-            return jdbcHelper.getQueryRunner().query(conn, sql, new MapListHandler(), params);
+        try {
+            try (Connection conn = helper.getDataSource().getConnection();) {
+                return helper.getQueryRunner().query(conn, sql, new MapListHandler(), params);
+            } 
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
         }
     }
 
     public Map<String, Object> insert(final @NotBlank String sql, final Object... params) throws SQLException {
         hasTextOf(sql, "sql");
-        try (Connection conn = jdbcHelper.getDataSource().getConnection();) {
-            return jdbcHelper.getQueryRunner().insert(conn, sql, new MapHandler(), params);
+        try (Connection conn = helper.getDataSource().getConnection();) {
+            return helper.getQueryRunner().insert(conn, sql, new MapHandler(), params);
         }
     }
 
     public int[] insertBatch(final @NotBlank String sql, final Object[][] params) throws SQLException {
         hasTextOf(sql, "sql");
-        try (Connection conn = jdbcHelper.getDataSource().getConnection();) {
-            return jdbcHelper.getQueryRunner().insertBatch(conn, sql, null, params);
+        try (Connection conn = helper.getDataSource().getConnection();) {
+            return helper.getQueryRunner().insertBatch(conn, sql, null, params);
         }
     }
 
     public int update(final @NotBlank String sql, Object... params) throws SQLException {
         hasTextOf(sql, "sql");
-        try (Connection conn = jdbcHelper.getDataSource().getConnection();) {
-            return jdbcHelper.getQueryRunner().update(conn, sql, params);
+        try (Connection conn = helper.getDataSource().getConnection();) {
+            return helper.getQueryRunner().update(conn, sql, params);
         }
     }
 
     public int[] batch(final @NotBlank String sql, final Object[][] params) throws SQLException {
         hasTextOf(sql, "sql");
-        try (Connection conn = jdbcHelper.getDataSource().getConnection();) {
-            return jdbcHelper.getQueryRunner().batch(conn, sql, params);
+        try (Connection conn = helper.getDataSource().getConnection();) {
+            return helper.getQueryRunner().batch(conn, sql, params);
         }
     }
 
@@ -114,13 +120,17 @@ public class JDBCSourceFacade implements DataSourceFacade {
             notNullOf(config, "properties");
             hasTextOf(dataSourceName, "dataSourceName");
 
-            final JDBCDataSourceProperties _config = (JDBCDataSourceProperties) dataSourceProperties;
-            final HikariJDBCHelper jdbcHelper = new HikariJDBCHelper(
-                    new StatementConfiguration(_config.getFetchDirection(), _config.getFetchSize(), _config.getMaxFieldSize(),
-                            _config.getMaxRows(), safeLongToInt(_config.getQueryTimeoutMs())),
-                    _config.toHikariConfig());
+            try {
+                final JDBCDataSourceProperties c = (JDBCDataSourceProperties) dataSourceProperties;
+                StatementConfiguration statementConfig = new StatementConfiguration(c.getFetchDirection(), c.getFetchSize(),
+                        c.getMaxFieldSize(), c.getMaxRows(), safeLongToInt(c.getQueryTimeoutMs()));
 
-            return new JDBCSourceFacade(config, dataSourceName, jdbcHelper);
+                return new JDBCSourceFacade(config, dataSourceName,
+                        new JDBCRunnerHelper(statementConfig, new HikariDataSource(c.toHikariConfig())));
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw e;
+            }
         }
 
         @Override
