@@ -29,37 +29,40 @@ import org.graalvm.polyglot.HostAccess;
 import com.wl4g.infra.common.lang.DateUtils2;
 
 /**
- * {@link DateUtil}
+ * {@link DateHolder}
  * 
  * @author James Wong
  * @version 2022-12-25
  * @since v1.0.0
  */
-public class DateUtil {
+public class DateHolder {
 
-    public static @HostAccess.Export long currentMillis() {
+    public @HostAccess.Export DateHolder() {
+    }
+
+    public @HostAccess.Export long currentMillis() {
         return currentTimeMillis();
     }
 
-    public static @HostAccess.Export long currentNanoTime() {
+    public @HostAccess.Export long currentNanoTime() {
         return System.nanoTime();
     }
 
-    public static @HostAccess.Export Date parseDate(final String dateString, final String pattern) throws ParseException {
+    public @HostAccess.Export Date parseDate(final String dateString, final String pattern) throws ParseException {
         if (isBlank(dateString) || isNull(pattern)) {
             return null;
         }
         return DateUtils2.parseDate(dateString, pattern);
     }
 
-    public static @HostAccess.Export String formatDate(String pattern) {
+    public @HostAccess.Export String formatDate(String pattern) {
         if (isNull(pattern)) {
             return null;
         }
         return DateUtils2.getDate(pattern);
     }
 
-    public static @HostAccess.Export Date getDateOf(int calendarField, int amount, String pattern) {
+    public @HostAccess.Export Date getDateOf(int calendarField, int amount, String pattern) {
         if (isNull(pattern)) {
             return null;
         }
@@ -69,14 +72,14 @@ public class DateUtil {
         return c.getTime();
     }
 
-    public static @HostAccess.Export String getFormatDateOf(int calendarField, int amount, String pattern) {
+    public @HostAccess.Export String getFormatDateOf(int calendarField, int amount, String pattern) {
         if (isNull(pattern)) {
             return null;
         }
         return DateUtils2.getDateOf(calendarField, amount, pattern);
     }
 
-    public static @HostAccess.Export Double getDistanceOf(Date before, Date after, String pattern) {
+    public @HostAccess.Export Double getDistanceOf(Date before, Date after, String pattern) {
         if (isNull(before) || isNull(after) || isNull(pattern)) {
             return null;
         }

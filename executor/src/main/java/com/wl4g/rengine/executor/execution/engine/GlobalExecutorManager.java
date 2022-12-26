@@ -75,7 +75,7 @@ public class GlobalExecutorManager implements Closeable {
             synchronized (this) {
                 if (isNull(runner = runnerCaching.get(scenesCode))) {
                     runner = new GenericTaskRunner<RunnerProperties>(new RunnerProperties(StartupMode.NOSTARTUP, concurrency, 0L,
-                            (int) (concurrency * 1.5), new AbortPolicy())) {
+                            (int) (concurrency * 2), new AbortPolicy())) {
                     };
                     runner.start();
                 }

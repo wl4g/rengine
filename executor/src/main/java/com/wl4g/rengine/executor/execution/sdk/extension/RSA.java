@@ -40,7 +40,10 @@ import lombok.ToString;
  */
 public class RSA {
 
-    public static @HostAccess.Export String encryptToBase64(
+    public @HostAccess.Export RSA() {
+    }
+
+    public @HostAccess.Export String encryptToBase64(
             final boolean isPrivateKey,
             final @NotBlank String base64Key,
             final String plaintext) {
@@ -58,7 +61,7 @@ public class RSA {
         return rsa.encrypt(key, new CodecSource(plaintext)).toBase64();
     }
 
-    public static @HostAccess.Export String decryptFromBase64(
+    public @HostAccess.Export String decryptFromBase64(
             final boolean isPrivateKey,
             final @NotBlank String base64Key,
             String base64Ciphertext) {
@@ -76,7 +79,7 @@ public class RSA {
         return rsa.decrypt(key, CodecSource.fromBase64(base64Ciphertext)).toString();
     }
 
-    public static @HostAccess.Export RsaKeyPair generateKeyToBase64() {
+    public @HostAccess.Export RsaKeyPair generateKeyToBase64() {
         final RSAKeyPairSpec keyPair = (RSAKeyPairSpec) new RSACryptor().generateKeyPair();
         return new RsaKeyPair(keyPair.getPubBase64String(), keyPair.getBase64String());
     }

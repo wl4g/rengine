@@ -34,7 +34,10 @@ import com.wl4g.infra.common.crypto.symmetric.AES256CBCPKCS7;
  */
 public class AES {
 
-    public static @HostAccess.Export String encrypt256CbcPkcs7ToBase64(
+    public @HostAccess.Export AES() {
+    }
+
+    public @HostAccess.Export String encrypt256CbcPkcs7ToBase64(
             final @NotBlank String base64Key,
             final @NotBlank String base64Iv,
             final String plaintext) {
@@ -48,7 +51,7 @@ public class AES {
                 .toBase64();
     }
 
-    public static @HostAccess.Export String decrypt256CbcPkcs7FromBase64(
+    public @HostAccess.Export String decrypt256CbcPkcs7FromBase64(
             final @NotBlank String base64Key,
             final @NotBlank String base64Iv,
             final String base64Ciphertext) {
@@ -62,7 +65,7 @@ public class AES {
                 .toString();
     }
 
-    public static @HostAccess.Export String generateKeyToBase64() {
+    public @HostAccess.Export String generateKeyToBase64() {
         return new AES256CBCPKCS7().generateKey().toBase64();
     }
 

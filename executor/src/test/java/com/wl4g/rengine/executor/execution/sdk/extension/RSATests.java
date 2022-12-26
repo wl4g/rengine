@@ -32,14 +32,16 @@ public class RSATests {
 
     @Test
     public void testGenerateKeyAndPublicKeyEncryptAndPrivateDecrypt() {
-        final RsaKeyPair base64Key = RSA.generateKeyToBase64();
+        final RSA rsa = new RSA();
+
+        final RsaKeyPair base64Key = rsa.generateKeyToBase64();
         System.out.println("base64Key: " + base64Key);
 
         final String plaintext = "abcdefghijklmnopqrstuvwxyz";
         System.out.println("plaintext: " + plaintext);
 
-        final String ciphertext = RSA.encryptToBase64(false, base64Key.getPublicKey(), plaintext);
-        final String plaintext2 = RSA.decryptFromBase64(true, base64Key.getPrivateKey(), ciphertext);
+        final String ciphertext = rsa.encryptToBase64(false, base64Key.getPublicKey(), plaintext);
+        final String plaintext2 = rsa.decryptFromBase64(true, base64Key.getPrivateKey(), ciphertext);
 
         System.out.println("ciphertext: " + ciphertext);
         System.out.println("plaintext2: " + plaintext2);

@@ -329,7 +329,7 @@
   "queryAllDeclaredMethods":true,
   "methods":[
     {"name":"<init>","parameterTypes":[] }, 
-    {"name":"getName","parameterTypes":["java.lang.String"] }, 
+    {"name":"getName","parameterTypes":[] }, 
     {"name":"setName","parameterTypes":["java.lang.String"] }, 
     {"name":"getEngine","parameterTypes":[] }, 
     {"name":"setEngine","parameterTypes":["com.wl4g.rengine.common.entity.Rule$RuleEngine"] }
@@ -347,6 +347,7 @@
   "queryAllDeclaredConstructors":true,
   "methods":[
     {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getScripts","parameterTypes":[] }, 
     {"name":"setScripts","parameterTypes":["java.util.List"] }
   ]
 },
@@ -371,6 +372,7 @@
   "queryAllDeclaredConstructors":true,
   "methods":[
     {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getUploads","parameterTypes":[] },
     {"name":"setUploads","parameterTypes":["java.util.List"] }
   ]
 },
@@ -413,8 +415,8 @@
     {"name":"setObjectPrefix","parameterTypes":["java.lang.String"] }, 
     {"name":"getSize","parameterTypes":[] }, 
     {"name":"setSize","parameterTypes":["java.lang.Long"] }, 
-    {"name":"getOnwer","parameterTypes":[] }, 
-    {"name":"setOnwer","parameterTypes":["java.lang.String"] }, 
+    {"name":"getOwner","parameterTypes":[] }, 
+    {"name":"setOwner","parameterTypes":["java.lang.String"] }, 
     {"name":"getGroup","parameterTypes":[] }, 
     {"name":"setGroup","parameterTypes":["java.lang.String"] }, 
     {"name":"getAccessMode","parameterTypes":[] }, 

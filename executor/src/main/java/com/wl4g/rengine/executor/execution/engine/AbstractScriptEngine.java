@@ -40,6 +40,7 @@ import com.wl4g.rengine.common.graph.ExecutionGraph.BaseOperator;
 import com.wl4g.rengine.common.graph.ExecutionGraphContext;
 import com.wl4g.rengine.common.graph.ExecutionGraphParameter;
 import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
+import com.wl4g.rengine.executor.execution.ExecutionConfig;
 import com.wl4g.rengine.executor.execution.datasource.GlobalDataSourceManager;
 import com.wl4g.rengine.executor.execution.sdk.ScriptContext;
 import com.wl4g.rengine.executor.execution.sdk.ScriptContext.ScriptParameter;
@@ -73,6 +74,9 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public abstract class AbstractScriptEngine implements IEngine {
+
+    @Inject
+    ExecutionConfig config;
 
     @Inject
     ExecutorMeterService meterService;
@@ -130,7 +134,8 @@ public abstract class AbstractScriptEngine implements IEngine {
                 .lastResult(lastResult)
                 .dataService(dataService)
                 .logger(new ScriptLogger(minioManager))
-                .executor(createScriptExecutor(globalExecutorManager.getExecutor(parameter.getScenesCode(), 2))) // TODO-use-config
+                .executor(createScriptExecutor(
+                        globalExecutorManager.getExecutor(parameter.getScenesCode(), config.perExecutorThreadPools())))
                 // .attributes(ProxyObject.fromMap(emptyMap()))
                 .build();
     }

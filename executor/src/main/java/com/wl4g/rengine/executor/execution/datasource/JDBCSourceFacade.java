@@ -30,6 +30,7 @@ import javax.inject.Singleton;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.dbutils.StatementConfiguration;
 import org.apache.commons.dbutils.handlers.MapHandler;
 import org.apache.commons.dbutils.handlers.MapListHandler;
@@ -39,7 +40,6 @@ import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
 import com.wl4g.rengine.common.entity.DataSourceProperties.JDBCDataSourceProperties;
 import com.wl4g.rengine.common.util.JDBCRunnerHelper;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
-import com.zaxxer.hikari.HikariDataSource;
 
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
@@ -74,7 +74,7 @@ public class JDBCSourceFacade implements DataSourceFacade {
         try {
             try (Connection conn = helper.getDataSource().getConnection();) {
                 return helper.getQueryRunner().query(conn, sql, new MapListHandler(), params);
-            } 
+            }
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
@@ -120,17 +120,34 @@ public class JDBCSourceFacade implements DataSourceFacade {
             notNullOf(config, "properties");
             hasTextOf(dataSourceName, "dataSourceName");
 
-            try {
-                final JDBCDataSourceProperties c = (JDBCDataSourceProperties) dataSourceProperties;
-                StatementConfiguration statementConfig = new StatementConfiguration(c.getFetchDirection(), c.getFetchSize(),
-                        c.getMaxFieldSize(), c.getMaxRows(), safeLongToInt(c.getQueryTimeoutMs()));
+            final JDBCDataSourceProperties c = (JDBCDataSourceProperties) dataSourceProperties;
+            StatementConfiguration statementConfig = new StatementConfiguration(c.getFetchDirection(), c.getFetchSize(),
+                    c.getMaxFieldSize(), c.getMaxRows(), safeLongToInt(c.getQueryTimeoutMs()));
 
-                return new JDBCSourceFacade(config, dataSourceName,
-                        new JDBCRunnerHelper(statementConfig, new HikariDataSource(c.toHikariConfig())));
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw e;
-            }
+            final BasicDataSource bds = new BasicDataSource();
+            bds.setDriverClassName(c.getDriverClassName());
+            bds.setUrl(c.getJdbcUrl());
+            bds.setUsername(c.getUsername());
+            bds.setPassword(c.getPassword());
+            bds.setInitialSize(c.getInitPoolSize());
+            bds.setMaxTotal(c.getMaximumPoolSize());
+            bds.setMaxIdle(c.getMaximumPoolSize() / 2);
+            bds.setMinIdle(c.getMinimumIdle());
+            bds.setMinEvictableIdleTimeMillis(c.getIdleTimeout());
+            bds.setSoftMinEvictableIdleTimeMillis(c.getSoftMinIdleTimeout());
+            bds.setMaxConnLifetimeMillis(c.getMaxConnLifeTime());
+            bds.setMaxWaitMillis(c.getConnectionTimeout());
+            bds.setTimeBetweenEvictionRunsMillis(c.getEvictionRunsBetweenTime());
+            bds.setValidationQuery(c.getValidationTestSql());
+            bds.setValidationQueryTimeout(c.getValidationTimeout().intValue());
+            bds.setAutoCommitOnReturn(c.getAutoCommit());
+            bds.setCacheState(c.getCacheState());
+            bds.setTestOnBorrow(c.getTestOnBorrow());
+            bds.setTestOnCreate(c.getTestOnCreate());
+            bds.setTestOnReturn(c.getTestOnReturn());
+            bds.setTestWhileIdle(c.getTestWhileIdle());
+
+            return new JDBCSourceFacade(config, dataSourceName, new JDBCRunnerHelper(statementConfig, bds));
         }
 
         @Override

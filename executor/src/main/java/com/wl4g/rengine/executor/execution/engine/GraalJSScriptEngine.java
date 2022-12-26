@@ -51,6 +51,7 @@ import com.wl4g.infra.common.lang.StringUtils2;
 import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
 import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
 import com.wl4g.rengine.common.exception.EvaluationException;
+import com.wl4g.rengine.common.exception.ExecutionScriptException;
 import com.wl4g.rengine.common.graph.ExecutionGraphContext;
 import com.wl4g.rengine.executor.execution.sdk.ScriptContext;
 import com.wl4g.rengine.executor.execution.sdk.ScriptExecutor;
@@ -92,8 +93,8 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
             FileIOUtils.forceMkdir(commonjsDir);
             graalOptions.put("js.commonjs-require-cwd", commonjsDir.getAbsolutePath());
 
-            graalPolyglotManager = new GraalPolyglotManager(getIntProperty("graaljs.context.pool.min", 1),
-                    getIntProperty("graaljs.context.pool.max", 10), () -> Context.newBuilder("js") // Only-allowed-JS-language
+            this.graalPolyglotManager = new GraalPolyglotManager(getIntProperty("graaljs.context.pool.min", 1),
+                    getIntProperty("graaljs.context.pool.max", 1000), () -> Context.newBuilder("js") // Only-allowed-JS-language
                             .allowAllAccess(getBooleanProperty("graaljs.allowAllAccess", true))
                             .allowExperimentalOptions(getBooleanProperty("graaljs.allowExperimentalOptions", true))
                             .allowIO(getBooleanProperty("graaljs.allowIO", true))
@@ -109,7 +110,8 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
                             .options(graalOptions)
                             .build());
         } catch (Exception e) {
-            log.error("Failed to init graal JS Script Engine.", e);
+            log.error("Failed to init graal JS Script engine.", e);
+            throw new ExecutionScriptException(e);
         }
     }
 

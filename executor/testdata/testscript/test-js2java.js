@@ -1,23 +1,12 @@
 function process(context) {
     // for case1:
     console.info("context:", context);
-    console.info("context.id:", context.id);
     console.info("context.getId():", context.getId());
     console.info("context.getType():", context.getType());
-    console.info("context.getArgs():", context.getArgs()[0]);
+    //console.info("context.getParameter():", context.getParameter());
+    //console.info("context.getParameter().getArgs():", context.getParameter().getArgs());
     console.info("context.getAttributes():", context.getAttributes());
     console.info("context.getAttributes()['objId']:", context.getAttributes()["objId"]);
-    console.info("context.getEvent():", context.getEvent());
-    console.info("context.getEvent().getType():", context.getEvent().getType());
-    console.info("context.getEvent().getObservedTime():", context.getEvent().getObservedTime());
-    console.info("context.getEvent().getBody():", context.getEvent().getBody());
-    console.info("context.getEvent().getAttributes():", context.getEvent().getAttributes());
-    console.info("context.getEvent().getSource():", context.getEvent().getSource());
-    console.info("context.getEvent().getSource().getTime():", context.getEvent().getSource().getTime());
-    console.info("context.getEvent().getSource().getPrincipals():", context.getEvent().getSource().getPrincipals());
-    console.info("context.getEvent().getSource().getLocation():", context.getEvent().getSource().getLocation());
-    console.info("context.getEvent().getSource().getLocation().getIpAddress():", context.getEvent().getSource().getLocation().getIpAddress());
-    console.info("context.getEvent().getSource().getLocation().getZipcode():", context.getEvent().getSource().getLocation().getZipcode());
 
     // for case2:
     const httpResult1 = testForHttpRequest1(context);
@@ -39,6 +28,15 @@ function process(context) {
 
     // for case8:
     const kafkaResult = testForKafkaPublish(context);
+
+    // for case9:
+    //testForExecutorTasks(context);
+
+    // for case10:
+    testForAESEncryptions(context);
+
+    // for case11:
+    testForRSAEncryptions(context);
 
     return new ScriptResult(true)
         .addValue("httpResult1", httpResult1)
@@ -116,6 +114,7 @@ function testForJdbcSql(context) {
 
 function testForSshExec(context) {
     try {
+        //const sshService = new ScriptSSHClient();
         const sshService = context.getDataService().getDefaultSSHClient();
         var sshResult = sshService.execute("localhost", 22, "prometheus", "123456", "ls -al /tmp/");
         console.info("sshResult:", sshResult);
@@ -125,12 +124,11 @@ function testForSshExec(context) {
     }
 }
 
-// docker exec -it kafka1 /opt/bitnami/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test_topic
 function testForKafkaPublish(context) {
     try {
         const topic = "test_topic";
         const kafkaService = context.getDataService().getKafkaService("default");
-        kafkaService.publish(topic, {"foo1":"bar1"});
+        kafkaService.publish(topic, {"foo":"bar"});
         const kafkaResult = "none";
         console.info("kafkaResult: " + kafkaResult);
         return kafkaResult;
@@ -138,3 +136,58 @@ function testForKafkaPublish(context) {
         console.error(">>>", e);
     }
 }
+
+function testForExecutorTasks(context) {
+    if (context.getId() != 11) { return; }
+    try {
+        var executor = context.getExecutor();
+        var futures = [];
+        for (var i = 0; i <= 5; i++) {
+            var f = executor.submit(() => {
+                var i =1;
+                console.info("Test task " + i + " running ...");
+                return "result for task "+i;
+            });
+            futures.push(f);
+        }
+        for (var i = 0; i <= futures.length; i++) {
+            console.info("++++result " + i + " is : " + futures[i].get());
+        }
+    } catch(e) {
+        console.error(">>>", e);
+    }
+}
+
+function testForAESEncryptions(context) {
+    var base64Iv = new Coding().toBase64("1234567890abcdef");
+    console.info("base64Iv: " + base64Iv);
+
+    var aes = new AES();
+    var base64Key = aes.generateKeyToBase64();
+    console.info("base64Key: " + base64Key);
+
+    var plaintext = "abcdefghijklmnopqrstuvwxyz";
+    console.info("plaintext: " + plaintext);
+
+    var ciphertext = aes.encrypt256CbcPkcs7ToBase64(base64Key, base64Iv, plaintext);
+    var plaintext2 = aes.decrypt256CbcPkcs7FromBase64(base64Key, base64Iv, ciphertext);
+
+    console.info("ciphertext: " + ciphertext);
+    console.info("plaintext2: " + plaintext2);
+}
+
+function testForRSAEncryptions(context) {
+    var rsa = new RSA();
+    var base64Key = rsa.generateKeyToBase64();
+    console.info("base64Key: " + base64Key);
+
+    var plaintext = "abcdefghijklmnopqrstuvwxyz";
+    console.info("plaintext: " + plaintext);
+
+    var ciphertext = rsa.encryptToBase64(false, base64Key.getPublicKey(), plaintext);
+    var plaintext2 = rsa.decryptFromBase64(true, base64Key.getPrivateKey(), ciphertext);
+
+    console.info("ciphertext: " + ciphertext);
+    console.info("plaintext2: " + plaintext2);
+}
+

@@ -34,42 +34,45 @@ import com.wl4g.infra.common.codec.Base58;
  */
 public class Coding {
 
-    public static @HostAccess.Export String toBase58(String str) {
+    public @HostAccess.Export Coding() {
+    }
+
+    public @HostAccess.Export String toBase58(String str) {
         if (isNull(str)) {
             return null;
         }
         return Base58.encodeBase58(str);
     }
 
-    public static @HostAccess.Export String fromBase58(String str) {
+    public @HostAccess.Export String fromBase58(String str) {
         if (isNull(str)) {
             return null;
         }
         return new String(Base58.decodeBase58(str), UTF_8);
     }
 
-    public static @HostAccess.Export String toBase64(String str) {
+    public @HostAccess.Export String toBase64(String str) {
         if (isNull(str)) {
             return null;
         }
         return Base64.encodeBase64String(str.getBytes(UTF_8));
     }
 
-    public static @HostAccess.Export String fromBase64(String str) {
+    public @HostAccess.Export String fromBase64(String str) {
         if (isNull(str)) {
             return null;
         }
         return new String(Base64.decodeBase64(str.getBytes(UTF_8)), UTF_8);
     }
 
-    public static @HostAccess.Export String toHex(String str) {
+    public @HostAccess.Export String toHex(String str) {
         if (isNull(str)) {
             return null;
         }
         return Hex.encodeHexString(str.getBytes(UTF_8));
     }
 
-    public static @HostAccess.Export String fromHex(String str) throws DecoderException {
+    public @HostAccess.Export String fromHex(String str) throws DecoderException {
         if (isNull(str)) {
             return null;
         }

@@ -32,17 +32,19 @@ public class AESTests {
 
     @Test
     public void test256CbcPkcs7GenerateKeyAndEncryptAndDecrypt() {
+        final AES aes = new AES();
+
         final String base64Iv = new CodecSource("1234567890abcdef").toBase64();
         System.out.println("base64Iv: " + base64Iv);
 
-        final String base64Key = AES.generateKeyToBase64();
+        final String base64Key = aes.generateKeyToBase64();
         System.out.println("base64Key: " + base64Key);
 
         final String plaintext = "abcdefghijklmnopqrstuvwxyz";
         System.out.println("plaintext: " + plaintext);
 
-        final String ciphertext = AES.encrypt256CbcPkcs7ToBase64(base64Key, base64Iv, plaintext);
-        final String plaintext2 = AES.decrypt256CbcPkcs7FromBase64(base64Key, base64Iv, ciphertext);
+        final String ciphertext = aes.encrypt256CbcPkcs7ToBase64(base64Key, base64Iv, plaintext);
+        final String plaintext2 = aes.decrypt256CbcPkcs7FromBase64(base64Key, base64Iv, ciphertext);
 
         System.out.println("ciphertext: " + ciphertext);
         System.out.println("plaintext2: " + plaintext2);

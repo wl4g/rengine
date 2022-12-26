@@ -31,7 +31,10 @@ import org.graalvm.polyglot.HostAccess;
  */
 public class JSON {
 
-    public static @HostAccess.Export Object parse(String json) {
+    public @HostAccess.Export JSON() {
+    }
+
+    public @HostAccess.Export Object parse(String json) {
         if (isNull(json)) {
             return null;
         }
@@ -41,11 +44,11 @@ public class JSON {
         return parseMapObject(json);
     }
 
-    public static @HostAccess.Export String stringify(Object obj) {
+    public @HostAccess.Export String stringify(Object obj) {
         return stringify(obj, false);
     }
 
-    public static @HostAccess.Export String stringify(Object obj, boolean isPretty) {
+    public @HostAccess.Export String stringify(Object obj, boolean isPretty) {
         return toJSONString(obj, isPretty);
     }
 

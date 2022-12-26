@@ -22,23 +22,18 @@ import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseMapObject;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.String.format;
-import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.equalsAnyIgnoreCase;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.time.Duration;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -47,7 +42,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.infra.common.jedis.JedisClientBuilder.JedisConfig;
 import com.wl4g.rengine.common.exception.ConfigRengineException;
-import com.zaxxer.hikari.HikariConfig;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -191,142 +185,72 @@ public class DataSourceProperties extends BaseBean {
         Long queryTimeoutMs = Duration.ofSeconds(15).toMillis();
 
         //
-        // see:com.zaxxer.hikari.HikariConfig
+        // see:org.apache.commons.dbcp2.BasicDataSource
         //
-        // Properties changeable at runtime through the HikariConfigMXBean
-        String catalog;
+
+        @NotBlank
         @Default
-        Long connectionTimeout = SECONDS.toMillis(10); // must >=250ms
+        String driverClassName = "com.mysql.cj.jdbc.Driver";
+
+        @NotBlank
         @Default
-        Long validationTimeout = SECONDS.toMillis(5); // must >=250ms
+        String jdbcUrl = "jdbc:mysql://localhost:3306/mysql?useUnicode=true&serverTimezone=UTC&characterEncoding=utf-8&useSSL=false";
+
+        @NotBlank
+        @Default
+        String username = "root";
+
+        @NotBlank
+        @Default
+        String password = "123456";
+
+        @Default
+        Long connectionTimeout = SECONDS.toMillis(30);
+
+        @Default
+        Long validationTimeout = SECONDS.toMillis(5);
+
+        @Default
+        String validationTestSql = "SELECT 1";
+
         @Default
         Long idleTimeout = MINUTES.toMillis(10);
-        Long leakDetectionThreshold;
+
         @Default
-        Long maxLifetime = MINUTES.toMillis(30);
+        Long softMinIdleTimeout = -1L;
+
         @Default
-        Integer maximumPoolSize = 5;
+        Long maxConnLifeTime = -1L;
+
+        @Default
+        Long evictionRunsBetweenTime = -1L;
+
+        @Default
+        Integer initPoolSize = 5;
+
+        @Default
+        Integer maximumPoolSize = 20;
+
         @Default
         Integer minimumIdle = 1;
-        @NotBlank
-        String username;
-        @NotBlank
-        String password;
 
-        // Properties NOT changeable at runtimez
-        Long initializationFailTimeout;
-        String connectionInitSql;
-        String connectionTestQuery;
-        String dataSourceClassName;
-        String dataSourceJndiName;
-        String driverClassName;
-        String exceptionOverrideClassName;
-        @NotBlank
-        String jdbcUrl;
-        String poolName;
-        String schema;
-        String transactionIsolationName;
-        Boolean autoCommit;
-        Boolean readOnly;
-        Boolean isolateInternalQueries;
-        Boolean registerMbeans;
-        Boolean allowPoolSuspension;
-        Properties dataSourceProperties;
-        Properties healthCheckProperties;
-        Long keepaliveTime;
-        Boolean sealed;
+        @Default
+        Boolean autoCommit = true;
 
-        @JsonIgnore
-        volatile transient HikariConfig hikariConfig;
+        @Default
+        Boolean cacheState = true;
 
-        public HikariConfig toHikariConfig() {
-            if (isNull(hikariConfig)) {
-                synchronized (this) {
-                    if (isNull(hikariConfig)) {
-                        hikariConfig = new HikariConfig();
-                        if (nonNull(getCatalog())) {
-                            hikariConfig.setCatalog(getCatalog());
-                        }
-                        if (nonNull(getConnectionTimeout())) {
-                            hikariConfig.setConnectionTimeout(getConnectionTimeout());
-                        }
-                        if (nonNull(getIdleTimeout())) {
-                            hikariConfig.setIdleTimeout(getIdleTimeout());
-                        }
-                        if (nonNull(getLeakDetectionThreshold())) {
-                            hikariConfig.setLeakDetectionThreshold(getLeakDetectionThreshold());
-                        }
-                        if (nonNull(getMaxLifetime())) {
-                            hikariConfig.setMaxLifetime(getMaxLifetime());
-                        }
-                        if (nonNull(getMaximumPoolSize())) {
-                            hikariConfig.setMaximumPoolSize(getMaximumPoolSize());
-                        }
-                        if (nonNull(getMinimumIdle())) {
-                            hikariConfig.setMinimumIdle(getMinimumIdle());
-                        }
-                        if (nonNull(getDataSourceClassName())) {
-                            hikariConfig.setDataSourceClassName(getDataSourceClassName());
-                        }
-                        if (nonNull(getUsername())) {
-                            hikariConfig.setUsername(getUsername());
-                        }
-                        if (nonNull(getPassword())) {
-                            hikariConfig.setPassword(getPassword());
-                        }
-                        if (nonNull(getValidationTimeout())) {
-                            hikariConfig.setValidationTimeout(getValidationTimeout());
-                        }
-                        if (nonNull(getConnectionTestQuery())) {
-                            hikariConfig.setConnectionTestQuery(getConnectionTestQuery());
-                        }
-                        if (nonNull(getConnectionInitSql())) {
-                            hikariConfig.setConnectionInitSql(getConnectionInitSql());
-                        }
-                        if (nonNull(getDataSourceProperties())) {
-                            hikariConfig.setDataSourceProperties(getDataSourceProperties());
-                        }
-                        if (nonNull(getDriverClassName())) {
-                            hikariConfig.setDriverClassName(getDriverClassName());
-                        }
-                        if (nonNull(getDriverClassName())) {
-                            hikariConfig.setJdbcUrl(getJdbcUrl());
-                        }
-                        if (nonNull(getAutoCommit())) {
-                            hikariConfig.setAutoCommit(getAutoCommit());
-                        }
-                        if (nonNull(getAllowPoolSuspension())) {
-                            hikariConfig.setAllowPoolSuspension(getAllowPoolSuspension());
-                        }
-                        if (nonNull(getInitializationFailTimeout())) {
-                            hikariConfig.setInitializationFailTimeout(getInitializationFailTimeout());
-                        }
-                        if (nonNull(getIsolateInternalQueries())) {
-                            hikariConfig.setIsolateInternalQueries(getIsolateInternalQueries());
-                        }
-                        if (nonNull(getHealthCheckProperties())) {
-                            hikariConfig.setHealthCheckProperties(getHealthCheckProperties());
-                        }
-                        if (nonNull(getKeepaliveTime())) {
-                            hikariConfig.setKeepaliveTime(getKeepaliveTime());
-                        }
-                        if (nonNull(getReadOnly())) {
-                            hikariConfig.setReadOnly(getReadOnly());
-                        }
-                        if (nonNull(getPoolName())) {
-                            hikariConfig.setPoolName(getPoolName());
-                        }
-                        if (nonNull(getSchema())) {
-                            hikariConfig.setSchema(getSchema());
-                        }
-                        if (!isBlank(getExceptionOverrideClassName())) {
-                            hikariConfig.setExceptionOverrideClassName(getExceptionOverrideClassName());
-                        }
-                    }
-                }
-            }
-            return hikariConfig;
-        }
+        @Default
+        Boolean testOnBorrow = false;
+
+        @Default
+        Boolean testOnCreate = false;
+
+        @Default
+        Boolean testOnReturn = false;
+
+        @Default
+        Boolean testWhileIdle = false;
 
         @Override
         public DataSourcePropertiesBase validate() {
@@ -334,6 +258,7 @@ public class DataSourceProperties extends BaseBean {
             hasTextOf(getJdbcUrl(), "jdbcUrl");
             hasTextOf(getUsername(), "username");
             hasTextOf(getPassword(), "password");
+            isTrueOf(getMaximumPoolSize() > 0, "getMaximumPoolSize()>0");
             return this;
         }
     }

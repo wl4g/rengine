@@ -65,8 +65,13 @@ public abstract class TestSetupDefaults {
             }
 
             @Override
-            public @NotNull @Min(0) @Max(65535) Integer threadPools() {
-                return ExecutionConfig.DEFAULT_THREAD_POOLS;
+            public @NotNull @Min(0) @Max(65535) Integer executorThreadPools() {
+                return ExecutionConfig.DEFAULT_EXECUTOR_THREAD_POOLS;
+            }
+
+            @Override
+            public @NotNull @Min(0) @Max(1024) Integer perExecutorThreadPools() {
+                return ExecutionConfig.DEFAULT_PER_EXECUTOR_THREAD_POOLS;
             }
 
             @Override

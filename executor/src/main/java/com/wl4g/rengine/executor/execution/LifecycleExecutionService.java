@@ -96,25 +96,25 @@ public class LifecycleExecutionService {
     @Inject
     DefaultWorkflowExecution workflowExecution;
 
-    GenericTaskRunner<RunnerProperties> taskRunner;
+    GenericTaskRunner<RunnerProperties> executionRunner;
 
     @PostConstruct
     void init() {
-        final int threadPools = config.threadPools();
-        log.info("Initialzing execution threads pool for : {}", threadPools);
-        this.taskRunner = new GenericTaskRunner<RunnerProperties>(new RunnerProperties(StartupMode.NOSTARTUP, threadPools)) {
+        final int threads = config.executorThreadPools();
+        log.info("Initialzing execution threads pool for : {}", threads);
+        this.executionRunner = new GenericTaskRunner<RunnerProperties>(new RunnerProperties(StartupMode.NOSTARTUP, threads)) {
             @Override
             protected String getThreadNamePrefix() {
                 return EvaluatorServiceImpl.class.getSimpleName();
             }
         };
-        this.taskRunner.start();
+        this.executionRunner.start();
     }
 
     void destroy(@Observes @BeforeDestroyed(ApplicationScoped.class) ServletContext init) {
-        if (nonNull(taskRunner)) {
+        if (nonNull(executionRunner)) {
             try {
-                this.taskRunner.close();
+                this.executionRunner.close();
             } catch (IOException e) {
                 log.error("Failed to closing evaluation runner", e);
             }
@@ -135,7 +135,7 @@ public class LifecycleExecutionService {
         // Submit to execution workers.
         final Map<String, Future<ResultDescription>> futures = sceneses.stream()
                 .map(scenes -> new KeyValue(scenes.getScenesCode(),
-                        taskRunner.getWorker().submit(new ExecutionRunner(latch, evaluation, scenes))))
+                        executionRunner.getWorker().submit(new ExecutionRunner(latch, evaluation, scenes))))
                 .collect(toMap(kv -> kv.getKey(), kv -> (Future) kv.getValue()));
 
         // Collect for uncompleted results.

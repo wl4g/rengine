@@ -30,56 +30,59 @@ import org.graalvm.polyglot.HostAccess;
 @SuppressWarnings("deprecation")
 public class Hashing {
 
-    public static @HostAccess.Export String md5(String str) {
+    public @HostAccess.Export Hashing() {
+    }
+
+    public @HostAccess.Export String md5(String str) {
         if (isNull(str)) {
             return null;
         }
         return com.google.common.hash.Hashing.md5().hashBytes(str.getBytes(UTF_8)).toString();
     }
 
-    public static @HostAccess.Export String sha1(String str) {
+    public @HostAccess.Export String sha1(String str) {
         if (isNull(str)) {
             return null;
         }
         return com.google.common.hash.Hashing.sha1().hashBytes(str.getBytes(UTF_8)).toString();
     }
 
-    public static @HostAccess.Export String sha256(String str) {
+    public @HostAccess.Export String sha256(String str) {
         if (isNull(str)) {
             return null;
         }
         return com.google.common.hash.Hashing.sha256().hashBytes(str.getBytes(UTF_8)).toString();
     }
 
-    public static @HostAccess.Export String sha384(String str) {
+    public @HostAccess.Export String sha384(String str) {
         if (isNull(str)) {
             return null;
         }
         return com.google.common.hash.Hashing.sha384().hashBytes(str.getBytes(UTF_8)).toString();
     }
 
-    public static @HostAccess.Export String sha512(String str) {
+    public @HostAccess.Export String sha512(String str) {
         if (isNull(str)) {
             return null;
         }
         return com.google.common.hash.Hashing.sha512().hashBytes(str.getBytes(UTF_8)).toString();
     }
 
-    public static @HostAccess.Export String hmacSha1(String key, String str) {
+    public @HostAccess.Export String hmacSha1(String key, String str) {
         if (isNull(str)) {
             return null;
         }
         return com.google.common.hash.Hashing.hmacSha1(key.getBytes(UTF_8)).hashBytes(str.getBytes(UTF_8)).toString();
     }
 
-    public static @HostAccess.Export String hmacSha256(String key, String str) {
+    public @HostAccess.Export String hmacSha256(String key, String str) {
         if (isNull(str)) {
             return null;
         }
         return com.google.common.hash.Hashing.hmacSha256(key.getBytes(UTF_8)).hashBytes(str.getBytes(UTF_8)).toString();
     }
 
-    public static @HostAccess.Export String hmacSha512(String key, String str) {
+    public @HostAccess.Export String hmacSha512(String key, String str) {
         if (isNull(str)) {
             return null;
         }

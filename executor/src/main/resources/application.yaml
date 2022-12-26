@@ -181,7 +181,7 @@ quarkus:
     file-encoding: UTF-8
     inline-before-analysis: true
     ## see:https://quarkus.io/guides/native-reference#i-get-an-outofmemoryerror-oome-building-native-executables-what-can-i-do
-    native-image-xmx: 12g
+    #native-image-xmx: 10g
     #resources:
     #  includes: foo/**,bar/**/*.txt
     #  excludes: foo/private/**
@@ -191,7 +191,7 @@ quarkus:
     ## [Notice]: As of GraalVM 22.2 the language:js plugin has been removed from the default plugin list, and needs to be installed manually by run $GRAALVM_HOME/bin/gu install js
     ## Run this command to check if the image is supports: docker run --rm quay.io/quarkus/ubi-quarkus-native-image:22.1-java11 --help | grep 'language'
     ## [Notice]: Required option: "--initialize-at-run-time=org.apache.commons.lang3.RandomUtils" is already set in the (com.wl4g:infra-common-java11) dependency module.
-    additional-build-args: "--language:js,--no-fallback,--report-unsupported-elements-at-runtime"
+    additional-build-args: "--language:js,--no-fallback,--report-unsupported-elements-at-runtime,--initialize-at-run-time=com.sun.jmx.mbeanserver.JmxMBeanServer"
     #compression:
     #  level: 5 # 1-10 The larger the higher the compression ratio, the longer the build time.
     #  additional-args: --ultra-brute,-v
@@ -277,7 +277,8 @@ rengine:
     execution:
       scenes-rules-cached-prefix: 'rengine:scenes:rules:cached:'
       scenes-rules-cached-expire: 900000
-      thread-pools: 3
+      executor-thread-pools: 10
+      per-executor-thread-pools: 2
       max-query-batch: 1024
       evaluate-timeout-offset-rate: 0.1f
     minio:

@@ -48,8 +48,7 @@
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
   "methods":[
-    {"name":"submit","parameterTypes":["java.util.concurrent.Callable"] }, 
-    {"name":"submitForComplete","parameterTypes":["java.util.concurrent.Callable","long"] }, 
+    {"name":"submit","parameterTypes":["org.graalvm.polyglot.Value"] }, 
     {"name":"submitForComplete","parameterTypes":["java.util.List","long"] }, 
     {"name":"submitForComplete","parameterTypes":["java.util.List","com.wl4g.infra.common.task.CompleteTaskListener","long"] }, 
     {"name":"toString","parameterTypes":[] }
@@ -167,6 +166,20 @@
   ]
 },
 {
+  "name":"com.wl4g.rengine.executor.execution.sdk.extension.RSA$RsaKeyPair",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getPublicKey","parameterTypes":[] }, 
+    {"name":"getPrivateKey","parameterTypes":[] }, 
+    {"name":"setPublicKey","parameterTypes":["java.lang.String"] }, 
+    {"name":"setPrivateKey","parameterTypes":["java.lang.String"] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
   "name":"com.wl4g.rengine.executor.execution.sdk.extension.Coding",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
@@ -183,7 +196,7 @@
   ]
 },
 {
-  "name":"com.wl4g.rengine.executor.execution.sdk.extension.DateUtil",
+  "name":"com.wl4g.rengine.executor.execution.sdk.extension.DateHolder",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
