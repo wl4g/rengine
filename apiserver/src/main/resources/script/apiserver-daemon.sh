@@ -11,11 +11,10 @@
 set -e
 
 # Source function library.
-
-[ -f /etc/rc.d/init.d/functions ] && . /etc/rc.d/init.d/functions || echo
+[ -f /etc/rc.d/init.d/functions ] && . /etc/rc.d/init.d/functions || echo -n ''
 
 # Source networking configuration.
-[ -f /etc/sysconfig/network ] && . /etc/sysconfig/network || echo
+[ -f /etc/sysconfig/network ] && . /etc/sysconfig/network || echo -n ''
 
 # Check that networking is up.
 [ "$NETWORKING" = "no" ] && exit 0
@@ -136,6 +135,5 @@ case $COMMAND in
     ;;
     *)
   echo $"Usage:{start|stop|restart|status|shell}"
-  exit 2
 esac
 

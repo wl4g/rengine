@@ -39,7 +39,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class QueryUpload extends QueryBase<UploadObject> {
     private @Nullable Long uploadId;
-    private @Nullable Long scenesId;
-    private @Nullable UploadObject.UploadType UploadType;
+    private @Nullable UploadObject.UploadType uploadType;
     private @Nullable String extension;
 }

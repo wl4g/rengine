@@ -16,7 +16,9 @@
 package com.wl4g.rengine.apiserver.admin.service.impl;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static java.lang.String.format;
+import static com.wl4g.rengine.apiserver.mongo.QueryHolder.andCriteria;
+import static com.wl4g.rengine.apiserver.mongo.QueryHolder.baseCriteria;
+import static com.wl4g.rengine.apiserver.mongo.QueryHolder.isCriteria;
 import static java.util.Objects.isNull;
 
 import java.util.List;
@@ -31,17 +33,16 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import com.mongodb.client.result.DeleteResult;
-import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.infra.common.bean.page.PageHolder;
-import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
-import com.wl4g.rengine.common.entity.Rule;
-import com.wl4g.rengine.common.util.IdGenUtil;
 import com.wl4g.rengine.apiserver.admin.model.DeleteRule;
 import com.wl4g.rengine.apiserver.admin.model.DeleteRuleResult;
 import com.wl4g.rengine.apiserver.admin.model.QueryRule;
 import com.wl4g.rengine.apiserver.admin.model.SaveRule;
 import com.wl4g.rengine.apiserver.admin.model.SaveRuleResult;
 import com.wl4g.rengine.apiserver.admin.service.RuleService;
+import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
+import com.wl4g.rengine.common.entity.Rule;
+import com.wl4g.rengine.common.util.IdGenUtil;
 
 /**
  * {@link RuleServiceImpl}
@@ -57,13 +58,8 @@ public class RuleServiceImpl implements RuleService {
 
     @Override
     public PageHolder<Rule> query(QueryRule model) {
-        Query query = new Query(new Criteria().andOperator(Criteria.where("enable").is(BaseBean.ENABLED),
-                Criteria.where("delFlag").is(BaseBean.DEL_FLAG_NORMAL),
-                new Criteria().orOperator(Criteria.where("_id").is(model.getRuleId()),
-                        Criteria.where("scenesId").is(model.getScenesId()),
-                        Criteria.where("name").regex(format("(%s)+", model.getName())),
-                        Criteria.where("enable").is(model.getEnable()), Criteria.where("labels").in(model.getLabels()),
-                        Criteria.where("orgCode").is(model.getOrgCode()))));
+        Query query = new Query(andCriteria(baseCriteria(model), isCriteria("_id", model.getRuleId()),
+                isCriteria("scenesId", model.getScenesId())));
 
         query.with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
 

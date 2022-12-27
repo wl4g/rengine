@@ -20,7 +20,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * {@link RengineManagerProperties}
+ * {@link RengineApiServerProperties}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -29,7 +29,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class RengineManagerProperties {
+public class RengineApiServerProperties {
 
     private MinioProperties minio = new MinioProperties();
 

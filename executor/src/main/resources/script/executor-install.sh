@@ -25,6 +25,14 @@ SC_CTL_PATH="/bin/${APP_NAME}-ctl"
 # Service file name.
 SERVICE_FILE_NAME="${APP_NAME}.service"
 
+# Check directory.
+if [ ! -x "$DATA_DIR" ]; then
+  mkdir -p "$DATA_DIR"
+fi
+if [ ! -x "$LOG_DIR" ]; then
+  mkdir -p "$LOG_DIR"
+fi
+
 #
 # ===== Check installed =====
 #

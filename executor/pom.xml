@@ -128,7 +128,8 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-dbcp2</artifactId>
         </dependency>
-        <!-- [problem]: Run in native mode, unable to get connection error -->
+        <!-- [problem]: Run in native mode, unable to get connection error. -->
+        <!-- see:https://github.com/brettwooldridge/HikariCP/issues/976 -->
         <!-- <dependency>-->
         <!--     <groupId>com.zaxxer</groupId>-->
         <!--     <artifactId>HikariCP</artifactId>-->

@@ -92,6 +92,11 @@
             <groupId>com.wl4g</groupId>
             <artifactId>infra-context</artifactId>
         </dependency>
+        <!-- Cache(Jedis) -->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+        </dependency>
         <!-- Spring -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

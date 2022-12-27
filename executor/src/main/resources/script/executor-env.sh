@@ -12,22 +12,22 @@ set -e
 
 # Load the user environment, e.g. get the secret key of decrypting database password.
 if [ -f "/etc/profile" ]; then # e.g. CentOS.x, Ubuntu.x
-  . /etc/profile
+  . /etc/profile && echo -n '' || echo -n ''
 fi
 if [ -f "/etc/bashrc" ]; then # e.g. CentOS.x
-  . /etc/bashrc
+  . /etc/bashrc && echo -n '' || echo -n ''
 fi
 if [ -f "/etc/bash.bashrc" ]; then # e.g. Ubuntu.x
-  . /etc/bash.bashrc
+  . /etc/bash.bashrc && echo -n '' || echo -n ''
 fi
 if [ -f "$HOME/.bashrc" ]; then # e.g. CentOS.x, Ubuntu.x
-  . ~/.bashrc
+  . ~/.bashrc && echo -n '' || echo -n ''
 fi
 if [ -f "$HOME/.bash_profile" ]; then # e.g. CentOS.x
-  . ~/.bash_profile
+  . ~/.bash_profile && echo -n '' || echo -n ''
 fi
 if [ -f "$HOME/.profile" ]; then # e.g. Ubuntu.x
-  . ~/.profile
+  . ~/.profile && echo -n '' || echo -n ''
 fi
 
 # Current directory.
@@ -257,23 +257,13 @@ fi
 #
 if [ -z "$APP_OPTS" ]; then
   # Add the core options arguments it supports according to different application types.
-  if [ -n "$(ls ${BASE_DIR}/lib/* | grep -E ${BASE_DIR}/lib/spring-boot)" ]; then # This is spring-boot app?
+  if [ -n "$(ls ${BASE_DIR}/lib/* 2>&1|grep -E ${BASE_DIR}/lib/spring-boot)" ]; then # The spring-boot App?
     APP_OPTS="$APP_OPTS --spring.application.name=${APP_NAME}"
     APP_OPTS="$APP_OPTS --spring.profiles.active=${APP_PROFILE}"
     APP_OPTS="$APP_OPTS --server.tomcat.basedir=${DATA_DIR}"
     APP_OPTS="$APP_OPTS --logging.file.name=${LOG_DIR}/${APP_NAME}_${APP_PROFILE}.log"
-  else if [ -n "$(ls ${BASE_DIR}/lib/* | grep -E ${BASE_DIR}/lib/quarkus-core)" ]; then # This is quarkus app?
+  elif [ -n "$(ls ${BASE_DIR}/lib/* 2>&1|grep -E ${BASE_DIR}/lib/quarkus-core)" ]; then # The quarkus App?
     APP_OPTS="$APP_OPTS -Dquarkus.application.name=${APP_NAME}"
     APP_OPTS="$APP_OPTS -Dquarkus.log.file.path=${LOG_DIR}/${APP_NAME}_${APP_PROFILE}.log"
   fi
-fi
-
-# Check directory.
-if [ ! -x "$DATA_DIR" ]; then
-  mkdir -p "$DATA_DIR"
-fi
-
-if [ ! -x "$LOG_DIR" ]; then
-  mkdir -p "$LOG_DIR"
-fi
 fi

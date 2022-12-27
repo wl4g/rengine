@@ -16,6 +16,9 @@
 package com.wl4g.rengine.apiserver.admin.service.impl;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.rengine.apiserver.mongo.QueryHolder.andCriteria;
+import static com.wl4g.rengine.apiserver.mongo.QueryHolder.baseCriteria;
+import static com.wl4g.rengine.apiserver.mongo.QueryHolder.isCriteria;
 
 import java.util.List;
 
@@ -29,11 +32,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import com.mongodb.client.result.DeleteResult;
-import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.infra.common.bean.page.PageHolder;
-import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
-import com.wl4g.rengine.common.entity.WorkflowGraph;
-import com.wl4g.rengine.common.util.IdGenUtil;
 import com.wl4g.rengine.apiserver.admin.model.DeleteWorkflowGraph;
 import com.wl4g.rengine.apiserver.admin.model.DeleteWorkflowGraphResult;
 import com.wl4g.rengine.apiserver.admin.model.QueryWorkflowGraph;
@@ -41,6 +40,9 @@ import com.wl4g.rengine.apiserver.admin.model.SaveWorkflowGraph;
 import com.wl4g.rengine.apiserver.admin.model.SaveWorkflowGraphResult;
 import com.wl4g.rengine.apiserver.admin.service.WorkflowGraphService;
 import com.wl4g.rengine.apiserver.mongo.GlobalMongoSequenceService;
+import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
+import com.wl4g.rengine.common.entity.WorkflowGraph;
+import com.wl4g.rengine.common.util.IdGenUtil;
 
 /**
  * {@link WorkflowGraphServiceImpl}
@@ -60,11 +62,8 @@ public class WorkflowGraphServiceImpl implements WorkflowGraphService {
 
     @Override
     public PageHolder<WorkflowGraph> query(QueryWorkflowGraph model) {
-        Query query = new Query(new Criteria().andOperator(Criteria.where("enable").is(BaseBean.ENABLED),
-                Criteria.where("delFlag").is(BaseBean.DEL_FLAG_NORMAL),
-                new Criteria().orOperator(Criteria.where("_id").is(model.getGraphId()),
-                        Criteria.where("workflowId").is(model.getWorkflowId()), Criteria.where("enable").is(model.getEnable()),
-                        Criteria.where("orgCode").is(model.getOrgCode()), Criteria.where("labels").in(model.getLabels()))));
+        Query query = new Query(andCriteria(baseCriteria(model), isCriteria("_id", model.getGraphId()),
+                isCriteria("workflowId", model.getWorkflowId())));
 
         query.with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "revision", "updateDate")));
 

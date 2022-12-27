@@ -17,7 +17,9 @@ package com.wl4g.rengine.apiserver.admin.service.impl;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.TypeConverts.safeLongToInt;
-import static java.lang.String.format;
+import static com.wl4g.rengine.apiserver.mongo.QueryHolder.andCriteria;
+import static com.wl4g.rengine.apiserver.mongo.QueryHolder.baseCriteria;
+import static com.wl4g.rengine.apiserver.mongo.QueryHolder.isCriteria;
 import static java.util.Objects.isNull;
 
 import java.util.Collections;
@@ -34,15 +36,15 @@ import org.springframework.stereotype.Service;
 
 import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
-import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
-import com.wl4g.rengine.common.entity.Scenes;
-import com.wl4g.rengine.common.util.IdGenUtil;
 import com.wl4g.rengine.apiserver.admin.model.DeleteScenes;
 import com.wl4g.rengine.apiserver.admin.model.DeleteScenesResult;
 import com.wl4g.rengine.apiserver.admin.model.QueryScenes;
 import com.wl4g.rengine.apiserver.admin.model.SaveScenes;
 import com.wl4g.rengine.apiserver.admin.model.SaveScenesResult;
 import com.wl4g.rengine.apiserver.admin.service.ScenesService;
+import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
+import com.wl4g.rengine.common.entity.Scenes;
+import com.wl4g.rengine.common.util.IdGenUtil;
 
 /**
  * {@link ScenesServiceImpl}
@@ -58,11 +60,7 @@ public class ScenesServiceImpl implements ScenesService {
 
     @Override
     public PageHolder<Scenes> query(QueryScenes model) {
-        Query query = new Query(new Criteria().andOperator(Criteria.where("enable").is(1), Criteria.where("delFlag").is(0),
-                new Criteria().orOperator(Criteria.where("_id").is(model.getScenesId()),
-                        Criteria.where("name").regex(format("(%s)+", model.getName())),
-                        Criteria.where("enable").is(model.getEnable()), Criteria.where("orgCode").is(model.getOrgCode()),
-                        Criteria.where("labels").in(model.getLabels()))));
+        Query query = new Query(andCriteria(baseCriteria(model), isCriteria("_id", model.getScenesId())));
 
         query.with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
 

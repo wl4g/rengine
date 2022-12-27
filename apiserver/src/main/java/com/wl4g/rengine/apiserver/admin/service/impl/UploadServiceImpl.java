@@ -17,6 +17,9 @@ package com.wl4g.rengine.apiserver.admin.service.impl;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.TypeConverts.safeLongToInt;
+import static com.wl4g.rengine.apiserver.mongo.QueryHolder.andCriteria;
+import static com.wl4g.rengine.apiserver.mongo.QueryHolder.baseCriteria;
+import static com.wl4g.rengine.apiserver.mongo.QueryHolder.isCriteria;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toList;
@@ -37,14 +40,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import com.mongodb.client.result.DeleteResult;
-import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.infra.common.bean.page.PageHolder;
-import com.wl4g.rengine.common.constants.RengineConstants;
-import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
-import com.wl4g.rengine.common.entity.UploadObject;
-import com.wl4g.rengine.common.entity.UploadObject.UploadType;
-import com.wl4g.rengine.common.util.IdGenUtil;
-import com.wl4g.rengine.common.validation.ValidForEntityMarker;
 import com.wl4g.rengine.apiserver.admin.model.DeleteUpload;
 import com.wl4g.rengine.apiserver.admin.model.DeleteUploadResult;
 import com.wl4g.rengine.apiserver.admin.model.QueryUpload;
@@ -53,6 +49,12 @@ import com.wl4g.rengine.apiserver.admin.model.SaveUploadResult;
 import com.wl4g.rengine.apiserver.admin.service.UploadService;
 import com.wl4g.rengine.apiserver.minio.MinioClientManager;
 import com.wl4g.rengine.apiserver.minio.MinioClientProperties;
+import com.wl4g.rengine.common.constants.RengineConstants;
+import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
+import com.wl4g.rengine.common.entity.UploadObject;
+import com.wl4g.rengine.common.entity.UploadObject.UploadType;
+import com.wl4g.rengine.common.util.IdGenUtil;
+import com.wl4g.rengine.common.validation.ValidForEntityMarker;
 
 import io.minio.credentials.Credentials;
 
@@ -73,13 +75,8 @@ public class UploadServiceImpl implements UploadService {
 
     @Override
     public PageHolder<UploadObject> query(QueryUpload model) {
-        Query query = new Query(new Criteria().andOperator(Criteria.where("enable").is(BaseBean.ENABLED),
-                Criteria.where("delFlag").is(BaseBean.DEL_FLAG_NORMAL),
-                new Criteria().orOperator(Criteria.where("_id").is(model.getUploadId()),
-                        Criteria.where("scenesId").is(model.getScenesId()),
-                        Criteria.where("name").regex(format("(%s)+", model.getName())),
-                        Criteria.where("enable").is(model.getEnable()), Criteria.where("orgCode").is(model.getOrgCode()),
-                        Criteria.where("labels").in(model.getLabels()), Criteria.where("UploadType").is(model.getUploadType()))));
+        Query query = new Query(andCriteria(baseCriteria(model), isCriteria("_id", model.getUploadId()),
+                isCriteria("uploadType", model.getUploadType())));
 
         query.with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
 

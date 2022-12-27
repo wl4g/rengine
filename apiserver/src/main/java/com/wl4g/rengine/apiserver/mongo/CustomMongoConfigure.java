@@ -20,6 +20,7 @@ import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 //import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions.MongoConverterConfigurationAdapter;
 
+import com.wl4g.rengine.common.entity.DataSourceProperties;
 import com.wl4g.rengine.common.entity.WorkflowGraph;
 import com.wl4g.rengine.common.util.BsonUtils2;
 
@@ -73,7 +74,8 @@ public class CustomMongoConfigure extends AbstractMongoClientConfiguration {
     protected void configureConverters(MongoConverterConfigurationAdapter adapter) {
         adapter.registerConverter(new WorkflowGraphToDocumentConverter());
         adapter.registerConverter(new DocumentToWorkflowGraphConverter());
-
+        adapter.registerConverter(new DataSourcePropertiesToDocumentConverter());
+        adapter.registerConverter(new DocumentToDataSourcePropertiesConverter());
     }
 
     @WritingConverter
@@ -89,6 +91,22 @@ public class CustomMongoConfigure extends AbstractMongoClientConfiguration {
         @Override
         public WorkflowGraph convert(Document source) {
             return parseJSON(source.toJson(BsonUtils2.DEFAULT_JSON_WRITER_SETTINGS), WorkflowGraph.class);
+        }
+    }
+
+    @WritingConverter
+    static class DataSourcePropertiesToDocumentConverter implements Converter<DataSourceProperties, Document> {
+        @Override
+        public Document convert(final DataSourceProperties source) {
+            return Document.parse(toJSONString(source));
+        }
+    }
+
+    @ReadingConverter
+    static class DocumentToDataSourcePropertiesConverter implements Converter<Document, DataSourceProperties> {
+        @Override
+        public DataSourceProperties convert(Document source) {
+            return parseJSON(source.toJson(BsonUtils2.DEFAULT_JSON_WRITER_SETTINGS), DataSourceProperties.class);
         }
     }
 

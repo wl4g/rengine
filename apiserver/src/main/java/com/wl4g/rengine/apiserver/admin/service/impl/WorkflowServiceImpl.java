@@ -16,7 +16,9 @@
 package com.wl4g.rengine.apiserver.admin.service.impl;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static java.lang.String.format;
+import static com.wl4g.rengine.apiserver.mongo.QueryHolder.andCriteria;
+import static com.wl4g.rengine.apiserver.mongo.QueryHolder.baseCriteria;
+import static com.wl4g.rengine.apiserver.mongo.QueryHolder.isCriteria;
 import static java.util.Objects.isNull;
 
 import java.util.List;
@@ -31,17 +33,16 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import com.mongodb.client.result.DeleteResult;
-import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.infra.common.bean.page.PageHolder;
-import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
-import com.wl4g.rengine.common.entity.Workflow;
-import com.wl4g.rengine.common.util.IdGenUtil;
 import com.wl4g.rengine.apiserver.admin.model.DeleteWorkflow;
 import com.wl4g.rengine.apiserver.admin.model.DeleteWorkflowResult;
 import com.wl4g.rengine.apiserver.admin.model.QueryWorkflow;
 import com.wl4g.rengine.apiserver.admin.model.SaveWorkflow;
 import com.wl4g.rengine.apiserver.admin.model.SaveWorkflowResult;
 import com.wl4g.rengine.apiserver.admin.service.WorkflowService;
+import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
+import com.wl4g.rengine.common.entity.Workflow;
+import com.wl4g.rengine.common.util.IdGenUtil;
 
 /**
  * {@link WorkflowServiceImpl}
@@ -57,13 +58,8 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     public PageHolder<Workflow> query(QueryWorkflow model) {
-        Query query = new Query(new Criteria().andOperator(Criteria.where("enable").is(BaseBean.ENABLED),
-                Criteria.where("delFlag").is(BaseBean.DEL_FLAG_NORMAL),
-                new Criteria().orOperator(Criteria.where("_id").is(model.getWorkflowId()),
-                        Criteria.where("scenesId").is(model.getScenesId()),
-                        Criteria.where("name").regex(format("(%s)+", model.getName())),
-                        Criteria.where("enable").is(model.getEnable()), Criteria.where("orgCode").is(model.getOrgCode()),
-                        Criteria.where("labels").in(model.getLabels()))));
+        Query query = new Query(andCriteria(baseCriteria(model), isCriteria("_id", model.getWorkflowId()),
+                isCriteria("scenesId", model.getScenesId())));
 
         query.with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
 

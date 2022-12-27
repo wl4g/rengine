@@ -25,7 +25,7 @@ import com.wl4g.rengine.apiserver.minio.MinioClientAutoConfiguration;
 import com.wl4g.rengine.apiserver.mongo.CustomMongoConfigure;
 
 /**
- * {@link RengineManagerAutoConfiguration}
+ * {@link RengineApiServerAutoConfiguration}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -33,12 +33,12 @@ import com.wl4g.rengine.apiserver.mongo.CustomMongoConfigure;
  */
 @Configuration
 @Import({ MinioClientAutoConfiguration.class, CustomMongoConfigure.class })
-public class RengineManagerAutoConfiguration {
+public class RengineApiServerAutoConfiguration {
 
     @Bean
     @ConfigurationProperties(prefix = RengineConstants.CONF_PREFIX)
-    public RengineManagerProperties rengineManagerProperties() {
-        return new RengineManagerProperties();
+    public RengineApiServerProperties rengineApiServerProperties() {
+        return new RengineApiServerProperties();
     }
 
 }
