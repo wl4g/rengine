@@ -1,8 +1,8 @@
 # Rengine for Operation Guide
 
-- [GeoJSON updater](./docs/en/operation-geojson_updater.md)
+- [GeoJSON updater](./operation-geojson_updater.md)
 
-- [Healthy Telemetry](./docs/en/operation-geojson_updater.md)
+- [Healthy Telemetry](./operation-telemetry.md)
 
 ## FAQ
 

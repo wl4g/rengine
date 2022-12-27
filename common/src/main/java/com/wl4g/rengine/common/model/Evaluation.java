@@ -9,21 +9,26 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
  * See the License for the specific engine governing permissions and
  * limitations under the License.
  */
 package com.wl4g.rengine.common.model;
 
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import lombok.Builder.Default;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -39,10 +44,18 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @SuperBuilder
 @ToString
+@NoArgsConstructor
 public class Evaluation extends EvaluationBase {
 
     @NotBlank
-    String scenesCode;
+    String clientId;
+
+    @NotBlank
+    String clientSecret;
+
+    @NotEmpty
+    @Default
+    List<String> scenesCodes = new LinkedList<>();
 
     /**
      * That is, the maximum execution time, and the user determines the
@@ -74,9 +87,9 @@ public class Evaluation extends EvaluationBase {
      * BuyerId+UserId to execute it.
      */
     @Nullable
-    Map<String, String> args;
+    @Default
+    Map<String, Object> args = new LinkedHashMap<>(4);
 
     public static final long DEFAULT_TIMEOUT = 3_000L;
     public static final boolean DEFAULT_BESTEFFORT = false;
-
 }

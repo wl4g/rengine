@@ -18,8 +18,8 @@ package com.wl4g.rengine.job.analytic;
 import org.apache.flink.api.connector.source.Source;
 import org.apache.flink.api.connector.source.SourceSplit;
 
-import com.wl4g.rengine.job.analytic.core.hive.RengineHiveStreamingSupport;
-import com.wl4g.rengine.job.analytic.core.kafka.RengineKafkaUtil;
+import com.wl4g.rengine.job.hive.RengineHiveStreamingSupport;
+import com.wl4g.rengine.job.kafka.RengineKafkaUtil;
 
 /**
  * {@link RengineKafka2HiveStreaming}

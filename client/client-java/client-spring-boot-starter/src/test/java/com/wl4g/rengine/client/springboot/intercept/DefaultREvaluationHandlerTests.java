@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -47,12 +47,12 @@ public class DefaultREvaluationHandlerTests {
         arguments.add(2);
 
         String paramsTemplate = "{{userId=#0.userId, goodId=#0.goodId, count=#1}}";
-        Map<String, String> args = DefaultREvaluationHandler.parseParamsTemplate(arguments, defaultMethodSignature,
+        Map<String, Object> args = DefaultREvaluationHandler.parseParamsTemplate(arguments, defaultMethodSignature,
                 paramsTemplate);
         System.out.println(args);
         Assertions.assertEquals(args.get("goodId"), "G202202082139942");
         Assertions.assertEquals(args.get("userId"), "u100101");
-        Assertions.assertEquals(args.get("count"), "2");
+        Assertions.assertEquals(args.get("count"), 2);
     }
 
     @Test(expected = Throwable.class)

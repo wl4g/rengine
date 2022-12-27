@@ -1,150 +1,183 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>rengine-job</artifactId>
-	<packaging>pom</packaging>
-	<name>Rengine Job</name>
-	<url>http://rengine.wl4g.com</url>
-	<description>Rengine Jobs.</description>
-	<organization>
-	    <name>wl4g</name>
-	    <url>https://rengine.wl4g.com</url>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>rengine-job</artifactId>
+    <packaging>pom</packaging>
+    <name>Rengine Job</name>
+    <url>http://rengine.wl4g.com</url>
+    <description>Rengine Jobs.</description>
+    <organization>
+        <name>wl4g</name>
+        <url>https://rengine.wl4g.com</url>
     </organization>
     <licenses>
-      <license>
-        <name>Apache License Version 2.0</name>
-        <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        <distribution>repo</distribution>
-      </license>
+        <license>
+            <name>Apache License Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
     </licenses>
     <scm>
-      <connection>scm:git:git@github.com:wl4g/rengine.git</connection>
-      <developerConnection>scm:git:git@github.com:wl4g/rengine.git</developerConnection>
-      <url>https://github.com/wl4g/rengine</url>
-      <tag>HEAD</tag>
+        <connection>scm:git:git@github.com:wl4g/rengine.git</connection>
+        <developerConnection>scm:git:git@github.com:wl4g/rengine.git</developerConnection>
+        <url>https://github.com/wl4g/rengine</url>
+        <tag>HEAD</tag>
     </scm>
     <issueManagement>
-      <system>github</system>
-      <url>https://github.com/wl4g/rengine/issues</url>
+        <system>github</system>
+        <url>https://github.com/wl4g/rengine/issues</url>
     </issueManagement>
-	<developers>
-	  <developer>
-	    <id>James Wong</id>
-	    <name>jameswong1376</name>
-	    <email>jameswong1376@gmail.com</email>
-	    <roles>
-	      <role>owner</role>
-	      <role>maintainer</role>
-	      <role>developer</role>
-	    </roles>
-	    <timezone>+8</timezone>
-	  </developer>
-	  <developer>
-	    <id>xburnerair00</id>
-	    <name>xburnerair00</name>
-	    <email>xburnerair00@163.com</email>
-	    <roles>
-	      <role>maintainer</role>
-	      <role>developer</role>
-	    </roles>
-	    <timezone>+8</timezone>
-	  </developer>
-	</developers>
-	<parent>
-		<groupId>com.wl4g</groupId>
-		<artifactId>rengine-parent</artifactId>
-		<version>1.0.0</version>
-	</parent>
-	<modules>
-		<module>job-base</module>
-		<!--<module>job-kafka-elasticsearch</module>-->
-		<module>job-kafka-hbase</module>
-		<!--<module>job-kafka-hive</module>-->
-		<!--<module>job-pulsar-elasticsearch</module>-->
-		<module>job-pulsar-hbase</module>
-		<!--<module>job-pulsar-hive</module>-->
-		<!--<module>job-rabbitmq-elasticsearch</module>-->
-		<module>job-rabbitmq-hbase</module>
-		<!--<module>job-rabbitmq-hive</module>-->
-	</modules>
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>1.8</java.version>
-		<scala.version>2.11</scala.version>
-		<flink.version>1.14.4</flink.version>
-		<flink-shaded-jackson.version>2.12.4-14.0</flink-shaded-jackson.version>
-		<hadoop.version>2.7.2</hadoop.version>
-		<hbase.version>2.2.1</hbase.version>
-		<testcontainers.version>1.16.2</testcontainers.version>
-	</properties>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<includes>
-						<include>**/*Tests.java</include>
-					</includes>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>jar-no-fork</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<configuration>
-					<configLocation>/../tools/checkstyle/google_checks.xml</configLocation>
-				</configuration>
-				<executions>
-					<!-- Solutions to maven checkstyle errors in Eclipse: https://gitee.com/wl4g/blogs/blob/master/articles/maven.checkstyle-eclipse-error/README_CN.md -->
-					<!-- <execution> -->
-					<!-- <id>checkstyle</id> -->
-					<!-- <phase>validate</phase> -->
-					<!-- <goals> -->
-					<!-- <goal>check</goal> -->
-					<!-- </goals> -->
-					<!-- <configuration> -->
-					<!-- <failOnViolation>true</failOnViolation> -->
-					<!-- </configuration> -->
-					<!-- </execution> -->
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
-	<profiles>
-		<profile>
-			<id>release</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-deploy-plugin</artifactId>
-						<configuration>
-							<skip>true</skip>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+    <developers>
+        <developer>
+            <id>James Wong</id>
+            <name>jameswong1376</name>
+            <email>jameswong1376@gmail.com</email>
+            <roles>
+                <role>owner</role>
+                <role>maintainer</role>
+                <role>developer</role>
+            </roles>
+            <timezone>+8</timezone>
+        </developer>
+        <developer>
+            <id>xburnerair00</id>
+            <name>xburnerair00</name>
+            <email>xburnerair00@163.com</email>
+            <roles>
+                <role>maintainer</role>
+                <role>developer</role>
+            </roles>
+            <timezone>+8</timezone>
+        </developer>
+    </developers>
+    <parent>
+        <groupId>com.wl4g</groupId>
+        <artifactId>rengine-parent</artifactId>
+        <version>1.0.0</version>
+    </parent>
+    <modules>
+        <module>job-base</module>
+        <module>job-kafka-hbase</module>
+        <!--<module>job-kafka-elasticsearch</module>-->
+        <!--<module>job-kafka-hive</module>-->
+        <module>job-pulsar-hbase</module>
+        <!--<module>job-pulsar-elasticsearch</module>-->
+        <!--<module>job-pulsar-hive</module>-->
+        <module>job-rabbitmq-hbase</module>
+        <!--<module>job-rabbitmq-elasticsearch</module>-->
+        <!--<module>job-rabbitmq-hive</module>-->
+    </modules>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+        <hadoop.version>2.7.2</hadoop.version>
+        <hbase.version>2.2.1</hbase.version>
+        <!-- <hbase.version>2.1.0-cdh6.3.1</hbase.version> -->
+    </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <include>**/*Tests.java</include>
+                    </includes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <configuration>
+                    <configLocation>/../tools/checkstyle/google_checks.xml</configLocation>
+                </configuration>
+                <executions>
+                    <!-- Solutions to maven checkstyle errors in Eclipse: https://gitee.com/wl4g/blogs/blob/master/articles/maven.checkstyle-eclipse-error/README_CN.md -->
+                    <!-- <execution> -->
+                    <!-- <id>checkstyle</id> -->
+                    <!-- <phase>validate</phase> -->
+                    <!-- <goals> -->
+                    <!-- <goal>check</goal> -->
+                    <!-- </goals> -->
+                    <!-- <configuration> -->
+                    <!-- <failOnViolation>true</failOnViolation> -->
+                    <!-- </configuration> -->
+                    <!-- </execution> -->
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-deploy-plugin</artifactId>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>with-flink1.14-scala2.11</id>
+            <properties>
+                <scala.version>2.11</scala.version>
+                <flink.version>1.14.4</flink.version>
+                <flink-shaded-jackson.version>2.12.4-14.0</flink-shaded-jackson.version>
+                <flink-ml.version>1.12.7</flink-ml.version>
+                <flink-statefun.version>3.2.0</flink-statefun.version>
+                <suffix-scala.version>_${scala.version}</suffix-scala.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>with-flink1.14-scala2.12</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <scala.version>2.12</scala.version>
+                <flink.version>1.14.4</flink.version>
+                <flink-shaded-jackson.version>2.12.4-14.0</flink-shaded-jackson.version>
+                <flink-ml.version>2.0.0</flink-ml.version>
+                <flink-statefun.version>3.2.0</flink-statefun.version>
+                <suffix-scala.version>_${scala.version}</suffix-scala.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>with-flink1.15-scala2.12</id>
+            <properties>
+                <scala.version>2.12</scala.version>
+                <flink.version>1.15.2</flink.version>
+                <flink-shaded-jackson.version>2.12.4-15.0</flink-shaded-jackson.version>
+                <flink-ml.version>2.1.0</flink-ml.version>
+                <flink-statefun.version>3.2.0</flink-statefun.version>
+                <!-- Only supported 2.12, removed suffix chars. -->
+                <suffix-scala.version></suffix-scala.version>
+            </properties>
+        </profile>
+    </profiles>
 </project>

@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -44,6 +44,7 @@ import com.wl4g.rengine.eventbus.config.ClientEventBusConfig;
 import com.wl4g.rengine.eventbus.recorder.EventRecorder;
 
 import lombok.AllArgsConstructor;
+import lombok.CustomLog;
 import lombok.Getter;
 
 /**
@@ -53,8 +54,9 @@ import lombok.Getter;
  * @version 2022-05-30 v3.0.0
  * @since v1.0.0
  */
+@CustomLog
 @Getter
-public class KafkaEventBusService extends AbstractEventBusService<ProducerResult> implements Closeable {
+public class KafkaEventBusService extends AbstractEventBusService<Future<ProducerResult>> implements Closeable {
 
     private final KafkaProducer<String, String> kafkaProducer;
 
@@ -85,7 +87,7 @@ public class KafkaEventBusService extends AbstractEventBusService<ProducerResult
     }
 
     @Override
-    public List<Future<ProducerResult>> doPublish(final List<RengineEvent> events) throws IOException {
+    public List<Future<ProducerResult>> doPublish(final List<RengineEvent> events) throws Exception {
         List<Future<ProducerResult>> results = new ArrayList<>(events.size());
 
         safeList(events).parallelStream().forEach(event -> {

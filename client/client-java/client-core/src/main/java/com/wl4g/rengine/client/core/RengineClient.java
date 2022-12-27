@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -18,6 +18,7 @@ package com.wl4g.rengine.client.core;
 import static com.google.common.base.Charsets.UTF_8;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
+import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
@@ -26,13 +27,14 @@ import static java.lang.String.valueOf;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -68,52 +70,55 @@ public class RengineClient {
     private @Default OkHttpClient httpClient = new OkHttpClient().newBuilder().build();
     private @Default Function<Throwable, EvaluationResult> defaultFailback = new DefaultFailback();
 
-    public EvaluationResult evaluate(@NotBlank String scenesCode, @Nullable Map<String, String> args) {
-        return evaluate(IdGenUtil.next(), scenesCode, Evaluation.DEFAULT_TIMEOUT, Evaluation.DEFAULT_BESTEFFORT, args, null);
-    }
-
-    public EvaluationResult evaluate(@NotBlank String scenesCode, @Min(1) Long timeoutMs, @Nullable Map<String, String> args) {
-        return evaluate(IdGenUtil.next(), scenesCode, timeoutMs, Evaluation.DEFAULT_BESTEFFORT, args, null);
+    public EvaluationResult evaluate(@NotEmpty List<String> scenesCodes, @Nullable Map<String, Object> args) {
+        return evaluate(IdGenUtil.next(), scenesCodes, Evaluation.DEFAULT_TIMEOUT, Evaluation.DEFAULT_BESTEFFORT, args, null);
     }
 
     public EvaluationResult evaluate(
-            @NotNull @NotBlank String scenesCode,
+            @NotEmpty List<String> scenesCodes,
+            @Min(1) Long timeoutMs,
+            @Nullable Map<String, Object> args) {
+        return evaluate(IdGenUtil.next(), scenesCodes, timeoutMs, Evaluation.DEFAULT_BESTEFFORT, args, null);
+    }
+
+    public EvaluationResult evaluate(
+            @NotEmpty List<String> scenesCodes,
             @NotNull Boolean bestEffort,
-            @Nullable Map<String, String> args) {
-        return evaluate(IdGenUtil.next(), scenesCode, Evaluation.DEFAULT_TIMEOUT, bestEffort, args, null);
+            @Nullable Map<String, Object> args) {
+        return evaluate(IdGenUtil.next(), scenesCodes, Evaluation.DEFAULT_TIMEOUT, bestEffort, args, null);
     }
 
     public EvaluationResult evaluate(
             String requestId,
-            @NotBlank String scenesCode,
+            @NotEmpty List<String> scenesCodes,
             @NotNull Boolean bestEffort,
             @Min(1) Long timeoutMs,
-            @Nullable Map<String, String> args) {
-        return evaluate(requestId, scenesCode, timeoutMs, bestEffort, args, null);
+            @Nullable Map<String, Object> args) {
+        return evaluate(requestId, scenesCodes, timeoutMs, bestEffort, args, null);
     }
 
     public EvaluationResult evaluate(
             String requestId,
-            @NotBlank String scenesCode,
+            @NotEmpty List<String> scenesCodes,
             @NotNull @Min(1) Long timeoutMs,
             @NotNull Boolean bestEffort,
-            @Nullable Map<String, String> args) {
-        return evaluate(requestId, scenesCode, timeoutMs, bestEffort, args, null);
+            @Nullable Map<String, Object> args) {
+        return evaluate(requestId, scenesCodes, timeoutMs, bestEffort, args, null);
     }
 
     public EvaluationResult evaluate(
             String requestId,
-            @NotBlank String scenesCode,
+            @NotEmpty List<String> scenesCodes,
             @NotNull @Min(1) Long timeoutMs,
             @NotNull Boolean bestEffort,
-            @Nullable Map<String, String> args,
+            @Nullable Map<String, Object> args,
             Function<Throwable, EvaluationResult> failback) {
-        hasTextOf(scenesCode, "scenesCode");
+        notEmptyOf(scenesCodes, "scenesCodes");
         return evaluate(Evaluation.builder()
                 .requestId(valueOf(requestId))
                 .clientId(config.getClientId())
                 .clientSecret(config.getClientSecret())
-                .scenesCode(scenesCode)
+                .scenesCodes(scenesCodes)
                 .timeout(timeoutMs)
                 .bestEffort(bestEffort)
                 .args(args)
@@ -124,7 +129,7 @@ public class RengineClient {
         notNullOf(evaluation, "evaluation");
         hasTextOf(evaluation.getClientId(), "clientId");
         hasTextOf(evaluation.getClientSecret(), "clientSecret");
-        hasTextOf(evaluation.getScenesCode(), "scenesCode");
+        notEmptyOf(evaluation.getScenesCodes(), "scenesCodes");
         notNullOf(evaluation.getTimeout(), "timeout");
         isTrueOf(evaluation.getTimeout() > 0, "timeout>0");
         notNullOf(evaluation.getBestEffort(), "bestEffort");
@@ -162,7 +167,7 @@ public class RengineClient {
             if (evaluation.getBestEffort()) {
                 return defaultFailback.apply(e);
             }
-            throw new ClientEvaluationException(evaluation.getRequestId(), evaluation.getScenesCode(), evaluation.getTimeout(),
+            throw new ClientEvaluationException(evaluation.getRequestId(), evaluation.getScenesCodes(), evaluation.getTimeout(),
                     evaluation.getBestEffort(), e);
         }
 

@@ -2,8 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>rengine-client-spring-boot-starter</artifactId>
-    <name>Rengine Client SpringBoot</name>
-    <description>Rengine Client SpringBoot.</description>
+    <name>Rengine Client Spring Boot Starter</name>
+    <description>Rengine Client Spring Boot Starter.</description>
     <organization>
         <name>wl4g</name>
         <url>https://rengine.wl4g.com</url>
@@ -69,6 +69,12 @@
         <dependency>
             <groupId>com.wl4g</groupId>
             <artifactId>rengine-client-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.wl4g</groupId>
+            <artifactId>rengine-eventbus-kafka</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.wl4g</groupId>

@@ -9,13 +9,14 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 package com.wl4g.rengine.example.client.risk;
 
 import static java.lang.String.format;
+import static java.util.Collections.singletonList;
 
 import java.util.Map;
 
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Component;
 
 import com.wl4g.rengine.client.core.RengineClient;
 import com.wl4g.rengine.common.exception.RengineException;
+import com.wl4g.rengine.common.model.EvaluationResult;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,10 +42,10 @@ public class RengineRiskHandler {
 
     private @Autowired RengineClient rengineClient;
 
-    public void checkRiskFor(String scenesCode, Map<String, String> args) {
+    public void checkRiskFor(String scenesCode, Map<String, Object> args) {
         log.info("Risk checking for : {} => {}", scenesCode, args);
 
-        final var result = rengineClient.evaluate(scenesCode, true, args);
+        EvaluationResult result = rengineClient.evaluate(singletonList(scenesCode), true, args);
         log.info("Risk checked for result: {}, {} => {}", result, scenesCode, args);
 
         // Assertion risk evaluation result.

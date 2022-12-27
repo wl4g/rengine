@@ -1,0 +1,74 @@
+[
+{
+  "name":"com.wl4g.rengine.client.collector.error.LoggingJobErrorHandler",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+  ]
+},
+{
+  "name":"com.wl4g.rengine.client.collector.job.CollectJobExecutor",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+  ]
+},
+{
+  "name":"com.wl4g.rengine.client.collector.job.CollectJobExecutor$BodyConverter",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+  ]
+},
+{
+  "name":"com.wl4g.rengine.client.collector.job.PrometheusCollectJobExecutor",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+  ]
+},
+{
+  "name":"com.wl4g.rengine.client.collector.job.SimpleHttpCollectJobExecutor",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+  ]
+},
+{
+  "name":"com.wl4g.rengine.client.collector.job.SimpleJdbcCollectJobExecutor",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+  ]
+},
+{
+  "name":"com.wl4g.rengine.client.collector.job.SimpleRedisCollectJobExecutor",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+  ]
+},
+{
+  "name":"com.wl4g.rengine.client.collector.job.SimpleSSHCollectJobExecutor",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+  ]
+},
+{
+  "name":"com.wl4g.rengine.client.collector.job.SimpleTcpCollectJobExecutor",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+  ]
+}
+]

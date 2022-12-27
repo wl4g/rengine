@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -39,7 +39,7 @@ import lombok.CustomLog;
  * @since v1.0.0
  */
 @CustomLog
-public class LoggingEventBusService extends AbstractEventBusService<RengineEvent> {
+public class LoggingEventBusService extends AbstractEventBusService<Future<RengineEvent>> {
 
     public LoggingEventBusService(ClientEventBusConfig eventBusConfig, EventRecorder recorder) {
         super(eventBusConfig, recorder);

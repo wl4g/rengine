@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -76,6 +76,7 @@ public class ClientEventBusConfig {
         @ToString
         public static class CompactionConfig {
             private int threadPools = 1;
+            private int delaySeconds = 120;
         }
 
         public static enum EventRecorderProvider {
@@ -150,8 +151,21 @@ public class ClientEventBusConfig {
     @SuperBuilder
     @NoArgsConstructor
     public static class RabbitmqEventBusConfig {
-        private @Default Duration closingTimeout = Duration.ofMinutes(1);
-        private @Default Properties properties = new Properties();
+        private @Default Properties properties = new Properties() {
+            {
+                // see:com.rabbitmq.client.ConnectionFactoryConfigurator
+                // see:com.rabbitmq.client.ConnectionFactory
+                put("host", "localhost");
+                put("port", "5672");
+                put("username", "guest");
+                put("password", "guest");
+                put("virtual.host", "/");
+                put("connection.channel.max", "2047");
+                put("connection.frame.max", "0");
+                put("connection.heartbeat", "60");
+                put("use.nio", "true");
+            }
+        };
     }
 
 }

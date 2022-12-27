@@ -9,22 +9,29 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 package com.wl4g.rengine.common.entity;
 
+import static com.wl4g.infra.common.lang.Assert2.notEmpty;
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toSet;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wl4g.infra.common.bean.BaseBean;
-import com.wl4g.rengine.common.model.EvaluationEngine;
+import com.wl4g.rengine.common.entity.Rule.RuleEngine;
+import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -41,19 +48,74 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
-@ToString
+@ToString(callSuper = true)
 @NoArgsConstructor
 public class Workflow extends BaseBean {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -8038218208189261648L;
+    private @NotBlank Long scenesId;
     private @NotBlank String name;
-    private @NotNull EvaluationEngine engine;
-    private @Nullable List<Long> ruleIds;
+    private @NotNull RuleEngine engine;
 
-    //
-    // Temporary fields.
-    //
+    @Getter
+    @Setter
+    @SuperBuilder
+    @ToString
+    @NoArgsConstructor
+    public static class WorkflowWrapper extends Workflow {
+        private static final long serialVersionUID = 1L;
+        private @Nullable @Default List<WorkflowGraphWrapper> graphs = new ArrayList<>(4);
 
-    @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
-    private @Nullable transient List<Rule> rules;
+        // The latest revision(version) is the first one after the aggregation
+        // query in reverse order.
+        @JsonIgnore
+        public WorkflowGraphWrapper getEffectiveLatestGraph() {
+            validate(this);
+            return getGraphs().get(0);
+        }
+
+        public static WorkflowWrapper validate(WorkflowWrapper workflow) {
+            notEmpty(workflow.getGraphs(), "graphs");
+            for (WorkflowGraphWrapper graph : workflow.getGraphs()) {
+                WorkflowGraphWrapper.validate(graph);
+            }
+            return workflow;
+        }
+
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    @NoArgsConstructor
+    public static class WorkflowGraphWrapper extends WorkflowGraph {
+        private static final long serialVersionUID = 1L;
+        private @Nullable List<RuleWrapper> rules = new ArrayList<>(4);
+
+        public static WorkflowGraphWrapper validate(WorkflowGraphWrapper graph) {
+            notEmpty(graph.getNodes(), "graph.nodes");
+            notEmpty(graph.getConnections(), "graph.connections");
+            notEmpty(graph.getRules(), "graph.rules");
+
+            // Check for graph rules number.
+            final long expectedRuleIdNodes = graph.getNodes()
+                    .stream()
+                    .filter(n -> n instanceof RunNode)
+                    .map(n -> ((RunNode) n).getRuleId())
+                    .collect(toSet())
+                    .size();
+            final long existingRuleIdNodes = graph.getRules().size();
+            if (expectedRuleIdNodes != existingRuleIdNodes) {
+                throw new IllegalArgumentException(
+                        format("Invalid workflow graph rules configuration, expected number of rules: %s, but actual rules: %s",
+                                expectedRuleIdNodes, existingRuleIdNodes));
+            }
+
+            // Check for rule script.
+            for (RuleWrapper rule : graph.getRules()) {
+                RuleWrapper.validate(rule);
+            }
+            return graph;
+        }
+    }
 
 }

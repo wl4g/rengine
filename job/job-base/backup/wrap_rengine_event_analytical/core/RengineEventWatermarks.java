@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.job.analytic.core;
+package com.wl4g.rengine.job;
 
 import java.time.Duration;
 
@@ -23,7 +23,7 @@ import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.eventtime.WatermarksWithIdleness;
 
 import com.wl4g.rengine.common.event.RengineEvent.EventSource;
-import com.wl4g.rengine.job.analytic.core.model.RengineEventAnalytical;
+import com.wl4g.rengine.job.model.RengineEventAnalytical;
 
 /**
  * {@link RengineEventWatermarks}

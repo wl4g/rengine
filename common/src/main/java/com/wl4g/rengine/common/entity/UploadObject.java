@@ -9,12 +9,13 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 package com.wl4g.rengine.common.entity;
 
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang3.StringUtils.equalsAnyIgnoreCase;
@@ -50,7 +51,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
-@ToString
+@ToString(callSuper = true)
 @NoArgsConstructor
 public class UploadObject extends BaseBean {
     private static final long serialVersionUID = 1L;
@@ -64,12 +65,12 @@ public class UploadObject extends BaseBean {
 
     private @NotBlank String filename;
     private @NotBlank String extension;
-    private @NotNull @Min(1) Long size;
-    // private @Nullable String owner;
-    // private @NotBlank String group;
-    // private @Nullable String accessMode;
-    private @Nullable String md5sum;
-    private @Nullable String sha1sum;
+    private @NotNull @Min(0) Long size;
+    private @Nullable String owner;
+    private @Nullable String group;
+    private @Nullable String accessMode;
+    private @Nullable String md5;
+    private @Nullable String sha1;
 
     @Getter
     @AllArgsConstructor
@@ -114,7 +115,8 @@ public class UploadObject extends BaseBean {
         private final List<ExtensionType> extensions;
 
         @JsonCreator
-        public static UploadType of(String type) {
+        public static UploadType of(final @NotBlank String type) {
+            hasTextOf(type, "type");
             for (UploadType a : values()) {
                 if (a.name().equalsIgnoreCase(type)) {
                     return a;

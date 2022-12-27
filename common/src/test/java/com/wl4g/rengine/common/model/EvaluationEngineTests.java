@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -19,6 +19,8 @@ import static com.wl4g.infra.common.reflect.ReflectionUtils2.findMethodNullable;
 import static java.util.Arrays.asList;
 
 import org.junit.Test;
+
+import com.wl4g.rengine.common.entity.Rule.RuleEngine;
 
 /**
  * {@link EvaluationEngine}
@@ -32,7 +34,7 @@ public class EvaluationEngineTests {
     @SuppressWarnings("rawtypes")
     @Test
     public void testReflectGetEnumNameMethod() throws Exception {
-        Class<?> cls = EvaluationEngine.class;
+        Class<?> cls = RuleEngine.class;
 
         System.out.println(findMethodNullable(cls, "name"));
         System.out.println(cls.getMethod("name"));

@@ -9,28 +9,36 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 package com.wl4g.rengine.eventbus;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+import static java.lang.String.format;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonList;
 import static java.util.Objects.nonNull;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
+import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
 import com.wl4g.rengine.common.event.RengineEvent;
 import com.wl4g.rengine.eventbus.RabbitmqEventBusService.ProducerResult;
 import com.wl4g.rengine.eventbus.config.ClientEventBusConfig;
 import com.wl4g.rengine.eventbus.recorder.EventRecorder;
 
 import lombok.AllArgsConstructor;
+import lombok.CustomLog;
 import lombok.Getter;
 
 /**
@@ -40,113 +48,64 @@ import lombok.Getter;
  * @version 2022-05-30 v3.0.0
  * @since v1.0.0
  */
+@CustomLog
 @Getter
 public class RabbitmqEventBusService extends AbstractEventBusService<ProducerResult> implements Closeable {
 
-    // TODO
-    // private final RabbitmqProducer<String, String> pulsarProducer;
+    private final ClientEventBusConfig eventBusConfig;
+    private final ConnectionFactory factory;
 
     public RabbitmqEventBusService(ClientEventBusConfig eventBusConfig, EventRecorder recorder) {
         super(eventBusConfig, recorder);
-        // TODO
-        // this.pulsarProducer = new
-        // RabbitmqProducer<>(eventBusConfig.getRabbitmq().getProperties());
+        this.eventBusConfig = notNullOf(eventBusConfig, "eventBusConfig");
+        this.factory = new ConnectionFactory();
+        this.factory.load(eventBusConfig.getRabbitmq().getProperties(), "");
     }
 
     @Override
     public Object getOriginal() {
-        // TODO
-        // return pulsarProducer;
-        return null;
+        return factory;
     }
 
     @Override
     public void close() throws IOException {
-        // TODO
-        // if (nonNull(pulsarProducer)) {
-        // try {
-        // pulsarProducer.close(eventBusConfig.getRabbitmq().getClosingTimeout());
-        // } catch (Exception e) {
-        // log.warn("Unable to closing pulsar producer.", e);
-        // }
-        // }
+        if (nonNull(factory)) {
+            try {
+                factory.clone();
+            } catch (Exception e) {
+                log.warn("Unable to closing rabbitmq connection factory.", e);
+            }
+        }
     }
 
     @Override
-    public List<Future<ProducerResult>> doPublish(final List<RengineEvent> events) throws IOException {
-        // TODO
-        // ProducerRecord<String, String> record = new
-        // ProducerRecord<>(eventBusConfig.getEventTopic(),
-        // toJSONString(events));
-        // log.debug("Sending : {}", record);
-        //
-        // List<Future<ProducerResult>> results = new
-        // ArrayList<>(events.size());
-        // safeList(events).parallelStream().forEach(event -> {
-        // Future<RecordMetadata> future = pulsarProducer.send(record,
-        // (metadata, exception) -> {
-        // if (isNull(exception)) {
-        // recorder.addCompleted(singletonList(event));
-        // }
-        // });
-        // results.add(new ProducerFuture(future, event));
-        // });
-        //
-        // return results;
-        return null;
-    }
+    public List<ProducerResult> doPublish(final List<RengineEvent> events) throws Exception {
+        try (Connection connection = factory.newConnection();) {
+            log.debug("Sending : {}", toJSONString(events));
 
-    @Getter
-    @AllArgsConstructor
-    public static class ProducerFuture implements Future<ProducerResult> {
-        // TODO
-        // private Future<RecordMetadata> future;
-        private Future<Object> future;
-        private RengineEvent event;
+            List<ProducerResult> results = new ArrayList<>(events.size());
+            safeList(events)/* .parallelStream() */.forEach(event -> {
+                try (Channel channel = connection.createChannel();) {
+                    /* Queue.DeclareOk ok = */ channel.queueDeclare(eventBusConfig.getTopic(), true, true, false, emptyMap());
+                    channel.addReturnListener(reply -> {
+                        // see:https://www.rabbitmq.com/amqp-0-9-1-reference.html#domain.reply-code
+                        if (reply.getReplyCode() == AMQP.REPLY_SUCCESS) {
+                            recorder.completed(singletonList(event));
+                        }
+                        results.add(new ProducerResult(reply, event));
+                    });
+                } catch (Exception e) {
+                    log.warn(format("Unable to send event. - %s", event), e);
+                }
+            });
 
-        @Override
-        public boolean cancel(boolean mayInterruptIfRunning) {
-            return future.cancel(mayInterruptIfRunning);
-        }
-
-        @Override
-        public boolean isCancelled() {
-            return future.isCancelled();
-        }
-
-        @Override
-        public boolean isDone() {
-            return future.isDone();
-        }
-
-        @Override
-        public ProducerResult get() throws InterruptedException, ExecutionException {
-            // TODO
-            // RecordMetadata recordMetadata = future.get();
-            Object recordMetadata = future.get();
-            if (nonNull(recordMetadata)) {
-                return new ProducerResult(recordMetadata, event);
-            }
-            return null;
-        }
-
-        @Override
-        public ProducerResult get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-            // TODO
-            // RecordMetadata recordMetadata = future.get(timeout, unit);
-            Object recordMetadata = future.get(timeout, unit);
-            if (nonNull(recordMetadata)) {
-                return new ProducerResult(recordMetadata, event);
-            }
-            return null;
+            return results;
         }
     }
 
     @Getter
     @AllArgsConstructor
     public static class ProducerResult {
-        // TODO
-        // private RecordMetadata recordMetadata;
         private Object recordMetadata;
         private RengineEvent event;
     }

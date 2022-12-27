@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -17,17 +17,21 @@ package com.wl4g.rengine.eventbus;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.lang.String.format;
+import static java.util.Collections.singletonList;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
-import com.wl4g.infra.common.log.SmartLogger;
-import com.wl4g.infra.common.log.SmartLoggerFactory;
+import com.wl4g.infra.common.task.GenericTaskRunner;
+import com.wl4g.infra.common.task.RunnerProperties;
+import com.wl4g.infra.common.task.RunnerProperties.StartupMode;
 import com.wl4g.rengine.common.event.RengineEvent;
 import com.wl4g.rengine.eventbus.config.ClientEventBusConfig;
 import com.wl4g.rengine.eventbus.recorder.EventRecorder;
 
+import lombok.CustomLog;
 import lombok.Getter;
 
 /**
@@ -37,29 +41,42 @@ import lombok.Getter;
  * @version 2022-05-30 v3.0.0
  * @since v1.0.0
  */
+@CustomLog
 @Getter
-public abstract class AbstractEventBusService<R> implements RengineEventBusService<R> {
-    protected final SmartLogger log = SmartLoggerFactory.getLogger(getClass());
-
+public abstract class AbstractEventBusService<R> implements RengineEventBusService<R>, Closeable {
     protected final ClientEventBusConfig config;
     protected final EventRecorder recorder;
+    protected final GenericTaskRunner<RunnerProperties> compactScheduler;
 
     public AbstractEventBusService(ClientEventBusConfig config, EventRecorder recorder) {
-        this.config = notNullOf(config, "config");
+        this.config = notNullOf(config, "properties");
         this.recorder = notNullOf(recorder, "recorder");
+        this.compactScheduler = new GenericTaskRunner<RunnerProperties>(new RunnerProperties(StartupMode.ASYNC, 1)) {
+        };
+        this.compactScheduler.start();
+
+        // Timing scheduling execution.
+        this.compactScheduler.getWorker()
+                .schedule(() -> recorder.compact(event -> doPublish(singletonList(event))),
+                        config.getRecorder().getCompaction().getDelaySeconds(), TimeUnit.SECONDS);
     }
 
     @Override
-    public List<Future<R>> publish(List<RengineEvent> events) {
+    public void close() throws IOException {
+        this.compactScheduler.close();
+    }
+
+    @Override
+    public List<R> publishs(List<RengineEvent> events) {
         try {
             recorder.padding(events);
             return doPublish(events);
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error(format("Unable to publish events. - %s", events), e);
             return null;
         }
     }
 
-    protected abstract List<Future<R>> doPublish(List<RengineEvent> events) throws IOException;
+    protected abstract List<R> doPublish(List<RengineEvent> events) throws Exception;
 
 }

@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -25,6 +25,7 @@ import static com.wl4g.infra.common.lang.ClassUtils2.getMethod;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.invokeMethod;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.contains;
@@ -86,14 +87,15 @@ public class DefaultREvaluationHandler implements REvaluationHandler<REvaluation
 
         final String requestId = IdGenUtil.next();
         final Function<Throwable, EvaluationResult> failback = getFailback(failbackClazz);
-        final Map<String, String> args = buildEvaluateParams(jp, annotation, paramsTemplate);
+        final Map<String, Object> args = buildEvaluateParams(jp, annotation, paramsTemplate);
 
-        final EvaluationResult result = rengineClient.evaluate(requestId, scenesCode, timeoutMs, bestEffort, args, failback);
+        final EvaluationResult result = rengineClient.evaluate(requestId, singletonList(scenesCode), timeoutMs, bestEffort, args,
+                failback);
         log.debug("Evaluated of result: {}, {} => {}", result, scenesCode, args);
 
         // Assertion evaluation result.
         if (result.getErrorCount() > 0) {
-            throw new ClientEvaluationException(requestId, scenesCode, timeoutMs, bestEffort,
+            throw new ClientEvaluationException(requestId, singletonList(scenesCode), timeoutMs, bestEffort,
                     format("Unable to operation, detected risk in your environment."));
         }
 
@@ -119,7 +121,7 @@ public class DefaultREvaluationHandler implements REvaluationHandler<REvaluation
         return failback;
     }
 
-    protected Map<String, String> buildEvaluateParams(ProceedingJoinPoint jp, REvaluation annotation, String paramsTemplate) {
+    protected Map<String, Object> buildEvaluateParams(ProceedingJoinPoint jp, REvaluation annotation, String paramsTemplate) {
         return parseParamsTemplate(safeArrayToList(jp.getArgs()), (MethodSignature) jp.getSignature(), paramsTemplate);
     }
 
@@ -149,7 +151,7 @@ public class DefaultREvaluationHandler implements REvaluationHandler<REvaluation
      * @param paramsTemplate
      * @return
      */
-    public static Map<String, String> parseParamsTemplate(
+    public static Map<String, Object> parseParamsTemplate(
             @NotNull List<Object> arguments,
             @NotNull MethodSignature signature,
             @NotBlank String paramsTemplate) {
@@ -167,7 +169,7 @@ public class DefaultREvaluationHandler implements REvaluationHandler<REvaluation
         paramsTemplate = paramsTemplate.substring(2, paramsTemplate.length() - 2);
 
         // Parse template parameters.
-        final Map<String, String> args = new LinkedHashMap<>(arguments.size());
+        final Map<String, Object> args = new LinkedHashMap<>(arguments.size());
         for (String param : split(paramsTemplate, ",")) {
             final String[] keyValueParts = split(param, "=");
             isTrue(keyValueParts.length == 2, "Synatax error, the parameters template parts of %s", asList(keyValueParts));
@@ -189,10 +191,10 @@ public class DefaultREvaluationHandler implements REvaluationHandler<REvaluation
         }
 
         // Setup actual parameter values.
-        final Iterator<Entry<String, String>> it = args.entrySet().iterator();
+        final Iterator<Entry<String, Object>> it = args.entrySet().iterator();
         while (it.hasNext()) {
-            Entry<String, String> entry = it.next();
-            final String indexExpr = entry.getValue();
+            Entry<String, Object> entry = it.next();
+            final String indexExpr = (String) entry.getValue();
             if (contains(indexExpr, ".")) {
                 final String[] indexExprParts = split(indexExpr, ".");
                 isTrue(indexExprParts.length == 2, "Synatax error, the parameters template parts of %s", asList(indexExprParts));
@@ -212,7 +214,7 @@ public class DefaultREvaluationHandler implements REvaluationHandler<REvaluation
             } else {
                 final int paramIndex = Integer.parseInt(indexExpr);
                 final Object paramValue = arguments.get(paramIndex);
-                entry.setValue(isNull(paramValue) ? "" : paramValue.toString());
+                entry.setValue(paramValue);
             }
         }
 

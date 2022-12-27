@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -43,6 +43,7 @@ import com.wl4g.rengine.eventbus.config.ClientEventBusConfig.PulsarEventBusConfi
 import com.wl4g.rengine.eventbus.recorder.EventRecorder;
 
 import lombok.AllArgsConstructor;
+import lombok.CustomLog;
 import lombok.Getter;
 
 /**
@@ -55,8 +56,9 @@ import lombok.Getter;
  * @see https://github.com/wl4g-collect/Pulsar-analysis/blob/master/pulsar-client.md
  * @see 待发送队列源码分析:https://github1s.com/apache/pulsar/blob/branch-2.11/pulsar-client/src/main/java/org/apache/pulsar/client/impl/ProducerImpl.java#L1938-L1939
  */
+@CustomLog
 @Getter
-public class PulsarEventBusService extends AbstractEventBusService<ProducerResult> implements Closeable {
+public class PulsarEventBusService extends AbstractEventBusService<Future<ProducerResult>> implements Closeable {
     private final PulsarEventBusConfig pulsarConfig;
     private final PulsarClient client;
     private final Producer<RengineEvent> producer;
@@ -157,7 +159,7 @@ public class PulsarEventBusService extends AbstractEventBusService<ProducerResul
     }
 
     @Override
-    public List<Future<ProducerResult>> doPublish(final List<RengineEvent> events) throws IOException {
+    public List<Future<ProducerResult>> doPublish(final List<RengineEvent> events) throws Exception {
         log.debug("Sending : {}", events);
 
         List<Future<ProducerResult>> results = new ArrayList<>(events.size());

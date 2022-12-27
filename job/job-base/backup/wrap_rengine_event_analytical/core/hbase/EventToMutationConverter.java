@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.job.analytic.core.hbase;
+package com.wl4g.rengine.job.hbase;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
@@ -33,7 +33,7 @@ import org.apache.hadoop.hbase.client.Put;
 
 import com.wl4g.rengine.common.event.RengineEvent;
 import com.wl4g.rengine.common.event.RengineEvent.EventSource;
-import com.wl4g.rengine.job.analytic.core.model.RengineEventAnalytical;
+import com.wl4g.rengine.job.model.RengineEventAnalytical;
 
 /**
  * {@link EventToMutationConverter}

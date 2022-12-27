@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -34,6 +34,8 @@ import com.wl4g.rengine.client.springboot.intercept.REvaluationAdvice;
 import com.wl4g.rengine.client.springboot.intercept.REvaluationHandler;
 import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.common.model.EvaluationResult;
+
+import okhttp3.OkHttpClient;
 
 /**
  * {@link RengineClientAutoConfiguration}
@@ -61,7 +63,8 @@ public class RengineClientAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public RengineClient rengineClient(ClientCoreProperties config, Function<Throwable, EvaluationResult> defaultFailback) {
-        return RengineClient.builder().config(config).defaultFailback(defaultFailback).build();
+        final OkHttpClient httpClient = config.getOkHttpClient().newOkHttpClient();
+        return RengineClient.builder().config(config).httpClient(httpClient).defaultFailback(defaultFailback).build();
     }
 
     @Bean

@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -32,6 +32,8 @@ import com.wl4g.rengine.common.model.EvaluationResult;
 import com.wl4g.rengine.common.model.EvaluationResult.ResultDescription;
 import com.wl4g.rengine.common.util.IdGenUtil;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * {@link RengineClientTests}
  * 
@@ -39,6 +41,7 @@ import com.wl4g.rengine.common.util.IdGenUtil;
  * @version 2022-10-17
  * @since v3.0.0
  */
+@Slf4j
 public class RengineClientTests {
 
     ClientConfig invalidClientConfig = ClientConfig.builder()
@@ -49,22 +52,21 @@ public class RengineClientTests {
 
     EvaluationResult defaultFailbackResult = EvaluationResult.builder()
             .errorCount(2)
-            .results(singletonList(ResultDescription.builder().node("wf10010:03").build()))
+            .results(singletonList(ResultDescription.builder().scenesCode("s1001001").build()))
             .build();
 
     RengineClient defaultClient;
 
     @Before
     public void setupDefault() {
-        defaultClient = RengineClient.builder()
+        this.defaultClient = RengineClient.builder()
                 .config(ClientConfig.builder()
                         .endpoint(URI.create("http://localhost:28002"))
                         .clientId("iot-mqttcollector01")
                         .clientSecret("abcdefghijklmnopqrstuvwxyz")
                         .build())
                 .defaultFailback(e -> {
-                    System.err.println("Failed to evaluation of reason: ");
-                    e.printStackTrace();
+                    log.error("Failed to evaluation of reason: ", e.getMessage());
                     return null;
                 })
                 .build();
@@ -72,8 +74,8 @@ public class RengineClientTests {
 
     @Test
     public void testNewRengineClientEvaluationWithDefault() {
-        Map<String, String> args = new HashMap<>();
-        final var result = defaultClient.evaluate("iot_temp_warn", args);
+        Map<String, Object> args = new HashMap<>();
+        final EvaluationResult result = defaultClient.evaluate(singletonList("ecommerce_trade_gift"), args);
         System.out.println("Evaluation result: " + result);
     }
 
@@ -84,7 +86,8 @@ public class RengineClientTests {
             return defaultFailbackResult;
         }).build();
 
-        final var result = timeoutClient.evaluate(IdGenUtil.next(), "iot_temp_warn", 1000L, false, emptyMap());
+        final EvaluationResult result = timeoutClient.evaluate(IdGenUtil.next(), singletonList("ecommerce_trade_gift"), 1000L,
+                false, emptyMap());
         System.out.println("Evaluated result: " + result);
     }
 
@@ -95,7 +98,8 @@ public class RengineClientTests {
             return defaultFailbackResult;
         }).build();
 
-        final var result = timeoutClient.evaluate(IdGenUtil.next(), "iot_temp_warn", 1000L, true, emptyMap());
+        final var result = timeoutClient.evaluate(IdGenUtil.next(), singletonList("ecommerce_trade_gift"), 1000L, true,
+                emptyMap());
         System.out.println("Evaluated result: " + result);
         Assertions.assertEquals(defaultFailbackResult, result);
     }

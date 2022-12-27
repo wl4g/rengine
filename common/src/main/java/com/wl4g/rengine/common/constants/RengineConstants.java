@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -56,17 +56,24 @@ public abstract class RengineConstants extends EnvironmentUtil {
     @AllArgsConstructor
     public static enum MongoCollectionDefinition {
 
-        SCENESES("sceneses", true),
+        SCENESES("t_sceneses", true),
 
-        WORKFLOWS("workflows", true),
+        WORKFLOWS("t_workflows", true),
 
-        RULES("rules", true),
+        WORKFLOW_GRAPHS("t_workflow_graphs", true),
 
-        UPLOADS("uploads", true),
+        RULES("t_rules", true),
 
-        JOBS("jobs", true),
+        RULE_SCRIPTS("t_rule_scripts", true),
 
-        AGGREGATES("aggregates", true),
+        UPLOADS("t_uploads", true),
+
+        DATASOURCES("t_datasources", true),
+
+        @Deprecated
+        JOBS("t_jobs", true),
+
+        AGGREGATES("t_aggregates", true),
 
         SYS_NOTIFICATION_CONFIG("sys_notification_config", true),
 

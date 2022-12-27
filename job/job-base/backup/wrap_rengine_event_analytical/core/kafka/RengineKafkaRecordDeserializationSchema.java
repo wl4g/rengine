@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.job.analytic.core.kafka;
+package com.wl4g.rengine.job.kafka;
 
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static java.util.Objects.isNull;
@@ -28,7 +28,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
-import com.wl4g.rengine.job.analytic.core.model.RengineEventAnalytical;
+import com.wl4g.rengine.job.model.RengineEventAnalytical;
 
 import lombok.Getter;
 

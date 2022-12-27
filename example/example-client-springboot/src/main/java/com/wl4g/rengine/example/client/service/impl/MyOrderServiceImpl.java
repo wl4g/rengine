@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -68,7 +68,7 @@ public class MyOrderServiceImpl implements MyOrderService {
 
     @Override
     public Map<String, String> create2(CreateOrder order, Integer count) {
-        Map<String, String> args = new HashMap<>();
+        Map<String, Object> args = new HashMap<>();
         args.put("userId", order.getUserId());
         args.put("goodId", order.getGoodId());
         args.put("count", valueOf(count));
