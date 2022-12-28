@@ -27,7 +27,7 @@ import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.common.model.Evaluation;
 import com.wl4g.rengine.common.model.EvaluationResult;
-import com.wl4g.rengine.executor.rest.interceptor.CustomValid;
+import com.wl4g.rengine.executor.rest.intercept.CustomValid;
 import com.wl4g.rengine.executor.service.EvaluatorService;
 
 import io.smallrye.mutiny.Uni;

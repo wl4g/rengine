@@ -44,6 +44,9 @@ import lombok.experimental.SuperBuilder;
  */
 public class PrometheusParser {
 
+    public @HostAccess.Export PrometheusParser() {
+    }
+
     /**
      * Conversion to Prometheus(0.0.4/OpenMetrics1.0) to Event.Body JSON
      * 
@@ -69,7 +72,7 @@ public class PrometheusParser {
      * @see {@link io.prometheus.client.exporter.common.TextFormat#writeFormat()}
      * @return
      */
-    public static @HostAccess.Export String parse(String metricsString) {
+    public @HostAccess.Export String parse(String metricsString) {
         List<PrometheusMetrics> metrics = Lists.newArrayList();
 
         String[] lines = trimToEmpty(metricsString).split("\n");

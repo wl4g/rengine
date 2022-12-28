@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.executor.rest.interceptor;
+package com.wl4g.rengine.executor.rest.intercept;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
 

@@ -33,7 +33,7 @@ import lombok.CustomLog;
 @AllArgsConstructor
 public class ScriptLogger {
 
-    private final MinioManager minioManager;
+    final MinioManager minioManager;
 
     public @HostAccess.Export void trace(String format, Object... args) {
         write(1, format, args);

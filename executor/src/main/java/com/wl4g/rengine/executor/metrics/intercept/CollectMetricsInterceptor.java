@@ -1,13 +1,12 @@
-package com.wl4g.rengine.executor.execution.datasource;
-//@formatter:off
-///**
+// @formatter:off
+///*
 // * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>
 // *
 // * Licensed under the Apache License, Version 2.0 (the "License");
 // * you may not use this file except in compliance with the License.
 // * You may obtain a copy of the License at
 // *
-// * http://www.apache.org/licenses/LICENSE-2.0
+// *      http://www.apache.org/licenses/LICENSE-2.0
 // *
 // * Unless required by applicable law or agreed to in writing, software
 // * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,27 +14,27 @@ package com.wl4g.rengine.executor.execution.datasource;
 // * See the License for the specific language governing permissions and
 // * limitations under the License.
 // */
-//package com.wl4g.rengine.executor.execution.datasource;
+//package com.wl4g.rengine.executor.metrics.intercept;
 //
-//import java.util.List;
-//import java.util.Map;
-//
-//import javax.inject.Inject;
-//import javax.inject.Singleton;
-//import javax.validation.constraints.NotBlank;
-//import javax.validation.constraints.NotNull;
-//
-//import lombok.extern.slf4j.Slf4j;
+//import javax.interceptor.AroundInvoke;
+//import javax.interceptor.Interceptor;
+//import javax.interceptor.InvocationContext;
 //
 ///**
-// * {@link OpenTSDBSourceFacade}
-// *
+// * Notice: Since there is no way to dynamically inject beans into CDI, manual collection of metrics is currently used.
+// * 
 // * @author James Wong
-// * @version 2022-10-10
+// * @version 2022-12-28
 // * @since v1.0.0
 // */
-//@Getter
-//@CustomLog
-//public class OpenTSDBSourceFacade implements DataSourceFacade {
+//@CollectMetrics
+//@Interceptor
+//public class CollectMetricsInterceptor {
+//
+//    @AroundInvoke
+//    public Object intercept(InvocationContext context) throws Exception {
+//        return context.proceed();
+//    }
+//
 //}
-//@formatter:on
+// @formatter:on

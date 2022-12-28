@@ -22,7 +22,7 @@ import static com.wl4g.infra.common.lang.EnvironmentUtil.getBooleanProperty;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getIntProperty;
 import static com.wl4g.infra.common.lang.FastTimeClock.currentTimeMillis;
 import static com.wl4g.infra.common.lang.StringUtils2.getFilename;
-import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.evaluation_execute_time;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.evaluation_execution_time;
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toSet;
@@ -56,6 +56,7 @@ import com.wl4g.rengine.common.graph.ExecutionGraphContext;
 import com.wl4g.rengine.executor.execution.sdk.ScriptContext;
 import com.wl4g.rengine.executor.execution.sdk.ScriptExecutor;
 import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
+import com.wl4g.rengine.executor.metrics.ExecutorMeterService;
 import com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsTag;
 import com.wl4g.rengine.executor.minio.MinioManager.ObjectResource;
 
@@ -164,9 +165,10 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
 
             // Buried-point: execute cost-time.
             final Set<String> scriptFileNames = scripts.stream().map(s -> getFilename(s.getObjectPrefix())).collect(toSet());
-            final Timer executeTimer = meterService.timer(evaluation_execute_time.getName(), evaluation_execute_time.getHelp(),
-                    new double[] { 0.5, 0.9, 0.95 }, MetricsTag.CLIENT_ID, clientId, MetricsTag.SCENESCODE, scenesCode,
-                    MetricsTag.ENGINE, rule.getEngine().name(), MetricsTag.LIBRARY, scriptFileNames.toString());
+            final Timer executeTimer = meterService.timer(evaluation_execution_time.getName(),
+                    evaluation_execution_time.getHelp(), ExecutorMeterService.DEFAULT_PERCENTILES, MetricsTag.CLIENT_ID, clientId,
+                    MetricsTag.SCENESCODE, scenesCode, MetricsTag.ENGINE, rule.getEngine().name(), MetricsTag.LIBRARY,
+                    scriptFileNames.toString());
 
             final long begin = currentTimeMillis();
             final Value result = mainFunction.execute(scriptContext);

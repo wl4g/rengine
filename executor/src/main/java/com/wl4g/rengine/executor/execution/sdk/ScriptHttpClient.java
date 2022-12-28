@@ -15,19 +15,34 @@
  */
 package com.wl4g.rengine.executor.execution.sdk;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_client_failure;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_client_success;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_client_time;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_client_total;
 import static java.lang.String.format;
 
+import java.util.Map;
+
+import javax.annotation.Nullable;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import org.graalvm.polyglot.HostAccess;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.wl4g.infra.common.remoting.HttpEntity;
+import com.wl4g.infra.common.remoting.HttpResponseEntity;
 import com.wl4g.infra.common.remoting.RestClient;
+import com.wl4g.infra.common.remoting.standard.HttpHeaders;
+import com.wl4g.rengine.executor.metrics.MeterUtil;
 
+import io.netty.handler.codec.http.HttpMethod;
 import lombok.ToString;
 
 /**
@@ -40,7 +55,13 @@ import lombok.ToString;
 @ToString
 public class ScriptHttpClient {
 
-    private final RestClient restClient;
+    final static String METHOD_GET_FOR_TEXT = "getForText";
+    final static String METHOD_POST_FOR_TEXT = "getForText";
+    final static String METHOD_GET_FOR_JSON = "getForJson";
+    final static String METHOD_POST_FOR_JSON = "postForJson";
+    final static String METHOD_EXCHANGE = "exchange";
+
+    final RestClient restClient;
 
     public @HostAccess.Export ScriptHttpClient() {
         // Default: connectTimeout=6sec, readTimeout=60sec, maxResponseSize=2M
@@ -68,20 +89,98 @@ public class ScriptHttpClient {
         this.restClient = new RestClient(debug, connectTimeout, readTimeout, maxResponseSize);
     }
 
-    public @HostAccess.Export String getForText(String url) {
-        return restClient.getForObject(url, String.class);
+    public @HostAccess.Export String getForText(final @NotBlank String url) {
+        hasTextOf(url, "url");
+        MeterUtil.counter(execution_sdk_client_total, ScriptHttpClient.class, METHOD_GET_FOR_TEXT);
+
+        try {
+            final String result = MeterUtil.timer(execution_sdk_client_time, ScriptHttpClient.class, METHOD_GET_FOR_TEXT,
+                    () -> restClient.getForObject(url, String.class));
+
+            MeterUtil.counter(execution_sdk_client_success, ScriptHttpClient.class, METHOD_GET_FOR_TEXT);
+            return result;
+        } catch (Exception e) {
+            MeterUtil.counter(execution_sdk_client_failure, ScriptHttpClient.class, METHOD_GET_FOR_TEXT);
+            throw e;
+        }
     }
 
-    public @HostAccess.Export String postForText(String url, Object request) {
-        return restClient.postForObject(url, request, String.class);
+    public @HostAccess.Export String postForText(final @NotBlank String url, final @NotNull Object request) {
+        hasTextOf(url, "url");
+        notNullOf(request, "request");
+        MeterUtil.counter(execution_sdk_client_total, ScriptHttpClient.class, METHOD_POST_FOR_TEXT);
+
+        try {
+            final String result = MeterUtil.timer(execution_sdk_client_time, ScriptHttpClient.class, METHOD_POST_FOR_TEXT,
+                    () -> restClient.postForObject(url, request, String.class));
+
+            MeterUtil.counter(execution_sdk_client_success, ScriptHttpClient.class, METHOD_POST_FOR_TEXT);
+            return result;
+        } catch (Exception e) {
+            MeterUtil.counter(execution_sdk_client_failure, ScriptHttpClient.class, METHOD_POST_FOR_TEXT);
+            throw e;
+        }
     }
 
-    public @HostAccess.Export JsonNode getForJson(String url) {
-        return restClient.getForObject(url, JsonNode.class);
+    public @HostAccess.Export JsonNode getForJson(final @NotBlank String url) {
+        hasTextOf(url, "url");
+        MeterUtil.counter(execution_sdk_client_total, ScriptHttpClient.class, METHOD_GET_FOR_JSON);
+
+        try {
+            final JsonNode result = MeterUtil.timer(execution_sdk_client_time, ScriptHttpClient.class, METHOD_GET_FOR_JSON,
+                    () -> restClient.getForObject(url, JsonNode.class));
+
+            MeterUtil.counter(execution_sdk_client_success, ScriptHttpClient.class, METHOD_GET_FOR_JSON);
+            return result;
+        } catch (Exception e) {
+            MeterUtil.counter(execution_sdk_client_failure, ScriptHttpClient.class, METHOD_GET_FOR_JSON);
+            throw e;
+        }
     }
 
-    public @HostAccess.Export JsonNode postForJson(String url, Object request) {
-        return restClient.postForObject(url, request, JsonNode.class);
+    public @HostAccess.Export JsonNode postForJson(final @NotBlank String url, final @NotNull Object request) {
+        hasTextOf(url, "url");
+        notNullOf(request, "request");
+        MeterUtil.counter(execution_sdk_client_total, ScriptHttpClient.class, METHOD_POST_FOR_JSON);
+
+        try {
+            final JsonNode result = MeterUtil.timer(execution_sdk_client_time, ScriptHttpClient.class, METHOD_POST_FOR_JSON,
+                    () -> restClient.postForObject(url, request, JsonNode.class));
+
+            MeterUtil.counter(execution_sdk_client_success, ScriptHttpClient.class, METHOD_POST_FOR_JSON);
+            return result;
+        } catch (Exception e) {
+            MeterUtil.counter(execution_sdk_client_failure, ScriptHttpClient.class, METHOD_POST_FOR_JSON);
+            throw e;
+        }
+    }
+
+    public @HostAccess.Export HttpResponseEntity<String> exchange(
+            final @NotBlank String url,
+            final @NotBlank String method,
+            final @Nullable Object request,
+            final @NotNull Map<String, String> headers) {
+        hasTextOf(url, "url");
+        hasTextOf(method, "method");
+        // notNullOf(request, "request");
+        notNullOf(headers, "headers");
+        MeterUtil.counter(execution_sdk_client_total, ScriptHttpClient.class, METHOD_EXCHANGE);
+
+        try {
+            final HttpResponseEntity<String> result = MeterUtil.timer(execution_sdk_client_time, ScriptHttpClient.class,
+                    METHOD_EXCHANGE, () -> {
+                        final HttpHeaders httpHeaders = new HttpHeaders();
+                        safeMap(headers).forEach((key, value) -> httpHeaders.add(key, value));
+                        final HttpEntity<?> entity = new HttpEntity<>(request, httpHeaders);
+                        return restClient.exchange(url, HttpMethod.valueOf(method), entity, String.class);
+                    });
+
+            MeterUtil.counter(execution_sdk_client_success, ScriptHttpClient.class, METHOD_EXCHANGE);
+            return result;
+        } catch (Exception e) {
+            MeterUtil.counter(execution_sdk_client_failure, ScriptHttpClient.class, METHOD_EXCHANGE);
+            throw e;
+        }
     }
 
     public static final int DEFAULT_MIN_CONNECT_TIMEOUT = 100; // Default:min(100ms)

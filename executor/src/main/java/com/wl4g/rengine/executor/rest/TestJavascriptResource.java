@@ -50,9 +50,9 @@ import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.executor.execution.engine.GraalJSScriptEngine;
 import com.wl4g.rengine.executor.execution.sdk.ScriptContext;
 import com.wl4g.rengine.executor.execution.sdk.ScriptContext.ScriptParameter;
+import com.wl4g.rengine.executor.rest.intercept.CustomValid;
 import com.wl4g.rengine.executor.execution.sdk.ScriptHttpClient;
 import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
-import com.wl4g.rengine.executor.rest.interceptor.CustomValid;
 
 import io.quarkus.runtime.StartupEvent;
 import lombok.Data;

@@ -57,6 +57,7 @@ import com.wl4g.rengine.common.exception.RengineException;
 import com.wl4g.rengine.common.util.BsonUtils2;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
 import com.wl4g.rengine.executor.execution.datasource.DataSourceFacade.DataSourceFacadeBuilder;
+import com.wl4g.rengine.executor.metrics.ExecutorMeterService;
 import com.wl4g.rengine.executor.repository.MongoRepository;
 
 import io.quarkus.arc.All;
@@ -76,6 +77,10 @@ public final class GlobalDataSourceManager {
     @NotNull
     @Inject
     ExecutionConfig config;
+
+    @NotNull
+    @Inject
+    ExecutorMeterService meterService;
 
     @NotNull
     @Inject

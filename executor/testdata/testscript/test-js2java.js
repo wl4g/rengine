@@ -27,15 +27,18 @@ function process(context) {
     const sshResult = testForSshExec(context);
 
     // for case8:
-    const kafkaResult = testForKafkaPublish(context);
+    const processResult = testForProcessExec(context);
 
     // for case9:
-    //testForExecutorTasks(context);
+    const kafkaResult = testForKafkaPublish(context);
 
     // for case10:
-    testForAESEncryptions(context);
+    testForExecutorTasks(context);
 
     // for case11:
+    testForAESEncryptions(context);
+
+    // for case12:
     testForRSAEncryptions(context);
 
     return new ScriptResult(true)
@@ -45,6 +48,7 @@ function process(context) {
         .addValue("redisResult", redisResult)
         .addValue("jdbcResult", jdbcResult)
         .addValue("sshResult", sshResult)
+        .addValue("processResult", processResult)
         .addValue("kafkaResult", kafkaResult);
 }
 
@@ -61,9 +65,11 @@ function testForHttpRequest1(context) {
 
 function testForHttpRequest2(context) {
     try {
-        const httpResult2 = context.getDataService().getDefaultHttpClient().getForText("http://httpbin.org/get");
+        const requestBody = {"name":"foo"};
+        const headers = {"x-foo": "bar"};
+        const httpClient = context.getDataService().getDefaultHttpClient();
+        const httpResult2 = httpClient.exchange("http://httpbin.org/post", "POST", requestBody, headers);
         console.info("httpResult2:", httpResult2);
-        console.info("httpResult2('/headers'):", httpResult2.at("/headers"));
         return httpResult2;
     } catch(e) {
         console.error(">>>", e);
@@ -119,6 +125,18 @@ function testForSshExec(context) {
         var sshResult = sshService.execute("localhost", 22, "prometheus", "123456", "ls -al /tmp/");
         console.info("sshResult:", sshResult);
         return sshResult;
+    } catch(e) {
+        console.error(">>>", e);
+    }
+}
+
+function testForProcessExec(context) {
+    try {
+        //const sshService = new ScriptSSHClient();
+        const processService = context.getDataService().getDefaultProcessClient();
+        var processResult = processService.execute("ls -al /tmp/");
+        console.info("processResult:", processResult);
+        return processResult;
     } catch(e) {
         console.error(">>>", e);
     }

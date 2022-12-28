@@ -40,8 +40,8 @@ import lombok.ToString;
  */
 @ToString(callSuper = true)
 public class ScriptResult {
-    private Boolean state;
-    private Map<String, Object> valueMap;
+    Boolean state;
+    Map<String, Object> valueMap;
 
     public @HostAccess.Export ScriptResult() {
     }

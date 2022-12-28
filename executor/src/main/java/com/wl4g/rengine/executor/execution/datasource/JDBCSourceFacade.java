@@ -18,6 +18,10 @@ package com.wl4g.rengine.executor.execution.datasource;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.TypeConverts.safeLongToInt;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_datasource_facade_failure;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_datasource_facade_success;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_datasource_facade_total;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_datasource_facade_time;
 import static java.util.Objects.nonNull;
 
 import java.io.IOException;
@@ -40,6 +44,7 @@ import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
 import com.wl4g.rengine.common.entity.DataSourceProperties.JDBCDataSourceProperties;
 import com.wl4g.rengine.common.util.JDBCRunnerHelper;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
+import com.wl4g.rengine.executor.metrics.MeterUtil;
 
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
@@ -57,6 +62,12 @@ import lombok.Getter;
 @AllArgsConstructor
 public class JDBCSourceFacade implements DataSourceFacade {
 
+    final static String METHOD_FIND_LIST = "findList";
+    final static String METHOD_INSERT = "insert";
+    final static String METHOD_INSERT_BATCH = "insertBatch";
+    final static String METHOD_UPDATE = "update";
+    final static String METHOD_BATCH = "batch";
+
     final ExecutionConfig executionConfig;
     final String dataSourceName;
     final JDBCRunnerHelper helper;
@@ -64,48 +75,90 @@ public class JDBCSourceFacade implements DataSourceFacade {
     @Override
     public void close() throws IOException {
         if (nonNull(helper)) {
-            log.info("Closing to mysql data source for {} ...", dataSourceName);
+            log.info("Closing to jdbc data source for {} ...", dataSourceName);
             helper.close();
         }
     }
 
     public List<Map<String, Object>> findList(final @NotBlank String sql, final Object... params) throws SQLException {
         hasTextOf(sql, "sql");
-        try {
-            try (Connection conn = helper.getDataSource().getConnection();) {
-                return helper.getQueryRunner().query(conn, sql, new MapListHandler(), params);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        MeterUtil.counter(execution_datasource_facade_total, dataSourceName, DataSourceType.JDBC, METHOD_FIND_LIST);
+
+        try (Connection conn = helper.getDataSource().getConnection();) {
+            final List<Map<String, Object>> result = MeterUtil.timer(execution_datasource_facade_time, dataSourceName,
+                    DataSourceType.JDBC, METHOD_FIND_LIST,
+                    () -> helper.getQueryRunner().query(conn, sql, new MapListHandler(), params));
+
+            MeterUtil.counter(execution_datasource_facade_success, dataSourceName, DataSourceType.JDBC, METHOD_FIND_LIST);
+            return result;
+        } catch (Throwable e) {
+            MeterUtil.counter(execution_datasource_facade_failure, dataSourceName, DataSourceType.JDBC, METHOD_FIND_LIST);
             throw e;
         }
     }
 
     public Map<String, Object> insert(final @NotBlank String sql, final Object... params) throws SQLException {
         hasTextOf(sql, "sql");
+        MeterUtil.counter(execution_datasource_facade_total, dataSourceName, DataSourceType.JDBC, METHOD_INSERT);
+
         try (Connection conn = helper.getDataSource().getConnection();) {
-            return helper.getQueryRunner().insert(conn, sql, new MapHandler(), params);
+            final Map<String, Object> result = MeterUtil.timer(execution_datasource_facade_time, dataSourceName,
+                    DataSourceType.JDBC, METHOD_INSERT,
+                    () -> helper.getQueryRunner().insert(conn, sql, new MapHandler(), params));
+
+            MeterUtil.counter(execution_datasource_facade_success, dataSourceName, DataSourceType.JDBC, METHOD_INSERT);
+            return result;
+        } catch (Throwable e) {
+            MeterUtil.counter(execution_datasource_facade_failure, dataSourceName, DataSourceType.JDBC, METHOD_INSERT);
+            throw e;
         }
     }
 
     public int[] insertBatch(final @NotBlank String sql, final Object[][] params) throws SQLException {
         hasTextOf(sql, "sql");
+        MeterUtil.counter(execution_datasource_facade_total, dataSourceName, DataSourceType.JDBC, METHOD_INSERT_BATCH);
+
         try (Connection conn = helper.getDataSource().getConnection();) {
-            return helper.getQueryRunner().insertBatch(conn, sql, null, params);
+            final int[] result = MeterUtil.timer(execution_datasource_facade_time, dataSourceName, DataSourceType.JDBC,
+                    METHOD_INSERT_BATCH, () -> helper.getQueryRunner().insertBatch(conn, sql, null, params));
+
+            MeterUtil.counter(execution_datasource_facade_success, dataSourceName, DataSourceType.JDBC, METHOD_INSERT_BATCH);
+            return result;
+        } catch (Throwable e) {
+            MeterUtil.counter(execution_datasource_facade_failure, dataSourceName, DataSourceType.JDBC, METHOD_INSERT_BATCH);
+            throw e;
         }
     }
 
     public int update(final @NotBlank String sql, Object... params) throws SQLException {
         hasTextOf(sql, "sql");
+        MeterUtil.counter(execution_datasource_facade_total, dataSourceName, DataSourceType.JDBC, METHOD_UPDATE);
+
         try (Connection conn = helper.getDataSource().getConnection();) {
-            return helper.getQueryRunner().update(conn, sql, params);
+            final int result = MeterUtil.timer(execution_datasource_facade_time, dataSourceName, DataSourceType.JDBC,
+                    METHOD_UPDATE, () -> helper.getQueryRunner().update(conn, sql, params));
+
+            MeterUtil.counter(execution_datasource_facade_success, dataSourceName, DataSourceType.JDBC, METHOD_UPDATE);
+            return result;
+        } catch (Throwable e) {
+            MeterUtil.counter(execution_datasource_facade_failure, dataSourceName, DataSourceType.JDBC, METHOD_UPDATE);
+            throw e;
         }
     }
 
     public int[] batch(final @NotBlank String sql, final Object[][] params) throws SQLException {
         hasTextOf(sql, "sql");
+        MeterUtil.counter(execution_datasource_facade_total, dataSourceName, DataSourceType.JDBC, METHOD_BATCH);
+
         try (Connection conn = helper.getDataSource().getConnection();) {
-            return helper.getQueryRunner().batch(conn, sql, params);
+            final int[] result = MeterUtil.timer(execution_datasource_facade_time, dataSourceName, DataSourceType.JDBC,
+                    METHOD_BATCH, () -> helper.getQueryRunner().batch(conn, sql, params));
+
+            MeterUtil.counter(execution_datasource_facade_success, dataSourceName, DataSourceType.JDBC, METHOD_BATCH);
+            return result;
+        } catch (Throwable e) {
+            MeterUtil.counter(execution_datasource_facade_failure, dataSourceName, DataSourceType.JDBC, METHOD_BATCH);
+            throw e;
         }
     }
 
@@ -121,7 +174,7 @@ public class JDBCSourceFacade implements DataSourceFacade {
             hasTextOf(dataSourceName, "dataSourceName");
 
             final JDBCDataSourceProperties c = (JDBCDataSourceProperties) dataSourceProperties;
-            StatementConfiguration statementConfig = new StatementConfiguration(c.getFetchDirection(), c.getFetchSize(),
+            final StatementConfiguration statementConfig = new StatementConfiguration(c.getFetchDirection(), c.getFetchSize(),
                     c.getMaxFieldSize(), c.getMaxRows(), safeLongToInt(c.getQueryTimeoutMs()));
 
             final BasicDataSource bds = new BasicDataSource();
