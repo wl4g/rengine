@@ -12,7 +12,7 @@
 #
 
 spring:
-  application.name: rengine-manager
+  application.name: rengine-apiserver
   profiles:
     #include: db,minio,telemetry,swagger,arthas,security-oauth,security-static,devtool
     include: db,minio,telemetry,swagger,arthas,security-static
