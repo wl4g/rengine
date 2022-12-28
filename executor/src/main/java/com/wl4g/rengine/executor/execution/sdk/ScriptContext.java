@@ -41,24 +41,24 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @ToString
 @SuperBuilder
-public class ScriptContext implements /* Closeable, */Serializable {
+public class ScriptContext implements Serializable {
     private static final long serialVersionUID = 1106545214350173531L;
 
     //
     // Runtime context attributes.
     //
-    private final @NotBlank String id;
-    private final @NotBlank String type;
-    private final @NotNull @Default ScriptParameter parameter = ScriptParameter.builder().build();
-    private final @NotNull @Default ProxyObject attributes = ProxyObject.fromMap(new HashMap<>());
-    private final @Nullable ScriptResult lastResult;
+    final @NotBlank String id;
+    final @NotBlank String type;
+    final @NotNull @Default ScriptParameter parameter = ScriptParameter.builder().build();
+    final @NotNull @Default ProxyObject attributes = ProxyObject.fromMap(new HashMap<>());
+    final @Nullable ScriptResult lastResult;
 
     //
     // Helper attributes.
     //
-    private transient ScriptDataService dataService;
-    private transient ScriptLogger logger;
-    private transient ScriptExecutor executor;
+    transient ScriptDataService dataService;
+    transient ScriptLogger logger;
+    transient ScriptExecutor executor;
 
     public @HostAccess.Export String getId() {
         return id;

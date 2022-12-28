@@ -17,6 +17,10 @@ package com.wl4g.rengine.executor.execution.sdk;
 
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_client_failure;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_client_success;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_client_time;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_client_total;
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 
@@ -28,6 +32,7 @@ import org.graalvm.polyglot.HostAccess;
 import com.wl4g.infra.common.cli.ssh.SshHelperBase.SSHExecResult;
 import com.wl4g.infra.common.cli.ssh.SshdHelper;
 import com.wl4g.rengine.common.exception.ExecutionScriptException;
+import com.wl4g.rengine.executor.metrics.MeterUtil;
 
 import lombok.ToString;
 
@@ -40,6 +45,8 @@ import lombok.ToString;
  */
 @ToString
 public class ScriptSSHClient {
+
+    final static String METHOD_EXECUTE = "execute";
 
     public @HostAccess.Export ScriptSSHClient() {
     }
@@ -73,12 +80,18 @@ public class ScriptSSHClient {
         isTrueOf(port >= 1, "port>=1");
         hasTextOf(user, "user");
         isTrueOf(timeoutMs >= 1, "timeoutMs>=1");
+        MeterUtil.counter(execution_sdk_client_total, ScriptSSHClient.class, METHOD_EXECUTE);
+
         try {
             final char[] pemPrivateKeyChars = nonNull(pemPrivateKey) ? pemPrivateKey.toCharArray() : null;
-            return SshdHelper.getInstance()
-                    .execWaitForResponse(host, port, user, pemPrivateKeyChars, password, command, timeoutMs);
+            final SSHExecResult result = MeterUtil.timer(execution_sdk_client_time, ScriptSSHClient.class, METHOD_EXECUTE,
+                    () -> SshdHelper.getInstance()
+                            .execWaitForResponse(host, port, user, pemPrivateKeyChars, password, command, timeoutMs));
+
+            MeterUtil.counter(execution_sdk_client_success, ScriptSSHClient.class, METHOD_EXECUTE);
+            return result;
         } catch (Exception e) {
-            e.printStackTrace();
+            MeterUtil.counter(execution_sdk_client_failure, ScriptSSHClient.class, METHOD_EXECUTE);
             throw new ExecutionScriptException(
                     format("Failed to execute ssh command for equivalent : ssh -p %s %s@%s '%s'", port, user, host, command), e);
         }

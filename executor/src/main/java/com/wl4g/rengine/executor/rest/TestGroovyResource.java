@@ -38,7 +38,7 @@ import com.google.common.io.Resources;
 import com.wl4g.infra.common.lang.EnvironmentUtil;
 import com.wl4g.infra.common.runtime.JvmRuntimeTool;
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.executor.rest.interceptor.CustomValid;
+import com.wl4g.rengine.executor.rest.intercept.CustomValid;
 
 import groovy.lang.GroovyClassLoader;
 import groovy.transform.ToString;

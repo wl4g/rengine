@@ -67,6 +67,7 @@
     {"name":"postForText","parameterTypes":["java.lang.String","java.lang.Object"] }, 
     {"name":"getForJson","parameterTypes":["java.lang.String"] }, 
     {"name":"postForJson","parameterTypes":["java.lang.String","java.lang.Object"] }, 
+    {"name":"exchange","parameterTypes":["java.lang.String","java.lang.String","java.lang.Object","java.util.Map"] }, 
     {"name":"toString","parameterTypes":[] }
   ]
 },

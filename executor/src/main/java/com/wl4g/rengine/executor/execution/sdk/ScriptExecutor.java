@@ -50,8 +50,8 @@ import lombok.ToString;
 @ToString
 public class ScriptExecutor {
 
-    private final SafeScheduledTaskPoolExecutor executor;
-    private final GraalPolyglotManager graalPolyglotManager;
+    final SafeScheduledTaskPoolExecutor executor;
+    final GraalPolyglotManager graalPolyglotManager;
 
     public ScriptExecutor(@NotNull SafeScheduledTaskPoolExecutor executor, @NotNull GraalPolyglotManager graalPolyglotManager) {
         this.executor = notNullOf(executor, "executor");
