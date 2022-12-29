@@ -32,9 +32,9 @@ import org.testcontainers.containers.MongoDBContainer;
 //import org.testcontainers.utility.DockerImageName;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.wl4g.infra.common.serialize.BsonUtils2;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
-import com.wl4g.rengine.common.util.BsonUtils2;
 import com.wl4g.rengine.executor.execution.datasource.JDBCSourceFacade.JDBCSourceFacadeBuilder;
 import com.wl4g.rengine.executor.execution.datasource.KafkaSourceFacade.KafkaSourceFacadeBuilder;
 import com.wl4g.rengine.executor.execution.datasource.MongoSourceFacade.MongoSourceFacadeBuilder;

@@ -49,15 +49,17 @@ public class CustomMongoConfigureTests {
                 .updateDate(new Date())
                 .delFlag(0)
                 .build();
-        final String json = toJSONString(CustomMongoConfigure.DEFAULT_MODIFIER_MAPPER, source, CustomMongoConfigure.ID_TRANSFORM,
-                CustomMongoConfigure.IGNORE_PROPERTIES);
+        final String json = toJSONString(CustomMongoConfigure.DEFAULT_MODIFIER_MAPPER, source,
+                CustomMongoConfigure.ID_TRANSFORM_SERIALIZE, CustomMongoConfigure.IGNORE_PROPERTIES);
         System.out.println(json);
     }
 
     @Test
     public void testDeSerializeIgnoreAndTransformProperties() {
         final String json = "{\"_id\":111101001,\"orgCode\":null,\"enable\":1,\"labels\":[\"foo\"],\"remark\":null,\"createBy\":11,\"createDate\":\"2022-12-28 23:27:19\",\"updateBy\":11,\"updateDate\":\"2022-12-28 23:27:19\",\"delFlag\":0,\"name\":null,\"properties\":{\"type\":\"MONGO\",\"connectionString\":\"mongodb://localhost:27010\"}}";
-        final DataSourceProperties source = parseJSON(json, DataSourceProperties.class);
+        final DataSourceProperties source = parseJSON(CustomMongoConfigure.DEFAULT_MODIFIER_MAPPER, json,
+                DataSourceProperties.class, CustomMongoConfigure.ID_TRANSFORM_DESERIALIZE,
+                CustomMongoConfigure.IGNORE_PROPERTIES);
         System.out.println(source);
         assert source.getId() == 111101001L;
     }

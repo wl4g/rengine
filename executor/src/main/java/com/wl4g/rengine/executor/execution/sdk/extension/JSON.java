@@ -39,7 +39,7 @@ public class JSON {
             return null;
         }
         if (json.startsWith("[") && json.endsWith("]")) {
-            return parseArrayMapObject(json);
+            return parseArrayMapObject(null, json);
         }
         return parseMapObject(json);
     }
