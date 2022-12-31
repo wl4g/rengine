@@ -61,6 +61,7 @@ import com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsTag;
 import com.wl4g.rengine.executor.minio.MinioManager.ObjectResource;
 
 import io.micrometer.core.instrument.Timer;
+import io.quarkus.redis.datasource.RedisDataSource;
 import io.quarkus.runtime.StartupEvent;
 import lombok.CustomLog;
 import lombok.Getter;
@@ -79,6 +80,10 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
 
     @NotNull
     GraalPolyglotManager graalPolyglotManager;
+
+    public GraalJSScriptEngine(RedisDataSource redisDS) {
+        super(redisDS);
+    }
 
     void onStart(@Observes StartupEvent event) {
         try {

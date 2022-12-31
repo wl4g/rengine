@@ -9,25 +9,30 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.executor.execution.datasource;
+package com.wl4g.rengine.executor.metrics;
 
-import org.junit.Test;
+import org.junit.BeforeClass;
+
+import io.micrometer.prometheus.PrometheusConfig;
+import io.micrometer.prometheus.PrometheusMeterRegistry;
 
 /**
- * {@link MongoSourceFacadeTests}
+ * {@link MeterUtilTests}
  * 
  * @author James Wong
- * @version 2022-09-27
+ * @version 2022-12-31
  * @since v1.0.0
  */
-public class MongoSourceFacadeTests {
+public class MeterUtilTests {
 
-    @Test
-    public void test() {
+    @BeforeClass
+    public static void setup() {
+        MeterUtil.meterService = new ExecutorMeterService(new PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
+                "rengine-executor", 28002);
     }
 
 }

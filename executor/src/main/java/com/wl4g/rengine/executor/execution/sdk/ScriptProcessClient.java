@@ -41,9 +41,8 @@ import lombok.ToString;
  * @version 2022-09-25
  * @since v1.0.0
  */
-@ToString
+@ToString(callSuper = true)
 public class ScriptProcessClient {
-
     final static String METHOD_EXECUTE = "execute";
 
     public @HostAccess.Export ScriptProcessClient() {

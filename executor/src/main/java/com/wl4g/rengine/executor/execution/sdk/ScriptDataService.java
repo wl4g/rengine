@@ -20,8 +20,8 @@ import javax.validation.constraints.NotBlank;
 import org.graalvm.polyglot.HostAccess;
 
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
-import com.wl4g.rengine.executor.execution.datasource.DataSourceFacade;
-import com.wl4g.rengine.executor.execution.datasource.GlobalDataSourceManager;
+import com.wl4g.rengine.executor.execution.sdk.datasource.DataSourceFacade;
+import com.wl4g.rengine.executor.execution.sdk.datasource.GlobalDataSourceManager;
 
 import lombok.AllArgsConstructor;
 import lombok.ToString;
@@ -36,11 +36,11 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 public class ScriptDataService {
-
     final ScriptHttpClient defaultHttpClient;
     final ScriptSSHClient defaultSSHClient;
     final ScriptTCPClient defaultTCPClient;
     final ScriptProcessClient defaultProcessClient;
+    final ScriptRedisLockClient defaultRedisLockClient;
     final GlobalDataSourceManager globalDataSourceManager;
 
     public @HostAccess.Export ScriptHttpClient getDefaultHttpClient() {
@@ -57,6 +57,10 @@ public class ScriptDataService {
 
     public @HostAccess.Export ScriptProcessClient getDefaultProcessClient() {
         return defaultProcessClient;
+    }
+
+    public @HostAccess.Export ScriptRedisLockClient getDefaultRedisLockClient() {
+        return defaultRedisLockClient;
     }
 
     public @HostAccess.Export DataSourceFacade getMongoService(final @NotBlank String dataSourceName) {

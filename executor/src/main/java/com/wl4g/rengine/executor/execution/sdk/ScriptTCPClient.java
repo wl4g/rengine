@@ -46,7 +46,6 @@ import lombok.ToString;
  */
 @ToString
 public class ScriptTCPClient {
-
     final static String METHOD_EXECUTE = "execute";
 
     public @HostAccess.Export ScriptTCPClient() {

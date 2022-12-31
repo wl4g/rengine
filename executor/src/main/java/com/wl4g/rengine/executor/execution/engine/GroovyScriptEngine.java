@@ -24,6 +24,8 @@
 //import javax.inject.Singleton;
 //import javax.validation.constraints.NotNull;
 //
+//import io.quarkus.redis.datasource.RedisDataSource;
+//
 //import com.wl4g.infra.common.lang.StringUtils2;
 //import com.wl4g.rengine.common.entity.Scenes;
 //import com.wl4g.rengine.common.entity.UploadObject.UploadType;
@@ -52,6 +54,10 @@
 //
 //    @NotNull
 //    GroovyClassLoader gcl;
+//
+//    public GroovyScriptEngine(RedisDataSource redisDS) {
+//        super(redisDS);
+//    }
 //
 //    void onStart(@Observes StartupEvent ev) {
 //        try {

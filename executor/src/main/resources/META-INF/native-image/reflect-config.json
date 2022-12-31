@@ -80,7 +80,8 @@
     {"name":"<init>","parameterTypes":[] }, 
     {"name":"execute","parameterTypes":["java.lang.String","java.lang.String","java.lang.String","java.lang.String"] }, 
     {"name":"execute","parameterTypes":["java.lang.String","int","java.lang.String","java.lang.String","java.lang.String"] }, 
-    {"name":"execute","parameterTypes":["java.lang.String","int","java.lang.String","java.lang.String","java.lang.String","java.lang.String","long"] }
+    {"name":"execute","parameterTypes":["java.lang.String","int","java.lang.String","java.lang.String","java.lang.String","java.lang.String","long"] },
+    {"name":"toString","parameterTypes":[] }
   ]
 },
 {
@@ -91,7 +92,21 @@
   "methods":[
     {"name":"<init>","parameterTypes":[] }, 
     {"name":"execute","parameterTypes":["java.lang.String"] }, 
-    {"name":"execute","parameterTypes":["java.lang.String","long"] }
+    {"name":"execute","parameterTypes":["java.lang.String","long"] }, 
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.executor.execution.sdk.ScriptRedisLockClient",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":["com.wl4g.rengine.executor.execution.sdk.datasource.RedisSourceFacade"] }, 
+    {"name":"<init>","parameterTypes":["io.quarkus.redis.datasource.RedisDataSource"] }, 
+    {"name":"getLock","parameterTypes":["java.lang.String"] }, 
+    {"name":"getLock","parameterTypes":["java.lang.String","long"] },
+    {"name":"toString","parameterTypes":[] }
   ]
 },
 {
@@ -102,7 +117,8 @@
   "methods":[
     {"name":"<init>","parameterTypes":[] }, 
     {"name":"execute","parameterTypes":["java.lang.String","int","java.lang.String"] }, 
-    {"name":"execute","parameterTypes":["java.lang.String","int","java.lang.String","long"] }
+    {"name":"execute","parameterTypes":["java.lang.String","int","java.lang.String","long"] },
+    {"name":"toString","parameterTypes":[] }
   ]
 },
 {
@@ -132,9 +148,10 @@
     {"name":"getDefaultSSHClient","parameterTypes":[] }, 
     {"name":"getDefaultTCPClient","parameterTypes":[] }, 
     {"name":"getDefaultProcessClient","parameterTypes":[] }, 
+    {"name":"getDefaultRedisLockClient","parameterTypes":[] }, 
     {"name":"getMongoService","parameterTypes":["java.lang.String"] }, 
-    {"name":"getJDBCService","parameterTypes":["java.lang.String"] }, 
     {"name":"getRedisService","parameterTypes":["java.lang.String"] }, 
+    {"name":"getJDBCService","parameterTypes":["java.lang.String"] }, 
     {"name":"getKafkaService","parameterTypes":["java.lang.String"] }, 
     {"name":"getPhoenixService","parameterTypes":["java.lang.String"] }, 
     {"name":"getOpentTSDBService","parameterTypes":["java.lang.String"] }

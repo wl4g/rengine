@@ -13,25 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g;
-
-import com.wl4g.elasticjob.example.zookeeper.EmbedZookeeperServer;
 
 /**
- * {@link RengineCollectorTests}
- * 
- * @author James Wong
- * @version 2022-10-16
- * @since v1.0.0
+ * Operation facades for specific data sources.
  */
-public class RengineCollectorTests {
-
-    static {
-        EmbedZookeeperServer.start(21811);
-    }
-
-    public static void main(String[] args) {
-        RengineScheduler.main(args);
-    }
-
-}
+package com.wl4g.rengine.executor.execution.sdk.datasource;

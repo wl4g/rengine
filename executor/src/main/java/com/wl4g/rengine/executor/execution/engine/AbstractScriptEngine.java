@@ -41,14 +41,15 @@ import com.wl4g.rengine.common.graph.ExecutionGraphContext;
 import com.wl4g.rengine.common.graph.ExecutionGraphParameter;
 import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
-import com.wl4g.rengine.executor.execution.datasource.GlobalDataSourceManager;
 import com.wl4g.rengine.executor.execution.sdk.ScriptContext;
 import com.wl4g.rengine.executor.execution.sdk.ScriptContext.ScriptParameter;
+import com.wl4g.rengine.executor.execution.sdk.datasource.GlobalDataSourceManager;
 import com.wl4g.rengine.executor.execution.sdk.ScriptDataService;
 import com.wl4g.rengine.executor.execution.sdk.ScriptExecutor;
 import com.wl4g.rengine.executor.execution.sdk.ScriptHttpClient;
 import com.wl4g.rengine.executor.execution.sdk.ScriptLogger;
 import com.wl4g.rengine.executor.execution.sdk.ScriptProcessClient;
+import com.wl4g.rengine.executor.execution.sdk.ScriptRedisLockClient;
 import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
 import com.wl4g.rengine.executor.execution.sdk.ScriptSSHClient;
 import com.wl4g.rengine.executor.execution.sdk.ScriptTCPClient;
@@ -63,6 +64,7 @@ import com.wl4g.rengine.executor.metrics.ExecutorMeterService;
 import com.wl4g.rengine.executor.minio.MinioManager;
 import com.wl4g.rengine.executor.minio.MinioManager.ObjectResource;
 
+import io.quarkus.redis.datasource.RedisDataSource;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -74,6 +76,13 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public abstract class AbstractScriptEngine implements IEngine {
+
+    final RedisDataSource redisDS;
+    final ScriptHttpClient defaultHttpClient;
+    final ScriptSSHClient defaultSSHClient;
+    final ScriptTCPClient defaultTCPClient;
+    final ScriptProcessClient defaultProcessClient;
+    final ScriptRedisLockClient defaultRedisLockClient;
 
     @Inject
     ExecutionConfig config;
@@ -89,6 +98,15 @@ public abstract class AbstractScriptEngine implements IEngine {
 
     @Inject
     GlobalExecutorManager globalExecutorManager;
+
+    public AbstractScriptEngine(RedisDataSource redisDS) {
+        this.redisDS = notNullOf(redisDS, "redisDS");
+        this.defaultHttpClient = new ScriptHttpClient();
+        this.defaultSSHClient = new ScriptSSHClient();
+        this.defaultTCPClient = new ScriptTCPClient();
+        this.defaultProcessClient = new ScriptProcessClient();
+        this.defaultRedisLockClient = new ScriptRedisLockClient(redisDS);
+    }
 
     @NotNull
     List<ObjectResource> loadScriptResources(@NotBlank String scenesCode, @NotNull RuleWrapper rule, boolean useCache) {
@@ -113,7 +131,7 @@ public abstract class AbstractScriptEngine implements IEngine {
         notNullOf(graphContext, "graphContext");
 
         final ScriptDataService dataService = new ScriptDataService(defaultHttpClient, defaultSSHClient, defaultTCPClient,
-                defaultProcessClient, globalDataSourceManager);
+                defaultProcessClient, defaultRedisLockClient, globalDataSourceManager);
         final ExecutionGraphParameter parameter = graphContext.getParameter();
         final ScriptResult lastResult = isNull(graphContext.getLastResult()) ? null
                 : new ScriptResult(ReturnState.isTrue(graphContext.getLastResult().getReturnState()),
@@ -146,13 +164,7 @@ public abstract class AbstractScriptEngine implements IEngine {
     // Notice: The handcode entrypoint function is 'process'
     public static final String DEFAULT_MAIN_FUNCTION = "process";
     public static final String DEFAULT_TMP_CACHE_ROOT_DIR = "/tmp/__rengine_script_files_caches";
-
     public static final Map<String, Class<?>> REGISTER_MEMBERS;
-
-    final ScriptHttpClient defaultHttpClient = new ScriptHttpClient();
-    final ScriptSSHClient defaultSSHClient = new ScriptSSHClient();
-    final ScriptTCPClient defaultTCPClient = new ScriptTCPClient();
-    final ScriptProcessClient defaultProcessClient = new ScriptProcessClient();
 
     static {
         final Map<String, Class<?>> bindingMembers = new HashMap<>();
@@ -161,6 +173,7 @@ public abstract class AbstractScriptEngine implements IEngine {
         bindingMembers.put(ScriptSSHClient.class.getSimpleName(), ScriptSSHClient.class);
         bindingMembers.put(ScriptTCPClient.class.getSimpleName(), ScriptTCPClient.class);
         bindingMembers.put(ScriptProcessClient.class.getSimpleName(), ScriptProcessClient.class);
+        bindingMembers.put(ScriptRedisLockClient.class.getSimpleName(), ScriptRedisLockClient.class);
         bindingMembers.put(AES.class.getSimpleName(), AES.class);
         bindingMembers.put(RSA.class.getSimpleName(), RSA.class);
         bindingMembers.put(Coding.class.getSimpleName(), Coding.class);

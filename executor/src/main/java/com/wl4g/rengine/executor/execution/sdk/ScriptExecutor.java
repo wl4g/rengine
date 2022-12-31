@@ -49,7 +49,6 @@ import lombok.ToString;
  */
 @ToString
 public class ScriptExecutor {
-
     final SafeScheduledTaskPoolExecutor executor;
     final GraalPolyglotManager graalPolyglotManager;
 

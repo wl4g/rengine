@@ -15,40 +15,44 @@ function process(context) {
     const httpResult2 = testForHttpRequest2(context);
 
     // for case4:
-    const mongoResult = testForMongoQuery(context);
+    const lockResult = testForRedisLockOperation(context);
 
     // for case5:
-    const redisResult = testForRedisOperation(context);
-
-    // for case6:
-    const jdbcResult = testForJdbcSql(context);
-
-    // for case7:
     const sshResult = testForSshExec(context);
 
-    // for case8:
+    // for case6:
     const processResult = testForProcessExec(context);
 
+    // for case7:
+    const mongoResult = testForMongoQuery(context);
+
+    // for case8:
+    const redisResult = testForRedisOperation(context);
+
     // for case9:
-    const kafkaResult = testForKafkaPublish(context);
+    const jdbcResult = testForJdbcSql(context);
 
     // for case10:
-    testForExecutorTasks(context);
+    const kafkaResult = testForKafkaPublish(context);
 
     // for case11:
-    testForAESEncryptions(context);
+    testForExecutorTasks(context);
 
     // for case12:
+    testForAESEncryptions(context);
+
+    // for case13:
     testForRSAEncryptions(context);
 
     return new ScriptResult(true)
         .addValue("httpResult1", httpResult1)
         .addValue("httpResult2", httpResult2)
+        .addValue("lockResult", lockResult)
+        .addValue("sshResult", sshResult)
+        .addValue("processResult", processResult)
         .addValue("mongoResult", mongoResult)
         .addValue("redisResult", redisResult)
         .addValue("jdbcResult", jdbcResult)
-        .addValue("sshResult", sshResult)
-        .addValue("processResult", processResult)
         .addValue("kafkaResult", kafkaResult);
 }
 
@@ -71,6 +75,47 @@ function testForHttpRequest2(context) {
         const httpResult2 = httpClient.exchange("http://httpbin.org/post", "POST", requestBody, headers);
         console.info("httpResult2:", httpResult2);
         return httpResult2;
+    } catch(e) {
+        console.error(">>>", e);
+    }
+}
+
+function testForRedisLockOperation(context) {
+    try {
+        const redisLockService = context.getDataService().getDefaultRedisLockClient();
+        console.info("redisLockService: " + redisLockService);
+        var redisLock = redisLockService.getLock("testLock");
+        if (redisLock.tryLock()) {
+            console.info("Got lock for : " + redisLock);
+        } else {
+            console.info("No got lock for : " + redisLock);
+        }
+        console.info("redisLock: " + redisLock);
+        return redisLock;
+    } catch(e) {
+        console.error(">>>", e);
+    }
+}
+
+function testForSshExec(context) {
+    try {
+        //const sshService = new ScriptSSHClient();
+        const sshService = context.getDataService().getDefaultSSHClient();
+        var sshResult = sshService.execute("localhost", 22, "prometheus", "123456", "ls -al /tmp/");
+        console.info("sshResult:", sshResult);
+        return sshResult;
+    } catch(e) {
+        console.error(">>>", e);
+    }
+}
+
+function testForProcessExec(context) {
+    try {
+        //const sshService = new ScriptSSHClient();
+        const processService = context.getDataService().getDefaultProcessClient();
+        var processResult = processService.execute("ls -al /tmp/");
+        console.info("processResult:", processResult);
+        return processResult;
     } catch(e) {
         console.error(">>>", e);
     }
@@ -113,30 +158,6 @@ function testForJdbcSql(context) {
         var jdbcResult = jdbcService.findList(sql, []);
         console.info("jdbcResult: " + jdbcResult);
         return jdbcResult;
-    } catch(e) {
-        console.error(">>>", e);
-    }
-}
-
-function testForSshExec(context) {
-    try {
-        //const sshService = new ScriptSSHClient();
-        const sshService = context.getDataService().getDefaultSSHClient();
-        var sshResult = sshService.execute("localhost", 22, "prometheus", "123456", "ls -al /tmp/");
-        console.info("sshResult:", sshResult);
-        return sshResult;
-    } catch(e) {
-        console.error(">>>", e);
-    }
-}
-
-function testForProcessExec(context) {
-    try {
-        //const sshService = new ScriptSSHClient();
-        const processService = context.getDataService().getDefaultProcessClient();
-        var processResult = processService.execute("ls -al /tmp/");
-        console.info("processResult:", processResult);
-        return processResult;
     } catch(e) {
         console.error(">>>", e);
     }

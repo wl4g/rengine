@@ -54,7 +54,6 @@ import lombok.ToString;
  */
 @ToString
 public class ScriptHttpClient {
-
     final static String METHOD_GET_FOR_TEXT = "getForText";
     final static String METHOD_POST_FOR_TEXT = "getForText";
     final static String METHOD_GET_FOR_JSON = "getForJson";
