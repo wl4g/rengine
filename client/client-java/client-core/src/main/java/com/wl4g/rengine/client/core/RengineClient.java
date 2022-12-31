@@ -139,7 +139,7 @@ public class RengineClient {
 
         final String requestBody = toJSONString(evaluation);
         final Request request = new Request.Builder().url(UriComponentsBuilder.fromUri(config.getEndpoint())
-                .path(RengineConstants.API_EVALUATOR_EVALUATE)
+                .path(RengineConstants.API_EXECUTOR_EVALUATE)
                 .build()
                 .toString()).post(FormBody.create(requestBody, MediaType.get("application/json"))).build();
         try (final Response response = httpClient.newBuilder()

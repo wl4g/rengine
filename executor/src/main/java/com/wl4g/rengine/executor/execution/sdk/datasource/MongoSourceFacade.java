@@ -210,7 +210,7 @@ public class MongoSourceFacade implements DataSourceFacade {
     }
 
     MongoCollection<Document> getCollection(MongoCollectionDefinition collection) {
-        return mongoClient.getDatabase(RengineConstants.DEF_MONGODB_DATABASE).getCollection(collection.getName());
+        return mongoClient.getDatabase(RengineConstants.DEFAULT_MONGODB_DATABASE).getCollection(collection.getName());
     }
 
     @Singleton

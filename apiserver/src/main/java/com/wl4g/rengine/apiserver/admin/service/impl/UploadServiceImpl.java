@@ -97,7 +97,7 @@ public class UploadServiceImpl implements UploadService {
         UploadType uploadType = UploadType.of(model.getUploadType());
         // The precise object prefixes to ensure the creation of STS policy
         // with precise authorized write permissions.
-        String objectPrefix = format("%s/%s/%s", RengineConstants.DEF_MINIO_BUCKET, uploadType.getPrefix(), model.getFilename());
+        String objectPrefix = format("%s/%s/%s", RengineConstants.DEFAULT_MINIO_BUCKET, uploadType.getPrefix(), model.getFilename());
         UploadObject upload = UploadObject.builder()
                 .uploadType(model.getUploadType())
                 .id(IdGenUtil.nextLong())
@@ -131,7 +131,7 @@ public class UploadServiceImpl implements UploadService {
                     .endpoint(config.getEndpoint())
                     .region(config.getRegion())
                     // .bucket(properties.getBucket())
-                    .bucket(RengineConstants.DEF_MINIO_BUCKET)
+                    .bucket(RengineConstants.DEFAULT_MINIO_BUCKET)
                     .accessKey(credentials.accessKey())
                     .secretKey(credentials.secretKey())
                     .sessionToken(credentials.sessionToken())

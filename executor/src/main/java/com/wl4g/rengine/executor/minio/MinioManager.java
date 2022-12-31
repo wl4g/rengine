@@ -19,9 +19,11 @@ import static com.google.common.base.Charsets.UTF_8;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static com.wl4g.infra.common.lang.EnvironmentUtil.getIntProperty;
 import static com.wl4g.infra.common.lang.StringUtils2.getFilename;
 import static com.wl4g.infra.common.lang.TypeConverts.safeLongToInt;
+import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_TMP_SCRIPT_CACHE_DIR;
+import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_S3_OBJECT_MAX_LIMIT;
+import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_S3_OBJECT_READ_BUFFER;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.BufferedOutputStream;
@@ -45,7 +47,6 @@ import javax.validation.constraints.NotNull;
 import com.google.common.io.Resources;
 import com.wl4g.infra.common.io.FileIOUtils;
 import com.wl4g.rengine.common.entity.UploadObject.UploadType;
-import com.wl4g.rengine.executor.execution.engine.AbstractScriptEngine;
 import com.wl4g.rengine.executor.minio.MinioConfig.IOkHttpClientConfig;
 
 import io.minio.GetObjectArgs;
@@ -128,11 +129,11 @@ public class MinioManager {
         GetObjectArgs args = GetObjectArgs.builder().bucket(config.bucket()).region(config.region()).object(objectPrefix).build();
         try (GetObjectResponse result = minioClient.getObject(args);) {
             int available = result.available();
-            isTrue(available <= OBJECT_MAX_READABLE_SIZE, "Maximum file object readable limit exceeded: %s",
-                    OBJECT_MAX_READABLE_SIZE);
+            isTrue(available <= DEFAULT_EXECUTOR_S3_OBJECT_MAX_LIMIT, "Maximum file object readable limit exceeded: %s",
+                    DEFAULT_EXECUTOR_S3_OBJECT_MAX_LIMIT);
 
             try (FileOutputStream out = new FileOutputStream(localFile, false);
-                    BufferedOutputStream bout = new BufferedOutputStream(out, OBJECT_READ_BUFFER_SIZE);) {
+                    BufferedOutputStream bout = new BufferedOutputStream(out, DEFAULT_EXECUTOR_S3_OBJECT_READ_BUFFER);) {
                 // ByteArrayOutputStream out = new ByteArrayOutputStream(4092);
                 // result.transferTo(out);
                 // out.toByteArray();
@@ -149,9 +150,10 @@ public class MinioManager {
                     .region(config.region())
                     .object(objectPrefix)
                     .build();
-            ObjectWriteResponse result = minioClient.putObject(args);
 
-            // minio 不支持追加写??? 参考 zadig 的日志写入机制?
+            // minioClient.uploadObject(UploadObjectArgs.builder().filename(null).build());
+            // UploadSnowballObjectsArgs.builder().objects(null).build();
+            ObjectWriteResponse result = minioClient.putObject(args);
 
         } catch (InvalidKeyException | ErrorResponseException | InsufficientDataException | InternalException
                 | InvalidResponseException | NoSuchAlgorithmException | ServerException | XmlParserException | IOException e) {
@@ -165,7 +167,7 @@ public class MinioManager {
         hasTextOf(objectPrefix, "objectPrefix");
         hasTextOf(scenesCode, "scenesCode");
 
-        final File localFile = new File(AbstractScriptEngine.DEFAULT_TMP_CACHE_ROOT_DIR.concat("/")
+        final File localFile = new File(DEFAULT_EXECUTOR_TMP_SCRIPT_CACHE_DIR.concat("/")
                 .concat(uploadType.name())
                 .concat("/")
                 .concat(scenesCode)
@@ -185,8 +187,8 @@ public class MinioManager {
         private @NotNull int available;
 
         public byte[] readToBytes() throws IOException {
-            isTrue(available <= OBJECT_MAX_READABLE_SIZE, "Maximum file object readable limit exceeded: %s",
-                    OBJECT_MAX_READABLE_SIZE);
+            isTrue(available <= DEFAULT_EXECUTOR_S3_OBJECT_MAX_LIMIT, "Maximum file object readable limit exceeded: %s",
+                    DEFAULT_EXECUTOR_S3_OBJECT_MAX_LIMIT);
             return Resources.toByteArray(localFile.toURI().toURL());
         }
 
@@ -194,8 +196,5 @@ public class MinioManager {
             return new String(readToBytes(), UTF_8);
         }
     }
-
-    public static final int OBJECT_READ_BUFFER_SIZE = getIntProperty("OBJECT_READ_BUFFER_SIZE", 4 * 1024);
-    public static final int OBJECT_MAX_READABLE_SIZE = getIntProperty("OBJECT_MAX_READABLE_SIZE", 10 * 1024 * 1024);
 
 }

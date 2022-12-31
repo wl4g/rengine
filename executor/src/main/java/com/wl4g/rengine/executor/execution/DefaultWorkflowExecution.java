@@ -71,15 +71,15 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
                 .traceId(evaluation.getRequestId())
                 .trace(true)
                 .clientId(evaluation.getClientId())
-                .scenesCode(valueOf(scenes.getScenesCode()))
-                .workflowId(valueOf(workflow.getId()))
+                .scenesCode(scenes.getScenesCode())
+                .workflowId(workflow.getId())
                 .args(evaluation.getArgs())
                 .build();
 
         final Map<String, RuleWrapper> ruleMap = safeList(workflowGraph.getRules()).stream()
                 .collect(toMap(r -> valueOf(r.getId()), r -> r));
 
-        final ExecutionGraphContext context = new ExecutionGraphContext(parameter, ctx -> {
+        final ExecutionGraphContext graphContext = new ExecutionGraphContext(parameter, ctx -> {
             final String ruleId = ((IRunOperator) ctx.getCurrentNode()).getRuleId();
 
             final RuleWrapper rule = Assert2.notNull(ruleMap.get(ruleId),
@@ -94,7 +94,7 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
         });
 
         final ExecutionGraph<?> graph = ExecutionGraph.from(workflowGraph);
-        final ExecutionGraphResult result = graph.apply(context);
+        final ExecutionGraphResult result = graph.apply(graphContext);
         return ResultDescription.builder()
                 .scenesCode(scenes.getScenesCode())
                 .success(true)

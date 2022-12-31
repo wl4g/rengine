@@ -16,6 +16,7 @@
 package com.wl4g.rengine.common.exception;
 
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 
 import lombok.Getter;
 
@@ -33,19 +34,23 @@ public class EvaluationException extends RengineException {
     private String requestId;
     private String clientId;
     private String scenesCode;
+    private Long workflowId;
 
-    public EvaluationException(String requestId, String clientId, String scenesCode, String message) {
+    public EvaluationException(String requestId, String clientId, String scenesCode, Long workflowId, String message) {
         super(message);
         this.requestId = hasTextOf(requestId, "requestId");
         this.clientId = hasTextOf(clientId, "clientId");
         this.scenesCode = hasTextOf(scenesCode, "scenesCode");
+        this.workflowId = notNullOf(workflowId, "workflowId");
     }
 
-    public EvaluationException(String requestId, String clientId, String scenesCode, String message, Throwable cause) {
+    public EvaluationException(String requestId, String clientId, String scenesCode, Long workflowId, String message,
+            Throwable cause) {
         super(message, cause);
         this.requestId = hasTextOf(requestId, "requestId");
         this.clientId = hasTextOf(clientId, "clientId");
         this.scenesCode = hasTextOf(scenesCode, "scenesCode");
+        this.workflowId = notNullOf(workflowId, "workflowId");
     }
 
     public EvaluationException(String requestId, String clientId, String scenesCode, Throwable cause) {

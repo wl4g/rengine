@@ -15,7 +15,7 @@
  */
 package com.wl4g.rengine.executor.execution;
 
-import static com.wl4g.rengine.common.constants.RengineConstants.CONF_PREFIX_EVALUATOR;
+import static com.wl4g.rengine.common.constants.RengineConstants.CONF_PREFIX_EXECUTOR;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -37,7 +37,7 @@ import io.smallrye.config.WithDefault;
  * @see https://quarkus.io/guides/properties-extending-support#custom-properties-source
  */
 @StaticInitSafe
-@ConfigMapping(prefix = CONF_PREFIX_EVALUATOR + ".execution", namingStrategy = NamingStrategy.KEBAB_CASE)
+@ConfigMapping(prefix = CONF_PREFIX_EXECUTOR + ".execution", namingStrategy = NamingStrategy.KEBAB_CASE)
 public interface ExecutionConfig {
 
     @WithDefault(DEFAULT_SCENES_RULES_CACHED_PREFIX)
@@ -73,10 +73,27 @@ public interface ExecutionConfig {
     @Max(1)
     Float evaluateTimeoutOffsetRate();
 
+    @WithDefault(DEFAULT_SCRIPT_LOG_DIR)
+    @NotBlank
+    String scriptLogDir();
+
+    @WithDefault(DEFAULT_SCRIPT_LOG_FILE_MAX_SIZE + "")
+    @NotNull
+    @Min(1024)
+    Integer scriptLogFileMaxSize();
+
+    @WithDefault(DEFAULT_SCRIPT_LOG_FILE_MAX_COUNT + "")
+    @NotNull
+    @Min(1)
+    Integer scriptLogFileMaxCount();
+
     public static final String DEFAULT_SCENES_RULES_CACHED_PREFIX = "rengine:scenes:rules:cached:";
     public static final long DEFAULT_SCENES_RULES_CACHED_EXPIRE = 15 * 60 * 1000;
     public static final int DEFAULT_EXECUTOR_THREAD_POOLS = 10;
     public static final int DEFAULT_PER_EXECUTOR_THREAD_POOLS = 2;
     public static final int DEFAULT_MAX_QUERY_BATCH = 1024;
     public static final float DEFAULT_TIMEOUT_OFFSET_RATE = 0.1f;
+    public static final String DEFAULT_SCRIPT_LOG_DIR = "/tmp/__rengine_script_log";
+    public static final int DEFAULT_SCRIPT_LOG_FILE_MAX_SIZE = 512 * 1024 * 1024;
+    public static final int DEFAULT_SCRIPT_LOG_FILE_MAX_COUNT = 10;
 }

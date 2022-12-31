@@ -55,10 +55,6 @@
 //    @NotNull
 //    GroovyClassLoader gcl;
 //
-//    public GroovyScriptEngine(RedisDataSource redisDS) {
-//        super(redisDS);
-//    }
-//
 //    void onStart(@Observes StartupEvent ev) {
 //        try {
 //            log.info("Init groovy classloader ...");

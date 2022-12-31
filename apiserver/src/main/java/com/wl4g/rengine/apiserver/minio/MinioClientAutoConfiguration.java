@@ -15,6 +15,8 @@
  */
 package com.wl4g.rengine.apiserver.minio;
 
+import static com.wl4g.rengine.common.constants.RengineConstants.CONF_PREFIX_APISERVER;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -33,7 +35,7 @@ import okhttp3.OkHttpClient;
 public class MinioClientAutoConfiguration {
 
     @Bean
-    @ConfigurationProperties(prefix = "spring.data.minio")
+    @ConfigurationProperties(prefix = CONF_PREFIX_APISERVER + ".minio")
     public MinioClientProperties minioClientProperties() {
         return new MinioClientProperties();
     }
@@ -51,7 +53,8 @@ public class MinioClientAutoConfiguration {
     // Builder builder = MinioClient.builder()
     // .endpoint(properties.getEndpoint())
     // /* .credentialsProvider(provider)
-    // */.credentials(properties.getTenantAccessKey(), properties.getTenantSecretKey())
+    // */.credentials(properties.getTenantAccessKey(),
+    // properties.getTenantSecretKey())
     // .httpClient(httpClient);
     // if (isBlank(properties.getRegion())) {
     // builder.region(properties.getRegion());
@@ -66,7 +69,8 @@ public class MinioClientAutoConfiguration {
     // MinioAdminClient.Builder builder = MinioAdminClient.builder()
     // .endpoint(properties.getEndpoint())
     // /* .credentialsProvider(provider)
-    // */.credentials(properties.getTenantAccessKey(), properties.getTenantSecretKey())
+    // */.credentials(properties.getTenantAccessKey(),
+    // properties.getTenantSecretKey())
     // .httpClient(httpClient);
     // if (isBlank(properties.getRegion())) {
     // builder.region(properties.getRegion());

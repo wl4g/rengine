@@ -92,7 +92,7 @@ public class ExecutionGraphTests {
                 .traceId(UUID.randomUUID().toString())
                 .trace(true)
                 .scenesCode("s1234567890")
-                .workflowId("wf1234567890")
+                .workflowId(100100101L)
                 .args(singletonMap("deviceId", "12345678"))
                 .build();
 

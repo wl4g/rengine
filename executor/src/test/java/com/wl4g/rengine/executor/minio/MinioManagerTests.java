@@ -39,7 +39,7 @@ public class MinioManagerTests {
     @Test
     public void testDetermineLocalFile() throws IOException {
         File localFile = MinioManager.determineLocalFile(UploadType.USER_LIBRARY_WITH_JS,
-                "/rengine/library/js/commons-lang-3.0.0.js", "iot_generic_temp_warning");
+                "/rengine/library/js/commons-lang-3.0.0.js", "ecommerce_trade_gift");
         System.out.println(localFile);
     }
 

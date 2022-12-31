@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -47,7 +48,7 @@ import com.wl4g.rengine.executor.execution.sdk.datasource.GlobalDataSourceManage
 import com.wl4g.rengine.executor.execution.sdk.ScriptDataService;
 import com.wl4g.rengine.executor.execution.sdk.ScriptExecutor;
 import com.wl4g.rengine.executor.execution.sdk.ScriptHttpClient;
-import com.wl4g.rengine.executor.execution.sdk.ScriptLogger;
+//import com.wl4g.rengine.executor.execution.sdk.ScriptLogger;
 import com.wl4g.rengine.executor.execution.sdk.ScriptProcessClient;
 import com.wl4g.rengine.executor.execution.sdk.ScriptRedisLockClient;
 import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
@@ -77,12 +78,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class AbstractScriptEngine implements IEngine {
 
-    final RedisDataSource redisDS;
-    final ScriptHttpClient defaultHttpClient;
-    final ScriptSSHClient defaultSSHClient;
-    final ScriptTCPClient defaultTCPClient;
-    final ScriptProcessClient defaultProcessClient;
-    final ScriptRedisLockClient defaultRedisLockClient;
+    @Inject
+    RedisDataSource redisDS;
 
     @Inject
     ExecutionConfig config;
@@ -99,8 +96,14 @@ public abstract class AbstractScriptEngine implements IEngine {
     @Inject
     GlobalExecutorManager globalExecutorManager;
 
-    public AbstractScriptEngine(RedisDataSource redisDS) {
-        this.redisDS = notNullOf(redisDS, "redisDS");
+    ScriptHttpClient defaultHttpClient;
+    ScriptSSHClient defaultSSHClient;
+    ScriptTCPClient defaultTCPClient;
+    ScriptProcessClient defaultProcessClient;
+    ScriptRedisLockClient defaultRedisLockClient;
+
+    @PostConstruct
+    void init() {
         this.defaultHttpClient = new ScriptHttpClient();
         this.defaultSSHClient = new ScriptSSHClient();
         this.defaultTCPClient = new ScriptTCPClient();
@@ -132,55 +135,63 @@ public abstract class AbstractScriptEngine implements IEngine {
 
         final ScriptDataService dataService = new ScriptDataService(defaultHttpClient, defaultSSHClient, defaultTCPClient,
                 defaultProcessClient, defaultRedisLockClient, globalDataSourceManager);
+
         final ExecutionGraphParameter parameter = graphContext.getParameter();
+
         final ScriptResult lastResult = isNull(graphContext.getLastResult()) ? null
                 : new ScriptResult(ReturnState.isTrue(graphContext.getLastResult().getReturnState()),
                         graphContext.getLastResult().getValueMap());
+
+        final SafeScheduledTaskPoolExecutor executor = globalExecutorManager.getExecutor(parameter.getWorkflowId(),
+                config.perExecutorThreadPools());
 
         return ScriptContext.builder()
                 .id(graphContext.getCurrentNode().getId())
                 .type(((BaseOperator<?>) graphContext.getCurrentNode()).getType())
                 .parameter(ScriptParameter.builder()
                         .requestTime(parameter.getRequestTime())
-                        .clientId(graphContext.getParameter().getClientId())
-                        .traceId(graphContext.getParameter().getTraceId())
-                        .trace(graphContext.getParameter().isTrace())
-                        .scenesCode(graphContext.getParameter().getScenesCode())
-                        .workflowId(graphContext.getParameter().getWorkflowId())
-                        .args(ProxyObject.fromMap((Map) graphContext.getParameter().getArgs()))
+                        .clientId(parameter.getClientId())
+                        .traceId(parameter.getTraceId())
+                        .trace(parameter.isTrace())
+                        .scenesCode(parameter.getScenesCode())
+                        .workflowId(parameter.getWorkflowId())
+                        .args(ProxyObject.fromMap((Map) parameter.getArgs()))
                         .build())
                 .lastResult(lastResult)
                 .dataService(dataService)
-                .logger(new ScriptLogger(minioManager))
-                .executor(createScriptExecutor(
-                        globalExecutorManager.getExecutor(parameter.getScenesCode(), config.perExecutorThreadPools())))
+                // .logger(new ScriptLogger(parameter.getScenesCode(),
+                // parameter.getWorkflowId(), minioManager))
+                .executor(createScriptExecutor(parameter, executor))
                 // .attributes(ProxyObject.fromMap(emptyMap()))
                 .build();
     }
 
     @NotNull
-    abstract ScriptExecutor createScriptExecutor(final @NotNull SafeScheduledTaskPoolExecutor executor);
+    abstract ScriptExecutor createScriptExecutor(
+            final @NotNull ExecutionGraphParameter parameter,
+            final @NotNull SafeScheduledTaskPoolExecutor executor);
 
-    // Notice: The handcode entrypoint function is 'process'
-    public static final String DEFAULT_MAIN_FUNCTION = "process";
-    public static final String DEFAULT_TMP_CACHE_ROOT_DIR = "/tmp/__rengine_script_files_caches";
-    public static final Map<String, Class<?>> REGISTER_MEMBERS;
+    public static final Map<String, Object> REGISTER_MEMBERS;
 
     static {
-        final Map<String, Class<?>> bindingMembers = new HashMap<>();
+        final Map<String, Object> bindingMembers = new HashMap<>();
         bindingMembers.put(ScriptResult.class.getSimpleName(), ScriptResult.class);
         bindingMembers.put(ScriptHttpClient.class.getSimpleName(), ScriptHttpClient.class);
         bindingMembers.put(ScriptSSHClient.class.getSimpleName(), ScriptSSHClient.class);
         bindingMembers.put(ScriptTCPClient.class.getSimpleName(), ScriptTCPClient.class);
         bindingMembers.put(ScriptProcessClient.class.getSimpleName(), ScriptProcessClient.class);
         bindingMembers.put(ScriptRedisLockClient.class.getSimpleName(), ScriptRedisLockClient.class);
-        bindingMembers.put(AES.class.getSimpleName(), AES.class);
-        bindingMembers.put(RSA.class.getSimpleName(), RSA.class);
-        bindingMembers.put(Coding.class.getSimpleName(), Coding.class);
-        bindingMembers.put(Hashing.class.getSimpleName(), Hashing.class);
-        bindingMembers.put(JSON.class.getSimpleName(), JSON.class);
         bindingMembers.put(RengineEvent.class.getSimpleName(), RengineEvent.class);
-        bindingMembers.put(PrometheusParser.class.getSimpleName(), PrometheusParser.class);
+        // Notice: If you want to statically call the method of the java sdk
+        // uiltity class in JavaScript, you must register the sdk tool class as
+        // an instance member, otherwise you can only use the method of new
+        // MyTool().myMethod() to call.
+        bindingMembers.put(AES.class.getSimpleName(), new AES());
+        bindingMembers.put(RSA.class.getSimpleName(), new RSA());
+        bindingMembers.put(Coding.class.getSimpleName(), new Coding());
+        bindingMembers.put(Hashing.class.getSimpleName(), new Hashing());
+        bindingMembers.put(JSON.class.getSimpleName(), new JSON());
+        bindingMembers.put(PrometheusParser.class.getSimpleName(), new PrometheusParser());
         REGISTER_MEMBERS = unmodifiableMap(bindingMembers);
     }
 

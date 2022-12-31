@@ -15,6 +15,15 @@
  */
 package com.wl4g.rengine.executor.execution.engine;
 
+import static java.util.Collections.singletonMap;
+
+import org.graalvm.polyglot.Source;
+import org.graalvm.polyglot.Value;
+import org.junit.Test;
+
+import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager.ContextWrapper;
+import com.wl4g.rengine.executor.util.TestSetupDefaults;
+
 /**
  * {@link GraalJSScriptEngineTests}
  * 
@@ -24,5 +33,29 @@ package com.wl4g.rengine.executor.execution.engine;
  * @see https://github.com/wl4g/infra/blob/master/common-java11/src/test/java/com/wl4g/infra/common/graalvm/GraalPolyglotManagerTests.java#L97
  */
 public class GraalJSScriptEngineTests {
+
+    @Test
+    public void testInitWithCustomLog() throws Exception {
+        final GraalJSScriptEngine engine = new GraalJSScriptEngine();
+        engine.config = TestSetupDefaults.createExecutionConfig();
+        engine.onStart(null);
+        try (ContextWrapper graalContext = engine.getGraalPolyglotManager()
+                .getContext(singletonMap(GraalJSScriptEngine.KEY_WORKFLOW_ID, 101001010L));) {
+            // @formatter:off
+            final String script = "function testLog(name){"
+                                    + "console.info(\"The testing info logs name is:\", name);"
+                                    + "console.warn(\"The testing warn logs name is:\", name);"
+                                    + "console.error(\"The testing error logs name is:\", name);"
+                                    + "return name;"
+                                + "}";
+            // @formatter:on
+            graalContext.eval(Source.newBuilder("js", script, "test.js").build());
+            final Value bindings = graalContext.getBindings("js");
+            final Value testFunction = bindings.getMember("testLog");
+            final Value result = testFunction.execute("jack001");
+            System.out.println("result: " + result);
+            assert result.toString().equals("jack001");
+        }
+    }
 
 }

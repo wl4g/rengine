@@ -45,11 +45,11 @@ public class MongoRepository {
     ReactiveMongoClient reactiveMongoClient;
 
     public MongoCollection<Document> getCollection(MongoCollectionDefinition collection) {
-        return mongoClient.getDatabase(RengineConstants.DEF_MONGODB_DATABASE).getCollection(collection.getName());
+        return mongoClient.getDatabase(RengineConstants.DEFAULT_MONGODB_DATABASE).getCollection(collection.getName());
     }
 
     public ReactiveMongoCollection<Document> getReactiveCollection(MongoCollectionDefinition collection) {
-        return reactiveMongoClient.getDatabase(RengineConstants.DEF_MONGODB_DATABASE).getCollection(collection.getName());
+        return reactiveMongoClient.getDatabase(RengineConstants.DEFAULT_MONGODB_DATABASE).getCollection(collection.getName());
     }
 
 }

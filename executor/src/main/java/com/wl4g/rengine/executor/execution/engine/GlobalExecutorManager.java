@@ -28,7 +28,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.task.GenericTaskRunner;
@@ -50,7 +49,7 @@ import lombok.CustomLog;
 @Singleton
 public class GlobalExecutorManager implements Closeable {
 
-    private final Map<String, GenericTaskRunner<RunnerProperties>> runnerCaching = new ConcurrentHashMap<>(4);
+    private final Map<Long, GenericTaskRunner<RunnerProperties>> runnerCaching = new ConcurrentHashMap<>(4);
 
     @NotNull
     @Inject
@@ -68,12 +67,12 @@ public class GlobalExecutorManager implements Closeable {
     }
 
     public SafeScheduledTaskPoolExecutor getExecutor(
-            final @NotBlank String scenesCode,
-            @Min(1) @Max(DEFAULT_POOL_LIMIT) int concurrency) {
-        GenericTaskRunner<RunnerProperties> runner = runnerCaching.get(scenesCode);
+            final @NotNull Long workflowId,
+            final @Min(1) @Max(DEFAULT_POOL_LIMIT) int concurrency) {
+        GenericTaskRunner<RunnerProperties> runner = runnerCaching.get(workflowId);
         if (isNull(runner)) {
             synchronized (this) {
-                if (isNull(runner = runnerCaching.get(scenesCode))) {
+                if (isNull(runner = runnerCaching.get(workflowId))) {
                     runner = new GenericTaskRunner<RunnerProperties>(new RunnerProperties(StartupMode.NOSTARTUP, concurrency, 0L,
                             (int) (concurrency * 2), new AbortPolicy())) {
                     };

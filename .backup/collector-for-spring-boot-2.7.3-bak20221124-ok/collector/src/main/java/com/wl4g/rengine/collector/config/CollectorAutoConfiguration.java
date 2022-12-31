@@ -15,7 +15,7 @@
  */
 package com.wl4g.rengine.collector.config;
 
-import static com.wl4g.rengine.common.constants.RengineConstants.CONF_PREFIX_COLLECTOR;
+import static com.wl4g.rengine.common.constants.RengineConstants.CONF_PREFIX_SCHEDULER;
 
 import javax.sql.DataSource;
 
@@ -50,7 +50,7 @@ import com.wl4g.rengine.collector.job.SimpleTcpCollectJobExecutor;
 public class CollectorAutoConfiguration {
 
     @Bean
-    @ConfigurationProperties(prefix = CONF_PREFIX_COLLECTOR)
+    @ConfigurationProperties(prefix = CONF_PREFIX_SCHEDULER)
     public CollectorProperties collectorProperties() {
         return new CollectorProperties();
     }
@@ -62,12 +62,12 @@ public class CollectorAutoConfiguration {
 
     @Bean
     @ConditionalOnBean(DataSource.class)
-    @ConditionalOnProperty(name = CONF_PREFIX_COLLECTOR + ".tracing.type", havingValue = "RDB")
+    @ConditionalOnProperty(name = CONF_PREFIX_SCHEDULER + ".tracing.type", havingValue = "RDB")
     public TracingConfiguration<DataSource> tracingConfiguration(DataSource dataSource) {
         return new TracingConfiguration<>("RDB", dataSource);
     }
 
-    @ConditionalOnProperty(name = CONF_PREFIX_COLLECTOR + ".dump.port")
+    @ConditionalOnProperty(name = CONF_PREFIX_SCHEDULER + ".dump.port")
     @Bean(initMethod = "listen", destroyMethod = "close")
     public SnapshotService snapshotService(CoordinatorRegistryCenter registryCenter, CollectorProperties config) {
         return new SnapshotService(registryCenter, config.getDump().getPort());

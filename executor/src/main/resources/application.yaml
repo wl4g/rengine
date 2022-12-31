@@ -273,7 +273,7 @@ quarkus:
 
 ## Rengine evaluator configuration.
 rengine:
-  evaluator:
+  executor:
     execution:
       scenes-rules-cached-prefix: 'rengine:scenes:rules:cached:'
       scenes-rules-cached-expire: 900000
@@ -281,6 +281,9 @@ rengine:
       per-executor-thread-pools: 2
       max-query-batch: 1024
       evaluate-timeout-offset-rate: 0.1f
+      script-log-dir: /tmp/__rengine_script_log
+      script-log-file-max-size: 536870912 # Default by 512MB
+      script-log-file-max-count: 10
     minio:
       endpoint: http://localhost:9000
       region: us-east-1

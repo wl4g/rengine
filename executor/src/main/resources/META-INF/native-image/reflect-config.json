@@ -1,5 +1,23 @@
 [
 {
+  "name":"com.wl4g.rengine.executor.execution.engine.AbstractScriptEngine",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name":"com.wl4g.rengine.executor.execution.engine.GraalJSScriptEngine",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
   "name":"com.wl4g.rengine.executor.execution.sdk.ScriptContext",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
@@ -48,6 +66,7 @@
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
   "methods":[
+    {"name":"<init>","parameterTypes":["java.lang.Long","com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor","com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager"] }, 
     {"name":"submit","parameterTypes":["org.graalvm.polyglot.Value"] }, 
     {"name":"submitForComplete","parameterTypes":["java.util.List","long"] }, 
     {"name":"submitForComplete","parameterTypes":["java.util.List","com.wl4g.infra.common.task.CompleteTaskListener","long"] }, 

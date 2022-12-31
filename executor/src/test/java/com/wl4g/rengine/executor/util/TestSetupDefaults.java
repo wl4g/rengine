@@ -83,6 +83,21 @@ public abstract class TestSetupDefaults {
             public @NotNull @Min(0) @Max(1) Float evaluateTimeoutOffsetRate() {
                 return ExecutionConfig.DEFAULT_TIMEOUT_OFFSET_RATE;
             }
+
+            @Override
+            public @NotBlank String scriptLogDir() {
+                return ExecutionConfig.DEFAULT_SCRIPT_LOG_DIR;
+            }
+
+            @Override
+            public @NotNull @Min(1024) Integer scriptLogFileMaxSize() {
+                return ExecutionConfig.DEFAULT_SCRIPT_LOG_FILE_MAX_SIZE;
+            }
+
+            @Override
+            public @NotNull @Min(1) Integer scriptLogFileMaxCount() {
+                return ExecutionConfig.DEFAULT_SCRIPT_LOG_FILE_MAX_COUNT;
+            }
         };
     }
 

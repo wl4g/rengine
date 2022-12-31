@@ -35,6 +35,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.unit.DataSize;
@@ -65,17 +66,17 @@ import lombok.ToString;
 @Validated
 public class MinioClientProperties implements InitializingBean {
 
-    private OkHttpClientConfig httpClient = new OkHttpClientConfig();
+    private @NotNull OkHttpClientConfig httpClient = new OkHttpClientConfig();
 
-    private @NotBlank String endpoint = RengineConstants.DEF_MINIO_ENDPOINT;
+    private @NotBlank String endpoint = RengineConstants.DEFAULT_MINIO_ENDPOINT;
 
-    private @Nullable String region = RengineConstants.DEF_MINIO_REGION;
+    private @Nullable String region = RengineConstants.DEFAULT_MINIO_REGION;
 
     private @NotBlank String tenantAccessKey = "rengine";
 
     private @NotBlank String tenantSecretKey = "12345678";
 
-    private UserUploadAssumeConfig userUpload = new UserUploadAssumeConfig();
+    private @NotNull UserUploadAssumeConfig userUpload = new UserUploadAssumeConfig();
 
     @Override
     public void afterPropertiesSet() throws Exception {

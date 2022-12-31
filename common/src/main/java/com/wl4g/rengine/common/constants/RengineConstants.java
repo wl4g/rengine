@@ -32,25 +32,62 @@ import lombok.Getter;
  */
 public abstract class RengineConstants extends EnvironmentUtil {
 
+    //
+    // Basic definitions.
+    //
+
     public static final String CONF_PREFIX = "rengine";
-    public static final String CONF_PREFIX_MANAGER = CONF_PREFIX + ".manager";
-    public static final String CONF_PREFIX_EVALUATOR = CONF_PREFIX + ".evaluator";
-    public static final String CONF_PREFIX_COLLECTOR = CONF_PREFIX + ".collector";
+
+    //
+    // ApiServer definitions.
+    //
+
+    public static final String CONF_PREFIX_APISERVER = CONF_PREFIX + ".apiserver";
+    public static final String DEFAULT_MONGODB_DATABASE = getStringProperty("mongodb.database", "rengine");
+    public static final String DEFAULT_MINIO_ENDPOINT = "http://localhost:9000";
+    public static final String DEFAULT_MINIO_REGION = "us-east-1";
+    public static final String DEFAULT_MINIO_BUCKET = "rengine";
+
+    //
+    // Scheduler definitions.
+    //
+
+    public static final String CONF_PREFIX_SCHEDULER = CONF_PREFIX + ".scheduler";
+
+    //
+    // Executor definitions.
+    //
+
+    public static final String CONF_PREFIX_EXECUTOR = CONF_PREFIX + ".executor";
+    public static final String API_EXECUTOR_EVALUATE = "/evaluate";
+    // Notice: The handcode entrypoint function is 'process'
+    public static final String DEFAULT_EXECUTOR_MAIN_FUNCTION = "process";
+    public static final String DEFAULT_EXECUTOR_TMP_SCRIPT_CACHE_DIR = "/tmp/__rengine_script_caches";
+    public static final String DEFAULT_EXECUTOR_LOGGING_PREFIX = "log";
+    public static final int DEFAULT_EXECUTOR_S3_OBJECT_READ_BUFFER = getIntProperty("EXECUTOR_S3_OBJECT_READ_BUFFER", 4 * 1024);
+    public static final int DEFAULT_EXECUTOR_S3_OBJECT_MAX_LIMIT = getIntProperty("EXECUTOR_S3_OBJECT_MAX_LIMIT",
+            10 * 1024 * 1024);
+
+    //
+    // Eventbus definitions.
+    //
+
     public static final String CONF_PREFIX_EVENTBUS = CONF_PREFIX + ".eventbus";
     public static final String CONF_PREFIX_EVENTBUS_KAFKA = CONF_PREFIX_EVENTBUS + ".kafka";
     public static final String CONF_PREFIX_EVENTBUS_PULSAR = CONF_PREFIX_EVENTBUS + ".pulsar";
     public static final String CONF_PREFIX_EVENTBUS_ROCKETMQ = CONF_PREFIX_EVENTBUS + ".rabbitmq";
+
+    //
+    // Client definitions.
+    //
+
     public static final String CONF_PREFIX_CLIENT = CONF_PREFIX + ".client";
 
-    public static final String DEF_EVENTBUS_TOPIC = "rengine_event";
+    //
+    // Jobs definitions.
+    //
 
-    public static final String DEF_MONGODB_DATABASE = getStringProperty("mongodb.database", "rengine");
-
-    public static final String DEF_MINIO_ENDPOINT = "http://localhost:9000";
-    public static final String DEF_MINIO_REGION = "us-east-1";
-    public static final String DEF_MINIO_BUCKET = "rengine";
-
-    public static final String API_EVALUATOR_EVALUATE = "/evaluate";
+    public static final String DEFAULT_EVENTBUS_TOPIC = "rengine_event";
 
     @Getter
     @AllArgsConstructor

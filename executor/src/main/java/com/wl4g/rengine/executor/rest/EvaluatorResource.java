@@ -69,7 +69,7 @@ public class EvaluatorResource {
      * @see https://quarkus.io/guides/resteasy-reactive#asyncreactive-support
      */
     @POST
-    @Path(RengineConstants.API_EVALUATOR_EVALUATE)
+    @Path(RengineConstants.API_EXECUTOR_EVALUATE)
     public Uni<RespBase<EvaluationResult>> evaluate(Evaluation evaluation) throws SystemException {
         log.debug("Evaluating of : {}", evaluation);
         return evaluatorService.evaluate(evaluation);

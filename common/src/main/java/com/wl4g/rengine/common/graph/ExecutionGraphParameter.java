@@ -61,7 +61,7 @@ public final class ExecutionGraphParameter implements Serializable {
     /**
      * The execution workflow ID.
      */
-    private @NotBlank String workflowId;
+    private @NotBlank Long workflowId;
 
     /**
      * The execution workflow arguments.

@@ -47,6 +47,7 @@ public class ScriptContext implements Serializable {
     //
     // Runtime context attributes.
     //
+
     final @NotBlank String id;
     final @NotBlank String type;
     final @NotNull @Default ScriptParameter parameter = ScriptParameter.builder().build();
@@ -56,8 +57,9 @@ public class ScriptContext implements Serializable {
     //
     // Helper attributes.
     //
+
     transient ScriptDataService dataService;
-    transient ScriptLogger logger;
+    // transient ScriptLogger logger;
     transient ScriptExecutor executor;
 
     public @HostAccess.Export String getId() {
@@ -88,9 +90,9 @@ public class ScriptContext implements Serializable {
         return dataService;
     }
 
-    public @HostAccess.Export ScriptLogger getLogger() {
-        return logger;
-    }
+    // public @HostAccess.Export ScriptLogger getLogger() {
+    // return logger;
+    // }
 
     public @HostAccess.Export ScriptExecutor getExecutor() {
         return executor;
@@ -104,7 +106,7 @@ public class ScriptContext implements Serializable {
         private final @NotBlank String traceId;
         private final @Default boolean trace = true;
         private final @NotBlank String scenesCode;
-        private final @NotBlank String workflowId;
+        private final @NotBlank Long workflowId;
         private final @NotNull @Default ProxyObject args = ProxyObject.fromMap(new HashMap<>());
 
         public @HostAccess.Export long getRequestTime() {
@@ -127,7 +129,7 @@ public class ScriptContext implements Serializable {
             return scenesCode;
         }
 
-        public @HostAccess.Export String getWorkflowId() {
+        public @HostAccess.Export Long getWorkflowId() {
             return workflowId;
         }
 

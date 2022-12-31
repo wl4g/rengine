@@ -62,14 +62,14 @@ public class MinioReadyHealthCheck implements HealthCheck {
             if (minioManager.getMinioClient()
                     .bucketExists(BucketExistsArgs.builder()
                             // .extraHeaders(Collections.emptyMap())
-                            .bucket(RengineConstants.DEF_MINIO_BUCKET)
+                            .bucket(RengineConstants.DEFAULT_MINIO_BUCKET)
                             .build())) {
                 builder.up();
             } else {
-                builder.down().withData("message", format("No found MinIO bucket: %s", RengineConstants.DEF_MINIO_BUCKET));
+                builder.down().withData("message", format("No found MinIO bucket: %s", RengineConstants.DEFAULT_MINIO_BUCKET));
             }
         } catch (Exception e) {
-            builder.down().withData("message", format("Failed to found MinIO bucket: %s", RengineConstants.DEF_MINIO_BUCKET));
+            builder.down().withData("message", format("Failed to found MinIO bucket: %s", RengineConstants.DEFAULT_MINIO_BUCKET));
         }
         return builder.build();
     }

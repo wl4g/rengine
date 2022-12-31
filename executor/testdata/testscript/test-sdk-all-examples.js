@@ -198,33 +198,31 @@ function testForExecutorTasks(context) {
 }
 
 function testForAESEncryptions(context) {
-    var base64Iv = new Coding().toBase64("1234567890abcdef");
+    var base64Iv = Coding.toBase64("1234567890abcdef");
     console.info("base64Iv: " + base64Iv);
 
-    var aes = new AES();
-    var base64Key = aes.generateKeyToBase64();
+    var base64Key = AES.generateKeyToBase64();
     console.info("base64Key: " + base64Key);
 
     var plaintext = "abcdefghijklmnopqrstuvwxyz";
     console.info("plaintext: " + plaintext);
 
-    var ciphertext = aes.encrypt256CbcPkcs7ToBase64(base64Key, base64Iv, plaintext);
-    var plaintext2 = aes.decrypt256CbcPkcs7FromBase64(base64Key, base64Iv, ciphertext);
+    var ciphertext = AES.encrypt256CbcPkcs7ToBase64(base64Key, base64Iv, plaintext);
+    var plaintext2 = AES.decrypt256CbcPkcs7FromBase64(base64Key, base64Iv, ciphertext);
 
     console.info("ciphertext: " + ciphertext);
     console.info("plaintext2: " + plaintext2);
 }
 
 function testForRSAEncryptions(context) {
-    var rsa = new RSA();
-    var base64Key = rsa.generateKeyToBase64();
+    var base64Key = RSA.generateKeyToBase64();
     console.info("base64Key: " + base64Key);
 
     var plaintext = "abcdefghijklmnopqrstuvwxyz";
     console.info("plaintext: " + plaintext);
 
-    var ciphertext = rsa.encryptToBase64(false, base64Key.getPublicKey(), plaintext);
-    var plaintext2 = rsa.decryptFromBase64(true, base64Key.getPrivateKey(), ciphertext);
+    var ciphertext = RSA.encryptToBase64(false, base64Key.getPublicKey(), plaintext);
+    var plaintext2 = RSA.decryptFromBase64(true, base64Key.getPrivateKey(), ciphertext);
 
     console.info("ciphertext: " + ciphertext);
     console.info("plaintext2: " + plaintext2);

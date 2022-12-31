@@ -44,7 +44,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class ClientEventBusConfig {
 
-    private @Default String topic = RengineConstants.DEF_EVENTBUS_TOPIC;
+    private @Default String topic = RengineConstants.DEFAULT_EVENTBUS_TOPIC;
 
     private @Default EventStoreConfig recorder = new EventStoreConfig();
 

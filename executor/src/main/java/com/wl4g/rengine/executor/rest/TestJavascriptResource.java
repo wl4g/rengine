@@ -43,7 +43,7 @@ import org.graalvm.polyglot.Value;
 import org.graalvm.polyglot.proxy.ProxyObject;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.wl4g.infra.common.graalvm.GraalPolyglotManager.ContextWrapper;
+import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager.ContextWrapper;
 import com.wl4g.infra.common.lang.EnvironmentUtil;
 import com.wl4g.infra.common.runtime.JvmRuntimeTool;
 import com.wl4g.infra.common.web.rest.RespBase;
@@ -115,7 +115,7 @@ public class TestJavascriptResource {
         }
 
         long begin = currentTimeMillis();
-        try (ContextWrapper context = jsScriptEngine.getGraalPolyglotManager().getContext();) {
+        try (ContextWrapper context = jsScriptEngine.getGraalPolyglotManager().getContext(null);) {
             log.info("JSScript execution ...");
             System.out.println(format("cost(newContext): %sms", (currentTimeMillis() - begin)));
 

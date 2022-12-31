@@ -15,10 +15,10 @@
  */
 package com.wl4g.rengine.executor.minio;
 
-import static com.wl4g.rengine.common.constants.RengineConstants.CONF_PREFIX_EVALUATOR;
-import static com.wl4g.rengine.common.constants.RengineConstants.DEF_MINIO_BUCKET;
-import static com.wl4g.rengine.common.constants.RengineConstants.DEF_MINIO_ENDPOINT;
-import static com.wl4g.rengine.common.constants.RengineConstants.DEF_MINIO_REGION;
+import static com.wl4g.rengine.common.constants.RengineConstants.CONF_PREFIX_EXECUTOR;
+import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_MINIO_BUCKET;
+import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_MINIO_ENDPOINT;
+import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_MINIO_REGION;
 
 import java.net.Proxy;
 import java.time.Duration;
@@ -43,18 +43,18 @@ import io.smallrye.config.WithDefault;
  * @see https://quarkus.io/guides/properties-extending-support#custom-properties-source
  */
 @StaticInitSafe
-@ConfigMapping(prefix = CONF_PREFIX_EVALUATOR + ".minio", namingStrategy = NamingStrategy.KEBAB_CASE)
+@ConfigMapping(prefix = CONF_PREFIX_EXECUTOR + ".minio", namingStrategy = NamingStrategy.KEBAB_CASE)
 public interface MinioConfig {
 
-    @WithDefault(DEF_MINIO_ENDPOINT)
+    @WithDefault(DEFAULT_MINIO_ENDPOINT)
     @NotBlank
     String endpoint();
 
-    @WithDefault(DEF_MINIO_REGION)
+    @WithDefault(DEFAULT_MINIO_REGION)
     @NotBlank
     String region();
 
-    @WithDefault(DEF_MINIO_BUCKET)
+    @WithDefault(DEFAULT_MINIO_BUCKET)
     @NotBlank
     String bucket();
 
