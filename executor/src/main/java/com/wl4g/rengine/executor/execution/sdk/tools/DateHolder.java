@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.executor.execution.sdk.extension;
+package com.wl4g.rengine.executor.execution.sdk.tools;
 
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.FastTimeClock.currentTimeMillis;
@@ -36,6 +36,11 @@ import com.wl4g.infra.common.lang.DateUtils2;
  * @since v1.0.0
  */
 public class DateHolder {
+    private static final DateHolder DEFAULT = new DateHolder();
+
+    public static @HostAccess.Export DateHolder getInstance() {
+        return DEFAULT;
+    }
 
     public @HostAccess.Export DateHolder() {
     }
@@ -48,6 +53,10 @@ public class DateHolder {
         return System.nanoTime();
     }
 
+    public @HostAccess.Export Date getDate() {
+        return new Date();
+    }
+
     public @HostAccess.Export Date parseDate(final String dateString, final String pattern) throws ParseException {
         if (isBlank(dateString) || isNull(pattern)) {
             return null;
@@ -56,10 +65,14 @@ public class DateHolder {
     }
 
     public @HostAccess.Export String formatDate(String pattern) {
-        if (isNull(pattern)) {
+        return formatDate(new Date(), pattern);
+    }
+
+    public @HostAccess.Export String formatDate(Date date, String pattern) {
+        if (isNull(date) || isNull(pattern)) {
             return null;
         }
-        return DateUtils2.getDate(pattern);
+        return DateUtils2.formatDate(date, pattern);
     }
 
     public @HostAccess.Export Date getDateOf(int calendarField, int amount, String pattern) {

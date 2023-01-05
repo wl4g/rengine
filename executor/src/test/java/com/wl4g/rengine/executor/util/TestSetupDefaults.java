@@ -85,18 +85,44 @@ public abstract class TestSetupDefaults {
             }
 
             @Override
-            public @NotBlank String scriptLogDir() {
-                return ExecutionConfig.DEFAULT_SCRIPT_LOG_DIR;
+            public @NotNull ScriptLogConfig log() {
+                return new ScriptLogConfig() {
+                    @Override
+                    public @NotBlank String baseDir() {
+                        return ExecutionConfig.DEFAULT_SCRIPT_LOG_BASE_DIR;
+                    }
+
+                    @Override
+                    public @NotNull @Min(1024) Integer fileMaxSize() {
+                        return ExecutionConfig.DEFAULT_SCRIPT_LOG_FILE_MAX_SIZE;
+                    }
+
+                    @Override
+                    public @NotNull @Min(1) Integer fileMaxCount() {
+                        return ExecutionConfig.DEFAULT_SCRIPT_LOG_FILE_MAX_COUNT;
+                    }
+                };
             }
 
             @Override
-            public @NotNull @Min(1024) Integer scriptLogFileMaxSize() {
-                return ExecutionConfig.DEFAULT_SCRIPT_LOG_FILE_MAX_SIZE;
-            }
+            public @NotNull NotifierConfig notifier() {
+                return new NotifierConfig() {
 
-            @Override
-            public @NotNull @Min(1) Integer scriptLogFileMaxCount() {
-                return ExecutionConfig.DEFAULT_SCRIPT_LOG_FILE_MAX_COUNT;
+                    @Override
+                    public @NotNull @Min(0) Long refreshLockTimeout() {
+                        return ExecutionConfig.DEFAULT_NOTIFIER_REFRESH_LOCK_TIMEOUT;
+                    }
+
+                    @Override
+                    public @NotBlank String refreshedCachedPrefix() {
+                        return ExecutionConfig.DEFAULT_NOTIFIER_REFRESHED_CACHED_PREFIX;
+                    }
+
+                    @Override
+                    public @NotNull @Min(0) @Max(1) Float refreshedCachedExpireOffsetRate() {
+                        return ExecutionConfig.DEFAULT_NOTIFIER_EXPIRE_OFFSET_RATE;
+                    }
+                };
             }
         };
     }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.executor.execution.sdk.extension;
+package com.wl4g.rengine.executor.execution.sdk.tools;
 
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static java.util.Objects.isNull;
@@ -39,6 +39,11 @@ import lombok.ToString;
  * @since v1.0.0
  */
 public class RSA {
+    private static final RSA DEFAULT = new RSA();
+
+    public static @HostAccess.Export RSA getInstance() {
+        return DEFAULT;
+    }
 
     public @HostAccess.Export RSA() {
     }

@@ -67,10 +67,31 @@ public class ScriptRedisLockClient {
     }
 
     public @HostAccess.Export ScriptRedisLockClient(@NotNull final RedisDataSource redisDS) {
+        this.jedisLockManager = buildJedisLockManager(redisDS);
+    }
+
+    public @HostAccess.Export Lock getLock(@NotBlank String lockName) {
+        return getLock(lockName, 6_000L);
+    }
+
+    public @HostAccess.Export Lock getLock(@NotBlank String lockName, @Min(0) long timeoutMs) {
+        MeterUtil.counter(execution_sdk_client_total, ScriptRedisLockClient.class, METHOD_GET_LOCK);
+        try {
+            final Lock lock = MeterUtil.timer(execution_sdk_client_time, ScriptRedisLockClient.class, METHOD_GET_LOCK,
+                    () -> jedisLockManager.getLock(lockName, timeoutMs, TimeUnit.MILLISECONDS));
+            MeterUtil.counter(execution_sdk_client_success, ScriptRedisLockClient.class, METHOD_GET_LOCK);
+            return lock;
+        } catch (Exception e) {
+            MeterUtil.counter(execution_sdk_client_failure, ScriptRedisLockClient.class, METHOD_GET_LOCK);
+            throw new ExecutionScriptException(format("Failed to get lock for : '%s'", lockName), e);
+        }
+    }
+
+    public static JedisLockManager buildJedisLockManager(final @NotNull RedisDataSource redisDS) {
         notNullOf(redisDS, "redisDS");
         final StringCommands<String, String> redisStringCommands = redisDS.string(String.class);
         final RedisAPI redisApi = RedisAPI.api(redisDS.getReactive().getRedis());
-        this.jedisLockManager = new JedisLockManager(new JedisClient() {
+        return new JedisLockManager(new JedisClient() {
             @Override
             public void close() throws IOException {
             }
@@ -91,23 +112,6 @@ public class ScriptRedisLockClient {
                 return "OK";
             }
         });
-    }
-
-    public @HostAccess.Export Lock getLock(@NotBlank String lockName) {
-        return getLock(lockName, 6_000L);
-    }
-
-    public @HostAccess.Export Lock getLock(@NotBlank String lockName, @Min(0) long timeoutMs) {
-        MeterUtil.counter(execution_sdk_client_total, ScriptRedisLockClient.class, METHOD_GET_LOCK);
-        try {
-            final Lock lock = MeterUtil.timer(execution_sdk_client_time, ScriptRedisLockClient.class, METHOD_GET_LOCK,
-                    () -> jedisLockManager.getLock(lockName, timeoutMs, TimeUnit.MILLISECONDS));
-            MeterUtil.counter(execution_sdk_client_success, ScriptRedisLockClient.class, METHOD_GET_LOCK);
-            return lock;
-        } catch (Exception e) {
-            MeterUtil.counter(execution_sdk_client_failure, ScriptRedisLockClient.class, METHOD_GET_LOCK);
-            throw new ExecutionScriptException(format("Failed to get lock for : '%s'", lockName), e);
-        }
     }
 
 }

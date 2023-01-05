@@ -19,9 +19,12 @@ import javax.validation.constraints.NotBlank;
 
 import org.graalvm.polyglot.HostAccess;
 
+import com.wl4g.infra.common.notification.MessageNotifier.NotifierKind;
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
 import com.wl4g.rengine.executor.execution.sdk.datasource.DataSourceFacade;
 import com.wl4g.rengine.executor.execution.sdk.datasource.GlobalDataSourceManager;
+import com.wl4g.rengine.executor.execution.sdk.notifier.GlobalMessageNotifierManager;
+import com.wl4g.rengine.executor.execution.sdk.notifier.ScriptMessageNotifier;
 
 import lombok.AllArgsConstructor;
 import lombok.ToString;
@@ -42,6 +45,9 @@ public class ScriptDataService {
     final ScriptProcessClient defaultProcessClient;
     final ScriptRedisLockClient defaultRedisLockClient;
     final GlobalDataSourceManager globalDataSourceManager;
+    final GlobalMessageNotifierManager globalMessageNotifierManager;
+
+    // --- SDK Utility Clients. ----
 
     public @HostAccess.Export ScriptHttpClient getDefaultHttpClient() {
         return defaultHttpClient;
@@ -62,6 +68,8 @@ public class ScriptDataService {
     public @HostAccess.Export ScriptRedisLockClient getDefaultRedisLockClient() {
         return defaultRedisLockClient;
     }
+
+    // --- SDK DataSource Services. ----
 
     public @HostAccess.Export DataSourceFacade getMongoService(final @NotBlank String dataSourceName) {
         return globalDataSourceManager.loadDataSource(DataSourceType.MONGO, dataSourceName);
@@ -88,5 +96,11 @@ public class ScriptDataService {
     // @Nullable String dataSourceName) {
     // return opentsdbAggregatedService;
     // }
+
+    // --- SDK Message Notifiers. ----
+
+    public @HostAccess.Export ScriptMessageNotifier getMessageNotifier(final @NotBlank String notifierType) {
+        return globalMessageNotifierManager.getMessageNotifier(NotifierKind.valueOf(notifierType));
+    }
 
 }

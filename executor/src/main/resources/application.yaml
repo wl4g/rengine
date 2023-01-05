@@ -275,15 +275,20 @@ quarkus:
 rengine:
   executor:
     execution:
-      scenes-rules-cached-prefix: 'rengine:scenes:rules:cached:'
+      scenes-rules-cached-prefix: 'rengine:executor:scenes:rules:'
       scenes-rules-cached-expire: 900000
       executor-thread-pools: 10
       per-executor-thread-pools: 2
       max-query-batch: 1024
       evaluate-timeout-offset-rate: 0.1f
-      script-log-dir: /tmp/__rengine_script_log
-      script-log-file-max-size: 536870912 # Default by 512MB
-      script-log-file-max-count: 10
+      log:
+        base-dir: /tmp/__rengine_script_log
+        file-max-size: 536870912 # Default by 512MB
+        file-max-count: 10
+      notifier:
+        refresh-lock-timeout: 60000
+        refreshed-cached-prefix: 'rengine:executor:sdk:notifier:refreshed:'
+        refreshed-cached-expire-offset-rate: 0.1f
     minio:
       endpoint: http://localhost:9000
       region: us-east-1

@@ -19,7 +19,6 @@ import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableMap;
-import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toList;
 
 import java.util.HashMap;
@@ -31,21 +30,12 @@ import javax.inject.Inject;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import org.graalvm.polyglot.proxy.ProxyObject;
-
 import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
 import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
 import com.wl4g.rengine.common.entity.UploadObject.ExtensionType;
 import com.wl4g.rengine.common.entity.UploadObject.UploadType;
-import com.wl4g.rengine.common.graph.ExecutionGraph.BaseOperator;
-import com.wl4g.rengine.common.graph.ExecutionGraphContext;
 import com.wl4g.rengine.common.graph.ExecutionGraphParameter;
-import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
-import com.wl4g.rengine.executor.execution.sdk.ScriptContext;
-import com.wl4g.rengine.executor.execution.sdk.ScriptContext.ScriptParameter;
-import com.wl4g.rengine.executor.execution.sdk.datasource.GlobalDataSourceManager;
-import com.wl4g.rengine.executor.execution.sdk.ScriptDataService;
 import com.wl4g.rengine.executor.execution.sdk.ScriptExecutor;
 import com.wl4g.rengine.executor.execution.sdk.ScriptHttpClient;
 //import com.wl4g.rengine.executor.execution.sdk.ScriptLogger;
@@ -54,13 +44,16 @@ import com.wl4g.rengine.executor.execution.sdk.ScriptRedisLockClient;
 import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
 import com.wl4g.rengine.executor.execution.sdk.ScriptSSHClient;
 import com.wl4g.rengine.executor.execution.sdk.ScriptTCPClient;
-import com.wl4g.rengine.executor.execution.sdk.extension.AES;
-import com.wl4g.rengine.executor.execution.sdk.extension.Coding;
-import com.wl4g.rengine.executor.execution.sdk.extension.Hashing;
-import com.wl4g.rengine.executor.execution.sdk.extension.JSON;
-import com.wl4g.rengine.executor.execution.sdk.extension.PrometheusParser;
-import com.wl4g.rengine.executor.execution.sdk.extension.RSA;
-import com.wl4g.rengine.executor.execution.sdk.extension.RengineEvent;
+import com.wl4g.rengine.executor.execution.sdk.datasource.GlobalDataSourceManager;
+import com.wl4g.rengine.executor.execution.sdk.notifier.GlobalMessageNotifierManager;
+import com.wl4g.rengine.executor.execution.sdk.tools.AES;
+import com.wl4g.rengine.executor.execution.sdk.tools.Coding;
+import com.wl4g.rengine.executor.execution.sdk.tools.DateHolder;
+import com.wl4g.rengine.executor.execution.sdk.tools.Hashing;
+import com.wl4g.rengine.executor.execution.sdk.tools.JSON;
+import com.wl4g.rengine.executor.execution.sdk.tools.PrometheusParser;
+import com.wl4g.rengine.executor.execution.sdk.tools.RSA;
+import com.wl4g.rengine.executor.execution.sdk.tools.RengineEvent;
 import com.wl4g.rengine.executor.metrics.ExecutorMeterService;
 import com.wl4g.rengine.executor.minio.MinioManager;
 import com.wl4g.rengine.executor.minio.MinioManager.ObjectResource;
@@ -94,6 +87,9 @@ public abstract class AbstractScriptEngine implements IEngine {
     GlobalDataSourceManager globalDataSourceManager;
 
     @Inject
+    GlobalMessageNotifierManager globalMessageNotifierManager;
+
+    @Inject
     GlobalExecutorManager globalExecutorManager;
 
     ScriptHttpClient defaultHttpClient;
@@ -112,7 +108,7 @@ public abstract class AbstractScriptEngine implements IEngine {
     }
 
     @NotNull
-    List<ObjectResource> loadScriptResources(@NotBlank String scenesCode, @NotNull RuleWrapper rule, boolean useCache) {
+    protected List<ObjectResource> loadScriptResources(@NotBlank String scenesCode, @NotNull RuleWrapper rule, boolean useCache) {
         notNullOf(rule, "rule");
         log.debug("Loading script {} by scenesCode: {}, ruleId: {}", scenesCode, rule.getId());
 
@@ -128,46 +124,8 @@ public abstract class AbstractScriptEngine implements IEngine {
         }).collect(toList());
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     @NotNull
-    ScriptContext newScriptContext(final @NotNull ExecutionGraphContext graphContext) {
-        notNullOf(graphContext, "graphContext");
-
-        final ScriptDataService dataService = new ScriptDataService(defaultHttpClient, defaultSSHClient, defaultTCPClient,
-                defaultProcessClient, defaultRedisLockClient, globalDataSourceManager);
-
-        final ExecutionGraphParameter parameter = graphContext.getParameter();
-
-        final ScriptResult lastResult = isNull(graphContext.getLastResult()) ? null
-                : new ScriptResult(ReturnState.isTrue(graphContext.getLastResult().getReturnState()),
-                        graphContext.getLastResult().getValueMap());
-
-        final SafeScheduledTaskPoolExecutor executor = globalExecutorManager.getExecutor(parameter.getWorkflowId(),
-                config.perExecutorThreadPools());
-
-        return ScriptContext.builder()
-                .id(graphContext.getCurrentNode().getId())
-                .type(((BaseOperator<?>) graphContext.getCurrentNode()).getType())
-                .parameter(ScriptParameter.builder()
-                        .requestTime(parameter.getRequestTime())
-                        .clientId(parameter.getClientId())
-                        .traceId(parameter.getTraceId())
-                        .trace(parameter.isTrace())
-                        .scenesCode(parameter.getScenesCode())
-                        .workflowId(parameter.getWorkflowId())
-                        .args(ProxyObject.fromMap((Map) parameter.getArgs()))
-                        .build())
-                .lastResult(lastResult)
-                .dataService(dataService)
-                // .logger(new ScriptLogger(parameter.getScenesCode(),
-                // parameter.getWorkflowId(), minioManager))
-                .executor(createScriptExecutor(parameter, executor))
-                // .attributes(ProxyObject.fromMap(emptyMap()))
-                .build();
-    }
-
-    @NotNull
-    abstract ScriptExecutor createScriptExecutor(
+    protected abstract ScriptExecutor createScriptExecutor(
             final @NotNull ExecutionGraphParameter parameter,
             final @NotNull SafeScheduledTaskPoolExecutor executor);
 
@@ -186,12 +144,13 @@ public abstract class AbstractScriptEngine implements IEngine {
         // uiltity class in JavaScript, you must register the sdk tool class as
         // an instance member, otherwise you can only use the method of new
         // MyTool().myMethod() to call.
-        bindingMembers.put(AES.class.getSimpleName(), new AES());
-        bindingMembers.put(RSA.class.getSimpleName(), new RSA());
-        bindingMembers.put(Coding.class.getSimpleName(), new Coding());
-        bindingMembers.put(Hashing.class.getSimpleName(), new Hashing());
-        bindingMembers.put(JSON.class.getSimpleName(), new JSON());
-        bindingMembers.put(PrometheusParser.class.getSimpleName(), new PrometheusParser());
+        bindingMembers.put(DateHolder.class.getSimpleName(), DateHolder.getInstance());
+        bindingMembers.put(Coding.class.getSimpleName(), Coding.getInstance());
+        bindingMembers.put(Hashing.class.getSimpleName(), Hashing.getInstance());
+        bindingMembers.put(AES.class.getSimpleName(), AES.getInstance());
+        bindingMembers.put(RSA.class.getSimpleName(), RSA.getInstance());
+        bindingMembers.put(JSON.class.getSimpleName(), JSON.getInstance());
+        bindingMembers.put(PrometheusParser.class.getSimpleName(), PrometheusParser.getInstance());
         REGISTER_MEMBERS = unmodifiableMap(bindingMembers);
     }
 

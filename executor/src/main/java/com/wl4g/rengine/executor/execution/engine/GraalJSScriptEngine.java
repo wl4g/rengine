@@ -27,6 +27,7 @@ import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTO
 import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.evaluation_execution_time;
 import static java.lang.String.format;
 import static java.util.Collections.singletonMap;
+import static java.util.Objects.isNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toSet;
 
@@ -45,6 +46,7 @@ import javax.validation.constraints.NotNull;
 import org.graalvm.polyglot.PolyglotException;
 import org.graalvm.polyglot.Source;
 import org.graalvm.polyglot.Value;
+import org.graalvm.polyglot.proxy.ProxyObject;
 
 import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager;
 import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager.ContextWrapper;
@@ -58,10 +60,14 @@ import com.wl4g.rengine.common.exception.EvaluationException;
 import com.wl4g.rengine.common.exception.ExecutionScriptException;
 import com.wl4g.rengine.common.graph.ExecutionGraphContext;
 import com.wl4g.rengine.common.graph.ExecutionGraphParameter;
+import com.wl4g.rengine.common.graph.ExecutionGraph.BaseOperator;
+import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
 import com.wl4g.rengine.executor.execution.sdk.ScriptContext;
+import com.wl4g.rengine.executor.execution.sdk.ScriptDataService;
 import com.wl4g.rengine.executor.execution.sdk.ScriptExecutor;
 import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
+import com.wl4g.rengine.executor.execution.sdk.ScriptContext.ScriptParameter;
 import com.wl4g.rengine.executor.metrics.ExecutorMeterService;
 import com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsTag;
 import com.wl4g.rengine.executor.minio.MinioManager.ObjectResource;
@@ -94,15 +100,13 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
     void onStart(@Observes StartupEvent event) {
         try {
             log.info("Initialzing graal JS script engine ...");
-            FileIOUtils.forceMkdir(new File(config.scriptLogDir()));
+            FileIOUtils.forceMkdir(new File(config.log().baseDir()));
 
             this.graalPolyglotManager = GraalPolyglotManager.newDefaultGraalJS(DEFAULT_EXECUTOR_TMP_SCRIPT_CACHE_DIR,
                     metadata -> new JdkLoggingOutputStream(buildLogFilePattern(false, metadata), Level.INFO,
-                            config.scriptLogFileMaxSize(), config.scriptLogFileMaxCount(), JvmRuntimeTool.isJvmInDebugging,
-                            false),
+                            config.log().fileMaxSize(), config.log().fileMaxCount(), JvmRuntimeTool.isJvmInDebugging, false),
                     metadata -> new JdkLoggingOutputStream(buildLogFilePattern(true, metadata), Level.WARNING,
-                            config.scriptLogFileMaxSize(), config.scriptLogFileMaxCount(), JvmRuntimeTool.isJvmInDebugging,
-                            true));
+                            config.log().fileMaxSize(), config.log().fileMaxCount(), JvmRuntimeTool.isJvmInDebugging, true));
         } catch (Exception e) {
             log.error("Failed to init graal JS Script engine.", e);
             throw new ExecutionScriptException(e);
@@ -177,14 +181,52 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
         }
     }
 
-    void bindingMembers(final @NotNull ScriptContext scriptContext, final @NotNull Value bindings) {
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @NotNull
+    private ScriptContext newScriptContext(final @NotNull ExecutionGraphContext graphContext) {
+        notNullOf(graphContext, "graphContext");
+
+        final ScriptDataService dataService = new ScriptDataService(defaultHttpClient, defaultSSHClient, defaultTCPClient,
+                defaultProcessClient, defaultRedisLockClient, globalDataSourceManager, globalMessageNotifierManager);
+
+        final ExecutionGraphParameter parameter = graphContext.getParameter();
+
+        final ScriptResult lastResult = isNull(graphContext.getLastResult()) ? null
+                : new ScriptResult(ReturnState.isTrue(graphContext.getLastResult().getReturnState()),
+                        graphContext.getLastResult().getValueMap());
+
+        final SafeScheduledTaskPoolExecutor executor = globalExecutorManager.getExecutor(parameter.getWorkflowId(),
+                config.perExecutorThreadPools());
+
+        return ScriptContext.builder()
+                .id(graphContext.getCurrentNode().getId())
+                .type(((BaseOperator<?>) graphContext.getCurrentNode()).getType())
+                .parameter(ScriptParameter.builder()
+                        .requestTime(parameter.getRequestTime())
+                        .clientId(parameter.getClientId())
+                        .traceId(parameter.getTraceId())
+                        .trace(parameter.isTrace())
+                        .scenesCode(parameter.getScenesCode())
+                        .workflowId(parameter.getWorkflowId())
+                        .args(ProxyObject.fromMap((Map) parameter.getArgs()))
+                        .build())
+                .lastResult(lastResult)
+                .dataService(dataService)
+                // .logger(new ScriptLogger(parameter.getScenesCode(),
+                // parameter.getWorkflowId(), minioManager))
+                .executor(createScriptExecutor(parameter, executor))
+                // .attributes(ProxyObject.fromMap(emptyMap()))
+                .build();
+    }
+
+    private void bindingMembers(final @NotNull ScriptContext scriptContext, final @NotNull Value bindings) {
         // Try not to bind implicit objects, let users create new objects by
         // self or get default objects from the graal context.
         REGISTER_MEMBERS.forEach((name, member) -> bindings.putMember(name, member));
     }
 
     @Override
-    ScriptExecutor createScriptExecutor(
+    protected ScriptExecutor createScriptExecutor(
             final @NotNull ExecutionGraphParameter parameter,
             final @NotNull SafeScheduledTaskPoolExecutor executor) {
         return new ScriptExecutor(parameter.getWorkflowId(), executor, graalPolyglotManager);
@@ -192,7 +234,7 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
 
     String buildLogFilePattern(boolean isStdErr, Map<String, Object> metadata) {
         final Long workflowId = (Long) safeMap(metadata).get(KEY_WORKFLOW_ID);
-        final String filePattern = config.scriptLogDir().concat("/").concat(workflowId + "").concat(isStdErr ? ".err" : ".log");
+        final String filePattern = config.log().baseDir().concat("/").concat(workflowId + "").concat(isStdErr ? ".err" : ".log");
         return filePattern;
     }
 

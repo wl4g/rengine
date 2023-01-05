@@ -9,51 +9,65 @@ function process(context) {
     console.info("context.getAttributes()['objId']:", context.getAttributes()["objId"]);
 
     // for case2:
-    const httpResult1 = testForHttpRequest1(context);
+    //const httpResult1 = testForHttpRequest1(context);
 
     // for case3:
-    const httpResult2 = testForHttpRequest2(context);
+    //const httpResult2 = testForHttpRequest2(context);
 
     // for case4:
-    const lockResult = testForRedisLockOperation(context);
+    const lockResult = testForRedisLockClient(context);
 
     // for case5:
-    const sshResult = testForSshExec(context);
+    const sshResult = testForSshClient(context);
 
     // for case6:
-    const processResult = testForProcessExec(context);
+    const processResult = testForProcessClient(context);
 
     // for case7:
-    const mongoResult = testForMongoQuery(context);
+    const mongoResult = testForMongoSourceFacade(context);
 
     // for case8:
-    const redisResult = testForRedisOperation(context);
+    const redisResult = testForRedisSourceFacade(context);
 
     // for case9:
-    const jdbcResult = testForJdbcSql(context);
+    const jdbcResult = testForJdbcSourceFacade(context);
 
     // for case10:
-    const kafkaResult = testForKafkaPublish(context);
+    const kafkaResult = testForKafkaSourceFacade(context);
 
     // for case11:
     testForExecutorTasks(context);
 
     // for case12:
-    testForAESEncryptions(context);
+    const dateHolderResult = testForDateHolder(context);
 
     // for case13:
-    testForRSAEncryptions(context);
+    const codingResult = testForCoding(context);
+
+    // for case14:
+    const hashingResult = testForHashing(context);
+
+    // for case15:
+    const aesResult = testForAES(context);
+
+    // for case16:
+    const rsaResult = testForRSA(context);
 
     return new ScriptResult(true)
-        .addValue("httpResult1", httpResult1)
-        .addValue("httpResult2", httpResult2)
+        //.addValue("httpResult1", httpResult1)
+        //.addValue("httpResult2", httpResult2)
         .addValue("lockResult", lockResult)
         .addValue("sshResult", sshResult)
         .addValue("processResult", processResult)
         .addValue("mongoResult", mongoResult)
         .addValue("redisResult", redisResult)
         .addValue("jdbcResult", jdbcResult)
-        .addValue("kafkaResult", kafkaResult);
+        .addValue("kafkaResult", kafkaResult)
+        .addValue("dateHolderResult", dateHolderResult)
+        .addValue("codingResult", codingResult)
+        .addValue("hashingResult", hashingResult)
+        .addValue("aesResult", aesResult)
+        .addValue("rsaResult", rsaResult);
 }
 
 function testForHttpRequest1(context) {
@@ -80,7 +94,7 @@ function testForHttpRequest2(context) {
     }
 }
 
-function testForRedisLockOperation(context) {
+function testForRedisLockClient(context) {
     try {
         const redisLockService = context.getDataService().getDefaultRedisLockClient();
         console.info("redisLockService: " + redisLockService);
@@ -97,7 +111,7 @@ function testForRedisLockOperation(context) {
     }
 }
 
-function testForSshExec(context) {
+function testForSshClient(context) {
     try {
         //const sshService = new ScriptSSHClient();
         const sshService = context.getDataService().getDefaultSSHClient();
@@ -109,7 +123,7 @@ function testForSshExec(context) {
     }
 }
 
-function testForProcessExec(context) {
+function testForProcessClient(context) {
     try {
         //const sshService = new ScriptSSHClient();
         const processService = context.getDataService().getDefaultProcessClient();
@@ -121,7 +135,7 @@ function testForProcessExec(context) {
     }
 }
 
-function testForMongoQuery(context) {
+function testForMongoSourceFacade(context) {
     try {
         const mongoQuery = [
             { $match: { "eventType": "ecommerce_trade_gift" } },
@@ -137,7 +151,7 @@ function testForMongoQuery(context) {
     }
 }
 
-function testForRedisOperation(context) {
+function testForRedisSourceFacade(context) {
     try {
         const redisService = context.getDataService().getRedisService("default");
         console.info("redisService: " + redisService);
@@ -150,7 +164,7 @@ function testForRedisOperation(context) {
     }
 }
 
-function testForJdbcSql(context) {
+function testForJdbcSourceFacade(context) {
     try {
         var sql = "select * from user where user='root'";
         const jdbcService = context.getDataService().getJDBCService("default");
@@ -163,7 +177,7 @@ function testForJdbcSql(context) {
     }
 }
 
-function testForKafkaPublish(context) {
+function testForKafkaSourceFacade(context) {
     try {
         const topic = "test_topic";
         const kafkaService = context.getDataService().getKafkaService("default");
@@ -197,7 +211,45 @@ function testForExecutorTasks(context) {
     }
 }
 
-function testForAESEncryptions(context) {
+function testForDateHolder(context) {
+    console.info("currentMillis: " + DateHolder.currentMillis());
+    console.info("currentNanoTime: " + DateHolder.currentNanoTime());
+    var date = DateHolder.getDate();
+    console.info("getDate: " + date);
+    console.info("formatDate: " + DateHolder.formatDate(date, "yyyy-MM-dd"));
+    console.info("getDateOf: " + DateHolder.getDateOf(5, 10, "yyyy-MM-dd"));
+    return date;
+}
+
+function testForCoding(context) {
+    var base64 = Coding.toBase64("1234567890abcdef");
+    console.info("base64: " + base64);
+    console.info("fromBase64: " + Coding.fromBase64(base64));
+
+    var base58 = Coding.toBase58("1234567890abcdef");
+    console.info("base58: " + base58);
+    console.info("fromBase58: " + Coding.fromBase64(base58));
+
+    var hex = Coding.toHex("1234567890abcdef");
+    console.info("hex: " + hex);
+    console.info("fromHex: " + Coding.fromHex(hex));
+    return hex;
+}
+
+function testForHashing(context) {
+    console.info("md5: " + Hashing.md5("1234567890abcdef"));
+    console.info("sha1: " + Hashing.sha1("1234567890abcdef"));
+    console.info("sha256: " + Hashing.sha256("1234567890abcdef"));
+    console.info("sha384: " + Hashing.sha384("1234567890abcdef"));
+    console.info("sha512: " + Hashing.sha512("1234567890abcdef"));
+    console.info("hmacSha1: " + Hashing.hmacSha1("abc", "1234567890abcdef"));
+    console.info("hmacSha256: " + Hashing.hmacSha256("abc", "1234567890abcdef"));
+    var hmacSha512 = Hashing.hmacSha512("abc", "1234567890abcdef");
+    console.info("hmacSha512: " + hmacSha512);
+    return hmacSha512;
+}
+
+function testForAES(context) {
     var base64Iv = Coding.toBase64("1234567890abcdef");
     console.info("base64Iv: " + base64Iv);
 
@@ -207,14 +259,15 @@ function testForAESEncryptions(context) {
     var plaintext = "abcdefghijklmnopqrstuvwxyz";
     console.info("plaintext: " + plaintext);
 
-    var ciphertext = AES.encrypt256CbcPkcs7ToBase64(base64Key, base64Iv, plaintext);
-    var plaintext2 = AES.decrypt256CbcPkcs7FromBase64(base64Key, base64Iv, ciphertext);
+    var ciphertext = AES.encryptCbcPkcs7ToBase64(base64Key, base64Iv, plaintext);
+    var plaintext2 = AES.decryptCbcPkcs7FromBase64(base64Key, base64Iv, ciphertext);
 
     console.info("ciphertext: " + ciphertext);
     console.info("plaintext2: " + plaintext2);
+    return plaintext2;
 }
 
-function testForRSAEncryptions(context) {
+function testForRSA(context) {
     var base64Key = RSA.generateKeyToBase64();
     console.info("base64Key: " + base64Key);
 
@@ -226,5 +279,6 @@ function testForRSAEncryptions(context) {
 
     console.info("ciphertext: " + ciphertext);
     console.info("plaintext2: " + plaintext2);
+    return plaintext2;
 }
 

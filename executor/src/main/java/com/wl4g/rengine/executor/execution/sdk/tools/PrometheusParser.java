@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.executor.execution.sdk.extension;
+package com.wl4g.rengine.executor.execution.sdk.tools;
 
-import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+import static java.util.Collections.emptyList;
 import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.replace;
 import static org.apache.commons.lang3.StringUtils.split;
@@ -43,6 +44,11 @@ import lombok.experimental.SuperBuilder;
  * @since v1.0.0
  */
 public class PrometheusParser {
+    private static final PrometheusParser DEFAULT = new PrometheusParser();
+
+    public static @HostAccess.Export PrometheusParser getInstance() {
+        return DEFAULT;
+    }
 
     public @HostAccess.Export PrometheusParser() {
     }
@@ -72,8 +78,11 @@ public class PrometheusParser {
      * @see {@link io.prometheus.client.exporter.common.TextFormat#writeFormat()}
      * @return
      */
-    public @HostAccess.Export String parse(String metricsString) {
-        List<PrometheusMetrics> metrics = Lists.newArrayList();
+    public @HostAccess.Export List<PrometheusMetrics> parse(String metricsString) {
+        if (isBlank(metricsString)) {
+            return emptyList();
+        }
+        final List<PrometheusMetrics> metrics = Lists.newArrayList();
 
         String[] lines = trimToEmpty(metricsString).split("\n");
         String currentHelp = "";
@@ -134,7 +143,7 @@ public class PrometheusParser {
             }
         }
 
-        return toJSONString(metrics);
+        return metrics;
     }
 
     @SuperBuilder

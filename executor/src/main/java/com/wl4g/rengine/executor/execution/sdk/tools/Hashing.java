@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.executor.execution.sdk.extension;
+package com.wl4g.rengine.executor.execution.sdk.tools;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static java.util.Objects.isNull;
 
+import org.apache.commons.codec.binary.Base64;
 import org.graalvm.polyglot.HostAccess;
 
 /**
@@ -29,6 +30,11 @@ import org.graalvm.polyglot.HostAccess;
  */
 @SuppressWarnings("deprecation")
 public class Hashing {
+    private static final Hashing DEFAULT = new Hashing();
+
+    public static @HostAccess.Export Hashing getInstance() {
+        return DEFAULT;
+    }
 
     public @HostAccess.Export Hashing() {
     }
@@ -37,56 +43,59 @@ public class Hashing {
         if (isNull(str)) {
             return null;
         }
-        return com.google.common.hash.Hashing.md5().hashBytes(str.getBytes(UTF_8)).toString();
+        return Base64.encodeBase64String(com.google.common.hash.Hashing.md5().hashBytes(str.getBytes(UTF_8)).asBytes());
     }
 
     public @HostAccess.Export String sha1(String str) {
         if (isNull(str)) {
             return null;
         }
-        return com.google.common.hash.Hashing.sha1().hashBytes(str.getBytes(UTF_8)).toString();
+        return Base64.encodeBase64String(com.google.common.hash.Hashing.sha1().hashBytes(str.getBytes(UTF_8)).asBytes());
     }
 
     public @HostAccess.Export String sha256(String str) {
         if (isNull(str)) {
             return null;
         }
-        return com.google.common.hash.Hashing.sha256().hashBytes(str.getBytes(UTF_8)).toString();
+        return Base64.encodeBase64String(com.google.common.hash.Hashing.sha256().hashBytes(str.getBytes(UTF_8)).asBytes());
     }
 
     public @HostAccess.Export String sha384(String str) {
         if (isNull(str)) {
             return null;
         }
-        return com.google.common.hash.Hashing.sha384().hashBytes(str.getBytes(UTF_8)).toString();
+        return Base64.encodeBase64String(com.google.common.hash.Hashing.sha384().hashBytes(str.getBytes(UTF_8)).asBytes());
     }
 
     public @HostAccess.Export String sha512(String str) {
         if (isNull(str)) {
             return null;
         }
-        return com.google.common.hash.Hashing.sha512().hashBytes(str.getBytes(UTF_8)).toString();
+        return Base64.encodeBase64String(com.google.common.hash.Hashing.sha512().hashBytes(str.getBytes(UTF_8)).asBytes());
     }
 
     public @HostAccess.Export String hmacSha1(String key, String str) {
         if (isNull(str)) {
             return null;
         }
-        return com.google.common.hash.Hashing.hmacSha1(key.getBytes(UTF_8)).hashBytes(str.getBytes(UTF_8)).toString();
+        return Base64.encodeBase64String(
+                com.google.common.hash.Hashing.hmacSha1(key.getBytes(UTF_8)).hashBytes(str.getBytes(UTF_8)).asBytes());
     }
 
     public @HostAccess.Export String hmacSha256(String key, String str) {
         if (isNull(str)) {
             return null;
         }
-        return com.google.common.hash.Hashing.hmacSha256(key.getBytes(UTF_8)).hashBytes(str.getBytes(UTF_8)).toString();
+        return Base64.encodeBase64String(
+                com.google.common.hash.Hashing.hmacSha256(key.getBytes(UTF_8)).hashBytes(str.getBytes(UTF_8)).asBytes());
     }
 
     public @HostAccess.Export String hmacSha512(String key, String str) {
         if (isNull(str)) {
             return null;
         }
-        return com.google.common.hash.Hashing.hmacSha512(key.getBytes(UTF_8)).hashBytes(str.getBytes(UTF_8)).toString();
+        return Base64.encodeBase64String(
+                com.google.common.hash.Hashing.hmacSha512(key.getBytes(UTF_8)).hashBytes(str.getBytes(UTF_8)).asBytes());
     }
 
 }

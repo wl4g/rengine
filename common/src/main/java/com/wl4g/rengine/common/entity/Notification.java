@@ -15,8 +15,6 @@
  */
 package com.wl4g.rengine.common.entity;
 
-import java.util.List;
-
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -26,13 +24,13 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.wl4g.infra.common.bean.BaseBean;
+import com.wl4g.infra.common.notification.MessageNotifier.NotifierKind;
 import com.wl4g.infra.common.validation.EnumValue;
 import com.wl4g.rengine.common.entity.Notification.AliyunSmsConfig;
 import com.wl4g.rengine.common.entity.Notification.AliyunVmsConfig;
 import com.wl4g.rengine.common.entity.Notification.DingtalkConfig;
 import com.wl4g.rengine.common.entity.Notification.EmailConfig;
-import com.wl4g.rengine.common.entity.Notification.WeComConfig;
-import com.wl4g.rengine.common.entity.Notification.WebhookConfig;
+import com.wl4g.rengine.common.entity.Notification.WeChatMpConfig;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -50,12 +48,12 @@ import lombok.experimental.SuperBuilder;
  */
 // 1.多态参见:https://swagger.io/docs/specification/data-models/inheritance-and-polymorphism/
 // 2.对于swagger3注解,父类必须是抽象的，否则swagger3页面请求参数schemas展开后会以父类名重复展示3个.
-@Schema(oneOf = { EmailConfig.class, DingtalkConfig.class, WeComConfig.class, AliyunSmsConfig.class, AliyunVmsConfig.class,
-        WebhookConfig.class }, discriminatorProperty = "@kind")
+@Schema(oneOf = { EmailConfig.class, DingtalkConfig.class, AliyunSmsConfig.class, AliyunVmsConfig.class, WeChatMpConfig.class },
+        discriminatorProperty = "@kind")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@kind", visible = true)
 @JsonSubTypes({ @Type(value = EmailConfig.class, name = "EMAIL"), @Type(value = DingtalkConfig.class, name = "DINGTALK"),
-        @Type(value = WeComConfig.class, name = "WECOM"), @Type(value = AliyunSmsConfig.class, name = "ALIYUNSMS"),
-        @Type(value = AliyunVmsConfig.class, name = "ALIYUNVMS"), @Type(value = WebhookConfig.class, name = "WEBHOOK") })
+        @Type(value = AliyunSmsConfig.class, name = "ALIYUN_SMS"), @Type(value = AliyunVmsConfig.class, name = "ALIYUN_VMS"),
+        @Type(value = WeChatMpConfig.class, name = "WECHAT_MP") })
 @Getter
 @Setter
 @SuperBuilder
@@ -64,9 +62,9 @@ import lombok.experimental.SuperBuilder;
 public abstract class Notification extends BaseBean {
     private static final long serialVersionUID = 1L;
 
-    @Schema(name = "@kind", implementation = NotificationKind.class)
+    @Schema(name = "@kind", implementation = NotifierKind.class)
     @JsonProperty(value = "@kind")
-    private @NotBlank @EnumValue(enumCls = NotificationKind.class) String kind;
+    private @NotBlank @EnumValue(enumCls = NotifierKind.class) String kind;
 
     @Getter
     @Setter
@@ -90,17 +88,9 @@ public abstract class Notification extends BaseBean {
     @NoArgsConstructor
     public static class DingtalkConfig extends Notification {
         private static final long serialVersionUID = 1L;
+        private String agentId;
         private @NotBlank String appKey;
         private @NotBlank String appSecret;
-    }
-
-    @Getter
-    @Setter
-    @SuperBuilder
-    @ToString
-    @NoArgsConstructor
-    public static class WeComConfig extends Notification {
-        private static final long serialVersionUID = 1L;
     }
 
     @Getter
@@ -134,13 +124,8 @@ public abstract class Notification extends BaseBean {
     @SuperBuilder
     @ToString
     @NoArgsConstructor
-    public static class WebhookConfig extends Notification {
+    public static class WeChatMpConfig extends Notification {
         private static final long serialVersionUID = 1L;
-        private List<String> urls;
-    }
-
-    public static enum NotificationKind {
-        EMAIL, DINGTALK, WECOM, ALIYUNSMS, ALIYUNVMS, WEBHOOK
     }
 
 }

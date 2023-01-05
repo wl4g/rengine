@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.executor.execution.sdk.extension;
+package com.wl4g.rengine.executor.execution.sdk.tools;
 
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseArrayMapObject;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseMapObject;
@@ -30,6 +30,11 @@ import org.graalvm.polyglot.HostAccess;
  * @since v1.0.0
  */
 public class JSON {
+    private static final JSON DEFAULT = new JSON();
+
+    public static @HostAccess.Export JSON getInstance() {
+        return DEFAULT;
+    }
 
     public @HostAccess.Export JSON() {
     }

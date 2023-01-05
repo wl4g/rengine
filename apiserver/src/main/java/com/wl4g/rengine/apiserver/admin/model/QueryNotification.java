@@ -17,8 +17,8 @@ package com.wl4g.rengine.apiserver.admin.model;
 
 import javax.annotation.Nullable;
 
+import com.wl4g.infra.common.notification.MessageNotifier.NotifierKind;
 import com.wl4g.infra.common.validation.EnumValue;
-import com.wl4g.rengine.common.entity.Notification.NotificationKind;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -40,6 +40,6 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 @NoArgsConstructor
 public class QueryNotification {
-    @Schema(implementation = NotificationKind.class)
-    private @Nullable @EnumValue(enumCls = NotificationKind.class) String kind;
+    @Schema(implementation = NotifierKind.class)
+    private @Nullable @EnumValue(enumCls = NotifierKind.class) String kind;
 }

@@ -39,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Singleton
-public class EvaluatorApplicationInitializer {
+public class ExecutorApplicationInitializer {
 
     void onStart(@Observes StartupEvent event, @ConfigProperty(name = "quarkus.application.name") String appName) {
         log.info("The application is starting...");

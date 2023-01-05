@@ -73,27 +73,58 @@ public interface ExecutionConfig {
     @Max(1)
     Float evaluateTimeoutOffsetRate();
 
-    @WithDefault(DEFAULT_SCRIPT_LOG_DIR)
-    @NotBlank
-    String scriptLogDir();
-
-    @WithDefault(DEFAULT_SCRIPT_LOG_FILE_MAX_SIZE + "")
     @NotNull
-    @Min(1024)
-    Integer scriptLogFileMaxSize();
+    ScriptLogConfig log();
 
-    @WithDefault(DEFAULT_SCRIPT_LOG_FILE_MAX_COUNT + "")
     @NotNull
-    @Min(1)
-    Integer scriptLogFileMaxCount();
+    NotifierConfig notifier();
 
-    public static final String DEFAULT_SCENES_RULES_CACHED_PREFIX = "rengine:scenes:rules:cached:";
+    public static interface ScriptLogConfig {
+        @WithDefault(DEFAULT_SCRIPT_LOG_BASE_DIR)
+        @NotBlank
+        String baseDir();
+
+        @WithDefault(DEFAULT_SCRIPT_LOG_FILE_MAX_SIZE + "")
+        @NotNull
+        @Min(1024)
+        Integer fileMaxSize();
+
+        @WithDefault(DEFAULT_SCRIPT_LOG_FILE_MAX_COUNT + "")
+        @NotNull
+        @Min(1)
+        Integer fileMaxCount();
+    }
+
+    public static interface NotifierConfig {
+        @WithDefault(DEFAULT_NOTIFIER_REFRESH_LOCK_TIMEOUT + "")
+        @NotNull
+        @Min(0)
+        Long refreshLockTimeout();
+
+        @WithDefault(DEFAULT_NOTIFIER_REFRESHED_CACHED_PREFIX + "")
+
+        @NotBlank
+        String refreshedCachedPrefix();
+
+        @WithDefault(DEFAULT_NOTIFIER_EXPIRE_OFFSET_RATE + "")
+        @NotNull
+        @Min(0)
+        @Max(1)
+        Float refreshedCachedExpireOffsetRate();
+    }
+
+    public static final String DEFAULT_SCENES_RULES_CACHED_PREFIX = "rengine:executor:scenes:rules:";
     public static final long DEFAULT_SCENES_RULES_CACHED_EXPIRE = 15 * 60 * 1000;
     public static final int DEFAULT_EXECUTOR_THREAD_POOLS = 10;
     public static final int DEFAULT_PER_EXECUTOR_THREAD_POOLS = 2;
     public static final int DEFAULT_MAX_QUERY_BATCH = 1024;
     public static final float DEFAULT_TIMEOUT_OFFSET_RATE = 0.1f;
-    public static final String DEFAULT_SCRIPT_LOG_DIR = "/tmp/__rengine_script_log";
+
+    public static final String DEFAULT_SCRIPT_LOG_BASE_DIR = "/tmp/__rengine_script_log";
     public static final int DEFAULT_SCRIPT_LOG_FILE_MAX_SIZE = 512 * 1024 * 1024;
     public static final int DEFAULT_SCRIPT_LOG_FILE_MAX_COUNT = 10;
+
+    public static final long DEFAULT_NOTIFIER_REFRESH_LOCK_TIMEOUT = 60 * 1000L;
+    public static final String DEFAULT_NOTIFIER_REFRESHED_CACHED_PREFIX = "rengine:executor:sdk:notifier:refreshed:";
+    public static final float DEFAULT_NOTIFIER_EXPIRE_OFFSET_RATE = 0.1f;
 }

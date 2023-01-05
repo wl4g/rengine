@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.executor.execution.sdk.extension;
+package com.wl4g.rengine.executor.execution.sdk.tools;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static java.util.Objects.isNull;
@@ -33,6 +33,11 @@ import com.wl4g.infra.common.codec.Base58;
  * @since v1.0.0
  */
 public class Coding {
+    private static final Coding DEFAULT = new Coding();
+
+    public static @HostAccess.Export Coding getInstance() {
+        return DEFAULT;
+    }
 
     public @HostAccess.Export Coding() {
     }
@@ -44,11 +49,11 @@ public class Coding {
         return Base58.encodeBase58(str);
     }
 
-    public @HostAccess.Export String fromBase58(String str) {
-        if (isNull(str)) {
+    public @HostAccess.Export String fromBase58(String base58Str) {
+        if (isNull(base58Str)) {
             return null;
         }
-        return new String(Base58.decodeBase58(str), UTF_8);
+        return new String(Base58.decodeBase58(base58Str), UTF_8);
     }
 
     public @HostAccess.Export String toBase64(String str) {
@@ -58,11 +63,11 @@ public class Coding {
         return Base64.encodeBase64String(str.getBytes(UTF_8));
     }
 
-    public @HostAccess.Export String fromBase64(String str) {
-        if (isNull(str)) {
+    public @HostAccess.Export String fromBase64(String base64Str) {
+        if (isNull(base64Str)) {
             return null;
         }
-        return new String(Base64.decodeBase64(str.getBytes(UTF_8)), UTF_8);
+        return new String(Base64.decodeBase64(base64Str.getBytes(UTF_8)), UTF_8);
     }
 
     public @HostAccess.Export String toHex(String str) {
@@ -72,11 +77,47 @@ public class Coding {
         return Hex.encodeHexString(str.getBytes(UTF_8));
     }
 
-    public @HostAccess.Export String fromHex(String str) throws DecoderException {
-        if (isNull(str)) {
+    public @HostAccess.Export String fromHex(String hexStr) throws DecoderException {
+        if (isNull(hexStr)) {
             return null;
         }
-        return new String(Hex.decodeHex(str), UTF_8);
+        return new String(Hex.decodeHex(hexStr), UTF_8);
+    }
+
+    public @HostAccess.Export String toBase58FromHex(String hexStr) {
+        if (isNull(hexStr)) {
+            return null;
+        }
+        try {
+            return Base58.encodeBase58(Hex.decodeHex(hexStr));
+        } catch (DecoderException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    public @HostAccess.Export String toHexFromBase58(String base58Str) {
+        if (isNull(base58Str)) {
+            return null;
+        }
+        return Hex.encodeHexString(Base58.decodeBase58(base58Str));
+    }
+
+    public @HostAccess.Export String toBase64FromHex(String hexStr) {
+        if (isNull(hexStr)) {
+            return null;
+        }
+        try {
+            return Base64.encodeBase64String(Hex.decodeHex(hexStr));
+        } catch (DecoderException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    public @HostAccess.Export String toHexFromBase64(String base64Str) {
+        if (isNull(base64Str)) {
+            return null;
+        }
+        return Hex.encodeHexString(Base64.decodeBase64(base64Str.getBytes(UTF_8)));
     }
 
 }
