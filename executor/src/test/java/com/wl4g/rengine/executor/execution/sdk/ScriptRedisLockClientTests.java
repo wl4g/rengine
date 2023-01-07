@@ -20,28 +20,17 @@ import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.util.Arrays.asList;
 
-import java.time.Duration;
 import java.util.List;
-import java.util.OptionalInt;
 import java.util.concurrent.locks.Lock;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.wl4g.rengine.executor.metrics.MeterUtilTests;
+import com.wl4g.rengine.executor.util.TestDefaultRedisSetup;
 
-import io.quarkus.runtime.LaunchMode;
-import io.quarkus.vertx.core.runtime.QuarkusExecutorFactory;
-import io.quarkus.vertx.core.runtime.config.VertxConfiguration;
-import io.vertx.core.Vertx;
-import io.vertx.core.impl.VertxBuilder;
-import io.vertx.core.net.impl.transport.Transport;
-import io.vertx.core.spi.VertxThreadFactory;
-import io.vertx.mutiny.redis.client.Redis;
 import io.vertx.mutiny.redis.client.RedisAPI;
 import io.vertx.mutiny.redis.client.Response;
-import io.vertx.redis.client.RedisClientType;
-import io.vertx.redis.client.RedisOptions;
 
 /**
  * {@link ScriptRedisLockClientTests}
@@ -60,7 +49,8 @@ public class ScriptRedisLockClientTests {
 
     @Test
     public void testQuarksRedisEvalScript() {
-        final RedisAPI redisApi = createRedisAPIDefault(createRedisDefault(createVertxDefault()));
+        final RedisAPI redisApi = TestDefaultRedisSetup
+                .buildRedisAPIDefault(TestDefaultRedisSetup.buildRedisDefault(TestDefaultRedisSetup.buildVertxDefault()));
 
         final List<String> keys = asList("testLocks");
         final int numkeys = keys.size();
@@ -89,51 +79,13 @@ public class ScriptRedisLockClientTests {
 
     @Test
     public void testGetLockWithRedisDataSource() {
-        final Vertx vertx = createVertxDefault();
-        final Redis redis = createRedisDefault(vertx);
-        final RedisAPI redisAPI = createRedisAPIDefault(redis);
-        final io.quarkus.redis.datasource.RedisDataSource redisDS = new io.quarkus.redis.runtime.datasource.BlockingRedisDataSourceImpl(
-                new io.vertx.mutiny.core.Vertx(vertx), redis, redisAPI, Duration.ofSeconds(5));
+        final io.quarkus.redis.datasource.RedisDataSource redisDS = TestDefaultRedisSetup.buildRedisDataSourceDefault();
 
         final ScriptRedisLockClient lockClient = new ScriptRedisLockClient(redisDS);
         final Lock lock = lockClient.getLock("testLock");
         final boolean locks = lock.tryLock();
         System.out.println(format("Gets locks : %s for : %s", lock, locks));
         assert locks;
-    }
-
-    public static Vertx createVertxDefault() {
-        final VertxConfiguration conf = new VertxConfiguration();
-        conf.queueSize = OptionalInt.of(2);
-        conf.workerPoolSize = 2;
-        conf.eventLoopsPoolSize = OptionalInt.of(2);
-        conf.internalBlockingPoolSize = 2;
-        conf.keepAliveTime = Duration.ofSeconds(3);
-        conf.maxWorkerExecuteTime = Duration.ofSeconds(3);
-        return new VertxBuilder().transport(Transport.transport(true))
-                .executorServiceFactory(new QuarkusExecutorFactory(conf, LaunchMode.TEST))
-                .threadFactory(VertxThreadFactory.INSTANCE)
-                .vertx();
-    }
-
-    public static Redis createRedisDefault(final Vertx vertx) {
-        final RedisOptions options = new RedisOptions().addConnectionString("redis://localhost:6379")
-                .addConnectionString("redis://localhost:6380")
-                .addConnectionString("redis://localhost:6381")
-                .addConnectionString("redis://localhost:7379")
-                .addConnectionString("redis://localhost:7380")
-                .addConnectionString("redis://localhost:7381")
-                .setPassword("zzx!@#$%")
-                .setType(RedisClientType.CLUSTER);
-
-        // final io.vertx.redis.client.impl.RedisClient redisClient = new
-        // io.vertx.redis.client.impl.RedisClient(vertx, options);
-
-        return Redis.createClient(new io.vertx.mutiny.core.Vertx(vertx), options);
-    }
-
-    public static RedisAPI createRedisAPIDefault(final Redis redis) {
-        return RedisAPI.api(redis);
     }
 
 }

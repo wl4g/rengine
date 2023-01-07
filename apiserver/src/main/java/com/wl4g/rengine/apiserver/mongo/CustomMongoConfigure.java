@@ -1,11 +1,5 @@
 package com.wl4g.rengine.apiserver.mongo;
 
-import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
-import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
-import static java.util.Collections.singletonMap;
-
-import java.util.Map;
-
 import org.bson.Document;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
@@ -23,11 +17,9 @@ import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 //import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions.MongoConverterConfigurationAdapter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wl4g.infra.common.serialize.BsonUtils2;
-import com.wl4g.infra.common.serialize.JacksonUtils;
 import com.wl4g.rengine.common.entity.DataSourceProperties;
 import com.wl4g.rengine.common.entity.WorkflowGraph;
+import com.wl4g.rengine.common.util.BsonEntitySerializers;
 
 /**
  * {@link CustomMongoConfigure}
@@ -87,7 +79,7 @@ public class CustomMongoConfigure extends AbstractMongoClientConfiguration {
     static class WorkflowGraphToDocumentConverter implements Converter<WorkflowGraph, Document> {
         @Override
         public Document convert(final WorkflowGraph source) {
-            return Document.parse(toJSONString(DEFAULT_MODIFIER_MAPPER, source, ID_TRANSFORM_DESERIALIZE, IGNORE_PROPERTIES));
+            return BsonEntitySerializers.toDocument(source);
         }
     }
 
@@ -95,8 +87,7 @@ public class CustomMongoConfigure extends AbstractMongoClientConfiguration {
     static class DocumentToWorkflowGraphConverter implements Converter<Document, WorkflowGraph> {
         @Override
         public WorkflowGraph convert(Document source) {
-            return parseJSON(DEFAULT_MODIFIER_MAPPER, source.toJson(BsonUtils2.DEFAULT_JSON_WRITER_SETTINGS), WorkflowGraph.class,
-                    CustomMongoConfigure.ID_TRANSFORM_DESERIALIZE, CustomMongoConfigure.IGNORE_PROPERTIES);
+            return BsonEntitySerializers.fromDocument(source, WorkflowGraph.class);
         }
     }
 
@@ -104,7 +95,7 @@ public class CustomMongoConfigure extends AbstractMongoClientConfiguration {
     static class DataSourcePropertiesToDocumentConverter implements Converter<DataSourceProperties, Document> {
         @Override
         public Document convert(final DataSourceProperties source) {
-            return Document.parse(toJSONString(DEFAULT_MODIFIER_MAPPER, source, ID_TRANSFORM_SERIALIZE, IGNORE_PROPERTIES));
+            return BsonEntitySerializers.toDocument(source);
         }
     }
 
@@ -112,19 +103,7 @@ public class CustomMongoConfigure extends AbstractMongoClientConfiguration {
     static class DocumentToDataSourcePropertiesConverter implements Converter<Document, DataSourceProperties> {
         @Override
         public DataSourceProperties convert(Document source) {
-            return parseJSON(DEFAULT_MODIFIER_MAPPER, source.toJson(BsonUtils2.DEFAULT_JSON_WRITER_SETTINGS),
-                    DataSourceProperties.class, CustomMongoConfigure.ID_TRANSFORM_DESERIALIZE,
-                    CustomMongoConfigure.IGNORE_PROPERTIES);
+            return BsonEntitySerializers.fromDocument(source, DataSourceProperties.class);
         }
     }
-
-    // Notice: When using a custom modifier, you should use an independent
-    // objectMapper, because the same objectmapper instance will cache the
-    // serializer of the target bean, which may cause the modifier to fail.
-    static final ObjectMapper DEFAULT_MODIFIER_MAPPER = JacksonUtils.newDefaultObjectMapper();
-
-    static final Map<String, String> ID_TRANSFORM_SERIALIZE = singletonMap("id", "_id");
-    static final Map<String, String> ID_TRANSFORM_DESERIALIZE = singletonMap("_id", "id");
-    static final String[] IGNORE_PROPERTIES = new String[] { "humanCreateDate", "humanUpdateDate" };
-
 }

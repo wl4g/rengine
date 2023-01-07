@@ -24,7 +24,7 @@ import org.apache.flink.types.Row;
 import java.util.List;
 
 /**
- * A source function that collects provided data periodically at a fixed
+ * BsonEntitySerializers source function that collects provided data periodically at a fixed
  * interval.
  */
 public class PeriodicSourceFunction implements SourceFunction<Row> {

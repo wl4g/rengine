@@ -39,10 +39,10 @@ import com.wl4g.rengine.executor.execution.sdk.datasource.JDBCSourceFacade.JDBCS
 import com.wl4g.rengine.executor.execution.sdk.datasource.KafkaSourceFacade.KafkaSourceFacadeBuilder;
 import com.wl4g.rengine.executor.execution.sdk.datasource.MongoSourceFacade.MongoSourceFacadeBuilder;
 import com.wl4g.rengine.executor.execution.sdk.datasource.RedisSourceFacade.RedisSourceFacadeBuilder;
-import com.wl4g.rengine.executor.util.TestSetupDefaults;
+import com.wl4g.rengine.executor.util.TestDefaultBaseSetup;
 
 /**
- * {@link GlobalDataSourceManagerTests}
+ * {@link GlobalMessageNotifierManagerTests}
  * 
  * @author James Wong
  * @version 2022-09-27
@@ -58,7 +58,7 @@ public class GlobalDataSourceManagerTests {
     public static void setup() throws Exception {
         // @formatter:off
         //if (!isBlank(System.getenv("TEST_USE_DEFAULT_MONGODB")) && isNull(mongoDBContainer)) {
-        //    synchronized (GlobalDataSourceManagerTests.class) {
+        //    synchronized (GlobalMessageNotifierManagerTests.class) {
         //        if (isNull(mongoDBContainer)) {
         //            mongoDBContainer = new MongoDBContainer(
         //                    DockerImageName.parse("bitnami/mongodb:4.4.6").asCompatibleSubstituteFor("mongo:4.4.6"));
@@ -74,8 +74,8 @@ public class GlobalDataSourceManagerTests {
             synchronized (GlobalDataSourceManagerTests.class) {
                 if (isNull(globalDataSourceManager)) {
                     globalDataSourceManager = new GlobalDataSourceManager();
-                    globalDataSourceManager.config = TestSetupDefaults.createExecutionConfig();
-                    globalDataSourceManager.mongoRepository = TestSetupDefaults.createMongoRepository();
+                    globalDataSourceManager.config = TestDefaultBaseSetup.createExecutionConfig();
+                    globalDataSourceManager.mongoRepository = TestDefaultBaseSetup.createMongoRepository();
                     globalDataSourceManager.builders = asList(new MongoSourceFacadeBuilder(), new JDBCSourceFacadeBuilder(),
                             new RedisSourceFacadeBuilder(), new KafkaSourceFacadeBuilder());
                     globalDataSourceManager.init();

@@ -830,7 +830,7 @@ public class CepPatternTests {
         DataStreamSource<Integer> elements = env.fromElements(1, 2, 3);
         OutputTag<Integer> outputTag = new OutputTag<Integer>("AAA") {
         };
-        CEP.pattern(elements, Pattern.begin("A"))
+        CEP.pattern(elements, Pattern.begin("BsonEntitySerializers"))
                 .inProcessingTime()
                 .flatSelect(outputTag, new PatternFlatTimeoutFunction<Integer, Integer>() {
                     @Override

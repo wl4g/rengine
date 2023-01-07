@@ -32,13 +32,13 @@ import com.wl4g.rengine.executor.execution.ExecutionConfig;
 import com.wl4g.rengine.executor.repository.MongoRepository;
 
 /**
- * {@link TestSetupDefaults}
+ * {@link TestDefaultBaseSetup}
  * 
  * @author James Wong
  * @version 2022-10-10
  * @since v1.0.0
  */
-public abstract class TestSetupDefaults {
+public abstract class TestDefaultBaseSetup {
 
     public static MongoRepository createMongoRepository() {
         MongoClient mongoClient = new MongoClientImpl(MongoClientSettings.builder()

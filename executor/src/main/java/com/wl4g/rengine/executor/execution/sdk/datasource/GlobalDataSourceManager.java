@@ -21,7 +21,6 @@ import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.isNull;
@@ -48,13 +47,13 @@ import org.bson.Document;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
-import com.wl4g.infra.common.serialize.BsonUtils2;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.DataSourceProperties;
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourcePropertiesBase;
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
 import com.wl4g.rengine.common.exception.ConfigRengineException;
 import com.wl4g.rengine.common.exception.RengineException;
+import com.wl4g.rengine.common.util.BsonEntitySerializers;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
 import com.wl4g.rengine.executor.execution.sdk.datasource.DataSourceFacade.DataSourceFacadeBuilder;
 import com.wl4g.rengine.executor.metrics.ExecutorMeterService;
@@ -161,7 +160,7 @@ public final class GlobalDataSourceManager {
                 .find(Filters.and(Filters.eq("properties.type", dataSourceType), Filters.eq("name", dataSourceName)))
                 .batchSize(2)
                 .limit(2)
-                .map(doc -> parseJSON(doc.toJson(BsonUtils2.DEFAULT_JSON_WRITER_SETTINGS), DataSourceProperties.class))
+                .map(doc -> BsonEntitySerializers.fromDocument(doc, DataSourceProperties.class))
                 .iterator();) {
 
             // Check should have only one.

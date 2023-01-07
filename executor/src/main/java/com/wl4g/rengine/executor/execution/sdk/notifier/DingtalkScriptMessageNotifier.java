@@ -15,21 +15,27 @@
  */
 package com.wl4g.rengine.executor.execution.sdk.notifier;
 
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+
 import java.util.Map;
 
 import javax.inject.Singleton;
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.notification.MessageNotifier.NotifierKind;
+import com.wl4g.infra.common.notification.dingtalk.DingtalkMessageNotifier;
 import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI;
 import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.AccessToken;
 import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.AccessTokenResult;
 import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.CreateSceneGroupV2;
 import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.CreateSceneGroupV2Result;
+import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.MsgKeyType;
+import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.RobotGroupMessagesSend;
 import com.wl4g.rengine.common.entity.Notification;
 import com.wl4g.rengine.common.entity.Notification.DingtalkConfig;
 
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * {@link DingtalkScriptMessageNotifier}
@@ -39,6 +45,7 @@ import lombok.Getter;
  * @since v1.0.0
  */
 @Getter
+@Setter
 @Singleton
 public class DingtalkScriptMessageNotifier implements ScriptMessageNotifier {
 
@@ -50,13 +57,31 @@ public class DingtalkScriptMessageNotifier implements ScriptMessageNotifier {
     }
 
     @Override
-    public Object send(Map<String, Object> parameter) {
-        final String accessToken = refreshed().getAccessToken();
-        return DingtalkAPI.sendRobotGroupMessages(accessToken, null);
+    public Object send(final @NotNull Map<String, Object> parameter) {
+        final String accessToken = getRequiredRefreshed().getAccessToken();
+        final String msgKey = (String) parameter.getOrDefault(DingtalkMessageNotifier.KEY_MSG_KEY,
+                MsgKeyType.sampleMarkdown.name());
+        final String msgParam = (String) parameter.get(DingtalkMessageNotifier.KEY_MSG_PARAM);
+        final String openConversationId = (String) parameter.get(DingtalkMessageNotifier.KEY_OPEN_CONVERSATION_ID);
+        final String robotCode = (String) parameter.get(DingtalkMessageNotifier.KEY_ROBOT_CODE);
+
+        hasTextOf(accessToken, "acccessToken");
+        hasTextOf(msgKey, "msgKey");
+        hasTextOf(msgParam, "msgParam");
+        hasTextOf(robotCode, "robotCode");
+        hasTextOf(openConversationId, "openConversationId");
+
+        return DingtalkAPI.sendRobotGroupMessages(accessToken,
+                RobotGroupMessagesSend.builder()
+                        .msgKey(MsgKeyType.valueOf(msgKey))
+                        .msgParam(msgParam)
+                        .openConversationId(openConversationId)
+                        .robotCode(robotCode)
+                        .build());
     }
 
     public CreateSceneGroupV2Result createSceneGroupV2(final @NotNull CreateSceneGroupV2 request) {
-        final String accessToken = refreshed().getAccessToken();
+        final String accessToken = getRequiredRefreshed().getAccessToken();
         return DingtalkAPI.createSceneGroupV2(accessToken, request);
     }
 
@@ -65,13 +90,14 @@ public class DingtalkScriptMessageNotifier implements ScriptMessageNotifier {
         final DingtalkConfig config = (DingtalkConfig) notification;
         final AccessTokenResult result = DingtalkAPI
                 .getAccessToken(AccessToken.builder().appKey(config.getAppKey()).appSecret(config.getAppSecret()).build());
-        return (this.refreshed = RefreshedInfo.builder()
+
+        return RefreshedInfo.builder()
                 .notifierType(kind())
-                // .appKey(config.getAppKey())
+                .appKey(config.getAppKey())
                 // .appSecret(config.getAppSecret())
                 .accessToken(result.getAccessToken())
                 .expireSeconds(result.getExpireIn())
-                .build());
+                .build();
     }
 
 }

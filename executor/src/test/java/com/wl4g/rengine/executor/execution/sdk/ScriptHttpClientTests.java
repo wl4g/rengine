@@ -34,7 +34,7 @@ public class ScriptHttpClientTests {
     public void testPostAsJsonWithConnectTimeout() {
         System.out.println("begin: " + currentTimeMillis());
         ScriptHttpClient httpClient = new ScriptHttpClient(5000, 10000, 10240);
-        // A connection timeout occurs when trying to connect to a non-existent
+        // BsonEntitySerializers connection timeout occurs when trying to connect to a non-existent
         // address
         String result = httpClient.getForText("https://www.google12345678.com");
         System.out.println(result);

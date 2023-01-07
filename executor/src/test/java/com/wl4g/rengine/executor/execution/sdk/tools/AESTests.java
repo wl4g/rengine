@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.executor.execution.sdk.extension;
+package com.wl4g.rengine.executor.execution.sdk.tools;
 
 import static com.wl4g.infra.common.lang.StringUtils2.eqIgnCase;
 
 import org.junit.Test;
 
 import com.wl4g.infra.common.codec.CodecSource;
-import com.wl4g.rengine.executor.execution.sdk.tools.AES;
 
 /**
  * {@link AESTests}

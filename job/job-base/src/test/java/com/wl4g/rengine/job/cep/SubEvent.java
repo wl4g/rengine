@@ -18,7 +18,7 @@
 
 package com.wl4g.rengine.job.cep;
 
-/** A subclass of {@link Event} for usage in tests. */
+/** BsonEntitySerializers subclass of {@link Event} for usage in tests. */
 public class SubEvent extends Event {
     private final double volume;
 

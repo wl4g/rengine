@@ -45,11 +45,11 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
 import com.wl4g.infra.common.locks.JedisLockManager;
 import com.wl4g.infra.common.notification.MessageNotifier.NotifierKind;
-import com.wl4g.infra.common.serialize.BsonUtils2;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.Notification;
 import com.wl4g.rengine.common.exception.ConfigRengineException;
 import com.wl4g.rengine.common.exception.RengineException;
+import com.wl4g.rengine.common.util.BsonEntitySerializers;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
 import com.wl4g.rengine.executor.execution.sdk.ScriptRedisLockClient;
 import com.wl4g.rengine.executor.execution.sdk.notifier.ScriptMessageNotifier.RefreshedInfo;
@@ -107,43 +107,73 @@ public class GlobalMessageNotifierManager {
     }
 
     public ScriptMessageNotifier getMessageNotifier(final @NotNull NotifierKind notifierType) {
-        final ScriptMessageNotifier notifier = notifierMap.get(notifierType);
+        final ScriptMessageNotifier notifier = notifierMap.get(notNullOf(notifierType, "notifierType"));
         notNull(notifier, "Unable to get notifier, please check if notifier of type %s is supported and implemented.",
                 notifierType);
+        return ensureRefreshed(notifier);
+    }
 
-        RefreshedInfo refreshed = loadRefreshedInfo(notifierType);
+    /**
+     * Make sure that the refreshed info of the currently obtained notifier is
+     * valid.
+     * 
+     * @param notifier
+     * @return
+     */
+    ScriptMessageNotifier ensureRefreshed(final @NotNull ScriptMessageNotifier notifier) {
+        final NotifierKind notifierType = notifier.kind();
+        RefreshedInfo refreshed = loadRefreshed(notifierType);
         if (isNull(refreshed)) {
-            // Use distributed exclusive locks to prevent other nodes in the
-            // cluster from overwriting repeated refreshes.
-            final Lock lock = lockManager.getLock(DEFAULT_LOCK_PREFIX.concat(notifierType.name()));
-            try {
-                if (lock.tryLock(config.notifier().refreshLockTimeout(), TimeUnit.MILLISECONDS)) {
-                    refreshed = loadRefreshedInfo(notifierType);
-                    if (isNull(refreshed)) { // expired?
-                        refreshed = notifier.refresh(findNotification(notifierType));
-                        saveRefreshedInfo(refreshed);
+            synchronized (notifierType) {
+                refreshed = loadRefreshed(notifierType);
+                if (isNull(refreshed)) {
+                    // Here we give priority to using local locks to prevent
+                    // local multi-threaded execution. After obtaining local
+                    // locks, we also need to obtain distributed locks to
+                    // prevent other nodes in the cluster from preempting
+                    // execution. In this way, multi-level locks are used to
+                    // ensure performance as much as possible.
+                    final Lock lock = lockManager.getLock(DEFAULT_LOCK_PREFIX.concat(notifierType.name()),
+                            config.notifier().refreshLockTimeout(), TimeUnit.MILLISECONDS);
+                    try {
+                        if (lock.tryLock()) {
+                            refreshed = loadRefreshed(notifierType);
+                            if (isNull(refreshed)) { // expired?
+                                refreshed = notifier.refresh(findNotification(notifierType));
+                                saveRefreshed(refreshed);
+                            }
+                        }
+                    } catch (Exception e) {
+                        log.error(format("Failed to refresh notifier for '%s'.", notifierType), e);
+                    } finally {
+                        lock.unlock();
                     }
                 }
-            } catch (InterruptedException e) {
-                log.error(format("Failed to refresh notifier for '%s'.", notifierType), e);
-            } finally {
-                lock.unlock();
             }
         }
+        // Sets to current effective refreshed.
+        notifier.setRefreshed(refreshed);
 
         return notifier;
     }
 
-    RefreshedInfo loadRefreshedInfo(NotifierKind notifierType) {
-        return parseJSON(redisStringCommands.get(config.notifier().refreshedCachedPrefix().concat(notifierType.name())),
-                RefreshedInfo.class);
+    RefreshedInfo loadRefreshed(NotifierKind notifierType) {
+        return parseJSON(redisStringCommands.get(buildRefreshedCachedKey(notifierType)), RefreshedInfo.class);
     }
 
-    void saveRefreshedInfo(RefreshedInfo refreshed) {
-        final int expireSeconds = (int) (refreshed.getExpireSeconds()
+    void saveRefreshed(RefreshedInfo refreshed) {
+        final int effectiveExpireSec = (int) (refreshed.getExpireSeconds()
                 * (1 - config.notifier().refreshedCachedExpireOffsetRate()));
-        redisStringCommands.set(config.notifier().refreshedCachedPrefix().concat(refreshed.getNotifierType().name()),
-                toJSONString(refreshed), new SetArgs().px(Duration.ofSeconds(expireSeconds)));
+        // Sets effective expire.
+        refreshed.setEffectiveExpireSeconds(effectiveExpireSec);
+
+        redisStringCommands.set(buildRefreshedCachedKey(refreshed.getNotifierType()), toJSONString(refreshed),
+                new SetArgs().px(Duration.ofSeconds(effectiveExpireSec)));
+    }
+
+    String buildRefreshedCachedKey(final @NotNull NotifierKind notifierType) {
+        notNullOf(notifierType, "notifierType");
+        return config.notifier().refreshedCachedPrefix().concat(notifierType.name());
     }
 
     @NotNull
@@ -164,10 +194,10 @@ public class GlobalMessageNotifierManager {
         final MongoCollection<Document> collection = mongoRepository
                 .getCollection(MongoCollectionDefinition.SYS_NOTIFICATION_CONFIG);
 
-        try (final MongoCursor<Notification> cursor = collection.find(Filters.and(Filters.in("properties.type", notifierTypes)))
+        try (final MongoCursor<Notification> cursor = collection.find(Filters.and(Filters.in("type", notifierTypes)))
                 .batchSize(2)
                 .limit(2)
-                .map(doc -> parseJSON(doc.toJson(BsonUtils2.DEFAULT_JSON_WRITER_SETTINGS), Notification.class))
+                .map(doc -> BsonEntitySerializers.fromDocument(doc, Notification.class))
                 .iterator();) {
 
             // Check should have only one.

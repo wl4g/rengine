@@ -28,7 +28,7 @@ import org.junit.Test;
 
 import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
 import com.wl4g.rengine.executor.service.EvaluatorService;
-import com.wl4g.rengine.executor.util.TestSetupDefaults;
+import com.wl4g.rengine.executor.util.TestDefaultBaseSetup;
 
 import io.quarkus.redis.datasource.ReactiveRedisDataSource;
 import io.quarkus.redis.datasource.bitmap.ReactiveBitMapCommands;
@@ -77,8 +77,8 @@ public class EvaluatorServiceTests {
 
         // Manual setup/inject depends.
         final EvaluatorServiceImpl evaluatorService = new EvaluatorServiceImpl(testNullReactiveRedisDataSource);
-        evaluatorService.mongoRepository = TestSetupDefaults.createMongoRepository();
-        evaluatorService.config = TestSetupDefaults.createExecutionConfig();
+        evaluatorService.mongoRepository = TestDefaultBaseSetup.createMongoRepository();
+        evaluatorService.config = TestDefaultBaseSetup.createExecutionConfig();
         this.evaluatorService = evaluatorService;
     }
 

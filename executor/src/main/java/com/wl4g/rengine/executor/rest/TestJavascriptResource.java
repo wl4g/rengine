@@ -131,7 +131,7 @@ public class TestJavascriptResource {
             //                .principals(singletonList("admin"))
             //                .location(EventLocation.builder().zipcode("20500").build())
             //                .build(),
-            //        "A serious alarm occurs when the device temperature is greater than 52℃", singletonMap("objId", "1010012"));
+            //        "BsonEntitySerializers serious alarm occurs when the device temperature is greater than 52℃", singletonMap("objId", "1010012"));
             // @formatter:on
 
             Map<String, Object> attributes = new HashMap<>();

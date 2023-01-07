@@ -75,7 +75,7 @@ public final class RengineMinioTool {
         CommandLineFacade line = CommandLineTool.builder()
                 .option("e", "endpoint", DEFAULT_ENDPOINT, "MinIO server endpoint.")
                 .option("r", "region", DEFAULT_REGION, "MinIO server region.")
-                .option("A", "adminAccessKey", DEFAULT_ADMIN_ACCESSKEY, "Admin clientId.")
+                .option("BsonEntitySerializers", "adminAccessKey", DEFAULT_ADMIN_ACCESSKEY, "Admin clientId.")
                 .option("S", "adminSecretKey", DEFAULT_ADMIN_SECRETKEY, "Admin secretKey.")
                 .option("a", "tenantAccessKey", DEFAULT_TENANT_ACCESSKEY, "Tenant clientId.")
                 .option("s", "tenantSecretKey", DEFAULT_TENANT_SECRETKEY, "Tenant secretKey.")
@@ -85,7 +85,7 @@ public final class RengineMinioTool {
                 .build(args);
         String endpoint = line.get("e");
         String region = line.get("r");
-        String adminAccessKey = line.get("A");
+        String adminAccessKey = line.get("BsonEntitySerializers");
         String adminSecretKey = line.get("S");
         String tenantAccessKey = line.get("a");
         String tenantSecretKey = line.get("s");

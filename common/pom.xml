@@ -136,6 +136,13 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
+        <!-- Mongodb -->
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver-core</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
         <!-- <dependency>-->
         <!--     <groupId>io.grpc</groupId>-->
         <!--     <artifactId>grpc-context</artifactId>-->

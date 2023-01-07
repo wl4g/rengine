@@ -22,7 +22,7 @@ import org.graalvm.polyglot.Value;
 import org.junit.Test;
 
 import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager.ContextWrapper;
-import com.wl4g.rengine.executor.util.TestSetupDefaults;
+import com.wl4g.rengine.executor.util.TestDefaultBaseSetup;
 
 /**
  * {@link GraalJSScriptEngineTests}
@@ -37,7 +37,7 @@ public class GraalJSScriptEngineTests {
     @Test
     public void testInitWithCustomLog() throws Exception {
         final GraalJSScriptEngine engine = new GraalJSScriptEngine();
-        engine.config = TestSetupDefaults.createExecutionConfig();
+        engine.config = TestDefaultBaseSetup.createExecutionConfig();
         engine.onStart(null);
         try (ContextWrapper graalContext = engine.getGraalPolyglotManager()
                 .getContext(singletonMap(GraalJSScriptEngine.KEY_WORKFLOW_ID, 101001010L));) {

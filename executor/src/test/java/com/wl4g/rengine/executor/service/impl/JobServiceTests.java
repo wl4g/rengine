@@ -20,7 +20,7 @@ package com.wl4g.rengine.executor.service.impl;
 //import org.junit.Before;
 //
 //import com.wl4g.rengine.executor.service.JobService;
-//import com.wl4g.rengine.executor.util.TestSetupDefaults;
+//import com.wl4g.rengine.executor.util.TestDefaultBaseSetup;
 //
 ///**
 // * {@link JobServiceTests}
@@ -48,7 +48,7 @@ package com.wl4g.rengine.executor.service.impl;
 //
 //        // Manual setup/inject depends.
 //        JobServiceImpl jobService = new JobServiceImpl();
-//        jobService.mongoRepository = TestSetupDefaults.createMongoRepository();
+//        jobService.mongoRepository = TestDefaultBaseSetup.createMongoRepository();
 //        this.jobService = jobService;
 //    }
 //

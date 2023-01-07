@@ -19,6 +19,8 @@ import static com.wl4g.infra.common.lang.Assert2.notNull;
 
 import java.util.Map;
 
+import javax.validation.constraints.NotNull;
+
 import com.wl4g.infra.common.notification.MessageNotifier;
 import com.wl4g.infra.common.notification.MessageNotifier.NotifierKind;
 import com.wl4g.rengine.common.entity.Notification;
@@ -40,14 +42,16 @@ public interface ScriptMessageNotifier {
 
     MessageNotifier.NotifierKind kind();
 
-    Object send(Map<String, Object> parameter);
+    Object send(final @NotNull Map<String, Object> parameter);
 
-    default RefreshedInfo refreshed() {
+    default RefreshedInfo getRequiredRefreshed() {
         return notNull(getRefreshed(),
-                "The should not be here, the current local cached refreshed is null, it should have been initialized before calling the notifier sending method.");
+                "Internal error! Should not be here, the current local cached refreshed is null, it should have been initialized before calling the notifier sending method.");
     }
 
     RefreshedInfo getRefreshed();
+
+    void setRefreshed(RefreshedInfo refreshed);
 
     RefreshedInfo refresh(Notification notification);
 
@@ -55,13 +59,13 @@ public interface ScriptMessageNotifier {
     @Setter
     @SuperBuilder
     @NoArgsConstructor
-    @ToString(callSuper = true)
+    @ToString
     public static class RefreshedInfo {
         private NotifierKind notifierType;
-        // private String appKey;
+        private String appKey;
         // private String appSecret;
         private String accessToken;
         private Integer expireSeconds;
+        private Integer effectiveExpireSeconds;
     }
-
 }

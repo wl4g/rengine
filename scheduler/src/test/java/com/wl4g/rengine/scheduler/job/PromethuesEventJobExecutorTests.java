@@ -28,7 +28,7 @@ public class PromethuesEventJobExecutorTests {
 
     @Test
     public void testParseMetrics() {
-        String fromResult = "# HELP go_gc_duration_seconds A summary of the GC invocation durations.\n"
+        String fromResult = "# HELP go_gc_duration_seconds BsonEntitySerializers summary of the GC invocation durations.\n"
                 + "# TYPE go_gc_duration_seconds summary\n" + "go_gc_duration_seconds{quantile=\"0\"} 4.1449e-05\n"
                 + "go_gc_duration_seconds{quantile=\"0.25\"} 5.3531e-05\n"
                 + "go_gc_duration_seconds{quantile=\"0.5\"} 0.000144173\n"
