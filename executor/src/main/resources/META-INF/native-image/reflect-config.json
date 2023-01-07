@@ -524,7 +524,10 @@
   "allDeclaredConstructors": true,
   "queryAllDeclaredMethods": true,
   "queryAllDeclaredConstructors": true,
-  "methods": []
+  "methods": [
+    {"name": "kind","parameterTypes": []},
+    {"name": "send","parameterTypes": ["java.util.Map"]}
+  ]
 },
 {
   "name": "com.wl4g.rengine.executor.execution.sdk.notifier.DingtalkScriptMessageNotifier",
@@ -534,7 +537,30 @@
   "queryAllDeclaredMethods": true,
   "queryAllDeclaredConstructors": true,
   "methods": [
-    {"name": "<init>","parameterTypes": []}
+    {"name": "<init>","parameterTypes": []},
+    {"name": "kind","parameterTypes": []},
+    {"name": "send","parameterTypes": ["java.util.Map"]},
+    {"name": "createSceneGroupV2","parameterTypes": ["com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$CreateSceneGroupV2"]},
+    {"name": "getRefreshed","parameterTypes": []},
+    {"name": "setRefreshed","parameterTypes": ["com.wl4g.rengine.executor.execution.sdk.notifier.ScriptMessageNotifier$RefreshedInfo"]},
+    {"name": "refresh","parameterTypes": ["com.wl4g.rengine.common.entity.Notification"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.executor.execution.sdk.notifier.DingtalkScriptMessageNotifier_Subclass",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>","parameterTypes": []},
+    {"name": "kind","parameterTypes": []},
+    {"name": "send","parameterTypes": ["java.util.Map"]},
+    {"name": "createSceneGroupV2","parameterTypes": ["com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI$CreateSceneGroupV2"]},
+    {"name": "getRefreshed","parameterTypes": []},
+    {"name": "setRefreshed","parameterTypes": ["com.wl4g.rengine.executor.execution.sdk.notifier.ScriptMessageNotifier$RefreshedInfo"]},
+    {"name": "refresh","parameterTypes": ["com.wl4g.rengine.common.entity.Notification"]}
   ]
 },
 {
@@ -589,16 +615,18 @@
   "methods": [
     {"name": "<init>","parameterTypes": []},
     {"name": "<init>","parameterTypes": ["com.wl4g.rengine.executor.execution.sdk.notifier.ScriptMessageNotifier$RefreshedInfo$RefreshedInfoBuilder"]},
-    {"name": "getAccessToken","parameterTypes": []},
-    {"name": "getExpireSeconds","parameterTypes": []},
-    {"name": "setEffectiveExpireSeconds","parameterTypes": ["java.lang.Integer"]},
     {"name": "getNotifierType","parameterTypes": []},
     {"name": "getAppKey","parameterTypes": []},
-    {"name": "setNotifierType","parameterTypes": ["com.wl4g.infra.common.notification.MessageNotifier$NotifierKind"]},
+    {"name": "getAccessToken","parameterTypes": []},
+    {"name": "getExpireSeconds","parameterTypes": []},
     {"name": "getEffectiveExpireSeconds","parameterTypes": []},
+    {"name": "getAttributes","parameterTypes": []},
+    {"name": "setNotifierType","parameterTypes": ["com.wl4g.infra.common.notification.MessageNotifier$NotifierKind"]},
     {"name": "setAppKey","parameterTypes": ["java.lang.String"]},
     {"name": "setAccessToken","parameterTypes": ["java.lang.String"]},
     {"name": "setExpireSeconds","parameterTypes": ["java.lang.Integer"]},
+    {"name": "setEffectiveExpireSeconds","parameterTypes": ["java.lang.Integer"]},
+    {"name": "setAttributes","parameterTypes": ["java.util.Map"]},
     {"name": "toString","parameterTypes": []},
     {"name": "builder","parameterTypes": []}
   ]

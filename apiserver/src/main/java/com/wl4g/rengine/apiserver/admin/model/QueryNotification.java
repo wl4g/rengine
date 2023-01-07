@@ -41,5 +41,5 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class QueryNotification {
     @Schema(implementation = NotifierKind.class)
-    private @Nullable @EnumValue(enumCls = NotifierKind.class) String kind;
+    private @Nullable @EnumValue(enumCls = NotifierKind.class) String type;
 }

@@ -17,14 +17,18 @@ package com.wl4g.rengine.executor.execution.sdk.notifier;
 
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.validation.constraints.NotNull;
+
+import org.graalvm.polyglot.HostAccess;
 
 import com.wl4g.infra.common.notification.MessageNotifier;
 import com.wl4g.infra.common.notification.MessageNotifier.NotifierKind;
 import com.wl4g.rengine.common.entity.Notification;
 
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -42,6 +46,7 @@ public interface ScriptMessageNotifier {
 
     MessageNotifier.NotifierKind kind();
 
+    @HostAccess.Export
     Object send(final @NotNull Map<String, Object> parameter);
 
     default RefreshedInfo getRequiredRefreshed() {
@@ -61,11 +66,18 @@ public interface ScriptMessageNotifier {
     @NoArgsConstructor
     @ToString
     public static class RefreshedInfo {
-        private NotifierKind notifierType;
-        private String appKey;
-        // private String appSecret;
-        private String accessToken;
-        private Integer expireSeconds;
-        private Integer effectiveExpireSeconds;
+        NotifierKind notifierType;
+
+        String appKey;
+        // String appSecret;
+
+        String accessToken;
+
+        Integer expireSeconds;
+
+        Integer effectiveExpireSeconds;
+
+        @Default
+        Map<String, Object> attributes = new HashMap<>();
     }
 }

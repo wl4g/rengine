@@ -52,8 +52,8 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public QueryNotificationResult query(QueryNotification model) {
         List<Notification> notifications = null;
-        if (!isBlank(model.getKind())) {
-            Criteria criteria = new Criteria().orOperator(Criteria.where("kind").is(model.getKind()));
+        if (!isBlank(model.getType())) {
+            Criteria criteria = new Criteria().orOperator(Criteria.where("properties.type").is(model.getType()));
             notifications = mongoTemplate.find(new Query(criteria), Notification.class,
                     MongoCollectionDefinition.SYS_NOTIFICATION_CONFIG.getName());
         } else {

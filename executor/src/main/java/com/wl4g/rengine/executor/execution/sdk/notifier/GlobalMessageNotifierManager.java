@@ -194,7 +194,7 @@ public class GlobalMessageNotifierManager {
         final MongoCollection<Document> collection = mongoRepository
                 .getCollection(MongoCollectionDefinition.SYS_NOTIFICATION_CONFIG);
 
-        try (final MongoCursor<Notification> cursor = collection.find(Filters.and(Filters.in("type", notifierTypes)))
+        try (final MongoCursor<Notification> cursor = collection.find(Filters.and(Filters.in("properties.type", notifierTypes)))
                 .batchSize(2)
                 .limit(2)
                 .map(doc -> BsonEntitySerializers.fromDocument(doc, Notification.class))
