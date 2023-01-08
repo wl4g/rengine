@@ -30,7 +30,7 @@
 //import com.wl4g.rengine.common.entity.Scenes;
 //import com.wl4g.rengine.common.entity.UploadObject.UploadType;
 //import com.wl4g.rengine.common.exception.EvaluationException;
-//import com.wl4g.rengine.common.model.Evaluation;
+//import com.wl4g.rengine.common.model.ExecuteRequest;
 //import com.wl4g.rengine.executor.execution.sdk.ScriptContext;
 //import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
 //import com.wl4g.rengine.executor.minio.MinioManager.ObjectResource;
@@ -76,7 +76,7 @@
 //
 //    @SuppressWarnings("unchecked")
 //    @Override
-//    public ScriptResult execute(final Evaluation evaluation, final Scenes scenes) {
+//    public ScriptResult execute(final ExecuteRequest executeRequest, final Scenes scenes) {
 //        log.debug("Execution Groovy script for scenesCode: {} ...", scenes.getScenesCode());
 //
 //        try {
@@ -108,18 +108,18 @@
 //                        }
 //                    }
 //                } catch (Throwable e) {
-//                    throw new EvaluationException(evaluation.getRequestId(), scenes.getScenesCode(),
+//                    throw new EvaluationException(executeRequest.getRequestId(), scenes.getScenesCode(),
 //                            format("Failed to load groovy dependency '%s'", scriptName), e);
 //                }
 //            }
 //
 //            // TODO
-//            final String result = mainFunction.apply(newScriptContext(evaluation));
+//            final String result = mainFunction.apply(newScriptContext(executeRequest));
 //            log.debug("Executed Groovy script main: {}, result: {}", DEFAULT_MAIN_FUNCTION, result.toString());
 //            // TODO re-wrap result object
 //            return new ScriptResult(null);
 //        } catch (Exception e) {
-//            throw new EvaluationException(evaluation.getRequestId(), scenes.getScenesCode(),
+//            throw new EvaluationException(executeRequest.getRequestId(), scenes.getScenesCode(),
 //                    format("Failed to execution Groovy script for scenesCode: %s", scenes.getScenesCode()), e);
 //        }
 //    }

@@ -272,65 +272,95 @@
   ]
 },
 {
-  "name":"com.wl4g.rengine.common.entity.Notification$DingtalkConfig",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "methods":[
-    {"name":"<init>","parameterTypes":[] },
-    {"name":"getAppKey","parameterTypes":[] },
-    {"name":"setAppKey","parameterTypes":["java.lang.String"] },
-    {"name":"getAppSecret","parameterTypes":[] },
-    {"name":"setAppSecret","parameterTypes":["java.lang.String"] }
+  "name": "com.wl4g.rengine.common.entity.Notification$DingtalkConfig",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>","parameterTypes": []},
+    {"name": "<init>","parameterTypes": ["com.wl4g.rengine.common.entity.Notification$DingtalkConfig$DingtalkConfigBuilder"]},
+    {"name": "toString","parameterTypes": []},
+    {"name": "getAgentId","parameterTypes": []},
+    {"name": "getDefaultOpenConversationId","parameterTypes": []},
+    {"name": "getAppKey","parameterTypes": []},
+    {"name": "getAppSecret","parameterTypes": []},
+    {"name": "getDefaultRobotCode","parameterTypes": []},
+    {"name": "getDefaultScenesGroupV2TemplateId","parameterTypes": []},
+    {"name": "getDefaultScenesGroupV2AdminUserIds","parameterTypes": []},
+    {"name": "getDefaultScenesGroupV2UserIds","parameterTypes": []},
+    {"name": "setAgentId","parameterTypes": ["java.lang.String"]},
+    {"name": "setAppKey","parameterTypes": ["java.lang.String"]},
+    {"name": "setAppSecret","parameterTypes": ["java.lang.String"]},
+    {"name": "setDefaultOpenConversationId","parameterTypes": ["java.lang.String"]},
+    {"name": "setDefaultRobotCode","parameterTypes": ["java.lang.String"]},
+    {"name": "setDefaultScenesGroupV2TemplateId","parameterTypes": ["java.lang.String"]},
+    {"name": "setDefaultScenesGroupV2AdminUserIds","parameterTypes": ["java.util.List"]},
+    {"name": "setDefaultScenesGroupV2UserIds","parameterTypes": ["java.util.List"]},
+    {"name": "builder","parameterTypes": []}
   ]
 },
 {
-  "name":"com.wl4g.rengine.common.entity.Notification$WeComConfig",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "methods":[
-    {"name":"<init>","parameterTypes":[] }
+  "name": "com.wl4g.rengine.common.entity.Notification$AliyunSmsConfig",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>","parameterTypes": []},
+    {"name": "<init>","parameterTypes": ["com.wl4g.rengine.common.entity.Notification$AliyunSmsConfig$AliyunSmsConfigBuilder"]},
+    {"name": "toString","parameterTypes": []},
+    {"name": "getAccessKey","parameterTypes": []},
+    {"name": "getAccessSecret","parameterTypes": []},
+    {"name": "getRegionId","parameterTypes": []},
+    {"name": "getSignName","parameterTypes": []},
+    {"name": "setAccessKey","parameterTypes": ["java.lang.String"]},
+    {"name": "setAccessSecret","parameterTypes": ["java.lang.String"]},
+    {"name": "setRegionId","parameterTypes": ["java.lang.String"]},
+    {"name": "setSignName","parameterTypes": ["java.lang.String"]},
+    {"name": "builder","parameterTypes": []}
   ]
 },
 {
-  "name":"com.wl4g.rengine.common.entity.Notification$AliyunSmsConfig",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "methods":[
-    {"name":"<init>","parameterTypes":[] },
-    {"name":"getAccessKey","parameterTypes":[] },
-    {"name":"setAccessKey","parameterTypes":["java.lang.String"] },
-    {"name":"getAccessSecret","parameterTypes":[] },
-    {"name":"setAccessSecret","parameterTypes":["java.lang.String"] },
-    {"name":"getRegionId","parameterTypes":[] },
-    {"name":"setRegionId","parameterTypes":["java.lang.String"] },
-    {"name":"getSignName","parameterTypes":[] },
-    {"name":"setSignName","parameterTypes":["java.lang.String"] }
+  "name": "com.wl4g.rengine.common.entity.Notification$AliyunVmsConfig",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>","parameterTypes": []},
+    {"name": "<init>","parameterTypes": ["com.wl4g.rengine.common.entity.Notification$AliyunVmsConfig$AliyunVmsConfigBuilder"]},
+    {"name": "toString","parameterTypes": []},
+    {"name": "getAccessKey","parameterTypes": []},
+    {"name": "getAccessSecret","parameterTypes": []},
+    {"name": "getRegionId","parameterTypes": []},
+    {"name": "setAccessKey","parameterTypes": ["java.lang.String"]},
+    {"name": "setAccessSecret","parameterTypes": ["java.lang.String"]},
+    {"name": "setRegionId","parameterTypes": ["java.lang.String"]},
+    {"name": "getCalledShowNumber","parameterTypes": []},
+    {"name": "setCalledShowNumber","parameterTypes": ["java.lang.String"]},
+    {"name": "builder","parameterTypes": []}
   ]
 },
 {
-  "name":"com.wl4g.rengine.common.entity.Notification$AliyunVmsConfig",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "methods":[
-    {"name":"<init>","parameterTypes":[] },
-    {"name":"getAccessKey","parameterTypes":[] },
-    {"name":"setAccessKey","parameterTypes":["java.lang.String"] },
-    {"name":"getAccessSecret","parameterTypes":[] },
-    {"name":"setAccessSecret","parameterTypes":["java.lang.String"] },
-    {"name":"getRegionId","parameterTypes":[] },
-    {"name":"setRegionId","parameterTypes":["java.lang.String"] },
-    {"name":"getCalledShowNumber","parameterTypes":[] },
-    {"name":"setCalledShowNumber","parameterTypes":["java.lang.String"] }
-  ]
-},
-{
-  "name":"com.wl4g.rengine.common.entity.Notification$WebhookConfig",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "methods":[
-    {"name":"<init>","parameterTypes":[] },
-    {"name":"getUrls","parameterTypes":[] },
-    {"name":"setUrls","parameterTypes":["java.util.List"] }
+  "name": "com.wl4g.rengine.common.entity.Notification$WeChatMpConfig",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>","parameterTypes": []},
+    {"name": "<init>","parameterTypes": ["com.wl4g.rengine.common.entity.Notification$WeChatMpConfig$WeChatMpConfigBuilder"]},
+    {"name": "toString","parameterTypes": []},
+    {"name": "getAppSecret","parameterTypes": []},
+    {"name": "setAppSecret","parameterTypes": ["java.lang.String"]},
+    {"name": "getAppId","parameterTypes": []},
+    {"name": "setAppId","parameterTypes": ["java.lang.String"]},
+    {"name": "builder","parameterTypes": []}
   ]
 },
 {

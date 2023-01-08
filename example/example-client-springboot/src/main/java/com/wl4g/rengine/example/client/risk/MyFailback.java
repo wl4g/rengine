@@ -18,7 +18,7 @@ package com.wl4g.rengine.example.client.risk;
 import static java.lang.String.format;
 
 import com.wl4g.rengine.client.core.RengineClient.DefaultFailback;
-import com.wl4g.rengine.common.model.EvaluationResult;
+import com.wl4g.rengine.common.model.ExecuteResult;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,9 +33,9 @@ import lombok.extern.slf4j.Slf4j;
 public class MyFailback extends DefaultFailback {
 
     @Override
-    public EvaluationResult apply(Throwable t) {
+    public ExecuteResult apply(Throwable t) {
         log.warn(format(":::Failed to evaluation of reason: %s", t.getMessage()));
-        return EvaluationResult.builder().errorCount(Integer.MAX_VALUE).build();
+        return ExecuteResult.builder().errorCount(Integer.MAX_VALUE).build();
     }
 
 }

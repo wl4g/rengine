@@ -44,7 +44,7 @@
     public void checkRiskFor(String scenesCode, Map<String, String> args) {
         log.info("Risk checking for : {} => {}", scenesCode, args);
 
-        final var result = rengineClient.evaluate(scenesCode, true, args);
+        final var result = rengineClient.execute(scenesCode, true, args);
         log.info("Risk checked for result: {}, {} => {}", result, scenesCode, args);
 
         // Assertion risk evaluation result.

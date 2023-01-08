@@ -25,21 +25,21 @@ import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
-import com.wl4g.rengine.common.model.Evaluation;
-import com.wl4g.rengine.common.model.EvaluationResult;
+import com.wl4g.rengine.common.model.ExecuteRequest;
+import com.wl4g.rengine.common.model.ExecuteResult;
 
 import io.smallrye.mutiny.Uni;
 
 /**
- * {@link EvaluatorService}
+ * {@link EngineExecutionService}
  * 
  * @author James Wong
  * @version 2022-09-17
  * @since v1.0.0
  */
-public interface EvaluatorService {
+public interface EngineExecutionService {
 
-    Uni<RespBase<EvaluationResult>> evaluate(final @Valid @NotNull Evaluation model);
+    Uni<RespBase<ExecuteResult>> execute(final @Valid @NotNull ExecuteRequest model);
 
     List<ScenesWrapper> findScenesWorkflowGraphRules(@NotEmpty List<String> scenesCodes, @Min(1) @Max(1024) int revisions);
 

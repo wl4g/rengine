@@ -17,6 +17,7 @@ package com.wl4g.rengine.executor.rest;
 
 import javax.inject.Inject;
 import javax.transaction.SystemException;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -25,16 +26,16 @@ import javax.ws.rs.core.MediaType;
 
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.common.constants.RengineConstants;
-import com.wl4g.rengine.common.model.Evaluation;
-import com.wl4g.rengine.common.model.EvaluationResult;
+import com.wl4g.rengine.common.model.ExecuteRequest;
+import com.wl4g.rengine.common.model.ExecuteResult;
 import com.wl4g.rengine.executor.rest.intercept.CustomValid;
-import com.wl4g.rengine.executor.service.EvaluatorService;
+import com.wl4g.rengine.executor.service.EngineExecutionService;
 
 import io.smallrye.mutiny.Uni;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link EvaluatorResource}
+ * {@link EngineExecutionResource}
  * 
  * @author James Wong
  * @version 2022-09-18
@@ -42,11 +43,9 @@ import lombok.extern.slf4j.Slf4j;
  * @see https://github.com/quarkusio/quarkus-quickstarts/blob/2.12.Final/jta-quickstart/src/main/java/org/acme/quickstart/TransactionalResource.java
  */
 @Slf4j
-@Path("/evaluator")
 @CustomValid
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
-public class EvaluatorResource {
+@Path(RengineConstants.API_EXECUTOR_EXECUTE_BASE)
+public class EngineExecutionResource {
 
     /**
      * Quarkus 正在使用 GraalVM 构建本机可执行文件。GraalVM
@@ -57,22 +56,24 @@ public class EvaluatorResource {
      * @see https://quarkus.io/guides/cdi-reference#native-executables-and-private-members
      */
     @Inject
-    EvaluatorService evaluatorService;
+    EngineExecutionService engineExecutionService;
 
     /**
      * Process requests from business applications are evaluated against a rules
-     * evaluation.
+     * executeRequest.
      * 
-     * @param evaluation
+     * @param executeRequest
      * @return
      * @throws SystemException
      * @see https://quarkus.io/guides/resteasy-reactive#asyncreactive-support
      */
     @POST
-    @Path(RengineConstants.API_EXECUTOR_EVALUATE)
-    public Uni<RespBase<EvaluationResult>> evaluate(Evaluation evaluation) throws SystemException {
-        log.debug("Evaluating of : {}", evaluation);
-        return evaluatorService.evaluate(evaluation);
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path(RengineConstants.API_EXECUTOR_EXECUTE)
+    public Uni<RespBase<ExecuteResult>> execute(final @NotNull ExecuteRequest executeRequest) throws SystemException {
+        log.debug("Executing for : {}", executeRequest);
+        return engineExecutionService.execute(executeRequest);
     }
 
 }

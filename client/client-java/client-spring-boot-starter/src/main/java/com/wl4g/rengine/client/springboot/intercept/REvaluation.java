@@ -23,8 +23,8 @@ import java.lang.annotation.Target;
 import java.util.function.Function;
 
 import com.wl4g.rengine.client.core.RengineClient.DefaultFailback;
-import com.wl4g.rengine.common.model.Evaluation;
-import com.wl4g.rengine.common.model.EvaluationResult;
+import com.wl4g.rengine.common.model.ExecuteRequest;
+import com.wl4g.rengine.common.model.ExecuteResult;
 
 /**
  * for example:
@@ -51,7 +51,7 @@ import com.wl4g.rengine.common.model.EvaluationResult;
 public @interface REvaluation {
 
     /**
-     * Evaluation scenes code.
+     * ExecuteRequest scenes code.
      * 
      * @return
      */
@@ -62,9 +62,9 @@ public @interface REvaluation {
      * acceptable maximum execution time according to actual needs. Returns
      * immediately if evaluation/feature acquisition and computation times-out.
      * 
-     * @see {@link com.wl4g.rengine.common.model.Evaluation#getTimeout()}
+     * @see {@link com.wl4g.rengine.common.model.ExecuteRequest#getTimeout()}
      */
-    long timeout() default Evaluation.DEFAULT_TIMEOUT;
+    long timeout() default ExecuteRequest.DEFAULT_TIMEOUT;
 
     /**
      * This attribute is used to control the behavior when the calculation
@@ -75,12 +75,12 @@ public @interface REvaluation {
      * value of the evaluation result/feature will be given a default value, and
      * the corresponding error code will be set. </br>
      * 
-     * @see {@link com.wl4g.rengine.common.model.Evaluation#getBestEffort()}
+     * @see {@link com.wl4g.rengine.common.model.ExecuteRequest#getBestEffort()}
      */
-    boolean bestEffort() default Evaluation.DEFAULT_BESTEFFORT;
+    boolean bestEffort() default ExecuteRequest.DEFAULT_BESTEFFORT;
 
     /**
-     * Evaluation to parameters template.
+     * ExecuteRequest to parameters template.
      * 
      * <p>
      * for example: {{ userId=#0.userId, goodId=#0.goodId, count=#1 }}
@@ -96,6 +96,6 @@ public @interface REvaluation {
      * 
      * @return
      */
-    Class<? extends Function<Throwable, EvaluationResult>> failback() default DefaultFailback.class;
+    Class<? extends Function<Throwable, ExecuteResult>> failback() default DefaultFailback.class;
 
 }

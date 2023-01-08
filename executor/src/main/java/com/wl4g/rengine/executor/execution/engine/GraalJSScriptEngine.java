@@ -16,7 +16,6 @@
 package com.wl4g.rengine.executor.execution.engine;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
-import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
@@ -31,7 +30,6 @@ import static java.util.Objects.isNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toSet;
 
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,7 +49,6 @@ import org.graalvm.polyglot.proxy.ProxyObject;
 import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager;
 import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager.ContextWrapper;
 import com.wl4g.infra.common.graalvm.polyglot.JdkLoggingOutputStream;
-import com.wl4g.infra.common.io.FileIOUtils;
 import com.wl4g.infra.common.lang.StringUtils2;
 import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
 import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
@@ -62,6 +59,7 @@ import com.wl4g.rengine.common.graph.ExecutionGraphContext;
 import com.wl4g.rengine.common.graph.ExecutionGraphParameter;
 import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
+import com.wl4g.rengine.executor.execution.ExecutionConfig.ScriptLogConfig;
 import com.wl4g.rengine.executor.execution.sdk.ScriptContext;
 import com.wl4g.rengine.executor.execution.sdk.ScriptContext.ScriptParameter;
 import com.wl4g.rengine.executor.execution.sdk.ScriptDataService;
@@ -88,8 +86,6 @@ import lombok.Getter;
 @Singleton
 public class GraalJSScriptEngine extends AbstractScriptEngine {
 
-    public static final String KEY_WORKFLOW_ID = GraalJSScriptEngine.class.getSimpleName().concat(".WORKFLOW_ID");
-
     @Inject
     ExecutionConfig config;
 
@@ -99,16 +95,17 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
     void onStart(@Observes StartupEvent event) {
         try {
             log.info("Initialzing graal JS script engine ...");
-            FileIOUtils.forceMkdir(new File(config.log().baseDir()));
+            final ScriptLogConfig scriptLogConfig = config.log();
 
             this.graalPolyglotManager = GraalPolyglotManager.newDefaultGraalJS(DEFAULT_EXECUTOR_TMP_SCRIPT_CACHE_DIR,
-                    metadata -> new JdkLoggingOutputStream(buildLogFilePattern(false, metadata), Level.INFO,
-                            config.log().fileMaxSize(), config.log().fileMaxCount(), config.log().enableConsole(), false),
-                    metadata -> new JdkLoggingOutputStream(buildLogFilePattern(true, metadata), Level.WARNING,
-                            config.log().fileMaxSize(), config.log().fileMaxCount(), config.log().enableConsole(), true));
+                    metadata -> new JdkLoggingOutputStream(buildScriptLogFilePattern(scriptLogConfig.baseDir(), metadata, false),
+                            Level.INFO, scriptLogConfig.fileMaxSize(), scriptLogConfig.fileMaxCount(),
+                            scriptLogConfig.enableConsole(), false),
+                    metadata -> new JdkLoggingOutputStream(buildScriptLogFilePattern(scriptLogConfig.baseDir(), metadata, true),
+                            Level.WARNING, scriptLogConfig.fileMaxSize(), scriptLogConfig.fileMaxCount(),
+                            scriptLogConfig.enableConsole(), true));
         } catch (Exception e) {
-            log.error("Failed to init graal JS Script engine.", e);
-            throw new ExecutionScriptException(e);
+            throw new ExecutionScriptException("Failed to init graal JS Script engine.", e);
         }
     }
 
@@ -135,7 +132,8 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
 
         log.debug("Execution JS script for scenesCode: {} ...", scenesCode);
         // see:https://github.com/oracle/graaljs/blob/vm-ee-22.1.0/graal-js/src/com.oracle.truffle.js.test.threading/src/com/oracle/truffle/js/test/threading/AsyncTaskTests.java#L283
-        try (ContextWrapper graalContext = graalPolyglotManager.getContext(singletonMap(KEY_WORKFLOW_ID, workflowId));) {
+        try (ContextWrapper graalContext = graalPolyglotManager
+                .getContext(singletonMap(SCIPRT_LOGGER_KEY_WORKFLOW_ID, workflowId));) {
             // New construct script context.
             final ScriptContext scriptContext = newScriptContext(graphContext);
 
@@ -229,12 +227,6 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
             final @NotNull ExecutionGraphParameter parameter,
             final @NotNull SafeScheduledTaskPoolExecutor executor) {
         return new ScriptExecutor(parameter.getWorkflowId(), executor, graalPolyglotManager);
-    }
-
-    String buildLogFilePattern(boolean isStdErr, Map<String, Object> metadata) {
-        final Long workflowId = (Long) safeMap(metadata).get(KEY_WORKFLOW_ID);
-        final String filePattern = config.log().baseDir().concat("/").concat(workflowId + "").concat(isStdErr ? ".err" : ".log");
-        return filePattern;
     }
 
 }

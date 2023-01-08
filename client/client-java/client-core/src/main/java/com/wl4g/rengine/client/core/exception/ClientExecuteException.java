@@ -22,14 +22,14 @@ import com.wl4g.rengine.common.exception.RengineException;
 import lombok.Getter;
 
 /**
- * {@link ClientEvaluationException}
+ * {@link ClientExecuteException}
  * 
  * @author James Wong
  * @version 2022-10-17
  * @since v3.0.0
  */
 @Getter
-public class ClientEvaluationException extends RengineException {
+public class ClientExecuteException extends RengineException {
     private static final long serialVersionUID = 4247583228100258388L;
 
     private String requestId;
@@ -37,11 +37,11 @@ public class ClientEvaluationException extends RengineException {
     private Boolean bestEffort;
     private Long timeout;
 
-    public ClientEvaluationException() {
+    public ClientExecuteException() {
         super();
     }
 
-    public ClientEvaluationException(String requestId, List<String> scenesCodes, Long timeout, Boolean bestEffort,
+    public ClientExecuteException(String requestId, List<String> scenesCodes, Long timeout, Boolean bestEffort,
             String message) {
         super(message);
         this.requestId = requestId;
@@ -50,7 +50,7 @@ public class ClientEvaluationException extends RengineException {
         this.bestEffort = bestEffort;
     }
 
-    public ClientEvaluationException(String requestId, List<String> scenesCodes, Long timeout, Boolean bestEffort, String message,
+    public ClientExecuteException(String requestId, List<String> scenesCodes, Long timeout, Boolean bestEffort, String message,
             Throwable cause) {
         super(message, cause);
         this.requestId = requestId;
@@ -59,7 +59,7 @@ public class ClientEvaluationException extends RengineException {
         this.bestEffort = bestEffort;
     }
 
-    public ClientEvaluationException(String requestId, List<String> scenesCodes, Long timeout, Boolean bestEffort,
+    public ClientExecuteException(String requestId, List<String> scenesCodes, Long timeout, Boolean bestEffort,
             Throwable cause) {
         super(cause);
         this.requestId = requestId;

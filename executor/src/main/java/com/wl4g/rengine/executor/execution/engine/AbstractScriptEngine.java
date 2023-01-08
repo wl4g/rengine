@@ -16,6 +16,7 @@
 package com.wl4g.rengine.executor.execution.engine;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableMap;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.validation.constraints.NotBlank;
@@ -35,6 +37,7 @@ import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
 import com.wl4g.rengine.common.entity.UploadObject.ExtensionType;
 import com.wl4g.rengine.common.entity.UploadObject.UploadType;
 import com.wl4g.rengine.common.graph.ExecutionGraphParameter;
+import com.wl4g.rengine.common.util.ScriptEngineUtil;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
 import com.wl4g.rengine.executor.execution.sdk.ScriptExecutor;
 import com.wl4g.rengine.executor.execution.sdk.ScriptHttpClient;
@@ -128,6 +131,16 @@ public abstract class AbstractScriptEngine implements IEngine {
     protected abstract ScriptExecutor createScriptExecutor(
             final @NotNull ExecutionGraphParameter parameter,
             final @NotNull SafeScheduledTaskPoolExecutor executor);
+
+    public static String buildScriptLogFilePattern(
+            final @NotBlank String scriptLogBaseDir,
+            final @Nullable Map<String, Object> metadata,
+            final boolean isStdErr) {
+        final Long workflowId = (Long) safeMap(metadata).get(SCIPRT_LOGGER_KEY_WORKFLOW_ID);
+        return ScriptEngineUtil.buildScriptLogFilePattern(scriptLogBaseDir, workflowId, isStdErr);
+    }
+
+    public static final String SCIPRT_LOGGER_KEY_WORKFLOW_ID = AbstractScriptEngine.class.getSimpleName().concat(".WORKFLOW_ID");
 
     public static final Map<String, Object> REGISTER_MEMBERS;
 

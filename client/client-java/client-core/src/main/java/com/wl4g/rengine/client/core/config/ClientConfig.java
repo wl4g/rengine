@@ -22,7 +22,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.minio.OkHttpClientConfig;
-import com.wl4g.rengine.common.model.Evaluation;
+import com.wl4g.rengine.common.model.ExecuteRequest;
 
 import lombok.Builder.Default;
 import lombok.Getter;
@@ -51,9 +51,9 @@ public class ClientConfig {
 
     private @NotBlank String clientSecret;
 
-    private @NotNull @Min(1) @Default Long defaultTimeout = Evaluation.DEFAULT_TIMEOUT;
+    private @NotNull @Min(1) @Default Long defaultTimeout = ExecuteRequest.DEFAULT_TIMEOUT;
 
-    private @NotNull @Min(1) @Default Boolean defaultBestEffort = Evaluation.DEFAULT_BESTEFFORT;
+    private @NotNull @Min(1) @Default Boolean defaultBestEffort = ExecuteRequest.DEFAULT_BESTEFFORT;
 
     private @NotNull @Default OkHttpClientConfig okHttpClient = new OkHttpClientConfig();
 }

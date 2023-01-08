@@ -41,10 +41,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.wl4g.infra.common.remoting.uri.UriComponentsBuilder;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.client.core.config.ClientConfig;
-import com.wl4g.rengine.client.core.exception.ClientEvaluationException;
+import com.wl4g.rengine.client.core.exception.ClientExecuteException;
 import com.wl4g.rengine.common.constants.RengineConstants;
-import com.wl4g.rengine.common.model.Evaluation;
-import com.wl4g.rengine.common.model.EvaluationResult;
+import com.wl4g.rengine.common.model.ExecuteRequest;
+import com.wl4g.rengine.common.model.ExecuteResult;
 import com.wl4g.rengine.common.util.IdGenUtil;
 
 import lombok.Builder.Default;
@@ -68,53 +68,53 @@ import okhttp3.Response;
 public class RengineClient {
     private @Default ClientConfig config = new ClientConfig();
     private @Default OkHttpClient httpClient = new OkHttpClient().newBuilder().build();
-    private @Default Function<Throwable, EvaluationResult> defaultFailback = new DefaultFailback();
+    private @Default Function<Throwable, ExecuteResult> defaultFailback = new DefaultFailback();
 
-    public EvaluationResult evaluate(@NotEmpty List<String> scenesCodes, @Nullable Map<String, Object> args) {
-        return evaluate(IdGenUtil.next(), scenesCodes, Evaluation.DEFAULT_TIMEOUT, Evaluation.DEFAULT_BESTEFFORT, args, null);
+    public ExecuteResult execute(@NotEmpty List<String> scenesCodes, @Nullable Map<String, Object> args) {
+        return execute(IdGenUtil.next(), scenesCodes, ExecuteRequest.DEFAULT_TIMEOUT, ExecuteRequest.DEFAULT_BESTEFFORT, args, null);
     }
 
-    public EvaluationResult evaluate(
+    public ExecuteResult execute(
             @NotEmpty List<String> scenesCodes,
             @Min(1) Long timeoutMs,
             @Nullable Map<String, Object> args) {
-        return evaluate(IdGenUtil.next(), scenesCodes, timeoutMs, Evaluation.DEFAULT_BESTEFFORT, args, null);
+        return execute(IdGenUtil.next(), scenesCodes, timeoutMs, ExecuteRequest.DEFAULT_BESTEFFORT, args, null);
     }
 
-    public EvaluationResult evaluate(
+    public ExecuteResult execute(
             @NotEmpty List<String> scenesCodes,
             @NotNull Boolean bestEffort,
             @Nullable Map<String, Object> args) {
-        return evaluate(IdGenUtil.next(), scenesCodes, Evaluation.DEFAULT_TIMEOUT, bestEffort, args, null);
+        return execute(IdGenUtil.next(), scenesCodes, ExecuteRequest.DEFAULT_TIMEOUT, bestEffort, args, null);
     }
 
-    public EvaluationResult evaluate(
+    public ExecuteResult execute(
             String requestId,
             @NotEmpty List<String> scenesCodes,
             @NotNull Boolean bestEffort,
             @Min(1) Long timeoutMs,
             @Nullable Map<String, Object> args) {
-        return evaluate(requestId, scenesCodes, timeoutMs, bestEffort, args, null);
+        return execute(requestId, scenesCodes, timeoutMs, bestEffort, args, null);
     }
 
-    public EvaluationResult evaluate(
+    public ExecuteResult execute(
             String requestId,
             @NotEmpty List<String> scenesCodes,
             @NotNull @Min(1) Long timeoutMs,
             @NotNull Boolean bestEffort,
             @Nullable Map<String, Object> args) {
-        return evaluate(requestId, scenesCodes, timeoutMs, bestEffort, args, null);
+        return execute(requestId, scenesCodes, timeoutMs, bestEffort, args, null);
     }
 
-    public EvaluationResult evaluate(
+    public ExecuteResult execute(
             String requestId,
             @NotEmpty List<String> scenesCodes,
             @NotNull @Min(1) Long timeoutMs,
             @NotNull Boolean bestEffort,
             @Nullable Map<String, Object> args,
-            Function<Throwable, EvaluationResult> failback) {
+            Function<Throwable, ExecuteResult> failback) {
         notEmptyOf(scenesCodes, "scenesCodes");
-        return evaluate(Evaluation.builder()
+        return execute(ExecuteRequest.builder()
                 .requestId(valueOf(requestId))
                 .clientId(config.getClientId())
                 .clientSecret(config.getClientSecret())
@@ -125,36 +125,36 @@ public class RengineClient {
                 .build(), failback);
     }
 
-    public EvaluationResult evaluate(@NotNull Evaluation evaluation, Function<Throwable, EvaluationResult> failback) {
-        notNullOf(evaluation, "evaluation");
-        hasTextOf(evaluation.getClientId(), "clientId");
-        hasTextOf(evaluation.getClientSecret(), "clientSecret");
-        notEmptyOf(evaluation.getScenesCodes(), "scenesCodes");
-        notNullOf(evaluation.getTimeout(), "timeout");
-        isTrueOf(evaluation.getTimeout() > 0, "timeout>0");
-        notNullOf(evaluation.getBestEffort(), "bestEffort");
-        if (isBlank(evaluation.getRequestId())) {
-            evaluation.setRequestId(UUID.randomUUID().toString());
+    public ExecuteResult execute(@NotNull ExecuteRequest executeRequest, Function<Throwable, ExecuteResult> failback) {
+        notNullOf(executeRequest, "evaluation");
+        hasTextOf(executeRequest.getClientId(), "clientId");
+        hasTextOf(executeRequest.getClientSecret(), "clientSecret");
+        notEmptyOf(executeRequest.getScenesCodes(), "scenesCodes");
+        notNullOf(executeRequest.getTimeout(), "timeout");
+        isTrueOf(executeRequest.getTimeout() > 0, "timeout>0");
+        notNullOf(executeRequest.getBestEffort(), "bestEffort");
+        if (isBlank(executeRequest.getRequestId())) {
+            executeRequest.setRequestId(UUID.randomUUID().toString());
         }
 
-        final String requestBody = toJSONString(evaluation);
+        final String requestBody = toJSONString(executeRequest);
         final Request request = new Request.Builder().url(UriComponentsBuilder.fromUri(config.getEndpoint())
-                .path(RengineConstants.API_EXECUTOR_EVALUATE)
+                .path(RengineConstants.API_EXECUTOR_EXECUTE)
                 .build()
                 .toString()).post(FormBody.create(requestBody, MediaType.get("application/json"))).build();
         try (final Response response = httpClient.newBuilder()
-                .callTimeout(Duration.ofMillis(evaluation.getTimeout()))
+                .callTimeout(Duration.ofMillis(executeRequest.getTimeout()))
                 .build()
                 .newCall(request)
                 .execute();) {
             if (response.isSuccessful()) {
-                final RespBase<EvaluationResult> result = parseJSON(new String(response.body().bytes(), UTF_8), RESULT_TYPEREF);
+                final RespBase<ExecuteResult> result = parseJSON(new String(response.body().bytes(), UTF_8), RESULT_TYPEREF);
                 if (RespBase.isSuccess(result)) {
                     return result.getData();
                 }
             }
             // Fast fail-back.
-            if (evaluation.getBestEffort()) {
+            if (executeRequest.getBestEffort()) {
                 return defaultFailback.apply(null);
             }
         } catch (Throwable e) {
@@ -164,26 +164,26 @@ public class RengineClient {
             } else {
                 log.warn(format("%s. - %s", errmsg, e.getMessage()));
             }
-            if (evaluation.getBestEffort()) {
+            if (executeRequest.getBestEffort()) {
                 return defaultFailback.apply(e);
             }
-            throw new ClientEvaluationException(evaluation.getRequestId(), evaluation.getScenesCodes(), evaluation.getTimeout(),
-                    evaluation.getBestEffort(), e);
+            throw new ClientExecuteException(executeRequest.getRequestId(), executeRequest.getScenesCodes(), executeRequest.getTimeout(),
+                    executeRequest.getBestEffort(), e);
         }
 
         return null;
     }
 
-    public static class DefaultFailback implements Function<Throwable, EvaluationResult> {
+    public static class DefaultFailback implements Function<Throwable, ExecuteResult> {
         @Override
-        public EvaluationResult apply(Throwable t) {
+        public ExecuteResult apply(Throwable t) {
             // System.err.println(format("Failed to evaluation of reason: %s",
             // t.getMessage()));
-            return EvaluationResult.builder().errorCount(Integer.MAX_VALUE).build();
+            return ExecuteResult.builder().errorCount(Integer.MAX_VALUE).build();
         }
     }
 
-    private static final TypeReference<RespBase<EvaluationResult>> RESULT_TYPEREF = new TypeReference<RespBase<EvaluationResult>>() {
+    private static final TypeReference<RespBase<ExecuteResult>> RESULT_TYPEREF = new TypeReference<RespBase<ExecuteResult>>() {
     };
 
 }

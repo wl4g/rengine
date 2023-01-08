@@ -65,13 +65,13 @@ import com.wl4g.infra.common.serialize.BsonUtils2;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.common.web.rest.RespBase.RetCode;
 import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
-import com.wl4g.rengine.common.model.Evaluation;
-import com.wl4g.rengine.common.model.EvaluationResult;
+import com.wl4g.rengine.common.model.ExecuteRequest;
+import com.wl4g.rengine.common.model.ExecuteResult;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
 import com.wl4g.rengine.executor.execution.LifecycleExecutionService;
 import com.wl4g.rengine.executor.metrics.ExecutorMeterService;
 import com.wl4g.rengine.executor.repository.MongoRepository;
-import com.wl4g.rengine.executor.service.EvaluatorService;
+import com.wl4g.rengine.executor.service.EngineExecutionService;
 
 import io.quarkus.redis.datasource.ReactiveRedisDataSource;
 import io.quarkus.redis.datasource.string.ReactiveStringCommands;
@@ -79,7 +79,7 @@ import io.smallrye.mutiny.Uni;
 import lombok.CustomLog;
 
 /**
- * {@link EvaluatorServiceImpl}
+ * {@link EngineExecutionServiceImpl}
  * 
  * @author James Wong
  * @version 2022-09-18
@@ -88,7 +88,7 @@ import lombok.CustomLog;
  */
 @CustomLog
 @Singleton
-public class EvaluatorServiceImpl implements EvaluatorService {
+public class EngineExecutionServiceImpl implements EngineExecutionService {
 
     @Inject
     ExecutionConfig config;
@@ -106,61 +106,61 @@ public class EvaluatorServiceImpl implements EvaluatorService {
     // final StringCommands<String, String> redisStringCommands;
     final ReactiveStringCommands<String, String> reactiveRedisStringCommands;
 
-    public EvaluatorServiceImpl(/* RedisDataSource redisDS, */ ReactiveRedisDataSource reactiveRedisDS) {
+    public EngineExecutionServiceImpl(/* RedisDataSource redisDS, */ ReactiveRedisDataSource reactiveRedisDS) {
         // this.redisStringCommands = redisDS.string(String.class);
         this.reactiveRedisStringCommands = reactiveRedisDS.string(String.class);
     }
 
     @Override
-    public Uni<RespBase<EvaluationResult>> evaluate(final @NotNull @Valid Evaluation evaluation) {
+    public Uni<RespBase<ExecuteResult>> execute(final @NotNull @Valid ExecuteRequest executeRequest) {
         // @formatter:off
         //return Uni.createFrom().item(() -> {
-        //    RespBase<EvaluationResult> resp = RespBase.create();
+        //    RespBase<ExecuteResult> resp = RespBase.create();
         //    try {
         //        // Query the sceneses of cascade by scenesCode.
         //        final List<ScenesWrapper> sceneses = safeList(
-        //                findScenesWorkflowGraphRulesWithCaching(evaluation, 1));
+        //                findScenesWorkflowGraphRulesWithCaching(executeRequest, 1));
         //
         //        // Execution to workflow graphs.
-        //        final EvaluationResult result = lifecycleExecutionService.execute(evaluation, sceneses);
+        //        final ExecuteResult result = lifecycleExecutionService.execute(executeRequest, sceneses);
         //
         //        // Check for success completes.
         //        if (safeList(result.getResults()).stream().filter(res -> res.getSuccess()).count() == sceneses.size()) {
-        //            resp.setStatus(EvaluationResult.STATUS_ALL_SUCCESS);
+        //            resp.setStatus(ExecuteResult.STATUS_ALL_SUCCESS);
         //        } else {
-        //            resp.setStatus(EvaluationResult.STATUS_PART_SUCCESS);
+        //            resp.setStatus(ExecuteResult.STATUS_PART_SUCCESS);
         //        }
         //        resp.setData(result);
         //    } catch (Throwable e) {
         //        final String errmsg = format("Could not to execution evaluate of requestId: '%s', reason: %s",
-        //                evaluation.getRequestId(), Exceptions.getRootCausesString(e, true));
+        //                executeRequest.getRequestId(), Exceptions.getRootCausesString(e, true));
         //        log.error(errmsg, e);
         //        resp.withCode(RetCode.SYS_ERR).withMessage(errmsg);
         //    }
-        //    return resp.withRequestId(evaluation.getRequestId());
+        //    return resp.withRequestId(executeRequest.getRequestId());
         //});
         // @formatter:on
 
-        return findScenesWorkflowGraphRulesWithCaching(evaluation, 1).chain(sceneses -> {
-            final RespBase<EvaluationResult> resp = RespBase.create();
+        return findScenesWorkflowGraphRulesWithCaching(executeRequest, 1).chain(sceneses -> {
+            final RespBase<ExecuteResult> resp = RespBase.create();
             try {
                 // Execution to workflow graphs.
-                final EvaluationResult result = lifecycleExecutionService.execute(evaluation, sceneses);
+                final ExecuteResult result = lifecycleExecutionService.execute(executeRequest, sceneses);
 
                 // Check for success completes.
                 if (safeList(result.getResults()).stream().filter(res -> res.getSuccess()).count() == sceneses.size()) {
-                    resp.setStatus(EvaluationResult.STATUS_ALL_SUCCESS);
+                    resp.setStatus(ExecuteResult.STATUS_ALL_SUCCESS);
                 } else {
-                    resp.setStatus(EvaluationResult.STATUS_PART_SUCCESS);
+                    resp.setStatus(ExecuteResult.STATUS_PART_SUCCESS);
                 }
                 resp.setData(result);
             } catch (Throwable e) {
                 final String errmsg = format("Could not to execution evaluate of requestId: '%s', reason: %s",
-                        evaluation.getRequestId(), Exceptions.getRootCausesString(e, true));
+                        executeRequest.getRequestId(), Exceptions.getRootCausesString(e, true));
                 log.error(errmsg, e);
                 resp.withCode(RetCode.SYS_ERR).withMessage(errmsg);
             }
-            resp.withRequestId(evaluation.getRequestId());
+            resp.withRequestId(executeRequest.getRequestId());
             return Uni.createFrom().item(() -> resp);
         });
     }
@@ -335,7 +335,7 @@ public class EvaluatorServiceImpl implements EvaluatorService {
 
     @SuppressWarnings("deprecation")
     Uni<List<ScenesWrapper>> findScenesWorkflowGraphRulesWithCaching(
-            final @NotNull Evaluation evaluation,
+            final @NotNull ExecuteRequest executeRequest,
             final @Min(1) @Max(1024) int revisions) {
         //
         // Notice: Since the bottom layer of ordinary blocking redisCommands is
@@ -345,14 +345,14 @@ public class EvaluatorServiceImpl implements EvaluatorService {
         // thread cannot be blocked: vert.x-eventloop-thread-2.
         //
         // @formatter:off
-        //final List<ScenesWrapper> cachedSceneses = safeList(evaluation.getScenesCodes()).stream()
+        //final List<ScenesWrapper> cachedSceneses = safeList(executeRequest.getScenesCodes()).stream()
         //        .map(scenesCode -> parseJSON(redisStringCommands.get(config.scenesRulesCachedPrefix().concat(scenesCode)),
         //                ScenesWrapper.class))
         //        .filter(s -> nonNull(s))
         //        .collect(toList());
         //
         //final List<String> cachedScenesCodes = cachedSceneses.stream().map(s -> s.getScenesCode()).collect(toList());
-        //final List<String> uncachedScenesCodes = safeList(evaluation.getScenesCodes()).stream()
+        //final List<String> uncachedScenesCodes = safeList(executeRequest.getScenesCodes()).stream()
         //        .filter(scenesCode -> !cachedScenesCodes.contains(scenesCode))
         //        .collect(toList());
         //
@@ -379,14 +379,14 @@ public class EvaluatorServiceImpl implements EvaluatorService {
         //
 
         final String scenesCodesHash = Hashing.md5()
-                .hashBytes(safeList(evaluation.getScenesCodes()).stream().collect(joining("-")).getBytes(UTF_8))
+                .hashBytes(safeList(executeRequest.getScenesCodes()).stream().collect(joining("-")).getBytes(UTF_8))
                 .toString();
         final String batchQueryingKey = config.engine().scenesRulesCachedPrefix().concat(scenesCodesHash);
 
         final Uni<List<ScenesWrapper>> cachedScenesUnis = reactiveRedisStringCommands.get(batchQueryingKey).flatMap(json -> {
             if (Objects.isNull(json)) {
                 // Querying from database.
-                final List<ScenesWrapper> sceneses = findScenesWorkflowGraphRules(evaluation.getScenesCodes(), revisions);
+                final List<ScenesWrapper> sceneses = findScenesWorkflowGraphRules(executeRequest.getScenesCodes(), revisions);
                 // Save to redis cache.
                 return reactiveRedisStringCommands
                         .setex(batchQueryingKey, config.engine().scenesRulesCachedExpire(), toJSONString(sceneses))
@@ -399,7 +399,7 @@ public class EvaluatorServiceImpl implements EvaluatorService {
                 // not have enough time to allow early abandonment of
                 // execution.
                 .ifNoItem()
-                .after(Duration.ofMillis((long) (evaluation.getTimeout() / 0.85)))
+                .after(Duration.ofMillis((long) (executeRequest.getTimeout() / 0.85)))
                 .fail();
 
         // return Uni.combine().all().unis(cachedScenesUnis);

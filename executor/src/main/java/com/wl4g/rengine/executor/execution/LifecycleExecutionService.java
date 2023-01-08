@@ -62,12 +62,12 @@ import com.wl4g.infra.common.task.RunnerProperties.StartupMode;
 import com.wl4g.rengine.common.entity.Rule.RuleEngine;
 import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
 import com.wl4g.rengine.common.exception.RengineException;
-import com.wl4g.rengine.common.model.Evaluation;
-import com.wl4g.rengine.common.model.EvaluationResult;
-import com.wl4g.rengine.common.model.EvaluationResult.ResultDescription;
+import com.wl4g.rengine.common.model.ExecuteRequest;
+import com.wl4g.rengine.common.model.ExecuteResult;
+import com.wl4g.rengine.common.model.ExecuteResult.ResultDescription;
 import com.wl4g.rengine.executor.metrics.ExecutorMeterService;
 import com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsTag;
-import com.wl4g.rengine.executor.service.impl.EvaluatorServiceImpl;
+import com.wl4g.rengine.executor.service.impl.EngineExecutionServiceImpl;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -105,7 +105,7 @@ public class LifecycleExecutionService {
         this.executionRunner = new GenericTaskRunner<RunnerProperties>(new RunnerProperties(StartupMode.NOSTARTUP, threads)) {
             @Override
             protected String getThreadNamePrefix() {
-                return EvaluatorServiceImpl.class.getSimpleName();
+                return EngineExecutionServiceImpl.class.getSimpleName();
             }
         };
         this.executionRunner.start();
@@ -116,15 +116,15 @@ public class LifecycleExecutionService {
             try {
                 this.executionRunner.close();
             } catch (IOException e) {
-                log.error("Failed to closing evaluation runner", e);
+                log.error("Failed to closing executeRequest runner", e);
             }
         }
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public @NotNull EvaluationResult execute(final @NotNull Evaluation evaluation, @NotEmpty final List<ScenesWrapper> sceneses)
+    public @NotNull ExecuteResult execute(final @NotNull ExecuteRequest executeRequest, @NotEmpty final List<ScenesWrapper> sceneses)
             throws Exception {
-        notNullOf(evaluation, "evaluation");
+        notNullOf(executeRequest, "executeRequest");
         notEmptyOf(sceneses, "sceneses");
 
         final List<String> scenesCodes = sceneses.stream().map(s -> s.getScenesCode()).collect(toList());
@@ -135,12 +135,12 @@ public class LifecycleExecutionService {
         // Submit to execution workers.
         final Map<String, Future<ResultDescription>> futures = sceneses.stream()
                 .map(scenes -> new KeyValue(scenes.getScenesCode(),
-                        executionRunner.getWorker().submit(new ExecutionRunner(latch, evaluation, scenes))))
+                        executionRunner.getWorker().submit(new ExecutionRunner(latch, executeRequest, scenes))))
                 .collect(toMap(kv -> kv.getKey(), kv -> (Future) kv.getValue()));
 
         // Collect for uncompleted results.
         final List<ResultDescription> uncompleteds = new ArrayList<>(futures.size());
-        final long timeoutMs = (long) ((long) evaluation.getTimeout() * (1 - config.engine().evaluateTimeoutOffsetRate()));
+        final long timeoutMs = (long) ((long) executeRequest.getTimeout() * (1 - config.engine().evaluateTimeoutOffsetRate()));
 
         if (!latch.await(timeoutMs, MILLISECONDS)) { // timeout?
             final Iterator<Entry<String, Future<ResultDescription>>> it = futures.entrySet().iterator();
@@ -172,8 +172,8 @@ public class LifecycleExecutionService {
             }
         }).collect(toList());
 
-        return EvaluationResult.builder()
-                .requestId(evaluation.getRequestId())
+        return ExecuteResult.builder()
+                .requestId(executeRequest.getRequestId())
                 .errorCount(uncompleteds.size())
                 .results(newArrayList(Iterables.concat(completeds, uncompleteds)))
                 .build();
@@ -207,7 +207,7 @@ public class LifecycleExecutionService {
     @AllArgsConstructor
     class ExecutionRunner implements Callable<ResultDescription> {
         final @NotNull CountDownLatch latch;
-        final @NotNull Evaluation evaluation;
+        final @NotNull ExecuteRequest executeRequest;
         final @NotNull ScenesWrapper scenes;
 
         @Override
@@ -216,16 +216,16 @@ public class LifecycleExecutionService {
             notNull(engine, "Please check if the configuration is correct, rule engine type of workflow is null.");
 
             try {
-                // Buried-point: total evaluation.
+                // Buried-point: total executeRequest.
                 meterService.counter(evaluation_total.getName(), evaluation_total.getHelp(), MetricsTag.ENGINE, engine.name())
                         .increment();
 
                 final WorkflowExecution execution = getExecution(engine);
                 notNull(execution, "Could not load execution rule engine via %s of '%s'", engine.name(),
-                        evaluation.getClientId());
-                final ResultDescription result = execution.execute(evaluation, scenes);
+                        executeRequest.getClientId());
+                final ResultDescription result = execution.execute(executeRequest, scenes);
 
-                // Buried-point: success evaluation.
+                // Buried-point: success executeRequest.
                 meterService.counter(evaluation_success.getName(), evaluation_success.getHelp(), MetricsTag.ENGINE, engine.name())
                         .increment();
 
@@ -235,14 +235,14 @@ public class LifecycleExecutionService {
                     e.printStackTrace();
                 }
 
-                // Buried-point: failed evaluation.
+                // Buried-point: failed executeRequest.
                 meterService.counter(evaluation_failure.getName(), evaluation_failure.getHelp(), MetricsTag.ENGINE, engine.name())
                         .increment();
 
                 final String errmsg = ExceptionUtils.getRootCauseMessage(e);
                 throw new RengineException(format(
                         "Failed to execution %s engine of requestId: '%s', clientId: '%s', scenesCode: '%s'. reason: %s",
-                        engine.name(), evaluation.getRequestId(), evaluation.getClientId(), scenes.getScenesCode(), errmsg), e);
+                        engine.name(), executeRequest.getRequestId(), executeRequest.getClientId(), scenes.getScenesCode(), errmsg), e);
             } finally {
                 latch.countDown();
             }

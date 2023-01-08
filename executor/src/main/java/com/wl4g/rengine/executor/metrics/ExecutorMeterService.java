@@ -53,31 +53,31 @@ public class ExecutorMeterService extends PrometheusMeterFacade {
     @AllArgsConstructor
     public static enum MetricsName {
 
-        evaluation_total("evaluation_total", "The stats of evaluation total"),
+        evaluation_total("evaluation_total", "The stats of executeRequest total"),
 
-        evaluation_success("evaluation_success", "The stats of evaluation success"),
+        evaluation_success("evaluation_success", "The stats of executeRequest success"),
 
-        evaluation_failure("evaluation_failure", "The stats of evaluation failure"),
+        evaluation_failure("evaluation_failure", "The stats of executeRequest failure"),
 
-        evaluation_execution_time("evaluation_execution_time", "The stats of evaluation execution time"),
+        evaluation_execution_time("evaluation_execution_time", "The stats of executeRequest execution time"),
 
-        execution_datasource_facade_total("execution_datasource_facade_total", "The stats of datasource facade evaluation total"),
+        execution_datasource_facade_total("execution_datasource_facade_total", "The stats of datasource facade executeRequest total"),
 
         execution_datasource_facade_success("execution_datasource_facade_success",
-                "The stats of datasource facade evaluation success"),
+                "The stats of datasource facade executeRequest success"),
 
         execution_datasource_facade_failure("execution_datasource_facade_failure",
-                "The stats of datasource facade evaluation failure"),
+                "The stats of datasource facade executeRequest failure"),
 
-        execution_datasource_facade_time("execution_datasource_facade_failure", "The stats of datasource facade evaluation time"),
+        execution_datasource_facade_time("execution_datasource_facade_failure", "The stats of datasource facade executeRequest time"),
 
-        execution_sdk_client_total("execution_sdk_client_total", "The stats of sdk client evaluation total"),
+        execution_sdk_client_total("execution_sdk_client_total", "The stats of sdk client executeRequest total"),
 
-        execution_sdk_client_success("execution_sdk_client_success", "The stats of sdk client evaluation success"),
+        execution_sdk_client_success("execution_sdk_client_success", "The stats of sdk client executeRequest success"),
 
-        execution_sdk_client_failure("execution_sdk_client_failure", "The stats of sdk client evaluation failure"),
+        execution_sdk_client_failure("execution_sdk_client_failure", "The stats of sdk client executeRequest failure"),
 
-        execution_sdk_client_time("execution_sdk_client_time", "The stats of sdk client evaluation time");
+        execution_sdk_client_time("execution_sdk_client_time", "The stats of sdk client executeRequest time");
 
         private final String name;
         private final String help;

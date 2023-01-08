@@ -34,7 +34,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link Evaluation}
+ * {@link ExecuteRequest}
  * 
  * @author James Wong
  * @version 2022-09-18
@@ -45,7 +45,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class Evaluation extends EvaluationBase {
+public class ExecuteRequest extends RequestBase {
 
     @NotBlank
     String clientId;

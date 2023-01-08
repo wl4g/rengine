@@ -15,6 +15,7 @@
  */
 package com.wl4g.rengine.client.core;
 
+import static java.lang.System.out;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 
@@ -28,8 +29,8 @@ import org.junit.jupiter.api.Assertions;
 
 import com.wl4g.rengine.client.core.config.ClientConfig;
 import com.wl4g.rengine.common.exception.RengineException;
-import com.wl4g.rengine.common.model.EvaluationResult;
-import com.wl4g.rengine.common.model.EvaluationResult.ResultDescription;
+import com.wl4g.rengine.common.model.ExecuteResult;
+import com.wl4g.rengine.common.model.ExecuteResult.ResultDescription;
 import com.wl4g.rengine.common.util.IdGenUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +51,7 @@ public class RengineClientTests {
             .clientSecret("abcdefghijklmnopqrstuvwxyz")
             .build();
 
-    EvaluationResult defaultFailbackResult = EvaluationResult.builder()
+    ExecuteResult defaultFailbackResult = ExecuteResult.builder()
             .errorCount(2)
             .results(singletonList(ResultDescription.builder().scenesCode("s1001001").build()))
             .build();
@@ -73,34 +74,34 @@ public class RengineClientTests {
     }
 
     @Test
-    public void testNewRengineClientEvaluationWithDefault() {
+    public void testNewRengineClientExecutionWithDefault() {
         Map<String, Object> args = new HashMap<>();
-        final EvaluationResult result = defaultClient.evaluate(singletonList("ecommerce_trade_gift"), args);
-        System.out.println("Evaluation result: " + result);
+        final ExecuteResult result = defaultClient.execute(singletonList("ecommerce_trade_gift"), args);
+        out.println("Executed result: " + result);
     }
 
     @Test(expected = RengineException.class)
-    public void testNewRengineClientEvaluationWithTimeoutFail() {
+    public void testNewRengineClientExecutionWithTimeoutFail() {
         RengineClient timeoutClient = RengineClient.builder().config(invalidClientConfig).defaultFailback(e -> {
-            System.out.println("\nFailed to evaluation of reason: " + e.getMessage());
+            out.println("\nFailed to evaluation of reason: " + e.getMessage());
             return defaultFailbackResult;
         }).build();
 
-        final EvaluationResult result = timeoutClient.evaluate(IdGenUtil.next(), singletonList("ecommerce_trade_gift"), 1000L,
+        final ExecuteResult result = timeoutClient.execute(IdGenUtil.next(), singletonList("ecommerce_trade_gift"), 1000L,
                 false, emptyMap());
-        System.out.println("Evaluated result: " + result);
+        out.println("Executed result: " + result);
     }
 
     @Test
-    public void testNewRengineClientEvaluationWithTimeoutSuccess() {
+    public void testNewRengineClientExecutionWithTimeoutSuccess() {
         RengineClient timeoutClient = RengineClient.builder().config(invalidClientConfig).defaultFailback(e -> {
-            System.out.println("\nFailed to evaluation of reason: " + e.getMessage());
+            out.println("\nFailed to evaluation of reason: " + e.getMessage());
             return defaultFailbackResult;
         }).build();
 
-        final var result = timeoutClient.evaluate(IdGenUtil.next(), singletonList("ecommerce_trade_gift"), 1000L, true,
+        final var result = timeoutClient.execute(IdGenUtil.next(), singletonList("ecommerce_trade_gift"), 1000L, true,
                 emptyMap());
-        System.out.println("Evaluated result: " + result);
+        out.println("Executed result: " + result);
         Assertions.assertEquals(defaultFailbackResult, result);
     }
 

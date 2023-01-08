@@ -38,8 +38,8 @@ import com.wl4g.rengine.common.graph.ExecutionGraphContext;
 import com.wl4g.rengine.common.graph.ExecutionGraphParameter;
 import com.wl4g.rengine.common.graph.ExecutionGraphResult;
 import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
-import com.wl4g.rengine.common.model.Evaluation;
-import com.wl4g.rengine.common.model.EvaluationResult.ResultDescription;
+import com.wl4g.rengine.common.model.ExecuteRequest;
+import com.wl4g.rengine.common.model.ExecuteResult.ResultDescription;
 import com.wl4g.rengine.executor.execution.engine.GraalJSScriptEngine;
 import com.wl4g.rengine.executor.execution.engine.IEngine;
 import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
@@ -61,19 +61,19 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
     GraalJSScriptEngine graalJSScriptEngine;
 
     @Override
-    public ResultDescription execute(final Evaluation evaluation, final ScenesWrapper scenes) {
+    public ResultDescription execute(final ExecuteRequest executeRequest, final ScenesWrapper scenes) {
         final WorkflowWrapper workflow = scenes.getEffectivePriorityWorkflow();
         final WorkflowGraphWrapper workflowGraph = workflow.getEffectiveLatestGraph();
         final IEngine engine = getEngine(workflow.getEngine());
 
         final ExecutionGraphParameter parameter = ExecutionGraphParameter.builder()
                 .requestTime(currentTimeMillis())
-                .traceId(evaluation.getRequestId())
+                .traceId(executeRequest.getRequestId())
                 .trace(true)
-                .clientId(evaluation.getClientId())
+                .clientId(executeRequest.getClientId())
                 .scenesCode(scenes.getScenesCode())
                 .workflowId(workflow.getId())
-                .args(evaluation.getArgs())
+                .args(executeRequest.getArgs())
                 .build();
 
         final Map<String, RuleWrapper> ruleMap = safeList(workflowGraph.getRules()).stream()

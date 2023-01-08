@@ -27,7 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
-import com.wl4g.rengine.executor.service.EvaluatorService;
+import com.wl4g.rengine.executor.service.EngineExecutionService;
 import com.wl4g.rengine.executor.util.TestDefaultBaseSetup;
 
 import io.quarkus.redis.datasource.ReactiveRedisDataSource;
@@ -67,7 +67,7 @@ public class EvaluatorServiceTests {
     // @Mock
     // @org.mockito.Mock
     // @InjectMock(convertScopes = true)
-    EvaluatorService evaluatorService;
+    EngineExecutionService engineExecutionService;
 
     @Before
     public void setup() {
@@ -76,16 +76,16 @@ public class EvaluatorServiceTests {
         // QuarkusMock.installMockForType(mock, JobService.class);
 
         // Manual setup/inject depends.
-        final EvaluatorServiceImpl evaluatorService = new EvaluatorServiceImpl(testNullReactiveRedisDataSource);
+        final EngineExecutionServiceImpl evaluatorService = new EngineExecutionServiceImpl(testNullReactiveRedisDataSource);
         evaluatorService.mongoRepository = TestDefaultBaseSetup.createMongoRepository();
         evaluatorService.config = TestDefaultBaseSetup.createExecutionConfig();
-        this.evaluatorService = evaluatorService;
+        this.engineExecutionService = evaluatorService;
     }
 
     @Test
     public void testFindScenesWorkflowGraphRules() {
         try {
-            List<ScenesWrapper> sceneses = evaluatorService.findScenesWorkflowGraphRules(singletonList("ecommerce_trade_gift"),
+            List<ScenesWrapper> sceneses = engineExecutionService.findScenesWorkflowGraphRules(singletonList("ecommerce_trade_gift"),
                     1);
             System.out.println(toJSONString(sceneses, true));
         } catch (Exception e) {

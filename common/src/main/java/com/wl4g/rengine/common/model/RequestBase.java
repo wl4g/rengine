@@ -24,7 +24,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link EvaluationBase}
+ * {@link RequestBase}
  * 
  * @author James Wong
  * @version 2022-10-17
@@ -35,8 +35,7 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @SuperBuilder
 @NoArgsConstructor
-public class EvaluationBase {
-
+public class RequestBase {
     @NotBlank
     String requestId;
 }

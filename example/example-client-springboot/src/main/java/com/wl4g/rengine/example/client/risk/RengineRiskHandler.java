@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 
 import com.wl4g.rengine.client.core.RengineClient;
 import com.wl4g.rengine.common.exception.RengineException;
-import com.wl4g.rengine.common.model.EvaluationResult;
+import com.wl4g.rengine.common.model.ExecuteResult;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,7 +45,7 @@ public class RengineRiskHandler {
     public void checkRiskFor(String scenesCode, Map<String, Object> args) {
         log.info("Risk checking for : {} => {}", scenesCode, args);
 
-        EvaluationResult result = rengineClient.evaluate(singletonList(scenesCode), true, args);
+        ExecuteResult result = rengineClient.execute(singletonList(scenesCode), true, args);
         log.info("Risk checked for result: {}, {} => {}", result, scenesCode, args);
 
         // Assertion risk evaluation result.

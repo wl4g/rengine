@@ -50,15 +50,15 @@
 //    @AllArgsConstructor
 //    public static enum MetricsName {
 //
-//        evaluation_total("evaluation_total", "The stats of evaluation total"),
+//        execution_total("execution_total", "The stats of execution total"),
 //
-//        evaluation_success("evaluation_success", "The stats of evaluation success"),
+//        execution_success("execution_success", "The stats of execution success"),
 //
-//        evaluation_failure("evaluation_suspicious", "The stats of evaluation failure"),
+//        execution_failure("execution_suspicious", "The stats of execution failure"),
 //
-//        evaluation_execute_time("evaluation_execute_time", "The stats of evaluation execute time"),
+//        execution_execute_time("execution_execute_time", "The stats of execution execute time"),
 //
-//        evaluation_suspicious("evaluation_suspicious", "The stats of evaluation suspicious");
+//        execution_suspicious("execution_suspicious", "The stats of execution suspicious");
 //
 //        private final String name;
 //        private final String help;
@@ -69,7 +69,6 @@
 //        public static final String ENGINE = "engine";
 //        public static final String SCENESCODE = "scenesCode";
 //        public static final String SERVICE = "service";
-//        public static final String LIBRARY = "library";
 //    }
 //
 //}

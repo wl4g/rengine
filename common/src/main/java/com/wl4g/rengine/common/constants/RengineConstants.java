@@ -59,7 +59,8 @@ public abstract class RengineConstants extends EnvironmentUtil {
     //
 
     public static final String CONF_PREFIX_EXECUTOR = CONF_PREFIX + ".executor";
-    public static final String API_EXECUTOR_EVALUATE = "/evaluate";
+    public static final String API_EXECUTOR_EXECUTE_BASE = "/execution";
+    public static final String API_EXECUTOR_EXECUTE = "/execute";
     // Notice: The handcode entrypoint function is 'process'
     public static final String DEFAULT_EXECUTOR_MAIN_FUNCTION = "process";
     public static final String DEFAULT_EXECUTOR_TMP_SCRIPT_CACHE_DIR = "/tmp/__rengine_script_caches";

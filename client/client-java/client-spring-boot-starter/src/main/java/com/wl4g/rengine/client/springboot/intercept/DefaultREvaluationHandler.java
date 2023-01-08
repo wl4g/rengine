@@ -54,8 +54,8 @@ import org.springframework.core.env.Environment;
 
 import com.wl4g.infra.common.reflect.ObjectInstantiators;
 import com.wl4g.rengine.client.core.RengineClient;
-import com.wl4g.rengine.client.core.exception.ClientEvaluationException;
-import com.wl4g.rengine.common.model.EvaluationResult;
+import com.wl4g.rengine.client.core.exception.ClientExecuteException;
+import com.wl4g.rengine.common.model.ExecuteResult;
 import com.wl4g.rengine.common.util.IdGenUtil;
 
 import lombok.CustomLog;
@@ -80,22 +80,22 @@ public class DefaultREvaluationHandler implements REvaluationHandler<REvaluation
         final long timeoutMs = annotation.timeout();
         final boolean bestEffort = annotation.bestEffort();
         final String paramsTemplate = annotation.paramsTemplate();
-        final Class<? extends Function<Throwable, EvaluationResult>> failbackClazz = annotation.failback();
+        final Class<? extends Function<Throwable, ExecuteResult>> failbackClazz = annotation.failback();
         hasText(scenesCode, "The evaluation parameter for scenesCode is missing.");
         isTrue(timeoutMs > 0, "The evaluation timeoutMs must > 0.");
         hasText(paramsTemplate, "The evaluation parameter for paramsTemplate is missing.");
 
         final String requestId = IdGenUtil.next();
-        final Function<Throwable, EvaluationResult> failback = getFailback(failbackClazz);
+        final Function<Throwable, ExecuteResult> failback = getFailback(failbackClazz);
         final Map<String, Object> args = buildEvaluateParams(jp, annotation, paramsTemplate);
 
-        final EvaluationResult result = rengineClient.evaluate(requestId, singletonList(scenesCode), timeoutMs, bestEffort, args,
+        final ExecuteResult result = rengineClient.execute(requestId, singletonList(scenesCode), timeoutMs, bestEffort, args,
                 failback);
         log.debug("Evaluated of result: {}, {} => {}", result, scenesCode, args);
 
         // Assertion evaluation result.
         if (result.getErrorCount() > 0) {
-            throw new ClientEvaluationException(requestId, singletonList(scenesCode), timeoutMs, bestEffort,
+            throw new ClientExecuteException(requestId, singletonList(scenesCode), timeoutMs, bestEffort,
                     format("Unable to operation, detected risk in your environment."));
         }
 
@@ -103,16 +103,16 @@ public class DefaultREvaluationHandler implements REvaluationHandler<REvaluation
     }
 
     @SuppressWarnings("unchecked")
-    protected Function<Throwable, EvaluationResult> getFailback(
-            Class<? extends Function<Throwable, EvaluationResult>> failbackClazz) {
+    protected Function<Throwable, ExecuteResult> getFailback(
+            Class<? extends Function<Throwable, ExecuteResult>> failbackClazz) {
         if (isNull(failbackClazz)) {
             return null;
         }
-        Function<Throwable, EvaluationResult> failback = (Function<Throwable, EvaluationResult>) failbackCaching
+        Function<Throwable, ExecuteResult> failback = (Function<Throwable, ExecuteResult>) failbackCaching
                 .get(failbackClazz);
         if (isNull(failback)) {
             synchronized (this) {
-                failback = (Function<Throwable, EvaluationResult>) failbackCaching.get(failbackClazz);
+                failback = (Function<Throwable, ExecuteResult>) failbackCaching.get(failbackClazz);
                 if (isNull(failback)) {
                     failbackCaching.put(failbackClazz, failback = ObjectInstantiators.newInstance(failbackClazz));
                 }

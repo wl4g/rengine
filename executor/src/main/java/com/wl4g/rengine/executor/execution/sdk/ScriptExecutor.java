@@ -18,6 +18,7 @@ package com.wl4g.rengine.executor.execution.sdk;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.rengine.executor.execution.engine.AbstractScriptEngine.SCIPRT_LOGGER_KEY_WORKFLOW_ID;
 import static java.lang.String.format;
 import static java.util.Collections.singletonMap;
 import static java.util.stream.Collectors.toList;
@@ -39,7 +40,6 @@ import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager.ContextWrappe
 import com.wl4g.infra.common.task.CompleteTaskListener;
 import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
 import com.wl4g.rengine.common.exception.ExecutionScriptException;
-import com.wl4g.rengine.executor.execution.engine.GraalJSScriptEngine;
 
 import lombok.ToString;
 
@@ -71,7 +71,7 @@ public class ScriptExecutor {
             // The same context restricted of graal.js does not allow
             // multi-threaded access, a new context must be used to execute in
             // the thread pool asynchronously.
-            final Map<String, Object> metadata = singletonMap(GraalJSScriptEngine.KEY_WORKFLOW_ID, workflowId);
+            final Map<String, Object> metadata = singletonMap(SCIPRT_LOGGER_KEY_WORKFLOW_ID, workflowId);
             try (ContextWrapper graalContext = graalPolyglotManager.getContext(metadata);) {
                 final Value jsFunction = graalContext
                         .eval(Source.newBuilder("js", script, "lambda0.js").mimeType("application/javascript+module").build());
@@ -91,7 +91,7 @@ public class ScriptExecutor {
                 // The same context restricted of graal.js does not allow
                 // multi-threaded access, a new context must be used to execute
                 // in the thread pool asynchronously.
-                final Map<String, Object> metadata = singletonMap(GraalJSScriptEngine.KEY_WORKFLOW_ID, workflowId);
+                final Map<String, Object> metadata = singletonMap(SCIPRT_LOGGER_KEY_WORKFLOW_ID, workflowId);
                 try (ContextWrapper graalContext = graalPolyglotManager.getContext(metadata);) {
                     final Value jsFunction = graalContext
                             .eval(Source.newBuilder("js", script, format("lambda%s.js", index.getAndIncrement()))
@@ -122,7 +122,7 @@ public class ScriptExecutor {
                 // The same context restricted of graal.js does not allow
                 // multi-threaded access, a new context must be used to execute
                 // in the thread pool asynchronously.
-                final Map<String, Object> metadata = singletonMap(GraalJSScriptEngine.KEY_WORKFLOW_ID, workflowId);
+                final Map<String, Object> metadata = singletonMap(SCIPRT_LOGGER_KEY_WORKFLOW_ID, workflowId);
                 try (ContextWrapper graalContext = graalPolyglotManager.getContext(metadata);) {
                     final Value jsFunction = graalContext
                             .eval(Source.newBuilder("js", script, format("lambda%s.js", index.getAndIncrement()))

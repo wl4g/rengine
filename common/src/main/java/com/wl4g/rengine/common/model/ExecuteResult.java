@@ -29,7 +29,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link EvaluationResult}
+ * {@link ExecuteResult}
  * 
  * @author James Wong
  * @version 2022-09-21
@@ -40,7 +40,7 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @SuperBuilder
 @NoArgsConstructor
-public class EvaluationResult extends EvaluationBase {
+public class ExecuteResult extends RequestBase {
 
     @NotNull
     @Default
