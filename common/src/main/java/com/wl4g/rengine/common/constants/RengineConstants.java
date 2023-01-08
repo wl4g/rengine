@@ -60,7 +60,15 @@ public abstract class RengineConstants extends EnvironmentUtil {
 
     public static final String CONF_PREFIX_EXECUTOR = CONF_PREFIX + ".executor";
     public static final String API_EXECUTOR_EXECUTE_BASE = "/execution";
+    // Receive execution request from client SDK. For example, a request from a
+    // business application JVM process via a dependent client SDK.
     public static final String API_EXECUTOR_EXECUTE = "/execute";
+    // Receive execution requests from arbitrary external systems. For example:
+    // the request sent when the pushes(or webhook) subscription events from
+    // WeChat, Dingtalk and other social platforms servers.
+    // This API is very useful, such as realizing chat interaction with WeChat
+    // official account or Dingding robot.
+    public static final String API_EXECUTOR_EXECUTE_WRAPPER = "/execute-wrapper";
     // Notice: The handcode entrypoint function is 'process'
     public static final String DEFAULT_EXECUTOR_MAIN_FUNCTION = "process";
     public static final String DEFAULT_EXECUTOR_TMP_SCRIPT_CACHE_DIR = "/tmp/__rengine_script_caches";
@@ -94,6 +102,10 @@ public abstract class RengineConstants extends EnvironmentUtil {
     @AllArgsConstructor
     public static enum MongoCollectionDefinition {
 
+        SYS_IDP_CONFIG("sys_idp_config", true),
+
+        SYS_NOTIFICATION_CONFIG("sys_notification_config", true),
+
         SCENESES("t_sceneses", true),
 
         WORKFLOWS("t_workflows", true),
@@ -108,14 +120,11 @@ public abstract class RengineConstants extends EnvironmentUtil {
 
         DATASOURCES("t_datasources", true),
 
-        @Deprecated
-        JOBS("t_jobs", true),
+        SCHEDULING_TRIGGER("t_scheduling_triggers", true),
 
-        AGGREGATES("t_aggregates", true),
+        SCHEDULING_JOBS("t_scheduling_jobs", true),
 
-        SYS_NOTIFICATION_CONFIG("sys_notification_config", true),
-
-        SYS_IDP_CONFIG("sys_idp_config", true);
+        AGGREGATES("t_aggregates", true);
 
         private final String name;
         private final boolean isWriteConcernSafe;

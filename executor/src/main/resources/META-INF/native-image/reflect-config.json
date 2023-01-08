@@ -530,6 +530,27 @@
   ]
 },
 {
+  "name": "com.wl4g.rengine.executor.execution.sdk.notifier.EmailScriptMessageNotifier",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>","parameterTypes": []},
+    {"name": "update","parameterTypes": ["com.wl4g.rengine.executor.execution.sdk.notifier.ScriptMessageNotifier$RefreshedInfo"]},
+    {"name": "kind","parameterTypes": []},
+    {"name": "refresh","parameterTypes": ["com.wl4g.rengine.common.entity.Notification"]},
+    {"name": "getUsingConfig","parameterTypes": []},
+    {"name": "getMailSender","parameterTypes": []},
+    {"name": "setUsingConfig","parameterTypes": ["com.wl4g.infra.common.notification.email.EmailNotifierProperties"]},
+    {"name": "setMailSender","parameterTypes": ["com.wl4g.infra.common.notification.email.internal.JavaMailSender"]},
+    {"name": "send","parameterTypes": ["java.util.Map"]},
+    {"name": "getRefreshed","parameterTypes": []},
+    {"name": "setRefreshed","parameterTypes": ["com.wl4g.rengine.executor.execution.sdk.notifier.ScriptMessageNotifier$RefreshedInfo"]}
+  ]
+},
+{
   "name": "com.wl4g.rengine.executor.execution.sdk.notifier.DingtalkScriptMessageNotifier",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
@@ -656,10 +677,10 @@
   "queryAllDeclaredMethods":true
 },
 {
-  "name":"com.wl4g.rengine.executor.rest.TestGroovyResource$GroovyExecution"
+  "name":"com.wl4g.rengine.executor.rest.hello.HelloGroovyResource$GroovyExecution"
 },
 {
-  "name":"com.wl4g.rengine.executor.rest.TestJavascriptResource",
+  "name":"com.wl4g.rengine.executor.rest.hello.HelloGraalJSResource",
   "queriedMethods":[
     {"name":"execution","parameterTypes":["com.wl4g.rengine.executor.rest.TestJavascriptResource$JavascriptExecution"] },
     {"name":"init","parameterTypes":[] },
@@ -667,7 +688,7 @@
   ]
 },
 {
-  "name":"com.wl4g.rengine.executor.rest.TestJavascriptResource$JavascriptExecution",
+  "name":"com.wl4g.rengine.executor.rest.hello.HelloGraalJSResource$JavascriptExecution",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,

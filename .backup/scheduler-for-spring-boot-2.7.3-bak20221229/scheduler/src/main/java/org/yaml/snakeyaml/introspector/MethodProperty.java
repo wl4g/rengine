@@ -27,7 +27,7 @@ import org.yaml.snakeyaml.util.ArrayUtils;
 
 /**
  * <p>
- * A <code>MethodProperty</code> is a <code>Property</code> which is accessed
+ * BsonEntitySerializers <code>MethodProperty</code> is a <code>Property</code> which is accessed
  * through accessor methods (setX, getX). It is possible to have a
  * <code>MethodProperty</code> which has only setter, only getter, or both. It
  * is not possible to have a <code>MethodProperty</code> which has neither

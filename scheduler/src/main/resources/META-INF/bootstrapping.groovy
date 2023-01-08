@@ -31,7 +31,7 @@ class RengineCollectorBootstrappingConfigurer implements IBootstrappingConfigure
 
     @Override
     def int getOrder() {
-        return -100
+        return -50
     }
 
     @Override

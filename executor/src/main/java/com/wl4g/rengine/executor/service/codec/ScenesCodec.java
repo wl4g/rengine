@@ -28,7 +28,7 @@ package com.wl4g.rengine.executor.service.codec;
 //
 //import com.mongodb.MongoClientSettings;
 //import com.wl4g.rengine.common.entity.Scenes;
-//import com.wl4g.rengine.common.util.IdGenUtil;
+//import com.wl4g.rengine.common.util.IdGenUtils;
 //
 ///**
 // * {@link ScenesCodec}
@@ -62,7 +62,7 @@ package com.wl4g.rengine.executor.service.codec;
 //    @Override
 //    public Scenes generateIdIfAbsentFromDocument(Scenes document) {
 //        if (!documentHasId(document)) {
-//            document.setId(IdGenUtil.next());
+//            document.setId(IdGenUtils.next());
 //        }
 //        return document;
 //    }

@@ -16,6 +16,7 @@
 package com.wl4g.rengine.executor.execution;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Objects.nonNull;
@@ -30,6 +31,7 @@ import com.wl4g.infra.common.lang.Assert2;
 import com.wl4g.rengine.common.entity.Rule.RuleEngine;
 import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
 import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
+import com.wl4g.rengine.common.entity.SchedulingJob.ResultDescription;
 import com.wl4g.rengine.common.entity.Workflow.WorkflowGraphWrapper;
 import com.wl4g.rengine.common.entity.Workflow.WorkflowWrapper;
 import com.wl4g.rengine.common.graph.ExecutionGraph;
@@ -39,10 +41,11 @@ import com.wl4g.rengine.common.graph.ExecutionGraphParameter;
 import com.wl4g.rengine.common.graph.ExecutionGraphResult;
 import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
 import com.wl4g.rengine.common.model.ExecuteRequest;
-import com.wl4g.rengine.common.model.ExecuteResult.ResultDescription;
 import com.wl4g.rengine.executor.execution.engine.GraalJSScriptEngine;
 import com.wl4g.rengine.executor.execution.engine.IEngine;
 import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
+
+import lombok.CustomLog;
 
 /**
  * {@link DefaultWorkflowExecution}
@@ -51,6 +54,7 @@ import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
  * @version 2022-09-17
  * @since v1.0.0
  */
+@CustomLog
 @Singleton
 public class DefaultWorkflowExecution implements WorkflowExecution {
 
@@ -66,40 +70,52 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
         final WorkflowGraphWrapper workflowGraph = workflow.getEffectiveLatestGraph();
         final IEngine engine = getEngine(workflow.getEngine());
 
-        final ExecutionGraphParameter parameter = ExecutionGraphParameter.builder()
-                .requestTime(currentTimeMillis())
-                .traceId(executeRequest.getRequestId())
-                .trace(true)
-                .clientId(executeRequest.getClientId())
-                .scenesCode(scenes.getScenesCode())
-                .workflowId(workflow.getId())
-                .args(executeRequest.getArgs())
-                .build();
+        try {
+            final ExecutionGraphParameter parameter = ExecutionGraphParameter.builder()
+                    .requestTime(currentTimeMillis())
+                    .traceId(executeRequest.getRequestId())
+                    .trace(true)
+                    .clientId(executeRequest.getClientId())
+                    .scenesCode(scenes.getScenesCode())
+                    .workflowId(workflow.getId())
+                    .args(executeRequest.getArgs())
+                    .build();
 
-        final Map<String, RuleWrapper> ruleMap = safeList(workflowGraph.getRules()).stream()
-                .collect(toMap(r -> valueOf(r.getId()), r -> r));
+            final Map<String, RuleWrapper> ruleMap = safeList(workflowGraph.getRules()).stream()
+                    .collect(toMap(r -> valueOf(r.getId()), r -> r));
 
-        final ExecutionGraphContext graphContext = new ExecutionGraphContext(parameter, ctx -> {
-            final String ruleId = ((IRunOperator) ctx.getCurrentNode()).getRuleId();
+            final ExecutionGraphContext graphContext = new ExecutionGraphContext(parameter, ctx -> {
+                final String ruleId = ((IRunOperator) ctx.getCurrentNode()).getRuleId();
 
-            final RuleWrapper rule = Assert2.notNull(ruleMap.get(ruleId),
-                    "The rule '%s' is missing. please check workflow graph rules configuration.", ruleId);
+                final RuleWrapper rule = Assert2.notNull(ruleMap.get(ruleId),
+                        "The rule '%s' is missing. please check workflow graph rules configuration.", ruleId);
 
-            final ScriptResult result = engine.execute(ctx, rule);
-            if (nonNull(result)) {
-                return new ExecutionGraphResult(ReturnState.of(result.getState()), result.getValueMap());
-            }
+                final ScriptResult result = engine.execute(ctx, rule);
+                if (nonNull(result)) {
+                    return new ExecutionGraphResult(ReturnState.of(result.getState()), result.getValueMap());
+                }
 
-            return new ExecutionGraphResult(ReturnState.FALSE);
-        });
+                return new ExecutionGraphResult(ReturnState.FALSE);
+            });
 
-        final ExecutionGraph<?> graph = ExecutionGraph.from(workflowGraph);
-        final ExecutionGraphResult result = graph.apply(graphContext);
-        return ResultDescription.builder()
-                .scenesCode(scenes.getScenesCode())
-                .success(true)
-                .valueMap(result.getValueMap())
-                .build();
+            final ExecutionGraph<?> graph = ExecutionGraph.from(workflowGraph);
+            final ExecutionGraphResult result = graph.apply(graphContext);
+
+            return ResultDescription.builder()
+                    .scenesCode(scenes.getScenesCode())
+                    .success(true)
+                    .valueMap(result.getValueMap())
+                    .build();
+        } catch (Exception e) {
+            log.warn(format("Failed to execution workflow graph for scenesCode: %s, workflowId: %s", scenes.getScenesCode(),
+                    workflow.getId()), e);
+
+            return ResultDescription.builder()
+                    .scenesCode(scenes.getScenesCode())
+                    .success(false)
+                    .reason(format("Failed to execution workflow graph of reason: %s", e.getMessage()))
+                    .build();
+        }
     }
 
     protected IEngine getEngine(RuleEngine kind) {

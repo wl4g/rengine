@@ -113,7 +113,7 @@ curl -v -XPOST \
 
 ### Mock testing dynamic `groovy` script execution?
 
-- Source codes see: [TestGroovyResource.java](src/main/java/com/wl4g/rengine/executor/rest/TestGroovyResource.java)
+- Source codes see: [HelloGroovyResource.java](src/main/java/com/wl4g/rengine/executor/rest/hello/HelloGroovyResource.java)
 
 - Generate testing script to local path.
 
@@ -130,7 +130,7 @@ curl -L -o /tmp/test.groovy 'https://raw.githubusercontent.com/wl4g/rengine/mast
 - Mocking request execution
 
 ```bash
-curl -v -XPOST -H 'Content-Type: application/json' 'http://localhost:28002/test/groovy/execution' -d '{
+curl -v -XPOST -H 'Content-Type: application/json' 'http://localhost:28002/hello/groovy/execute' -d '{
     "scriptPath": "file:///tmp/test.groovy",
     "args": ["jack01", "66"]
 }'
@@ -144,7 +144,7 @@ tail -f /tmp/rengine/executor.log | jq -r '.message'
 
 ### Mock testing dynamic `js` script execution?
 
-- Source codes see: [TestJavascriptResource.java](src/main/java/com/wl4g/rengine/executor/rest/TestJavascriptResource.java)
+- Source codes see: [HelloGraalJSResource.java](src/main/java/com/wl4g/rengine/executor/rest/hello/HelloGraalJSResource.java)
 
 - Generate testing script to local path.
 
@@ -161,7 +161,7 @@ curl -L -o /tmp/test-js2java.js 'https://raw.githubusercontent.com/wl4g/rengine/
 - Mocking request execution
 
 ```bash
-curl -v -XPOST -H 'Content-Type: application/json' 'http://localhost:28002/test/javascript/execution' -d '{
+curl -v -XPOST -H 'Content-Type: application/json' 'http://localhost:28002/hello/graaljs/execute' -d '{
     "scriptPath": "file:///tmp/test-js2java.js",
     "args": ["jack01", "66"]
 }'
@@ -173,7 +173,7 @@ curl -v -XPOST -H 'Content-Type: application/json' 'http://localhost:28002/test/
 tail -f /tmp/rengine/executor.log | jq -r '.message'
 ```
 
-### Use the Groovy evaluation engine support native executable mode ?
+### Use the Groovy execution engine support native executable mode ?
 
 - Currently not supported.
 
@@ -182,7 +182,7 @@ tail -f /tmp/rengine/executor.log | jq -r '.message'
 - Related difficult refer to see: [github.com/quarkusio/quarkus/issues/2720](https://github.com/quarkusio/quarkus/issues/2720)
 
 
-### Use the JavaScript evaluation engine support JVM mode and native executable mode?
+### Use the JS execution engine support JVM mode and native executable mode?
 
 - Yes, both are supported, thanks to GraalVM's multi-language support, but the --language:js option must be added when building native, and the version is best to use `GraalVM 22.1`, because the js plugin has been removed by default from `GraalVM 22.2`
 

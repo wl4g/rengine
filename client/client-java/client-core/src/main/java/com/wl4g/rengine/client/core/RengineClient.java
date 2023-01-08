@@ -45,7 +45,7 @@ import com.wl4g.rengine.client.core.exception.ClientExecuteException;
 import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.common.model.ExecuteRequest;
 import com.wl4g.rengine.common.model.ExecuteResult;
-import com.wl4g.rengine.common.util.IdGenUtil;
+import com.wl4g.rengine.common.util.IdGenUtils;
 
 import lombok.Builder.Default;
 import lombok.experimental.SuperBuilder;
@@ -71,21 +71,21 @@ public class RengineClient {
     private @Default Function<Throwable, ExecuteResult> defaultFailback = new DefaultFailback();
 
     public ExecuteResult execute(@NotEmpty List<String> scenesCodes, @Nullable Map<String, Object> args) {
-        return execute(IdGenUtil.next(), scenesCodes, ExecuteRequest.DEFAULT_TIMEOUT, ExecuteRequest.DEFAULT_BESTEFFORT, args, null);
+        return execute(IdGenUtils.next(), scenesCodes, ExecuteRequest.DEFAULT_TIMEOUT, ExecuteRequest.DEFAULT_BESTEFFORT, args, null);
     }
 
     public ExecuteResult execute(
             @NotEmpty List<String> scenesCodes,
             @Min(1) Long timeoutMs,
             @Nullable Map<String, Object> args) {
-        return execute(IdGenUtil.next(), scenesCodes, timeoutMs, ExecuteRequest.DEFAULT_BESTEFFORT, args, null);
+        return execute(IdGenUtils.next(), scenesCodes, timeoutMs, ExecuteRequest.DEFAULT_BESTEFFORT, args, null);
     }
 
     public ExecuteResult execute(
             @NotEmpty List<String> scenesCodes,
             @NotNull Boolean bestEffort,
             @Nullable Map<String, Object> args) {
-        return execute(IdGenUtil.next(), scenesCodes, ExecuteRequest.DEFAULT_TIMEOUT, bestEffort, args, null);
+        return execute(IdGenUtils.next(), scenesCodes, ExecuteRequest.DEFAULT_TIMEOUT, bestEffort, args, null);
     }
 
     public ExecuteResult execute(

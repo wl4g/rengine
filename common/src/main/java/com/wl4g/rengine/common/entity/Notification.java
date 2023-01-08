@@ -15,10 +15,11 @@
  */
 package com.wl4g.rengine.common.entity;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -32,6 +33,7 @@ import com.wl4g.infra.common.notification.MessageNotifier.NotifierKind;
 import com.wl4g.infra.common.validation.EnumValue;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -82,12 +84,41 @@ public class Notification extends BaseBean {
     @ToString
     @NoArgsConstructor
     public static class EmailConfig extends NotifierConfigPropertiesBase {
-        private @NotBlank String smtpHost;
-        private @NotNull @Min(0) Integer smtpPort;
-        private @NotBlank String sendMail;
+
+        /**
+         * Protocol used by the Email(SMTP) server.
+         */
+        private @NotBlank @Default String protocol = "smtp";
+
+        /**
+         * Email(SMTP) server host.
+         */
+        private @NotBlank @Default String host = "smtp.exmail.qq.com";
+
+        /**
+         * Email(SMTP) server port.
+         */
+        private @NotBlank @Default Integer port = 465;
+
+        /**
+         * Login user of the Email(SMTP) server.
+         */
         private @NotBlank String username;
+
+        /**
+         * Login password of the Email(SMTP) server.
+         */
         private @NotBlank String password;
-        private @NotNull Boolean useSSL;
+
+        /**
+         * Default MimeMessage encoding.
+         */
+        private @NotBlank @Default String defaultEncoding = "UTF-8";
+
+        /**
+         * Additional JavaMail session properties.
+         */
+        private @Nullable @Default Map<String, String> properties = new HashMap<>();
     }
 
     @Getter

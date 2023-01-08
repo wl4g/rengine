@@ -28,10 +28,10 @@ import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 
 import com.wl4g.rengine.client.core.config.ClientConfig;
+import com.wl4g.rengine.common.entity.SchedulingJob.ResultDescription;
 import com.wl4g.rengine.common.exception.RengineException;
 import com.wl4g.rengine.common.model.ExecuteResult;
-import com.wl4g.rengine.common.model.ExecuteResult.ResultDescription;
-import com.wl4g.rengine.common.util.IdGenUtil;
+import com.wl4g.rengine.common.util.IdGenUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -87,7 +87,7 @@ public class RengineClientTests {
             return defaultFailbackResult;
         }).build();
 
-        final ExecuteResult result = timeoutClient.execute(IdGenUtil.next(), singletonList("ecommerce_trade_gift"), 1000L,
+        final ExecuteResult result = timeoutClient.execute(IdGenUtils.next(), singletonList("ecommerce_trade_gift"), 1000L,
                 false, emptyMap());
         out.println("Executed result: " + result);
     }
@@ -99,7 +99,7 @@ public class RengineClientTests {
             return defaultFailbackResult;
         }).build();
 
-        final var result = timeoutClient.execute(IdGenUtil.next(), singletonList("ecommerce_trade_gift"), 1000L, true,
+        final var result = timeoutClient.execute(IdGenUtils.next(), singletonList("ecommerce_trade_gift"), 1000L, true,
                 emptyMap());
         out.println("Executed result: " + result);
         Assertions.assertEquals(defaultFailbackResult, result);

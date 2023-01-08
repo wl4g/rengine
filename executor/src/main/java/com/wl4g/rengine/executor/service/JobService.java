@@ -19,7 +19,7 @@ package com.wl4g.rengine.executor.service;
 //
 // import java.util.List;
 //
-// import com.wl4g.rengine.common.entity.Job;
+// import com.wl4g.rengine.common.entity.SchedulingJob;
 // import com.wl4g.rengine.executor.service.impl.JobServiceImpl;
 //
 // import io.smallrye.mutiny.Uni;
@@ -33,8 +33,8 @@ package com.wl4g.rengine.executor.service;
 // */
 // public interface JobService {
 //
-// Uni<List<Job>> listAll();
+// Uni<List<SchedulingJob>> listAll();
 //
-// Uni<Void> save(Job job);
+// Uni<Void> save(SchedulingJob job);
 //
 // }

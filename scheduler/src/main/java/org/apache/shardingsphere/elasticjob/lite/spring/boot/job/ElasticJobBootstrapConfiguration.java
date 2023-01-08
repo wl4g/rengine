@@ -34,10 +34,10 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import com.google.common.base.Preconditions;
-import com.wl4g.rengine.scheduler.config.CollectorProperties;
-import com.wl4g.rengine.scheduler.config.CollectorProperties.ScrapeJobProperties;
-import com.wl4g.rengine.scheduler.config.CollectorProperties.TracingProperties;
-import com.wl4g.rengine.scheduler.job.CollectJobExecutor.JobParamBase;
+import com.wl4g.rengine.scheduler.config.RengineSchedulerProperties;
+import com.wl4g.rengine.scheduler.config.RengineSchedulerProperties.BaseJobProperties;
+import com.wl4g.rengine.scheduler.config.RengineSchedulerProperties.TracingProperties;
+import com.wl4g.rengine.scheduler.job.AbstractJobExecutor.JobParamBase;
 
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -59,16 +59,16 @@ public class ElasticJobBootstrapConfiguration implements SmartInitializingSingle
 
     @Override
     public void afterSingletonsInstantiated() {
-        log.info("Initial Job bootstrap beans ...");
+        log.info("Initial SchedulingJob bootstrap beans ...");
         createJobBootstrapBeans();
-        log.info("Job Bootstrap beans initialized.");
+        log.info("SchedulingJob Bootstrap beans initialized.");
     }
 
     /**
      * Create job bootstrap instances and register them into container.
      */
     public void createJobBootstrapBeans() {
-        CollectorProperties config = applicationContext.getBean(CollectorProperties.class);
+        RengineSchedulerProperties config = applicationContext.getBean(RengineSchedulerProperties.class);
         SingletonBeanRegistry singletonBeanRegistry = ((ConfigurableApplicationContext) applicationContext).getBeanFactory();
         CoordinatorRegistryCenter registryCenter = applicationContext.getBean(CoordinatorRegistryCenter.class);
         TracingConfiguration<?> tracingConfig = getTracingConfiguration();
@@ -91,7 +91,7 @@ public class ElasticJobBootstrapConfiguration implements SmartInitializingSingle
     }
 
     private void constructJobBootstraps(
-            final CollectorProperties config,
+            final RengineSchedulerProperties config,
             final SingletonBeanRegistry singletonBeanRegistry,
             final CoordinatorRegistryCenter registryCenter,
             final TracingConfiguration<?> tracingConfig) {
@@ -173,20 +173,20 @@ public class ElasticJobBootstrapConfiguration implements SmartInitializingSingle
             final SingletonBeanRegistry singletonBeanRegistry,
             final CoordinatorRegistryCenter registryCenter,
             final TracingConfiguration<?> tracingConfig,
-            final ScrapeJobProperties<? extends JobParamBase> scrapeConfig) {
+            final BaseJobProperties<? extends JobParamBase> jobConfigProperties) {
 
-        JobConfiguration jobConfig = scrapeConfig.toJobConfiguration(jobName);
+        JobConfiguration jobConfig = jobConfigProperties.toJobConfiguration(jobName);
         jobExtraConfigurations(jobConfig, tracingConfig);
 
         if (isBlank(jobConfig.getCron())) {
             hasText(jobBootstrapBeanName, "The property [jobBootstrapBeanName] is required for One-off job.");
             singletonBeanRegistry.registerSingleton(jobBootstrapBeanName,
-                    new OneOffJobBootstrap(registryCenter, scrapeConfig.getJobType().name(), jobConfig));
+                    new OneOffJobBootstrap(registryCenter, jobConfigProperties.getJobType().name(), jobConfig));
         } else {
             String beanName = !isBlank(jobBootstrapBeanName) ? jobBootstrapBeanName
                     : jobConfig.getJobName() + "-ScheduleJobBootstrap";
             singletonBeanRegistry.registerSingleton(beanName,
-                    new ScheduleJobBootstrap(registryCenter, scrapeConfig.getJobType().name(), jobConfig));
+                    new ScheduleJobBootstrap(registryCenter, jobConfigProperties.getJobType().name(), jobConfig));
         }
     }
 

@@ -61,10 +61,10 @@ import com.wl4g.infra.common.task.RunnerProperties;
 import com.wl4g.infra.common.task.RunnerProperties.StartupMode;
 import com.wl4g.rengine.common.entity.Rule.RuleEngine;
 import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
+import com.wl4g.rengine.common.entity.SchedulingJob.ResultDescription;
 import com.wl4g.rengine.common.exception.RengineException;
 import com.wl4g.rengine.common.model.ExecuteRequest;
 import com.wl4g.rengine.common.model.ExecuteResult;
-import com.wl4g.rengine.common.model.ExecuteResult.ResultDescription;
 import com.wl4g.rengine.executor.metrics.ExecutorMeterService;
 import com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsTag;
 import com.wl4g.rengine.executor.service.impl.EngineExecutionServiceImpl;
@@ -122,8 +122,9 @@ public class LifecycleExecutionService {
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public @NotNull ExecuteResult execute(final @NotNull ExecuteRequest executeRequest, @NotEmpty final List<ScenesWrapper> sceneses)
-            throws Exception {
+    public @NotNull ExecuteResult execute(
+            final @NotNull ExecuteRequest executeRequest,
+            @NotEmpty final List<ScenesWrapper> sceneses) throws Exception {
         notNullOf(executeRequest, "executeRequest");
         notEmptyOf(sceneses, "sceneses");
 
@@ -152,8 +153,12 @@ public class LifecycleExecutionService {
                     // Not need to execution continue.
                     future.cancel(true);
                     it.remove();
-                    uncompleteds.add(
-                            ResultDescription.builder().scenesCode(entry.getKey()).success(false).valueMap(emptyMap()).build());
+                    uncompleteds.add(ResultDescription.builder()
+                            .scenesCode(entry.getKey())
+                            .success(false)
+                            .valueMap(emptyMap())
+                            .reason(format("Execution time exceeded in total %sms", timeoutMs))
+                            .build());
                 }
             }
             log.debug("The parts success executed workflow graph tasks are: {}. requestId: {}, clientId: {}, scenesCodes: {}",
@@ -240,9 +245,11 @@ public class LifecycleExecutionService {
                         .increment();
 
                 final String errmsg = ExceptionUtils.getRootCauseMessage(e);
-                throw new RengineException(format(
-                        "Failed to execution %s engine of requestId: '%s', clientId: '%s', scenesCode: '%s'. reason: %s",
-                        engine.name(), executeRequest.getRequestId(), executeRequest.getClientId(), scenes.getScenesCode(), errmsg), e);
+                throw new RengineException(
+                        format("Failed to execution %s engine of requestId: '%s', clientId: '%s', scenesCode: '%s'. reason: %s",
+                                engine.name(), executeRequest.getRequestId(), executeRequest.getClientId(),
+                                scenes.getScenesCode(), errmsg),
+                        e);
             } finally {
                 latch.countDown();
             }

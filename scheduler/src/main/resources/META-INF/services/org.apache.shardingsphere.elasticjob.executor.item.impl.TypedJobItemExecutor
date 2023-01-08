@@ -7,9 +7,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-com.wl4g.rengine.scheduler.job.SimpleHttpCollectJobExecutor
-com.wl4g.rengine.scheduler.job.PrometheusCollectJobExecutor
-com.wl4g.rengine.scheduler.job.SimpleJdbcCollectJobExecutor
-com.wl4g.rengine.scheduler.job.SimpleRedisCollectJobExecutor
-com.wl4g.rengine.scheduler.job.SimpleTcpCollectJobExecutor
-com.wl4g.rengine.scheduler.job.SimpleSSHCollectJobExecutor
+com.wl4g.rengine.scheduler.job.EngineSchedulingControllerJobExecutor

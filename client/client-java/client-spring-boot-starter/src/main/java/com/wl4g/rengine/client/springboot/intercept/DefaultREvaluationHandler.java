@@ -56,7 +56,7 @@ import com.wl4g.infra.common.reflect.ObjectInstantiators;
 import com.wl4g.rengine.client.core.RengineClient;
 import com.wl4g.rengine.client.core.exception.ClientExecuteException;
 import com.wl4g.rengine.common.model.ExecuteResult;
-import com.wl4g.rengine.common.util.IdGenUtil;
+import com.wl4g.rengine.common.util.IdGenUtils;
 
 import lombok.CustomLog;
 
@@ -85,7 +85,7 @@ public class DefaultREvaluationHandler implements REvaluationHandler<REvaluation
         isTrue(timeoutMs > 0, "The evaluation timeoutMs must > 0.");
         hasText(paramsTemplate, "The evaluation parameter for paramsTemplate is missing.");
 
-        final String requestId = IdGenUtil.next();
+        final String requestId = IdGenUtils.next();
         final Function<Throwable, ExecuteResult> failback = getFailback(failbackClazz);
         final Map<String, Object> args = buildEvaluateParams(jp, annotation, paramsTemplate);
 

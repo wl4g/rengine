@@ -86,7 +86,7 @@
     <dependencies>
         <dependency>
             <groupId>com.wl4g</groupId>
-            <artifactId>rengine-common</artifactId>
+            <artifactId>rengine-service</artifactId>
         </dependency>
         <dependency>
             <groupId>com.wl4g</groupId>
@@ -113,13 +113,11 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-ui</artifactId>
-            <version>1.6.11</version>
         </dependency>
         <!-- see:https://springdoc.org/#spring-native-support -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-native</artifactId>
-            <version>1.6.11</version>
         </dependency>
         <!-- SECURITY -->
         <dependency>

@@ -49,6 +49,10 @@ public interface ScriptMessageNotifier {
     @HostAccess.Export
     Object send(final @NotNull Map<String, Object> parameter);
 
+    RefreshedInfo getRefreshed();
+
+    void setRefreshed(RefreshedInfo refreshed);
+
     default RefreshedInfo getRequiredRefreshed() {
         return notNull(getRefreshed(),
                 "Internal error! Should not be here, the current local cached refreshed is null, it should have been initialized before calling the notifier sending method.");
@@ -60,10 +64,6 @@ public interface ScriptMessageNotifier {
     }
 
     RefreshedInfo refresh(Notification notification);
-
-    RefreshedInfo getRefreshed();
-
-    void setRefreshed(RefreshedInfo refreshed);
 
     @Getter
     @Setter

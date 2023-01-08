@@ -17,9 +17,10 @@ package com.wl4g.rengine.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.validation.constraints.NotNull;
+
+import com.wl4g.rengine.common.entity.SchedulingJob.ResultDescription;
 
 import lombok.Builder.Default;
 import lombok.Getter;
@@ -40,7 +41,7 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @SuperBuilder
 @NoArgsConstructor
-public class ExecuteResult extends RequestBase {
+public class ExecuteResult extends BaseRequest {
 
     @NotNull
     @Default
@@ -49,27 +50,6 @@ public class ExecuteResult extends RequestBase {
     @NotNull
     @Default
     List<ResultDescription> results = new ArrayList<>();
-
-    @Getter
-    @Setter
-    @ToString
-    @SuperBuilder
-    @NoArgsConstructor
-    public static class ResultDescription {
-
-        // TODO 目前设计为场景ID
-        // 未来演进为通用特征平台，是否可将此字段表示为 feature?
-        // 特征平台的 feature 其实 rengine 就是 eventType (即前者一切数据类型揭:特征，后者一切数据类型揭:事件)
-        // 参见eBay特征平台: https://mp.weixin.qq.com/s/UG4VJ3HuzcBhjLcmtVpLFw
-        @NotNull
-        String scenesCode;
-
-        @NotNull
-        Boolean success;
-
-        @NotNull
-        Map<String, Object> valueMap;
-    }
 
     public static final String STATUS_PART_SUCCESS = "PartSuccess";
     public static final String STATUS_ALL_SUCCESS = "AllSuccess";

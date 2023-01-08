@@ -27,7 +27,7 @@ package com.wl4g.rengine.executor.service.impl;
 //
 // import org.bson.Document;
 //
-// import com.wl4g.rengine.common.entity.Job;
+// import com.wl4g.rengine.common.entity.SchedulingJob;
 // import com.wl4g.rengine.executor.repository.MongoRepository;
 // import com.wl4g.rengine.executor.service.JobService;
 //
@@ -51,16 +51,16 @@ package com.wl4g.rengine.executor.service.impl;
 // MongoSourceFacade mongoFacade;
 //
 // @Override
-// public Uni<List<Job>> listAll() {
+// public Uni<List<SchedulingJob>> listAll() {
 // // TODO hello world
 // return mongoFacade.getReactiveCollection(JOBS).find().map(doc -> {
-// Job job = Job.builder().id(doc.getLong("id")).build();
+// SchedulingJob job = SchedulingJob.builder().id(doc.getLong("id")).build();
 // return job;
 // }).collect().asList();
 // }
 //
 // @Override
-// public Uni<Void> save(Job job) {
+// public Uni<Void> save(SchedulingJob job) {
 // log.info("");
 // // TODO hello world
 // Document document = new Document().append("id",

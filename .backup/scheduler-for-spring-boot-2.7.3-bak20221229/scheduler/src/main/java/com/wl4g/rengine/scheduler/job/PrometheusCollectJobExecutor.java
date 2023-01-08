@@ -67,7 +67,7 @@ public class PrometheusCollectJobExecutor extends SimpleHttpCollectJobExecutor {
      * Conversion to Prometheus(0.0.4/OpenMetrics1.0) to Event.Body JSON
      * 
      * <pre>
-     *   # HELP go_gc_duration_seconds A summary of the GC invocation durations.
+     *   # HELP go_gc_duration_seconds BsonEntitySerializers summary of the GC invocation durations.
      *   # TYPE go_gc_duration_seconds summary
      *   go_gc_duration_seconds{quantile="0"} 4.1449e-05
      *   go_gc_duration_seconds{quantile="0.25"} 5.3531e-05

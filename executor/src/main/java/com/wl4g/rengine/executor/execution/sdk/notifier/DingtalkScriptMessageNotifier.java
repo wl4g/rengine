@@ -87,13 +87,14 @@ public class DingtalkScriptMessageNotifier implements ScriptMessageNotifier {
         hasTextOf(openConversationId, "openConversationId");
         hasTextOf(robotCode, "robotCode");
 
-        return DingtalkAPI.sendRobotGroupMessages(accessToken,
-                RobotGroupMessagesSend.builder()
-                        .msgKey(MsgKeyType.valueOf(msgKey))
-                        .msgParam(msgParam)
-                        .openConversationId(openConversationId)
-                        .robotCode(robotCode)
-                        .build());
+        return DingtalkAPI.getInstance()
+                .sendRobotGroupMessages(accessToken,
+                        RobotGroupMessagesSend.builder()
+                                .msgKey(MsgKeyType.valueOf(msgKey))
+                                .msgParam(msgParam)
+                                .openConversationId(openConversationId)
+                                .robotCode(robotCode)
+                                .build());
     }
 
     public CreateSceneGroupV2Result createSceneGroupV2(final @NotNull CreateSceneGroupV2 request) {
@@ -139,13 +140,13 @@ public class DingtalkScriptMessageNotifier implements ScriptMessageNotifier {
             request.setUuid(UUID.randomUUID().toString());
         }
 
-        return DingtalkAPI.createSceneGroupV2(accessToken, request);
+        return DingtalkAPI.getInstance().createSceneGroupV2(accessToken, request);
     }
 
     @Override
     public RefreshedInfo refresh(Notification notification) {
         final DingtalkConfig config = (DingtalkConfig) notification.getProperties();
-        final AccessTokenResult result = DingtalkAPI
+        final AccessTokenResult result = DingtalkAPI.getInstance()
                 .getAccessToken(AccessToken.builder().appKey(config.getAppKey()).appSecret(config.getAppSecret()).build());
 
         // Sets default configuration properties.

@@ -29,13 +29,13 @@ import org.apache.shardingsphere.elasticjob.infra.yaml.config.YamlConfiguration;
 import org.apache.shardingsphere.elasticjob.infra.yaml.config.YamlConfigurationConverterFactory;
 import org.apache.shardingsphere.elasticjob.infra.yaml.exception.YamlConfigurationConverterNotFoundException;
 
-import com.wl4g.rengine.scheduler.job.CollectJobExecutor.JobParamBase;
+import com.wl4g.rengine.scheduler.job.AbstractJobExecutor.JobParamBase;
 
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Job configuration POJO.
+ * SchedulingJob configuration POJO.
  */
 @Getter
 @Setter

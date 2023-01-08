@@ -38,7 +38,7 @@ import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Representer;
 import org.yaml.snakeyaml.resolver.Resolver;
 
-import com.wl4g.rengine.scheduler.config.CollectorYamlConstructor;
+import com.wl4g.rengine.scheduler.config.RengineSchedulerYamlConstructor;
 
 import org.springframework.beans.factory.config.YamlProcessor;
 import org.springframework.boot.origin.Origin;
@@ -99,7 +99,7 @@ class OriginTrackedYamlLoader extends YamlProcessor {
 
         OriginTrackingConstructor(LoaderOptions loadingConfig) {
             super(loadingConfig);
-            CollectorYamlConstructor.configure(this);
+            RengineSchedulerYamlConstructor.configure(this);
         }
 
         @Override

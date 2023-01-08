@@ -685,7 +685,155 @@
   ]
 },
 {
-  "name":"com.wl4g.rengine.common.model.Evaluation",
+  "name": "com.wl4g.rengine.common.entity.SchedulingTrigger",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>","parameterTypes": []},
+    {"name": "<init>","parameterTypes": ["com.wl4g.rengine.common.entity.SchedulingTrigger$SchedulingTriggerBuilder"]},
+    {"name": "toString","parameterTypes": []},
+    {"name": "getProperties","parameterTypes": []},
+    {"name": "setProperties","parameterTypes": ["com.wl4g.rengine.common.entity.SchedulingTrigger$TriggerPropertiesBase"]},
+    {"name": "builder","parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.SchedulingTrigger$TriggerPropertiesBase",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>","parameterTypes": []},
+    {"name": "<init>","parameterTypes": ["com.wl4g.rengine.common.entity.SchedulingTrigger$TriggerPropertiesBase$TriggerPropertiesBaseBuilder"]},
+    {"name": "setType","parameterTypes": ["java.lang.String"]},
+    {"name": "toString","parameterTypes": []},
+    {"name": "getType","parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.SchedulingTrigger$CronTriggerConfig",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>","parameterTypes": []},
+    {"name": "<init>","parameterTypes": ["com.wl4g.rengine.common.entity.SchedulingTrigger$CronTriggerConfig$CronTriggerConfigBuilder"]},
+    {"name": "getScenesCodes","parameterTypes": []},
+    {"name": "getBestEffort","parameterTypes": []},
+    {"name": "getTimeout","parameterTypes": []},
+    {"name": "getArgs","parameterTypes": []},
+    {"name": "setCron","parameterTypes": ["java.lang.String"]},
+    {"name": "setMisfire","parameterTypes": ["java.lang.Boolean"]},
+    {"name": "setScenesCodes","parameterTypes": ["java.util.List"]},
+    {"name": "setBestEffort","parameterTypes": ["java.lang.Boolean"]},
+    {"name": "setTimeout","parameterTypes": ["java.lang.Long"]},
+    {"name": "setArgs","parameterTypes": ["java.util.Map"]},
+    {"name": "getCron","parameterTypes": []},
+    {"name": "getMisfire","parameterTypes": []},
+    {"name": "toString","parameterTypes": []},
+    {"name": "$default$misfire","parameterTypes": []},
+    {"name": "$default$scenesCodes","parameterTypes": []},
+    {"name": "$default$bestEffort","parameterTypes": []},
+    {"name": "$default$timeout","parameterTypes": []},
+    {"name": "builder","parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.SchedulingJob",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>","parameterTypes": []},
+    {"name": "<init>","parameterTypes": ["com.wl4g.rengine.common.entity.SchedulingJob$SchedulingJobBuilder"]},
+    {"name": "getTriggerId","parameterTypes": []},
+    {"name": "setTriggerId","parameterTypes": ["java.lang.Long"]},
+    {"name": "getRunState","parameterTypes": []},
+    {"name": "setRunState","parameterTypes": ["java.util.Date"]},
+    {"name": "getSchedTime","parameterTypes": []},
+    {"name": "setSchedTime","parameterTypes": ["java.util.Date"]},
+    {"name": "getFirstFireTimeTime","parameterTypes": []},
+    {"name": "setFirstFireTimeTime","parameterTypes": ["java.util.Date"]},
+    {"name": "getRequestId","parameterTypes": []},
+    {"name": "setRequestId","parameterTypes": ["java.lang.String"]},
+    {"name": "getFinishedTime","parameterTypes": []},
+    {"name": "setFinishedTime","parameterTypes": ["java.util.Date"]},
+    {"name": "getResults","parameterTypes": []},
+    {"name": "setResults","parameterTypes": ["java.util.List"]},
+    {"name": "toString","parameterTypes": []},
+    {"name": "builder","parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.SchedulingJob$RunState",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "toString","parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.SchedulingJob$ResultDescription",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>","parameterTypes": []},
+    {"name": "<init>","parameterTypes": ["com.wl4g.rengine.common.entity.SchedulingJob$ResultDescription$ResultDescriptionBuilder"]},
+    {"name": "getScenesCode","parameterTypes": []},
+    {"name": "setScenesCode","parameterTypes": ["java.lang.String"]},
+    {"name": "getSuccess","parameterTypes": []},
+    {"name": "getValueMap","parameterTypes": []},
+    {"name": "setSuccess","parameterTypes": ["java.lang.Boolean"]},
+    {"name": "setValueMap","parameterTypes": ["java.util.Map"]},
+    {"name": "getReason","parameterTypes": []},
+    {"name": "setReason","parameterTypes": ["java.lang.String"]},
+    {"name": "toString","parameterTypes": []},
+    {"name": "builder","parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.SchedulingJob$ResultDescription$ResultDescriptionBuilderImpl",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>","parameterTypes": []},
+    {"name": "self","parameterTypes": []},
+    {"name": "self","parameterTypes": []},
+    {"name": "build","parameterTypes": []}
+  ]
+},
+{
+  "name":"com.wl4g.rengine.common.model.BaseRequest",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[]},
+    {"name":"getRequestId","parameterTypes":[]},
+    {"name":"setRequestId","parameterTypes":["java.lang.String"]},
+    {"name":"validate","parameterTypes":[]},
+    {"name":"toString","parameterTypes":["java.lang.String"]}
+   ]
+},
+{
+  "name":"com.wl4g.rengine.common.model.ExecuteRequest",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
@@ -703,19 +851,11 @@
     {"name":"setTimeout","parameterTypes":["java.lang.Long"] },
     {"name":"getArgs","parameterTypes":[] },
     {"name":"setArgs","parameterTypes":["java.util.Map"] },
+    {"name":"validate","parameterTypes":[] },
     {"name":"toString","parameterTypes":[] }
   ]
 },
 {
-  "name":"com.wl4g.rengine.common.model.EvaluationBase",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "methods":[{"name":"setRequestId","parameterTypes":["java.lang.String"] }]
-},
-{
-  "name":"com.wl4g.rengine.common.model.EvaluationResult"
-},
-{
-  "name":"com.wl4g.rengine.common.model.EvaluationResult$ResultDescription"
+  "name":"com.wl4g.rengine.common.model.ExecuteResult"
 }
 ]

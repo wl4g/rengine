@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.shardingsphere.elasticjob.api;
 
 import java.util.ArrayList;
@@ -22,7 +21,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
-import com.wl4g.rengine.scheduler.job.CollectJobExecutor.JobParamBase;
+import com.wl4g.rengine.scheduler.job.AbstractJobExecutor.JobParamBase;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

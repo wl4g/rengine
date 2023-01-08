@@ -33,6 +33,7 @@ import com.wl4g.infra.common.notification.dingtalk.DingtalkMessageNotifier;
 import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.CreateSceneGroupV2;
 import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.MsgKeyType;
 import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.SampleActionCard6Param;
+import com.wl4g.infra.common.notification.email.internal.EmailSenderAPI;
 import com.wl4g.rengine.executor.util.TestDefaultBaseSetup;
 import com.wl4g.rengine.executor.util.TestDefaultRedisSetup;
 
@@ -58,7 +59,8 @@ public class GlobalMessageNotifierManagerTests {
                     globalMessageNotifierManager.config = TestDefaultBaseSetup.createExecutionConfig();
                     globalMessageNotifierManager.mongoRepository = TestDefaultBaseSetup.createMongoRepository();
                     globalMessageNotifierManager.redisDS = TestDefaultRedisSetup.buildRedisDataSourceDefault();
-                    globalMessageNotifierManager.notifiers = asList(new DingtalkScriptMessageNotifier());
+                    globalMessageNotifierManager.notifiers = asList(new EmailScriptMessageNotifier(),
+                            new DingtalkScriptMessageNotifier());
                     globalMessageNotifierManager.init();
                 }
             }
@@ -131,6 +133,24 @@ public class GlobalMessageNotifierManagerTests {
                 .subadmin_ids("6165471647114842627")
                 .build());
 
+        System.out.println(toJSONString(result));
+    }
+
+    @Test
+    @RepeatedTest(5)
+    public void testEmailNotifierSend() throws Exception {
+        setup();
+
+        final ScriptMessageNotifier emailNotifier = globalMessageNotifierManager.getMessageNotifier(NotifierKind.EMAIL);
+        System.out.println("emailNotifier : " + emailNotifier);
+
+        final Map<String, Object> parameter = new HashMap<>();
+        parameter.put(EmailSenderAPI.KEY_MAILMSG_TYPE, EmailSenderAPI.VALUE_MAILMSG_SIMPLE);
+        parameter.put(EmailSenderAPI.KEY_MAILMSG_SUBJECT, "Testing Sender(Simple)");
+        parameter.put(EmailScriptMessageNotifier.KEY_EMAIL_TO_USERS, "983708408@qq.com");
+        parameter.put(EmailScriptMessageNotifier.KEY_EMAIL_MSG, "This testing simple message!!!");
+
+        final Object result = emailNotifier.send(parameter);
         System.out.println(toJSONString(result));
     }
 

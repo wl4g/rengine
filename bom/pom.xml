@@ -82,6 +82,7 @@
         <elasticjob.version>3.0.1</elasticjob.version>
         <curator.version>5.1.0</curator.version>
         <logstash.version>7.2</logstash.version>
+        <springdoc-openapi.version>1.6.11</springdoc-openapi.version>
         <!-- Notice: quarkus-2.12.2-netty-4.1.79.Final, quarkus-2.14.3-netty-4.1.82.Final -->
         <netty.version>4.1.82.Final</netty.version>
         <commons-dbutils.version>1.7</commons-dbutils.version>
@@ -160,7 +161,22 @@
             </dependency>
             <dependency>
                 <groupId>com.wl4g</groupId>
+                <artifactId>rengine-executor</artifactId>
+                <version>${project.parent.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.wl4g</groupId>
+                <artifactId>rengine-apiserver</artifactId>
+                <version>${project.parent.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.wl4g</groupId>
                 <artifactId>rengine-scheduler</artifactId>
+                <version>${project.parent.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.wl4g</groupId>
+                <artifactId>rengine-service</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>
@@ -243,16 +259,6 @@
                 <artifactId>rengine-job-rabbitmq-hive</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.wl4g</groupId>
-                <artifactId>rengine-executor</artifactId>
-                <version>${project.parent.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wl4g</groupId>
-                <artifactId>rengine-apiserver</artifactId>
-                <version>${project.parent.version}</version>
-            </dependency>
             <!-- Spring Cloud -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
@@ -266,6 +272,20 @@
                 <groupId>org.springframework.experimental</groupId>
                 <artifactId>spring-native</artifactId>
                 <version>${spring-native.version}</version>
+            </dependency>
+            <!-- Docs -->
+            <!-- see:https://springdoc.org/#demos -->
+            <!-- see:https://github.com/springdoc/springdoc-openapi-demos -->
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-ui</artifactId>
+                <version>${springdoc-openapi.version}</version>
+            </dependency>
+            <!-- see:https://springdoc.org/#spring-native-support -->
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-native</artifactId>
+                <version>${springdoc-openapi.version}</version>
             </dependency>
             <!-- ELASTIC JOB -->
             <dependency>

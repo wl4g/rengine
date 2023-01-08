@@ -66,7 +66,7 @@ public class CollectorPropertiesTests {
                 + "        readTimeoutMs: 5000";
         // @formatter:on
 
-        CollectorProperties config = new Yaml(new CollectorYamlConstructor()).loadAs(yaml, CollectorProperties.class);
+        RengineSchedulerProperties config = new Yaml(new RengineSchedulerYamlConstructor()).loadAs(yaml, RengineSchedulerProperties.class);
         System.out.println(toJSONString(config, true));
     }
 

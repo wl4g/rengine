@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>rengine-service</artifactId>
+    <name>Rengine Service</name>
+    <description>Rengine Service</description>
+    <organization>
+        <name>wl4g</name>
+        <url>https://rengine.wl4g.com</url>
+    </organization>
+    <licenses>
+        <license>
+            <name>Apache License Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <connection>scm:git:git@github.com:wl4g/rengine.git</connection>
+        <developerConnection>scm:git:git@github.com:wl4g/rengine.git</developerConnection>
+        <url>https://github.com/wl4g/rengine</url>
+        <tag>HEAD</tag>
+    </scm>
+    <issueManagement>
+        <system>github</system>
+        <url>https://github.com/wl4g/rengine/issues</url>
+    </issueManagement>
+    <developers>
+        <developer>
+            <id>James Wong</id>
+            <name>jameswong1376</name>
+            <email>jameswong1376@gmail.com</email>
+            <roles>
+                <role>owner</role>
+                <role>maintainer</role>
+                <role>developer</role>
+            </roles>
+            <timezone>+8</timezone>
+        </developer>
+        <developer>
+            <id>xburnerair00</id>
+            <name>xburnerair00</name>
+            <email>xburnerair00@163.com</email>
+            <roles>
+                <role>maintainer</role>
+                <role>developer</role>
+            </roles>
+            <timezone>+8</timezone>
+        </developer>
+    </developers>
+    <!-- see:https://swenfang.github.io/2018/06/03/Maven-Priority/ -->
+    <repositories>
+        <repository>
+            <id>spring-release</id>
+            <name>Spring release</name>
+            <url>https://repo.spring.io/release</url>
+        </repository>
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring milestone</name>
+            <url>https://repo.spring.io/milestone</url>
+        </repository>
+    </repositories>
+    <properties></properties>
+    <parent>
+        <groupId>com.wl4g</groupId>
+        <artifactId>rengine-parent</artifactId>
+        <version>1.0.0</version>
+    </parent>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.wl4g</groupId>
+                <artifactId>rengine-bom</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>com.wl4g</groupId>
+            <artifactId>rengine-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.wl4g</groupId>
+            <artifactId>infra-context</artifactId>
+        </dependency>
+        <!-- Cache(Jedis) -->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+        </dependency>
+        <!-- Spring -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!-- SECURITY -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-web</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <!-- Docs -->
+        <!-- see:https://springdoc.org/#demos -->
+        <!-- see:https://github.com/springdoc/springdoc-openapi-demos -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <!-- see:https://springdoc.org/#spring-native-support -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-native</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <!-- APM -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-sleuth</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-actuator-autoconfigure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-jmx</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+        <!-- DB -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+        </dependency>
+        <!-- OSS -->
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <!-- Tests -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/**.yaml</include>
+                    <include>**/**.yml</include>
+                    <include>**/**.conf</include>
+                    <include>**/**.properties</include>
+                    <include>**/**.json</include>
+                    <include>**/**.xml</include>
+                    <include>**/**.txt</include>
+                    <include>**/**.tpl</include>
+                    <include>**/**.groovy</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>static/**</include>
+                </includes>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <include>**/*Tests.java</include>
+                    </includes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <configuration>
+                    <configLocation>/../tools/checkstyle/google_checks.xml</configLocation>
+                </configuration>
+                <executions>
+                    <!-- Solutions to maven checkstyle errors in Eclipse: https://gitee.com/wl4g/blogs/blob/master/articles/maven.checkstyle-eclipse-error/README_CN.md -->
+                    <!-- <execution> -->
+                    <!-- <id>checkstyle</id> -->
+                    <!-- <phase>validate</phase> -->
+                    <!-- <goals> -->
+                    <!-- <goal>check</goal> -->
+                    <!-- </goals> -->
+                    <!-- <configuration> -->
+                    <!-- <failOnViolation>true</failOnViolation> -->
+                    <!-- </configuration> -->
+                    <!-- </execution> -->
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>integration-test</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -15,6 +15,11 @@
  */
 package com.wl4g.rengine.common.model;
 
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
+import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,7 +50,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class ExecuteRequest extends RequestBase {
+public class ExecuteRequest extends BaseRequest {
 
     @NotBlank
     String clientId;
@@ -89,6 +94,17 @@ public class ExecuteRequest extends RequestBase {
     @Nullable
     @Default
     Map<String, Object> args = new LinkedHashMap<>(4);
+
+    public ExecuteRequest validate() {
+        super.validate();
+        hasTextOf(clientId, "clientId");
+        hasTextOf(clientSecret, "clientSecret");
+        notEmptyOf(scenesCodes, "scenesCodes");
+        notNullOf(timeout, "timeout");
+        isTrueOf(timeout > 0, "timeout > 0");
+        notNullOf(bestEffort, "bestEffort");
+        return this;
+    }
 
     public static final long DEFAULT_TIMEOUT = 3_000L;
     public static final boolean DEFAULT_BESTEFFORT = false;
