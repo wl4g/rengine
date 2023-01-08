@@ -23,7 +23,7 @@ function process(context) {
     //const mongoResult = testSdkForMongoSourceFacade(context);
 
     // for sdk case6:
-    const jdbcResult = testSdkForJdbcSourceFacade(context);
+    //const jdbcResult = testSdkForJdbcSourceFacade(context);
 
     // for sdk case7:
     //const redisResult = testSdkForRedisSourceFacade(context);
@@ -59,7 +59,7 @@ function process(context) {
         //.addValue("lockResult", lockResult)
         //.addValue("mongoResult", mongoResult)
         //.addValue("redisResult", redisResult)
-        .addValue("jdbcResult", jdbcResult)
+        //.addValue("jdbcResult", jdbcResult)
         //.addValue("kafkaResult", kafkaResult)
         .addValue("dingtalkResult", dingtalkResult)
         .addValue("dateHolderResult", dateHolderResult)
@@ -191,18 +191,14 @@ function testSdkForKafkaSourceFacade(context) {
 
 function testSdkForDingtalkNotifier(context) {
     try {
-        //var DingtalkScriptMessageNotifier = Java.type("com.wl4g.rengine.executor.execution.sdk.notifier.DingtalkScriptMessageNotifier");
-        //console.info("DingtalkScriptMessageNotifier:", new DingtalkScriptMessageNotifier());
-
         const topic = "test_topic";
         console.info("dingtalkNotifier ...");
         const dingtalkNotifier = context.getDataService().getMessageNotifier("DINGTALK");
         console.info("dingtalkNotifier: " + dingtalkNotifier);
 
         const parameter = {
-            "msgKey": "sampleActionCard6",
             "msgParam": "{\"title\":\"(故障演练)异常告警\",\"text\":\"- 告警时间: 2023-01-01 01:01:01\n- 持续时间: 10m\n- 应用服务: mqttcollect\n- 集群环境: production\n- 节点 IP: 10.0.0.112\n- 节点 CPU(10s): 200%\n- 节点 Free Mem(5m): 10%\n- 节点 InNet(1m): 1234mbps\n- 节点 OutNet(1m): 1234mbps\n- 节点 IOPS(1m): 512/1501\n- 节点 Free Disks: 99GB/250GB\n- 诊断信息: <font color='#ff0000' size=3>send_kafka_fail_rate > 30%</font>\n- **[更多指标](http://grafana.example.com/123)**\",\"buttonTitle1\":\"Restart Now\",\"buttonUrl1\":\"https://qq.com\",\"buttonTitle2\":\"Cancel\",\"buttonUrl2\":\"https://qq.com\"}",
-            // 可选参数, 默认会读取 sys_notifications 表的 properties.defaultOpenConversationId 等字段.
+            "msgKey": "sampleActionCard6"
             //"openConversationId": "cidG+niQ3Ny\\/NwUc5KE7mANUQ==",
             //"robotCode": "dingbhyrzjxx6qjhjcdr"
         };
