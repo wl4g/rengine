@@ -100,7 +100,7 @@ public class LifecycleExecutionService {
 
     @PostConstruct
     void init() {
-        final int threads = config.executorThreadPools();
+        final int threads = config.engine().executorThreadPools();
         log.info("Initialzing execution threads pool for : {}", threads);
         this.executionRunner = new GenericTaskRunner<RunnerProperties>(new RunnerProperties(StartupMode.NOSTARTUP, threads)) {
             @Override
@@ -140,7 +140,7 @@ public class LifecycleExecutionService {
 
         // Collect for uncompleted results.
         final List<ResultDescription> uncompleteds = new ArrayList<>(futures.size());
-        final long timeoutMs = (long) ((long) evaluation.getTimeout() * (1 - config.evaluateTimeoutOffsetRate()));
+        final long timeoutMs = (long) ((long) evaluation.getTimeout() * (1 - config.engine().evaluateTimeoutOffsetRate()));
 
         if (!latch.await(timeoutMs, MILLISECONDS)) { // timeout?
             final Iterator<Entry<String, Future<ResultDescription>>> it = futures.entrySet().iterator();

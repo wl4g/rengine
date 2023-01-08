@@ -54,11 +54,16 @@ public interface ScriptMessageNotifier {
                 "Internal error! Should not be here, the current local cached refreshed is null, it should have been initialized before calling the notifier sending method.");
     }
 
+    default void update(final @NotNull RefreshedInfo refreshed) {
+        notNull(refreshed, "Internal error! The setup current refreshed is required.");
+        setRefreshed(refreshed);
+    }
+
+    RefreshedInfo refresh(Notification notification);
+
     RefreshedInfo getRefreshed();
 
     void setRefreshed(RefreshedInfo refreshed);
-
-    RefreshedInfo refresh(Notification notification);
 
     @Getter
     @Setter

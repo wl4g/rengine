@@ -117,7 +117,7 @@ public class MongoSourceFacade implements DataSourceFacade {
                                 .collect(toList());
 
                         try (MongoCursor<JsonNode> cursor = collection.aggregate(aggregateQuery)
-                                .batchSize(getExecutionConfig().maxQueryBatch())
+                                .batchSize(executionConfig.engine().maxQueryBatch())
                                 .map(doc -> parseToNode(doc.toJson()))
                                 .iterator();) {
                             return IteratorUtils.toList(cursor);

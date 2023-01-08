@@ -50,24 +50,23 @@ import org.graalvm.polyglot.proxy.ProxyObject;
 
 import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager;
 import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager.ContextWrapper;
-import com.wl4g.infra.common.io.FileIOUtils;
 import com.wl4g.infra.common.graalvm.polyglot.JdkLoggingOutputStream;
+import com.wl4g.infra.common.io.FileIOUtils;
 import com.wl4g.infra.common.lang.StringUtils2;
-import com.wl4g.infra.common.runtime.JvmRuntimeTool;
 import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
 import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
 import com.wl4g.rengine.common.exception.EvaluationException;
 import com.wl4g.rengine.common.exception.ExecutionScriptException;
+import com.wl4g.rengine.common.graph.ExecutionGraph.BaseOperator;
 import com.wl4g.rengine.common.graph.ExecutionGraphContext;
 import com.wl4g.rengine.common.graph.ExecutionGraphParameter;
-import com.wl4g.rengine.common.graph.ExecutionGraph.BaseOperator;
 import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
 import com.wl4g.rengine.executor.execution.sdk.ScriptContext;
+import com.wl4g.rengine.executor.execution.sdk.ScriptContext.ScriptParameter;
 import com.wl4g.rengine.executor.execution.sdk.ScriptDataService;
 import com.wl4g.rengine.executor.execution.sdk.ScriptExecutor;
 import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
-import com.wl4g.rengine.executor.execution.sdk.ScriptContext.ScriptParameter;
 import com.wl4g.rengine.executor.metrics.ExecutorMeterService;
 import com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsTag;
 import com.wl4g.rengine.executor.minio.MinioManager.ObjectResource;
@@ -104,9 +103,9 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
 
             this.graalPolyglotManager = GraalPolyglotManager.newDefaultGraalJS(DEFAULT_EXECUTOR_TMP_SCRIPT_CACHE_DIR,
                     metadata -> new JdkLoggingOutputStream(buildLogFilePattern(false, metadata), Level.INFO,
-                            config.log().fileMaxSize(), config.log().fileMaxCount(), JvmRuntimeTool.isJvmInDebugging, false),
+                            config.log().fileMaxSize(), config.log().fileMaxCount(), config.log().enableConsole(), false),
                     metadata -> new JdkLoggingOutputStream(buildLogFilePattern(true, metadata), Level.WARNING,
-                            config.log().fileMaxSize(), config.log().fileMaxCount(), JvmRuntimeTool.isJvmInDebugging, true));
+                            config.log().fileMaxSize(), config.log().fileMaxCount(), config.log().enableConsole(), true));
         } catch (Exception e) {
             log.error("Failed to init graal JS Script engine.", e);
             throw new ExecutionScriptException(e);
@@ -196,7 +195,7 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
                         graphContext.getLastResult().getValueMap());
 
         final SafeScheduledTaskPoolExecutor executor = globalExecutorManager.getExecutor(parameter.getWorkflowId(),
-                config.perExecutorThreadPools());
+                config.engine().perExecutorThreadPools());
 
         return ScriptContext.builder()
                 .id(graphContext.getCurrentNode().getId())

@@ -315,7 +315,7 @@ public class EvaluatorServiceImpl implements EvaluatorService {
         // aggregates.add(Aggregates.merge("_tmp_load_scenes_with_cascade"));
 
         final MongoCursor<ScenesWrapper> cursor = collection.aggregate(aggregates)
-                .batchSize(config.maxQueryBatch())
+                .batchSize(config.engine().maxQueryBatch())
                 .map(scenesDoc -> {
                     log.debug("Found scenes object by scenesCodes: {} to json: {}", scenesCodes, scenesDoc.toJson());
                     final Map<String, Object> scenesMap = BsonUtils2.asMap(scenesDoc);
@@ -381,7 +381,7 @@ public class EvaluatorServiceImpl implements EvaluatorService {
         final String scenesCodesHash = Hashing.md5()
                 .hashBytes(safeList(evaluation.getScenesCodes()).stream().collect(joining("-")).getBytes(UTF_8))
                 .toString();
-        final String batchQueryingKey = config.scenesRulesCachedPrefix().concat(scenesCodesHash);
+        final String batchQueryingKey = config.engine().scenesRulesCachedPrefix().concat(scenesCodesHash);
 
         final Uni<List<ScenesWrapper>> cachedScenesUnis = reactiveRedisStringCommands.get(batchQueryingKey).flatMap(json -> {
             if (Objects.isNull(json)) {
@@ -389,7 +389,7 @@ public class EvaluatorServiceImpl implements EvaluatorService {
                 final List<ScenesWrapper> sceneses = findScenesWorkflowGraphRules(evaluation.getScenesCodes(), revisions);
                 // Save to redis cache.
                 return reactiveRedisStringCommands
-                        .setex(batchQueryingKey, config.scenesRulesCachedExpire(), toJSONString(sceneses))
+                        .setex(batchQueryingKey, config.engine().scenesRulesCachedExpire(), toJSONString(sceneses))
                         .chain(() -> Uni.createFrom().item(() -> sceneses));
             }
             return Uni.createFrom().item(() -> parseJSON(json, SCENES_TYPE_REF));

@@ -122,6 +122,7 @@ public class GlobalMessageNotifierManager {
      */
     ScriptMessageNotifier ensureRefreshed(final @NotNull ScriptMessageNotifier notifier) {
         final NotifierKind notifierType = notifier.kind();
+
         RefreshedInfo refreshed = loadRefreshed(notifierType);
         if (isNull(refreshed)) {
             synchronized (notifierType) {
@@ -140,19 +141,22 @@ public class GlobalMessageNotifierManager {
                             refreshed = loadRefreshed(notifierType);
                             if (isNull(refreshed)) { // expired?
                                 refreshed = notifier.refresh(findNotification(notifierType));
+                                log.info("Refreshed to {} for notifier %s, {}", refreshed, notifierType);
                                 saveRefreshed(refreshed);
                             }
                         }
                     } catch (Exception e) {
                         log.error(format("Failed to refresh notifier for '%s'.", notifierType), e);
+                        throw e;
                     } finally {
                         lock.unlock();
                     }
                 }
             }
         }
+
         // Sets to current effective refreshed.
-        notifier.setRefreshed(refreshed);
+        notifier.update(refreshed);
 
         return notifier;
     }

@@ -275,14 +275,16 @@ quarkus:
 rengine:
   executor:
     execution:
-      scenes-rules-cached-prefix: 'rengine:executor:scenes:rules:'
-      scenes-rules-cached-expire: 900000
-      executor-thread-pools: 10
-      per-executor-thread-pools: 2
-      max-query-batch: 1024
-      evaluate-timeout-offset-rate: 0.1f
+      engine:
+        scenes-rules-cached-prefix: 'rengine:executor:scenes:rules:'
+        scenes-rules-cached-expire: 900000
+        executor-thread-pools: 10
+        per-executor-thread-pools: 2
+        max-query-batch: 1024
+        evaluate-timeout-offset-rate: 0.1f
       log:
         base-dir: /tmp/__rengine_script_log
+        enable-console: true
         file-max-size: 536870912 # Default by 512MB
         file-max-count: 10
       notifier:

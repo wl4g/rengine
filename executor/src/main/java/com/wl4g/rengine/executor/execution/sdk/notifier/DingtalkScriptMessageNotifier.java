@@ -29,8 +29,6 @@ import java.util.UUID;
 import javax.inject.Singleton;
 import javax.validation.constraints.NotNull;
 
-import org.graalvm.polyglot.HostAccess;
-
 import com.wl4g.infra.common.collection.CollectionUtils2;
 import com.wl4g.infra.common.notification.MessageNotifier.NotifierKind;
 import com.wl4g.infra.common.notification.dingtalk.DingtalkMessageNotifier;
@@ -67,7 +65,7 @@ public class DingtalkScriptMessageNotifier implements ScriptMessageNotifier {
     }
 
     @Override
-    public @HostAccess.Export Object send(final @NotNull Map<String, Object> parameter) {
+    public Object send(final @NotNull Map<String, Object> parameter) {
         final String accessToken = getRequiredRefreshed().getAccessToken();
         final String msgKey = (String) parameter.getOrDefault(DingtalkMessageNotifier.KEY_MSG_KEY,
                 MsgKeyType.sampleMarkdown.name());
@@ -98,7 +96,7 @@ public class DingtalkScriptMessageNotifier implements ScriptMessageNotifier {
                         .build());
     }
 
-    public @HostAccess.Export CreateSceneGroupV2Result createSceneGroupV2(final @NotNull CreateSceneGroupV2 request) {
+    public CreateSceneGroupV2Result createSceneGroupV2(final @NotNull CreateSceneGroupV2 request) {
         final String accessToken = getRequiredRefreshed().getAccessToken();
 
         // Gets default configuration properties.

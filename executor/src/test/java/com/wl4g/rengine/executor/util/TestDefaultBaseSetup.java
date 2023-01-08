@@ -53,35 +53,40 @@ public abstract class TestDefaultBaseSetup {
 
     public static ExecutionConfig createExecutionConfig() {
         return new ExecutionConfig() {
-
             @Override
-            public @NotBlank String scenesRulesCachedPrefix() {
-                return ExecutionConfig.DEFAULT_SCENES_RULES_CACHED_PREFIX;
-            }
+            public @NotNull EngineConfig engine() {
+                return new EngineConfig() {
+                    @Override
+                    public @NotBlank String scenesRulesCachedPrefix() {
+                        return ExecutionConfig.DEFAULT_SCENES_RULES_CACHED_PREFIX;
+                    }
 
-            @Override
-            public @NotNull @Min(0) Long scenesRulesCachedExpire() {
-                return ExecutionConfig.DEFAULT_SCENES_RULES_CACHED_EXPIRE;
-            }
+                    @Override
+                    public @NotNull @Min(0) Long scenesRulesCachedExpire() {
+                        return ExecutionConfig.DEFAULT_SCENES_RULES_CACHED_EXPIRE;
+                    }
 
-            @Override
-            public @NotNull @Min(0) @Max(65535) Integer executorThreadPools() {
-                return ExecutionConfig.DEFAULT_EXECUTOR_THREAD_POOLS;
-            }
+                    @Override
+                    public @NotNull @Min(0) @Max(65535) Integer executorThreadPools() {
+                        return ExecutionConfig.DEFAULT_EXECUTOR_THREAD_POOLS;
+                    }
 
-            @Override
-            public @NotNull @Min(0) @Max(1024) Integer perExecutorThreadPools() {
-                return ExecutionConfig.DEFAULT_PER_EXECUTOR_THREAD_POOLS;
-            }
+                    @Override
+                    public @NotNull @Min(0) @Max(1024) Integer perExecutorThreadPools() {
+                        return ExecutionConfig.DEFAULT_PER_EXECUTOR_THREAD_POOLS;
+                    }
 
-            @Override
-            public @NotNull @Min(0) @Max(100000) Integer maxQueryBatch() {
-                return ExecutionConfig.DEFAULT_MAX_QUERY_BATCH;
-            }
+                    @Override
+                    public @NotNull @Min(0) @Max(100000) Integer maxQueryBatch() {
+                        return ExecutionConfig.DEFAULT_MAX_QUERY_BATCH;
+                    }
 
-            @Override
-            public @NotNull @Min(0) @Max(1) Float evaluateTimeoutOffsetRate() {
-                return ExecutionConfig.DEFAULT_TIMEOUT_OFFSET_RATE;
+                    @Override
+                    public @NotNull @Min(0) @Max(1) Float evaluateTimeoutOffsetRate() {
+                        return ExecutionConfig.DEFAULT_TIMEOUT_OFFSET_RATE;
+                    }
+
+                };
             }
 
             @Override
@@ -90,6 +95,11 @@ public abstract class TestDefaultBaseSetup {
                     @Override
                     public @NotBlank String baseDir() {
                         return ExecutionConfig.DEFAULT_SCRIPT_LOG_BASE_DIR;
+                    }
+
+                    @Override
+                    public @NotNull Boolean enableConsole() {
+                        return ExecutionConfig.DEFAULT_SCRIPT_LOG_ENABLE_CONSOLE;
                     }
 
                     @Override
@@ -124,6 +134,7 @@ public abstract class TestDefaultBaseSetup {
                     }
                 };
             }
+
         };
     }
 

@@ -40,38 +40,8 @@ import io.smallrye.config.WithDefault;
 @ConfigMapping(prefix = CONF_PREFIX_EXECUTOR + ".execution", namingStrategy = NamingStrategy.KEBAB_CASE)
 public interface ExecutionConfig {
 
-    @WithDefault(DEFAULT_SCENES_RULES_CACHED_PREFIX)
-    @NotBlank
-    String scenesRulesCachedPrefix();
-
-    @WithDefault(DEFAULT_SCENES_RULES_CACHED_EXPIRE + "")
     @NotNull
-    @Min(0)
-    Long scenesRulesCachedExpire();
-
-    @WithDefault(DEFAULT_EXECUTOR_THREAD_POOLS + "")
-    @NotNull
-    @Min(0)
-    @Max(1024)
-    Integer executorThreadPools();
-
-    @WithDefault(DEFAULT_PER_EXECUTOR_THREAD_POOLS + "")
-    @NotNull
-    @Min(0)
-    @Max(1024)
-    Integer perExecutorThreadPools();
-
-    @WithDefault(DEFAULT_MAX_QUERY_BATCH + "")
-    @NotNull
-    @Min(0)
-    @Max(10_0000)
-    Integer maxQueryBatch();
-
-    @WithDefault(DEFAULT_TIMEOUT_OFFSET_RATE + "")
-    @NotNull
-    @Min(0)
-    @Max(1)
-    Float evaluateTimeoutOffsetRate();
+    EngineConfig engine();
 
     @NotNull
     ScriptLogConfig log();
@@ -79,10 +49,49 @@ public interface ExecutionConfig {
     @NotNull
     NotifierConfig notifier();
 
+    public static interface EngineConfig {
+        @WithDefault(DEFAULT_SCENES_RULES_CACHED_PREFIX)
+        @NotBlank
+        String scenesRulesCachedPrefix();
+
+        @WithDefault(DEFAULT_SCENES_RULES_CACHED_EXPIRE + "")
+        @NotNull
+        @Min(0)
+        Long scenesRulesCachedExpire();
+
+        @WithDefault(DEFAULT_EXECUTOR_THREAD_POOLS + "")
+        @NotNull
+        @Min(0)
+        @Max(1024)
+        Integer executorThreadPools();
+
+        @WithDefault(DEFAULT_PER_EXECUTOR_THREAD_POOLS + "")
+        @NotNull
+        @Min(0)
+        @Max(1024)
+        Integer perExecutorThreadPools();
+
+        @WithDefault(DEFAULT_MAX_QUERY_BATCH + "")
+        @NotNull
+        @Min(0)
+        @Max(10_0000)
+        Integer maxQueryBatch();
+
+        @WithDefault(DEFAULT_TIMEOUT_OFFSET_RATE + "")
+        @NotNull
+        @Min(0)
+        @Max(1)
+        Float evaluateTimeoutOffsetRate();
+    }
+
     public static interface ScriptLogConfig {
         @WithDefault(DEFAULT_SCRIPT_LOG_BASE_DIR)
         @NotBlank
         String baseDir();
+
+        @WithDefault(DEFAULT_SCRIPT_LOG_ENABLE_CONSOLE + "")
+        @NotNull
+        Boolean enableConsole();
 
         @WithDefault(DEFAULT_SCRIPT_LOG_FILE_MAX_SIZE + "")
         @NotNull
@@ -121,6 +130,7 @@ public interface ExecutionConfig {
     public static final float DEFAULT_TIMEOUT_OFFSET_RATE = 0.1f;
 
     public static final String DEFAULT_SCRIPT_LOG_BASE_DIR = "/tmp/__rengine_script_log";
+    public static final boolean DEFAULT_SCRIPT_LOG_ENABLE_CONSOLE = true;
     public static final int DEFAULT_SCRIPT_LOG_FILE_MAX_SIZE = 512 * 1024 * 1024;
     public static final int DEFAULT_SCRIPT_LOG_FILE_MAX_COUNT = 10;
 
