@@ -20,6 +20,9 @@ import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_notifier_failure;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_notifier_time;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_notifier_total;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
@@ -39,6 +42,7 @@ import com.wl4g.infra.common.notification.email.internal.EmailSenderAPI;
 import com.wl4g.infra.common.notification.email.internal.JavaMailSender;
 import com.wl4g.rengine.common.entity.Notification;
 import com.wl4g.rengine.common.entity.Notification.EmailConfig;
+import com.wl4g.rengine.executor.metrics.MeterUtil;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -67,72 +71,96 @@ public class EmailScriptMessageNotifier implements ScriptMessageNotifier {
     @SuppressWarnings("unchecked")
     @Override
     public Object send(final @NotNull Map<String, Object> parameter) {
-        notNullOf(parameter, "parameter");
+        MeterUtil.counter(execution_sdk_notifier_total, DingtalkScriptMessageNotifier.class, METHOD_SEND);
+        try {
+            return MeterUtil.timer(execution_sdk_notifier_time, DingtalkScriptMessageNotifier.class, METHOD_SEND, () -> {
+                notNullOf(parameter, "parameter");
+                final String content = (String) parameter.get(KEY_EMAIL_MSG);
+                hasTextOf(content, format("parameter['%s']", KEY_EMAIL_MSG));
 
-        final String content = (String) parameter.get(KEY_EMAIL_MSG);
-        hasTextOf(content, format("parameter['%s']", KEY_EMAIL_MSG));
+                final Object toUsers = parameter.get(KEY_EMAIL_TO_USERS);
+                notNullOf(toUsers, format("parameter['%s']", KEY_EMAIL_TO_USERS));
+                List<String> toUserList = null;
+                if (toUsers instanceof List) {
+                    toUserList = (List<String>) toUsers;
+                } else if (toUsers instanceof String) {
+                    toUserList = asList(split((String) toUsers, ","));
+                } else {
+                    throw new UnsupportedOperationException(
+                            format("Unsupported toUsers parameter type, please check whether the parameters are correct, "
+                                    + "only arrays or comma-separated strings are supported. toUsers: %s", toUsers));
+                }
 
-        final Object toUsers = parameter.get(KEY_EMAIL_TO_USERS);
-        notNullOf(toUsers, format("parameter['%s']", KEY_EMAIL_TO_USERS));
-        List<String> toUserList = null;
-        if (toUsers instanceof List) {
-            toUserList = (List<String>) toUsers;
-        } else if (toUsers instanceof String) {
-            toUserList = asList(split((String) toUsers, ","));
-        } else {
-            throw new UnsupportedOperationException(
-                    format("Unsupported toUsers parameter type, please check whether the parameters are correct, "
-                            + "only arrays or comma-separated strings are supported. toUsers: %s", toUsers));
+                EmailSenderAPI.send(mailSender, usingConfig,
+                        new GenericNotifierParam().setToObjects(toUserList).addParameters(parameter), content);
+                return null;
+            });
+        } catch (Exception e) {
+            MeterUtil.counter(execution_sdk_notifier_failure, DingtalkScriptMessageNotifier.class, METHOD_SEND);
+            throw e;
         }
-
-        EmailSenderAPI.send(mailSender, usingConfig, new GenericNotifierParam().setToObjects(toUserList).addParameters(parameter),
-                content);
-        return null;
     }
 
     @Override
     public void update(@NotNull RefreshedInfo refreshed) {
-        ScriptMessageNotifier.super.update(refreshed);
+        MeterUtil.counter(execution_sdk_notifier_total, DingtalkScriptMessageNotifier.class, METHOD_UPDATE);
+        try {
+            MeterUtil.timer(execution_sdk_notifier_time, DingtalkScriptMessageNotifier.class, METHOD_UPDATE, () -> {
+                ScriptMessageNotifier.super.update(refreshed);
 
-        // Initialze for config properties.
-        final EmailConfig config = parseJSON((String) refreshed.getAttributes().get(KEY_EMAIL_CONFIG), EmailConfig.class);
-        notNull(config,
-                "Internal error! Please check the redis cache configuration data, email config json is required. refreshed: %s",
-                refreshed);
+                // Initialze for config properties.
+                final EmailConfig config = parseJSON((String) refreshed.getAttributes().get(KEY_EMAIL_CONFIG), EmailConfig.class);
+                notNull(config,
+                        "Internal error! Please check the redis cache configuration data, email config json is required. refreshed: %s",
+                        refreshed);
 
-        usingConfig = new EmailNotifierProperties();
-        usingConfig.setProtocol(config.getProtocol());
-        usingConfig.setHost(config.getHost());
-        usingConfig.setPort(config.getPort());
-        usingConfig.setUsername(config.getUsername());
-        usingConfig.setPassword(config.getPassword());
-        usingConfig.setDefaultEncoding(config.getDefaultEncoding());
-        usingConfig.setProperties(config.getProperties());
+                usingConfig = new EmailNotifierProperties();
+                usingConfig.setProtocol(config.getProtocol());
+                usingConfig.setHost(config.getHost());
+                usingConfig.setPort(config.getPort());
+                usingConfig.setUsername(config.getUsername());
+                usingConfig.setPassword(config.getPassword());
+                usingConfig.setDefaultEncoding(config.getDefaultEncoding());
+                usingConfig.setProperties(config.getProperties());
 
-        // Initialze for sender.
-        if (isNull(mailSender)) {
-            synchronized (this) {
+                // Initialze for sender.
                 if (isNull(mailSender)) {
-                    mailSender = EmailSenderAPI.buildSender(usingConfig);
+                    synchronized (this) {
+                        if (isNull(mailSender)) {
+                            mailSender = EmailSenderAPI.buildSender(usingConfig);
+                        }
+                    }
                 }
-            }
+                return null;
+            });
+        } catch (Exception e) {
+            MeterUtil.counter(execution_sdk_notifier_failure, DingtalkScriptMessageNotifier.class, METHOD_UPDATE);
+            throw e;
         }
     }
 
     @Override
     public RefreshedInfo refresh(Notification notification) {
-        final EmailConfig config = (EmailConfig) notification.getProperties();
-
-        return RefreshedInfo.builder()
-                .notifierType(kind())
-                // .appKey(null)
-                // .appSecret(null)
-                // .accessToken(null)
-                // The accessToken is not actually needed, so it is set to never
-                // expire
-                .expireSeconds(Integer.MAX_VALUE)
-                .attributes(singletonMap(KEY_EMAIL_CONFIG, toJSONString(config)))
-                .build();
+        MeterUtil.counter(execution_sdk_notifier_total, DingtalkScriptMessageNotifier.class, METHOD_REFRESH);
+        try {
+            return MeterUtil.timer(execution_sdk_notifier_time, DingtalkScriptMessageNotifier.class, METHOD_REFRESH, () -> {
+                final EmailConfig config = (EmailConfig) notification.getProperties();
+                return RefreshedInfo.builder()
+                        .notifierType(kind())
+                        // .appKey(null)
+                        // .appSecret(null)
+                        // .accessToken(null)
+                        // The accessToken is not actually needed, so it is set
+                        // to never
+                        // expire
+                        .expireSeconds(Integer.MAX_VALUE)
+                        .attributes(singletonMap(KEY_EMAIL_CONFIG, toJSONString(config)))
+                        .build();
+            });
+        } catch (Exception e) {
+            MeterUtil.counter(execution_sdk_notifier_failure, DingtalkScriptMessageNotifier.class, METHOD_REFRESH);
+            throw e;
+        }
     }
 
     public static final String KEY_EMAIL_CONFIG = "__KEY_" + EmailConfig.class.getSimpleName();

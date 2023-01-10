@@ -41,6 +41,8 @@ public class MeterUtil {
 
     static ExecutorMeterService meterService;
 
+    // --- Meter for sdk datasource facade. ---
+
     public static void counter(
             final MetricsName metricsName,
             final String dataSourceName,
@@ -76,6 +78,8 @@ public class MeterUtil {
             }
         });
     }
+
+    // --- Meter for sdk clients and notifiers. ---
 
     public static void counter(final MetricsName metricsName, final Class<?> sdkType, final String methodName) {
         try {

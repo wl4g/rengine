@@ -85,7 +85,7 @@ curl -v localhost:28002/healthz/started
 curl -v localhost:28002/metrics
 ```
 
-- Manual evaluating mocking
+- Testing for API execute
 
 ```bash
 curl -v -XPOST \
@@ -103,6 +103,40 @@ curl -v -XPOST \
     "foo": "bar"
   }
 }'
+
+- Testing for API execute-wrapper(POST)
+
+```bash
+curl -v -XPOST \
+-H 'Content-Type: application/json' \
+'localhost:28002/execution/execute-wrapper' \
+-d '{
+  "requestId": "b9bc3e0e-d705-4ff2-9edf-970dcf95dea5",
+  "clientId": "JVqEpEwIaqkEkeD5",
+  "clientSecret": "Uf6nJDyJQHKRP43ycl9vZ9zs7s1nyu77",
+  "scenesCodes": ["ecommerce_trade_gift"],
+  "timeout": 3000,
+  "bestEffort": true,
+  "args": {
+    "userId": "u10010101",
+    "foo": "bar"
+  }
+}'
+```
+
+- Testing for API execute-wrapper(GET)
+
+```bash
+
+echo '{"foo":"bar"}' | base64 -w 9999
+
+curl -s "localhost:28002/execution/execute-wrapper?\
+clientId=JVqEpEwIaqkEkeD5\
+&clientSecret=Uf6nJDyJQHKRP43ycl9vZ9zs7s1nyu77\
+&scenesCodes=ecommerce_trade_gift\
+&timeout=30000\
+&bestEffort=true\
+&args=eyJmb28iOiJiYXIifQo="
 ```
 
 - [More Configuration: quarkus.io/guides/all-config](https://quarkus.io/guides/all-config)

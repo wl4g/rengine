@@ -60,10 +60,13 @@ public class SchedulingJob extends BaseBean {
     @SuperBuilder
     @NoArgsConstructor
     public static class ResultDescription {
-        // TODO 目前设计为场景ID
-        // 未来演进为通用特征平台，是否可将此字段表示为 feature?
-        // rengine eventType(一切数据类型揭:事件) 相当于特征平台的 features (一切数据类型揭:特征)
-        // 参见eBay特征平台: https://mp.weixin.qq.com/s/UG4VJ3HuzcBhjLcmtVpLFw
+        // Notice: It is currently designed as a scene ID and will evolve into a
+        // general feature platform in the future. Can this field be expressed
+        // as feature???
+        // rengine eventType (all data types as: events) is equivalent to the
+        // features of the feature platform (all data types as: features)
+        // eBay Features Platform see:
+        // https://mp.weixin.qq.com/s/UG4VJ3HuzcBhjLcmtVpLFw
         @NotNull
         String scenesCode;
 

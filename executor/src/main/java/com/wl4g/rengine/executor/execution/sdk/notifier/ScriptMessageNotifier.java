@@ -85,4 +85,8 @@ public interface ScriptMessageNotifier {
         @Default
         Map<String, Object> attributes = new HashMap<>();
     }
+
+    final static String METHOD_SEND = "send";
+    final static String METHOD_UPDATE = "update";
+    final static String METHOD_REFRESH = "refresh";
 }

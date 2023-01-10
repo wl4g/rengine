@@ -34,6 +34,7 @@ import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.CreateSc
 import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.MsgKeyType;
 import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.SampleActionCard6Param;
 import com.wl4g.infra.common.notification.email.internal.EmailSenderAPI;
+import com.wl4g.rengine.executor.metrics.TestDefaultMeterSetup;
 import com.wl4g.rengine.executor.util.TestDefaultBaseSetup;
 import com.wl4g.rengine.executor.util.TestDefaultRedisSetup;
 
@@ -55,6 +56,7 @@ public class GlobalMessageNotifierManagerTests {
         if (isNull(globalMessageNotifierManager)) {
             synchronized (GlobalMessageNotifierManagerTests.class) {
                 if (isNull(globalMessageNotifierManager)) {
+                    TestDefaultMeterSetup.setup();
                     globalMessageNotifierManager = new GlobalMessageNotifierManager();
                     globalMessageNotifierManager.config = TestDefaultBaseSetup.createExecutionConfig();
                     globalMessageNotifierManager.mongoRepository = TestDefaultBaseSetup.createMongoRepository();

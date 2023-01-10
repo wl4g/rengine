@@ -39,6 +39,7 @@ import com.wl4g.rengine.executor.execution.sdk.datasource.JDBCSourceFacade.JDBCS
 import com.wl4g.rengine.executor.execution.sdk.datasource.KafkaSourceFacade.KafkaSourceFacadeBuilder;
 import com.wl4g.rengine.executor.execution.sdk.datasource.MongoSourceFacade.MongoSourceFacadeBuilder;
 import com.wl4g.rengine.executor.execution.sdk.datasource.RedisSourceFacade.RedisSourceFacadeBuilder;
+import com.wl4g.rengine.executor.metrics.TestDefaultMeterSetup;
 import com.wl4g.rengine.executor.util.TestDefaultBaseSetup;
 
 /**
@@ -73,6 +74,7 @@ public class GlobalDataSourceManagerTests {
         if (isNull(globalDataSourceManager)) {
             synchronized (GlobalDataSourceManagerTests.class) {
                 if (isNull(globalDataSourceManager)) {
+                    TestDefaultMeterSetup.setup();
                     globalDataSourceManager = new GlobalDataSourceManager();
                     globalDataSourceManager.config = TestDefaultBaseSetup.createExecutionConfig();
                     globalDataSourceManager.mongoRepository = TestDefaultBaseSetup.createMongoRepository();

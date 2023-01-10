@@ -60,6 +60,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.Variable;
 import com.wl4g.infra.common.bean.BaseBean;
+import com.wl4g.infra.common.collection.CollectionUtils2;
 import com.wl4g.infra.common.lang.Exceptions;
 import com.wl4g.infra.common.serialize.BsonUtils2;
 import com.wl4g.infra.common.web.rest.RespBase;
@@ -143,7 +144,12 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
 
         return findScenesWorkflowGraphRulesWithCaching(executeRequest, 1).chain(sceneses -> {
             final RespBase<ExecuteResult> resp = RespBase.create();
+            resp.setRequestId(executeRequest.getRequestId());
             try {
+                if (CollectionUtils2.isEmpty(sceneses)) {
+                    return Uni.createFrom().item(() -> resp.withMessage("Invalid scenesCodes"));
+                }
+
                 // Execution to workflow graphs.
                 final ExecuteResult result = lifecycleExecutionService.execute(executeRequest, sceneses);
 
@@ -160,7 +166,6 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
                 log.error(errmsg, e);
                 resp.withCode(RetCode.SYS_ERR).withMessage(errmsg);
             }
-            resp.withRequestId(executeRequest.getRequestId());
             return Uni.createFrom().item(() -> resp);
         });
     }

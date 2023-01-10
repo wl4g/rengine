@@ -23,7 +23,7 @@ import static com.wl4g.infra.common.lang.FastTimeClock.currentTimeMillis;
 import static com.wl4g.infra.common.lang.StringUtils2.getFilename;
 import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_MAIN_FUNCTION;
 import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_TMP_SCRIPT_CACHE_DIR;
-import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.evaluation_execution_time;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_time;
 import static java.lang.String.format;
 import static java.util.Collections.singletonMap;
 import static java.util.Objects.isNull;
@@ -161,8 +161,8 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
 
             // Buried-point: execute cost-time.
             final Set<String> scriptFileNames = scripts.stream().map(s -> getFilename(s.getObjectPrefix())).collect(toSet());
-            final Timer executeTimer = meterService.timer(evaluation_execution_time.getName(),
-                    evaluation_execution_time.getHelp(), ExecutorMeterService.DEFAULT_PERCENTILES, MetricsTag.CLIENT_ID, clientId,
+            final Timer executeTimer = meterService.timer(execution_time.getName(),
+                    execution_time.getHelp(), ExecutorMeterService.DEFAULT_PERCENTILES, MetricsTag.CLIENT_ID, clientId,
                     MetricsTag.SCENESCODE, scenesCode, MetricsTag.ENGINE, rule.getEngine().name(), MetricsTag.LIBRARY,
                     scriptFileNames.toString());
 

@@ -19,9 +19,9 @@ import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
-import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_datasource_facade_failure;
-import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_datasource_facade_success;
-import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_datasource_facade_total;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_datasource_facade_failure;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_datasource_facade_success;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_datasource_facade_total;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.nonNull;
@@ -81,7 +81,7 @@ public class KafkaSourceFacade implements DataSourceFacade {
     public void publish(final @NotBlank String topic, final @NotEmpty List<Map<String, Object>> records) {
         hasTextOf(topic, "topic");
         notEmptyOf(records, "records");
-        MeterUtil.counter(execution_datasource_facade_total, dataSourceName, DataSourceType.KAFKA, METHOD_PUBLISH);
+        MeterUtil.counter(execution_sdk_datasource_facade_total, dataSourceName, DataSourceType.KAFKA, METHOD_PUBLISH);
 
         records.forEach(r -> {
             final ProducerRecord<String, String> record = new ProducerRecord<>(topic, toJSONString(r));
@@ -89,10 +89,10 @@ public class KafkaSourceFacade implements DataSourceFacade {
                 // TODO local padding storage process
                 if (nonNull(ex)) {
                     log.warn(format("Failed to publish to kafka of {}", r), ex);
-                    MeterUtil.counter(execution_datasource_facade_failure, dataSourceName, DataSourceType.KAFKA, METHOD_PUBLISH);
+                    MeterUtil.counter(execution_sdk_datasource_facade_failure, dataSourceName, DataSourceType.KAFKA, METHOD_PUBLISH);
                 } else {
                     log.debug(format("Published to kafka of {}", r));
-                    MeterUtil.counter(execution_datasource_facade_success, dataSourceName, DataSourceType.KAFKA, METHOD_PUBLISH);
+                    MeterUtil.counter(execution_sdk_datasource_facade_success, dataSourceName, DataSourceType.KAFKA, METHOD_PUBLISH);
                 }
             });
         });

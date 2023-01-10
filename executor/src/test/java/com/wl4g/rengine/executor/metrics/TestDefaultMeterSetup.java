@@ -21,13 +21,13 @@ import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 
 /**
- * {@link MeterUtilTests}
+ * {@link TestDefaultMeterSetup}
  * 
  * @author James Wong
  * @version 2022-12-31
  * @since v1.0.0
  */
-public class MeterUtilTests {
+public class TestDefaultMeterSetup {
 
     @BeforeClass
     public static void setup() {

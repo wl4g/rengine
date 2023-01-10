@@ -19,15 +19,16 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.evaluation_failure;
-import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.evaluation_success;
-import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.evaluation_total;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_failure;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_success;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_total;
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.nonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -51,11 +52,8 @@ import javax.servlet.ServletContext;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
-
 import com.google.common.collect.Iterables;
 import com.wl4g.infra.common.bean.KeyValue;
-import com.wl4g.infra.common.runtime.JvmRuntimeTool;
 import com.wl4g.infra.common.task.GenericTaskRunner;
 import com.wl4g.infra.common.task.RunnerProperties;
 import com.wl4g.infra.common.task.RunnerProperties.StartupMode;
@@ -70,7 +68,7 @@ import com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsTag;
 import com.wl4g.rengine.executor.service.impl.EngineExecutionServiceImpl;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.CustomLog;
 
 /**
  * {@link LifecycleExecutionService}
@@ -80,7 +78,7 @@ import lombok.extern.slf4j.Slf4j;
  * @since v1.0.0
  * @see https://github.com/google/guice/wiki/Motivation
  */
-@Slf4j
+@CustomLog
 @Singleton
 public class LifecycleExecutionService {
 
@@ -222,7 +220,7 @@ public class LifecycleExecutionService {
 
             try {
                 // Buried-point: total executeRequest.
-                meterService.counter(evaluation_total.getName(), evaluation_total.getHelp(), MetricsTag.ENGINE, engine.name())
+                meterService.counter(execution_total.getName(), execution_total.getHelp(), MetricsTag.ENGINE, engine.name())
                         .increment();
 
                 final WorkflowExecution execution = getExecution(engine);
@@ -231,25 +229,22 @@ public class LifecycleExecutionService {
                 final ResultDescription result = execution.execute(executeRequest, scenes);
 
                 // Buried-point: success executeRequest.
-                meterService.counter(evaluation_success.getName(), evaluation_success.getHelp(), MetricsTag.ENGINE, engine.name())
+                meterService.counter(execution_success.getName(), execution_success.getHelp(), MetricsTag.ENGINE, engine.name())
                         .increment();
 
                 return result;
             } catch (Throwable e) {
-                if (JvmRuntimeTool.isJvmInDebugging) {
-                    e.printStackTrace();
-                }
+                final String errmsg = format(
+                        "Failed to execution %s engine of requestId: '%s', clientId: '%s', scenesCode: '%s'. reason: %s",
+                        engine.name(), executeRequest.getRequestId(), executeRequest.getClientId(), scenes.getScenesCode(),
+                        getRootCauseMessage(e));
+                log.error(errmsg, e);
 
                 // Buried-point: failed executeRequest.
-                meterService.counter(evaluation_failure.getName(), evaluation_failure.getHelp(), MetricsTag.ENGINE, engine.name())
+                meterService.counter(execution_failure.getName(), execution_failure.getHelp(), MetricsTag.ENGINE, engine.name())
                         .increment();
 
-                final String errmsg = ExceptionUtils.getRootCauseMessage(e);
-                throw new RengineException(
-                        format("Failed to execution %s engine of requestId: '%s', clientId: '%s', scenesCode: '%s'. reason: %s",
-                                engine.name(), executeRequest.getRequestId(), executeRequest.getClientId(),
-                                scenes.getScenesCode(), errmsg),
-                        e);
+                throw new RengineException(errmsg, e);
             } finally {
                 latch.countDown();
             }

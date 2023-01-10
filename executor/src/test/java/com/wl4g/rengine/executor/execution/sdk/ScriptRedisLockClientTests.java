@@ -26,7 +26,7 @@ import java.util.concurrent.locks.Lock;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.wl4g.rengine.executor.metrics.MeterUtilTests;
+import com.wl4g.rengine.executor.metrics.TestDefaultMeterSetup;
 import com.wl4g.rengine.executor.util.TestDefaultRedisSetup;
 
 import io.vertx.mutiny.redis.client.RedisAPI;
@@ -44,7 +44,7 @@ public class ScriptRedisLockClientTests {
 
     @BeforeClass
     public static void setup() {
-        MeterUtilTests.setup();
+        TestDefaultMeterSetup.setup();
     }
 
     @Test
