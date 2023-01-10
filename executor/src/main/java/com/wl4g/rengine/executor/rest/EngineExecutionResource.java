@@ -22,6 +22,7 @@ import static java.lang.Long.parseLong;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
@@ -158,11 +159,11 @@ public class EngineExecutionResource {
 
         // bestEffect
         String bestEffectString = headers.get(PARAM_BEST_EFFECT); // Optional
-        Boolean bestEffect = isBlank(bestEffectString) ? ExecuteRequest.DEFAULT_BESTEFFORT : parseBoolean(bestEffectString);
+        Boolean bestEffort = isBlank(bestEffectString) ? null : parseBoolean(bestEffectString);
 
         // timeout
         String timeoutString = headers.get(PARAM_TIMEOUT); // Optional
-        Long timeout = isBlank(timeoutString) ? ExecuteRequest.DEFAULT_TIMEOUT : parseLong(timeoutString);
+        Long timeout = isBlank(timeoutString) ? null : parseLong(timeoutString);
 
         // args
         Map<String, Object> args = null; // Optional
@@ -199,6 +200,26 @@ public class EngineExecutionResource {
                     scenesCodes = ((List) scenesCodesObj);
                 }
             }
+            if (isNull(bestEffort)) {
+                final Object bestEffectObj = args.get(PARAM_BEST_EFFECT);
+                if (nonNull(bestEffectObj)) {
+                    if (bestEffectObj instanceof String) {
+                        bestEffort = parseBoolean((String) bestEffectObj);
+                    } else if (bestEffectObj instanceof Boolean) {
+                        bestEffort = (Boolean) bestEffectObj;
+                    }
+                }
+            }
+            if (isNull(timeout)) {
+                final Object timeoutObj = args.get(PARAM_TIMEOUT);
+                if (nonNull(timeoutObj)) {
+                    if (timeoutObj instanceof String) {
+                        timeout = parseLong((String) timeoutObj);
+                    } else if (timeoutObj instanceof Number) {
+                        timeout = ((Number) timeoutObj).longValue();
+                    }
+                }
+            }
         }
 
         // Allow request query parameters to override body parameters.
@@ -223,14 +244,24 @@ public class EngineExecutionResource {
                 }
                 args = parseMapObject(queryArgs);
             }
+            // override for bestEffect if necessary.
+            final String queryBestEffectString = queryParams.get(PARAM_BEST_EFFECT);
+            bestEffort = isBlank(queryBestEffectString) ? bestEffort : parseBoolean(queryBestEffectString);
+            // override for timeout if necessary.
+            final String queryTimeoutString = queryParams.get(PARAM_TIMEOUT);
+            timeout = isBlank(queryTimeoutString) ? timeout : parseLong(queryTimeoutString);
         }
+
+        // Setup default values.
+        bestEffort = isNull(bestEffort) ? ExecuteRequest.DEFAULT_BESTEFFORT : bestEffort;
+        timeout = isNull(timeout) ? ExecuteRequest.DEFAULT_TIMEOUT : timeout;
 
         return engineExecutionService.execute(ExecuteRequest.builder()
                 .requestId(isBlank(requestId) ? IdGenUtils.next() : requestId)
                 .clientId(clientId)
                 .clientSecret(clientSecret)
                 .scenesCodes(scenesCodes)
-                .bestEffort(bestEffect)
+                .bestEffort(bestEffort)
                 .timeout(timeout)
                 .args(args)
                 .build()
@@ -246,8 +277,7 @@ public class EngineExecutionResource {
     public static final String PARAM_CLIENT_ID = "clientId";
     public static final String PARAM_CLIENT_SECRET = "clientSecret";
     public static final String PARAM_SCENES_CODES = "scenesCodes";
-    public static final String PARAM_BEST_EFFECT = "bestEffect";
+    public static final String PARAM_BEST_EFFECT = "bestEffort";
     public static final String PARAM_TIMEOUT = "timeout";
     public static final String PARAM_ARGS = "args";
-
 }

@@ -50,6 +50,30 @@ public interface ExecutionConfig {
     NotifierConfig notifier();
 
     public static interface EngineConfig {
+        @WithDefault(DEFAULT_EXECUTOR_THREAD_POOLS + "")
+        @NotNull
+        @Min(1)
+        @Max(1024)
+        Integer executorThreadPools();
+
+        @WithDefault(DEFAULT_EXECUTOR_ACCEPT_QUEUE + "")
+        @NotNull
+        @Min(1)
+        @Max(10240)
+        Integer executorAcceptQueue();
+
+        @WithDefault(DEFAULT_PER_EXECUTOR_THREAD_POOLS + "")
+        @NotNull
+        @Min(0)
+        @Max(1024)
+        Integer perExecutorThreadPools();
+
+        @WithDefault(DEFAULT_TIMEOUT_OFFSET_RATE + "")
+        @NotNull
+        @Min(0)
+        @Max(1)
+        Float executeTimeoutOffsetRate();
+
         @WithDefault(DEFAULT_SCENES_RULES_CACHED_PREFIX)
         @NotBlank
         String scenesRulesCachedPrefix();
@@ -59,29 +83,11 @@ public interface ExecutionConfig {
         @Min(0)
         Long scenesRulesCachedExpire();
 
-        @WithDefault(DEFAULT_EXECUTOR_THREAD_POOLS + "")
-        @NotNull
-        @Min(0)
-        @Max(1024)
-        Integer executorThreadPools();
-
-        @WithDefault(DEFAULT_PER_EXECUTOR_THREAD_POOLS + "")
-        @NotNull
-        @Min(0)
-        @Max(1024)
-        Integer perExecutorThreadPools();
-
         @WithDefault(DEFAULT_MAX_QUERY_BATCH + "")
         @NotNull
         @Min(0)
         @Max(10_0000)
         Integer maxQueryBatch();
-
-        @WithDefault(DEFAULT_TIMEOUT_OFFSET_RATE + "")
-        @NotNull
-        @Min(0)
-        @Max(1)
-        Float evaluateTimeoutOffsetRate();
     }
 
     public static interface ScriptLogConfig {
@@ -125,6 +131,7 @@ public interface ExecutionConfig {
     public static final String DEFAULT_SCENES_RULES_CACHED_PREFIX = "rengine:executor:scenes:rules:";
     public static final long DEFAULT_SCENES_RULES_CACHED_EXPIRE = 15 * 60 * 1000;
     public static final int DEFAULT_EXECUTOR_THREAD_POOLS = 10;
+    public static final int DEFAULT_EXECUTOR_ACCEPT_QUEUE = 10;
     public static final int DEFAULT_PER_EXECUTOR_THREAD_POOLS = 2;
     public static final int DEFAULT_MAX_QUERY_BATCH = 1024;
     public static final float DEFAULT_TIMEOUT_OFFSET_RATE = 0.1f;

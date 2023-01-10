@@ -30,7 +30,6 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -55,8 +54,7 @@ import javax.validation.constraints.NotNull;
 import com.google.common.collect.Iterables;
 import com.wl4g.infra.common.bean.KeyValue;
 import com.wl4g.infra.common.task.GenericTaskRunner;
-import com.wl4g.infra.common.task.RunnerProperties;
-import com.wl4g.infra.common.task.RunnerProperties.StartupMode;
+import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
 import com.wl4g.rengine.common.entity.Rule.RuleEngine;
 import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
 import com.wl4g.rengine.common.entity.SchedulingJob.ResultDescription;
@@ -94,27 +92,23 @@ public class LifecycleExecutionService {
     @Inject
     DefaultWorkflowExecution workflowExecution;
 
-    GenericTaskRunner<RunnerProperties> executionRunner;
+    SafeScheduledTaskPoolExecutor executionExecutor;
 
     @PostConstruct
     void init() {
         final int threads = config.engine().executorThreadPools();
-        log.info("Initialzing execution threads pool for : {}", threads);
-        this.executionRunner = new GenericTaskRunner<RunnerProperties>(new RunnerProperties(StartupMode.NOSTARTUP, threads)) {
-            @Override
-            protected String getThreadNamePrefix() {
-                return EngineExecutionServiceImpl.class.getSimpleName();
-            }
-        };
-        this.executionRunner.start();
+        final int acceptQueue = config.engine().executorAcceptQueue();
+        log.info("Initialzing execution executor of threads pool: {}, acceptQueue: {}", threads, acceptQueue);
+        this.executionExecutor = GenericTaskRunner.newDefaultScheduledExecutor(EngineExecutionServiceImpl.class.getSimpleName(),
+                threads, acceptQueue);
     }
 
     void destroy(@Observes @BeforeDestroyed(ApplicationScoped.class) ServletContext init) {
-        if (nonNull(executionRunner)) {
+        if (nonNull(executionExecutor)) {
             try {
-                this.executionRunner.close();
-            } catch (IOException e) {
-                log.error("Failed to closing executeRequest runner", e);
+                this.executionExecutor.shutdown();
+            } catch (Exception e) {
+                log.error("Failed to shutdown execution executor.", e);
             }
         }
     }
@@ -134,12 +128,12 @@ public class LifecycleExecutionService {
         // Submit to execution workers.
         final Map<String, Future<ResultDescription>> futures = sceneses.stream()
                 .map(scenes -> new KeyValue(scenes.getScenesCode(),
-                        executionRunner.getWorker().submit(new ExecutionRunner(latch, executeRequest, scenes))))
+                        executionExecutor.submit(new ExecutionRunner(latch, executeRequest, scenes))))
                 .collect(toMap(kv -> kv.getKey(), kv -> (Future) kv.getValue()));
 
         // Collect for uncompleted results.
         final List<ResultDescription> uncompleteds = new ArrayList<>(futures.size());
-        final long timeoutMs = (long) ((long) executeRequest.getTimeout() * (1 - config.engine().evaluateTimeoutOffsetRate()));
+        final long timeoutMs = (long) ((long) executeRequest.getTimeout() * (1 - config.engine().executeTimeoutOffsetRate()));
 
         if (!latch.await(timeoutMs, MILLISECONDS)) { // timeout?
             final Iterator<Entry<String, Future<ResultDescription>>> it = futures.entrySet().iterator();

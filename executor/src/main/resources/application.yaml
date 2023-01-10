@@ -279,9 +279,10 @@ rengine:
         scenes-rules-cached-prefix: 'rengine:executor:scenes:rules:'
         scenes-rules-cached-expire: 900000
         executor-thread-pools: 10
+        executor-accept-queue: 10
         per-executor-thread-pools: 2
         max-query-batch: 1024
-        evaluate-timeout-offset-rate: 0.1f
+        execute-timeout-offset-rate: 0.1f
       log:
         base-dir: /tmp/__rengine_script_log
         enable-console: true

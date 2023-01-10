@@ -72,6 +72,11 @@ public abstract class TestDefaultBaseSetup {
                     }
 
                     @Override
+                    public @NotNull @Min(1) @Max(10240) Integer executorAcceptQueue() {
+                        return ExecutionConfig.DEFAULT_EXECUTOR_ACCEPT_QUEUE;
+                    }
+
+                    @Override
                     public @NotNull @Min(0) @Max(1024) Integer perExecutorThreadPools() {
                         return ExecutionConfig.DEFAULT_PER_EXECUTOR_THREAD_POOLS;
                     }
@@ -82,10 +87,9 @@ public abstract class TestDefaultBaseSetup {
                     }
 
                     @Override
-                    public @NotNull @Min(0) @Max(1) Float evaluateTimeoutOffsetRate() {
+                    public @NotNull @Min(0) @Max(1) Float executeTimeoutOffsetRate() {
                         return ExecutionConfig.DEFAULT_TIMEOUT_OFFSET_RATE;
                     }
-
                 };
             }
 
