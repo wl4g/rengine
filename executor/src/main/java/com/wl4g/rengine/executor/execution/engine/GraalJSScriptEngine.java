@@ -26,17 +26,15 @@ import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTO
 import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_time;
 import static java.lang.String.format;
 import static java.util.Collections.singletonMap;
-import static java.util.Objects.isNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toSet;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.validation.constraints.NotNull;
@@ -44,7 +42,6 @@ import javax.validation.constraints.NotNull;
 import org.graalvm.polyglot.PolyglotException;
 import org.graalvm.polyglot.Source;
 import org.graalvm.polyglot.Value;
-import org.graalvm.polyglot.proxy.ProxyObject;
 
 import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager;
 import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager.ContextWrapper;
@@ -54,15 +51,11 @@ import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
 import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
 import com.wl4g.rengine.common.exception.EvaluationException;
 import com.wl4g.rengine.common.exception.ExecutionScriptException;
-import com.wl4g.rengine.common.graph.ExecutionGraph.BaseOperator;
 import com.wl4g.rengine.common.graph.ExecutionGraphContext;
 import com.wl4g.rengine.common.graph.ExecutionGraphParameter;
-import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
 import com.wl4g.rengine.executor.execution.ExecutionConfig.ScriptLogConfig;
 import com.wl4g.rengine.executor.execution.sdk.ScriptContext;
-import com.wl4g.rengine.executor.execution.sdk.ScriptContext.ScriptParameter;
-import com.wl4g.rengine.executor.execution.sdk.ScriptDataService;
 import com.wl4g.rengine.executor.execution.sdk.ScriptExecutor;
 import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
 import com.wl4g.rengine.executor.metrics.ExecutorMeterService;
@@ -70,7 +63,6 @@ import com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsTag;
 import com.wl4g.rengine.executor.minio.MinioManager.ObjectResource;
 
 import io.micrometer.core.instrument.Timer;
-import io.quarkus.runtime.StartupEvent;
 import lombok.CustomLog;
 import lombok.Getter;
 
@@ -92,7 +84,8 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
     @NotNull
     GraalPolyglotManager graalPolyglotManager;
 
-    void onStart(@Observes StartupEvent event) {
+    @PostConstruct
+    void init() {
         try {
             log.info("Initialzing graal JS script engine ...");
             final ScriptLogConfig scriptLogConfig = config.log();
@@ -132,15 +125,14 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
 
         log.debug("Execution JS script for scenesCode: {} ...", scenesCode);
         // see:https://github.com/oracle/graaljs/blob/vm-ee-22.1.0/graal-js/src/com.oracle.truffle.js.test.threading/src/com/oracle/truffle/js/test/threading/AsyncTaskTests.java#L283
-        try (ContextWrapper graalContext = graalPolyglotManager
-                .getContext(singletonMap(SCIPRT_LOGGER_KEY_WORKFLOW_ID, workflowId));) {
+        try (ContextWrapper graalContext = graalPolyglotManager.getContext(singletonMap(KEY_WORKFLOW_ID, workflowId));) {
             // New construct script context.
             final ScriptContext scriptContext = newScriptContext(graphContext);
 
             // Load all scripts dependencies.
             final List<ObjectResource> scripts = safeList(loadScriptResources(scenesCode, rule, true));
             for (ObjectResource script : scripts) {
-                isTrue(!script.isBinary(), "Invalid JS dependency library binary type");
+                isTrue(!script.isBinary(), "invalid js dependency lib type");
                 log.debug("Evaling js-dependencys: {}", script.getObjectPrefix());
 
                 final String scriptName = StringUtils2.getFilename(script.getObjectPrefix()).concat("@").concat(scenesCode);
@@ -161,10 +153,9 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
 
             // Buried-point: execute cost-time.
             final Set<String> scriptFileNames = scripts.stream().map(s -> getFilename(s.getObjectPrefix())).collect(toSet());
-            final Timer executeTimer = meterService.timer(execution_time.getName(),
-                    execution_time.getHelp(), ExecutorMeterService.DEFAULT_PERCENTILES, MetricsTag.CLIENT_ID, clientId,
-                    MetricsTag.SCENESCODE, scenesCode, MetricsTag.ENGINE, rule.getEngine().name(), MetricsTag.LIBRARY,
-                    scriptFileNames.toString());
+            final Timer executeTimer = meterService.timer(execution_time.getName(), execution_time.getHelp(),
+                    ExecutorMeterService.DEFAULT_PERCENTILES, MetricsTag.CLIENT_ID, clientId, MetricsTag.SCENESCODE, scenesCode,
+                    MetricsTag.ENGINE, rule.getEngine().name(), MetricsTag.LIBRARY, scriptFileNames.toString());
 
             final long begin = currentTimeMillis();
             final Value result = mainFunction.execute(scriptContext);
@@ -176,44 +167,6 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
         } catch (Throwable e) {
             throw new EvaluationException(traceId, clientId, scenesCode, workflowId, "Failed to execution js script", e);
         }
-    }
-
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    @NotNull
-    private ScriptContext newScriptContext(final @NotNull ExecutionGraphContext graphContext) {
-        notNullOf(graphContext, "graphContext");
-
-        final ScriptDataService dataService = new ScriptDataService(defaultHttpClient, defaultSSHClient, defaultTCPClient,
-                defaultProcessClient, defaultRedisLockClient, globalDataSourceManager, globalMessageNotifierManager);
-
-        final ExecutionGraphParameter parameter = graphContext.getParameter();
-
-        final ScriptResult lastResult = isNull(graphContext.getLastResult()) ? null
-                : new ScriptResult(ReturnState.isTrue(graphContext.getLastResult().getReturnState()),
-                        graphContext.getLastResult().getValueMap());
-
-        final SafeScheduledTaskPoolExecutor executor = globalExecutorManager.getExecutor(parameter.getWorkflowId(),
-                config.engine().perExecutorThreadPools());
-
-        return ScriptContext.builder()
-                .id(graphContext.getCurrentNode().getId())
-                .type(((BaseOperator<?>) graphContext.getCurrentNode()).getType())
-                .parameter(ScriptParameter.builder()
-                        .requestTime(parameter.getRequestTime())
-                        .clientId(parameter.getClientId())
-                        .traceId(parameter.getTraceId())
-                        .trace(parameter.isTrace())
-                        .scenesCode(parameter.getScenesCode())
-                        .workflowId(parameter.getWorkflowId())
-                        .args(ProxyObject.fromMap((Map) parameter.getArgs()))
-                        .build())
-                .lastResult(lastResult)
-                .dataService(dataService)
-                // .logger(new ScriptLogger(parameter.getScenesCode(),
-                // parameter.getWorkflowId(), minioManager))
-                .executor(createScriptExecutor(parameter, executor))
-                // .attributes(ProxyObject.fromMap(emptyMap()))
-                .build();
     }
 
     private void bindingMembers(final @NotNull ScriptContext scriptContext, final @NotNull Value bindings) {

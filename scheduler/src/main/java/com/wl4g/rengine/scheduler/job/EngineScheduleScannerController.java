@@ -20,7 +20,7 @@ import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.task.QuartzUtils2.newDefaultJobDetail;
 import static com.wl4g.infra.common.task.QuartzUtils2.newDefaultJobTrigger;
 import static com.wl4g.infra.common.task.QuartzUtils2.newScheduler;
-import static com.wl4g.rengine.scheduler.job.AbstractJobExecutor.SchedulerJobType.ENGINE_EXECUTION_SCHEDULER_CONTROLLER;
+import static com.wl4g.rengine.scheduler.job.AbstractJobExecutor.ExecutorJobType.ENGINE_SCHEDULE_CONTROLLER;
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 
@@ -41,7 +41,6 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 
-import com.wl4g.infra.context.utils.SpringContextHolder;
 import com.wl4g.rengine.client.core.RengineClient;
 import com.wl4g.rengine.common.entity.SchedulingJob;
 import com.wl4g.rengine.common.entity.SchedulingJob.RunState;
@@ -51,7 +50,6 @@ import com.wl4g.rengine.common.entity.SchedulingTrigger.TriggerType;
 import com.wl4g.rengine.common.model.ExecuteRequest;
 import com.wl4g.rengine.common.model.ExecuteResult;
 import com.wl4g.rengine.service.SchedulingJobService;
-import com.wl4g.rengine.service.SchedulingTriggerService;
 import com.wl4g.rengine.service.model.QuerySchedulingTrigger;
 import com.wl4g.rengine.service.model.SaveSchedulingJob;
 import com.wl4g.rengine.service.model.SaveSchedulingJobResult;
@@ -60,7 +58,7 @@ import lombok.CustomLog;
 import lombok.Getter;
 
 /**
- * {@link EngineSchedulingControllerJobExecutor}
+ * {@link EngineScheduleScannerController}
  * 
  * @author James Wong
  * @version 2022-10-20
@@ -69,24 +67,17 @@ import lombok.Getter;
  */
 @Getter
 @CustomLog
-public class EngineSchedulingControllerJobExecutor extends AbstractJobExecutor {
+public class EngineScheduleScannerController extends AbstractJobExecutor {
 
-    private final RengineClient rengineClient;
-    private final SchedulingTriggerService schedulingTriggerService;
-    private final SchedulingJobService schedulingJobService;
     // The engine execution scheduling local scheduler.
     private final Scheduler scheduler;
 
-    public EngineSchedulingControllerJobExecutor() {
+    public EngineScheduleScannerController() {
         super();
-        this.rengineClient = SpringContextHolder.getBean(RengineClient.class);
-        this.schedulingTriggerService = SpringContextHolder.getBean(SchedulingTriggerService.class);
-        this.schedulingJobService = SpringContextHolder.getBean(SchedulingJobService.class);
-
         // TODO use config
         // final int concurrency=config.getScrapeJobConfigs();
         final int concurrency = 2;
-        this.scheduler = newScheduler(ENGINE_EXECUTION_SCHEDULER_CONTROLLER.name(), concurrency, null, null, null);
+        this.scheduler = newScheduler(ENGINE_SCHEDULE_CONTROLLER.name(), concurrency, null, null, null);
         try {
             this.scheduler.start();
         } catch (SchedulerException e) {
@@ -96,7 +87,7 @@ public class EngineSchedulingControllerJobExecutor extends AbstractJobExecutor {
 
     @Override
     public String getType() {
-        return ENGINE_EXECUTION_SCHEDULER_CONTROLLER.name();
+        return ENGINE_SCHEDULE_CONTROLLER.name();
     }
 
     @Override
@@ -191,7 +182,7 @@ public class EngineSchedulingControllerJobExecutor extends AbstractJobExecutor {
                             .schedTime(new Date())
                             .remark(format("Failed to scheduling engine execution. reason: %s", e.getMessage()))
                             .build();
-                    // The preparation information was not saved successful ?
+                    // The preparation information was not saved successful?
                     // then new insert.
                     if (nonNull(jobPrepared)) {
                         jobSchedFailed.setId(jobPrepared.getId());
@@ -204,69 +195,6 @@ public class EngineSchedulingControllerJobExecutor extends AbstractJobExecutor {
                 }
             }
         });
-    }
-
-    public static class EngineSchedulingJob implements Job {
-        @Override
-        public void execute(JobExecutionContext context) throws JobExecutionException {
-            RengineClient rengineClient = null;
-            CronTriggerConfig ctc = null;
-            SchedulingJobService schedulingJobService = null;
-            Long jobId = null;
-
-            try {
-                final JobDataMap jobDataMap = context.getTrigger().getJobDataMap();
-                assert nonNull(jobDataMap);
-
-                rengineClient = (RengineClient) jobDataMap.get(KEY_RENGINE_CLIENT);
-                ctc = (CronTriggerConfig) jobDataMap.get(KEY_CRON_TRIGGER);
-                schedulingJobService = (SchedulingJobService) jobDataMap.get(KEY_SCHEDULING_JOB_SERVICE);
-                jobId = (Long) jobDataMap.get(KEY_CURRENT_JOB_ID);
-
-                assert nonNull(rengineClient);
-                assert nonNull(ctc);
-                assert nonNull(schedulingJobService);
-                assert nonNull(jobId);
-
-                final ExecuteResult result = rengineClient.execute(ExecuteRequest.builder()
-                        // .clientId("") // TODO
-                        // .clientSecret("")
-                        .scenesCodes(ctc.getScenesCodes())
-                        .bestEffort(ctc.getBestEffort())
-                        .timeout(ctc.getTimeout())
-                        .args(safeMap(ctc.getArgs()))
-                        .build(), ex -> null);
-
-                // Update execution success info to DB.
-                final SchedulingJob jobExecutionSuccess = schedulingJobService.get(jobId);
-                jobExecutionSuccess.setRunState(RunState.SUCCESS);
-                jobExecutionSuccess.setFinishedTime(new Date());
-                jobExecutionSuccess.setRequestId(result.getRequestId());
-                jobExecutionSuccess.setResults(result.getResults());
-
-                log.debug("Updating to job for : {}", jobExecutionSuccess);
-                final var resultSuccess = schedulingJobService.save(jobExecutionSuccess);
-                log.debug("Updated to job for : {} => {}", jobExecutionSuccess, resultSuccess);
-
-            } catch (Exception e) {
-                log.error(format("Failed to execute engine execution for : jobId: %s, triggerKey: %s", jobId,
-                        context.getTrigger().getKey()), e);
-
-                // Update execution failed info to DB.
-                SchedulingJob jobExecutionFailed = null;
-                try {
-                    jobExecutionFailed = schedulingJobService.get(jobId);
-                    jobExecutionFailed.setRunState(RunState.FAILED);
-                    jobExecutionFailed.setFinishedTime(new Date());
-
-                    log.debug("Updating to job for : {}", jobExecutionFailed);
-                    final var resultFailed = schedulingJobService.save(jobExecutionFailed);
-                    log.debug("Updated to job for : {} => {}", jobExecutionFailed, resultFailed);
-                } catch (Exception e2) {
-                    log.error(format("Failed to update failed execution job to DB. job: %s", jobExecutionFailed), e2);
-                }
-            }
-        }
     }
 
     public static class EngineSchedulingControllerJobParam extends JobParamBase {

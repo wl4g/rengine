@@ -108,6 +108,10 @@ public interface ExecutionConfig {
         @NotNull
         @Min(1)
         Integer fileMaxCount();
+
+        @WithDefault(DEFAULT_SCRIPT_LOG_UPLOADER_CRON)
+        @NotBlank
+        String uploaderCron();
     }
 
     public static interface NotifierConfig {
@@ -140,6 +144,7 @@ public interface ExecutionConfig {
     public static final boolean DEFAULT_SCRIPT_LOG_ENABLE_CONSOLE = true;
     public static final int DEFAULT_SCRIPT_LOG_FILE_MAX_SIZE = 512 * 1024 * 1024;
     public static final int DEFAULT_SCRIPT_LOG_FILE_MAX_COUNT = 10;
+    public static final String DEFAULT_SCRIPT_LOG_UPLOADER_CRON = "0 1 * * * * ?";
 
     public static final long DEFAULT_NOTIFIER_REFRESH_LOCK_TIMEOUT = 60 * 1000L;
     public static final String DEFAULT_NOTIFIER_REFRESHED_CACHED_PREFIX = "rengine:executor:sdk:notifier:refreshed:";

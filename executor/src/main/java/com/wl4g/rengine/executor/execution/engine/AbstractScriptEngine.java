@@ -18,10 +18,15 @@ package com.wl4g.rengine.executor.execution.engine;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.infra.common.lang.TypeConverts.parseLongOrNull;
+import static com.wl4g.rengine.common.util.ScriptEngineUtil.getAllLogDirs;
+import static com.wl4g.rengine.common.util.ScriptEngineUtil.getAllLogFilenames;
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableMap;
+import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toList;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,13 +37,28 @@ import javax.inject.Inject;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import org.graalvm.polyglot.proxy.ProxyObject;
+import org.quartz.Job;
+import org.quartz.JobDataMap;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+import org.quartz.SchedulerException;
+
+import com.wl4g.infra.common.task.QuartzUtils2;
 import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
 import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
+import com.wl4g.rengine.common.entity.UploadObject;
 import com.wl4g.rengine.common.entity.UploadObject.ExtensionType;
 import com.wl4g.rengine.common.entity.UploadObject.UploadType;
+import com.wl4g.rengine.common.graph.ExecutionGraph.BaseOperator;
+import com.wl4g.rengine.common.graph.ExecutionGraphContext;
 import com.wl4g.rengine.common.graph.ExecutionGraphParameter;
+import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
 import com.wl4g.rengine.common.util.ScriptEngineUtil;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
+import com.wl4g.rengine.executor.execution.sdk.ScriptContext;
+import com.wl4g.rengine.executor.execution.sdk.ScriptContext.ScriptParameter;
+import com.wl4g.rengine.executor.execution.sdk.ScriptDataService;
 import com.wl4g.rengine.executor.execution.sdk.ScriptExecutor;
 import com.wl4g.rengine.executor.execution.sdk.ScriptHttpClient;
 //import com.wl4g.rengine.executor.execution.sdk.ScriptLogger;
@@ -58,9 +78,11 @@ import com.wl4g.rengine.executor.execution.sdk.tools.PrometheusParser;
 import com.wl4g.rengine.executor.execution.sdk.tools.RSA;
 import com.wl4g.rengine.executor.execution.sdk.tools.RengineEvent;
 import com.wl4g.rengine.executor.metrics.ExecutorMeterService;
+import com.wl4g.rengine.executor.minio.MinioConfig;
 import com.wl4g.rengine.executor.minio.MinioManager;
 import com.wl4g.rengine.executor.minio.MinioManager.ObjectResource;
 
+import io.minio.ObjectWriteArgs;
 import io.quarkus.redis.datasource.RedisDataSource;
 import lombok.extern.slf4j.Slf4j;
 
@@ -75,13 +97,19 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class AbstractScriptEngine implements IEngine {
 
     @Inject
-    RedisDataSource redisDS;
+    ExecutionConfig executionConfig;
 
     @Inject
-    ExecutionConfig config;
+    MinioConfig minioConfig;
 
     @Inject
     ExecutorMeterService meterService;
+
+    @Inject
+    org.quartz.Scheduler scheduler;
+
+    @Inject
+    RedisDataSource redisDS;
 
     @Inject
     MinioManager minioManager;
@@ -108,6 +136,37 @@ public abstract class AbstractScriptEngine implements IEngine {
         this.defaultTCPClient = new ScriptTCPClient();
         this.defaultProcessClient = new ScriptProcessClient();
         this.defaultRedisLockClient = new ScriptRedisLockClient(redisDS);
+
+        // Script logging uploader job.
+        // see:https://quarkus.io/guides/quartz#creating-the-maven-project
+        try {
+            // Create job
+            final String jobId = "job-".concat(ScriptLoggingUploader.class.getSimpleName())
+                    .concat("@")
+                    .concat(getClass().getSimpleName());
+            final var uploaderJob = QuartzUtils2.newDefaultJobDetail(jobId, ScriptLoggingUploader.class);
+
+            // Create trigger
+            final String triggerId = "trigger-".concat(ScriptLoggingUploader.class.getSimpleName())
+                    .concat("@")
+                    .concat(getClass().getSimpleName());
+            final var uploaderTrigger = QuartzUtils2.newDefaultJobTrigger(triggerId, executionConfig.log().uploaderCron(), true,
+                    new JobDataMap() {
+                        private static final long serialVersionUID = 1L;
+                        {
+                            put(ExecutionConfig.class.getName(), executionConfig);
+                            put(MinioConfig.class.getName(), minioConfig);
+                            put(MinioManager.class.getName(), minioManager);
+                        }
+                    });
+
+            // Schedule
+            this.scheduler.scheduleJob(uploaderJob, uploaderTrigger);
+
+            log.info("Scheduled script logging uploader of job: {}, trigger: {}", uploaderJob, uploaderTrigger);
+        } catch (SchedulerException e) {
+            log.error("Failed to schedule script logging uploader.", e);
+        }
     }
 
     @NotNull
@@ -127,6 +186,45 @@ public abstract class AbstractScriptEngine implements IEngine {
         }).collect(toList());
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @NotNull
+    protected ScriptContext newScriptContext(final @NotNull ExecutionGraphContext graphContext) {
+        notNullOf(graphContext, "graphContext");
+
+        final ScriptDataService dataService = new ScriptDataService(defaultHttpClient, defaultSSHClient, defaultTCPClient,
+                defaultProcessClient, defaultRedisLockClient, globalDataSourceManager, globalMessageNotifierManager);
+
+        final ExecutionGraphParameter parameter = graphContext.getParameter();
+
+        final ScriptResult lastResult = isNull(graphContext.getLastResult()) ? null
+                : new ScriptResult(ReturnState.isTrue(graphContext.getLastResult().getReturnState()),
+                        graphContext.getLastResult().getValueMap());
+
+        final SafeScheduledTaskPoolExecutor executor = globalExecutorManager.getExecutor(parameter.getWorkflowId(),
+                executionConfig.engine().perExecutorThreadPools());
+
+        return ScriptContext.builder()
+                .id(graphContext.getCurrentNode().getId())
+                .type(((BaseOperator<?>) graphContext.getCurrentNode()).getType())
+                .parameter(ScriptParameter.builder()
+                        .requestTime(parameter.getRequestTime())
+                        .clientId(parameter.getClientId())
+                        .traceId(parameter.getTraceId())
+                        .trace(parameter.isTrace())
+                        .scenesCode(parameter.getScenesCode())
+                        .workflowId(parameter.getWorkflowId())
+                        .args(ProxyObject.fromMap((Map) parameter.getArgs()))
+                        .build())
+                .lastResult(lastResult)
+                .dataService(dataService)
+                // @formatter:off
+                // .logger(new ScriptLogger(parameter.getScenesCode(),parameter.getWorkflowId(), minioManager))
+                // @formatter:on
+                .executor(createScriptExecutor(parameter, executor))
+                // .attributes(ProxyObject.fromMap(emptyMap()))
+                .build();
+    }
+
     @NotNull
     protected abstract ScriptExecutor createScriptExecutor(
             final @NotNull ExecutionGraphParameter parameter,
@@ -136,12 +234,50 @@ public abstract class AbstractScriptEngine implements IEngine {
             final @NotBlank String scriptLogBaseDir,
             final @Nullable Map<String, Object> metadata,
             final boolean isStdErr) {
-        final Long workflowId = (Long) safeMap(metadata).get(SCIPRT_LOGGER_KEY_WORKFLOW_ID);
+        final Long workflowId = (Long) safeMap(metadata).get(KEY_WORKFLOW_ID);
         return ScriptEngineUtil.buildScriptLogFilePattern(scriptLogBaseDir, workflowId, isStdErr);
     }
 
-    public static final String SCIPRT_LOGGER_KEY_WORKFLOW_ID = AbstractScriptEngine.class.getSimpleName().concat(".WORKFLOW_ID");
+    public static class ScriptLoggingUploader implements Job {
+        @Override
+        public void execute(JobExecutionContext context) throws JobExecutionException {
+            log.info("Scanning upload script logs to MinIO ...");
 
+            final JobDataMap jobDataMap = context.getTrigger().getJobDataMap();
+            final ExecutionConfig config = (ExecutionConfig) jobDataMap.get(ExecutionConfig.class.getName());
+            final MinioConfig minioConfig = (MinioConfig) jobDataMap.get(MinioConfig.class.getName());
+            final MinioManager minioManager = (MinioManager) jobDataMap.get(MinioManager.class.getName());
+            notNullOf(config, "config");
+            notNullOf(minioManager, "minioManager");
+            notNullOf(minioConfig, "minioConfig");
+
+            // Scanner all script logs upload to MinIO.
+            getAllLogDirs(config.log().baseDir(), false).parallelStream().forEach(dirname -> {
+                final Long workflowId = notNullOf(parseLongOrNull(dirname), "workflowId");
+                log.info("Scan script log dir for workflowId: {}", workflowId);
+
+                getAllLogFilenames(config.log().baseDir(), workflowId, true).parallelStream()
+                        .map(f -> new File(f))
+                        // TODO
+                        // 1) S3/minio limit min size for 5MB.
+                        // 2) Must check that the log file was generated
+                        // yesterday or before and has run to finished.
+                        .filter(f -> f.length() > ObjectWriteArgs.MIN_MULTIPART_SIZE)
+                        .forEach(f -> {
+                            final String objectPrefix = minioConfig.bucket()
+                                    .concat("/")
+                                    .concat(UploadObject.UploadType.SCRIPT_LOG.getPrefix())
+                                    .concat("/")
+                                    .concat(f.getName());
+
+                            log.info("Uploading script log to {} from {}", objectPrefix, f);
+                            minioManager.uploadObject(objectPrefix, f.getAbsolutePath());
+                        });
+            });
+        }
+    }
+
+    public static final String KEY_WORKFLOW_ID = AbstractScriptEngine.class.getSimpleName().concat(".WORKFLOW_ID");
     public static final Map<String, Object> REGISTER_MEMBERS;
 
     static {

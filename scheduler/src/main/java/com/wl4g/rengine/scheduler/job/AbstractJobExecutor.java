@@ -15,12 +15,10 @@
  */
 package com.wl4g.rengine.scheduler.job;
 
-import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 
-import java.util.Collection;
 import java.util.List;
 
 import javax.validation.constraints.NotBlank;
@@ -33,12 +31,15 @@ import org.apache.shardingsphere.elasticjob.executor.JobFacade;
 import org.apache.shardingsphere.elasticjob.executor.item.impl.TypedJobItemExecutor;
 import org.apache.shardingsphere.elasticjob.lite.internal.storage.JobNodePath;
 import org.apache.shardingsphere.elasticjob.reg.base.CoordinatorRegistryCenter;
+import org.springframework.context.ApplicationContext;
 
 import com.wl4g.infra.context.utils.SpringContextHolder;
-import com.wl4g.rengine.eventbus.RengineEventBusService;
+import com.wl4g.rengine.client.core.RengineClient;
 import com.wl4g.rengine.scheduler.config.RengineSchedulerProperties;
 import com.wl4g.rengine.scheduler.config.RengineSchedulerProperties.BaseJobProperties;
 import com.wl4g.rengine.scheduler.config.RengineSchedulerProperties.EngineSchedulingControllerJobProperties;
+import com.wl4g.rengine.service.SchedulingJobService;
+import com.wl4g.rengine.service.SchedulingTriggerService;
 
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
@@ -62,18 +63,29 @@ import lombok.ToString;
 @CustomLog
 public abstract class AbstractJobExecutor implements TypedJobItemExecutor {
 
+    protected ApplicationContext applicationContext;
+
     protected final RengineSchedulerProperties config;
+
     protected final CoordinatorRegistryCenter regCenter;
-    @SuppressWarnings("rawtypes")
-    protected final Collection<RengineEventBusService> eventbusServices;
-    // protected final SpelVariables spelVariables;
+
+    protected final RengineClient rengineClient;
+
+    protected final SchedulingTriggerService schedulingTriggerService;
+
+    protected final SchedulingJobService schedulingJobService;
+
+    // @SuppressWarnings("rawtypes")
+    // protected final Collection<RengineEventBusService> eventbusServices;
 
     public AbstractJobExecutor() {
+        this.applicationContext = SpringContextHolder.getBean(ApplicationContext.class);
         this.config = SpringContextHolder.getBean(RengineSchedulerProperties.class);
         this.regCenter = SpringContextHolder.getBean(CoordinatorRegistryCenter.class);
-        this.eventbusServices = safeMap(SpringContextHolder.getBeans(RengineEventBusService.class)).values();
-        // this.spelVariables = new
-        // SpelVariables().from(config.getGlobalScrapeJobConfig().getJobVariables());
+        this.rengineClient = SpringContextHolder.getBean(RengineClient.class);
+        this.schedulingTriggerService = SpringContextHolder.getBean(SchedulingTriggerService.class);
+        this.schedulingJobService = SpringContextHolder.getBean(SchedulingJobService.class);
+        // this.eventbusServices=safeMap(SpringContextHolder.getBeans(RengineEventBusService.class)).values();
     }
 
     @Override
@@ -125,8 +137,14 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor {
     @Getter
     @ToString
     @AllArgsConstructor
-    public static enum SchedulerJobType {
-        ENGINE_EXECUTION_SCHEDULER_CONTROLLER(EngineSchedulingControllerJobProperties.class);
+    public static enum ExecutorJobType {
+
+        ENGINE_SCHEDULE_CONTROLLER(EngineSchedulingControllerJobProperties.class),
+
+        // TODO remove jobConfigClass?
+        ENGINE_EXECUTION_SCHEDULER(EngineSchedulingControllerJobProperties.class),
+
+        ENGINE_EXECUTION_JOB(EngineSchedulingControllerJobProperties.class);
 
         private final Class<? extends BaseJobProperties<? extends JobParamBase>> jobConfigClass;
     }

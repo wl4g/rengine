@@ -15,11 +15,9 @@
  */
 package com.wl4g.rengine.service.impl;
 
-import static com.wl4g.infra.common.lang.TypeConverts.safeLongToInt;
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -31,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.IdentityProvider;
+import com.wl4g.rengine.common.util.BeanSensitiveTransforms;
 import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.service.IdentityProviderService;
 import com.wl4g.rengine.service.model.QueryIdentityProvider;
@@ -60,8 +59,15 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
         } else {
             idpConfigs = mongoTemplate.findAll(IdentityProvider.class, MongoCollectionDefinition.SYS_IDP_CONFIG.getName());
         }
+        // Collections.sort(idpConfigs, (o1, o2) ->
+        // safeLongToInt(o2.getUpdateDate().getTime() -
+        // o1.getUpdateDate().getTime()));
 
-        Collections.sort(idpConfigs, (o1, o2) -> safeLongToInt(o2.getUpdateDate().getTime() - o1.getUpdateDate().getTime()));
+        // Mask sensitive information.
+        for (IdentityProvider idp : idpConfigs) {
+            BeanSensitiveTransforms.transform(idp);
+        }
+
         return QueryIdentityProviderResult.builder().providers(idpConfigs).build();
     }
 

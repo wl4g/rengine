@@ -15,7 +15,7 @@
  */
 package com.wl4g.rengine.executor.execution.engine;
 
-import static com.wl4g.rengine.executor.execution.engine.AbstractScriptEngine.SCIPRT_LOGGER_KEY_WORKFLOW_ID;
+import static com.wl4g.rengine.executor.execution.engine.AbstractScriptEngine.KEY_WORKFLOW_ID;
 import static java.util.Collections.singletonMap;
 
 import org.graalvm.polyglot.Source;
@@ -39,9 +39,9 @@ public class GraalJSScriptEngineTests {
     public void testInitWithCustomLog() throws Exception {
         final GraalJSScriptEngine engine = new GraalJSScriptEngine();
         engine.config = TestDefaultBaseSetup.createExecutionConfig();
-        engine.onStart(null);
+        engine.init();
         try (ContextWrapper graalContext = engine.getGraalPolyglotManager()
-                .getContext(singletonMap(SCIPRT_LOGGER_KEY_WORKFLOW_ID, 101001010L));) {
+                .getContext(singletonMap(KEY_WORKFLOW_ID, 101001010L));) {
             // @formatter:off
             final String script = "function testLog(name){"
                                     + "console.info(\"The testing info logs name is:\", name);"

@@ -255,7 +255,7 @@ EOF
 chmod 750 $SERVICE_FILE && chown -R $APP_USER:$APP_GROUP $SERVICE_FILE && mv $SERVICE_FILE /etc/init.d/
 
 #
-# ===== Generate systemd(e.g. If CentOS 7 systemctl) service =====
+# ===== Generate systemd(e.g. If CentOS7+/Ubuntu16+ systemctl) service =====
 #
 
 if [ -f "/bin/systemctl" ]; then
@@ -279,16 +279,18 @@ After=network.target remote-fs.target nss-lookup.target
 Type=simple
 PIDFile=$DATA_DIR/$APP_NAME.pid
 ExecStartPre=/bin/rm -f $DATA_DIR/$APP_NAME.pid
-ExecStart=/bin/bash -c "$APP_ENV && exec $EXEC_CMD > $OUT_FILE 2>&1"
-ExecStartPost=/bin/bash -c "/bin/echo \$MAINPID >$DATA_DIR/$APP_NAME.pid"
-ExecReload=/bin/kill -s HUP \$MAINPID
+ExecStart=/bin/bash -c "/etc/init.d/$APP_NAME.service start"
+ExecStartPost=/bin/bash -c "/bin/mkdir -p /mnt/disk1/$APP_NAME && /bin/echo \$MAINPID >$DATA_DIR/$APP_NAME.pid"
+#ExecReload=/bin/kill -s HUP \$MAINPID
+ExecReload=/bin/bash -c "/etc/init.d/$APP_NAME.service restart"
+ExecStop=/bin/bash -c "/etc/init.d/$APP_NAME.service stop"
 
 # Will it cause 'Restart=on-abnormal' to be invalid?
 #ExecStop=/bin/kill -s TERM \$MAINPID
 #StandardOutput=null
 StandardError=journal
-LimitNOFILE=1048576
-LimitNPROC=1048576
+LimitNOFILE=65535
+LimitNPROC=65535
 LimitCORE=infinity
 TimeoutStartSec=5
 Restart=on-abnormal

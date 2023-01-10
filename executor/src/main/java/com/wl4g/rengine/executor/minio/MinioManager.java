@@ -21,15 +21,16 @@ import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.StringUtils2.getFilename;
 import static com.wl4g.infra.common.lang.TypeConverts.safeLongToInt;
-import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_TMP_SCRIPT_CACHE_DIR;
 import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_S3_OBJECT_MAX_LIMIT;
 import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_S3_OBJECT_READ_BUFFER;
+import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_TMP_SCRIPT_CACHE_DIR;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.Proxy.Type;
@@ -54,6 +55,7 @@ import io.minio.GetObjectResponse;
 import io.minio.MinioClient;
 import io.minio.ObjectWriteResponse;
 import io.minio.PutObjectArgs;
+import io.minio.UploadObjectArgs;
 import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InsufficientDataException;
 import io.minio.errors.InternalException;
@@ -143,18 +145,41 @@ public class MinioManager {
         }
     }
 
-    public void writeObject(@NotBlank String objectPrefix) {
+    public ObjectWriteResponse putObject(
+            final @NotBlank String objectPrefix,
+            final @NotNull InputStream stream,
+            final long objectSize,
+            final long partSize) {
+        hasTextOf(objectPrefix, "objectPrefix");
+        notNullOf(stream, "stream");
         try {
-            PutObjectArgs args = PutObjectArgs.builder()
+            return minioClient.putObject(PutObjectArgs.builder()
                     .bucket(config.bucket())
                     .region(config.region())
                     .object(objectPrefix)
-                    .build();
+                    // see:io.minio.PutObjectBaseArgs.Builder#validateSizes
+                    // see:io.minio.ObjectWriteArgs.MAX_PART_SIZE
+                    .stream(stream, objectSize, partSize)
+                    .build());
+        } catch (InvalidKeyException | ErrorResponseException | InsufficientDataException | InternalException
+                | InvalidResponseException | NoSuchAlgorithmException | ServerException | XmlParserException | IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
-            // minioClient.uploadObject(UploadObjectArgs.builder().filename(null).build());
-            // UploadSnowballObjectsArgs.builder().objects(null).build();
-            ObjectWriteResponse result = minioClient.putObject(args);
-
+    public ObjectWriteResponse uploadObject(final @NotBlank String objectPrefix, final @NotNull String filename) {
+        hasTextOf(objectPrefix, "objectPrefix");
+        hasTextOf(filename, "filename");
+        try {
+            // UploadSnowballObjectsArgs
+            return minioClient.uploadObject(UploadObjectArgs.builder()
+                    .bucket(config.bucket())
+                    .region(config.region())
+                    .object(objectPrefix)
+                    // see:io.minio.PutObjectBaseArgs.Builder#validateSizes
+                    // see:io.minio.ObjectWriteArgs.MAX_PART_SIZE
+                    .filename(filename)
+                    .build());
         } catch (InvalidKeyException | ErrorResponseException | InsufficientDataException | InternalException
                 | InvalidResponseException | NoSuchAlgorithmException | ServerException | XmlParserException | IOException e) {
             throw new IllegalStateException(e);

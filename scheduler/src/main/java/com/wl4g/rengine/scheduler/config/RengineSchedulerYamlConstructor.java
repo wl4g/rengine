@@ -21,7 +21,7 @@ import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.constructor.BaseConstructor;
 import org.yaml.snakeyaml.constructor.Constructor;
 
-import com.wl4g.rengine.scheduler.job.AbstractJobExecutor.SchedulerJobType;
+import com.wl4g.rengine.scheduler.job.AbstractJobExecutor.ExecutorJobType;
 
 /**
  * {@link RengineSchedulerYamlConstructor}
@@ -38,7 +38,7 @@ public class RengineSchedulerYamlConstructor extends Constructor {
 
     public static void configure(BaseConstructor constructor) {
         notNullOf(constructor, "constructor");
-        for (SchedulerJobType type : SchedulerJobType.values()) {
+        for (ExecutorJobType type : ExecutorJobType.values()) {
             // TODO Notice: For example, PrometheusCollectJobExecutor inherits
             // the
             // SimpleHttpCollectJobExecutor and is temporarily treated as the

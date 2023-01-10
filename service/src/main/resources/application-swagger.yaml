@@ -13,9 +13,14 @@
 
 ## see:https://springdoc.org/#springdoc-openapi-core-properties
 ## see:https://github1s.com/springdoc/springdoc-openapi-demos/blob/HEAD/springdoc-openapi-spring-boot-2-webmvc/src/main/resources/application.yml#L1-L21
+## see:org.springdoc.core.SpringDocConfigProperties
+## see:org.springdoc.core.GroupedOpenApi#getPackagesToScan()
+## see:org.springdoc.webmvc.api.OpenApiResource#openapiJson()
+## see:org.springdoc.api.AbstractOpenApiResource#getOpenApi()
+## see:org.springdoc.api.AbstractOpenApiResource#isPackageToScan()
 springdoc:
   version: '@springdoc.version@'
-  api-docs: ## see:org.springdoc.core.SpringDocConfigProperties
+  api-docs:
     enabled: true
     path: /v3/api-docs ## Default by '/v3/api-docs'
     packagesToScan: 'com.wl4g.rengine'
@@ -25,9 +30,9 @@ springdoc:
   show-actuator: false ## Default by false
   use-management-port: false ## Default by false
   group-configs:
-    - group: default-api
-      pathsToMatch: /default-api/**
-      packagesToScan: com.wl4g.rengine.apiserver.controller
+    - group: apiserver-docs
+      pathsToMatch: /admin/**
+      packagesToScan: com.wl4g.rengine.apiserver
   swagger-ui:
     enabled: true ## Default by true
     path: /swagger-ui.html
@@ -70,8 +75,8 @@ springdoc:
   customOASConfig:
     project:
       name: ${spring.application.name:MyApp}
-      description: "@project.description@ APIs Documention"
-      version: "@project.version@"
+      #description: "@project.description@ APIs Documention"
+      description: "${spring.application.name:MyApp} APIs Documention"
       encoding: "@project.build.sourceEncoding@"
       termsOfService: "http://swagger.io/terms/"
     license:

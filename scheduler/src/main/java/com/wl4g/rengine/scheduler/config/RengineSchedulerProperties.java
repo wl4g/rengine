@@ -51,8 +51,8 @@ import org.springframework.core.env.Environment;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wl4g.infra.common.reflect.ReflectionUtils2;
 import com.wl4g.rengine.scheduler.job.AbstractJobExecutor.JobParamBase;
-import com.wl4g.rengine.scheduler.job.AbstractJobExecutor.SchedulerJobType;
-import com.wl4g.rengine.scheduler.job.EngineSchedulingControllerJobExecutor.EngineSchedulingControllerJobParam;
+import com.wl4g.rengine.scheduler.job.AbstractJobExecutor.ExecutorJobType;
+import com.wl4g.rengine.scheduler.job.EngineScheduleScannerController.EngineSchedulingControllerJobParam;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -297,7 +297,7 @@ public class RengineSchedulerProperties implements InitializingBean {
         private Collection<String> jobListenerTypes = new LinkedList<>();
         private String description = "The job that scrapes events remote over HTTP/TCP/SSH/Redis/JDBC etc.";
 
-        public abstract SchedulerJobType getJobType();
+        public abstract ExecutorJobType getJobType();
 
         public abstract List<C> getJobParams();
 
@@ -368,8 +368,8 @@ public class RengineSchedulerProperties implements InitializingBean {
 
         @JsonIgnore
         @Override
-        public SchedulerJobType getJobType() {
-            return SchedulerJobType.ENGINE_EXECUTION_SCHEDULER_CONTROLLER;
+        public ExecutorJobType getJobType() {
+            return ExecutorJobType.ENGINE_SCHEDULE_CONTROLLER;
         }
 
         @JsonIgnore

@@ -1,5 +1,64 @@
 [
 {
+  "name": "com.wl4g.rengine.executor.minio.MinioManager",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": []
+},
+{
+  "name": "com.wl4g.rengine.executor.minio.MinioManager$ObjectResource",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>","parameterTypes": ["java.lang.String","boolean","java.io.File","int"]},
+    {"name": "readToBytes","parameterTypes": []},
+    {"name": "readToString","parameterTypes": []},
+    {"name": "getObjectPrefix","parameterTypes": []},
+    {"name": "isBinary","parameterTypes": []},
+    {"name": "getLocalFile","parameterTypes": []},
+    {"name": "getAvailable","parameterTypes": []},
+    {"name": "toString","parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.executor.minio.MinioConfig",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "region","parameterTypes": []},
+    {"name": "endpoint","parameterTypes": []},
+    {"name": "tenantAccessKey","parameterTypes": []},
+    {"name": "tenantSecretKey","parameterTypes": []},
+    {"name": "httpClient","parameterTypes": []},
+    {"name": "bucket","parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.executor.execution.ExecutionConfig",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "region","parameterTypes": []},
+    {"name": "endpoint","parameterTypes": []},
+    {"name": "tenantAccessKey","parameterTypes": []},
+    {"name": "tenantSecretKey","parameterTypes": []},
+    {"name": "httpClient","parameterTypes": []},
+    {"name": "bucket","parameterTypes": []}
+  ]
+},
+{
   "name":"com.wl4g.rengine.executor.execution.engine.AbstractScriptEngine",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
@@ -15,6 +74,20 @@
   "queryAllDeclaredConstructors":true,
   "methods":[
     {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name": "com.wl4g.rengine.executor.execution.engine.GlobalExecutorManager",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>","parameterTypes": []},
+    {"name": "close","parameterTypes": []},
+    {"name": "getExecutor","parameterTypes": ["java.lang.Long","int"]},
+    {"name": "lambda$0","parameterTypes": ["java.lang.Long","com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor"]}
   ]
 },
 {

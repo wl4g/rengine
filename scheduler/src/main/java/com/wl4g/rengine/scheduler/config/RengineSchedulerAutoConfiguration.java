@@ -31,7 +31,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.wl4g.rengine.scheduler.job.EngineSchedulingControllerJobExecutor;
+import com.wl4g.rengine.scheduler.job.EngineScheduleScannerController;
 
 /**
  * {@link RengineSchedulerAutoConfiguration}
@@ -79,8 +79,8 @@ public class RengineSchedulerAutoConfiguration {
     }
 
     @Bean
-    public EngineSchedulingControllerJobExecutor engineSchedulingControllerJobExecutor() {
-        return new EngineSchedulingControllerJobExecutor();
+    public EngineScheduleScannerController engineScheduleScannerController() {
+        return new EngineScheduleScannerController();
     }
 
 }

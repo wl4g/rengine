@@ -15,12 +15,26 @@
  */
 package com.wl4g.rengine.common.util;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.lang.String.valueOf;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+import static org.apache.commons.lang3.StringUtils.endsWithIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.replace;
+import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
+
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.List;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+
+import com.wl4g.infra.common.io.FileIOUtils;
+import com.wl4g.infra.common.io.FileIOUtils.ReadTailFrame;
 
 /**
  * {@link ScriptEngineUtil}
@@ -32,16 +46,85 @@ import javax.validation.constraints.NotNull;
 public abstract class ScriptEngineUtil {
 
     public static String buildScriptLogFilePattern(
-            final @NotBlank String scriptLogBaseDir,
+            final @NotBlank String logBaseDir,
             final @NotNull Long workflowId,
             final boolean isStdErr) {
-        hasTextOf(scriptLogBaseDir, "scriptLogBaseDir");
+        hasTextOf(logBaseDir, "logBaseDir");
         notNullOf(workflowId, "workflowId");
-        final String filePattern = scriptLogBaseDir.concat("/")
-                .concat(valueOf(workflowId))
-                .concat("/")
-                .concat(isStdErr ? "stderr.log" : "stdout.log");
-        return filePattern;
+        return buildScriptLogDir(logBaseDir, workflowId).concat(File.separator)
+                .concat(isStdErr ? DEFAULT_STDERR_PREFIX : DEFAULT_STDOUT_PREFIX);
     }
+
+    public static String buildScriptLogDir(final @NotBlank String logBaseDir, final @NotNull Long workflowId) {
+        hasTextOf(logBaseDir, "logBaseDir");
+        notNullOf(workflowId, "workflowId");
+        return logBaseDir.concat(File.separator).concat(valueOf(workflowId));
+    }
+
+    public static List<String> getAllLogDirs(final @NotBlank String logBaseDir, boolean isAbsolute) {
+        return safeArrayToList(new File(logBaseDir).list(ScriptEngineUtil.defaultLogFilter)).stream()
+                .map(fn -> isAbsolute ? logBaseDir.concat(File.separator).concat(fn) : fn)
+                .collect(toList());
+    }
+
+    public static List<String> getAllLogFilenames(
+            final @NotBlank String logBaseDir,
+            final @NotNull Long workflowId,
+            final boolean isStdErr) {
+        final var logDir = new File(buildScriptLogDir(logBaseDir, workflowId));
+        final String prefix = isStdErr ? DEFAULT_STDERR_PREFIX : DEFAULT_STDOUT_PREFIX;
+        // for example:
+        // ls -al /tmp/__rengine_script_log/6150868953448448/
+        // stderr.log.0
+        // stderr.log.0.1
+        // stderr.log.0.1.lck
+        // stderr.log.0.lck
+        // stdout.log.0
+        // stdout.log.0.1
+        // stdout.log.0.1.lck
+        // stdout.log.0.lck
+        return safeArrayToList(logDir.list(defaultLogFilter)).stream()
+                .filter(f -> !isBlank(f) && f.contains(prefix))
+                .collect(toList());
+    }
+
+    public static String getLatestLogFile(
+            final @NotBlank String logBaseDir,
+            final @NotNull Long workflowId,
+            final boolean isStdErr) {
+        final var logDir = new File(buildScriptLogDir(logBaseDir, workflowId));
+        final String prefix = isStdErr ? DEFAULT_STDERR_PREFIX : DEFAULT_STDOUT_PREFIX;
+
+        final List<String> sortedLogFiles = getAllLogFilenames(logBaseDir, workflowId, isStdErr).stream()
+                .collect(toMap(f -> f, f -> {
+                    final String noPrefix = f.substring(f.lastIndexOf(prefix) + 1 + prefix.length());
+                    return Integer.parseInt(replace(noPrefix, ".", ""));
+                }))
+                .entrySet()
+                .stream()
+                .sorted((e1, e2) -> e1.getValue() - e2.getValue())
+                .map(e -> e.getKey())
+                .collect(toList());
+
+        return logDir.getAbsolutePath().concat(File.separator).concat(sortedLogFiles.get(sortedLogFiles.size() - 1));
+    }
+
+    public static ReadTailFrame getLogTail(
+            final @NotBlank String latestLogFile,
+            final boolean isStdErr,
+            long startPos,
+            int aboutLimit) {
+        return FileIOUtils.seekReadLines(latestLogFile, startPos, aboutLimit, line -> startsWithIgnoreCase(line, "EOF"));
+    }
+
+    public static final String DEFAULT_STDOUT_PREFIX = "stdout.log";
+    public static final String DEFAULT_STDERR_PREFIX = "stderr.log";
+
+    public static final FilenameFilter defaultLogFilter = new FilenameFilter() {
+        @Override
+        public boolean accept(File dir, String name) {
+            return !endsWithIgnoreCase(name, ".lck");
+        }
+    };
 
 }

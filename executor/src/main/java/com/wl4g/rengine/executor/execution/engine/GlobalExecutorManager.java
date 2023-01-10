@@ -22,7 +22,6 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -31,10 +30,9 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.task.GenericTaskRunner;
-import com.wl4g.infra.common.task.RunnerProperties;
-import com.wl4g.infra.common.task.RunnerProperties.StartupMode;
 import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
+import com.wl4g.rengine.executor.execution.sdk.ScriptExecutor;
 
 import lombok.CustomLog;
 
@@ -49,7 +47,7 @@ import lombok.CustomLog;
 @Singleton
 public class GlobalExecutorManager implements Closeable {
 
-    private final Map<Long, GenericTaskRunner<RunnerProperties>> runnerCaching = new ConcurrentHashMap<>(4);
+    private final Map<Long, SafeScheduledTaskPoolExecutor> executorCaching = new ConcurrentHashMap<>(4);
 
     @NotNull
     @Inject
@@ -57,11 +55,11 @@ public class GlobalExecutorManager implements Closeable {
 
     @Override
     public void close() throws IOException {
-        safeMap(runnerCaching).forEach((name, runner) -> {
+        safeMap(executorCaching).forEach((name, executor) -> {
             try {
-                runner.close();
-            } catch (IOException e) {
-                log.error("Failed to closing task runner of {}", name);
+                executor.shutdown();
+            } catch (Exception e) {
+                log.error("Failed to shutdown task executor of {}", name);
             }
         });
     }
@@ -69,18 +67,16 @@ public class GlobalExecutorManager implements Closeable {
     public SafeScheduledTaskPoolExecutor getExecutor(
             final @NotNull Long workflowId,
             final @Min(1) @Max(DEFAULT_POOL_LIMIT) int concurrency) {
-        GenericTaskRunner<RunnerProperties> runner = runnerCaching.get(workflowId);
-        if (isNull(runner)) {
+        SafeScheduledTaskPoolExecutor executor = executorCaching.get(workflowId);
+        if (isNull(executor)) {
             synchronized (this) {
-                if (isNull(runner = runnerCaching.get(workflowId))) {
-                    runner = new GenericTaskRunner<RunnerProperties>(new RunnerProperties(StartupMode.NOSTARTUP, concurrency, 0L,
-                            (int) (concurrency * 2), new AbortPolicy())) {
-                    };
-                    runner.start();
+                if (isNull(executor = executorCaching.get(workflowId))) {
+                    executor = GenericTaskRunner.newDefaultScheduledExecutor(ScriptExecutor.class.getSimpleName(), concurrency,
+                            (int) (concurrency * 2));
                 }
             }
         }
-        return runner.getWorker();
+        return executor;
     }
 
     public static final int DEFAULT_POOL_CONCURRENCY = 2;

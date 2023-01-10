@@ -18,6 +18,8 @@ import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions.MongoConverterConfigurationAdapter;
 
 import com.wl4g.rengine.common.entity.DataSourceProperties;
+import com.wl4g.rengine.common.entity.Notification;
+import com.wl4g.rengine.common.entity.SchedulingTrigger;
 import com.wl4g.rengine.common.entity.WorkflowGraph;
 import com.wl4g.rengine.common.util.BsonEntitySerializers;
 
@@ -73,6 +75,8 @@ public class CustomMongoConfigure extends AbstractMongoClientConfiguration {
         adapter.registerConverter(new DocumentToWorkflowGraphConverter());
         adapter.registerConverter(new DataSourcePropertiesToDocumentConverter());
         adapter.registerConverter(new DocumentToDataSourcePropertiesConverter());
+        adapter.registerConverter(new DocumentToNotificationConverter());
+        adapter.registerConverter(new DocumentToSchedulingTriggerConverter());
     }
 
     @WritingConverter
@@ -106,4 +110,37 @@ public class CustomMongoConfigure extends AbstractMongoClientConfiguration {
             return BsonEntitySerializers.fromDocument(source, DataSourceProperties.class);
         }
     }
+
+    @WritingConverter
+    static class NotificationToDocumentConverter implements Converter<Notification, Document> {
+        @Override
+        public Document convert(final Notification source) {
+            return BsonEntitySerializers.toDocument(source);
+        }
+    }
+
+    @ReadingConverter
+    static class DocumentToNotificationConverter implements Converter<Document, Notification> {
+        @Override
+        public Notification convert(Document source) {
+            return BsonEntitySerializers.fromDocument(source, Notification.class);
+        }
+    }
+
+    @WritingConverter
+    static class SchedulingTriggerToDocumentConverter implements Converter<SchedulingTrigger, Document> {
+        @Override
+        public Document convert(final SchedulingTrigger source) {
+            return BsonEntitySerializers.toDocument(source);
+        }
+    }
+
+    @ReadingConverter
+    static class DocumentToSchedulingTriggerConverter implements Converter<Document, SchedulingTrigger> {
+        @Override
+        public SchedulingTrigger convert(Document source) {
+            return BsonEntitySerializers.fromDocument(source, SchedulingTrigger.class);
+        }
+    }
+
 }

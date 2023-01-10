@@ -36,6 +36,7 @@ import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.DataSourceProperties;
+import com.wl4g.rengine.common.util.BeanSensitiveTransforms;
 import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.service.DataSourceService;
 import com.wl4g.rengine.service.model.DeleteDataSource;
@@ -64,6 +65,11 @@ public class DataSourceServiceImpl implements DataSourceService {
 
         final List<DataSourceProperties> dataSourceProperties = mongoTemplate.find(query, DataSourceProperties.class,
                 MongoCollectionDefinition.DATASOURCES.getName());
+
+        // Mask sensitive information.
+        for (DataSourceProperties ds : dataSourceProperties) {
+            BeanSensitiveTransforms.transform(ds.getProperties());
+        }
 
         return new PageHolder<DataSourceProperties>(model.getPageNum(), model.getPageSize())
                 .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.DATASOURCES.getName()))

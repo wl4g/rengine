@@ -115,6 +115,11 @@ public abstract class TestDefaultBaseSetup {
                     public @NotNull @Min(1) Integer fileMaxCount() {
                         return ExecutionConfig.DEFAULT_SCRIPT_LOG_FILE_MAX_COUNT;
                     }
+
+                    @Override
+                    public @NotBlank String uploaderCron() {
+                        return ExecutionConfig.DEFAULT_SCRIPT_LOG_UPLOADER_CRON;
+                    }
                 };
             }
 
