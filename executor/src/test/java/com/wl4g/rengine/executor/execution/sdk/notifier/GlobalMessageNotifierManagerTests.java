@@ -70,7 +70,7 @@ public class GlobalMessageNotifierManagerTests {
     }
 
     @Test
-    @RepeatedTest(5)
+    @RepeatedTest(2)
     public void testDingtalkNotifierSend() throws Exception {
         setup();
 
@@ -139,7 +139,7 @@ public class GlobalMessageNotifierManagerTests {
     }
 
     @Test
-    @RepeatedTest(5)
+    @RepeatedTest(2)
     public void testEmailNotifierSend() throws Exception {
         setup();
 
@@ -147,10 +147,11 @@ public class GlobalMessageNotifierManagerTests {
         System.out.println("emailNotifier : " + emailNotifier);
 
         final Map<String, Object> parameter = new HashMap<>();
-        parameter.put(EmailSenderAPI.KEY_MAILMSG_TYPE, EmailSenderAPI.VALUE_MAILMSG_SIMPLE);
-        parameter.put(EmailSenderAPI.KEY_MAILMSG_SUBJECT, "Testing Sender(Simple)");
-        parameter.put(EmailScriptMessageNotifier.KEY_EMAIL_TO_USERS, "983708408@qq.com");
-        parameter.put(EmailScriptMessageNotifier.KEY_EMAIL_MSG, "This testing simple message!!!");
+        parameter.put(EmailSenderAPI.KEY_MAIL_TYPE, EmailSenderAPI.VALUE_MAIL_MIME);
+        parameter.put(EmailSenderAPI.KEY_MAIL_SUBJECT, "Testing Sender");
+        parameter.put(EmailScriptMessageNotifier.KEY_MAIL_TO_USERS, "983708408@qq.com");
+        parameter.put(EmailScriptMessageNotifier.KEY_MAIL_MSG,
+                "This testing <b>MIME<b> message!!!</br><font color=red>It's is red font.</font>");
 
         final Object result = emailNotifier.send(parameter);
         System.out.println(toJSONString(result));

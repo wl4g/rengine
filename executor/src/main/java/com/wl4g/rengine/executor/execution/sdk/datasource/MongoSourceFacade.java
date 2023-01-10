@@ -18,13 +18,15 @@ package com.wl4g.rengine.executor.execution.sdk.datasource;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseToNode;
-import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_datasource_facade_failure;
-import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_datasource_facade_success;
-import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_datasource_facade_time;
-import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_datasource_facade_total;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_datasource_failure;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_datasource_success;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_datasource_time;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_datasource_total;
 import static java.lang.String.format;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -102,13 +104,13 @@ public class MongoSourceFacade implements DataSourceFacade {
     public List<JsonNode> findList(@NotBlank String tableName, @NotNull List<Map<String, Object>> bsonFilters) {
         hasTextOf(tableName, "tableName");
         notNullOf(bsonFilters, "bsonFilters");
-        MeterUtil.counter(execution_sdk_datasource_facade_total, dataSourceName, DataSourceType.MONGO, METHOD_FIND_LIST);
+        MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.MONGO, METHOD_FIND_LIST);
 
         log.debug("Bson query params : {}", bsonFilters);
         try {
-            final List<JsonNode> result = MeterUtil.timer(execution_sdk_datasource_facade_time, dataSourceName, DataSourceType.MONGO,
-                    METHOD_FIND_LIST, () -> {
-                        final MongoCollection<Document> collection = getCollection(MongoCollectionDefinition.of(tableName));
+            final List<JsonNode> result = MeterUtil.timer(execution_sdk_datasource_time, dataSourceName,
+                    DataSourceType.MONGO, METHOD_FIND_LIST, () -> {
+                        final MongoCollection<Document> collection = getCollection(tableName);
                         final List<Bson> aggregateQuery = safeList(bsonFilters).stream()
                                 .flatMap(p -> safeMap(p).entrySet()
                                         .stream()
@@ -123,10 +125,10 @@ public class MongoSourceFacade implements DataSourceFacade {
                             return IteratorUtils.toList(cursor);
                         }
                     });
-            MeterUtil.counter(execution_sdk_datasource_facade_success, dataSourceName, DataSourceType.MONGO, METHOD_FIND_LIST);
+            MeterUtil.counter(execution_sdk_datasource_success, dataSourceName, DataSourceType.MONGO, METHOD_FIND_LIST);
             return result;
         } catch (Throwable e) {
-            MeterUtil.counter(execution_sdk_datasource_facade_failure, dataSourceName, DataSourceType.MONGO, METHOD_FIND_LIST);
+            MeterUtil.counter(execution_sdk_datasource_failure, dataSourceName, DataSourceType.MONGO, METHOD_FIND_LIST);
             throw e;
         }
     }
@@ -134,13 +136,13 @@ public class MongoSourceFacade implements DataSourceFacade {
     public Set<Integer> insertMany(@NotBlank String tableName, @NotNull List<Map<String, Object>> bsonEntitys) {
         hasTextOf(tableName, "tableName");
         notNullOf(bsonEntitys, "bsonEntitys");
-        MeterUtil.counter(execution_sdk_datasource_facade_total, dataSourceName, DataSourceType.MONGO, METHOD_INSERT_MANY);
+        MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.MONGO, METHOD_INSERT_MANY);
 
         log.debug("Insert bson entitys: {}", bsonEntitys);
         try {
-            final Set<Integer> modifiedes = MeterUtil.timer(execution_sdk_datasource_facade_time, dataSourceName,
+            final Set<Integer> modifiedes = MeterUtil.timer(execution_sdk_datasource_time, dataSourceName,
                     DataSourceType.MONGO, METHOD_FIND_LIST, () -> {
-                        final MongoCollection<Document> collection = getCollection(MongoCollectionDefinition.of(tableName));
+                        final MongoCollection<Document> collection = getCollection(tableName);
                         final List<Document> insertDocs = safeList(bsonEntitys).stream()
                                 .map(b -> new Document(b))
                                 .collect(toList());
@@ -150,10 +152,10 @@ public class MongoSourceFacade implements DataSourceFacade {
                         return result.getInsertedIds().keySet();
                     });
 
-            MeterUtil.counter(execution_sdk_datasource_facade_success, dataSourceName, DataSourceType.MONGO, METHOD_INSERT_MANY);
+            MeterUtil.counter(execution_sdk_datasource_success, dataSourceName, DataSourceType.MONGO, METHOD_INSERT_MANY);
             return modifiedes;
         } catch (Throwable e) {
-            MeterUtil.counter(execution_sdk_datasource_facade_failure, dataSourceName, DataSourceType.MONGO, METHOD_INSERT_MANY);
+            MeterUtil.counter(execution_sdk_datasource_failure, dataSourceName, DataSourceType.MONGO, METHOD_INSERT_MANY);
             throw e;
         }
     }
@@ -165,23 +167,23 @@ public class MongoSourceFacade implements DataSourceFacade {
         hasTextOf(tableName, "tableName");
         notNullOf(bsonFilter, "bsonFilter");
         notNullOf(bsonEntitys, "bsonEntitys");
-        MeterUtil.counter(execution_sdk_datasource_facade_total, dataSourceName, DataSourceType.MONGO, METHOD_UPDATE_MANY);
+        MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.MONGO, METHOD_UPDATE_MANY);
 
         log.debug("Update bson entitys: {} of filter: {}", bsonEntitys, bsonFilter);
         try {
-            final Long modifiedCount = MeterUtil.timer(execution_sdk_datasource_facade_time, dataSourceName, DataSourceType.MONGO,
+            final Long modifiedCount = MeterUtil.timer(execution_sdk_datasource_time, dataSourceName, DataSourceType.MONGO,
                     METHOD_FIND_LIST, () -> {
-                        final MongoCollection<Document> collection = getCollection(MongoCollectionDefinition.of(tableName));
+                        final MongoCollection<Document> collection = getCollection(tableName);
                         final List<Bson> updateBsons = safeList(bsonEntitys).stream().map(b -> new Document(b)).collect(toList());
                         final UpdateOptions options = new UpdateOptions().upsert(true);
                         final UpdateResult result = collection.updateMany(BsonUtils2.asBson(bsonFilter), updateBsons, options);
                         return result.getModifiedCount();
                     });
 
-            MeterUtil.counter(execution_sdk_datasource_facade_success, dataSourceName, DataSourceType.MONGO, METHOD_UPDATE_MANY);
+            MeterUtil.counter(execution_sdk_datasource_success, dataSourceName, DataSourceType.MONGO, METHOD_UPDATE_MANY);
             return modifiedCount;
         } catch (Throwable e) {
-            MeterUtil.counter(execution_sdk_datasource_facade_failure, dataSourceName, DataSourceType.MONGO, METHOD_UPDATE_MANY);
+            MeterUtil.counter(execution_sdk_datasource_failure, dataSourceName, DataSourceType.MONGO, METHOD_UPDATE_MANY);
             throw e;
         }
     }
@@ -189,28 +191,31 @@ public class MongoSourceFacade implements DataSourceFacade {
     public Long deleteMany(@NotBlank String tableName, @NotNull Map<String, Object> bsonFilter) {
         hasTextOf(tableName, "tableName");
         notNullOf(bsonFilter, "bsonFilter");
-        MeterUtil.counter(execution_sdk_datasource_facade_total, dataSourceName, DataSourceType.MONGO, METHOD_DELETE_MANY);
+        MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.MONGO, METHOD_DELETE_MANY);
 
         log.debug("Delete bson filter: {}", bsonFilter);
         try {
-            final Long modifiedCount = MeterUtil.timer(execution_sdk_datasource_facade_time, dataSourceName, DataSourceType.MONGO,
+            final Long modifiedCount = MeterUtil.timer(execution_sdk_datasource_time, dataSourceName, DataSourceType.MONGO,
                     METHOD_FIND_LIST, () -> {
-                        final MongoCollection<Document> collection = getCollection(MongoCollectionDefinition.of(tableName));
+                        final MongoCollection<Document> collection = getCollection(tableName);
                         // final DeleteOptions options = new DeleteOptions();
                         final DeleteResult result = collection.deleteMany(new Document(bsonFilter));
                         return result.getDeletedCount();
                     });
 
-            MeterUtil.counter(execution_sdk_datasource_facade_success, dataSourceName, DataSourceType.MONGO, METHOD_DELETE_MANY);
+            MeterUtil.counter(execution_sdk_datasource_success, dataSourceName, DataSourceType.MONGO, METHOD_DELETE_MANY);
             return modifiedCount;
         } catch (Throwable e) {
-            MeterUtil.counter(execution_sdk_datasource_facade_failure, dataSourceName, DataSourceType.MONGO, METHOD_DELETE_MANY);
+            MeterUtil.counter(execution_sdk_datasource_failure, dataSourceName, DataSourceType.MONGO, METHOD_DELETE_MANY);
             throw e;
         }
     }
 
-    MongoCollection<Document> getCollection(MongoCollectionDefinition collection) {
-        return mongoClient.getDatabase(RengineConstants.DEFAULT_MONGODB_DATABASE).getCollection(collection.getName());
+    MongoCollection<Document> getCollection(final @NotBlank String collectionName) {
+        // The disable access to system collection.
+        isTrue(isNull(MongoCollectionDefinition.safeOf(collectionName)), "Forbidden to access system collection '%s'",
+                collectionName);
+        return mongoClient.getDatabase(RengineConstants.DEFAULT_MONGODB_DATABASE).getCollection(collectionName);
     }
 
     @Singleton

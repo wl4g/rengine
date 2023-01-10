@@ -17,11 +17,13 @@ package com.wl4g.rengine.executor.metrics;
 
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 import java.util.concurrent.Callable;
 
 import javax.enterprise.inject.spi.CDI;
 
+import com.wl4g.infra.common.notification.MessageNotifier.NotifierKind;
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
 import com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName;
 import com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsTag;
@@ -50,8 +52,8 @@ public class MeterUtil {
             final String methodName) {
         try {
             getMeterService()
-                    .counter(metricsName.getName(), metricsName.getHelp(), MetricsTag.DS_TYPE, dsType.name(), MetricsTag.DS_NAME,
-                            dataSourceName, MetricsTag.METHOD_NAME, methodName)
+                    .counter(metricsName.getName(), metricsName.getHelp(), MetricsTag.SDK_DS_TYPE, dsType.name(),
+                            MetricsTag.SDK_DS_NAME, dataSourceName, MetricsTag.METHOD_NAME, methodName)
                     .increment();
         } catch (Throwable e) {
             log.error(
@@ -67,24 +69,81 @@ public class MeterUtil {
             final DataSourceType dsType,
             final String methodName,
             final Callable<T> func) {
-        final Timer timer = getMeterService().timer(metricsName.getName(), metricsName.getHelp(),
-                ExecutorMeterService.DEFAULT_PERCENTILES, MetricsTag.DS_TYPE, dsType.name(), MetricsTag.DS_NAME, dataSourceName,
-                MetricsTag.METHOD_NAME, methodName);
-        return timer.record(() -> {
-            try {
-                return func.call();
-            } catch (Exception e) {
-                throw new IllegalStateException(e);
-            }
-        });
+        Timer timer = null;
+        try {
+            timer = getMeterService().timer(metricsName.getName(), metricsName.getHelp(),
+                    ExecutorMeterService.DEFAULT_PERCENTILES, MetricsTag.SDK_DS_TYPE, dsType.name(), MetricsTag.SDK_DS_NAME,
+                    dataSourceName, MetricsTag.METHOD_NAME, methodName);
+        } catch (Throwable e) {
+            log.error(format("Unable to timer meter for metricsName: '%s', dataSourceName: '%s', dsType: '%s', methodName: '%s'",
+                    metricsName, dataSourceName, dsType, methodName), e);
+
+        }
+        if (nonNull(timer)) {
+            return timer.record(() -> {
+                try {
+                    return func.call();
+                } catch (Exception e) {
+                    throw new IllegalStateException(e);
+                }
+            });
+        }
+        try {
+            return func.call();
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 
-    // --- Meter for sdk clients and notifiers. ---
+    // --- Meter for sdk notifiers. ---
+
+    public static void counter(final MetricsName metricsName, final NotifierKind notifierType, final String methodName) {
+        try {
+            getMeterService()
+                    .counter(metricsName.getName(), metricsName.getHelp(), MetricsTag.SDK_NOTIFIER_TYPE, notifierType.name(),
+                            MetricsTag.METHOD_NAME, methodName)
+                    .increment();
+        } catch (Throwable e) {
+            log.error(format("Unable to counter meter for metricsName: '%s', notifierType: '%s', methodName: '%s'", metricsName,
+                    notifierType, methodName), e);
+        }
+    }
+
+    public static <T> T timer(
+            final MetricsName metricsName,
+            final NotifierKind notifierType,
+            final String methodName,
+            final Callable<T> func) {
+        Timer timer = null;
+        try {
+            timer = getMeterService().timer(metricsName.getName(), metricsName.getHelp(),
+                    ExecutorMeterService.DEFAULT_PERCENTILES, MetricsTag.SDK_NOTIFIER_TYPE, notifierType.name(),
+                    MetricsTag.METHOD_NAME, methodName);
+        } catch (Throwable e) {
+            log.error(format("Unable to timer meter for metricsName: '%s', methodName: '%s'", metricsName, methodName), e);
+        }
+        if (nonNull(timer)) {
+            return timer.record(() -> {
+                try {
+                    return func.call();
+                } catch (Exception e) {
+                    throw new IllegalStateException(e);
+                }
+            });
+        }
+        try {
+            return func.call();
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    // --- Meter for sdk clients. ---
 
     public static void counter(final MetricsName metricsName, final Class<?> sdkType, final String methodName) {
         try {
             getMeterService()
-                    .counter(metricsName.getName(), metricsName.getHelp(), MetricsTag.SDK_TYPE, sdkType.getSimpleName(),
+                    .counter(metricsName.getName(), metricsName.getHelp(), MetricsTag.SDK_CLIENT_TYPE, sdkType.getSimpleName(),
                             MetricsTag.METHOD_NAME, methodName)
                     .increment();
         } catch (Throwable e) {
@@ -98,16 +157,29 @@ public class MeterUtil {
             final Class<?> sdkType,
             final String methodName,
             final Callable<T> func) {
-        final Timer timer = getMeterService().timer(metricsName.getName(), metricsName.getHelp(),
-                ExecutorMeterService.DEFAULT_PERCENTILES, MetricsTag.SDK_TYPE, sdkType.getSimpleName(), MetricsTag.METHOD_NAME,
-                methodName);
-        return timer.record(() -> {
-            try {
-                return func.call();
-            } catch (Exception e) {
-                throw new IllegalStateException(e);
-            }
-        });
+        Timer timer = null;
+        try {
+            timer = getMeterService().timer(metricsName.getName(), metricsName.getHelp(),
+                    ExecutorMeterService.DEFAULT_PERCENTILES, MetricsTag.SDK_CLIENT_TYPE, sdkType.getSimpleName(),
+                    MetricsTag.METHOD_NAME, methodName);
+        } catch (Throwable e) {
+            log.error(format("Unable to timer meter for metricsName: '%s', methodName: '%s'", metricsName, methodName), e);
+
+        }
+        if (nonNull(timer)) {
+            return timer.record(() -> {
+                try {
+                    return func.call();
+                } catch (Exception e) {
+                    throw new IllegalStateException(e);
+                }
+            });
+        }
+        try {
+            return func.call();
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     static ExecutorMeterService getMeterService() {

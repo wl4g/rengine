@@ -53,6 +53,8 @@ public class ExecutorMeterService extends PrometheusMeterFacade {
     @AllArgsConstructor
     public static enum MetricsName {
 
+        // Execution execute metrics.
+
         execution_total("execution_total", "The stats of execute total"),
 
         execution_success("execution_success", "The stats of execute success"),
@@ -61,25 +63,54 @@ public class ExecutorMeterService extends PrometheusMeterFacade {
 
         execution_time("execution_time", "The stats of execute execution time"),
 
-        execution_sdk_datasource_facade_total("execution_sdk_datasource_facade_total",
-                "The stats of datasource facade execute total"),
+        // SDK for datasource manager metrics.
 
-        execution_sdk_datasource_facade_success("execution_sdk_datasource_facade_success",
-                "The stats of datasource facade execute success"),
+        execution_sdk_datasource_manager_total("execution_sdk_datasource_manager_total",
+                "The stats of datasource manager execution total"),
 
-        execution_sdk_datasource_facade_failure("execution_sdk_datasource_facade_failure",
-                "The stats of datasource facade execute failure"),
+        execution_sdk_datasource_manager_success("execution_sdk_datasource_manager_success",
+                "The stats of datasource manager execute success"),
 
-        execution_sdk_datasource_facade_time("execution_sdk_datasource_facade_failure",
-                "The stats of datasource facade execute time"),
+        execution_sdk_datasource_manager_failure("execution_sdk_datasource_manager_failure",
+                "The stats of datasource manager execute failure"),
 
-        execution_sdk_notifier_total("execution_sdk_datasource_facade_total", "The stats of datasource facade execute total"),
+        execution_sdk_datasource_manager_time("execution_sdk_datasource_manager_time",
+                "The stats of datasource manager execute time"),
+
+        // SDK for datasource facade metrics.
+
+        execution_sdk_datasource_total("execution_sdk_datasource_total", "The stats of datasource facade execute total"),
+
+        execution_sdk_datasource_success("execution_sdk_datasource_success", "The stats of datasource facade execute success"),
+
+        execution_sdk_datasource_failure("execution_sdk_datasource_failure", "The stats of datasource facade execute failure"),
+
+        execution_sdk_datasource_time("execution_sdk_datasource_time", "The stats of datasource facade execute time"),
+
+        // SDK for notifier manager metrics.
+
+        execution_sdk_notifier_manager_total("execution_sdk_notifier_manager_success",
+                "The stats of datasource manager execution time"),
+
+        execution_sdk_notifier_manager_success("execution_sdk_notifier_manager_success",
+                "The stats of notifier manager execute success"),
+
+        execution_sdk_notifier_manager_failure("execution_sdk_notifier_manager_failure",
+                "The stats of notifier manager execute failure"),
+
+        execution_sdk_notifier_manager_time("execution_sdk_notifier_manager_time", "The stats of notifier manager execute time"),
+
+        // SDK for notifier metrics.
+
+        execution_sdk_notifier_total("execution_sdk_notifier_total", "The stats of datasource facade execute total"),
 
         execution_sdk_notifier_success("execution_sdk_notifier_success", "The stats of notifier execute success"),
 
         execution_sdk_notifier_failure("execution_sdk_notifier_failure", "The stats of notifier execute failure"),
 
-        execution_sdk_notifier_time("execution_sdk_notifier_failure", "The stats of notifier execute time"),
+        execution_sdk_notifier_time("execution_sdk_notifier_time", "The stats of notifier execute time"),
+
+        // SDK for clients metrics.
 
         execution_sdk_client_total("execution_sdk_client_total", "The stats of sdk client execute total"),
 
@@ -94,11 +125,12 @@ public class ExecutorMeterService extends PrometheusMeterFacade {
     }
 
     public static abstract class MetricsTag {
-        public static final String DS_TYPE = "dsType";
-        public static final String DS_NAME = "dsName";
-        public static final String METHOD_NAME = "method";
+        public static final String SDK_DS_TYPE = "dsType";
+        public static final String SDK_DS_NAME = "dsName";
+        public static final String SDK_CLIENT_TYPE = "client";
+        public static final String SDK_NOTIFIER_TYPE = "notifier";
 
-        public static final String SDK_TYPE = "sdkType";
+        public static final String METHOD_NAME = "method";
 
         public static final String ENGINE = "engine";
 

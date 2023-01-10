@@ -21,6 +21,7 @@ import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_notifier_failure;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_notifier_success;
 import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_notifier_time;
 import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_notifier_total;
 import static java.lang.String.format;
@@ -71,15 +72,15 @@ public class EmailScriptMessageNotifier implements ScriptMessageNotifier {
     @SuppressWarnings("unchecked")
     @Override
     public Object send(final @NotNull Map<String, Object> parameter) {
-        MeterUtil.counter(execution_sdk_notifier_total, DingtalkScriptMessageNotifier.class, METHOD_SEND);
         try {
-            return MeterUtil.timer(execution_sdk_notifier_time, DingtalkScriptMessageNotifier.class, METHOD_SEND, () -> {
+            MeterUtil.counter(execution_sdk_notifier_total, kind(), METHOD_SEND);
+            return MeterUtil.timer(execution_sdk_notifier_time, kind(), METHOD_SEND, () -> {
                 notNullOf(parameter, "parameter");
-                final String content = (String) parameter.get(KEY_EMAIL_MSG);
-                hasTextOf(content, format("parameter['%s']", KEY_EMAIL_MSG));
+                final String content = (String) parameter.get(KEY_MAIL_MSG);
+                hasTextOf(content, format("parameter['%s']", KEY_MAIL_MSG));
 
-                final Object toUsers = parameter.get(KEY_EMAIL_TO_USERS);
-                notNullOf(toUsers, format("parameter['%s']", KEY_EMAIL_TO_USERS));
+                final Object toUsers = parameter.get(KEY_MAIL_TO_USERS);
+                notNullOf(toUsers, format("parameter['%s']", KEY_MAIL_TO_USERS));
                 List<String> toUserList = null;
                 if (toUsers instanceof List) {
                     toUserList = (List<String>) toUsers;
@@ -93,23 +94,25 @@ public class EmailScriptMessageNotifier implements ScriptMessageNotifier {
 
                 EmailSenderAPI.send(mailSender, usingConfig,
                         new GenericNotifierParam().setToObjects(toUserList).addParameters(parameter), content);
+
+                MeterUtil.counter(execution_sdk_notifier_success, kind(), METHOD_SEND);
                 return null;
             });
         } catch (Exception e) {
-            MeterUtil.counter(execution_sdk_notifier_failure, DingtalkScriptMessageNotifier.class, METHOD_SEND);
+            MeterUtil.counter(execution_sdk_notifier_failure, kind(), METHOD_SEND);
             throw e;
         }
     }
 
     @Override
     public void update(@NotNull RefreshedInfo refreshed) {
-        MeterUtil.counter(execution_sdk_notifier_total, DingtalkScriptMessageNotifier.class, METHOD_UPDATE);
         try {
-            MeterUtil.timer(execution_sdk_notifier_time, DingtalkScriptMessageNotifier.class, METHOD_UPDATE, () -> {
+            MeterUtil.counter(execution_sdk_notifier_total, kind(), METHOD_UPDATE);
+            MeterUtil.timer(execution_sdk_notifier_time, kind(), METHOD_UPDATE, () -> {
                 ScriptMessageNotifier.super.update(refreshed);
 
                 // Initialze for config properties.
-                final EmailConfig config = parseJSON((String) refreshed.getAttributes().get(KEY_EMAIL_CONFIG), EmailConfig.class);
+                final EmailConfig config = parseJSON((String) refreshed.getAttributes().get(KEY_MAIL_CONFIG), EmailConfig.class);
                 notNull(config,
                         "Internal error! Please check the redis cache configuration data, email config json is required. refreshed: %s",
                         refreshed);
@@ -131,20 +134,24 @@ public class EmailScriptMessageNotifier implements ScriptMessageNotifier {
                         }
                     }
                 }
+
+                MeterUtil.counter(execution_sdk_notifier_success, kind(), METHOD_UPDATE);
                 return null;
             });
         } catch (Exception e) {
-            MeterUtil.counter(execution_sdk_notifier_failure, DingtalkScriptMessageNotifier.class, METHOD_UPDATE);
+            MeterUtil.counter(execution_sdk_notifier_failure, kind(), METHOD_UPDATE);
             throw e;
         }
     }
 
     @Override
     public RefreshedInfo refresh(Notification notification) {
-        MeterUtil.counter(execution_sdk_notifier_total, DingtalkScriptMessageNotifier.class, METHOD_REFRESH);
         try {
-            return MeterUtil.timer(execution_sdk_notifier_time, DingtalkScriptMessageNotifier.class, METHOD_REFRESH, () -> {
+            MeterUtil.counter(execution_sdk_notifier_total, kind(), METHOD_REFRESH);
+            return MeterUtil.timer(execution_sdk_notifier_time, kind(), METHOD_REFRESH, () -> {
                 final EmailConfig config = (EmailConfig) notification.getProperties();
+
+                MeterUtil.counter(execution_sdk_notifier_success, kind(), METHOD_REFRESH);
                 return RefreshedInfo.builder()
                         .notifierType(kind())
                         // .appKey(null)
@@ -154,16 +161,16 @@ public class EmailScriptMessageNotifier implements ScriptMessageNotifier {
                         // to never
                         // expire
                         .expireSeconds(Integer.MAX_VALUE)
-                        .attributes(singletonMap(KEY_EMAIL_CONFIG, toJSONString(config)))
+                        .attributes(singletonMap(KEY_MAIL_CONFIG, toJSONString(config)))
                         .build();
             });
         } catch (Exception e) {
-            MeterUtil.counter(execution_sdk_notifier_failure, DingtalkScriptMessageNotifier.class, METHOD_REFRESH);
+            MeterUtil.counter(execution_sdk_notifier_failure, kind(), METHOD_REFRESH);
             throw e;
         }
     }
 
-    public static final String KEY_EMAIL_CONFIG = "__KEY_" + EmailConfig.class.getSimpleName();
-    public static final String KEY_EMAIL_TO_USERS = "toUsers";
-    public static final String KEY_EMAIL_MSG = "emailMsgContent";
+    public static final String KEY_MAIL_CONFIG = "__KEY_" + EmailConfig.class.getSimpleName();
+    public static final String KEY_MAIL_TO_USERS = "toUsers";
+    public static final String KEY_MAIL_MSG = "msgContent";
 }

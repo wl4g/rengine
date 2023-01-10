@@ -20,6 +20,10 @@ import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_notifier_manager_failure;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_notifier_manager_time;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_notifier_manager_total;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_notifier_manager_success;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
@@ -54,6 +58,7 @@ import com.wl4g.rengine.executor.execution.ExecutionConfig;
 import com.wl4g.rengine.executor.execution.sdk.ScriptRedisLockClient;
 import com.wl4g.rengine.executor.execution.sdk.notifier.ScriptMessageNotifier.RefreshedInfo;
 import com.wl4g.rengine.executor.metrics.ExecutorMeterService;
+import com.wl4g.rengine.executor.metrics.MeterUtil;
 import com.wl4g.rengine.executor.repository.MongoRepository;
 
 import io.quarkus.arc.All;
@@ -107,10 +112,21 @@ public class GlobalMessageNotifierManager {
     }
 
     public ScriptMessageNotifier getMessageNotifier(final @NotNull NotifierKind notifierType) {
-        final ScriptMessageNotifier notifier = notifierMap.get(notNullOf(notifierType, "notifierType"));
-        notNull(notifier, "Unable to get notifier, please check if notifier of type %s is supported and implemented.",
-                notifierType);
-        return ensureRefreshed(notifier);
+        try {
+            MeterUtil.counter(execution_sdk_notifier_manager_total, notifierType, METHOD_GETMESSAGENOTIFIER);
+            return MeterUtil.timer(execution_sdk_notifier_manager_time, notifierType, METHOD_GETMESSAGENOTIFIER, () -> {
+                final ScriptMessageNotifier notifier = notifierMap.get(notNullOf(notifierType, "notifierType"));
+                notNull(notifier, "Unable to get notifier, please check if notifier of type %s is supported and implemented.",
+                        notifierType);
+
+                ensureRefreshed(notifier);
+                MeterUtil.counter(execution_sdk_notifier_manager_success, notifierType, METHOD_GETMESSAGENOTIFIER);
+                return notifier;
+            });
+        } catch (Exception e) {
+            MeterUtil.counter(execution_sdk_notifier_manager_failure, notifierType, METHOD_GETMESSAGENOTIFIER);
+            throw e;
+        }
     }
 
     /**
@@ -162,17 +178,34 @@ public class GlobalMessageNotifierManager {
     }
 
     RefreshedInfo loadRefreshed(NotifierKind notifierType) {
-        return parseJSON(redisStringCommands.get(buildRefreshedCachedKey(notifierType)), RefreshedInfo.class);
+        try {
+            MeterUtil.counter(execution_sdk_notifier_manager_total, notifierType, METHOD_LOADREFRESHED);
+            return MeterUtil.timer(execution_sdk_notifier_manager_time, notifierType, METHOD_LOADREFRESHED, () -> {
+                return parseJSON(redisStringCommands.get(buildRefreshedCachedKey(notifierType)), RefreshedInfo.class);
+            });
+        } catch (Exception e) {
+            MeterUtil.counter(execution_sdk_notifier_manager_failure, notifierType, METHOD_LOADREFRESHED);
+            throw e;
+        }
     }
 
     void saveRefreshed(RefreshedInfo refreshed) {
-        final int effectiveExpireSec = (int) (refreshed.getExpireSeconds()
-                * (1 - config.notifier().refreshedCachedExpireOffsetRate()));
-        // Sets effective expire.
-        refreshed.setEffectiveExpireSeconds(effectiveExpireSec);
+        try {
+            MeterUtil.counter(execution_sdk_notifier_manager_total, refreshed.getNotifierType(), METHOD_SAVEREFRESHED);
+            MeterUtil.timer(execution_sdk_notifier_manager_time, refreshed.getNotifierType(), METHOD_SAVEREFRESHED, () -> {
+                final int effectiveExpireSec = (int) (refreshed.getExpireSeconds()
+                        * (1 - config.notifier().refreshedCachedExpireOffsetRate()));
+                // Sets effective expire.
+                refreshed.setEffectiveExpireSeconds(effectiveExpireSec);
 
-        redisStringCommands.set(buildRefreshedCachedKey(refreshed.getNotifierType()), toJSONString(refreshed),
-                new SetArgs().px(Duration.ofSeconds(effectiveExpireSec)));
+                redisStringCommands.set(buildRefreshedCachedKey(refreshed.getNotifierType()), toJSONString(refreshed),
+                        new SetArgs().px(Duration.ofSeconds(effectiveExpireSec)));
+                return null;
+            });
+        } catch (Exception e) {
+            MeterUtil.counter(execution_sdk_notifier_manager_failure, refreshed.getNotifierType(), METHOD_SAVEREFRESHED);
+            throw e;
+        }
     }
 
     String buildRefreshedCachedKey(final @NotNull NotifierKind notifierType) {
@@ -182,12 +215,20 @@ public class GlobalMessageNotifierManager {
 
     @NotNull
     Notification findNotification(final @NotNull NotifierKind notifierType) {
-        final List<Notification> notifications = findNotifications(notifierType);
-        if (notifications.size() > 1) {
-            throw new ConfigRengineException(
-                    format("The multiple notification of the same type and name were found of %s", notifierType));
+        try {
+            MeterUtil.counter(execution_sdk_notifier_manager_total, notifierType, METHOD_FINDNOTIFICATION);
+            return MeterUtil.timer(execution_sdk_notifier_manager_time, notifierType, METHOD_FINDNOTIFICATION, () -> {
+                final List<Notification> notifications = findNotifications(notifierType);
+                if (notifications.size() > 1) {
+                    throw new ConfigRengineException(
+                            format("The multiple notification of the same type and name were found of %s", notifierType));
+                }
+                return notifications.get(0);
+            });
+        } catch (Exception e) {
+            MeterUtil.counter(execution_sdk_notifier_manager_failure, notifierType, METHOD_FINDNOTIFICATION);
+            throw e;
         }
-        return notifications.get(0);
     }
 
     @SuppressWarnings("unchecked")
@@ -217,4 +258,8 @@ public class GlobalMessageNotifierManager {
 
     static final String DEFAULT_LOCK_PREFIX = "notifier:";
 
+    static final String METHOD_GETMESSAGENOTIFIER = "getMessageNotifier";
+    static final String METHOD_LOADREFRESHED = "loadRefreshed";
+    static final String METHOD_SAVEREFRESHED = "saveRefreshed";
+    static final String METHOD_FINDNOTIFICATION = "findNotification";
 }

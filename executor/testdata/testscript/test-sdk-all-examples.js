@@ -23,7 +23,7 @@ function process(context) {
     //const mongoResult = testSdkForMongoSourceFacade(context);
 
     // for sdk case6:
-    //const jdbcResult = testSdkForJdbcSourceFacade(context);
+    const jdbcResult = testSdkForJdbcSourceFacade(context);
 
     // for sdk case7:
     //const redisResult = testSdkForRedisSourceFacade(context);
@@ -35,21 +35,24 @@ function process(context) {
     const dingtalkResult = testSdkForDingtalkNotifier(context);
 
     // for sdk case10:
-    const dateHolderResult = testSdkForDateHolder(context);
+    const emailResult = testSdkForEmailNotifier(context);
 
     // for sdk case11:
-    const codingResult = testSdkForCoding(context);
+    const dateHolderResult = testSdkForDateHolder(context);
 
     // for sdk case12:
-    const hashingResult = testSdkForHashing(context);
+    const codingResult = testSdkForCoding(context);
 
     // for sdk case13:
-    const aesResult = testSdkForAES(context);
+    const hashingResult = testSdkForHashing(context);
 
     // for sdk case14:
-    const rsaResult = testSdkForRSA(context);
+    const aesResult = testSdkForAES(context);
 
     // for sdk case15:
+    const rsaResult = testSdkForRSA(context);
+
+    // for sdk case16:
     //testSdkForExecutorTasks(context);
 
     return new ScriptResult(true)
@@ -59,9 +62,10 @@ function process(context) {
         //.addValue("lockResult", lockResult)
         //.addValue("mongoResult", mongoResult)
         //.addValue("redisResult", redisResult)
-        //.addValue("jdbcResult", jdbcResult)
+        .addValue("jdbcResult", jdbcResult)
         //.addValue("kafkaResult", kafkaResult)
         .addValue("dingtalkResult", dingtalkResult)
+        .addValue("emailResult", emailResult)
         .addValue("dateHolderResult", dateHolderResult)
         .addValue("codingResult", codingResult)
         .addValue("hashingResult", hashingResult)
@@ -191,7 +195,6 @@ function testSdkForKafkaSourceFacade(context) {
 
 function testSdkForDingtalkNotifier(context) {
     try {
-        const topic = "test_topic";
         console.info("dingtalkNotifier ...");
         const dingtalkNotifier = context.getDataService().getMessageNotifier("DINGTALK");
         console.info("dingtalkNotifier: " + dingtalkNotifier);
@@ -203,10 +206,30 @@ function testSdkForDingtalkNotifier(context) {
             //"robotCode": "dingbhyrzjxx6qjhjcdr"
         };
         const notifierResult = dingtalkNotifier.send(parameter);
-        console.info("notifierResult: " + notifierResult);
+        console.info("dingtalkNotifierResult: " + notifierResult);
         return notifierResult;
     } catch(e) {
         console.error("DingtalkNotifier >>>", e);
+    }
+}
+
+function testSdkForEmailNotifier(context) {
+    try {
+        console.info("emailNotifier ...");
+        const emailNotifier = context.getDataService().getMessageNotifier("EMAIL");
+        console.info("emailNotifier: " + emailNotifier);
+
+        const parameter = {
+            "msgType": "MIME",
+            "subject": "Testing Sender",
+            "toUsers": "983708408@qq.com",
+            "msgContent": "This testing <b>MIME<b> message!!!</br><font color=red>It's is red font.</font>"
+        };
+        const result = emailNotifier.send(parameter);
+        console.info("emailNotifierResult: " + result);
+        return result;
+    } catch(e) {
+        console.error("EmailNotifier >>>", e);
     }
 }
 

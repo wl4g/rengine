@@ -16,6 +16,7 @@
 package com.wl4g.rengine.common.constants;
 
 import static java.lang.String.format;
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.equalsAnyIgnoreCase;
 
 import com.wl4g.infra.common.lang.EnvironmentUtil;
@@ -130,12 +131,20 @@ public abstract class RengineConstants extends EnvironmentUtil {
         private final boolean isWriteConcernSafe;
 
         public static MongoCollectionDefinition of(String type) {
+            final MongoCollectionDefinition collection = safeOf(type);
+            if (nonNull(collection)) {
+                return null;
+            }
+            throw new IllegalArgumentException(format("Invalid Mongo collection type for '%s'", type));
+        }
+
+        public static MongoCollectionDefinition safeOf(String type) {
             for (MongoCollectionDefinition a : values()) {
                 if (equalsAnyIgnoreCase(type, a.name(), a.getName())) {
                     return a;
                 }
             }
-            throw new IllegalArgumentException(format("Invalid Mongo collection type for '%s'", type));
+            return null;
         }
 
     }

@@ -21,6 +21,9 @@ import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_datasource_manager_failure;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_datasource_manager_time;
+import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_datasource_manager_total;
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.isNull;
@@ -57,6 +60,7 @@ import com.wl4g.rengine.common.util.BsonEntitySerializers;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
 import com.wl4g.rengine.executor.execution.sdk.datasource.DataSourceFacade.DataSourceFacadeBuilder;
 import com.wl4g.rengine.executor.metrics.ExecutorMeterService;
+import com.wl4g.rengine.executor.metrics.MeterUtil;
 import com.wl4g.rengine.executor.repository.MongoRepository;
 
 import io.quarkus.arc.All;
@@ -115,35 +119,45 @@ public final class GlobalDataSourceManager {
     public <T extends DataSourceFacade> T loadDataSource(
             final @NotNull DataSourceType dataSourceType,
             final @NotBlank String dataSourceName) {
-        notNullOf(dataSourceType, "dataSourceType");
-        hasTextOf(dataSourceName, "dataSourceName");
+        try {
+            MeterUtil.counter(execution_sdk_datasource_manager_total, dataSourceName, dataSourceType, METHOD_LOADDATASOURCE);
+            return MeterUtil.timer(execution_sdk_datasource_manager_time, dataSourceName, dataSourceType, METHOD_LOADDATASOURCE,
+                    () -> {
+                        notNullOf(dataSourceType, "dataSourceType");
+                        hasTextOf(dataSourceName, "dataSourceName");
 
-        Map<String, DataSourceFacade> dataSourceFacades = dataSourceCaches.get(dataSourceType);
-        if (isNull(dataSourceFacades)) {
-            synchronized (dataSourceType) {
-                dataSourceFacades = dataSourceCaches.get(dataSourceType);
-                if (isNull(dataSourceFacades)) {
-                    dataSourceCaches.put(dataSourceType, dataSourceFacades = new ConcurrentHashMap<>(4));
-                }
-            }
+                        Map<String, DataSourceFacade> dataSourceFacades = dataSourceCaches.get(dataSourceType);
+                        if (isNull(dataSourceFacades)) {
+                            synchronized (dataSourceType) {
+                                dataSourceFacades = dataSourceCaches.get(dataSourceType);
+                                if (isNull(dataSourceFacades)) {
+                                    dataSourceCaches.put(dataSourceType, dataSourceFacades = new ConcurrentHashMap<>(4));
+                                }
+                            }
+                        }
+
+                        DataSourceFacade dataSourceFacade = dataSourceFacades.get(dataSourceName);
+                        if (isNull(dataSourceFacade)) {
+                            synchronized (dataSourceName) {
+                                dataSourceFacade = dataSourceFacades.get(dataSourceName);
+                                if (isNull(dataSourceFacade)) {
+                                    final DataSourceFacadeBuilder builder = notNull(builderMap.get(dataSourceType),
+                                            "Unsupported to data source facade handler type of : %s/%s", dataSourceType,
+                                            dataSourceName);
+                                    // New init data source facade.
+                                    dataSourceFacades.put(dataSourceName, dataSourceFacade = builder.newInstnace(config,
+                                            dataSourceName, findDataSourceProperties(dataSourceType, dataSourceName)));
+                                }
+                            }
+                        }
+
+                        log.debug("Determined source facade : {} of : {}", dataSourceFacade, dataSourceName);
+                        return (T) dataSourceFacade;
+                    });
+        } catch (Exception e) {
+            MeterUtil.counter(execution_sdk_datasource_manager_failure, dataSourceName, dataSourceType, METHOD_LOADDATASOURCE);
+            throw e;
         }
-
-        DataSourceFacade dataSourceFacade = dataSourceFacades.get(dataSourceName);
-        if (isNull(dataSourceFacade)) {
-            synchronized (dataSourceName) {
-                dataSourceFacade = dataSourceFacades.get(dataSourceName);
-                if (isNull(dataSourceFacade)) {
-                    final DataSourceFacadeBuilder builder = notNull(builderMap.get(dataSourceType),
-                            "Unsupported to data source facade handler type of : %s/%s", dataSourceType, dataSourceName);
-                    // New init data source facade.
-                    dataSourceFacades.put(dataSourceName, dataSourceFacade = builder.newInstnace(config, dataSourceName,
-                            findDataSourceProperties(dataSourceType, dataSourceName)));
-                }
-            }
-        }
-
-        log.debug("Determined source facade : {} of : {}", dataSourceFacade, dataSourceName);
-        return (T) dataSourceFacade;
     }
 
     @SuppressWarnings("unchecked")
@@ -185,4 +199,5 @@ public final class GlobalDataSourceManager {
         }
     }
 
+    static final String METHOD_LOADDATASOURCE = "loadDataSource";
 }
