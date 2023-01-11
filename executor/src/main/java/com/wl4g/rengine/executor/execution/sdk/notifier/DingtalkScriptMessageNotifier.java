@@ -17,6 +17,10 @@ package com.wl4g.rengine.executor.execution.sdk.notifier;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.infra.common.lang.Assert2.notNull;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
+import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_notifier_failure;
 import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_notifier_success;
 import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_notifier_time;
@@ -29,10 +33,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import javax.inject.Singleton;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.wl4g.infra.common.collection.CollectionUtils2;
 import com.wl4g.infra.common.notification.MessageNotifier.NotifierKind;
 import com.wl4g.infra.common.notification.dingtalk.DingtalkMessageNotifier;
@@ -76,23 +82,20 @@ public class DingtalkScriptMessageNotifier implements ScriptMessageNotifier {
         try {
             MeterUtil.counter(execution_sdk_notifier_total, kind(), METHOD_SEND);
             return MeterUtil.timer(execution_sdk_notifier_time, kind(), METHOD_SEND, () -> {
+                final DingtalkConfig config = loadCurrentDingtalkConfig();
+
+                // Gets request parameters.
                 final String accessToken = getRequiredRefreshed().getAccessToken();
                 final String msgKey = (String) parameter.getOrDefault(DingtalkMessageNotifier.KEY_MSG_KEY,
                         MsgKeyType.sampleMarkdown.name());
                 final String msgParam = (String) parameter.get(DingtalkMessageNotifier.KEY_MSG_PARAM);
 
-                // Gets default configuration properties.
-                final Map<String, Object> attributes = getRequiredRefreshed().getAttributes();
-
                 // The following parameters are optional and default
-                // values
-                // are
-                // supported.
-                final String openConversationId = (String) parameter.getOrDefault(
-                        DingtalkMessageNotifier.KEY_OPEN_CONVERSATION_ID,
-                        attributes.get(DingtalkMessageNotifier.KEY_OPEN_CONVERSATION_ID));
+                // values are supported.
+                final String openConversationId = (String) parameter
+                        .getOrDefault(DingtalkMessageNotifier.KEY_OPEN_CONVERSATION_ID, config.getDefaultOpenConversationId());
                 final String robotCode = (String) parameter.getOrDefault(DingtalkMessageNotifier.KEY_ROBOT_CODE,
-                        attributes.get(DingtalkMessageNotifier.KEY_ROBOT_CODE));
+                        config.getDefaultRobotCode());
 
                 hasTextOf(accessToken, "acccessToken");
                 hasTextOf(msgKey, "msgKey");
@@ -120,32 +123,27 @@ public class DingtalkScriptMessageNotifier implements ScriptMessageNotifier {
         try {
             MeterUtil.counter(execution_sdk_notifier_total, kind(), METHOD_CREATESCENEGROUPV2);
             return MeterUtil.timer(execution_sdk_notifier_time, kind(), METHOD_CREATESCENEGROUPV2, () -> {
+                final DingtalkConfig config = loadCurrentDingtalkConfig();
+
+                // Gets request parameters.
                 final String accessToken = getRequiredRefreshed().getAccessToken();
-
-                // Gets default configuration properties.
-                final Map<String, Object> attributes = getRequiredRefreshed().getAttributes();
-
-                final List<String> defaultScenesGroupV2AdminUserIds = safeArrayToList(
-                        split((String) attributes.get(DingtalkMessageNotifier.KEY_SCENES_GROUP_V2_ADMIN_USER_IDS), ","));
-                final List<String> defaultScenesGroupV2UserIds = safeArrayToList(
-                        split((String) attributes.get(DingtalkMessageNotifier.KEY_SCENES_GROUP_V2_USER_IDS), ","));
 
                 // The following parameters are optional and default
                 // values are supported.
                 String templateId = request.getTemplate_id();
                 if (isBlank(templateId)) {
-                    templateId = (String) attributes.get(DingtalkMessageNotifier.KEY_SCENES_GROUP_V2_TEMPLATE_ID);
+                    templateId = config.getDefaultScenesGroupV2TemplateId();
                 }
                 // group admin users.
                 List<String> adminUserIds = safeArrayToList(split(request.getSubadmin_ids(), ","));
                 if (CollectionUtils2.isEmpty(adminUserIds)) {
-                    adminUserIds = defaultScenesGroupV2AdminUserIds;
+                    adminUserIds = config.getDefaultScenesGroupV2AdminUserIds();
                     request.setSubadmin_ids(join(adminUserIds, ","));
                 }
                 // group users.
                 List<String> userIds = safeArrayToList(split(request.getUser_ids(), ","));
                 if (CollectionUtils2.isEmpty(userIds)) {
-                    userIds = defaultScenesGroupV2UserIds;
+                    userIds = config.getDefaultScenesGroupV2UserIds();
                     request.setUser_ids(join(userIds, ","));
                 }
                 // group owner user.
@@ -170,6 +168,30 @@ public class DingtalkScriptMessageNotifier implements ScriptMessageNotifier {
             MeterUtil.counter(execution_sdk_notifier_failure, kind(), METHOD_CREATESCENEGROUPV2);
             throw e;
         }
+    }
+
+    public Map<String, String> processCallback(
+            final @NotNull Map<String, String> parameter,
+            final @NotNull Consumer<JsonNode> process) {
+        notNullOf(parameter, "parameter");
+        final String signature = parameter.get("signature");
+        final String timestamp = parameter.get("timestamp");
+        final String nonce = parameter.get("nonce");
+        final String bodyJson = parameter.get("nonce");
+        final DingtalkConfig config = loadCurrentDingtalkConfig().validate(true);
+        return DingtalkAPI.getInstance()
+                .processCallback(config.getToken(), config.getAesKey(), config.getCorpId(), signature, timestamp, nonce, bodyJson,
+                        process);
+    }
+
+    private DingtalkConfig loadCurrentDingtalkConfig() {
+        // Load current effective dingtalk config.
+        final DingtalkConfig config = parseJSON((String) getRequiredRefreshed().getAttributes().get(KEY_DINGTALK_CONFIG),
+                DingtalkConfig.class);
+        notNull(config,
+                "Internal error! Please check the redis cache configuration data, email config json is required. refreshed: %s",
+                getRefreshed());
+        return config;
     }
 
     @Override
@@ -199,13 +221,7 @@ public class DingtalkScriptMessageNotifier implements ScriptMessageNotifier {
 
                 // Sets default configuration properties.
                 final Map<String, Object> attributes = new HashMap<>();
-                attributes.put(DingtalkMessageNotifier.KEY_OPEN_CONVERSATION_ID, config.getDefaultOpenConversationId());
-                attributes.put(DingtalkMessageNotifier.KEY_ROBOT_CODE, config.getDefaultRobotCode());
-                attributes.put(DingtalkMessageNotifier.KEY_SCENES_GROUP_V2_TEMPLATE_ID,
-                        config.getDefaultScenesGroupV2TemplateId());
-                attributes.put(DingtalkMessageNotifier.KEY_SCENES_GROUP_V2_ADMIN_USER_IDS,
-                        config.getDefaultScenesGroupV2AdminUserIds());
-                attributes.put(DingtalkMessageNotifier.KEY_SCENES_GROUP_V2_USER_IDS, config.getDefaultScenesGroupV2UserIds());
+                attributes.put(KEY_DINGTALK_CONFIG, toJSONString(config));
 
                 MeterUtil.counter(execution_sdk_notifier_success, kind(), METHOD_REFRESH);
                 return RefreshedInfo.builder()
@@ -222,5 +238,11 @@ public class DingtalkScriptMessageNotifier implements ScriptMessageNotifier {
             throw e;
         }
     }
+
+    public static final String KEY_DINGTALK_CONFIG = DingtalkConfig.class.getName();
+
+    public static final String KEY_TOKEN = "token";
+    public static final String KEY_AES_KEY = "aesKey";
+    public static final String KEY_CORP_ID = "corpId";
 
 }

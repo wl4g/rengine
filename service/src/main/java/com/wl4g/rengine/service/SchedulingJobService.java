@@ -36,7 +36,7 @@ import com.wl4g.rengine.service.model.SaveSchedulingJobResult;
 public interface SchedulingJobService {
 
     default SchedulingJob get(@NotNull Long id) {
-        final var result = query(QuerySchedulingJob.builder().id(id).build());
+        final var result = query(QuerySchedulingJob.builder().jobId(id).build());
         return safeList(result.getRecords()).isEmpty() ? null : result.getRecords().get(0);
     }
 

@@ -40,7 +40,6 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 @NoArgsConstructor
 public abstract class QueryBase<Q> {
-    private @Nullable Long id;
     private @Nullable String name;
     private @Nullable String orgCode;
     private @Nullable List<String> labels;

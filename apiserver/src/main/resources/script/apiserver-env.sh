@@ -69,9 +69,11 @@ APP_USER_HOME="/home/${APP_USER}"
 LIB_DIR_NAME="lib"
 DATA_DIR="/mnt/disk1/${APP_NAME}"
 LOG_DIR="/mnt/disk1/log/${APP_NAME}"
-# Standard out logfile.
-#OUT_FILE="${LOG_DIR}/${APP_NAME}.out"
-OUT_FILE="/dev/null"
+
+# Standard out and err logfile.
+#STDOUT_FILE="/dev/null"
+STDOUT_FILE="${LOG_DIR}/${APP_NAME}.stdout"
+STDERR_FILE="${LOG_DIR}/${APP_NAME}.stderr"
 
 # Note that "java -cp" is in order. See: https://www.jianshu.com/p/23e0517d76f7
 # and https://docs.oracle.com/javase/8/docs/technotes/tools/unix/classpath.html

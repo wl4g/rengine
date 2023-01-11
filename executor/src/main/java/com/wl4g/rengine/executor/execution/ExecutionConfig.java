@@ -41,6 +41,9 @@ import io.smallrye.config.WithDefault;
 public interface ExecutionConfig {
 
     @NotNull
+    ServiceConfig service();
+
+    @NotNull
     EngineConfig engine();
 
     @NotNull
@@ -48,6 +51,24 @@ public interface ExecutionConfig {
 
     @NotNull
     NotifierConfig notifier();
+
+    /**
+     * @see {@link com.wl4g.rengine.service.config.RengineServiceProperties.ServiceProperties}
+     */
+    public static interface ServiceConfig {
+
+        @WithDefault(DEFAULT_DICT_CACHED_PREFIX)
+        @NotBlank
+        String dictCachedPrefix();
+
+        @WithDefault(DEFAULT_DICT_CACHED_EXPIRE + "")
+        @NotNull
+        @Min(0)
+        Long dictCachedExpire();
+
+        public static final String DEFAULT_DICT_CACHED_PREFIX = "rengine:executor:service:dict";
+        public static final long DEFAULT_DICT_CACHED_EXPIRE = 24 * 60 * 60 * 1000; // 24h
+    }
 
     public static interface EngineConfig {
         @WithDefault(DEFAULT_EXECUTOR_THREAD_POOLS + "")
@@ -88,6 +109,14 @@ public interface ExecutionConfig {
         @Min(0)
         @Max(10_0000)
         Integer maxQueryBatch();
+
+        public static final String DEFAULT_SCENES_RULES_CACHED_PREFIX = "rengine:executor:engine:scenes:rules:";
+        public static final long DEFAULT_SCENES_RULES_CACHED_EXPIRE = 15 * 60 * 1000; // 15m
+        public static final int DEFAULT_EXECUTOR_THREAD_POOLS = 10;
+        public static final int DEFAULT_EXECUTOR_ACCEPT_QUEUE = 10;
+        public static final int DEFAULT_PER_EXECUTOR_THREAD_POOLS = 2;
+        public static final int DEFAULT_MAX_QUERY_BATCH = 1024;
+        public static final float DEFAULT_TIMEOUT_OFFSET_RATE = 0.1f;
     }
 
     public static interface ScriptLogConfig {
@@ -112,6 +141,13 @@ public interface ExecutionConfig {
         @WithDefault(DEFAULT_SCRIPT_LOG_UPLOADER_CRON)
         @NotBlank
         String uploaderCron();
+
+        public static final String DEFAULT_SCRIPT_LOG_BASE_DIR = "/tmp/__rengine_script_log";
+        public static final boolean DEFAULT_SCRIPT_LOG_ENABLE_CONSOLE = true;
+        public static final int DEFAULT_SCRIPT_LOG_FILE_MAX_SIZE = 512 * 1024 * 1024;
+        public static final int DEFAULT_SCRIPT_LOG_FILE_MAX_COUNT = 10;
+        public static final String DEFAULT_SCRIPT_LOG_UPLOADER_CRON = "0 1 * * * * ?";
+
     }
 
     public static interface NotifierConfig {
@@ -130,23 +166,10 @@ public interface ExecutionConfig {
         @Min(0)
         @Max(1)
         Float refreshedCachedExpireOffsetRate();
+
+        public static final long DEFAULT_NOTIFIER_REFRESH_LOCK_TIMEOUT = 60 * 1000L;
+        public static final String DEFAULT_NOTIFIER_REFRESHED_CACHED_PREFIX = "rengine:executor:sdk:notifier:refreshed:";
+        public static final float DEFAULT_NOTIFIER_EXPIRE_OFFSET_RATE = 0.1f;
     }
 
-    public static final String DEFAULT_SCENES_RULES_CACHED_PREFIX = "rengine:executor:scenes:rules:";
-    public static final long DEFAULT_SCENES_RULES_CACHED_EXPIRE = 15 * 60 * 1000;
-    public static final int DEFAULT_EXECUTOR_THREAD_POOLS = 10;
-    public static final int DEFAULT_EXECUTOR_ACCEPT_QUEUE = 10;
-    public static final int DEFAULT_PER_EXECUTOR_THREAD_POOLS = 2;
-    public static final int DEFAULT_MAX_QUERY_BATCH = 1024;
-    public static final float DEFAULT_TIMEOUT_OFFSET_RATE = 0.1f;
-
-    public static final String DEFAULT_SCRIPT_LOG_BASE_DIR = "/tmp/__rengine_script_log";
-    public static final boolean DEFAULT_SCRIPT_LOG_ENABLE_CONSOLE = true;
-    public static final int DEFAULT_SCRIPT_LOG_FILE_MAX_SIZE = 512 * 1024 * 1024;
-    public static final int DEFAULT_SCRIPT_LOG_FILE_MAX_COUNT = 10;
-    public static final String DEFAULT_SCRIPT_LOG_UPLOADER_CRON = "0 1 * * * * ?";
-
-    public static final long DEFAULT_NOTIFIER_REFRESH_LOCK_TIMEOUT = 60 * 1000L;
-    public static final String DEFAULT_NOTIFIER_REFRESHED_CACHED_PREFIX = "rengine:executor:sdk:notifier:refreshed:";
-    public static final float DEFAULT_NOTIFIER_EXPIRE_OFFSET_RATE = 0.1f;
 }

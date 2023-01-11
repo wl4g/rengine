@@ -13,14 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.service.model;
+package com.wl4g.rengine.common.entity;
+
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static java.lang.String.valueOf;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotBlank;
 
-import com.wl4g.infra.common.validation.EnumValue;
-import com.wl4g.rengine.common.entity.IdentityProvider.IdPKind;
+import com.wl4g.infra.common.bean.BaseBean;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,10 +30,10 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link QueryIdentityProvider}
+ * {@link Dict}
  * 
  * @author James Wong
- * @version 2022-08-28
+ * @version 2022-09-13
  * @since v1.0.0
  */
 @Getter
@@ -39,9 +41,27 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class QueryIdentityProvider {
-    @Schema(implementation = IdPKind.class)
-    @Nullable
-    @EnumValue(enumCls = IdPKind.class)
-    String kind;
+public class Dict extends BaseBean {
+    private static final long serialVersionUID = -5762348176963349685L;
+
+    private @NotBlank DictType type;
+    private @NotBlank String key;
+    private @NotBlank String value;
+    private @Nullable Integer sort;
+
+    public static String buildCacheHashKey(@NotBlank String type, @NotBlank String key) {
+        hasTextOf(type, "type");
+        hasTextOf(key, "key");
+        return valueOf(type).concat(":").concat(key);
+    }
+
+    public static enum DictType {
+
+        API_CONFIG_DEFINITION,
+
+        ENGINE_EXECUTION_CUSTOM_RESP_TPL,
+
+        OTHER_TYPE;
+    }
+
 }

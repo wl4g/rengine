@@ -15,12 +15,8 @@
  */
 package com.wl4g.rengine.service.model;
 
-import javax.annotation.Nullable;
+import com.wl4g.rengine.common.entity.Dict;
 
-import com.wl4g.infra.common.validation.EnumValue;
-import com.wl4g.rengine.common.entity.IdentityProvider.IdPKind;
-
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,7 +24,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link QueryIdentityProvider}
+ * {@link SaveDict}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -39,9 +35,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class QueryIdentityProvider {
-    @Schema(implementation = IdPKind.class)
-    @Nullable
-    @EnumValue(enumCls = IdPKind.class)
-    String kind;
+public class SaveDict extends Dict {
+    private static final long serialVersionUID = 1L;
 }

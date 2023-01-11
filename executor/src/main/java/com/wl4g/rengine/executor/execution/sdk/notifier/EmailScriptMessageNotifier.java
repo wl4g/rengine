@@ -170,7 +170,7 @@ public class EmailScriptMessageNotifier implements ScriptMessageNotifier {
         }
     }
 
-    public static final String KEY_MAIL_CONFIG = "__KEY_" + EmailConfig.class.getSimpleName();
+    public static final String KEY_MAIL_CONFIG = EmailConfig.class.getName();
     public static final String KEY_MAIL_TO_USERS = "toUsers";
     public static final String KEY_MAIL_MSG = "msgContent";
 }

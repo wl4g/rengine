@@ -161,7 +161,7 @@ COMMAND=\$1
 function start(){
   PIDS=\$(getPids) # Get current process code.
   if [ -z "\$PIDS" ]; then
-    nohup $EXEC_CMD > $OUT_FILE 2>&1 < /dev/null &
+    nohup $EXEC_CMD 1> $STDOUT_FILE 2>$STDERR_FILE < /dev/null &
 
     echo -n "$APP_NAME starting ..."
     while true

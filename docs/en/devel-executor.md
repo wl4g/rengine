@@ -90,7 +90,7 @@ curl -v localhost:28002/metrics
 ```bash
 curl -v -XPOST \
 -H 'Content-Type: application/json' \
-'localhost:28002/execution/execute' \
+'localhost:28002/execution/execute/sdk' \
 -d '{
   "requestId": "b9bc3e0e-d705-4ff2-9edf-970dcf95dea5",
   "clientId": "JVqEpEwIaqkEkeD5",
@@ -104,12 +104,12 @@ curl -v -XPOST \
   }
 }'
 
-- Testing for API execute-wrapper(POST)
+- Testing for API execute/generic (POST)
 
 ```bash
 curl -v -XPOST \
 -H 'Content-Type: application/json' \
-'localhost:28002/execution/execute-wrapper' \
+'localhost:28002/execution/execute/generic' \
 -d '{
   "requestId": "b9bc3e0e-d705-4ff2-9edf-970dcf95dea5",
   "clientId": "JVqEpEwIaqkEkeD5",
@@ -124,13 +124,13 @@ curl -v -XPOST \
 }'
 ```
 
-- Testing for API execute-wrapper(GET)
+- Testing for API execute/generic (GET)
 
 ```bash
 
 echo '{"foo":"bar"}' | base64 -w 9999
 
-curl -s "localhost:28002/execution/execute-wrapper?\
+curl -s "localhost:28002/execution/execute/generic?\
 clientId=JVqEpEwIaqkEkeD5\
 &clientSecret=Uf6nJDyJQHKRP43ycl9vZ9zs7s1nyu77\
 &scenesCodes=ecommerce_trade_gift\

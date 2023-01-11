@@ -237,7 +237,7 @@ public class GlobalMessageNotifierManager {
         notNullOf(notifierTypes, "notifierTypes");
 
         final MongoCollection<Document> collection = mongoRepository
-                .getCollection(MongoCollectionDefinition.SYS_NOTIFICATION_CONFIG);
+                .getCollection(MongoCollectionDefinition.SYS_NOTIFICATIONS);
 
         try (final MongoCursor<Notification> cursor = collection.find(Filters.and(Filters.in("properties.type", notifierTypes)))
                 .batchSize(2)

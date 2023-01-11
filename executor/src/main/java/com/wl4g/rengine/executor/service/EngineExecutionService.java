@@ -41,6 +41,6 @@ public interface EngineExecutionService {
 
     Uni<RespBase<ExecuteResult>> execute(final @Valid @NotNull ExecuteRequest model);
 
-    List<ScenesWrapper> findScenesWorkflowGraphRules(@NotEmpty List<String> scenesCodes, @Min(1) @Max(1024) int revisions);
+    Uni<List<ScenesWrapper>> findScenesWorkflowGraphRules(@NotEmpty List<String> scenesCodes, @Min(1) @Max(1024) int revisions);
 
 }

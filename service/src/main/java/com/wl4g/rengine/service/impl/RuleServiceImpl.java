@@ -19,6 +19,7 @@ import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isCriteria;
+import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
 import static java.util.Objects.isNull;
 
 import java.util.List;
@@ -58,8 +59,8 @@ public class RuleServiceImpl implements RuleService {
 
     @Override
     public PageHolder<Rule> query(QueryRule model) {
-        Query query = new Query(andCriteria(baseCriteria(model), isCriteria("_id", model.getRuleId()),
-                isCriteria("scenesId", model.getScenesId())));
+        Query query = new Query(
+                andCriteria(baseCriteria(model), isIdCriteria(model.getRuleId()), isCriteria("scenesId", model.getScenesId())));
 
         query.with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
 

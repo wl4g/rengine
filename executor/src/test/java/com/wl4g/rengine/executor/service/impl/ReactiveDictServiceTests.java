@@ -16,33 +16,37 @@
 package com.wl4g.rengine.executor.service.impl;
 
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
-import static java.util.Collections.singletonList;
+import static java.util.Objects.isNull;
 
+import java.time.Duration;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.RepeatedTest;
 
-import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
-import com.wl4g.rengine.executor.service.EngineExecutionService;
+import com.wl4g.rengine.common.entity.Dict;
+import com.wl4g.rengine.common.entity.Dict.DictType;
 import com.wl4g.rengine.executor.util.TestDefaultBaseSetup;
+import com.wl4g.rengine.executor.util.TestDefaultRedisSetup;
 
 import io.quarkus.redis.datasource.ReactiveRedisDataSource;
+import io.quarkus.redis.datasource.ScanArgs;
 import io.quarkus.redis.datasource.bitmap.ReactiveBitMapCommands;
 import io.quarkus.redis.datasource.geo.ReactiveGeoCommands;
 import io.quarkus.redis.datasource.hash.ReactiveHashCommands;
+import io.quarkus.redis.datasource.hash.ReactiveHashScanCursor;
 import io.quarkus.redis.datasource.hyperloglog.ReactiveHyperLogLogCommands;
 import io.quarkus.redis.datasource.keys.ReactiveKeyCommands;
 import io.quarkus.redis.datasource.list.ReactiveListCommands;
 import io.quarkus.redis.datasource.pubsub.ReactivePubSubCommands;
 import io.quarkus.redis.datasource.set.ReactiveSetCommands;
 import io.quarkus.redis.datasource.sortedset.ReactiveSortedSetCommands;
-import io.quarkus.redis.datasource.string.GetExArgs;
 import io.quarkus.redis.datasource.string.ReactiveStringCommands;
-import io.quarkus.redis.datasource.string.SetArgs;
 import io.quarkus.redis.datasource.transactions.OptimisticLockingTransactionResult;
 import io.quarkus.redis.datasource.transactions.ReactiveTransactionalRedisDataSource;
 import io.quarkus.redis.datasource.transactions.TransactionResult;
@@ -52,50 +56,73 @@ import io.vertx.mutiny.redis.client.Redis;
 import io.vertx.mutiny.redis.client.Response;
 
 /**
- * {@link EvaluatorServiceTests}
+ * {@link ReactiveDictServiceTests}
  * 
  * @author James Wong
  * @version 2022-09-27
  * @since v1.0.0
  */
-// @QuarkusTest
-// @ExtendWith(MockitoExtension.class)
-// @QuarkusTestResource(value = MongoTestResource.class, initArgs =
-// @ResourceArg(name = MongoTestResource.PORT, value = "27017"))
-public class EvaluatorServiceTests {
+public class ReactiveDictServiceTests {
 
-    // @Mock
-    // @org.mockito.Mock
-    // @InjectMock(convertScopes = true)
-    EngineExecutionService engineExecutionService;
+    static ReactiveDictServiceImpl dictService;
 
-    @Before
     public void setup() {
-        // MockitoAnnotations.openMocks(this);
-        // JobService mock = Mockito.mock(JobService.class);
-        // QuarkusMock.installMockForType(mock, JobService.class);
-
-        // Manual setup/inject depends.
-        final EngineExecutionServiceImpl evaluatorService = new EngineExecutionServiceImpl(testNullReactiveRedisDataSource);
-        evaluatorService.mongoRepository = TestDefaultBaseSetup.createMongoRepository();
-        evaluatorService.config = TestDefaultBaseSetup.createExecutionConfig();
-        this.engineExecutionService = evaluatorService;
+        if (isNull(dictService)) {
+            synchronized (ReactiveDictServiceTests.class) {
+                if (isNull(dictService)) {
+                    dictService = new ReactiveDictServiceImpl();
+                    dictService.config = TestDefaultBaseSetup.createExecutionConfig();
+                    dictService.mongoRepository = TestDefaultBaseSetup.createMongoRepository();
+                    // dictService.reactiveRedisDS =
+                    // mockReactiveRedisDataSource;
+                    dictService.reactiveRedisDS = TestDefaultRedisSetup.buildRedisDataSourceDefault().getReactive();
+                    System.out.println("Init ...");
+                    dictService.init();
+                }
+            }
+        }
     }
 
     @Test
-    public void testFindScenesWorkflowGraphRules() {
+    public void testSerialzeDicts() {
+        setup();
+
+        final var dict1 = Dict.builder()
+                .id(6305460145405952L)
+                .type(DictType.ENGINE_EXECUTION_CUSTOM_RESP_TPL)
+                .key("dingtalk")
+                .value("{\"msg_signature\":\"%s\",\"timeStamp\":\"%s\",\"nonce\":\"%s\",\"encrypt\":\"%s\"}")
+                .sort(1)
+                .createBy(1L)
+                .createDate(new Date())
+                .build();
+        System.out.println(toJSONString(dict1));
+    }
+
+    @Test
+    @RepeatedTest(5)
+    public void testFindDicts() {
+        setup();
+
         try {
-            List<ScenesWrapper> sceneses = engineExecutionService.findScenesWorkflowGraphRules(singletonList("ecommerce_trade_gift"),
-                    1);
-            System.out.println(toJSONString(sceneses, true));
+            Uni<List<Dict>> dictsUni = dictService.findDicts(DictType.ENGINE_EXECUTION_CUSTOM_RESP_TPL,
+                    "dingtalk" /* null */);
+
+            System.out.println("Await for " + dictsUni + " ...");
+            System.out.println("----------------");
+
+            final var dicts = dictsUni.await().atMost(Duration.ofSeconds(60));
+            System.out.println(toJSONString(dicts, true));
+            assert !dicts.isEmpty();
+
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
         }
     }
 
-    final static String testNullScenesesJson = null;
-    final static ReactiveRedisDataSource testNullReactiveRedisDataSource = new ReactiveRedisDataSource() {
+    final static String mockDict1Json = "{\"id\":6305460145405952,\"orgCode\":null,\"enable\":null,\"labels\":null,\"remark\":null,\"createBy\":1,\"createDate\":\"2023-01-14 23:07:15\",\"updateBy\":null,\"updateDate\":null,\"delFlag\":null,\"humanCreateDate\":null,\"humanUpdateDate\":null,\"type\":\"ENGINE_EXECUTION_CUSTOM_RESP_TPL\",\"key\":\"dingtalk\",\"value\":\"{\\\"msg_signature\\\":\\\"%s\\\",\\\"timeStamp\\\":\\\"%s\\\",\\\"nonce\\\":\\\"%s\\\",\\\"encrypt\\\":\\\"%s\\\"}\",\"sort\":1}";
+    final static ReactiveRedisDataSource mockReactiveRedisDataSource = new ReactiveRedisDataSource() {
 
         @Override
         public <I> Uni<OptimisticLockingTransactionResult<I>> withTransaction(
@@ -124,135 +151,7 @@ public class EvaluatorServiceTests {
 
         @Override
         public <K, V> ReactiveStringCommands<K, V> string(Class<K> redisKeyType, Class<V> valueType) {
-            return new ReactiveStringCommands<>() {
-
-                @Override
-                public Uni<Long> append(K key, V value) {
-                    throw new UnsupportedOperationException();
-                }
-
-                @Override
-                public Uni<Long> decr(K key) {
-                    throw new UnsupportedOperationException();
-                }
-
-                @Override
-                public Uni<Long> decrby(K key, long amount) {
-                    throw new UnsupportedOperationException();
-                }
-
-                @SuppressWarnings("unchecked")
-                @Override
-                public Uni<V> get(K key) {
-                    return (Uni<V>) Uni.createFrom().item(() -> testNullScenesesJson);
-                }
-
-                @Override
-                public Uni<V> getdel(K key) {
-                    throw new UnsupportedOperationException();
-                }
-
-                @Override
-                public Uni<V> getex(K key, GetExArgs args) {
-                    throw new UnsupportedOperationException();
-                }
-
-                @Override
-                public Uni<String> getrange(K key, long start, long end) {
-                    throw new UnsupportedOperationException();
-                }
-
-                @Override
-                public Uni<V> getset(K key, V value) {
-                    throw new UnsupportedOperationException();
-                }
-
-                @Override
-                public Uni<Long> incr(K key) {
-                    throw new UnsupportedOperationException();
-                }
-
-                @Override
-                public Uni<Long> incrby(K key, long amount) {
-                    throw new UnsupportedOperationException();
-                }
-
-                @Override
-                public Uni<Double> incrbyfloat(K key, double amount) {
-                    throw new UnsupportedOperationException();
-                }
-
-                @Override
-                public Uni<String> lcs(K key1, K key2) {
-                    throw new UnsupportedOperationException();
-                }
-
-                @Override
-                public Uni<Long> lcsLength(K key1, K key2) {
-                    throw new UnsupportedOperationException();
-                }
-
-                @SuppressWarnings("unchecked")
-                @Override
-                public Uni<Map<K, V>> mget(K... keys) {
-                    throw new UnsupportedOperationException();
-                }
-
-                @Override
-                public Uni<Void> mset(Map<K, V> map) {
-                    throw new UnsupportedOperationException();
-                }
-
-                @Override
-                public Uni<Boolean> msetnx(Map<K, V> map) {
-                    throw new UnsupportedOperationException();
-                }
-
-                @Override
-                public Uni<Void> psetex(K key, long milliseconds, V value) {
-                    throw new UnsupportedOperationException();
-                }
-
-                @Override
-                public Uni<Void> set(K key, V value) {
-                    throw new UnsupportedOperationException();
-                }
-
-                @Override
-                public Uni<Void> set(K key, V value, SetArgs setArgs) {
-                    throw new UnsupportedOperationException();
-                }
-
-                @Override
-                public Uni<V> setGet(K key, V value) {
-                    throw new UnsupportedOperationException();
-                }
-
-                @Override
-                public Uni<V> setGet(K key, V value, SetArgs setArgs) {
-                    throw new UnsupportedOperationException();
-                }
-
-                @Override
-                public Uni<Void> setex(K key, long seconds, V value) {
-                    throw new UnsupportedOperationException();
-                }
-
-                @Override
-                public Uni<Boolean> setnx(K key, V value) {
-                    throw new UnsupportedOperationException();
-                }
-
-                @Override
-                public Uni<Long> setrange(K key, long offset, V value) {
-                    throw new UnsupportedOperationException();
-                }
-
-                @Override
-                public Uni<Long> strlen(K key) {
-                    throw new UnsupportedOperationException();
-                }
-            };
+            throw new UnsupportedOperationException();
         }
 
         @Override
@@ -292,7 +191,119 @@ public class EvaluatorServiceTests {
 
         @Override
         public <K, F, V> ReactiveHashCommands<K, F, V> hash(Class<K> redisKeyType, Class<F> fieldType, Class<V> valueType) {
-            throw new UnsupportedOperationException();
+            return new ReactiveHashCommands<K, F, V>() {
+
+                @SuppressWarnings("unchecked")
+                @Override
+                public Uni<Integer> hdel(K key, F... fields) {
+                    throw new UnsupportedOperationException();
+                }
+
+                @Override
+                public Uni<Boolean> hexists(K key, F field) {
+                    throw new UnsupportedOperationException();
+                }
+
+                @SuppressWarnings("unchecked")
+                @Override
+                public Uni<V> hget(K key, F field) {
+                    return Uni.createFrom().item(() -> {
+                        return (V) mockDict1Json;
+                    });
+                }
+
+                @Override
+                public Uni<Long> hincrby(K key, F field, long amount) {
+                    throw new UnsupportedOperationException();
+                }
+
+                @Override
+                public Uni<Double> hincrbyfloat(K key, F field, double amount) {
+                    throw new UnsupportedOperationException();
+                }
+
+                @SuppressWarnings("unchecked")
+                @Override
+                public Uni<Map<F, V>> hgetall(K key) {
+                    return Uni.createFrom().item(() -> {
+                        Map<F, V> mockDicts = new HashMap<>();
+                        String hashKey = DictType.ENGINE_EXECUTION_CUSTOM_RESP_TPL.name() + ":" + "dingtalk";
+                        mockDicts.put((F) hashKey, (V) mockDict1Json);
+                        return mockDicts;
+                    });
+                }
+
+                @Override
+                public Uni<List<F>> hkeys(K key) {
+                    throw new UnsupportedOperationException();
+                }
+
+                @Override
+                public Uni<Long> hlen(K key) {
+                    throw new UnsupportedOperationException();
+                }
+
+                @SuppressWarnings("unchecked")
+                @Override
+                public Uni<Map<F, V>> hmget(K key, F... fields) {
+                    throw new UnsupportedOperationException();
+                }
+
+                @Override
+                public Uni<Void> hmset(K key, Map<F, V> map) {
+                    throw new UnsupportedOperationException();
+                }
+
+                @Override
+                public Uni<F> hrandfield(K key) {
+                    throw new UnsupportedOperationException();
+                }
+
+                @Override
+                public Uni<List<F>> hrandfield(K key, long count) {
+                    throw new UnsupportedOperationException();
+                }
+
+                @Override
+                public Uni<Map<F, V>> hrandfieldWithValues(K key, long count) {
+                    throw new UnsupportedOperationException();
+                }
+
+                @Override
+                public ReactiveHashScanCursor<F, V> hscan(K key) {
+                    throw new UnsupportedOperationException();
+                }
+
+                @Override
+                public ReactiveHashScanCursor<F, V> hscan(K key, ScanArgs scanArgs) {
+                    throw new UnsupportedOperationException();
+                }
+
+                @Override
+                public Uni<Boolean> hset(K key, F field, V value) {
+                    throw new UnsupportedOperationException();
+                }
+
+                @Override
+                public Uni<Long> hset(K key, Map<F, V> map) {
+                    throw new UnsupportedOperationException();
+                }
+
+                @Override
+                public Uni<Boolean> hsetnx(K key, F field, V value) {
+                    throw new UnsupportedOperationException();
+                }
+
+                @Override
+                public Uni<Long> hstrlen(K key, F field) {
+                    throw new UnsupportedOperationException();
+                }
+
+                @Override
+                public Uni<List<V>> hvals(K key) {
+                    throw new UnsupportedOperationException();
+                }
+            };
         }
 
         @Override

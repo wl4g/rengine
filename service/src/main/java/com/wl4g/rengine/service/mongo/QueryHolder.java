@@ -56,9 +56,9 @@ public abstract class QueryHolder {
             boolean delFlagNormal) {
         notNullOf(model, "model");
         final List<Criteria> criterias = Lists.newArrayList();
-        if (nonNull(model.getName())) {
-            criterias.add(Criteria.where("_id").is(model.getId()));
-        }
+        // if (nonNull(model.getId())) {
+        // criterias.add(Criteria.where(DEFAULT_FIELD_ID_.is(model.getId()));
+        // }
         if (nonNull(model.getName())) {
             criterias.add(Criteria.where("name").regex(format("(%s)+", model.getName())));
         }
@@ -77,6 +77,13 @@ public abstract class QueryHolder {
             criterias.add(Criteria.where("delFlag").is(BaseBean.DEL_FLAG_DELETED));
         }
         return and ? new Criteria().andOperator(criterias) : new Criteria().orOperator(criterias);
+    }
+
+    public static @Nullable Criteria isIdCriteria(final @Nullable Object fieldValue) {
+        if (nonNull(fieldValue)) {
+            return Criteria.where(DEFAULT_FIELD_ID).is(fieldValue);
+        }
+        return null;
     }
 
     public static @Nullable Criteria isCriteria(final @NotBlank String fieldName, final @Nullable Object fieldValue) {
@@ -114,10 +121,16 @@ public abstract class QueryHolder {
         return sort(Direction.DESC, "updateDate");
     }
 
+    public static Sort descSort(final @NotBlank String... fieldNames) {
+        return sort(Direction.DESC, fieldNames);
+    }
+
     public static Sort sort(final @NotNull Direction direction, final @NotBlank String... fieldNames) {
         notNullOf(direction, "direction");
         notEmptyOf(fieldNames, "fieldNames");
         return Sort.by(direction, fieldNames);
     }
+
+    public static final String DEFAULT_FIELD_ID = "_id";
 
 }

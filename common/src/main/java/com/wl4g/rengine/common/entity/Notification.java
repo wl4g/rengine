@@ -15,6 +15,8 @@
  */
 package com.wl4g.rengine.common.entity;
 
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -127,14 +129,32 @@ public class Notification extends BaseBean {
     @ToString
     @NoArgsConstructor
     public static class DingtalkConfig extends NotifierConfigPropertiesBase {
-        private String agentId;
+        // The API authentication infomration.
         private @NotBlank String appKey;
         private @NotBlank String appSecret;
+        // The event subscribe callback API encryption information.
+        private String token;
+        private String aesKey;
+        // For DingTalk open platform enterprise internal applications, cropId
+        // is appKey.
+        private String corpId;
+        // The send to group messagees information.
         private @Nullable String defaultOpenConversationId;
         private @Nullable String defaultRobotCode;
         private @Nullable String defaultScenesGroupV2TemplateId;
         private @Nullable List<String> defaultScenesGroupV2AdminUserIds;
         private @Nullable List<String> defaultScenesGroupV2UserIds;
+
+        public DingtalkConfig validate(boolean checkCallbackAPIConfig) {
+            hasTextOf(appKey, "appKey");
+            hasTextOf(appSecret, "appSecret");
+            if (checkCallbackAPIConfig) {
+                hasTextOf(token, "token");
+                hasTextOf(aesKey, "aesKey");
+                hasTextOf(corpId, "corpId");
+            }
+            return this;
+        }
     }
 
     @Getter

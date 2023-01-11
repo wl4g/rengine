@@ -46,7 +46,7 @@ function start(){
   PIDS=$(getPids) # Get current process code.
   if [ -z "$PIDS" ]; then
     if [ "x$DAEMON_MODE" = "xtrue" ]; then
-      nohup $EXEC_CMD > "$OUT_FILE" 2>&1 < /dev/null &
+      nohup $EXEC_CMD 1> $STDOUT_FILE 2>$STDERR_FILE < /dev/null &
     else
       exec $EXEC_CMD
     fi

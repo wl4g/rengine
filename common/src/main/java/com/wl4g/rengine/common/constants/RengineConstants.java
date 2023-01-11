@@ -61,15 +61,16 @@ public abstract class RengineConstants extends EnvironmentUtil {
 
     public static final String CONF_PREFIX_EXECUTOR = CONF_PREFIX + ".executor";
     public static final String API_EXECUTOR_EXECUTE_BASE = "/execution";
-    // Receive execution request from client SDK. For example, a request from a
-    // business application JVM process via a dependent client SDK.
-    public static final String API_EXECUTOR_EXECUTE = "/execute";
-    // Receive execution requests from arbitrary external systems. For example:
-    // the request sent when the pushes(or webhook) subscription events from
-    // WeChat, Dingtalk and other social platforms servers.
+    // Receive execution request internal from client SDK. For example, a
+    // request from a business application JVM process via a dependent client
+    // SDK.
+    public static final String API_EXECUTOR_EXECUTE_INTERNAL = "/execute/internal";
+    // Receive execution requests custom from arbitrary external systems. For
+    // example: the request sent when the pushes(or webhook) subscription events
+    // from WeChat, Dingtalk and other social platforms servers.
     // This API is very useful, such as realizing chat interaction with WeChat
     // official account or Dingding robot.
-    public static final String API_EXECUTOR_EXECUTE_WRAPPER = "/execute-wrapper";
+    public static final String API_EXECUTOR_EXECUTE_CUSTOM = "/execute/custom";
     // Notice: The handcode entrypoint function is 'process'
     public static final String DEFAULT_EXECUTOR_MAIN_FUNCTION = "process";
     public static final String DEFAULT_EXECUTOR_TMP_SCRIPT_CACHE_DIR = "/tmp/__rengine_script_caches";
@@ -103,9 +104,11 @@ public abstract class RengineConstants extends EnvironmentUtil {
     @AllArgsConstructor
     public static enum MongoCollectionDefinition {
 
-        SYS_IDP_CONFIG("sys_idp_config", true),
+        SYS_DICTS("sys_dicts", true),
 
-        SYS_NOTIFICATION_CONFIG("sys_notification_config", true),
+        SYS_IDENTITY_PROVIDERS("sys_identity_providers", true),
+
+        SYS_NOTIFICATIONS("sys_notifications", true),
 
         SCENESES("t_sceneses", true),
 
@@ -133,7 +136,7 @@ public abstract class RengineConstants extends EnvironmentUtil {
         public static MongoCollectionDefinition of(String type) {
             final MongoCollectionDefinition collection = safeOf(type);
             if (nonNull(collection)) {
-                return null;
+                return collection;
             }
             throw new IllegalArgumentException(format("Invalid Mongo collection type for '%s'", type));
         }

@@ -17,8 +17,10 @@ package com.wl4g.rengine.service.model;
 
 import javax.annotation.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wl4g.infra.common.validation.EnumValue;
-import com.wl4g.rengine.common.entity.IdentityProvider.IdPKind;
+import com.wl4g.rengine.common.entity.Dict;
+import com.wl4g.rengine.common.entity.Dict.DictType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -28,7 +30,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link QueryIdentityProvider}
+ * {@link QueryDict}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -39,9 +41,30 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class QueryIdentityProvider {
-    @Schema(implementation = IdPKind.class)
+public class QueryDict extends QueryBase<Dict> {
+
     @Nullable
-    @EnumValue(enumCls = IdPKind.class)
-    String kind;
+    Long dictId;
+
+    @Schema(implementation = DictType.class)
+    @Nullable
+    @EnumValue(enumCls = DictType.class)
+    DictType type;
+
+    @Nullable
+    String key;
+
+    @Nullable
+    String value;
+
+    // @Nullable
+    // @Default
+    // Boolean isSimple = false;
+
+    // Dictionaries table has no name field.
+    @JsonIgnore
+    public void setName(String name) {
+        super.setName(name);
+    }
+
 }

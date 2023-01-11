@@ -54,10 +54,10 @@ public class NotificationServiceImpl implements NotificationService {
         if (!isBlank(model.getType())) {
             final Criteria criteria = new Criteria().orOperator(Criteria.where("properties.type").is(model.getType()));
             notifications = mongoTemplate.find(new Query(criteria), Notification.class,
-                    MongoCollectionDefinition.SYS_NOTIFICATION_CONFIG.getName());
+                    MongoCollectionDefinition.SYS_NOTIFICATIONS.getName());
         } else {
             notifications = mongoTemplate.findAll(Notification.class,
-                    MongoCollectionDefinition.SYS_NOTIFICATION_CONFIG.getName());
+                    MongoCollectionDefinition.SYS_NOTIFICATIONS.getName());
         }
         // Collections.sort(notifications, (o1, o2) ->
         // safeLongToInt(o2.getUpdateDate().getTime() -
@@ -80,7 +80,7 @@ public class NotificationServiceImpl implements NotificationService {
         } else {
             provider.preUpdate();
         }
-        Notification saved = mongoTemplate.insert(provider, MongoCollectionDefinition.SYS_NOTIFICATION_CONFIG.getName());
+        Notification saved = mongoTemplate.insert(provider, MongoCollectionDefinition.SYS_NOTIFICATIONS.getName());
         return SaveNotificationResult.builder().id(saved.getId()).build();
     }
 

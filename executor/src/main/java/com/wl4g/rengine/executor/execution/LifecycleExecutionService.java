@@ -63,7 +63,7 @@ import com.wl4g.rengine.common.model.ExecuteRequest;
 import com.wl4g.rengine.common.model.ExecuteResult;
 import com.wl4g.rengine.executor.metrics.ExecutorMeterService;
 import com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsTag;
-import com.wl4g.rengine.executor.service.impl.EngineExecutionServiceImpl;
+import com.wl4g.rengine.executor.service.impl.ReactiveEngineExecutionServiceImpl;
 
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
@@ -99,7 +99,7 @@ public class LifecycleExecutionService {
         final int threads = config.engine().executorThreadPools();
         final int acceptQueue = config.engine().executorAcceptQueue();
         log.info("Initialzing execution executor of threads pool: {}, acceptQueue: {}", threads, acceptQueue);
-        this.executionExecutor = GenericTaskRunner.newDefaultScheduledExecutor(EngineExecutionServiceImpl.class.getSimpleName(),
+        this.executionExecutor = GenericTaskRunner.newDefaultScheduledExecutor(ReactiveEngineExecutionServiceImpl.class.getSimpleName(),
                 threads, acceptQueue);
     }
 

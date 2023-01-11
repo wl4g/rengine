@@ -13,14 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.service.config;
+package com.wl4g.rengine.service.model;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 /**
- * {@link RengineApiServerProperties}
+ * {@link SaveDictResult}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -28,23 +30,8 @@ import lombok.ToString;
  */
 @Getter
 @Setter
-@ToString
-public class RengineApiServerProperties {
-
-    private MinioProperties minio = new MinioProperties();
-
-    @Getter
-    @Setter
-    @ToString
-    public static class MinioProperties {
-
-        private String endpoint;
-
-        private String accessKey;
-
-        private String secretKey;
-
-        private String filHost;
-    }
-
+@SuperBuilder
+@ToString(callSuper = true)
+@NoArgsConstructor
+public class SaveDictResult extends SaveResultBase {
 }

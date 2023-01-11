@@ -275,9 +275,12 @@ quarkus:
 rengine:
   executor:
     execution:
+      service:
+        dict-cached-prefix: 'rengine:executor:service:dict'
+        dict-cached-expire: 86400000 # 24h
       engine:
-        scenes-rules-cached-prefix: 'rengine:executor:scenes:rules:'
-        scenes-rules-cached-expire: 900000
+        scenes-rules-cached-prefix: 'rengine:executor:engine:scenes:rules:'
+        scenes-rules-cached-expire: 900000 # 15m
         executor-thread-pools: 10
         executor-accept-queue: 10
         per-executor-thread-pools: 2

@@ -13,26 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.executor.metrics;
+package com.wl4g.rengine.service.swagger;
 
-import org.junit.BeforeClass;
-
-import io.micrometer.prometheus.PrometheusConfig;
-import io.micrometer.prometheus.PrometheusMeterRegistry;
+import org.junit.Test;
 
 /**
- * {@link TestDefaultMeterSetup}
+ * {@link SpringDocOASAutoConfigurationTests}
  * 
  * @author James Wong
- * @version 2022-12-31
+ * @version 2023-01-13
  * @since v1.0.0
  */
-public class TestDefaultMeterSetup {
+public class SpringDocOASAutoConfigurationTests {
 
-    @BeforeClass
-    public static ExecutorMeterService setup() {
-        return MeterUtil.meterService = new ExecutorMeterService(new PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
-                "rengine-executor", 28002);
+    @Test
+    public void testTransformDocTitle() {
+        String transformed = SpringDocOASAutoConfiguration.transformDocTitle("rengine-apiserver");
+        System.out.println(transformed);
+        assert transformed.equals("Rengine Apiserver");
+
+        transformed = SpringDocOASAutoConfiguration.transformDocTitle("apiserver");
+        System.out.println(transformed);
+        assert transformed.equals("Apiserver");
     }
 
 }

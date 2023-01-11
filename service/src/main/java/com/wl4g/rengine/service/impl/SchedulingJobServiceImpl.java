@@ -20,6 +20,7 @@ import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isCriteria;
+import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
 import static java.util.Objects.isNull;
 
 import java.util.List;
@@ -56,8 +57,9 @@ public class SchedulingJobServiceImpl implements SchedulingJobService {
 
     @Override
     public PageHolder<SchedulingJob> query(QuerySchedulingJob model) {
-        final Query query = new Query(andCriteria(baseCriteria(model), isCriteria("triggerId", model.getTriggerId())))
-                .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
+        final Query query = new Query(
+                andCriteria(baseCriteria(model), isIdCriteria(model.getJobId()), isCriteria("triggerId", model.getTriggerId())))
+                        .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
         final List<SchedulingJob> jobes = mongoTemplate.find(query, SchedulingJob.class,
                 MongoCollectionDefinition.SCHEDULING_JOBS.getName());

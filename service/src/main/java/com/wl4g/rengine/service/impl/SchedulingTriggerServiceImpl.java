@@ -21,6 +21,7 @@ import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isCriteria;
+import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.modCriteria;
 import static java.util.Objects.isNull;
 
@@ -62,7 +63,7 @@ public class SchedulingTriggerServiceImpl implements SchedulingTriggerService {
 
     @Override
     public PageHolder<SchedulingTrigger> query(QuerySchedulingTrigger model) {
-        final Query query = new Query(andCriteria(baseCriteria(model)))
+        final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getTriggerId())))
                 .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
         final List<SchedulingTrigger> triggeres = mongoTemplate.find(query, SchedulingTrigger.class,

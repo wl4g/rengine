@@ -15,8 +15,13 @@
  */
 package com.wl4g.rengine.executor.util;
 
+import static com.mongodb.assertions.Assertions.notNull;
+import static com.mongodb.internal.event.EventListenerHelper.getCommandListener;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.findField;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.setField;
+
+import java.io.Closeable;
+import java.io.IOException;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -28,8 +33,20 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoDriverInformation;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.internal.MongoClientImpl;
+import com.mongodb.connection.AsynchronousSocketChannelStreamFactory;
+import com.mongodb.connection.SocketSettings;
+import com.mongodb.connection.SocketStreamFactory;
+import com.mongodb.connection.StreamFactory;
+import com.mongodb.connection.StreamFactoryFactory;
+import com.mongodb.internal.connection.Cluster;
+import com.mongodb.internal.connection.DefaultClusterFactory;
+import com.mongodb.internal.connection.InternalConnectionPoolSettings;
+import com.mongodb.lang.Nullable;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
 import com.wl4g.rengine.executor.repository.MongoRepository;
+
+import io.quarkus.mongodb.impl.ReactiveMongoClientImpl;
+import io.quarkus.mongodb.reactive.ReactiveMongoClient;
 
 /**
  * {@link TestDefaultBaseSetup}
@@ -41,54 +58,111 @@ import com.wl4g.rengine.executor.repository.MongoRepository;
 public abstract class TestDefaultBaseSetup {
 
     public static MongoRepository createMongoRepository() {
-        MongoClient mongoClient = new MongoClientImpl(MongoClientSettings.builder()
-                .applyConnectionString(new ConnectionString("mongodb://localhost:27017/rengine"))
-                .build(), MongoDriverInformation.builder().build());
-
         MongoRepository mongoRepository = new MongoRepository();
+
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(new ConnectionString("mongodb://localhost:27017/rengine"))
+                .build();
+        MongoDriverInformation driverInformation = MongoDriverInformation.builder().build();
+
+        Cluster cluster = createCluster(settings, driverInformation);
+
+        MongoClient mongoClient = new MongoClientImpl(settings, driverInformation);
         setField(findField(MongoRepository.class, null, MongoClient.class), mongoRepository, mongoClient, true);
 
+        ReactiveMongoClient reactiveMongoClient = new ReactiveMongoClientImpl(
+                new com.mongodb.reactivestreams.client.internal.MongoClientImpl(settings, driverInformation, cluster,
+                        new Closeable() {
+                            @Override
+                            public void close() throws IOException {
+                                System.out.println("Closing for test reactive mongo client...");
+                            }
+                        }));
+        setField(findField(MongoRepository.class, null, ReactiveMongoClient.class), mongoRepository, reactiveMongoClient, true);
+
         return mongoRepository;
+    }
+
+    // see:com.mongodb.client.internal.MongoClientImpl#createCluster
+    private static Cluster createCluster(
+            final MongoClientSettings settings,
+            @Nullable final MongoDriverInformation mongoDriverInformation) {
+        notNull("settings", settings);
+        return new DefaultClusterFactory().createCluster(settings.getClusterSettings(), settings.getServerSettings(),
+                settings.getConnectionPoolSettings(), InternalConnectionPoolSettings.builder().build(),
+                getStreamFactory(settings, false, true), getStreamFactory(settings, true, true), settings.getCredential(),
+                getCommandListener(settings.getCommandListeners()), settings.getApplicationName(), mongoDriverInformation,
+                settings.getCompressorList(), settings.getServerApi());
+    }
+
+    // see:com.mongodb.client.internal.MongoClientImpl#getStreamFactory
+    private static StreamFactory getStreamFactory(
+            final MongoClientSettings settings,
+            final boolean isHeartbeat,
+            final boolean isAsync) {
+        StreamFactoryFactory streamFactoryFactory = settings.getStreamFactoryFactory();
+        SocketSettings socketSettings = isHeartbeat ? settings.getHeartbeatSocketSettings() : settings.getSocketSettings();
+        if (streamFactoryFactory == null) {
+            return isAsync ? new AsynchronousSocketChannelStreamFactory(socketSettings, settings.getSslSettings())
+                    : new SocketStreamFactory(socketSettings, settings.getSslSettings());
+        } else {
+            return streamFactoryFactory.create(socketSettings, settings.getSslSettings());
+        }
     }
 
     public static ExecutionConfig createExecutionConfig() {
         return new ExecutionConfig() {
             @Override
+            public @NotNull ServiceConfig service() {
+                return new ServiceConfig() {
+                    @Override
+                    public @NotBlank String dictCachedPrefix() {
+                        return ServiceConfig.DEFAULT_DICT_CACHED_PREFIX;
+                    }
+
+                    @Override
+                    public @NotNull @Min(0) Long dictCachedExpire() {
+                        return ServiceConfig.DEFAULT_DICT_CACHED_EXPIRE;
+                    }
+                };
+            }
+
+            @Override
             public @NotNull EngineConfig engine() {
                 return new EngineConfig() {
                     @Override
                     public @NotBlank String scenesRulesCachedPrefix() {
-                        return ExecutionConfig.DEFAULT_SCENES_RULES_CACHED_PREFIX;
+                        return EngineConfig.DEFAULT_SCENES_RULES_CACHED_PREFIX;
                     }
 
                     @Override
                     public @NotNull @Min(0) Long scenesRulesCachedExpire() {
-                        return ExecutionConfig.DEFAULT_SCENES_RULES_CACHED_EXPIRE;
+                        return EngineConfig.DEFAULT_SCENES_RULES_CACHED_EXPIRE;
                     }
 
                     @Override
                     public @NotNull @Min(0) @Max(65535) Integer executorThreadPools() {
-                        return ExecutionConfig.DEFAULT_EXECUTOR_THREAD_POOLS;
+                        return EngineConfig.DEFAULT_EXECUTOR_THREAD_POOLS;
                     }
 
                     @Override
                     public @NotNull @Min(1) @Max(10240) Integer executorAcceptQueue() {
-                        return ExecutionConfig.DEFAULT_EXECUTOR_ACCEPT_QUEUE;
+                        return EngineConfig.DEFAULT_EXECUTOR_ACCEPT_QUEUE;
                     }
 
                     @Override
                     public @NotNull @Min(0) @Max(1024) Integer perExecutorThreadPools() {
-                        return ExecutionConfig.DEFAULT_PER_EXECUTOR_THREAD_POOLS;
+                        return EngineConfig.DEFAULT_PER_EXECUTOR_THREAD_POOLS;
                     }
 
                     @Override
                     public @NotNull @Min(0) @Max(100000) Integer maxQueryBatch() {
-                        return ExecutionConfig.DEFAULT_MAX_QUERY_BATCH;
+                        return EngineConfig.DEFAULT_MAX_QUERY_BATCH;
                     }
 
                     @Override
                     public @NotNull @Min(0) @Max(1) Float executeTimeoutOffsetRate() {
-                        return ExecutionConfig.DEFAULT_TIMEOUT_OFFSET_RATE;
+                        return EngineConfig.DEFAULT_TIMEOUT_OFFSET_RATE;
                     }
                 };
             }
@@ -98,27 +172,27 @@ public abstract class TestDefaultBaseSetup {
                 return new ScriptLogConfig() {
                     @Override
                     public @NotBlank String baseDir() {
-                        return ExecutionConfig.DEFAULT_SCRIPT_LOG_BASE_DIR;
+                        return ScriptLogConfig.DEFAULT_SCRIPT_LOG_BASE_DIR;
                     }
 
                     @Override
                     public @NotNull Boolean enableConsole() {
-                        return ExecutionConfig.DEFAULT_SCRIPT_LOG_ENABLE_CONSOLE;
+                        return ScriptLogConfig.DEFAULT_SCRIPT_LOG_ENABLE_CONSOLE;
                     }
 
                     @Override
                     public @NotNull @Min(1024) Integer fileMaxSize() {
-                        return ExecutionConfig.DEFAULT_SCRIPT_LOG_FILE_MAX_SIZE;
+                        return ScriptLogConfig.DEFAULT_SCRIPT_LOG_FILE_MAX_SIZE;
                     }
 
                     @Override
                     public @NotNull @Min(1) Integer fileMaxCount() {
-                        return ExecutionConfig.DEFAULT_SCRIPT_LOG_FILE_MAX_COUNT;
+                        return ScriptLogConfig.DEFAULT_SCRIPT_LOG_FILE_MAX_COUNT;
                     }
 
                     @Override
                     public @NotBlank String uploaderCron() {
-                        return ExecutionConfig.DEFAULT_SCRIPT_LOG_UPLOADER_CRON;
+                        return ScriptLogConfig.DEFAULT_SCRIPT_LOG_UPLOADER_CRON;
                     }
                 };
             }
@@ -129,21 +203,20 @@ public abstract class TestDefaultBaseSetup {
 
                     @Override
                     public @NotNull @Min(0) Long refreshLockTimeout() {
-                        return ExecutionConfig.DEFAULT_NOTIFIER_REFRESH_LOCK_TIMEOUT;
+                        return NotifierConfig.DEFAULT_NOTIFIER_REFRESH_LOCK_TIMEOUT;
                     }
 
                     @Override
                     public @NotBlank String refreshedCachedPrefix() {
-                        return ExecutionConfig.DEFAULT_NOTIFIER_REFRESHED_CACHED_PREFIX;
+                        return NotifierConfig.DEFAULT_NOTIFIER_REFRESHED_CACHED_PREFIX;
                     }
 
                     @Override
                     public @NotNull @Min(0) @Max(1) Float refreshedCachedExpireOffsetRate() {
-                        return ExecutionConfig.DEFAULT_NOTIFIER_EXPIRE_OFFSET_RATE;
+                        return NotifierConfig.DEFAULT_NOTIFIER_EXPIRE_OFFSET_RATE;
                     }
                 };
             }
-
         };
     }
 

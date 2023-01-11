@@ -23,6 +23,13 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * {@link User}
+ * 
+ * @author James Wong
+ * @version 2022-09-13
+ * @since v1.0.0
+ */
 @Getter
 @Setter
 @SuperBuilder
@@ -32,13 +39,8 @@ public class User extends BaseBean {
     private static final long serialVersionUID = -5762348176963349685L;
 
     private Integer type;
-
     private String username;
-
     private String password;
-
     private String email;
-
-    private String attrJson;
-
+    private String attributes;
 }

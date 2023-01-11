@@ -24,6 +24,7 @@ import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.wl4g.infra.common.lang.StringUtils2;
 import com.wl4g.rengine.service.swagger.SpringDocOASProperties.CustomOASConfig;
 import com.wl4g.rengine.service.swagger.SpringDocOASProperties.ProjectConfig;
 
@@ -58,18 +59,18 @@ public class SpringDocOASAutoConfiguration {
                 .forEach((source, target) -> SpringDocUtils.getConfig().replaceWithClass(source, target));
 
         // Create custom OpenAPI.
-        CustomOASConfig customConfig = config.getCustomOASConfig();
-        ProjectConfig project = customConfig.getProject();
-        OpenAPI openAPI = new OpenAPI();
-        Info info = new Info()
-                .title(project.getName().substring(0, 1).toUpperCase().concat(project.getName().substring(1)).concat(" APIs"))
+        final CustomOASConfig customConfig = config.getCustomOASConfig();
+        final ProjectConfig project = customConfig.getProject();
+        final OpenAPI openAPI = new OpenAPI();
+
+        final Info info = new Info().title(transformDocTitle(project.getName()).concat(" APIs"))
                 .version(project.getVersion())
                 .description(project.getDescription())
                 .termsOfService(project.getTermsOfService())
                 .license(customConfig.getLicense())
                 .contact(customConfig.getContact());
 
-        Components securitySchemes = new Components();
+        final Components securitySchemes = new Components();
         customConfig.getSecuritySchemes()
                 .entrySet()
                 .stream()
@@ -78,5 +79,18 @@ public class SpringDocOASAutoConfiguration {
 
         return openAPI.info(info).components(securitySchemes);
     }
+
+    public static String transformDocTitle(String appName) {
+        return StringUtils2.replaceGroups(appName, DEFAULT_TITLE_REGEX, gs -> {
+            if (gs.getIndex() == 0 || gs.getIndex() == 3) {
+                return gs.getGroupStr().toUpperCase();
+            } else if (gs.getIndex() == 2) {
+                return " ";
+            }
+            return gs.getGroupStr();
+        }).trim();
+    }
+
+    public static final String DEFAULT_TITLE_REGEX = "([a-zA-Z0-9])([a-zA-Z0-9]+)([-_]*)([a-zA-Z0-9]?)([a-zA-Z0-9]*)";
 
 }

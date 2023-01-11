@@ -55,9 +55,9 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
         if (!isBlank(model.getKind())) {
             Criteria criteria = new Criteria().orOperator(Criteria.where("kind").is(model.getKind()));
             idpConfigs = mongoTemplate.find(new Query(criteria), IdentityProvider.class,
-                    MongoCollectionDefinition.SYS_IDP_CONFIG.getName());
+                    MongoCollectionDefinition.SYS_IDENTITY_PROVIDERS.getName());
         } else {
-            idpConfigs = mongoTemplate.findAll(IdentityProvider.class, MongoCollectionDefinition.SYS_IDP_CONFIG.getName());
+            idpConfigs = mongoTemplate.findAll(IdentityProvider.class, MongoCollectionDefinition.SYS_IDENTITY_PROVIDERS.getName());
         }
         // Collections.sort(idpConfigs, (o1, o2) ->
         // safeLongToInt(o2.getUpdateDate().getTime() -
@@ -81,7 +81,7 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
             provider.preUpdate();
         }
         provider.setUpdateDate(new Date());
-        IdentityProvider saved = mongoTemplate.insert(provider, MongoCollectionDefinition.SYS_IDP_CONFIG.getName());
+        IdentityProvider saved = mongoTemplate.insert(provider, MongoCollectionDefinition.SYS_IDENTITY_PROVIDERS.getName());
         return SaveIdentityProviderResult.builder().id(saved.getId()).build();
     }
 

@@ -73,6 +73,10 @@ public class Scenes extends BaseBean {
             return workflows.get(0);
         }
 
+        public ScenesWrapper validate() {
+            return validate(this);
+        }
+
         public static ScenesWrapper validate(ScenesWrapper scenes) {
             notEmpty(scenes.getWorkflows(), "workflows");
             isTrue(scenes.getWorkflows().size() == 1, "workflows size must is 1, but size is %s", scenes.getWorkflows().size());

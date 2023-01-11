@@ -19,6 +19,7 @@ import static com.google.common.base.Charsets.UTF_8;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.lang.Assert2.notEmpty;
+import static com.wl4g.infra.common.lang.Exceptions.getRootCausesString;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RULES;
@@ -33,7 +34,6 @@ import static java.util.stream.Collectors.joining;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import javax.inject.Inject;
@@ -44,7 +44,6 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import org.apache.commons.collections.IteratorUtils;
 import org.bson.BsonDocument;
 import org.bson.BsonString;
 import org.bson.Document;
@@ -53,34 +52,33 @@ import org.bson.conversions.Bson;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import com.google.common.hash.Hashing;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.Variable;
 import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.infra.common.collection.CollectionUtils2;
-import com.wl4g.infra.common.lang.Exceptions;
-import com.wl4g.infra.common.serialize.BsonUtils2;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.common.web.rest.RespBase.RetCode;
 import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
 import com.wl4g.rengine.common.model.ExecuteRequest;
 import com.wl4g.rengine.common.model.ExecuteResult;
+import com.wl4g.rengine.common.util.BsonEntitySerializers;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
 import com.wl4g.rengine.executor.execution.LifecycleExecutionService;
 import com.wl4g.rengine.executor.metrics.ExecutorMeterService;
 import com.wl4g.rengine.executor.repository.MongoRepository;
 import com.wl4g.rengine.executor.service.EngineExecutionService;
 
+import io.quarkus.mongodb.reactive.ReactiveMongoCollection;
 import io.quarkus.redis.datasource.ReactiveRedisDataSource;
 import io.quarkus.redis.datasource.string.ReactiveStringCommands;
+import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import lombok.CustomLog;
 
 /**
- * {@link EngineExecutionServiceImpl}
+ * {@link ReactiveEngineExecutionServiceImpl}
  * 
  * @author James Wong
  * @version 2022-09-18
@@ -89,7 +87,7 @@ import lombok.CustomLog;
  */
 @CustomLog
 @Singleton
-public class EngineExecutionServiceImpl implements EngineExecutionService {
+public class ReactiveEngineExecutionServiceImpl implements EngineExecutionService {
 
     @Inject
     ExecutionConfig config;
@@ -98,18 +96,19 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
     ExecutorMeterService meterService;
 
     @Inject
+    MongoRepository mongoRepository;
+
+    @Inject
     LifecycleExecutionService lifecycleExecutionService;
 
     @Inject
-    MongoRepository mongoRepository;
+    ReactiveRedisDataSource reactiveRedisDS; // RedisDataSource
 
     // see:https://quarkus.io/guides/redis#creating-the-maven-project
-    // final StringCommands<String, String> redisStringCommands;
-    final ReactiveStringCommands<String, String> reactiveRedisStringCommands;
+    ReactiveStringCommands<String, String> reactiveRedisStringCommands; // StringCommands
 
-    public EngineExecutionServiceImpl(/* RedisDataSource redisDS, */ ReactiveRedisDataSource reactiveRedisDS) {
-        // this.redisStringCommands = redisDS.string(String.class);
-        this.reactiveRedisStringCommands = reactiveRedisDS.string(String.class);
+    void init() {
+        this.reactiveRedisStringCommands = reactiveRedisDS.string(String.class); // redisDS.string(String.class)
     }
 
     @Override
@@ -142,7 +141,7 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
         //});
         // @formatter:on
 
-        return findScenesWorkflowGraphRulesWithCaching(executeRequest, 1).chain(sceneses -> {
+        return findScenesWorkflowGraphRulesWithCached(executeRequest, 1).chain(sceneses -> {
             final RespBase<ExecuteResult> resp = RespBase.create();
             resp.setRequestId(executeRequest.getRequestId());
             try {
@@ -162,7 +161,7 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
                 resp.setData(result);
             } catch (Throwable e) {
                 final String errmsg = format("Could not to execution evaluate of requestId: '%s', reason: %s",
-                        executeRequest.getRequestId(), Exceptions.getRootCausesString(e, true));
+                        executeRequest.getRequestId(), getRootCausesString(e, true));
                 log.error(errmsg, e);
                 resp.withCode(RetCode.SYS_ERR).withMessage(errmsg);
             }
@@ -262,34 +261,31 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
      * @see https://www.notion.so/scenesworkflow-rules-uploads-f8e5a6f14fb64f858479b6565fb52142
      * @see https://www.mongodb.com/docs/v4.2/tutorial/model-embedded-one-to-many-relationships-between-documents/
      */
-    @SuppressWarnings("unchecked")
     @Override
-    public List<ScenesWrapper> findScenesWorkflowGraphRules(
+    public Uni<List<ScenesWrapper>> findScenesWorkflowGraphRules(
             @NotEmpty List<String> scenesCodes,
             @Min(1) @Max(1024) int revisions) {
         notEmpty(scenesCodes, "scenesCodes");
         isTrue(revisions >= 1 && revisions <= 1024, "revision %s must >= 1 and <= 1024", revisions);
-
-        final MongoCollection<Document> collection = mongoRepository.getCollection(SCENESES);
 
         // Common show projection.
         final Bson enableFilter = Aggregates.match(Filters.eq("enable", BaseBean.ENABLED));
         final Bson delFlagFilter = Aggregates.match(Filters.eq("delFlag", BaseBean.DEL_FLAG_NORMAL));
         final Bson project = Aggregates.project(Projections.fields(Projections.exclude("_class", "delFlag")));
 
-        Bson uploadsLookup = Aggregates.lookup(UPLOADS.getName(), asList(new Variable<>("uploadIds", "$uploadIds")),
+        final Bson uploadsLookup = Aggregates.lookup(UPLOADS.getName(), asList(new Variable<>("uploadIds", "$uploadIds")),
                 asList(Aggregates
                         .match(Filters.expr(new Document("$in", asList(new BsonString("$_id"), new BsonString("$$uploadIds"))))),
                         enableFilter, delFlagFilter, project),
                 "uploads");
 
-        Bson ruleScriptsLookup = Aggregates.lookup(RULE_SCRIPTS.getName(),
+        final Bson ruleScriptsLookup = Aggregates.lookup(RULE_SCRIPTS.getName(),
                 asList(new Variable<>("ruleId", BsonDocument.parse("{ $toLong: \"$_id\" }"))),
                 asList(Aggregates.match(Filters.expr(Filters.eq("ruleId", "$ruleId"))), enableFilter, delFlagFilter,
                         Aggregates.sort(new Document("revision", -1)), Aggregates.limit(revisions), project, uploadsLookup),
                 "scripts");
 
-        Bson rulesLookup = Aggregates.lookup(RULES.getName(), asList(new Variable<>("ruleIds",
+        final Bson rulesLookup = Aggregates.lookup(RULES.getName(), asList(new Variable<>("ruleIds",
                 BsonDocument.parse("{ $map: { input: \"$nodes\", in: { $toLong: \"$$this.ruleId\" } } }"))),
         // @formatter:off
         // $in 表达式匹配应直接使用 Document 对象? 否则:
@@ -301,13 +297,13 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
                         enableFilter, delFlagFilter, project, ruleScriptsLookup),
                 "rules");
 
-        Bson workflowGraphLookup = Aggregates.lookup(WORKFLOW_GRAPHS.getName(),
+        final Bson workflowGraphLookup = Aggregates.lookup(WORKFLOW_GRAPHS.getName(),
                 asList(new Variable<>("workflowId", BsonDocument.parse("{ $toLong: \"$workflowId\" }"))),
                 asList(Aggregates.match(Filters.expr(Filters.eq("scenesId", "$$scenesId"))), enableFilter, delFlagFilter,
                         Aggregates.sort(new Document("revision", -1)), Aggregates.limit(revisions), project, rulesLookup),
                 "graphs");
 
-        Bson workflowLookup = Aggregates.lookup(WORKFLOWS.getName(), asList(new Variable<>("scenesId", "$_id")),
+        final Bson workflowLookup = Aggregates.lookup(WORKFLOWS.getName(), asList(new Variable<>("scenesId", "$_id")),
                 asList(workflowGraphLookup), "workflows");
 
         final List<Bson> aggregates = Lists.newArrayList();
@@ -319,27 +315,26 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
         // The temporary collections are automatically created.
         // aggregates.add(Aggregates.merge("_tmp_load_scenes_with_cascade"));
 
-        final MongoCursor<ScenesWrapper> cursor = collection.aggregate(aggregates)
-                .batchSize(config.engine().maxQueryBatch())
-                .map(scenesDoc -> {
-                    log.debug("Found scenes object by scenesCodes: {} to json: {}", scenesCodes, scenesDoc.toJson());
-                    final Map<String, Object> scenesMap = BsonUtils2.asMap(scenesDoc);
-                    // Notice: When the manager uses spring-data-mongo to save
-                    // the entity by default, it will set the id to '_id'
-                    final String scenesJson = toJSONString(scenesMap).replaceAll("\"_id\":", "\"id\":");
-                    final ScenesWrapper scenes = parseJSON(scenesJson, ScenesWrapper.class);
-                    return ScenesWrapper.validate(scenes);
-                })
-                .iterator();
-        try {
-            return IteratorUtils.toList(cursor);
-        } finally {
-            cursor.close();
-        }
+        final ReactiveMongoCollection<Document> collection = mongoRepository.getReactiveCollection(SCENESES);
+        final Multi<Document> scenesesMulti = collection.aggregate(aggregates);
+        return scenesesMulti/* .batchSize(config.engine().maxQueryBatch()) */.map(scenesDoc -> {
+            // Solution-1:
+            // @formatter:off
+                //    log.debug("Found scenes object by scenesCodes: {} to json: {}", scenesCodes, scenesDoc.toJson());
+                //    final Map<String, Object> scenesMap = BsonUtils2.asMap(scenesDoc);
+                //    // Notice: When the manager uses spring-data-mongo to save
+                //    // the entity by default, it will set the id to '_id'
+                //    final String scenesJson = toJSONString(scenesMap).replaceAll("\"_id\":", "\"id\":");
+                //    final ScenesWrapper scenes = parseJSON(scenesJson, ScenesWrapper.class);
+                //    return ScenesWrapper.validate(scenes);
+                // @formatter:on
+            // Solution-2:
+            return BsonEntitySerializers.fromDocument(scenesDoc, ScenesWrapper.class).validate();
+        }).collect().asList();
     }
 
     @SuppressWarnings("deprecation")
-    Uni<List<ScenesWrapper>> findScenesWorkflowGraphRulesWithCaching(
+    Uni<List<ScenesWrapper>> findScenesWorkflowGraphRulesWithCached(
             final @NotNull ExecuteRequest executeRequest,
             final @Min(1) @Max(1024) int revisions) {
         //
@@ -388,27 +383,29 @@ public class EngineExecutionServiceImpl implements EngineExecutionService {
                 .toString();
         final String batchQueryingKey = config.engine().scenesRulesCachedPrefix().concat(scenesCodesHash);
 
-        final Uni<List<ScenesWrapper>> cachedScenesUnis = reactiveRedisStringCommands.get(batchQueryingKey).flatMap(json -> {
-            if (Objects.isNull(json)) {
+        final Uni<List<ScenesWrapper>> scenesesUni = reactiveRedisStringCommands.get(batchQueryingKey).flatMap(scenesJsons -> {
+            if (Objects.isNull(scenesJsons)) {
                 // Querying from database.
-                final List<ScenesWrapper> sceneses = findScenesWorkflowGraphRules(executeRequest.getScenesCodes(), revisions);
-                // Save to redis cache.
-                return reactiveRedisStringCommands
-                        .setex(batchQueryingKey, config.engine().scenesRulesCachedExpire(), toJSONString(sceneses))
-                        .chain(() -> Uni.createFrom().item(() -> sceneses));
+                return findScenesWorkflowGraphRules(executeRequest.getScenesCodes(), revisions)
+                        // Save to redis cache.
+                        .chain(sceneses -> {
+                            return reactiveRedisStringCommands
+                                    .setex(batchQueryingKey, config.engine().scenesRulesCachedExpire(), toJSONString(sceneses))
+                                    .map(res -> sceneses);
+                        });
             }
-            return Uni.createFrom().item(() -> parseJSON(json, SCENES_TYPE_REF));
+            return Uni.createFrom().item(() -> parseJSON(scenesJsons, SCENES_TYPE_REF));
         })
                 // If querying an workflow rules takes more than 85% of
                 // the total timeout time, then the execution graph may
                 // not have enough time to allow early abandonment of
                 // execution.
                 .ifNoItem()
-                .after(Duration.ofMillis((long) (executeRequest.getTimeout() / 0.85)))
+                .after(Duration.ofMillis((long) (executeRequest.getTimeout() * 0.85)))
                 .fail();
 
-        // return Uni.combine().all().unis(cachedScenesUnis);
-        return cachedScenesUnis;
+        // Uni.combine().all().unis(scenesesUni).combinedWith(_sceneses->_sceneses);
+        return scenesesUni;
     }
 
     public static final TypeReference<List<ScenesWrapper>> SCENES_TYPE_REF = new TypeReference<List<ScenesWrapper>>() {
