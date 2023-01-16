@@ -59,6 +59,29 @@
   ]
 },
 {
+  "name":"com.wl4g.rengine.executor.execution.engine.internal.GlobalSdkLoggingManager",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"toString","parameterTypes":[] }
+  ]
+},
+{
+  "name": "com.wl4g.rengine.executor.execution.engine.internal.GlobalSdkExecutorManager",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>","parameterTypes": []},
+    {"name": "close","parameterTypes": []},
+    {"name": "getExecutor","parameterTypes": ["java.lang.Long","int"]},
+    {"name": "lambda$0","parameterTypes": ["java.lang.Long","com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor"]}
+  ]
+},
+{
   "name":"com.wl4g.rengine.executor.execution.engine.AbstractScriptEngine",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
@@ -74,20 +97,6 @@
   "queryAllDeclaredConstructors":true,
   "methods":[
     {"name":"toString","parameterTypes":[] }
-  ]
-},
-{
-  "name": "com.wl4g.rengine.executor.execution.engine.GlobalExecutorManager",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>","parameterTypes": []},
-    {"name": "close","parameterTypes": []},
-    {"name": "getExecutor","parameterTypes": ["java.lang.Long","int"]},
-    {"name": "lambda$0","parameterTypes": ["java.lang.Long","com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor"]}
   ]
 },
 {

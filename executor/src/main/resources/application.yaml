@@ -221,6 +221,14 @@ quarkus:
       secret: abcdefghijklmnopqrstuvwzyx
     tls:
       verification: none
+  ## The scheduler configuration.
+  ## Resolved for error message: Quartz scheduler is either explicitly disabled through quarkus.scheduler.enabled=false
+  ## or no @Scheduled methods were found. If you only need to schedule a job programmatically you can force the
+  ## start of the scheduler by setting 'quarkus.quartz.start-mode=forced
+  #scheduler:
+  #  enabled: false
+  quartz:
+    start-mode: forced
   #datasource: {}
   ## see:https://github.com/quarkusio/quarkus-quickstarts/blob/main/mongodb-quickstart/src/main/resources/application.properties
   mongodb:

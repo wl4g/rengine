@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.executor.execution.engine;
+package com.wl4g.rengine.executor.execution.engine.internal;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static java.util.Objects.isNull;
@@ -37,7 +37,7 @@ import com.wl4g.rengine.executor.execution.sdk.ScriptExecutor;
 import lombok.CustomLog;
 
 /**
- * {@link GlobalExecutorManager}
+ * {@link GlobalSdkExecutorManager}
  * 
  * @author James Wong
  * @version 2022-12-26
@@ -45,7 +45,7 @@ import lombok.CustomLog;
  */
 @CustomLog
 @Singleton
-public class GlobalExecutorManager implements Closeable {
+public class GlobalSdkExecutorManager implements Closeable {
 
     private final Map<Long, SafeScheduledTaskPoolExecutor> executorCaching = new ConcurrentHashMap<>(4);
 

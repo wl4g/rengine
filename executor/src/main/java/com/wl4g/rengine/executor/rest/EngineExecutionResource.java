@@ -17,15 +17,19 @@ package com.wl4g.rengine.executor.rest;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static com.wl4g.infra.common.codec.Encodes.decodeBase64String;
+import static com.wl4g.infra.common.collection.CollectionUtils2.ensureMap;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.isTrue;
+import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseMapObject;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_BASE;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_CUSTOM;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_INTERNAL;
+import static com.wl4g.rengine.common.model.ExecuteRequest.DEFAULT_BESTEFFORT;
+import static com.wl4g.rengine.common.model.ExecuteRequest.DEFAULT_TIMEOUT;
 import static com.wl4g.rengine.executor.rest.EngineExecutionResource.RequestSettings.PARAM_REQ_SETTINGS;
 import static com.wl4g.rengine.executor.rest.EngineExecutionResource.ResponseSettings.PARAM_RESP_SETTINGS;
 import static java.lang.Boolean.parseBoolean;
@@ -34,7 +38,7 @@ import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static java.util.Objects.isNull;
+import static java.util.Collections.emptyMap;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
@@ -43,10 +47,12 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.replaceIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.split;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -59,9 +65,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
-import com.wl4g.infra.common.codec.Encodes;
 import com.wl4g.infra.common.collection.CollectionUtils2;
 import com.wl4g.infra.common.lang.Assert2;
+import com.wl4g.infra.common.lang.StringUtils2;
 import com.wl4g.infra.common.serialize.JaxbUtils;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.common.entity.Dict.DictType;
@@ -164,43 +170,125 @@ public class EngineExecutionResource {
      * @return
      * @throws Exception
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    Uni<String> doExecuteCustom(final String bodyString) throws Exception {
-        log.debug("Executing wrapper for body: {}", bodyString);
+    private Uni<String> doExecuteCustom(final String bodyString) throws Exception {
+        log.debug("Executing custom for body: {}", bodyString);
 
         final RoutingContext context = currentVertxRequest.getCurrent();
         // context.data(); // attributes?
         // context.body().asString("UTF-8"); // invalid?
         final HttpServerRequest request = context.request();
-        final MultiMap headers = request.headers();
         final MultiMap queryParams = context.queryParams(UTF_8);
-        final RequestSettings reqSettings = parseJSON(decodeBase64String(queryParams.get(PARAM_REQ_SETTINGS)),
-                RequestSettings.class); // Optional
-        final ResponseSettings respSettings = parseJSON(decodeBase64String(queryParams.get(PARAM_RESP_SETTINGS)),
-                ResponseSettings.class); // Optional
 
-        // 1. Gets parameters by headers (second priority).
-        //
-        // The basic parameters.
-        String requestId = headers.get(PARAM_REQUEST_ID); // Optional
-        String clientId = headers.get(PARAM_CLIENT_ID); // Required
-        String clientSecret = headers.get(PARAM_CLIENT_SECRET); // Required
-        List<String> scenesCodes = headers.getAll(PARAM_SCENES_CODES); // Required
-        // bestEffect
-        String bestEffectString = headers.get(PARAM_BEST_EFFORT); // Optional
-        Boolean bestEffort = isBlank(bestEffectString) ? null : parseBoolean(bestEffectString);
-        // timeout
-        String timeoutString = headers.get(PARAM_TIMEOUT); // Optional
-        Long timeout = isBlank(timeoutString) ? null : parseLong(timeoutString);
+        // Gets request and response custom settings configuration.
+        final RequestSettings reqSettings = RequestSettings.from(queryParams.get(PARAM_REQ_SETTINGS)); // Required
+        final ResponseSettings respSettings = ResponseSettings.from(queryParams.get(PARAM_RESP_SETTINGS)); // Required
 
-        // 2. Gets parameters by body (third priority).
-        //
-        // args
-        Map<String, Object> args = null; // Optional
+        final Map<String, Object> bodyArgs = getBodyArgs(request, reqSettings, bodyString); // Optional
+        final String queryForBodyArgsString = getMergedParam(bodyArgs, PARAM_ARGS, EMPTY); // Optional
+        final Map<String, Object> queryForBodyArgs = parseMapObject(decodeBase64String(queryForBodyArgsString));
+
+        // The args in query parameters take precedence over body args.
+        final Map<String, Object> mergedBodyArgs = ensureMap(bodyArgs);
+        mergedBodyArgs.putAll(queryForBodyArgs);
+
+        final String requestId = getMergedParam(mergedBodyArgs, PARAM_REQUEST_ID, IdGenUtils.next()); // Optional
+        final String clientId = getMergedParam(mergedBodyArgs, PARAM_CLIENT_ID, null); // Required
+        final String clientSecret = getMergedParam(mergedBodyArgs, PARAM_CLIENT_SECRET, null); // Required
+        final List<String> scenesCodes = getMergedParam(mergedBodyArgs, PARAM_SCENES_CODES, emptyList()); // Required
+        final Boolean bestEffort = parseBoolean(getMergedParam(bodyArgs, PARAM_BEST_EFFORT, DEFAULT_BESTEFFORT + "")); // Optional
+        final Long timeout = parseLong(getMergedParam(mergedBodyArgs, PARAM_TIMEOUT, DEFAULT_TIMEOUT + "")); // Optional
+
+        final ExecuteRequest executeRequest = ExecuteRequest.builder()
+                .requestId(requestId)
+                .clientId(clientId)
+                .clientSecret(clientSecret)
+                .scenesCodes(scenesCodes)
+                .bestEffort(bestEffort)
+                .timeout(timeout)
+                .args(mergedBodyArgs)
+                .build()
+                .validate();
+        return engineExecutionService.execute(executeRequest).flatMap(resp -> {
+            // The customize the response body, which be returned
+            // flexibly according to the custom setting parameters
+            // obtained from the request.
+            final Map<String, Object> mergedValueMap = new HashMap<>();
+            safeList(resp.getData().getResults()).stream()
+                    .filter(desc -> desc.getSuccess())
+                    .forEach(desc -> mergedValueMap.putAll(desc.getValueMap()));
+
+            // Load the response template from the dictionary service
+            // according to the request template key, and then render the
+            // response string.
+            return dictService.findDicts(DictType.ENGINE_EXECUTION_CUSTOM_RESP_TPL, respSettings.getTemplateKey()).map(dicts -> {
+                try {
+                    Assert2.notEmpty(dicts, "Not found response template dictionary by %s", respSettings.getTemplateKey());
+                    final String respTemplate = dicts.get(0).getValue();
+                    final String resolvedBody = ResponseSettings.resolve(respTemplate, mergedValueMap);
+                    log.debug("Resolved custom response body : {}", resolvedBody);
+                    return resolvedBody;
+                } catch (Exception e) {
+                    log.error(format("Failed to resolve custom response body. mergedResult: %s", mergedValueMap), e);
+                    throw e;
+                }
+            });
+        });
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private <T> T getMergedParam(
+            final @NotNull Map<String, Object> bodyArgs,
+            final @NotBlank String key,
+            final @Nullable T defaultValue) {
+        notNullOf(bodyArgs, "bodyArgs");
+        hasTextOf(key, "key");
+
+        final RoutingContext context = currentVertxRequest.getCurrent();
+        // context.data(); // attributes?
+        // context.body().asString("UTF-8"); // invalid?
+        final HttpServerRequest request = context.request();
+        final MultiMap queryParams = context.queryParams(UTF_8);
+        final MultiMap headers = request.headers();
+
+        // 1. Get parameter by query (first priority).
+        Object value = queryParams.get(key);
+        // 2. Get parameter by headers (second priority).
+        if (StringUtils2.isEmpty(value)) {
+            value = headers.get(key);
+        }
+        // 3. Get parameter by body (third priority).
+        if (StringUtils2.isEmpty(value)) {
+            final Object valueObj = bodyArgs.get(key);
+            if (nonNull(valueObj)) {
+                if (valueObj instanceof String) {
+                    value = valueObj.toString();
+                } else if (valueObj instanceof Collection) {
+                    value = CollectionUtils2.safeList((Collection) valueObj);
+                }
+            }
+        }
+        // 4. Use default if none.
+        value = StringUtils2.isEmpty(value) ? defaultValue : value;
+
+        // Transform string value to collection.
+        if (defaultValue instanceof Collection && value instanceof String) {
+            value = asList(split((String) value, ","));
+        }
+
+        return (T) value;
+    }
+
+    private Map<String, Object> getBodyArgs(
+            final @NotNull HttpServerRequest request,
+            final @Nullable RequestSettings reqSettings,
+            final @Nullable String bodyString) {
+        notNullOf(request, "request");
+
+        Map<String, Object> args = emptyMap(); // Optional
         if (!isBlank(bodyString) && request.method() == HttpMethod.POST) {
-            // final String bodyString =
-            // readFullyToString(request.getInputStream(), "UTF-8");
-            final String contentType = headers.get(HttpHeaders.CONTENT_TYPE);
+            // final String
+            // bodyString=readFullyToString(request.getInputStream(), "UTF-8");
+            final String contentType = request.headers().get(HttpHeaders.CONTENT_TYPE);
             if (containsIgnoreCase(contentType, "application/json")) {
                 args = parseMapObject(bodyString);
             } else if (containsIgnoreCase(contentType, "application/xml")) {
@@ -214,132 +302,9 @@ public class EngineExecutionResource {
                     throw new UnsupportedOperationException(format("Unsupported content type for %s", contentType));
                 }
             }
-            // Downgrade to get the required parameters from the body.
-            if (isBlank(requestId)) {
-                requestId = args.getOrDefault(PARAM_REQUEST_ID, EMPTY).toString();
-            }
-            if (isBlank(clientId)) {
-                clientId = args.getOrDefault(PARAM_CLIENT_ID, EMPTY).toString();
-            }
-            if (isBlank(clientSecret)) {
-                clientSecret = args.getOrDefault(PARAM_CLIENT_SECRET, EMPTY).toString();
-            }
-            if (CollectionUtils2.isEmpty(scenesCodes)) {
-                final Object scenesCodesObj = args.getOrDefault(PARAM_SCENES_CODES, emptyList());
-                if (scenesCodesObj instanceof List) {
-                    scenesCodes = ((List) scenesCodesObj);
-                }
-            }
-            if (isNull(bestEffort)) {
-                final Object bestEffectObj = args.get(PARAM_BEST_EFFORT);
-                if (nonNull(bestEffectObj)) {
-                    if (bestEffectObj instanceof String) {
-                        bestEffort = parseBoolean((String) bestEffectObj);
-                    } else if (bestEffectObj instanceof Boolean) {
-                        bestEffort = (Boolean) bestEffectObj;
-                    }
-                }
-            }
-            if (isNull(timeout)) {
-                final Object timeoutObj = args.get(PARAM_TIMEOUT);
-                if (nonNull(timeoutObj)) {
-                    if (timeoutObj instanceof String) {
-                        timeout = parseLong((String) timeoutObj);
-                    } else if (timeoutObj instanceof Number) {
-                        timeout = ((Number) timeoutObj).longValue();
-                    }
-                }
-            }
         }
 
-        // 3. Gets parameters by query (first priority).
-        //
-        // Allow request query parameters to override body parameters.
-        if (nonNull(queryParams)) {
-            // override for requestId if necessary.
-            final String queryRequestId = queryParams.get(PARAM_REQUEST_ID);
-            requestId = isBlank(queryRequestId) ? (isBlank(requestId) ? IdGenUtils.next() : requestId) : queryRequestId;
-
-            // override for clientId if necessary.
-            final String queryClientId = queryParams.get(PARAM_CLIENT_ID);
-            clientId = isBlank(queryClientId) ? clientId : queryClientId;
-
-            // override for clientSecret if necessary.
-            final String queryClientSecret = queryParams.get(PARAM_CLIENT_SECRET);
-            clientSecret = isBlank(queryClientSecret) ? clientSecret : queryClientSecret;
-
-            // override for scenesCodes if necessary.
-            final var queryScenesCodes = queryParams.get(PARAM_SCENES_CODES);
-            scenesCodes = isBlank(queryScenesCodes) ? scenesCodes : asList(split(queryScenesCodes, ","));
-
-            // override for args if necessary.
-            var queryArgs = queryParams.get(PARAM_ARGS);
-            if (!isBlank(queryArgs)) {
-                if (request.method() == HttpMethod.GET) {
-                    queryArgs = Encodes.decodeBase64String(queryArgs);
-                }
-                args = parseMapObject(queryArgs);
-            }
-
-            // override for bestEffect if necessary.
-            final String queryBestEffectString = queryParams.get(PARAM_BEST_EFFORT);
-            bestEffort = isBlank(queryBestEffectString) ? bestEffort : parseBoolean(queryBestEffectString);
-
-            // override for timeout if necessary.
-            final String queryTimeoutString = queryParams.get(PARAM_TIMEOUT);
-            timeout = isBlank(queryTimeoutString) ? timeout : parseLong(queryTimeoutString);
-        }
-
-        // 4. Sets parameters by default(fourth priority).
-        //
-        bestEffort = isNull(bestEffort) ? ExecuteRequest.DEFAULT_BESTEFFORT : bestEffort;
-        timeout = isNull(timeout) ? ExecuteRequest.DEFAULT_TIMEOUT : timeout;
-
-        final ExecuteRequest executeRequest = ExecuteRequest.builder()
-                .requestId(requestId)
-                .clientId(clientId)
-                .clientSecret(clientSecret)
-                .scenesCodes(scenesCodes)
-                .bestEffort(bestEffort)
-                .timeout(timeout)
-                .args(args)
-                .build()
-                .validate();
-        return engineExecutionService.execute(executeRequest).flatMap(resp -> {
-            if (isNull(respSettings)) {
-                // The should be friendly prompts to let
-                // developers(users) know how to set up more
-                // intuitively.
-                return Uni.createFrom()
-                        .item(() -> "Tips: The request is processed successfully, but the request parameter does not carry the response setting parameters."
-                                + "Please add the query parameter respSettings to the request to customize the response format.");
-            }
-
-            // The customize the response body, which be returned
-            // flexibly according to the custom setting parameters
-            // obtained from the request.
-            final Map<String, Object> mergedResult = new HashMap<>();
-            safeList(resp.getData().getResults()).stream()
-                    .filter(desc -> desc.getSuccess())
-                    .forEach(desc -> mergedResult.putAll(desc.getValueMap()));
-
-            hasTextOf(respSettings.getTemplateKey(), ResponseSettings.PARAM_RESP_SETTINGS + ".templateKey");
-            // Load the response template from the dictionary service
-            // according to the request template key, and then render the
-            // response string.
-            return dictService.findDicts(DictType.ENGINE_EXECUTION_CUSTOM_RESP_TPL, respSettings.getTemplateKey()).map(dicts -> {
-                try {
-                    Assert2.notEmpty(dicts, "Not found response template dictionary by %s", respSettings.getTemplateKey());
-                    final String respTemplate = dicts.get(0).getValue();
-                    final String resolvedBody = ResponseSettings.resolve(respTemplate, mergedResult);
-                    log.debug("Resolved custom response body : {}", resolvedBody);
-                    return resolvedBody;
-                } catch (Exception e) {
-                    log.error(format("Failed to resolve custom response body. mergedResult: %s", mergedResult), e);
-                    throw e;
-                }
-            });
-        });
+        return args;
     }
 
     @Getter
@@ -353,7 +318,16 @@ public class EngineExecutionResource {
          * The special parameter of the wrapper execution API, used to control
          * the body data format of the specified request.
          */
-        public String format = "json";
+        public @Nullable String format = "json";
+
+        public static RequestSettings from(@NotBlank String reqSettingsString) {
+            final RequestSettings reqSettings = parseJSON(decodeBase64String(reqSettingsString), RequestSettings.class); // Required
+            notNull(reqSettings,
+                    "Tip: The request parameter not carry the parameters set by the request. Please add the query parameter '%s' to the request"
+                            + " to configure the specification of a custom request.",
+                    PARAM_REQ_SETTINGS);
+            return reqSettings;
+        }
     }
 
     @Getter
@@ -363,7 +337,17 @@ public class EngineExecutionResource {
     public static class ResponseSettings {
         public static final String PARAM_RESP_SETTINGS = "respSettings";
 
-        public String templateKey;
+        public @NotBlank String templateKey;
+
+        public static ResponseSettings from(@NotBlank String respSettingsString) {
+            final ResponseSettings respSettings = parseJSON(decodeBase64String(respSettingsString), ResponseSettings.class); // Required
+            notNull(respSettings,
+                    "Tips: The request is processed successfully, but the request parameter does not carry the response setting parameters."
+                            + "Please add the query parameter '%s' to the request to customize the response specification.",
+                    PARAM_RESP_SETTINGS);
+            hasTextOf(respSettings.getTemplateKey(), PARAM_RESP_SETTINGS + ".templateKey");
+            return respSettings;
+        }
 
         public static String resolve(@NotBlank String template, @NotNull Map<String, Object> mergedValueMap) {
             hasTextOf(template, "template");
@@ -377,13 +361,13 @@ public class EngineExecutionResource {
                 tpl.append(replaceIgnoreCase(_tpl, "${" + k + "}", valueOf(v)));
             });
 
-            // Check is full resolved
+            // Check resolved is full.
             final String body = tpl.toString();
             checkResolved(body);
             return body;
         }
 
-        private static void checkResolved(String body) throws RengineException {
+        static void checkResolved(String body) throws RengineException {
             int firstStart = body.indexOf("$");
             if (firstStart > -1) {
                 int firstEnd = body.indexOf("}");

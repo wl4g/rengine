@@ -16,13 +16,15 @@
 package com.wl4g.rengine.common.util;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.infra.common.lang.StringUtils2.eqIgnCase;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-import java.util.Map;
+import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
@@ -33,6 +35,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.infra.common.serialize.BsonUtils2;
 import com.wl4g.infra.common.serialize.JacksonUtils;
+import com.wl4g.infra.common.serialize.JacksonUtils.DefaultDeserialzePropertyTransformer;
+import com.wl4g.infra.common.serialize.JacksonUtils.PropertyExcluder;
+import com.wl4g.infra.common.serialize.JacksonUtils.PropertyTransformer;
 
 /**
  * {@link BsonEntitySerializers}
@@ -62,7 +67,7 @@ public abstract class BsonEntitySerializers {
         if (isNull(entity)) {
             return null;
         }
-        return toJSONString(DEFAULT_MODIFIER_MAPPER, entity, ID_TRANSFORM_SERIALIZE, IGNORE_PROPERTIES);
+        return toJSONString(DEFAULT_MODIFIER_MAPPER, entity, ID_SERIALIZE_TRANSFORMER, BASE_EXCLUDER);
     }
 
     public static <T> T deserialize(final @Nullable String json, final @NotNull Class<T> clazz) {
@@ -70,7 +75,7 @@ public abstract class BsonEntitySerializers {
         if (isBlank(json)) {
             return null;
         }
-        return parseJSON(DEFAULT_MODIFIER_MAPPER, json, clazz, ID_TRANSFORM_DESERIALIZE, IGNORE_PROPERTIES);
+        return parseJSON(DEFAULT_MODIFIER_MAPPER, json, clazz, ID_DESERIALIZE_TRANSFORMER, BASE_EXCLUDER);
     }
 
     // Notice: When using a custom modifier, you should use an independent
@@ -78,8 +83,14 @@ public abstract class BsonEntitySerializers {
     // serializer of the target bean, which may cause the modifier to fail.
     public static final ObjectMapper DEFAULT_MODIFIER_MAPPER = JacksonUtils.newDefaultObjectMapper();
 
-    public static final Map<String, String> ID_TRANSFORM_SERIALIZE = singletonMap("id", "_id");
-    public static final Map<String, String> ID_TRANSFORM_DESERIALIZE = singletonMap("_id", "id");
-    public static final String[] IGNORE_PROPERTIES = new String[] { "humanCreateDate", "humanUpdateDate" };
+    public static final PropertyTransformer ID_SERIALIZE_TRANSFORMER = (
+            beanDesc,
+            property) -> BaseBean.class.isAssignableFrom(beanDesc.getBeanClass()) && eqIgnCase(property, "id") ? "_id" : property;
+
+    public static final PropertyTransformer ID_DESERIALIZE_TRANSFORMER = new DefaultDeserialzePropertyTransformer(BaseBean.class,
+            singletonMap("_id", "id"));
+
+    public static final List<String> IGNORE_PROPERTIES = asList("humanCreateDate", "humanUpdateDate");
+    public static final PropertyExcluder BASE_EXCLUDER = (beanDesc, property) -> IGNORE_PROPERTIES.contains(property);
 
 }

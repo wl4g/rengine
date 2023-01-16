@@ -36,6 +36,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.validation.Valid;
@@ -107,6 +108,7 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
     // see:https://quarkus.io/guides/redis#creating-the-maven-project
     ReactiveStringCommands<String, String> reactiveRedisStringCommands; // StringCommands
 
+    @PostConstruct
     void init() {
         this.reactiveRedisStringCommands = reactiveRedisDS.string(String.class); // redisDS.string(String.class)
     }

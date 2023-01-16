@@ -124,6 +124,13 @@ public class WorkflowGraph extends BaseBean {
             this.attributes = attributes;
             return (E) this;
         }
+
+        public BaseNode<E> validate() {
+            hasTextOf(type, "type");
+            hasTextOf(id, "id");
+            hasTextOf(name, "name");
+            return this;
+        }
     }
 
     @Getter

@@ -123,7 +123,7 @@ public abstract class ScriptEngineUtil {
     public static final FilenameFilter defaultLogFilter = new FilenameFilter() {
         @Override
         public boolean accept(File dir, String name) {
-            return !endsWithIgnoreCase(name, ".lck");
+            return !endsWithIgnoreCase(name, ".lck") && !dir.isHidden();
         }
     };
 

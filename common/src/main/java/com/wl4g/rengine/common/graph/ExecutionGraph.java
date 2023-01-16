@@ -97,6 +97,7 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
 
         // Check for duplicate node ID.
         nodes.stream()
+                .map(n -> n.validate())
                 .collect(groupingBy(n -> n.getId()))
                 .entrySet()
                 .stream()
@@ -107,29 +108,29 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
                 });
 
         // @formatter:off
-//        // Check for start node.
-//        List<ExecutionGraph<?>> startNodes = nodes.stream().filter(n -> n instanceof BootOperator).collect(toList());
-//        if (safeList(startNodes).size() != 1) {
-//            throw new InvalidNodeRelationException(format("There must be one and only one start node of : %s", startNodes));
-//        }
-//        if (!isBlank(safeList(startNodes).get(0).getPrevId())) {
-//            throw new InvalidNodeRelationException("The prevId value of start node must be empty.");
-//        }
-//
-//        // Check for end node.
-//        List<ExecutionGraph<?>> endNodes = nodes.stream().filter(n -> n instanceof EndOperator).collect(toList());
-//        if (safeList(endNodes).size() != 1) {
-//            throw new InvalidNodeRelationException(format("There must be one and only one end node of : %s", endNodes));
-//        }
-//
-//        // Check for start-to-end reachable continuity.
-//        Map<String, ExecutionGraph<?>> nodeMap = nodes.stream().collect(toMap(n -> n.getId(), n -> n));
-//        for (Entry<String, ExecutionGraph<?>> ent : nodeMap.entrySet()) {
-//            ExecutionGraph<?> n = ent.getValue();
-//            if (!(n instanceof BootOperator) && isNull(nodeMap.get(n.getPrevId()))) {
-//                throw new InvalidNodeRelationException(format("Invalid node unreachable orphaned of : %s", n));
-//            }
-//        }
+        //// Check for start node.
+        //List<ExecutionGraph<?>> startNodes = nodes.stream().filter(n -> n instanceof BootOperator).collect(toList());
+        //if (safeList(startNodes).size() != 1) {
+        //    throw new InvalidNodeRelationException(format("There must be one and only one start node of : %s", startNodes));
+        //}
+        //if (!isBlank(safeList(startNodes).get(0).getPrevId())) {
+        //    throw new InvalidNodeRelationException("The prevId value of start node must be empty.");
+        //}
+        //
+        //// Check for end node.
+        //List<ExecutionGraph<?>> endNodes = nodes.stream().filter(n -> n instanceof EndOperator).collect(toList());
+        //if (safeList(endNodes).size() != 1) {
+        //    throw new InvalidNodeRelationException(format("There must be one and only one end node of : %s", endNodes));
+        //}
+        //
+        //// Check for start-to-end reachable continuity.
+        //Map<String, ExecutionGraph<?>> nodeMap = nodes.stream().collect(toMap(n -> n.getId(), n -> n));
+        //for (Entry<String, ExecutionGraph<?>> ent : nodeMap.entrySet()) {
+        //    ExecutionGraph<?> n = ent.getValue();
+        //    if (!(n instanceof BootOperator) && isNull(nodeMap.get(n.getPrevId()))) {
+        //        throw new InvalidNodeRelationException(format("Invalid node unreachable orphaned of : %s", n));
+        //    }
+        //}
         // @formatter:on
 
         return nodes;

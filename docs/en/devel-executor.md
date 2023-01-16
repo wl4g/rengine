@@ -85,12 +85,12 @@ curl -v localhost:28002/healthz/started
 curl -v localhost:28002/metrics
 ```
 
-- Testing for API execute
+- Testing for API execute. [EngineExecutionResource.java](../../executor/src/main/java/com/wl4g/rengine/executor/rest/EngineExecutionResource.java)
 
 ```bash
 curl -v -XPOST \
 -H 'Content-Type: application/json' \
-'localhost:28002/execution/execute/sdk' \
+'localhost:28002/execution/execute/internal' \
 -d '{
   "requestId": "b9bc3e0e-d705-4ff2-9edf-970dcf95dea5",
   "clientId": "JVqEpEwIaqkEkeD5",
@@ -104,12 +104,11 @@ curl -v -XPOST \
   }
 }'
 
-- Testing for API execute/generic (POST)
+- Testing for API execute/custom (POST)
 
 ```bash
 curl -v -XPOST \
 -H 'Content-Type: application/json' \
-'localhost:28002/execution/execute/generic' \
 -d '{
   "requestId": "b9bc3e0e-d705-4ff2-9edf-970dcf95dea5",
   "clientId": "JVqEpEwIaqkEkeD5",
@@ -121,22 +120,23 @@ curl -v -XPOST \
     "userId": "u10010101",
     "foo": "bar"
   }
-}'
+}' 'localhost:28002/execution/execute/custom?reqSettings=eyJmb28iOiJiYXIifQo=&respSettings=eyJ0ZW1wbGF0ZUtleSI6ImRpbmd0YWxrIn0K' \
 ```
 
-- Testing for API execute/generic (GET)
+- Testing for API execute/custom (GET)
 
 ```bash
+#echo '{"foo":"bar"}' | base64 -w 999 # => eyJmb28iOiJiYXIifQo=
 
-echo '{"foo":"bar"}' | base64 -w 9999
-
-curl -s "localhost:28002/execution/execute/generic?\
+curl -v "http://localhost:28002/execution/execute/custom?\
 clientId=JVqEpEwIaqkEkeD5\
 &clientSecret=Uf6nJDyJQHKRP43ycl9vZ9zs7s1nyu77\
-&scenesCodes=ecommerce_trade_gift\
-&timeout=30000\
+&scenesCodes=dingtalk_event_callback\
 &bestEffort=true\
-&args=eyJmb28iOiJiYXIifQo="
+&timeout=60000\
+&args=eyJmb28iOiJiYXIifQo=\
+&reqSettings=eyJmb28iOiJiYXIifQo=\
+&respSettings=eyJ0ZW1wbGF0ZUtleSI6ImRpbmd0YWxrIn0K"
 ```
 
 - [More Configuration: quarkus.io/guides/all-config](https://quarkus.io/guides/all-config)
@@ -147,7 +147,7 @@ clientId=JVqEpEwIaqkEkeD5\
 
 ### Mock testing dynamic `groovy` script execution?
 
-- Source codes see: [HelloGroovyResource.java](src/main/java/com/wl4g/rengine/executor/rest/hello/HelloGroovyResource.java)
+- Source codes see: [HelloGroovyResource.java](../../executor/src/main/java/com/wl4g/rengine/executor/rest/hello/HelloGroovyResource.java)
 
 - Generate testing script to local path.
 
@@ -178,7 +178,7 @@ tail -f /tmp/rengine/executor.log | jq -r '.message'
 
 ### Mock testing dynamic `js` script execution?
 
-- Source codes see: [HelloGraalJSResource.java](src/main/java/com/wl4g/rengine/executor/rest/hello/HelloGraalJSResource.java)
+- Source codes see: [HelloGraalJSResource.java](../../executor/src/main/java/com/wl4g/rengine/executor/rest/hello/HelloGraalJSResource.java)
 
 - Generate testing script to local path.
 
