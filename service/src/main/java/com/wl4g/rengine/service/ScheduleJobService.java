@@ -20,30 +20,30 @@ import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
-import com.wl4g.rengine.common.entity.SchedulingJob;
-import com.wl4g.rengine.service.model.DeleteSchedulingJob;
-import com.wl4g.rengine.service.model.DeleteSchedulingJobResult;
-import com.wl4g.rengine.service.model.QuerySchedulingJob;
-import com.wl4g.rengine.service.model.SaveSchedulingJobResult;
+import com.wl4g.rengine.common.entity.ScheduleJob;
+import com.wl4g.rengine.service.model.DeleteScheduleJob;
+import com.wl4g.rengine.service.model.DeleteScheduleJobResult;
+import com.wl4g.rengine.service.model.QueryScheduleJob;
+import com.wl4g.rengine.service.model.SaveScheduleJobResult;
 
 /**
- * {@link SchedulingJobService}
+ * {@link ScheduleJobService}
  * 
  * @author James Wong
  * @version 2022-08-29
  * @since v1.0.0
  */
-public interface SchedulingJobService {
+public interface ScheduleJobService {
 
-    default SchedulingJob get(@NotNull Long id) {
-        final var result = query(QuerySchedulingJob.builder().jobId(id).build());
+    default ScheduleJob get(@NotNull Long id) {
+        final var result = query(QueryScheduleJob.builder().jobId(id).build());
         return safeList(result.getRecords()).isEmpty() ? null : result.getRecords().get(0);
     }
 
-    PageHolder<SchedulingJob> query(@NotNull QuerySchedulingJob model);
+    PageHolder<ScheduleJob> query(@NotNull QueryScheduleJob model);
 
-    SaveSchedulingJobResult save(@NotNull SchedulingJob model);
+    SaveScheduleJobResult save(@NotNull ScheduleJob model);
 
-    DeleteSchedulingJobResult delete(@NotNull DeleteSchedulingJob model);
+    DeleteScheduleJobResult delete(@NotNull DeleteScheduleJob model);
 
 }

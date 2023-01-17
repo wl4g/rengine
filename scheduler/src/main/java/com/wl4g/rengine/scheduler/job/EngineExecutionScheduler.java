@@ -27,9 +27,9 @@ import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
 import org.apache.shardingsphere.elasticjob.api.ShardingContext;
 import org.apache.shardingsphere.elasticjob.executor.JobFacade;
 
-import com.wl4g.rengine.common.entity.SchedulingJob;
-import com.wl4g.rengine.common.entity.SchedulingJob.RunState;
-import com.wl4g.rengine.common.entity.SchedulingTrigger.CronTriggerConfig;
+import com.wl4g.rengine.common.entity.ScheduleJob;
+import com.wl4g.rengine.common.entity.ScheduleJob.RunState;
+import com.wl4g.rengine.common.entity.ScheduleTrigger.CronTriggerConfig;
 import com.wl4g.rengine.common.model.ExecuteRequest;
 import com.wl4g.rengine.common.model.ExecuteResult;
 
@@ -78,28 +78,28 @@ public class EngineExecutionScheduler extends AbstractJobExecutor {
                     .build(), ex -> null);
 
             // Update execution success info to DB.
-            final SchedulingJob jobExecutionSuccess = schedulingJobService.get(jobId);
+            final ScheduleJob jobExecutionSuccess = scheduleJobService.get(jobId);
             jobExecutionSuccess.setRunState(RunState.SUCCESS);
             jobExecutionSuccess.setFinishedTime(new Date());
             jobExecutionSuccess.setRequestId(result.getRequestId());
             jobExecutionSuccess.setResults(result.getResults());
 
             log.debug("Updating to job for : {}", jobExecutionSuccess);
-            final var resultSuccess = schedulingJobService.save(jobExecutionSuccess);
+            final var resultSuccess = scheduleJobService.save(jobExecutionSuccess);
             log.debug("Updated to job for : {} => {}", jobExecutionSuccess, resultSuccess);
 
         } catch (Exception e) {
             log.error(format("Failed to execute engine execution for : contenxt: %s", context), e);
 
             // Update execution failed info to DB.
-            SchedulingJob jobExecutionFailed = null;
+            ScheduleJob jobExecutionFailed = null;
             try {
-                jobExecutionFailed = schedulingJobService.get(jobId);
+                jobExecutionFailed = scheduleJobService.get(jobId);
                 jobExecutionFailed.setRunState(RunState.FAILED);
                 jobExecutionFailed.setFinishedTime(new Date());
 
                 log.debug("Updating to job for : {}", jobExecutionFailed);
-                final var resultFailed = schedulingJobService.save(jobExecutionFailed);
+                final var resultFailed = scheduleJobService.save(jobExecutionFailed);
                 log.debug("Updated to job for : {} => {}", jobExecutionFailed, resultFailed);
             } catch (Exception e2) {
                 log.error(format("Failed to update failed execution job to DB. job: %s", jobExecutionFailed), e2);

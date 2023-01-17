@@ -58,7 +58,7 @@ public class RuleScriptController {
     private @Autowired RuleScriptService ruleScriptService;
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Query rule scripts model list.")
+    @Operation(description = "Query rule scripts.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful",
             content = { @Content(mediaType = "application/json") }) })
     @RequestMapping(path = { "query" }, method = { GET })
@@ -70,7 +70,7 @@ public class RuleScriptController {
     }
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Save rule scripts model.")
+    @Operation(description = "Save rule script.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
     public RespBase<SaveRuleScriptResult> save(@Validated @RequestBody SaveRuleScript model) {

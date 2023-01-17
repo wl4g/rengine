@@ -28,7 +28,7 @@ import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 
 import com.wl4g.rengine.client.core.config.ClientConfig;
-import com.wl4g.rengine.common.entity.SchedulingJob.ResultDescription;
+import com.wl4g.rengine.common.entity.ScheduleJob.ResultDescription;
 import com.wl4g.rengine.common.exception.RengineException;
 import com.wl4g.rengine.common.model.ExecuteResult;
 import com.wl4g.rengine.common.util.IdGenUtils;

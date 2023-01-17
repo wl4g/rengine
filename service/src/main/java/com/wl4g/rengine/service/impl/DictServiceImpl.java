@@ -33,6 +33,7 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
@@ -96,13 +97,15 @@ public class DictServiceImpl implements DictService {
 
         // The first priority get single from cache.
         if (nonNull(model.getType()) && !isBlank(model.getKey())) {
-            final var dict = parseJSON(hashOperations.get(config.getService().getDictCachedPrefix(),
+            final Dict dict = parseJSON(hashOperations.get(config.getService().getDictCachedPrefix(),
                     Dict.buildCacheHashKey(model.getType().name(), model.getKey())), Dict.class);
-            dicts = singletonList(dict);
+            if (nonNull(dict)) {
+                dicts = singletonList(dict);
+            }
         }
         // The second priority get all from cache, and filter.
         else if (isNull(model.getType()) || isBlank(model.getKey())) {
-            final var allDictJsonMap = hashOperations.entries(config.getService().getDictCachedPrefix());
+            final Map<String, String> allDictJsonMap = hashOperations.entries(config.getService().getDictCachedPrefix());
             dicts = safeMap(allDictJsonMap).entrySet()
                     .parallelStream()
                     .map(e -> parseJSON(e.getValue(), Dict.class))

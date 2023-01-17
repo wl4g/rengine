@@ -57,7 +57,7 @@ public class WorkflowGraphController {
     private @Autowired WorkflowGraphService workflowGraphService;
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Query workflow graph list.")
+    @Operation(description = "Query workflow graphs.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
     public RespBase<PageHolder<WorkflowGraph>> query(@Validated QueryWorkflowGraph model) {

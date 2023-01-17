@@ -90,7 +90,7 @@ public abstract class BsonEntitySerializers {
     public static final PropertyTransformer ID_DESERIALIZE_TRANSFORMER = new DefaultDeserialzePropertyTransformer(BaseBean.class,
             singletonMap("_id", "id"));
 
-    public static final List<String> IGNORE_PROPERTIES = asList("humanCreateDate", "humanUpdateDate");
-    public static final PropertyExcluder BASE_EXCLUDER = (beanDesc, property) -> IGNORE_PROPERTIES.contains(property);
+    public static final List<String> BASE_EXCLUDE_PROPERTIES = asList("humanCreateDate", "humanUpdateDate");
+    public static final PropertyExcluder BASE_EXCLUDER = (beanDesc, property) -> BASE_EXCLUDE_PROPERTIES.contains(property);
 
 }

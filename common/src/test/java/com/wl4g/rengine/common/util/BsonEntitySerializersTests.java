@@ -47,7 +47,7 @@ public class BsonEntitySerializersTests {
         assert map.keySet().contains("_id");
         assert !map.keySet().contains("id");
         // Ignored fields should not be generated.
-        assert !CollectionUtils2.containsAny(map.keySet(), BsonEntitySerializers.IGNORE_PROPERTIES);
+        assert !CollectionUtils2.containsAny(map.keySet(), BsonEntitySerializers.BASE_EXCLUDE_PROPERTIES);
 
         final List<Map<String, Object>> nodes = (List<Map<String, Object>>) map.get("nodes");
         System.out.println("nodes : " + nodes);

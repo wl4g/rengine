@@ -15,13 +15,6 @@
  */
 package com.wl4g.rengine.service.model;
 
-import javax.annotation.Nullable;
-
-import com.wl4g.infra.common.validation.EnumValue;
-import com.wl4g.rengine.common.entity.SchedulingTrigger;
-import com.wl4g.rengine.common.entity.SchedulingTrigger.TriggerType;
-
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,7 +22,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link QuerySchedulingTrigger}
+ * {@link DeleteScheduleTriggerResult}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -40,8 +33,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class QuerySchedulingTrigger extends QueryBase<SchedulingTrigger> {
-    @Schema(implementation = TriggerType.class)
-    private @Nullable @EnumValue(enumCls = TriggerType.class) String type;
-    private @Nullable Long triggerId;
+public class DeleteScheduleTriggerResult extends DeleteResultBase {
 }

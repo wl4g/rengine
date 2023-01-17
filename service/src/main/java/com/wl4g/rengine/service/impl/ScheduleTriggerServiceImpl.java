@@ -22,7 +22,7 @@ import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
-import static com.wl4g.rengine.service.mongo.QueryHolder.modCriteria;
+import static com.wl4g.rengine.service.mongo.QueryHolder.modIdCriteria;
 import static java.util.Objects.isNull;
 
 import java.util.Collections;
@@ -40,62 +40,60 @@ import org.springframework.stereotype.Service;
 import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
-import com.wl4g.rengine.common.entity.SchedulingTrigger;
+import com.wl4g.rengine.common.entity.ScheduleTrigger;
 import com.wl4g.rengine.common.util.IdGenUtils;
-import com.wl4g.rengine.service.SchedulingTriggerService;
-import com.wl4g.rengine.service.model.DeleteSchedulingTrigger;
-import com.wl4g.rengine.service.model.DeleteSchedulingTriggerResult;
-import com.wl4g.rengine.service.model.QuerySchedulingTrigger;
-import com.wl4g.rengine.service.model.SaveSchedulingTrigger;
-import com.wl4g.rengine.service.model.SaveSchedulingTriggerResult;
+import com.wl4g.rengine.service.ScheduleTriggerService;
+import com.wl4g.rengine.service.model.DeleteScheduleTrigger;
+import com.wl4g.rengine.service.model.DeleteScheduleTriggerResult;
+import com.wl4g.rengine.service.model.QueryScheduleTrigger;
+import com.wl4g.rengine.service.model.SaveScheduleTrigger;
+import com.wl4g.rengine.service.model.SaveScheduleTriggerResult;
 
 /**
- * {@link SchedulingTriggerServiceImpl}
+ * {@link ScheduleTriggerServiceImpl}
  * 
  * @author James Wong
  * @version 2023-01-08
  * @since v1.0.0
  */
 @Service
-public class SchedulingTriggerServiceImpl implements SchedulingTriggerService {
+public class ScheduleTriggerServiceImpl implements ScheduleTriggerService {
 
     private @Autowired MongoTemplate mongoTemplate;
 
     @Override
-    public PageHolder<SchedulingTrigger> query(QuerySchedulingTrigger model) {
-        final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getTriggerId())))
-                .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
+    public PageHolder<ScheduleTrigger> query(QueryScheduleTrigger model) {
+        final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getTriggerId()),
+                isCriteria("properties.type", model.getType())))
+                        .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
-        final List<SchedulingTrigger> triggeres = mongoTemplate.find(query, SchedulingTrigger.class,
-                MongoCollectionDefinition.SCHEDULING_TRIGGER.getName());
-        // Collections.sort(triggeres, (o1, o2) ->
-        // safeLongToInt(o2.getUpdateDate().getTime() -
-        // o1.getUpdateDate().getTime()));
+        final List<ScheduleTrigger> triggeres = mongoTemplate.find(query, ScheduleTrigger.class,
+                MongoCollectionDefinition.SCHEDULE_TRIGGER.getName());
 
-        return new PageHolder<SchedulingTrigger>(model.getPageNum(), model.getPageSize())
-                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.SCHEDULING_TRIGGER.getName()))
+        return new PageHolder<ScheduleTrigger>(model.getPageNum(), model.getPageSize())
+                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.SCHEDULE_TRIGGER.getName()))
                 .withRecords(triggeres);
     }
 
     @Override
-    public List<SchedulingTrigger> findWithSharding(
-            final @NotNull QuerySchedulingTrigger model,
+    public List<ScheduleTrigger> findWithSharding(
+            final @NotNull QueryScheduleTrigger model,
             final @NotNull Integer divisor,
             final @NotNull Integer remainder) {
 
-        final Query query = new Query(andCriteria(baseCriteria(model), isCriteria("_id", model.getTriggerId()),
-                modCriteria("_id", divisor, remainder), isCriteria("properties.type", model.getType()))).with(defaultSort());
+        final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getTriggerId()),
+                modIdCriteria(divisor, remainder), isCriteria("properties.type", model.getType()))).with(defaultSort());
 
-        List<SchedulingTrigger> triggers = mongoTemplate.find(query, SchedulingTrigger.class,
-                MongoCollectionDefinition.SCHEDULING_TRIGGER.getName());
+        List<ScheduleTrigger> triggers = mongoTemplate.find(query, ScheduleTrigger.class,
+                MongoCollectionDefinition.SCHEDULE_TRIGGER.getName());
         Collections.sort(triggers, (o1, o2) -> safeLongToInt(o2.getUpdateDate().getTime() - o1.getUpdateDate().getTime()));
 
         return triggers;
     }
 
     @Override
-    public SaveSchedulingTriggerResult save(SaveSchedulingTrigger model) {
-        SchedulingTrigger trigger = model;
+    public SaveScheduleTriggerResult save(SaveScheduleTrigger model) {
+        ScheduleTrigger trigger = model;
         notNullOf(trigger, "trigger");
 
         if (isNull(trigger.getId())) {
@@ -105,16 +103,16 @@ public class SchedulingTriggerServiceImpl implements SchedulingTriggerService {
             trigger.preUpdate();
         }
 
-        SchedulingTrigger saved = mongoTemplate.insert(trigger, MongoCollectionDefinition.SCHEDULING_TRIGGER.getName());
-        return SaveSchedulingTriggerResult.builder().id(saved.getId()).build();
+        ScheduleTrigger saved = mongoTemplate.insert(trigger, MongoCollectionDefinition.SCHEDULE_TRIGGER.getName());
+        return SaveScheduleTriggerResult.builder().id(saved.getId()).build();
     }
 
     @Override
-    public DeleteSchedulingTriggerResult delete(DeleteSchedulingTrigger model) {
+    public DeleteScheduleTriggerResult delete(DeleteScheduleTrigger model) {
         // 'id' is a keyword, it will be automatically converted to '_id'
         DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
-                MongoCollectionDefinition.SCHEDULING_TRIGGER.getName());
-        return DeleteSchedulingTriggerResult.builder().deletedCount(result.getDeletedCount()).build();
+                MongoCollectionDefinition.SCHEDULE_TRIGGER.getName());
+        return DeleteScheduleTriggerResult.builder().deletedCount(result.getDeletedCount()).build();
     }
 
 }

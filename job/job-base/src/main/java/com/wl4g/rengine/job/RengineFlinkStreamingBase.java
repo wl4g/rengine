@@ -86,7 +86,7 @@ public abstract class RengineFlinkStreamingBase implements Runnable {
     // FLINK Sink options.
     private Boolean forceUsePrintSink;
 
-    // FLINK SchedulingJob options.
+    // FLINK ScheduleJob options.
     private String jobName;
 
     // Command line.
@@ -132,7 +132,7 @@ public abstract class RengineFlinkStreamingBase implements Runnable {
                 .longOption("idleTimeoutMillis", "30000", "The timeout millis for the idleness detection.")
                 // FLINK Sink options.
                 .option("F", "forceUsePrintSink", "false", "Force override set to stdout print sink function.")
-                // SchedulingJob options.
+                // ScheduleJob options.
                 .option("J", "jobName", "RengineAggregateFlinkJob", "Flink connect MQ source streaming job name.");
     }
 
@@ -167,7 +167,7 @@ public abstract class RengineFlinkStreamingBase implements Runnable {
         this.idleTimeoutMillis = line.getLong("idleTimeoutMillis");
         // Sink options.
         this.forceUsePrintSink = line.getBoolean("forceUsePrintSink");
-        // SchedulingJob options.
+        // ScheduleJob options.
         this.jobName = line.get("jobName");
         return this;
     }
@@ -204,7 +204,8 @@ public abstract class RengineFlinkStreamingBase implements Runnable {
 
     @Override
     public void run() {
-        notNull(line, IllegalStateException.class, "Parse arguments are not initialized, must call #parse() before");
+        notNull(line, errmsg -> new IllegalStateException(errmsg),
+                "Parse arguments are not initialized, must call #parse() before");
 
         this.props = (Properties) System.getProperties().clone();
 

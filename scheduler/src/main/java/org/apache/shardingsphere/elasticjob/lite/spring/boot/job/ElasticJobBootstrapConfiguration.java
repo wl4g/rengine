@@ -59,9 +59,9 @@ public class ElasticJobBootstrapConfiguration implements SmartInitializingSingle
 
     @Override
     public void afterSingletonsInstantiated() {
-        log.info("Initial SchedulingJob bootstrap beans ...");
+        log.info("Initial ScheduleJob bootstrap beans ...");
         createJobBootstrapBeans();
-        log.info("SchedulingJob Bootstrap beans initialized.");
+        log.info("ScheduleJob Bootstrap beans initialized.");
     }
 
     /**

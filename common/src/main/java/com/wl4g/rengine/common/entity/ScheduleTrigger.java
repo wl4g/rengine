@@ -15,13 +15,9 @@
  */
 package com.wl4g.rengine.common.entity;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -53,7 +49,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class SchedulingTrigger extends BaseBean {
+public class ScheduleTrigger extends BaseBean {
     private static final long serialVersionUID = 1L;
 
     @NotNull
@@ -77,7 +73,7 @@ public class SchedulingTrigger extends BaseBean {
     }
 
     public static enum TriggerType {
-        NONE, CRON;
+        CRON/* , NONE */;
     }
 
     @Getter
@@ -88,10 +84,7 @@ public class SchedulingTrigger extends BaseBean {
     public static class CronTriggerConfig extends TriggerPropertiesBase {
         private @NotBlank String cron;
         private @NotNull @Default Boolean misfire = false;
-        private @NotEmpty @Default List<String> scenesCodes = new ArrayList<>();
-        private @NotNull @Default Boolean bestEffort = ExecuteRequest.DEFAULT_BESTEFFORT;
-        private @NotNull @Default @Min(1) Long timeout = ExecuteRequest.DEFAULT_TIMEOUT;
-        private @NotNull Map<String, Object> args;
+        private @NotNull List<ExecuteRequest> requests;
     }
 
 }

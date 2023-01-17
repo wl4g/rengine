@@ -20,7 +20,7 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
-import com.wl4g.rengine.common.entity.SchedulingJob.ResultDescription;
+import com.wl4g.rengine.common.entity.ScheduleJob.ResultDescription;
 
 import lombok.Builder.Default;
 import lombok.Getter;

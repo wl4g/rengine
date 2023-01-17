@@ -51,16 +51,17 @@ public class CustomMongoConfigureTests {
                 .delFlag(0)
                 .build();
         final String json = toJSONString(BsonEntitySerializers.DEFAULT_MODIFIER_MAPPER, source,
-                BsonEntitySerializers.ID_TRANSFORM_SERIALIZE, BsonEntitySerializers.IGNORE_PROPERTIES);
+                BsonEntitySerializers.ID_SERIALIZE_TRANSFORMER, BsonEntitySerializers.BASE_EXCLUDER);
         System.out.println(json);
+        assert json.contains("{\"_id\":111101001");
     }
 
     @Test
     public void testDeSerializeIgnoreAndTransformProperties() {
         final String json = "{\"_id\":111101001,\"orgCode\":null,\"enable\":1,\"labels\":[\"foo\"],\"remark\":null,\"createBy\":11,\"createDate\":\"2022-12-28 23:27:19\",\"updateBy\":11,\"updateDate\":\"2022-12-28 23:27:19\",\"delFlag\":0,\"name\":null,\"properties\":{\"type\":\"MONGO\",\"connectionString\":\"mongodb://localhost:27010\"}}";
         final DataSourceProperties source = parseJSON(BsonEntitySerializers.DEFAULT_MODIFIER_MAPPER, json,
-                DataSourceProperties.class, BsonEntitySerializers.ID_TRANSFORM_DESERIALIZE,
-                BsonEntitySerializers.IGNORE_PROPERTIES);
+                DataSourceProperties.class, BsonEntitySerializers.ID_DESERIALIZE_TRANSFORMER,
+                BsonEntitySerializers.BASE_EXCLUDER);
         System.out.println(source);
         assert source.getId() == 111101001L;
     }

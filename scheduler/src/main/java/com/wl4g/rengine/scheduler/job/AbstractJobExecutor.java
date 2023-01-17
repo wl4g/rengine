@@ -38,8 +38,8 @@ import com.wl4g.rengine.client.core.RengineClient;
 import com.wl4g.rengine.scheduler.config.RengineSchedulerProperties;
 import com.wl4g.rengine.scheduler.config.RengineSchedulerProperties.BaseJobProperties;
 import com.wl4g.rengine.scheduler.config.RengineSchedulerProperties.EngineSchedulingControllerJobProperties;
-import com.wl4g.rengine.service.SchedulingJobService;
-import com.wl4g.rengine.service.SchedulingTriggerService;
+import com.wl4g.rengine.service.ScheduleJobService;
+import com.wl4g.rengine.service.ScheduleTriggerService;
 
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
@@ -71,9 +71,9 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor {
 
     protected final RengineClient rengineClient;
 
-    protected final SchedulingTriggerService schedulingTriggerService;
+    protected final ScheduleTriggerService scheduleTriggerService;
 
-    protected final SchedulingJobService schedulingJobService;
+    protected final ScheduleJobService scheduleJobService;
 
     // @SuppressWarnings("rawtypes")
     // protected final Collection<RengineEventBusService> eventbusServices;
@@ -83,8 +83,8 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor {
         this.config = SpringContextHolder.getBean(RengineSchedulerProperties.class);
         this.regCenter = SpringContextHolder.getBean(CoordinatorRegistryCenter.class);
         this.rengineClient = SpringContextHolder.getBean(RengineClient.class);
-        this.schedulingTriggerService = SpringContextHolder.getBean(SchedulingTriggerService.class);
-        this.schedulingJobService = SpringContextHolder.getBean(SchedulingJobService.class);
+        this.scheduleTriggerService = SpringContextHolder.getBean(ScheduleTriggerService.class);
+        this.scheduleJobService = SpringContextHolder.getBean(ScheduleJobService.class);
         // this.eventbusServices=safeMap(SpringContextHolder.getBeans(RengineEventBusService.class)).values();
     }
 

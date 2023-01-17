@@ -124,9 +124,9 @@ public abstract class RengineConstants extends EnvironmentUtil {
 
         DATASOURCES("t_datasources", true),
 
-        SCHEDULING_TRIGGER("t_scheduling_triggers", true),
+        SCHEDULE_TRIGGER("t_schedule_triggers", true),
 
-        SCHEDULING_JOBS("t_scheduling_jobs", true),
+        SCHEDULE_JOBS("t_schedule_jobs", true),
 
         AGGREGATES("t_aggregates", true);
 

@@ -31,7 +31,7 @@ import com.wl4g.infra.common.lang.Assert2;
 import com.wl4g.rengine.common.entity.Rule.RuleEngine;
 import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
 import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
-import com.wl4g.rengine.common.entity.SchedulingJob.ResultDescription;
+import com.wl4g.rengine.common.entity.ScheduleJob.ResultDescription;
 import com.wl4g.rengine.common.entity.Workflow.WorkflowGraphWrapper;
 import com.wl4g.rengine.common.entity.Workflow.WorkflowWrapper;
 import com.wl4g.rengine.common.graph.ExecutionGraph;

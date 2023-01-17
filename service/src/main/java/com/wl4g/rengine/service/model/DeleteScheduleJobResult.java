@@ -22,7 +22,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link DeleteSchedulingTrigger}
+ * {@link DeleteScheduleJobResult}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -33,5 +33,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class DeleteSchedulingTrigger extends DeleteBase {
+public class DeleteScheduleJobResult extends DeleteResultBase {
 }

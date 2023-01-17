@@ -57,7 +57,7 @@ public class ScenesController {
     private @Autowired ScenesService scenesService;
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Query project list.")
+    @Operation(description = "Query sceneses.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
     public RespBase<PageHolder<Scenes>> query(@Validated QueryScenes model) {
@@ -68,7 +68,7 @@ public class ScenesController {
     }
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Save project model.")
+    @Operation(description = "Save scenes.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
     public RespBase<SaveScenesResult> save(@Validated @RequestBody SaveScenes model) {

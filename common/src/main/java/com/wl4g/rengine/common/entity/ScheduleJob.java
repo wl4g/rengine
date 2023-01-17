@@ -31,7 +31,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link SchedulingJob}
+ * {@link ScheduleJob}
  * 
  * @author James Wong
  * @version 2022-08-29
@@ -42,15 +42,13 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class SchedulingJob extends BaseBean {
+public class ScheduleJob extends BaseBean {
     private static final long serialVersionUID = 1L;
     private @NotNull Long triggerId;
     private RunState runState;
     private Date schedTime;
     private Date firstFireTime;
     private String requestId;
-    // private String clientId;
-    // private String clienttSecret;
     private Date finishedTime;
     private List<ResultDescription> results;
 

@@ -53,7 +53,7 @@ public class IdentityProviderController {
     private @Autowired IdentityProviderService identityProviderService;
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Query Identity Provider setting.")
+    @Operation(description = "Query identity provider settings.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
     public RespBase<QueryIdentityProviderResult> query(@Validated QueryIdentityProvider model) {
@@ -64,7 +64,7 @@ public class IdentityProviderController {
     }
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Save identity provider")
+    @Operation(description = "Save identity provider settings.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
     public RespBase<SaveIdentityProviderResult> save(@Validated @RequestBody SaveIdentityProvider model) {

@@ -57,7 +57,7 @@ public class DictController {
     private @Autowired DictService dictService;
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Query project list.")
+    @Operation(description = "Query dicts.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
     public RespBase<PageHolder<Dict>> query(@Validated QueryDict model) {
@@ -68,7 +68,7 @@ public class DictController {
     }
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Save project model.")
+    @Operation(description = "Save dict.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
     public RespBase<SaveDictResult> save(@Validated @RequestBody SaveDict model) {

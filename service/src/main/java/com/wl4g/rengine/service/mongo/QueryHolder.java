@@ -94,6 +94,10 @@ public abstract class QueryHolder {
         return null;
     }
 
+    public static @Nullable Criteria modIdCriteria(final @Nullable Integer divisor, final @Nullable Integer remainder) {
+        return modCriteria(DEFAULT_FIELD_ID, divisor, remainder);
+    }
+
     public static @Nullable Criteria modCriteria(
             final @NotBlank String fieldName,
             final @Nullable Integer divisor,

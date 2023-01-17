@@ -20,31 +20,31 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
-import com.wl4g.rengine.common.entity.SchedulingTrigger;
-import com.wl4g.rengine.service.model.DeleteSchedulingTrigger;
-import com.wl4g.rengine.service.model.DeleteSchedulingTriggerResult;
-import com.wl4g.rengine.service.model.QuerySchedulingTrigger;
-import com.wl4g.rengine.service.model.SaveSchedulingTrigger;
-import com.wl4g.rengine.service.model.SaveSchedulingTriggerResult;
+import com.wl4g.rengine.common.entity.ScheduleTrigger;
+import com.wl4g.rengine.service.model.DeleteScheduleTrigger;
+import com.wl4g.rengine.service.model.DeleteScheduleTriggerResult;
+import com.wl4g.rengine.service.model.QueryScheduleTrigger;
+import com.wl4g.rengine.service.model.SaveScheduleTrigger;
+import com.wl4g.rengine.service.model.SaveScheduleTriggerResult;
 
 /**
- * {@link SchedulingTriggerService}
+ * {@link ScheduleTriggerService}
  * 
  * @author James Wong
  * @version 2022-08-29
  * @since v1.0.0
  */
-public interface SchedulingTriggerService {
+public interface ScheduleTriggerService {
 
-    PageHolder<SchedulingTrigger> query(@NotNull QuerySchedulingTrigger model);
+    PageHolder<ScheduleTrigger> query(@NotNull QueryScheduleTrigger model);
 
-    List<SchedulingTrigger> findWithSharding(
-            @NotNull QuerySchedulingTrigger model,
+    List<ScheduleTrigger> findWithSharding(
+            @NotNull QueryScheduleTrigger model,
             @NotNull Integer divisor,
             @NotNull Integer remainder);
 
-    SaveSchedulingTriggerResult save(@NotNull SaveSchedulingTrigger model);
+    SaveScheduleTriggerResult save(@NotNull SaveScheduleTrigger model);
 
-    DeleteSchedulingTriggerResult delete(@NotNull DeleteSchedulingTrigger model);
+    DeleteScheduleTriggerResult delete(@NotNull DeleteScheduleTrigger model);
 
 }

@@ -35,46 +35,43 @@ import org.springframework.stereotype.Service;
 import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
-import com.wl4g.rengine.common.entity.SchedulingJob;
+import com.wl4g.rengine.common.entity.ScheduleJob;
 import com.wl4g.rengine.common.util.IdGenUtils;
-import com.wl4g.rengine.service.SchedulingJobService;
-import com.wl4g.rengine.service.model.DeleteSchedulingJob;
-import com.wl4g.rengine.service.model.DeleteSchedulingJobResult;
-import com.wl4g.rengine.service.model.QuerySchedulingJob;
-import com.wl4g.rengine.service.model.SaveSchedulingJobResult;
+import com.wl4g.rengine.service.ScheduleJobService;
+import com.wl4g.rengine.service.model.DeleteScheduleJob;
+import com.wl4g.rengine.service.model.DeleteScheduleJobResult;
+import com.wl4g.rengine.service.model.QueryScheduleJob;
+import com.wl4g.rengine.service.model.SaveScheduleJobResult;
 
 /**
- * {@link SchedulingJobServiceImpl}
+ * {@link ScheduleJobServiceImpl}
  * 
  * @author James Wong
  * @version 2023-01-08
  * @since v1.0.0
  */
 @Service
-public class SchedulingJobServiceImpl implements SchedulingJobService {
+public class ScheduleJobServiceImpl implements ScheduleJobService {
 
     private @Autowired MongoTemplate mongoTemplate;
 
     @Override
-    public PageHolder<SchedulingJob> query(QuerySchedulingJob model) {
+    public PageHolder<ScheduleJob> query(QueryScheduleJob model) {
         final Query query = new Query(
                 andCriteria(baseCriteria(model), isIdCriteria(model.getJobId()), isCriteria("triggerId", model.getTriggerId())))
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
-        final List<SchedulingJob> jobes = mongoTemplate.find(query, SchedulingJob.class,
-                MongoCollectionDefinition.SCHEDULING_JOBS.getName());
-        // Collections.sort(jobes, (o1, o2) ->
-        // safeLongToInt(o2.getUpdateDate().getTime() -
-        // o1.getUpdateDate().getTime()));
+        final List<ScheduleJob> jobes = mongoTemplate.find(query, ScheduleJob.class,
+                MongoCollectionDefinition.SCHEDULE_JOBS.getName());
 
-        return new PageHolder<SchedulingJob>(model.getPageNum(), model.getPageSize())
-                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.SCHEDULING_JOBS.getName()))
+        return new PageHolder<ScheduleJob>(model.getPageNum(), model.getPageSize())
+                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.SCHEDULE_JOBS.getName()))
                 .withRecords(jobes);
     }
 
     @Override
-    public SaveSchedulingJobResult save(SchedulingJob model) {
-        SchedulingJob job = model;
+    public SaveScheduleJobResult save(ScheduleJob model) {
+        ScheduleJob job = model;
         notNullOf(job, "job");
 
         if (isNull(job.getId())) {
@@ -84,16 +81,16 @@ public class SchedulingJobServiceImpl implements SchedulingJobService {
             job.preUpdate();
         }
 
-        final SchedulingJob saved = mongoTemplate.insert(job, MongoCollectionDefinition.SCHEDULING_JOBS.getName());
-        return SaveSchedulingJobResult.builder().id(saved.getId()).build();
+        final ScheduleJob saved = mongoTemplate.insert(job, MongoCollectionDefinition.SCHEDULE_JOBS.getName());
+        return SaveScheduleJobResult.builder().id(saved.getId()).build();
     }
 
     @Override
-    public DeleteSchedulingJobResult delete(DeleteSchedulingJob model) {
+    public DeleteScheduleJobResult delete(DeleteScheduleJob model) {
         // 'id' is a keyword, it will be automatically converted to '_id'
         final DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
-                MongoCollectionDefinition.SCHEDULING_JOBS.getName());
-        return DeleteSchedulingJobResult.builder().deletedCount(result.getDeletedCount()).build();
+                MongoCollectionDefinition.SCHEDULE_JOBS.getName());
+        return DeleteScheduleJobResult.builder().deletedCount(result.getDeletedCount()).build();
     }
 
 }

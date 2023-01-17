@@ -58,7 +58,7 @@ public class RuleController {
     private @Autowired RuleService ruleService;
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Query rules model list.")
+    @Operation(description = "Query rules.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful",
             content = { @Content(mediaType = "application/json") }) })
     @RequestMapping(path = { "query" }, method = { GET })
@@ -70,7 +70,7 @@ public class RuleController {
     }
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Save rules model.")
+    @Operation(description = "Save rule.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
     public RespBase<SaveRuleResult> save(@Validated @RequestBody SaveRule model) {

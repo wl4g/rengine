@@ -106,6 +106,6 @@ public class ExecuteRequest extends BaseRequest {
         return this;
     }
 
-    public static final long DEFAULT_TIMEOUT = 3_000L;
+    public static final long DEFAULT_TIMEOUT = 10_000L;
     public static final boolean DEFAULT_BESTEFFORT = false;
 }

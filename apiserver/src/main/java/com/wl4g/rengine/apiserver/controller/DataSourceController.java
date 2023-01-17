@@ -58,7 +58,7 @@ public class DataSourceController {
     private @Autowired DataSourceService dataSourceService;
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Query dataSources model list.")
+    @Operation(description = "Query dataSources.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful",
             content = { @Content(mediaType = "application/json") }) })
     @RequestMapping(path = { "query" }, method = { GET })
@@ -70,7 +70,7 @@ public class DataSourceController {
     }
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Save dataSources model.")
+    @Operation(description = "Save dataSource.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
     public RespBase<SaveDataSourceResult> save(@Validated @RequestBody SaveDataSource model) {

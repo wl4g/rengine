@@ -57,7 +57,7 @@ public class WorkflowController {
     private @Autowired WorkflowService workflowService;
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Query workflow list.")
+    @Operation(description = "Query workflows.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
     public RespBase<PageHolder<Workflow>> query(@Validated QueryWorkflow model) {
@@ -68,7 +68,7 @@ public class WorkflowController {
     }
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Save workflows model.")
+    @Operation(description = "Save workflow.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
     public RespBase<SaveWorkflowResult> save(@Validated @RequestBody SaveWorkflow model) {

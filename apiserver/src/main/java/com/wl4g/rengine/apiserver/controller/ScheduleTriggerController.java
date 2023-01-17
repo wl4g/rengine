@@ -15,6 +15,7 @@
  */
 package com.wl4g.rengine.apiserver.controller;
 
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -24,12 +25,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.service.NotificationService;
-import com.wl4g.rengine.service.model.QueryNotification;
-import com.wl4g.rengine.service.model.QueryNotificationResult;
-import com.wl4g.rengine.service.model.SaveNotification;
-import com.wl4g.rengine.service.model.SaveNotificationResult;
+import com.wl4g.rengine.common.entity.ScheduleTrigger;
+import com.wl4g.rengine.service.ScheduleTriggerService;
+import com.wl4g.rengine.service.model.DeleteScheduleTrigger;
+import com.wl4g.rengine.service.model.DeleteScheduleTriggerResult;
+import com.wl4g.rengine.service.model.QueryScheduleTrigger;
+import com.wl4g.rengine.service.model.SaveScheduleTrigger;
+import com.wl4g.rengine.service.model.SaveScheduleTriggerResult;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -38,39 +42,50 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link NotificationController}
+ * {@link ScheduleTriggerController}
  * 
  * @author James Wong
  * @version 2022-08-28
  * @since v1.0.0
  */
-@Tag(name = "NotificationAPI", description = "The notification setting management API")
+@Tag(name = "ScheduleTriggerAPI", description = "The ScheduleTrigger management API")
 @Slf4j
 @RestController
-@RequestMapping("/admin/notification")
-public class NotificationController {
+@RequestMapping("/admin/scheduleTrigger")
+public class ScheduleTriggerController {
 
-    private @Autowired NotificationService notificationService;
+    private @Autowired ScheduleTriggerService scheduleTriggerService;
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Query notification settings.")
+    @Operation(description = "Query schedule triggers.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
-    public RespBase<QueryNotificationResult> query(@Validated QueryNotification model) {
+    public RespBase<PageHolder<ScheduleTrigger>> query(@Validated QueryScheduleTrigger model) {
         log.info("called: model={}", model);
-        RespBase<QueryNotificationResult> resp = RespBase.create();
-        resp.setData(notificationService.query(model));
+        RespBase<PageHolder<ScheduleTrigger>> resp = RespBase.create();
+        resp.setData(scheduleTriggerService.query(model));
         return resp;
     }
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Save notification settings.")
+    @Operation(description = "Save schedule trigger.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    public RespBase<SaveNotificationResult> save(@Validated @RequestBody SaveNotification model) {
+    public RespBase<SaveScheduleTriggerResult> save(@Validated @RequestBody SaveScheduleTrigger model) {
         log.info("called: model={}", model);
-        RespBase<SaveNotificationResult> resp = RespBase.create();
-        resp.setData(notificationService.save(model));
+        RespBase<SaveScheduleTriggerResult> resp = RespBase.create();
+        resp.setData(scheduleTriggerService.save(model));
+        return resp;
+    }
+
+    // @SecurityRequirement(name = "default_oauth")
+    @Operation(description = "Delete schedule trigger.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
+    @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
+    public RespBase<DeleteScheduleTriggerResult> delete(@Validated @RequestBody DeleteScheduleTrigger model) {
+        log.info("called: model={}", model);
+        RespBase<DeleteScheduleTriggerResult> resp = RespBase.create();
+        resp.setData(scheduleTriggerService.delete(model));
         return resp;
     }
 

@@ -60,7 +60,7 @@ public class UploadController {
     private @Autowired UploadService uploadService;
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Query upload file list.")
+    @Operation(description = "Query upload files.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
     public RespBase<PageHolder<UploadObject>> query(@Validated QueryUpload model) {
