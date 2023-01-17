@@ -15,6 +15,7 @@
  */
 package com.wl4g.rengine.executor.execution.engine;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.ensureMap;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
@@ -176,7 +177,8 @@ public abstract class AbstractScriptEngine implements IEngine {
                 // .logger(new ScriptLogger(parameter.getScenesCode(),parameter.getWorkflowId(), minioManager))
                 // @formatter:on
                 .executor(createScriptExecutor(parameter, executor))
-                // .attributes(ProxyObject.fromMap(emptyMap()))
+                // Add the workflow graph extension attributes.
+                .attributes(ProxyObject.fromMap(ensureMap(parameter.getAttributes())))
                 .build();
     }
 

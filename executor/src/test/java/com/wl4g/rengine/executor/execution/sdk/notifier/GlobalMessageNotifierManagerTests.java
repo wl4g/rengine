@@ -34,6 +34,7 @@ import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.CreateSc
 import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.MsgKeyType;
 import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.SampleActionCard6Param;
 import com.wl4g.infra.common.notification.email.internal.EmailSenderAPI;
+import com.wl4g.infra.common.serialize.JacksonUtils;
 import com.wl4g.rengine.executor.metrics.TestDefaultMeterSetup;
 import com.wl4g.rengine.executor.util.TestDefaultBaseSetup;
 import com.wl4g.rengine.executor.util.TestDefaultRedisSetup;
@@ -74,13 +75,13 @@ public class GlobalMessageNotifierManagerTests {
     public void testDingtalkNotifierSend() throws Exception {
         setup();
 
-        final ScriptMessageNotifier dingtalkNotifier = globalMessageNotifierManager.getMessageNotifier(NotifierKind.DINGTALK);
+        final ScriptMessageNotifier dingtalkNotifier = globalMessageNotifierManager.obtain(NotifierKind.DINGTALK);
         System.out.println("dingtalkNotifier : " + dingtalkNotifier);
 
         // @formatter:off
         final MsgKeyType msgKey = MsgKeyType.sampleActionCard6;
         final SampleActionCard6Param msgParam = SampleActionCard6Param.builder()
-                .title("（故障演练）异常告警")
+                .title("（故障演练）异常告警") 
                 .text("- 告警时间: 2023-01-01 01:01:01\n- 持续时间: 10m\n- 应用服务: mqttcollect\n- 集群环境: production\n- 节点 IP: 10.0.0.112\n- 节点 CPU(10s): 200%\n- 节点 Free Mem(5m): 10%\n- 节点 InNet(1m): 1234mbps\n- 节点 OutNet(1m): 1234mbps\n- 节点 IOPS(1m): 512/1501\n- 节点 Free Disks: 99GB/250GB\n- 诊断信息: <font color='#ff0000' size=3>send_kafka_fail_rate > 30%</font>\n- **[更多指标](http://grafana.example.com/123)**")
                 .buttonTitle1("Restart Now")
                 .buttonUrl1("https://qq.com")
@@ -124,16 +125,19 @@ public class GlobalMessageNotifierManagerTests {
         setup();
 
         final DingtalkScriptMessageNotifier dingtalkNotifier = (DingtalkScriptMessageNotifier) globalMessageNotifierManager
-                .getMessageNotifier(NotifierKind.DINGTALK);
+                .obtain(NotifierKind.DINGTALK);
         System.out.println("dingtalkNotifier : " + dingtalkNotifier);
 
-        final Object result = dingtalkNotifier.createSceneGroupV2(CreateSceneGroupV2.builder()
+        final Map<String, Object> parameter = JacksonUtils.convertBean(CreateSceneGroupV2.builder()
                 .title("测试群-01")
-                .template_id("4ba6847f-b9b0-42ca-96ea-22c4ed8a3fbd")
-                .owner_user_id("6165471647114842627")
-                .user_ids("6165471647114842627")
-                .subadmin_ids("6165471647114842627")
-                .build());
+                .templateId("4ba6847f-b9b0-42ca-96ea-22c4ed8a3fbd")
+                .ownerUserId("6165471647114842627")
+                .userIds("6165471647114842627")
+                .subadminIds("6165471647114842627")
+                .build(), JacksonUtils.MAP_OBJECT_TYPE_REF);
+        System.out.println("parameter : " + parameter);
+
+        final Object result = dingtalkNotifier.createSceneGroupV2(parameter);
 
         System.out.println(toJSONString(result));
     }
@@ -143,7 +147,7 @@ public class GlobalMessageNotifierManagerTests {
     public void testEmailNotifierSend() throws Exception {
         setup();
 
-        final ScriptMessageNotifier emailNotifier = globalMessageNotifierManager.getMessageNotifier(NotifierKind.EMAIL);
+        final ScriptMessageNotifier emailNotifier = globalMessageNotifierManager.obtain(NotifierKind.EMAIL);
         System.out.println("emailNotifier : " + emailNotifier);
 
         final Map<String, Object> parameter = new HashMap<>();

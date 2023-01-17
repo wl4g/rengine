@@ -18,7 +18,6 @@ package com.wl4g.rengine.common.entity;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -138,17 +137,11 @@ public class Notification extends BaseBean {
         // For DingTalk open platform enterprise internal applications, cropId
         // is appKey.
         private String corpId;
-        // The send to group messagees information.
-        private @Nullable String defaultOpenConversationId;
-        private @Nullable String defaultRobotCode;
-        private @Nullable String defaultScenesGroupV2TemplateId;
-        private @Nullable List<String> defaultScenesGroupV2AdminUserIds;
-        private @Nullable List<String> defaultScenesGroupV2UserIds;
 
-        public DingtalkConfig validate(boolean checkCallbackAPIConfig) {
+        public DingtalkConfig validate(boolean checkCallbackAPIProperties) {
             hasTextOf(appKey, "appKey");
             hasTextOf(appSecret, "appSecret");
-            if (checkCallbackAPIConfig) {
+            if (checkCallbackAPIProperties) {
                 hasTextOf(token, "token");
                 hasTextOf(aesKey, "aesKey");
                 hasTextOf(corpId, "corpId");

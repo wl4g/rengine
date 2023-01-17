@@ -64,6 +64,16 @@ public final class ExecutionGraphParameter implements Serializable {
     private @NotBlank Long workflowId;
 
     /**
+     * The extended attribute configuration of the workflow graph, for example,
+     * calling
+     * <b>{@link com.wl4g.rengine.executor.execution.sdk.notifier.DingtalkScriptMessageNotifier}</b>
+     * in the execution node (script) of <b>dingtalk_workflow</b> to send group
+     * messages, at this time, the <b>openConversationId</b>, <b>robotCode</b>,
+     * etc. are required, which can be get from here.
+     */
+    private @Nullable Map<String, Object> attributes;
+
+    /**
      * The execution workflow arguments.
      */
     private @Default @Nullable Map<String, Object> args = emptyMap();

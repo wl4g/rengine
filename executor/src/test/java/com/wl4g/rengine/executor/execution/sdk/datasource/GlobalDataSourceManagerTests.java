@@ -91,7 +91,7 @@ public class GlobalDataSourceManagerTests {
     public void testMongoSourceFacadeFindList() throws Exception {
         setup();
 
-        final MongoSourceFacade mongoSourceFacade = globalDataSourceManager.loadDataSource(DataSourceType.MONGO, "default");
+        final MongoSourceFacade mongoSourceFacade = globalDataSourceManager.obtain(DataSourceType.MONGO, "default");
         System.out.println("mongoSourceFacade : " + mongoSourceFacade);
 
         // @formatter:off
@@ -111,7 +111,7 @@ public class GlobalDataSourceManagerTests {
     public void testJDBCSourceFacadeFindList() throws Exception {
         setup();
 
-        final JDBCSourceFacade jdbcSourceFacade = globalDataSourceManager.loadDataSource(DataSourceType.JDBC, "default");
+        final JDBCSourceFacade jdbcSourceFacade = globalDataSourceManager.obtain(DataSourceType.JDBC, "default");
         System.out.println("jdbcSourceFacade : " + jdbcSourceFacade);
 
         final String sql = "select * from user where user='root'";
@@ -124,7 +124,7 @@ public class GlobalDataSourceManagerTests {
     public void testRedisSourceFacadeFindList() throws Exception {
         setup();
 
-        final RedisSourceFacade redisSourceFacade = globalDataSourceManager.loadDataSource(DataSourceType.REDIS, "default");
+        final RedisSourceFacade redisSourceFacade = globalDataSourceManager.obtain(DataSourceType.REDIS, "default");
         System.out.println("redisSourceFacade : " + redisSourceFacade);
 
         redisSourceFacade.set("foo11", singletonMap("bar11", 123));
@@ -139,7 +139,7 @@ public class GlobalDataSourceManagerTests {
     public void testKafkaSourceFacadeFindList() throws Exception {
         setup();
 
-        final KafkaSourceFacade kafkaSourceFacade = globalDataSourceManager.loadDataSource(DataSourceType.KAFKA, "default");
+        final KafkaSourceFacade kafkaSourceFacade = globalDataSourceManager.obtain(DataSourceType.KAFKA, "default");
         System.out.println("kafkaSourceFacade : " + kafkaSourceFacade);
 
         kafkaSourceFacade.publish("test", singletonMap("foo11", "bar11"));

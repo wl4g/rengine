@@ -77,7 +77,8 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
                     .trace(true)
                     .clientId(executeRequest.getClientId())
                     .scenesCode(scenes.getScenesCode())
-                    .workflowId(workflow.getId())
+                    .workflowId(workflowGraph.getWorkflowId())
+                    .attributes(workflowGraph.getAttributes())
                     .args(executeRequest.getArgs())
                     .build();
 
@@ -108,7 +109,7 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
                     .build();
         } catch (Exception e) {
             log.warn(format("Failed to execution workflow graph for scenesCode: %s, workflowId: %s", scenes.getScenesCode(),
-                    workflow.getId()), e);
+                    workflowGraph.getWorkflowId()), e);
 
             return ResultDescription.builder()
                     .scenesCode(scenes.getScenesCode())

@@ -15,11 +15,14 @@
  */
 package com.wl4g.rengine.executor.execution.sdk.notifier;
 
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import org.graalvm.polyglot.HostAccess;
@@ -47,7 +50,7 @@ public interface ScriptMessageNotifier {
     MessageNotifier.NotifierKind kind();
 
     @HostAccess.Export
-    Object send(final @NotNull Map<String, Object> parameter);
+    Object send(final @NotEmpty Map<String, Object> parameter);
 
     RefreshedInfo getRefreshed();
 
@@ -58,12 +61,12 @@ public interface ScriptMessageNotifier {
                 "Internal error! Should not be here, the current local cached refreshed is null, it should have been initialized before calling the notifier sending method.");
     }
 
-    default void update(final @NotNull RefreshedInfo refreshed) {
+    default void update(@NotNull RefreshedInfo refreshed) {
         notNull(refreshed, "Internal error! The setup current refreshed is required.");
         setRefreshed(refreshed);
     }
 
-    RefreshedInfo refresh(Notification notification);
+    RefreshedInfo refresh(@NotNull Notification notification);
 
     @Getter
     @Setter
@@ -84,6 +87,12 @@ public interface ScriptMessageNotifier {
 
         @Default
         Map<String, Object> attributes = new HashMap<>();
+
+        public RefreshedInfo validate() {
+            hasTextOf(accessToken, "acccessToken");
+            notNullOf(expireSeconds, "expireSeconds");
+            return this;
+        }
     }
 
     final static String METHOD_SEND = "send";

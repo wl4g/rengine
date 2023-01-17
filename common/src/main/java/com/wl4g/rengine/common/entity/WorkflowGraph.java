@@ -65,11 +65,24 @@ public class WorkflowGraph extends BaseBean {
     private static final long serialVersionUID = 1917204508937266181L;
 
     private @NotNull(groups = ValidForEntityMarker.class) @Min(value = 0, groups = ValidForEntityMarker.class) Long revision;
+
     private @NotNull @Min(0) Long workflowId;
+
     private @NotEmpty List<BaseNode<?>> nodes = new LinkedList<>();
+
     private @NotEmpty List<NodeConnection> connections = new LinkedList<>();
 
-    public WorkflowGraph(@NotEmpty final List<BaseNode<?>> nodes, @NotEmpty final List<NodeConnection> connections) {
+    /**
+     * The extended attribute configuration of the workflow graph, for example,
+     * calling
+     * <b>{@link com.wl4g.rengine.executor.execution.sdk.notifier.DingtalkScriptMessageNotifier}</b>
+     * in the execution node (script) of <b>dingtalk_workflow</b> to send group
+     * messages, at this time, the <b>openConversationId</b>, <b>robotCode</b>,
+     * etc. are required, which can be get from here.
+     */
+    private @Nullable Map<String, Object> attributes = new HashMap<>();
+
+    public WorkflowGraph(final @NotEmpty List<BaseNode<?>> nodes, final @NotEmpty List<NodeConnection> connections) {
         this.nodes = notEmpty(nodes, "nodes");
         this.connections = notEmpty(connections, "connections");
     }
@@ -245,7 +258,6 @@ public class WorkflowGraph extends BaseBean {
             }
             throw new IllegalArgumentException(format("Invalid logical type for '%s'", type));
         }
-
     }
 
     // Notice: It is recommended to disable the toString method, otherwise

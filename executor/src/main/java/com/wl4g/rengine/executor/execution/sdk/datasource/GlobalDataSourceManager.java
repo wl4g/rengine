@@ -96,7 +96,7 @@ public final class GlobalDataSourceManager {
 
     Map<DataSourceType, DataSourceFacadeBuilder> builderMap = emptyMap();
 
-    Map<DataSourceType, Map<String, DataSourceFacade>> dataSourceCaches = new ConcurrentHashMap<>(4);
+    Map<DataSourceType, Map<String, DataSourceFacade>> dataSourceRegistry = new ConcurrentHashMap<>(4);
 
     @PostConstruct
     public void init() {
@@ -106,7 +106,7 @@ public final class GlobalDataSourceManager {
     }
 
     void destroy(@Observes @BeforeDestroyed(ApplicationScoped.class) ServletContext init) {
-        safeMap(dataSourceCaches).values().stream().flatMap(e -> e.values().stream()).forEach(ds -> {
+        safeMap(dataSourceRegistry).values().stream().flatMap(e -> e.values().stream()).forEach(ds -> {
             try {
                 ds.close();
             } catch (IOException e) {
@@ -116,53 +116,51 @@ public final class GlobalDataSourceManager {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends DataSourceFacade> T loadDataSource(
+    public <T extends DataSourceFacade> T obtain(
             final @NotNull DataSourceType dataSourceType,
             final @NotBlank String dataSourceName) {
         try {
-            MeterUtil.counter(execution_sdk_datasource_manager_total, dataSourceName, dataSourceType, METHOD_LOADDATASOURCE);
-            return MeterUtil.timer(execution_sdk_datasource_manager_time, dataSourceName, dataSourceType, METHOD_LOADDATASOURCE,
-                    () -> {
-                        notNullOf(dataSourceType, "dataSourceType");
-                        hasTextOf(dataSourceName, "dataSourceName");
+            MeterUtil.counter(execution_sdk_datasource_manager_total, dataSourceName, dataSourceType, METHOD_OBTAIN);
+            return MeterUtil.timer(execution_sdk_datasource_manager_time, dataSourceName, dataSourceType, METHOD_OBTAIN, () -> {
+                notNullOf(dataSourceType, "dataSourceType");
+                hasTextOf(dataSourceName, "dataSourceName");
 
-                        Map<String, DataSourceFacade> dataSourceFacades = dataSourceCaches.get(dataSourceType);
+                Map<String, DataSourceFacade> dataSourceFacades = dataSourceRegistry.get(dataSourceType);
+                if (isNull(dataSourceFacades)) {
+                    synchronized (dataSourceType) {
+                        dataSourceFacades = dataSourceRegistry.get(dataSourceType);
                         if (isNull(dataSourceFacades)) {
-                            synchronized (dataSourceType) {
-                                dataSourceFacades = dataSourceCaches.get(dataSourceType);
-                                if (isNull(dataSourceFacades)) {
-                                    dataSourceCaches.put(dataSourceType, dataSourceFacades = new ConcurrentHashMap<>(4));
-                                }
-                            }
+                            dataSourceRegistry.put(dataSourceType, dataSourceFacades = new ConcurrentHashMap<>(4));
                         }
+                    }
+                }
 
-                        DataSourceFacade dataSourceFacade = dataSourceFacades.get(dataSourceName);
+                DataSourceFacade dataSourceFacade = dataSourceFacades.get(dataSourceName);
+                if (isNull(dataSourceFacade)) {
+                    synchronized (dataSourceName) {
+                        dataSourceFacade = dataSourceFacades.get(dataSourceName);
                         if (isNull(dataSourceFacade)) {
-                            synchronized (dataSourceName) {
-                                dataSourceFacade = dataSourceFacades.get(dataSourceName);
-                                if (isNull(dataSourceFacade)) {
-                                    final DataSourceFacadeBuilder builder = notNull(builderMap.get(dataSourceType),
-                                            "Unsupported to data source facade handler type of : %s/%s", dataSourceType,
-                                            dataSourceName);
-                                    // New init data source facade.
-                                    dataSourceFacades.put(dataSourceName, dataSourceFacade = builder.newInstnace(config,
-                                            dataSourceName, findDataSourceProperties(dataSourceType, dataSourceName)));
-                                }
-                            }
+                            final DataSourceFacadeBuilder builder = notNull(builderMap.get(dataSourceType),
+                                    "Unsupported to data source facade handler type of : %s/%s", dataSourceType, dataSourceName);
+                            // New init data source facade.
+                            dataSourceFacades.put(dataSourceName, dataSourceFacade = builder.newInstnace(config, dataSourceName,
+                                    findDataSourceProperties(dataSourceType, dataSourceName)));
                         }
+                    }
+                }
 
-                        log.debug("Determined source facade : {} of : {}", dataSourceFacade, dataSourceName);
-                        return (T) dataSourceFacade;
-                    });
+                log.debug("Determined source facade : {} of : {}", dataSourceFacade, dataSourceName);
+                return (T) dataSourceFacade;
+            });
         } catch (Exception e) {
-            MeterUtil.counter(execution_sdk_datasource_manager_failure, dataSourceName, dataSourceType, METHOD_LOADDATASOURCE);
+            MeterUtil.counter(execution_sdk_datasource_manager_failure, dataSourceName, dataSourceType, METHOD_OBTAIN);
             throw e;
         }
     }
 
     @SuppressWarnings("unchecked")
     @NotNull
-    DataSourcePropertiesBase findDataSourceProperties(
+    private DataSourcePropertiesBase findDataSourceProperties(
             final @NotNull DataSourceType dataSourceType,
             final @NotBlank String dataSourceName) {
         notNullOf(dataSourceType, "dataSourceType");
@@ -199,5 +197,5 @@ public final class GlobalDataSourceManager {
         }
     }
 
-    static final String METHOD_LOADDATASOURCE = "loadDataSource";
+    static final String METHOD_OBTAIN = "obtain";
 }

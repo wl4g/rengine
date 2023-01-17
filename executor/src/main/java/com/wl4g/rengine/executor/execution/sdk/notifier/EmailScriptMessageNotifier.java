@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Singleton;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.notification.GenericNotifierParam;
@@ -71,7 +72,7 @@ public class EmailScriptMessageNotifier implements ScriptMessageNotifier {
 
     @SuppressWarnings("unchecked")
     @Override
-    public Object send(final @NotNull Map<String, Object> parameter) {
+    public Object send(final @NotEmpty Map<String, Object> parameter) {
         try {
             MeterUtil.counter(execution_sdk_notifier_total, kind(), METHOD_SEND);
             return MeterUtil.timer(execution_sdk_notifier_time, kind(), METHOD_SEND, () -> {
@@ -106,6 +107,7 @@ public class EmailScriptMessageNotifier implements ScriptMessageNotifier {
 
     @Override
     public void update(@NotNull RefreshedInfo refreshed) {
+        notNullOf(refreshed, "refreshed");
         try {
             MeterUtil.counter(execution_sdk_notifier_total, kind(), METHOD_UPDATE);
             MeterUtil.timer(execution_sdk_notifier_time, kind(), METHOD_UPDATE, () -> {
@@ -145,7 +147,8 @@ public class EmailScriptMessageNotifier implements ScriptMessageNotifier {
     }
 
     @Override
-    public RefreshedInfo refresh(Notification notification) {
+    public RefreshedInfo refresh(@NotNull Notification notification) {
+        notNullOf(notification, "notification");
         try {
             MeterUtil.counter(execution_sdk_notifier_total, kind(), METHOD_REFRESH);
             return MeterUtil.timer(execution_sdk_notifier_time, kind(), METHOD_REFRESH, () -> {

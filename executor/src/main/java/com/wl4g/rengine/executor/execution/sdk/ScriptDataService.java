@@ -71,36 +71,36 @@ public class ScriptDataService {
 
     // --- SDK DataSource Services. ----
 
-    public @HostAccess.Export DataSourceFacade getMongoService(final @NotBlank String dataSourceName) {
-        return globalDataSourceManager.loadDataSource(DataSourceType.MONGO, dataSourceName);
+    public @HostAccess.Export DataSourceFacade obtainMongoDSFacade(final @NotBlank String dataSourceName) {
+        return globalDataSourceManager.obtain(DataSourceType.MONGO, dataSourceName);
     }
 
-    public @HostAccess.Export DataSourceFacade getJDBCService(final @NotBlank String dataSourceName) {
-        return globalDataSourceManager.loadDataSource(DataSourceType.JDBC, dataSourceName);
+    public @HostAccess.Export DataSourceFacade obtainJdbcDSFacade(final @NotBlank String dataSourceName) {
+        return globalDataSourceManager.obtain(DataSourceType.JDBC, dataSourceName);
     }
 
-    public @HostAccess.Export DataSourceFacade getRedisService(final @NotBlank String dataSourceName) {
-        return globalDataSourceManager.loadDataSource(DataSourceType.REDIS, dataSourceName);
+    public @HostAccess.Export DataSourceFacade obtainRedisDSFacade(final @NotBlank String dataSourceName) {
+        return globalDataSourceManager.obtain(DataSourceType.REDIS, dataSourceName);
     }
 
-    public @HostAccess.Export DataSourceFacade getKafkaService(final @NotBlank String dataSourceName) {
-        return globalDataSourceManager.loadDataSource(DataSourceType.KAFKA, dataSourceName);
+    public @HostAccess.Export DataSourceFacade obtainKafkaDSFacade(final @NotBlank String dataSourceName) {
+        return globalDataSourceManager.obtain(DataSourceType.KAFKA, dataSourceName);
     }
 
-    // public @HostAccess.Export DataSourceFacade phoenixService(final @Nullable
-    // String dataSourceName) {
+    // public @HostAccess.Export DataSourceFacade obtainPhoenixFacade(final
+    // @Nullable String dataSourceName) {
     // return mongoAggregatedService;
     // }
 
-    // public @HostAccess.Export DataSourceFacade openTSDBService(final
+    // public @HostAccess.Export DataSourceFacade obtainOpenTSDBFacade(final
     // @Nullable String dataSourceName) {
     // return opentsdbAggregatedService;
     // }
 
     // --- SDK Message Notifiers. ----
 
-    public @HostAccess.Export ScriptMessageNotifier getMessageNotifier(final @NotBlank String notifierType) {
-        return globalMessageNotifierManager.getMessageNotifier(NotifierKind.valueOf(notifierType));
+    public @HostAccess.Export ScriptMessageNotifier obtainNotifier(final @NotBlank String notifierType) {
+        return globalMessageNotifierManager.obtain(NotifierKind.valueOf(notifierType));
     }
 
 }

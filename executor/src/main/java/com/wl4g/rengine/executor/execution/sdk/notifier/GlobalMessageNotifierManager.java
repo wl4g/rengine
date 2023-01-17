@@ -98,7 +98,7 @@ public class GlobalMessageNotifierManager {
     @All
     List<ScriptMessageNotifier> notifiers;
 
-    Map<NotifierKind, ScriptMessageNotifier> notifierMap;
+    Map<NotifierKind, ScriptMessageNotifier> notifierRegistry;
 
     StringCommands<String, String> redisStringCommands;
 
@@ -106,25 +106,25 @@ public class GlobalMessageNotifierManager {
 
     @PostConstruct
     public void init() {
-        this.notifierMap = safeList(notifiers).stream().collect(toMap(n -> n.kind(), n -> n));
+        this.notifierRegistry = safeList(notifiers).stream().collect(toMap(n -> n.kind(), n -> n));
         this.redisStringCommands = redisDS.string(String.class);
         this.lockManager = ScriptRedisLockClient.buildJedisLockManager(redisDS);
     }
 
-    public ScriptMessageNotifier getMessageNotifier(final @NotNull NotifierKind notifierType) {
+    public ScriptMessageNotifier obtain(final @NotNull NotifierKind notifierType) {
         try {
-            MeterUtil.counter(execution_sdk_notifier_manager_total, notifierType, METHOD_GETMESSAGENOTIFIER);
-            return MeterUtil.timer(execution_sdk_notifier_manager_time, notifierType, METHOD_GETMESSAGENOTIFIER, () -> {
-                final ScriptMessageNotifier notifier = notifierMap.get(notNullOf(notifierType, "notifierType"));
+            MeterUtil.counter(execution_sdk_notifier_manager_total, notifierType, METHOD_OBTAIN);
+            return MeterUtil.timer(execution_sdk_notifier_manager_time, notifierType, METHOD_OBTAIN, () -> {
+                final ScriptMessageNotifier notifier = notifierRegistry.get(notNullOf(notifierType, "notifierType"));
                 notNull(notifier, "Unable to get notifier, please check if notifier of type %s is supported and implemented.",
                         notifierType);
 
                 ensureRefreshed(notifier);
-                MeterUtil.counter(execution_sdk_notifier_manager_success, notifierType, METHOD_GETMESSAGENOTIFIER);
+                MeterUtil.counter(execution_sdk_notifier_manager_success, notifierType, METHOD_OBTAIN);
                 return notifier;
             });
         } catch (Exception e) {
-            MeterUtil.counter(execution_sdk_notifier_manager_failure, notifierType, METHOD_GETMESSAGENOTIFIER);
+            MeterUtil.counter(execution_sdk_notifier_manager_failure, notifierType, METHOD_OBTAIN);
             throw e;
         }
     }
@@ -236,8 +236,7 @@ public class GlobalMessageNotifierManager {
     List<Notification> findNotifications(final @NotNull NotifierKind... notifierTypes) {
         notNullOf(notifierTypes, "notifierTypes");
 
-        final MongoCollection<Document> collection = mongoRepository
-                .getCollection(MongoCollectionDefinition.SYS_NOTIFICATIONS);
+        final MongoCollection<Document> collection = mongoRepository.getCollection(MongoCollectionDefinition.SYS_NOTIFICATIONS);
 
         try (final MongoCursor<Notification> cursor = collection.find(Filters.and(Filters.in("properties.type", notifierTypes)))
                 .batchSize(2)
@@ -257,8 +256,7 @@ public class GlobalMessageNotifierManager {
     }
 
     static final String DEFAULT_LOCK_PREFIX = "notifier:";
-
-    static final String METHOD_GETMESSAGENOTIFIER = "getMessageNotifier";
+    static final String METHOD_OBTAIN = "obtain";
     static final String METHOD_LOADREFRESHED = "loadRefreshed";
     static final String METHOD_SAVEREFRESHED = "saveRefreshed";
     static final String METHOD_FINDNOTIFICATION = "findNotification";
