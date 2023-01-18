@@ -89,6 +89,7 @@ public class MongoSourceFacade implements DataSourceFacade {
     final static String METHOD_DELETE_MANY = "deleteMany";
 
     final ExecutionConfig executionConfig;
+    final GlobalDataSourceManager globalDataSourceManager;
     final String dataSourceName;
     final MongoClient mongoClient;
 
@@ -97,6 +98,9 @@ public class MongoSourceFacade implements DataSourceFacade {
         if (nonNull(mongoClient)) {
             log.info("Closing to mongo data source for {} ...", dataSourceName);
             mongoClient.close();
+
+            // Destroy for global datasource manager.
+            globalDataSourceManager.destroy(DataSourceType.MONGO, dataSourceName);
         }
     }
 
@@ -108,8 +112,8 @@ public class MongoSourceFacade implements DataSourceFacade {
 
         log.debug("Bson query params : {}", bsonFilters);
         try {
-            final List<JsonNode> result = MeterUtil.timer(execution_sdk_datasource_time, dataSourceName,
-                    DataSourceType.MONGO, METHOD_FIND_LIST, () -> {
+            final List<JsonNode> result = MeterUtil.timer(execution_sdk_datasource_time, dataSourceName, DataSourceType.MONGO,
+                    METHOD_FIND_LIST, () -> {
                         final MongoCollection<Document> collection = getCollection(tableName);
                         final List<Bson> aggregateQuery = safeList(bsonFilters).stream()
                                 .flatMap(p -> safeMap(p).entrySet()
@@ -140,8 +144,8 @@ public class MongoSourceFacade implements DataSourceFacade {
 
         log.debug("Insert bson entitys: {}", bsonEntitys);
         try {
-            final Set<Integer> modifiedes = MeterUtil.timer(execution_sdk_datasource_time, dataSourceName,
-                    DataSourceType.MONGO, METHOD_FIND_LIST, () -> {
+            final Set<Integer> modifiedes = MeterUtil.timer(execution_sdk_datasource_time, dataSourceName, DataSourceType.MONGO,
+                    METHOD_FIND_LIST, () -> {
                         final MongoCollection<Document> collection = getCollection(tableName);
                         final List<Document> insertDocs = safeList(bsonEntitys).stream()
                                 .map(b -> new Document(b))
@@ -224,6 +228,7 @@ public class MongoSourceFacade implements DataSourceFacade {
         @Override
         public DataSourceFacade newInstnace(
                 final @NotNull ExecutionConfig config,
+                final @NotNull GlobalDataSourceManager globalDataSourceManager,
                 final @NotBlank String dataSourceName,
                 final @NotNull DataSourcePropertiesBase dataSourceProperties) {
             notNullOf(config, "properties");
@@ -238,7 +243,7 @@ public class MongoSourceFacade implements DataSourceFacade {
                     MongoClientSettings.builder().applyConnectionString(new ConnectionString(connectionString)).build(),
                     MongoDriverInformation.builder().build());
 
-            return new MongoSourceFacade(config, dataSourceName, mongoClient);
+            return new MongoSourceFacade(config, globalDataSourceManager, dataSourceName, mongoClient);
         }
 
         @Override

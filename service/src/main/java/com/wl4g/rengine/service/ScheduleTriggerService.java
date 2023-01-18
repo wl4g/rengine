@@ -15,11 +15,16 @@
  */
 package com.wl4g.rengine.service;
 
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static java.lang.String.format;
+import static java.util.Objects.isNull;
+
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
+import com.wl4g.infra.common.collection.CollectionUtils2;
 import com.wl4g.rengine.common.entity.ScheduleTrigger;
 import com.wl4g.rengine.service.model.DeleteScheduleTrigger;
 import com.wl4g.rengine.service.model.DeleteScheduleTriggerResult;
@@ -35,6 +40,14 @@ import com.wl4g.rengine.service.model.SaveScheduleTriggerResult;
  * @since v1.0.0
  */
 public interface ScheduleTriggerService {
+
+    default ScheduleTrigger get(@NotNull Long triggerId) {
+        final var result = query(QueryScheduleTrigger.builder().triggerId(notNullOf(triggerId, "triggerId")).build());
+        if (isNull(result) || CollectionUtils2.isEmpty(result.getRecords())) {
+            throw new IllegalArgumentException(format("No found schedule trigger by %s", triggerId));
+        }
+        return result.getRecords().get(0);
+    }
 
     PageHolder<ScheduleTrigger> query(@NotNull QueryScheduleTrigger model);
 

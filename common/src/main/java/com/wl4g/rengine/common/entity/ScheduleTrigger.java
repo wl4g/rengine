@@ -15,7 +15,11 @@
  */
 package com.wl4g.rengine.common.entity;
 
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -38,7 +42,17 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link Trigger}
+ * A configuration entity that actively triggers the execution of workflow. For
+ * example, actively scrape prometheus indicators to realize monitoring and
+ * alarming. </br>
+ * </br>
+ * 
+ * For the passive execution of workflow, there is no need to configure a
+ * trigger, and it can be requested directly through the SDK or custom executor
+ * API. For the entry, see:
+ * {@link com.wl4g.rengine.executor.rest.EngineExecutionResource#executeInternal}
+ * and
+ * {@link com.wl4g.rengine.executor.rest.EngineExecutionResource#doExecuteCustom}
  * 
  * @author James Wong
  * @version 2022-08-29
@@ -53,7 +67,12 @@ public class ScheduleTrigger extends BaseBean {
     private static final long serialVersionUID = 1L;
 
     @NotNull
-    TriggerPropertiesBase properties;
+    TriggerPropertiesBase<?> properties;
+
+    public ScheduleTrigger validate() {
+        getProperties().validate();
+        return this;
+    }
 
     // 1.多态参见:https://swagger.io/docs/specification/data-models/inheritance-and-polymorphism/
     // 2.对于swagger3注解,父类必须是抽象的，否则swagger3页面请求参数schemas展开后会以父类名重复展示3个.
@@ -65,15 +84,30 @@ public class ScheduleTrigger extends BaseBean {
     @SuperBuilder
     @ToString(callSuper = true)
     @NoArgsConstructor
-    public static abstract class TriggerPropertiesBase {
+    public static abstract class TriggerPropertiesBase<T extends TriggerPropertiesBase<T>> {
         @Schema(name = "type", implementation = TriggerType.class)
         @JsonProperty(value = "type", access = Access.WRITE_ONLY)
         @NotNull
         private @NotBlank @EnumValue(enumCls = TriggerType.class) String type;
+
+        public abstract T validate();
     }
 
     public static enum TriggerType {
-        CRON/* , NONE */;
+
+        /**
+         * The periodic tasks. For example, actively scrape prometheus
+         * indicators to realize monitoring and alarming. </br>
+         */
+        CRON,
+
+        // Notice: The loop controller can be customized in the js rule codes.
+        // /**
+        // * Long-running tasks (infinite loop), for example, a controller
+        // * workflow that calls the kubernetes client api to monitor resource
+        // * changes, which usually never exits.
+        // */
+        // LOOP;
     }
 
     @Getter
@@ -81,10 +115,34 @@ public class ScheduleTrigger extends BaseBean {
     @SuperBuilder
     @ToString
     @NoArgsConstructor
-    public static class CronTriggerConfig extends TriggerPropertiesBase {
-        private @NotBlank String cron;
-        private @NotNull @Default Boolean misfire = false;
+    public static class CronTriggerConfig extends TriggerPropertiesBase<CronTriggerConfig> {
+        private @NotBlank @Default String cron = DEFAULT_CRON;
+        private @NotNull @Default Boolean monitorExecution = DEFAULT_MONITOR_EXECUTION;
+        private @NotNull @Default Boolean failover = DEFAULT_FAILOVER;
+        private @NotNull @Default Boolean misfire = DEFAULT_MISFIRE;
+        private @NotBlank @Default String timeZone = TimeZone.getDefault().getID();
+        private @NotNull @Default Integer maxTimeDiffSeconds = DEFAULT_MAX_TIME_DIFF_SECONDS;
+        private @NotNull @Default Integer reconcileIntervalMinutes = DEFAULT_RECONCILE_INTERVAL_MINUTES;
         private @NotNull List<ExecuteRequest> requests;
+
+        public CronTriggerConfig validate() {
+            hasTextOf(getCron(), "cron");
+            notNullOf(getMonitorExecution(), "monitorExecution");
+            notNullOf(getFailover(), "failover");
+            notNullOf(getMisfire(), "misfire");
+            notNullOf(getTimeZone(), "timeZone");
+            notNullOf(getMaxTimeDiffSeconds(), "maxTimeDiffSeconds");
+            notNullOf(getReconcileIntervalMinutes(), "reconcileIntervalMinutes");
+            notNullOf(getRequests(), "request");
+            return this;
+        }
+
+        public static final String DEFAULT_CRON = "0/10 * * * * ?";
+        public static final boolean DEFAULT_MONITOR_EXECUTION = true;
+        public static final boolean DEFAULT_FAILOVER = true;
+        public static final boolean DEFAULT_MISFIRE = false;
+        public static final int DEFAULT_MAX_TIME_DIFF_SECONDS = -1;
+        public static final int DEFAULT_RECONCILE_INTERVAL_MINUTES = 0;
     }
 
 }

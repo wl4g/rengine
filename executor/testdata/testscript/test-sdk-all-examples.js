@@ -216,7 +216,7 @@ function testSdkForDingtalkNotifier(context) {
 function testSdkForEmailNotifier(context) {
     try {
         console.info("emailNotifier ...");
-        const emailNotifier = context.getDataService().obtain("EMAIL");
+        const emailNotifier = context.getDataService().obtainNotifier("EMAIL");
         console.info("emailNotifier: " + emailNotifier);
 
         const parameter = {

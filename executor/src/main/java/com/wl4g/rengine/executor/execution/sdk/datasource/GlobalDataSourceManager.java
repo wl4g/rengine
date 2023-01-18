@@ -27,6 +27,7 @@ import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toMap;
 
 import java.io.IOException;
@@ -108,11 +109,26 @@ public final class GlobalDataSourceManager {
     void destroy(@Observes @BeforeDestroyed(ApplicationScoped.class) ServletContext init) {
         safeMap(dataSourceRegistry).values().stream().flatMap(e -> e.values().stream()).forEach(ds -> {
             try {
+                log.info(format("Closing data source facade : %s ...", ds.getDataSourceName()));
                 ds.close();
             } catch (IOException e) {
                 log.error(format("Unable to closing data source of %s", ds.getDataSourceName()), e);
             }
         });
+    }
+
+    void destroy(final @NotNull DataSourceType dataSourceType, final @NotBlank String dataSourceName) {
+        notNullOf(dataSourceType, "dataSourceType");
+        hasTextOf(dataSourceName, "dataSourceName");
+        final DataSourceFacade ds = safeMap(dataSourceRegistry.get(dataSourceType)).get(dataSourceName);
+        if (nonNull(ds)) {
+            try {
+                log.info(format("Closing data source facade : %s/%s ...", dataSourceType, ds.getDataSourceName()));
+                ds.close();
+            } catch (IOException e) {
+                log.error(format("Unable to closing data source of %s/%s", dataSourceType, ds.getDataSourceName()), e);
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -143,8 +159,8 @@ public final class GlobalDataSourceManager {
                             final DataSourceFacadeBuilder builder = notNull(builderMap.get(dataSourceType),
                                     "Unsupported to data source facade handler type of : %s/%s", dataSourceType, dataSourceName);
                             // New init data source facade.
-                            dataSourceFacades.put(dataSourceName, dataSourceFacade = builder.newInstnace(config, dataSourceName,
-                                    findDataSourceProperties(dataSourceType, dataSourceName)));
+                            dataSourceFacades.put(dataSourceName, dataSourceFacade = builder.newInstnace(config, this,
+                                    dataSourceName, findDataSourceProperties(dataSourceType, dataSourceName)));
                         }
                     }
                 }

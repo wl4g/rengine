@@ -20,7 +20,6 @@ package org.apache.shardingsphere.elasticjob.infra.pojo;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Properties;
 
 import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
@@ -28,8 +27,6 @@ import org.apache.shardingsphere.elasticjob.api.JobExtraConfiguration;
 import org.apache.shardingsphere.elasticjob.infra.yaml.config.YamlConfiguration;
 import org.apache.shardingsphere.elasticjob.infra.yaml.config.YamlConfigurationConverterFactory;
 import org.apache.shardingsphere.elasticjob.infra.yaml.exception.YamlConfigurationConverterNotFoundException;
-
-import com.wl4g.rengine.scheduler.job.AbstractJobExecutor.JobParamBase;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -50,8 +47,6 @@ public final class JobConfigurationPOJO {
     //
     // [Begin] ADD FEATURES.
     //
-
-    private String eventType;
 
     // When setup true, the shardingTotalCount will be ignored, and the will
     // be automatically allocated according to the number of cluster nodes
@@ -100,14 +95,6 @@ public final class JobConfigurationPOJO {
 
     private boolean staticSharding;
 
-    //
-    // [Begin] ADD FEATURES.
-    //
-    private List<? extends JobParamBase> jobParams = new ArrayList<>();
-    //
-    // [End] ADD FEATURES.
-    //
-
     /**
      * Convert to job configuration.
      *
@@ -150,7 +137,6 @@ public final class JobConfigurationPOJO {
                 //
                 // [Begin] ADD FEATURES.
                 //
-                .eventType(eventType)
                 // When setup true, the shardingTotalCount will be ignored, and
                 // the will be automatically allocated according to the number
                 // of cluster nodes priority.
@@ -177,13 +163,6 @@ public final class JobConfigurationPOJO {
                 .overwrite(overwrite)
                 .label(label)
                 .staticSharding(staticSharding)
-                //
-                // [Begin] ADD FEATURES.
-                //
-                .jobParams(jobParams)
-                //
-                // [End] ADD FEATURES.
-                //
                 .build();
         //
         // [End] MODIFIY FEATURES.
@@ -211,7 +190,6 @@ public final class JobConfigurationPOJO {
         //
         // [Begin] ADD FEATURES.
         //
-        result.setEventType(jobConfiguration.getEventType());
         // When setup true, the shardingTotalCount will be ignored, and
         // the will be automatically allocated according to the number
         // of cluster nodes priority.
@@ -243,13 +221,6 @@ public final class JobConfigurationPOJO {
         result.setOverwrite(jobConfiguration.isOverwrite());
         result.setLabel(jobConfiguration.getLabel());
         result.setStaticSharding(jobConfiguration.isStaticSharding());
-        //
-        // [Begin] ADD FEATURES.
-        //
-        result.setJobParams(jobConfiguration.getJobParams());
-        //
-        // [End] ADD FEATURES.
-        //
         return result;
     }
 

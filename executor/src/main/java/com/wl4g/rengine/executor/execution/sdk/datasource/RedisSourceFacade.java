@@ -24,8 +24,10 @@ import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName
 import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_datasource_success;
 import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_datasource_time;
 import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_datasource_total;
+import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toMap;
+import static org.apache.commons.lang3.StringUtils.startsWithAny;
 
 import java.io.IOException;
 import java.util.Map;
@@ -41,6 +43,7 @@ import com.wl4g.infra.common.jedis.JedisClientBuilder;
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourcePropertiesBase;
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
 import com.wl4g.rengine.common.entity.DataSourceProperties.RedisDataSourceProperties;
+import com.wl4g.rengine.common.exception.RengineException;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
 import com.wl4g.rengine.executor.metrics.MeterUtil;
 
@@ -74,6 +77,7 @@ public class RedisSourceFacade implements DataSourceFacade {
     final static String METHOD_EVAL = "eval";
 
     final ExecutionConfig executionConfig;
+    final GlobalDataSourceManager globalDataSourceManager;
     final String dataSourceName;
     final JedisClient jedisClient;
 
@@ -82,11 +86,15 @@ public class RedisSourceFacade implements DataSourceFacade {
         if (nonNull(jedisClient)) {
             log.info("Closing to redis single or cluster data source for {} ...", dataSourceName);
             jedisClient.close();
+
+            // Destroy for global datasource manager.
+            globalDataSourceManager.destroy(DataSourceType.REDIS, dataSourceName);
         }
     }
 
     public JsonNode get(final @NotBlank String key) {
         hasTextOf(key, "key");
+        checkPermission(key, false);
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.REDIS, METHOD_GET);
         try {
             final JsonNode result = MeterUtil.timer(execution_sdk_datasource_time, dataSourceName, DataSourceType.REDIS,
@@ -102,6 +110,7 @@ public class RedisSourceFacade implements DataSourceFacade {
 
     public String set(final @NotBlank String key, final Object value) {
         hasTextOf(key, "key");
+        checkPermission(key, true);
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.REDIS, METHOD_SET);
         try {
             if (nonNull(value)) {
@@ -121,6 +130,7 @@ public class RedisSourceFacade implements DataSourceFacade {
 
     public String setex(final @NotBlank String key, final Object value, final @Min(-2) long seconds) {
         hasTextOf(key, "key");
+        checkPermission(key, true);
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.REDIS, METHOD_SETEX);
         try {
             if (nonNull(value)) {
@@ -139,11 +149,13 @@ public class RedisSourceFacade implements DataSourceFacade {
     }
 
     public Long setnx(final @NotBlank String key, final Object value) {
+        checkPermission(key, true);
         return setnxex(key, value, Long.MAX_VALUE);
     }
 
     public Long setnxex(final @NotBlank String key, final Object value, final @Min(-2) long seconds) {
         hasTextOf(key, "key");
+        checkPermission(key, true);
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.REDIS, METHOD_SETNXEX);
         try {
             if (nonNull(value)) {
@@ -170,10 +182,11 @@ public class RedisSourceFacade implements DataSourceFacade {
 
     public Long del(final @NotBlank String key) {
         hasTextOf(key, "key");
+        checkPermission(key, true);
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.REDIS, METHOD_DEL);
         try {
-            final Long result = MeterUtil.timer(execution_sdk_datasource_time, dataSourceName, DataSourceType.REDIS,
-                    METHOD_DEL, () -> jedisClient.del(key));
+            final Long result = MeterUtil.timer(execution_sdk_datasource_time, dataSourceName, DataSourceType.REDIS, METHOD_DEL,
+                    () -> jedisClient.del(key));
 
             MeterUtil.counter(execution_sdk_datasource_success, dataSourceName, DataSourceType.REDIS, METHOD_DEL);
             return result;
@@ -185,6 +198,7 @@ public class RedisSourceFacade implements DataSourceFacade {
 
     public Long expire(final @NotBlank String key, final @Min(-2) long seconds) {
         hasTextOf(key, "key");
+        checkPermission(key, true);
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.REDIS, METHOD_EXPIRE);
         try {
             final Long result = MeterUtil.timer(execution_sdk_datasource_time, dataSourceName, DataSourceType.REDIS,
@@ -200,6 +214,7 @@ public class RedisSourceFacade implements DataSourceFacade {
 
     public Map<String, JsonNode> hgetAll(final @NotBlank String key) {
         hasTextOf(key, "key");
+        checkPermission(key, false);
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.REDIS, METHOD_HGETALL);
         try {
             final Map<String, JsonNode> result = MeterUtil.timer(execution_sdk_datasource_time, dataSourceName,
@@ -235,6 +250,7 @@ public class RedisSourceFacade implements DataSourceFacade {
     public Long hset(final @NotBlank String key, final @NotBlank String field, final Object value) {
         hasTextOf(key, "key");
         hasTextOf(field, "field");
+        checkPermission(key, false);
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.REDIS, METHOD_HSET);
         try {
             if (nonNull(value)) {
@@ -255,6 +271,7 @@ public class RedisSourceFacade implements DataSourceFacade {
     public Long hsetnx(final @NotBlank String key, final @NotBlank String field, final Object value) {
         hasTextOf(key, "key");
         hasTextOf(field, "field");
+        checkPermission(key, true);
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.REDIS, METHOD_HSETNX);
         try {
             if (nonNull(value)) {
@@ -287,20 +304,38 @@ public class RedisSourceFacade implements DataSourceFacade {
         }
     }
 
+    /**
+     * Usually, by default, it is only necessary to prohibit modification of the
+     * redis cache of the system prefix, but allow reading.
+     * 
+     * @param key
+     * @param forUpdate
+     */
+    private void checkPermission(final @NotBlank String key, final boolean forUpdate) {
+        if (forUpdate) {
+            if (startsWithAny(key, executionConfig.engine().scenesRulesCachedPrefix(),
+                    executionConfig.service().dictCachedPrefix(), executionConfig.notifier().refreshedCachedPrefix())) {
+                throw new RengineException(format("Forbidden to modify system cache prefix of '%s'", key));
+            }
+        }
+    }
+
     @Singleton
     public static class RedisSourceFacadeBuilder implements DataSourceFacadeBuilder {
 
         @Override
         public DataSourceFacade newInstnace(
                 final @NotNull ExecutionConfig config,
+                final @NotNull GlobalDataSourceManager globalDataSourceManager,
                 final @NotBlank String dataSourceName,
                 final @NotNull DataSourcePropertiesBase dataSourceProperties) {
             notNullOf(config, "properties");
+            notNullOf(globalDataSourceManager, "globalDataSourceManager");
             hasTextOf(dataSourceName, "dataSourceName");
 
             final RedisDataSourceProperties _config = (RedisDataSourceProperties) dataSourceProperties;
             final JedisClient jedisClient = new JedisClientBuilder(_config.getJedisConfig()).build();
-            return new RedisSourceFacade(config, dataSourceName, jedisClient);
+            return new RedisSourceFacade(config, globalDataSourceManager, dataSourceName, jedisClient);
         }
 
         @Override

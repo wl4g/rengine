@@ -18,10 +18,9 @@ package org.apache.shardingsphere.elasticjob.api;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Properties;
 
-import com.wl4g.rengine.scheduler.job.AbstractJobExecutor.JobParamBase;
+import com.wl4g.rengine.scheduler.job.AbstractJobExecutor.ExecutorJobType;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -48,7 +47,7 @@ public final class JobConfiguration {
     //
     // [Begin] ADD FEATURES.
     //
-    private String eventType;
+    ExecutorJobType jobType;
 
     // When setup true, the shardingTotalCount will be ignored, and the will
     // be automatically allocated according to the number of cluster nodes
@@ -172,13 +171,4 @@ public final class JobConfiguration {
     private String label;
 
     private boolean staticSharding;
-
-    //
-    // [Begin] ADD FEATURES.
-    //
-    private @Default List<? extends JobParamBase> jobParams = new ArrayList<>();
-    //
-    // [End] ADD FEATURES.
-    //
-
 }

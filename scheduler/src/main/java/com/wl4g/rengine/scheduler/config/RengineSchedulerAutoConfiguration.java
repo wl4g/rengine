@@ -17,11 +17,11 @@ package com.wl4g.rengine.scheduler.config;
 
 import static com.wl4g.rengine.common.constants.RengineConstants.CONF_PREFIX_SCHEDULER;
 
+import java.util.List;
+
 import javax.sql.DataSource;
 
 import org.apache.shardingsphere.elasticjob.lite.internal.snapshot.SnapshotService;
-import org.apache.shardingsphere.elasticjob.lite.spring.boot.job.ElasticJobBootstrapConfiguration;
-import org.apache.shardingsphere.elasticjob.lite.spring.boot.job.ScheduleJobBootstrapStartupRunner;
 import org.apache.shardingsphere.elasticjob.reg.base.CoordinatorRegistryCenter;
 import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperRegistryCenter;
 import org.apache.shardingsphere.elasticjob.tracing.api.TracingConfiguration;
@@ -31,7 +31,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.wl4g.rengine.scheduler.job.EngineScheduleScannerController;
+import com.wl4g.rengine.scheduler.job.EngineScheduleController;
+import com.wl4g.rengine.scheduler.lifecycle.GlobalScheduleJobManager;
 
 /**
  * {@link RengineSchedulerAutoConfiguration}
@@ -43,6 +44,8 @@ import com.wl4g.rengine.scheduler.job.EngineScheduleScannerController;
  */
 @Configuration
 public class RengineSchedulerAutoConfiguration {
+
+    // --- Scheduler configurations.
 
     @Bean
     @ConfigurationProperties(prefix = CONF_PREFIX_SCHEDULER)
@@ -68,19 +71,31 @@ public class RengineSchedulerAutoConfiguration {
         return new SnapshotService(registryCenter, config.getDump().getPort());
     }
 
+    // --- Scheduler components.
+
+    // @Bean
+    // public ElasticJobBootstrapConfiguration
+    // elasticJobBootstrapConfiguration() {
+    // return new ElasticJobBootstrapConfiguration();
+    // }
+    //
+    // @Bean
+    // public ScheduleJobBootstrapStartupRunner
+    // scheduleJobBootstrapStartupRunner() {
+    // return new ScheduleJobBootstrapStartupRunner();
+    // }
+
     @Bean
-    public ElasticJobBootstrapConfiguration elasticJobBootstrapConfiguration() {
-        return new ElasticJobBootstrapConfiguration();
+    public EngineScheduleController engineScheduleController() {
+        return new EngineScheduleController();
     }
 
     @Bean
-    public ScheduleJobBootstrapStartupRunner scheduleJobBootstrapStartupRunner() {
-        return new ScheduleJobBootstrapStartupRunner();
-    }
-
-    @Bean
-    public EngineScheduleScannerController engineScheduleScannerController() {
-        return new EngineScheduleScannerController();
+    public GlobalScheduleJobManager globalScheduleJobManager(
+            RengineSchedulerProperties config,
+            List<TracingConfiguration<?>> tracingConfigurations,
+            CoordinatorRegistryCenter registryCenter) {
+        return new GlobalScheduleJobManager(config, tracingConfigurations, registryCenter);
     }
 
 }

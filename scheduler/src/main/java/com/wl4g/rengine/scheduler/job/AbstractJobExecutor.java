@@ -21,7 +21,6 @@ import static java.util.Objects.nonNull;
 
 import java.util.List;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import org.apache.shardingsphere.elasticjob.api.ElasticJob;
@@ -37,23 +36,27 @@ import com.wl4g.infra.context.utils.SpringContextHolder;
 import com.wl4g.rengine.client.core.RengineClient;
 import com.wl4g.rengine.scheduler.config.RengineSchedulerProperties;
 import com.wl4g.rengine.scheduler.config.RengineSchedulerProperties.BaseJobProperties;
-import com.wl4g.rengine.scheduler.config.RengineSchedulerProperties.EngineSchedulingControllerJobProperties;
+import com.wl4g.rengine.scheduler.config.RengineSchedulerProperties.EngineScheduleControllerProperties;
+import com.wl4g.rengine.scheduler.lifecycle.GlobalScheduleJobManager;
 import com.wl4g.rengine.service.ScheduleJobService;
 import com.wl4g.rengine.service.ScheduleTriggerService;
 
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
 /**
- * The job abstract executor that actively collects time for scraping events.
- * scrape jobs configuration similar to prometheus. </br>
- * </br>
- * Distributed automatic fragmentation scraping task based on zookeeper, more
- * smart than prometheus.
+ * <ul>
+ * <li>Actively execute the abstract job of workflow.</br>
+ * </li>
+ * <li>For monitoring scenarios, it is similar to Prometheus's active scraping
+ * index operation. Distributed automatic fragmentation scraping task based on
+ * zookeeper, more smart than prometheus scraper.</br>
+ * </li>
+ * <li>For offline task scenarios, similar to spark, flink job.</br>
+ * </li>
+ * <ul>
  * 
  * @author James Wong
  * @version 2022-10-20
@@ -64,17 +67,12 @@ import lombok.ToString;
 public abstract class AbstractJobExecutor implements TypedJobItemExecutor {
 
     protected ApplicationContext applicationContext;
-
     protected final RengineSchedulerProperties config;
-
     protected final CoordinatorRegistryCenter regCenter;
-
     protected final RengineClient rengineClient;
-
+    protected final GlobalScheduleJobManager globalScheduleJobManager;
     protected final ScheduleTriggerService scheduleTriggerService;
-
     protected final ScheduleJobService scheduleJobService;
-
     // @SuppressWarnings("rawtypes")
     // protected final Collection<RengineEventBusService> eventbusServices;
 
@@ -83,6 +81,7 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor {
         this.config = SpringContextHolder.getBean(RengineSchedulerProperties.class);
         this.regCenter = SpringContextHolder.getBean(CoordinatorRegistryCenter.class);
         this.rengineClient = SpringContextHolder.getBean(RengineClient.class);
+        this.globalScheduleJobManager = SpringContextHolder.getBean(GlobalScheduleJobManager.class);
         this.scheduleTriggerService = SpringContextHolder.getBean(ScheduleTriggerService.class);
         this.scheduleJobService = SpringContextHolder.getBean(ScheduleJobService.class);
         // this.eventbusServices=safeMap(SpringContextHolder.getBeans(RengineEventBusService.class)).values();
@@ -139,25 +138,13 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor {
     @AllArgsConstructor
     public static enum ExecutorJobType {
 
-        ENGINE_SCHEDULE_CONTROLLER(EngineSchedulingControllerJobProperties.class),
+        ENGINE_SCHEDULE_CONTROLLER(EngineScheduleControllerProperties.class),
 
-        // TODO remove jobConfigClass?
-        ENGINE_EXECUTION_SCHEDULER(EngineSchedulingControllerJobProperties.class),
+        ENGINE_EXECUTION_SCHEDULER(EngineScheduleControllerProperties.class),
 
-        ENGINE_EXECUTION_JOB(EngineSchedulingControllerJobProperties.class);
+        ENGINE_EXECUTION_JOB(EngineScheduleControllerProperties.class);
 
-        private final Class<? extends BaseJobProperties<? extends JobParamBase>> jobConfigClass;
-    }
-
-    @Getter
-    @Setter
-    @ToString
-    @NoArgsConstructor
-    public abstract static class JobParamBase {
-        /**
-         * The collect parameter for name.
-         */
-        private @NotBlank String name;
+        private final Class<? extends BaseJobProperties> jobConfigClass;
     }
 
 }

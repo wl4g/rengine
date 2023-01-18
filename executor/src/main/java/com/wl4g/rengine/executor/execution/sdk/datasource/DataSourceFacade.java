@@ -40,6 +40,7 @@ public interface DataSourceFacade extends Closeable {
     public static interface DataSourceFacadeBuilder {
         DataSourceFacade newInstnace(
                 final @NotNull ExecutionConfig config,
+                final @NotNull GlobalDataSourceManager globalDataSourceManager,
                 final @NotBlank String dataSourceName,
                 final @NotNull DataSourcePropertiesBase dataSourceProperties);
 

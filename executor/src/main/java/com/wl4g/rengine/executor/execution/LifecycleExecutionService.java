@@ -52,7 +52,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.google.common.collect.Iterables;
-import com.wl4g.infra.common.bean.KeyValue;
+import com.wl4g.infra.common.lang.tuples.Tuple2;
 import com.wl4g.infra.common.task.GenericTaskRunner;
 import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
 import com.wl4g.rengine.common.entity.Rule.RuleEngine;
@@ -99,8 +99,8 @@ public class LifecycleExecutionService {
         final int threads = config.engine().executorThreadPools();
         final int acceptQueue = config.engine().executorAcceptQueue();
         log.info("Initialzing execution executor of threads pool: {}, acceptQueue: {}", threads, acceptQueue);
-        this.executionExecutor = GenericTaskRunner.newDefaultScheduledExecutor(ReactiveEngineExecutionServiceImpl.class.getSimpleName(),
-                threads, acceptQueue);
+        this.executionExecutor = GenericTaskRunner
+                .newDefaultScheduledExecutor(ReactiveEngineExecutionServiceImpl.class.getSimpleName(), threads, acceptQueue);
     }
 
     void destroy(@Observes @BeforeDestroyed(ApplicationScoped.class) ServletContext init) {
@@ -127,9 +127,9 @@ public class LifecycleExecutionService {
 
         // Submit to execution workers.
         final Map<String, Future<ResultDescription>> futures = sceneses.stream()
-                .map(scenes -> new KeyValue(scenes.getScenesCode(),
+                .map(scenes -> new Tuple2(scenes.getScenesCode(),
                         executionExecutor.submit(new ExecutionRunner(latch, executeRequest, scenes))))
-                .collect(toMap(kv -> kv.getKey(), kv -> (Future) kv.getValue()));
+                .collect(toMap(kv -> (String) kv.getItem1(), kv -> (Future) kv.getItem2()));
 
         // Collect for uncompleted results.
         final List<ResultDescription> uncompleteds = new ArrayList<>(futures.size());

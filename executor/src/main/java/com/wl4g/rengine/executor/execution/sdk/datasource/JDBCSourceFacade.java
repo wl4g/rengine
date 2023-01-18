@@ -69,6 +69,7 @@ public class JDBCSourceFacade implements DataSourceFacade {
     final static String METHOD_BATCH = "batch";
 
     final ExecutionConfig executionConfig;
+    final GlobalDataSourceManager globalDataSourceManager;
     final String dataSourceName;
     final JDBCRunnerHelper helper;
 
@@ -77,6 +78,9 @@ public class JDBCSourceFacade implements DataSourceFacade {
         if (nonNull(helper)) {
             log.info("Closing to jdbc data source for {} ...", dataSourceName);
             helper.close();
+
+            // Destroy for global datasource manager.
+            globalDataSourceManager.destroy(DataSourceType.JDBC, dataSourceName);
         }
     }
 
@@ -102,9 +106,8 @@ public class JDBCSourceFacade implements DataSourceFacade {
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.JDBC, METHOD_INSERT);
 
         try (Connection conn = helper.getDataSource().getConnection();) {
-            final Map<String, Object> result = MeterUtil.timer(execution_sdk_datasource_time, dataSourceName,
-                    DataSourceType.JDBC, METHOD_INSERT,
-                    () -> helper.getQueryRunner().insert(conn, sql, new MapHandler(), params));
+            final Map<String, Object> result = MeterUtil.timer(execution_sdk_datasource_time, dataSourceName, DataSourceType.JDBC,
+                    METHOD_INSERT, () -> helper.getQueryRunner().insert(conn, sql, new MapHandler(), params));
 
             MeterUtil.counter(execution_sdk_datasource_success, dataSourceName, DataSourceType.JDBC, METHOD_INSERT);
             return result;
@@ -135,8 +138,8 @@ public class JDBCSourceFacade implements DataSourceFacade {
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.JDBC, METHOD_UPDATE);
 
         try (Connection conn = helper.getDataSource().getConnection();) {
-            final int result = MeterUtil.timer(execution_sdk_datasource_time, dataSourceName, DataSourceType.JDBC,
-                    METHOD_UPDATE, () -> helper.getQueryRunner().update(conn, sql, params));
+            final int result = MeterUtil.timer(execution_sdk_datasource_time, dataSourceName, DataSourceType.JDBC, METHOD_UPDATE,
+                    () -> helper.getQueryRunner().update(conn, sql, params));
 
             MeterUtil.counter(execution_sdk_datasource_success, dataSourceName, DataSourceType.JDBC, METHOD_UPDATE);
             return result;
@@ -151,8 +154,8 @@ public class JDBCSourceFacade implements DataSourceFacade {
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.JDBC, METHOD_BATCH);
 
         try (Connection conn = helper.getDataSource().getConnection();) {
-            final int[] result = MeterUtil.timer(execution_sdk_datasource_time, dataSourceName, DataSourceType.JDBC,
-                    METHOD_BATCH, () -> helper.getQueryRunner().batch(conn, sql, params));
+            final int[] result = MeterUtil.timer(execution_sdk_datasource_time, dataSourceName, DataSourceType.JDBC, METHOD_BATCH,
+                    () -> helper.getQueryRunner().batch(conn, sql, params));
 
             MeterUtil.counter(execution_sdk_datasource_success, dataSourceName, DataSourceType.JDBC, METHOD_BATCH);
             return result;
@@ -168,6 +171,7 @@ public class JDBCSourceFacade implements DataSourceFacade {
         @Override
         public DataSourceFacade newInstnace(
                 final @NotNull ExecutionConfig config,
+                final @NotNull GlobalDataSourceManager globalDataSourceManager,
                 final @NotBlank String dataSourceName,
                 final @NotNull DataSourcePropertiesBase dataSourceProperties) {
             notNullOf(config, "properties");
@@ -200,7 +204,8 @@ public class JDBCSourceFacade implements DataSourceFacade {
             bds.setTestOnReturn(c.getTestOnReturn());
             bds.setTestWhileIdle(c.getTestWhileIdle());
 
-            return new JDBCSourceFacade(config, dataSourceName, new JDBCRunnerHelper(statementConfig, bds));
+            return new JDBCSourceFacade(config, globalDataSourceManager, dataSourceName,
+                    new JDBCRunnerHelper(statementConfig, bds));
         }
 
         @Override

@@ -45,10 +45,10 @@ import lombok.experimental.SuperBuilder;
 public class ScheduleJob extends BaseBean {
     private static final long serialVersionUID = 1L;
     private @NotNull Long triggerId;
+    private JobType jobType;
+    private String jobName;
     private RunState runState;
     private Date schedTime;
-    private Date firstFireTime;
-    private String requestId;
     private Date finishedTime;
     private List<ResultDescription> results;
 
@@ -81,7 +81,13 @@ public class ScheduleJob extends BaseBean {
     @Getter
     @ToString
     public static enum RunState {
-        PREPARED, SCHED, RUNNING, SUCCESS, FAILED, KILLED
+        PREPARED, SCHED, FAILED_SCHED, RUNNING, PART_SUCCESS, SUCCESS, FAILED, KILLED
+    }
+
+    @Getter
+    @ToString
+    public static enum JobType {
+        SCHEDULING, EXECUTING
     }
 
 }

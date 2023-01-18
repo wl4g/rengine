@@ -63,6 +63,7 @@ public class KafkaSourceFacade implements DataSourceFacade {
     final static String METHOD_PUBLISH = "publish";
 
     final ExecutionConfig executionConfig;
+    final GlobalDataSourceManager globalDataSourceManager;
     final String dataSourceName;
     final KafkaProducer<String, String> kafkaProducer;
 
@@ -71,6 +72,9 @@ public class KafkaSourceFacade implements DataSourceFacade {
         if (nonNull(kafkaProducer)) {
             log.info("Closing to kafka data source for {} ...", dataSourceName);
             kafkaProducer.close();
+
+            // Destroy for global datasource manager.
+            globalDataSourceManager.destroy(DataSourceType.KAFKA, dataSourceName);
         }
     }
 
@@ -104,13 +108,14 @@ public class KafkaSourceFacade implements DataSourceFacade {
         @Override
         public DataSourceFacade newInstnace(
                 final @NotNull ExecutionConfig config,
+                final @NotNull GlobalDataSourceManager globalDataSourceManager,
                 final @NotBlank String dataSourceName,
                 final @NotNull DataSourcePropertiesBase dataSourceProperties) {
             notNullOf(config, "properties");
             hasTextOf(dataSourceName, "dataSourceName");
 
             final Map<String, Object> configMap = ((KafkaDataSourceProperties) dataSourceProperties).toConfigMap();
-            return new KafkaSourceFacade(config, dataSourceName, new KafkaProducer<>(configMap));
+            return new KafkaSourceFacade(config, globalDataSourceManager, dataSourceName, new KafkaProducer<>(configMap));
         }
 
         @Override
