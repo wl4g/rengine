@@ -81,7 +81,7 @@ public class ScheduleJobServiceImpl implements ScheduleJobService {
             job.preUpdate();
         }
 
-        final ScheduleJob saved = mongoTemplate.insert(job, MongoCollectionDefinition.SCHEDULE_JOBS.getName());
+        final ScheduleJob saved = mongoTemplate.save(job, MongoCollectionDefinition.SCHEDULE_JOBS.getName());
         return SaveScheduleJobResult.builder().id(saved.getId()).build();
     }
 

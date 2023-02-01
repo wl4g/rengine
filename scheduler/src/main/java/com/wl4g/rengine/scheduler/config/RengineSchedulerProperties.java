@@ -16,7 +16,9 @@
 package com.wl4g.rengine.scheduler.config;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.ensureMap;
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.rengine.scheduler.util.Environments.resolveString;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -25,6 +27,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -67,17 +70,36 @@ public class RengineSchedulerProperties implements InitializingBean {
     private ZookeeperProperties zookeeper = new ZookeeperProperties();
     private TracingProperties tracing = new TracingProperties();
     private SnapshotDumpProperties dump = new SnapshotDumpProperties();
-    private EngineScheduleControllerProperties scheduleController = new EngineScheduleControllerProperties();
-    // @formatter:off
-    //private EngineExecutionSchedulerProperties executionScheduler = new EngineExecutionSchedulerProperties();
-    //private EngineExecutionJobProperties executionJob = new EngineExecutionJobProperties();
-    // @formatter:on
+    private EngineScheduleControllerProperties controller = new EngineScheduleControllerProperties();
+    private EngineScheduleExecutorProperties executor = new EngineScheduleExecutorProperties();
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        resolveJobProperties();
         applyDefaultToProperties();
         validateProperties();
-        resolveJobProperties();
+    }
+
+    protected void resolveJobProperties() {
+        controller.setName(resolveString(environment, controller.getName()));
+        controller.setCron(resolveString(environment, controller.getCron()));
+        controller.setTimeZone(resolveString(environment, controller.getTimeZone()));
+        controller.setJobBootstrapBeanName(resolveString(environment, controller.getJobBootstrapBeanName()));
+        controller.setShardingItemParameters(resolveString(environment, controller.getShardingItemParameters()));
+        controller.setJobParameter(resolveString(environment, controller.getJobParameter()));
+        controller.setJobShardingStrategyType(resolveString(environment, controller.getJobShardingStrategyType()));
+        controller.setJobExecutorServiceHandlerType(resolveString(environment, controller.getJobExecutorServiceHandlerType()));
+        controller.setJobErrorHandlerType(resolveString(environment, controller.getJobErrorHandlerType()));
+
+        final List<String> jobListenerTypes = safeList(controller.getJobListenerTypes());
+        for (int i = 0; i < jobListenerTypes.size(); i++) {
+            jobListenerTypes.set(i, resolveString(environment, jobListenerTypes.get(i)));
+        }
+        controller.setDescription(resolveString(environment, controller.getDescription()));
+
+        // Resolve extension attributes.
+        final Map<String, String> attributes = ensureMap(controller.getAttributes());
+        ensureMap(controller.getAttributes()).forEach((key, value) -> attributes.put(key, resolveString(environment, value)));
     }
 
     protected void applyDefaultToProperties() {
@@ -127,47 +149,6 @@ public class RengineSchedulerProperties implements InitializingBean {
         //            .collect(toList());
         //    isTrue(duplicateJobParamNames.isEmpty(), "The duplicate job params names for : %s", duplicateJobParamNames);
         //});
-        // @formatter:on
-    }
-
-    protected void resolveJobProperties() {
-        // @formatter:off
-        //safeList(jobConfigs).forEach(jobConf -> {
-        //    jobConf.setName(environment.resolvePlaceholders(jobConf.getName()));
-        //
-        //    jobConf.setCron(resolveString(environment, jobConf.getCron()));
-        //    jobConf.setTimeZone(resolveString(environment, jobConf.getTimeZone()));
-        //    jobConf.setJobBootstrapBeanName(resolveString(environment, jobConf.getJobBootstrapBeanName()));
-        //    jobConf.setShardingItemParameters(resolveString(environment, jobConf.getShardingItemParameters()));
-        //    jobConf.setJobParameter(resolveString(environment, jobConf.getJobParameter()));
-        //    jobConf.setJobShardingStrategyType(resolveString(environment, jobConf.getJobShardingStrategyType()));
-        //    jobConf.setJobExecutorServiceHandlerType(resolveString(environment, jobConf.getJobExecutorServiceHandlerType()));
-        //    jobConf.setJobErrorHandlerType(resolveString(environment, jobConf.getJobErrorHandlerType()));
-        //
-        //    List<String> jobListenerTypes = safeList(jobConf.getJobListenerTypes());
-        //    for (int i = 0; i < jobListenerTypes.size(); i++) {
-        //        jobListenerTypes.set(i, environment.resolvePlaceholders(jobListenerTypes.get(i)));
-        //    }
-        //
-        //    jobConf.setDescription(environment.resolvePlaceholders(jobConf.getDescription()));
-        //
-        //    // Resolve extension attributes.
-        //    Map<String, String> attributes = ensureMap(jobConf.getAttributes());
-        //    new HashMap<>(ensureMap(jobConf.getAttributes()))
-        //            .forEach((key, value) -> attributes.put(key, environment.resolvePlaceholders(value)));
-        //
-        //    // Resolve jobParams values.
-        //    // @formatter:off
-        //    //safeList(jobConf.getJobParams()).forEach(p -> {
-        //    //    ReflectionUtils2.doFullWithFields(p, targetField -> isGenericModifier(targetField.getModifiers()),
-        //    //            (field, objOfField) -> {
-        //    //                if (String.class.isAssignableFrom(field.getType()) && !Modifier.isFinal(field.getModifiers())) {
-        //    //                    setField(field, objOfField, resolveString(environment, getField(field, objOfField, true)), true);
-        //    //                }
-        //    //            });
-        //    //});
-        //    // @formatter:on
-        // });
         // @formatter:on
     }
 
@@ -271,7 +252,6 @@ public class RengineSchedulerProperties implements InitializingBean {
         private String cron;
         private String timeZone;
         private String jobBootstrapBeanName;
-
         // When setup true, the shardingTotalCount will be ignored, and the will
         // be automatically allocated according to the number of cluster nodes
         // priority.
@@ -285,7 +265,7 @@ public class RengineSchedulerProperties implements InitializingBean {
         private String jobExecutorServiceHandlerType;
         private String jobErrorHandlerType;
         private Collection<String> jobListenerTypes = new LinkedList<>();
-        private String description = "The job engine execution schedules.";
+        private String description;
         private Map<String, String> attributes = new HashMap<>();
 
         public abstract ExecutorJobType getJobType();
@@ -296,10 +276,9 @@ public class RengineSchedulerProperties implements InitializingBean {
             setMonitorExecution(true);
             setFailover(true);
             setMisfire(false);
-            setCron("0/10 * * * * ?");
+            setCron("0/5 * * * * ?");
             setTimeZone("GMT+08:00");
             setJobBootstrapBeanName(null);
-
             // When setup true, the shardingTotalCount will be ignored,
             // and the will be automatically allocated according to the
             // number of cluster nodes priority.
@@ -320,6 +299,7 @@ public class RengineSchedulerProperties implements InitializingBean {
         public JobConfiguration toJobConfiguration(final String jobName) {
             hasTextOf(jobName, "jobName");
             final JobConfiguration jobConfig = JobConfiguration.builder()
+                    .jobType(getJobType())
                     .jobName(jobName)
                     .disabled(nonNull(disabled) ? disabled : false)
                     .overwrite(nonNull(overwrite) ? overwrite : true)
@@ -352,6 +332,10 @@ public class RengineSchedulerProperties implements InitializingBean {
     @Setter
     @ToString
     public static class EngineScheduleControllerProperties extends BaseJobProperties {
+        public EngineScheduleControllerProperties() {
+            setDescription("The job engine execution schedule controller.");
+        }
+
         @JsonIgnore
         @Override
         public ExecutorJobType getJobType() {
@@ -359,26 +343,12 @@ public class RengineSchedulerProperties implements InitializingBean {
         }
     }
 
-    // @Getter
-    // @Setter
-    // @ToString
-    // public static class EngineExecutionSchedulerProperties extends
-    // BaseJobProperties {
-    // @Override
-    // public ExecutorJobType getJobType() {
-    // return ExecutorJobType.ENGINE_EXECUTION_SCHEDULER;
-    // }
-    // }
-    //
-    // @Getter
-    // @Setter
-    // @ToString
-    // public static class EngineExecutionJobProperties extends
-    // BaseJobProperties {
-    // @Override
-    // public ExecutorJobType getJobType() {
-    // return ExecutorJobType.ENGINE_EXECUTION_JOB;
-    // }
-    // }
+    @Getter
+    @Setter
+    @ToString
+    public static class EngineScheduleExecutorProperties {
+        private @Min(1) int concurrency = 1;
+        private @Min(1) int acceptQueue = 1;
+    }
 
 }

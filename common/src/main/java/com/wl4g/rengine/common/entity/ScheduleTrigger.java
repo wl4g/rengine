@@ -16,11 +16,12 @@
 package com.wl4g.rengine.common.entity;
 
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 
 import java.util.List;
-import java.util.TimeZone;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -74,8 +75,6 @@ public class ScheduleTrigger extends BaseBean {
         return this;
     }
 
-    // 1.多态参见:https://swagger.io/docs/specification/data-models/inheritance-and-polymorphism/
-    // 2.对于swagger3注解,父类必须是抽象的，否则swagger3页面请求参数schemas展开后会以父类名重复展示3个.
     @Schema(oneOf = { CronTriggerConfig.class }, discriminatorProperty = "type")
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", visible = true)
     @JsonSubTypes({ @Type(value = CronTriggerConfig.class, name = "CRON") })
@@ -93,6 +92,50 @@ public class ScheduleTrigger extends BaseBean {
         public abstract T validate();
     }
 
+    @Getter
+    @Setter
+    @SuperBuilder
+    @ToString
+    @NoArgsConstructor
+    public static class CronTriggerConfig extends TriggerPropertiesBase<CronTriggerConfig> {
+        // ElasticJob standard configuration.
+        private @NotBlank @Default String cron = DEFAULT_CRON;
+        private @NotNull @Default Boolean monitorExecution = DEFAULT_MONITOR_EXECUTION;
+        private @NotNull @Default Boolean failover = DEFAULT_FAILOVER;
+        private @NotNull @Default Boolean misfire = DEFAULT_MISFIRE;
+        private @NotBlank @Default String timeZone = DEFAULT_TIME_ZONE;
+        private @NotNull @Default Integer maxTimeDiffSeconds = DEFAULT_MAX_TIME_DIFF_SECONDS;
+        private @NotNull @Default Integer reconcileIntervalMinutes = DEFAULT_RECONCILE_INTERVAL_MINUTES;
+        // Engine execution configuration.
+        private @NotNull @Min(1) @Default Long maxTimeoutMs = DEFAULT_MAX_TIMEOUT_MS;
+        private @NotNull @Min(1) @Default Long awaitMs = DEFAULT_AWAIT_MS;
+        private @NotNull List<ExecuteRequest> requests;
+
+        public CronTriggerConfig validate() {
+            hasTextOf(getCron(), "cron");
+            notNullOf(getMonitorExecution(), "monitorExecution");
+            notNullOf(getFailover(), "failover");
+            notNullOf(getMisfire(), "misfire");
+            notNullOf(getTimeZone(), "timeZone");
+            notNullOf(getMaxTimeDiffSeconds(), "maxTimeDiffSeconds");
+            notNullOf(getReconcileIntervalMinutes(), "reconcileIntervalMinutes");
+            notNullOf(getRequests(), "request");
+            isTrueOf(getMaxTimeoutMs() > 0, "maxTimeoutMs > 0");
+            isTrueOf(getAwaitMs() > 0, "awaitMs > 0");
+            return this;
+        }
+
+        public static final String DEFAULT_CRON = "0/10 * * * * ?";
+        public static final boolean DEFAULT_MONITOR_EXECUTION = true;
+        public static final boolean DEFAULT_FAILOVER = true;
+        public static final boolean DEFAULT_MISFIRE = false;
+        public static final String DEFAULT_TIME_ZONE = "GMT+08:00";
+        public static final int DEFAULT_MAX_TIME_DIFF_SECONDS = -1;
+        public static final int DEFAULT_RECONCILE_INTERVAL_MINUTES = 0;
+        public static final long DEFAULT_MAX_TIMEOUT_MS = 30_000L;
+        public static final long DEFAULT_AWAIT_MS = 50L;
+    }
+
     public static enum TriggerType {
 
         /**
@@ -108,41 +151,6 @@ public class ScheduleTrigger extends BaseBean {
         // * changes, which usually never exits.
         // */
         // LOOP;
-    }
-
-    @Getter
-    @Setter
-    @SuperBuilder
-    @ToString
-    @NoArgsConstructor
-    public static class CronTriggerConfig extends TriggerPropertiesBase<CronTriggerConfig> {
-        private @NotBlank @Default String cron = DEFAULT_CRON;
-        private @NotNull @Default Boolean monitorExecution = DEFAULT_MONITOR_EXECUTION;
-        private @NotNull @Default Boolean failover = DEFAULT_FAILOVER;
-        private @NotNull @Default Boolean misfire = DEFAULT_MISFIRE;
-        private @NotBlank @Default String timeZone = TimeZone.getDefault().getID();
-        private @NotNull @Default Integer maxTimeDiffSeconds = DEFAULT_MAX_TIME_DIFF_SECONDS;
-        private @NotNull @Default Integer reconcileIntervalMinutes = DEFAULT_RECONCILE_INTERVAL_MINUTES;
-        private @NotNull List<ExecuteRequest> requests;
-
-        public CronTriggerConfig validate() {
-            hasTextOf(getCron(), "cron");
-            notNullOf(getMonitorExecution(), "monitorExecution");
-            notNullOf(getFailover(), "failover");
-            notNullOf(getMisfire(), "misfire");
-            notNullOf(getTimeZone(), "timeZone");
-            notNullOf(getMaxTimeDiffSeconds(), "maxTimeDiffSeconds");
-            notNullOf(getReconcileIntervalMinutes(), "reconcileIntervalMinutes");
-            notNullOf(getRequests(), "request");
-            return this;
-        }
-
-        public static final String DEFAULT_CRON = "0/10 * * * * ?";
-        public static final boolean DEFAULT_MONITOR_EXECUTION = true;
-        public static final boolean DEFAULT_FAILOVER = true;
-        public static final boolean DEFAULT_MISFIRE = false;
-        public static final int DEFAULT_MAX_TIME_DIFF_SECONDS = -1;
-        public static final int DEFAULT_RECONCILE_INTERVAL_MINUTES = 0;
     }
 
 }

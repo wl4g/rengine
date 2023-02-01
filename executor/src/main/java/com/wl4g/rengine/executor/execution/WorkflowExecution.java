@@ -18,8 +18,8 @@ package com.wl4g.rengine.executor.execution;
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
-import com.wl4g.rengine.common.entity.ScheduleJob.ResultDescription;
 import com.wl4g.rengine.common.model.ExecuteRequest;
+import com.wl4g.rengine.common.model.ExecuteResult.ResultDescription;
 
 /**
  * {@link WorkflowExecution}

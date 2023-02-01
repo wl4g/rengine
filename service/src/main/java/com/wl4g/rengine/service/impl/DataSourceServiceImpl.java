@@ -99,7 +99,7 @@ public class DataSourceServiceImpl implements DataSourceService {
             dataSourceProperties.preUpdate();
         }
 
-        DataSourceProperties saved = mongoTemplate.insert(dataSourceProperties, MongoCollectionDefinition.DATASOURCES.getName());
+        DataSourceProperties saved = mongoTemplate.save(dataSourceProperties, MongoCollectionDefinition.DATASOURCES.getName());
         return SaveDataSourceResult.builder().id(saved.getId()).build();
     }
 

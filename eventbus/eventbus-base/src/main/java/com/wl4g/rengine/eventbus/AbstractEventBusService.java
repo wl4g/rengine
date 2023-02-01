@@ -25,8 +25,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.wl4g.infra.common.task.GenericTaskRunner;
-import com.wl4g.infra.common.task.RunnerProperties;
-import com.wl4g.infra.common.task.RunnerProperties.StartupMode;
+import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
 import com.wl4g.rengine.common.event.RengineEvent;
 import com.wl4g.rengine.eventbus.config.ClientEventBusConfig;
 import com.wl4g.rengine.eventbus.recorder.EventRecorder;
@@ -46,24 +45,20 @@ import lombok.Getter;
 public abstract class AbstractEventBusService<R> implements RengineEventBusService<R>, Closeable {
     protected final ClientEventBusConfig config;
     protected final EventRecorder recorder;
-    protected final GenericTaskRunner<RunnerProperties> compactScheduler;
+    protected final SafeScheduledTaskPoolExecutor compactExecutor;
 
     public AbstractEventBusService(ClientEventBusConfig config, EventRecorder recorder) {
         this.config = notNullOf(config, "properties");
         this.recorder = notNullOf(recorder, "recorder");
-        this.compactScheduler = new GenericTaskRunner<RunnerProperties>(new RunnerProperties(StartupMode.ASYNC, 1)) {
-        };
-        this.compactScheduler.start();
-
+        this.compactExecutor = GenericTaskRunner.newDefaultScheduledExecutor(AbstractEventBusService.class.getSimpleName(), 1, 4);
         // Timing scheduling execution.
-        this.compactScheduler.getWorker()
-                .schedule(() -> recorder.compact(event -> doPublish(singletonList(event))),
-                        config.getRecorder().getCompaction().getDelaySeconds(), TimeUnit.SECONDS);
+        this.compactExecutor.schedule(() -> recorder.compact(event -> doPublish(singletonList(event))),
+                config.getRecorder().getCompaction().getDelaySeconds(), TimeUnit.SECONDS);
     }
 
     @Override
     public void close() throws IOException {
-        this.compactScheduler.close();
+        this.compactExecutor.shutdownNow();
     }
 
     @Override

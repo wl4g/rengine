@@ -35,6 +35,7 @@ import com.wl4g.rengine.service.minio.MinioClientProperties.UserUploadAssumeConf
 import io.minio.credentials.AssumeRoleProvider;
 import io.minio.credentials.Credentials;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import okhttp3.OkHttpClient;
 
 /**
@@ -44,10 +45,9 @@ import okhttp3.OkHttpClient;
  * @version 2022-08-31
  * @since v1.0.0
  */
-// @Slf4j
+@Getter
 @AllArgsConstructor
 public class MinioClientManager implements ApplicationRunner {
-
     private final MinioClientProperties config;
     private final OkHttpClient httpClient;
 

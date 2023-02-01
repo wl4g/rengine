@@ -181,7 +181,7 @@ public class DictServiceImpl implements DictService {
             dicts.preUpdate();
         }
 
-        final Dict saved = mongoTemplate.insert(dicts, MongoCollectionDefinition.SYS_DICTS.getName());
+        final Dict saved = mongoTemplate.save(dicts, MongoCollectionDefinition.SYS_DICTS.getName());
 
         // Save to cached.
         if (nonNull(saved.getId()) && saved.getId() > 0) {

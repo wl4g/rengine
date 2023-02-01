@@ -67,9 +67,8 @@ import io.minio.credentials.Credentials;
 public class UploadServiceImpl implements UploadService {
 
     private @Autowired Validator validator;
-    private @Autowired MinioClientProperties config;
     private @Autowired MongoTemplate mongoTemplate;
-    private @Autowired MinioClientManager minioManager;
+    private @Autowired(required = false) MinioClientManager minioManager;
 
     @Override
     public PageHolder<UploadObject> query(QueryUpload model) {
@@ -121,22 +120,23 @@ public class UploadServiceImpl implements UploadService {
         validator.validate(upload, ValidForEntityMarker.class);
 
         // Save metadata to mongo table.
-        mongoTemplate.insert(upload, MongoCollectionDefinition.UPLOADS.getName());
+        mongoTemplate.save(upload, MongoCollectionDefinition.UPLOADS.getName());
 
         // New create temporary STS credentials.
         try {
             Credentials credentials = minioManager.createSTSCredentials(objectPrefix);
+            final MinioClientProperties config = minioManager.getConfig();
             return SaveUploadResult.builder()
                     .id(upload.getId())
                     .endpoint(config.getEndpoint())
-                    .region(config.getRegion())
+                    .region(minioManager.getConfig().getRegion())
                     // .bucket(properties.getBucket())
                     .bucket(RengineConstants.DEFAULT_MINIO_BUCKET)
                     .accessKey(credentials.accessKey())
                     .secretKey(credentials.secretKey())
                     .sessionToken(credentials.sessionToken())
-                    .partSize(config.getUserUpload().getLibraryPartSize().toBytes())
-                    .fileLimitSize(config.getUserUpload().getLibraryFileLimitSize().toBytes())
+                    .partSize(minioManager.getConfig().getUserUpload().getLibraryPartSize().toBytes())
+                    .fileLimitSize(minioManager.getConfig().getUserUpload().getLibraryFileLimitSize().toBytes())
                     .objectPrefix(objectPrefix)
                     .extensions(safeList(uploadType.getExtensions()).stream().map(t -> t.getSuffix()).collect(toList()))
                     .build();

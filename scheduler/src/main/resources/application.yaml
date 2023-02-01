@@ -14,8 +14,8 @@
 spring:
   application.name: rengine-scheduler
   profiles:
-    #include: arthas,job,eventbus,devtool
-    include: arthas,job,job-safecloud,eventbus
+    #include: arthas,scheduler,devtool
+    include: arthas,scheduler
     active: dev
   banner:
     location: classpath:META-INF/banner.txt

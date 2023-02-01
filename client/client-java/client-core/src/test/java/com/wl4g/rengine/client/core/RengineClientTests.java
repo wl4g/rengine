@@ -28,9 +28,9 @@ import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 
 import com.wl4g.rengine.client.core.config.ClientConfig;
-import com.wl4g.rengine.common.entity.ScheduleJob.ResultDescription;
 import com.wl4g.rengine.common.exception.RengineException;
 import com.wl4g.rengine.common.model.ExecuteResult;
+import com.wl4g.rengine.common.model.ExecuteResult.ResultDescription;
 import com.wl4g.rengine.common.util.IdGenUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +52,6 @@ public class RengineClientTests {
             .build();
 
     ExecuteResult defaultFailbackResult = ExecuteResult.builder()
-            .errorCount(2)
             .results(singletonList(ResultDescription.builder().scenesCode("s1001001").build()))
             .build();
 
@@ -66,8 +65,8 @@ public class RengineClientTests {
                         .clientId("iot-mqttcollector01")
                         .clientSecret("abcdefghijklmnopqrstuvwxyz")
                         .build())
-                .defaultFailback(e -> {
-                    log.error("Failed to evaluation of reason: ", e.getMessage());
+                .defaultFailback(f -> {
+                    log.error("Failed to evaluation of reason: ", f.getError().getMessage());
                     return null;
                 })
                 .build();
@@ -82,20 +81,20 @@ public class RengineClientTests {
 
     @Test(expected = RengineException.class)
     public void testNewRengineClientExecutionWithTimeoutFail() {
-        RengineClient timeoutClient = RengineClient.builder().config(invalidClientConfig).defaultFailback(e -> {
-            out.println("\nFailed to evaluation of reason: " + e.getMessage());
+        RengineClient timeoutClient = RengineClient.builder().config(invalidClientConfig).defaultFailback(f -> {
+            out.println("\nFailed to evaluation of reason: " + f.getError().getMessage());
             return defaultFailbackResult;
         }).build();
 
-        final ExecuteResult result = timeoutClient.execute(IdGenUtils.next(), singletonList("ecommerce_trade_gift"), 1000L,
-                false, emptyMap());
+        final ExecuteResult result = timeoutClient.execute(IdGenUtils.next(), singletonList("ecommerce_trade_gift"), 1000L, false,
+                emptyMap());
         out.println("Executed result: " + result);
     }
 
     @Test
     public void testNewRengineClientExecutionWithTimeoutSuccess() {
-        RengineClient timeoutClient = RengineClient.builder().config(invalidClientConfig).defaultFailback(e -> {
-            out.println("\nFailed to evaluation of reason: " + e.getMessage());
+        RengineClient timeoutClient = RengineClient.builder().config(invalidClientConfig).defaultFailback(f -> {
+            out.println("\nFailed to evaluation of reason: " + f.getError().getMessage());
             return defaultFailbackResult;
         }).build();
 

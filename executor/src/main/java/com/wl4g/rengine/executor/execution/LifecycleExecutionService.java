@@ -28,14 +28,17 @@ import static java.util.Objects.nonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
@@ -57,10 +60,10 @@ import com.wl4g.infra.common.task.GenericTaskRunner;
 import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
 import com.wl4g.rengine.common.entity.Rule.RuleEngine;
 import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
-import com.wl4g.rengine.common.entity.ScheduleJob.ResultDescription;
 import com.wl4g.rengine.common.exception.RengineException;
 import com.wl4g.rengine.common.model.ExecuteRequest;
 import com.wl4g.rengine.common.model.ExecuteResult;
+import com.wl4g.rengine.common.model.ExecuteResult.ResultDescription;
 import com.wl4g.rengine.executor.metrics.ExecutorMeterService;
 import com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsTag;
 import com.wl4g.rengine.executor.service.impl.ReactiveEngineExecutionServiceImpl;
@@ -120,8 +123,6 @@ public class LifecycleExecutionService {
         notNullOf(executeRequest, "executeRequest");
         notEmptyOf(sceneses, "sceneses");
 
-        final List<String> scenesCodes = sceneses.stream().map(s -> s.getScenesCode()).collect(toList());
-
         // Monitor task timeout interrupt.
         final CountDownLatch latch = new CountDownLatch(sceneses.size());
 
@@ -131,48 +132,60 @@ public class LifecycleExecutionService {
                         executionExecutor.submit(new ExecutionRunner(latch, executeRequest, scenes))))
                 .collect(toMap(kv -> (String) kv.getItem1(), kv -> (Future) kv.getItem2()));
 
-        // Collect for uncompleted results.
-        final List<ResultDescription> uncompleteds = new ArrayList<>(futures.size());
-        final long timeoutMs = (long) ((long) executeRequest.getTimeout() * (1 - config.engine().executeTimeoutOffsetRate()));
+        // Completed results.
+        final Map<String, ResultDescription> completed = new HashMap<>(futures.size());
+        // Uncompleted results.
+        final Set<ResultDescription> uncompleted = new HashSet<>(futures.size());
 
-        if (!latch.await(timeoutMs, MILLISECONDS)) { // timeout?
-            final Iterator<Entry<String, Future<ResultDescription>>> it = futures.entrySet().iterator();
-            while (it.hasNext()) {
-                final Entry<String, Future<ResultDescription>> entry = it.next();
-                final Future<ResultDescription> future = entry.getValue();
-                // Collect for uncompleted results.
-                if (!future.isDone() || future.isCancelled()) {
-                    // Not need to execution continue.
-                    future.cancel(true);
-                    it.remove();
-                    uncompleteds.add(ResultDescription.builder()
-                            .scenesCode(entry.getKey())
-                            .success(false)
-                            .valueMap(emptyMap())
-                            .reason(format("Execution time exceeded in total %sms", timeoutMs))
-                            .build());
+        // Calculate the effective timeout time (ms), minus the network
+        // transmission time-consuming deviation.
+        final long effectiveTimeoutMs = (long) ((long) executeRequest.getTimeout()
+                * (1 - config.engine().executeTimeoutOffsetRate()));
+
+        for (long count = 0, await = DEFAULT_EXECUTION_AWAIT, total = effectiveTimeoutMs / await; count < total; count++) {
+            if (!futures.isEmpty() && !latch.await(await, MILLISECONDS)) {
+                final Iterator<Entry<String, Future<ResultDescription>>> it = futures.entrySet().iterator();
+                while (it.hasNext()) {
+                    final Entry<String, Future<ResultDescription>> entry = it.next();
+                    final Future<ResultDescription> future = entry.getValue();
+                    //
+                    // Notice: isCancelled a true when the submitted task is
+                    // rejected, see: #EMPTY_FUTURE_CANCELLED
+                    if (future.isDone() || future.isCancelled()) {
+                        // Not need to execution continue.
+                        it.remove();
+                        if (future.isDone()) {
+                            // Collect for completed results.
+                            completed.putIfAbsent(entry.getKey(), future.get());
+                        }
+                        if (future.isCancelled()) {
+                            // Collect for uncompleted results.
+                            uncompleted.add(ResultDescription.builder()
+                                    .scenesCode(entry.getKey())
+                                    .success(false)
+                                    .valueMap(emptyMap())
+                                    .reason(format("Execution time exceeded in total %sms", effectiveTimeoutMs))
+                                    .build());
+                        }
+                    }
                 }
             }
-            log.debug("The parts success executed workflow graph tasks are: {}. requestId: {}, clientId: {}, scenesCodes: {}",
-                    uncompleteds, scenesCodes);
-        } else {
-            log.debug("Executed workflow graph all tasks successfully. requestId: {}, clientId: {}, scenesCodes: {}",
-                    uncompleteds, scenesCodes);
         }
 
-        // Collect for completed results.
-        final List<ResultDescription> completeds = futures.values().stream().map(f -> {
-            try {
-                return f.get();
-            } catch (Exception e) {
-                throw new IllegalStateException(e);
-            }
-        }).collect(toList());
+        final List<String> scenesCodes = sceneses.stream().map(s -> s.getScenesCode()).collect(toList());
+        if (uncompleted.size() > 0) {
+            log.debug("The parts success executed workflow graph tasks are: {}. requestId: {}, clientId: {}, scenesCodes: {}",
+                    uncompleted, scenesCodes);
+        } else {
+            log.debug("Executed workflow graph all tasks successfully. requestId: {}, clientId: {}, scenesCodes: {}", uncompleted,
+                    scenesCodes);
+        }
 
+        final Set<ResultDescription> _completed = completed.entrySet().stream().map(e -> e.getValue()).collect(toSet());
         return ExecuteResult.builder()
                 .requestId(executeRequest.getRequestId())
-                .errorCount(uncompleteds.size())
-                .results(newArrayList(Iterables.concat(completeds, uncompleteds)))
+                .results(newArrayList(Iterables.concat(_completed, uncompleted)))
+                .description(_completed.size() == sceneses.size() ? "There are failed executions." : "All executed successfully")
                 .build();
     }
 
@@ -244,5 +257,7 @@ public class LifecycleExecutionService {
             }
         }
     }
+
+    public static final long DEFAULT_EXECUTION_AWAIT = 20L;
 
 }

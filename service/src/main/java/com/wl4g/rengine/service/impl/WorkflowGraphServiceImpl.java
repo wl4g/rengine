@@ -112,7 +112,7 @@ public class WorkflowGraphServiceImpl implements WorkflowGraphService {
 
         graph.setRevision(mongoSequenceService.getNextSequence(GlobalMongoSequenceService.GRAPHS_REVISION_SEQ));
 
-        WorkflowGraph saved = mongoTemplate.insert(graph, MongoCollectionDefinition.WORKFLOW_GRAPHS.getName());
+        WorkflowGraph saved = mongoTemplate.save(graph, MongoCollectionDefinition.WORKFLOW_GRAPHS.getName());
         return SaveWorkflowGraphResult.builder().id(saved.getId()).build();
     }
 

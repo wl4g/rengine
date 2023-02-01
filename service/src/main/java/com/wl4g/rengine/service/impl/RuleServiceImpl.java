@@ -97,7 +97,7 @@ public class RuleServiceImpl implements RuleService {
             rule.preUpdate();
         }
 
-        Rule saved = mongoTemplate.insert(rule, MongoCollectionDefinition.RULES.getName());
+        Rule saved = mongoTemplate.save(rule, MongoCollectionDefinition.RULES.getName());
         return SaveRuleResult.builder().id(saved.getId()).build();
     }
 

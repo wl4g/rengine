@@ -20,13 +20,13 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import org.springframework.core.env.Environment;
 
 /**
- * {@link EnvironmentUtils}
+ * {@link Environments}
  * 
  * @author James Wong
  * @version 2022-10-30
  * @since v3.0.0
  */
-public abstract class EnvironmentUtils {
+public abstract class Environments {
 
     public static String resolveString(Environment environment, String placeholder) {
         if (isBlank(placeholder)) {

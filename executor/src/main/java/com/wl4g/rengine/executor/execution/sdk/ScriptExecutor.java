@@ -25,6 +25,7 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -37,7 +38,6 @@ import org.graalvm.polyglot.Value;
 
 import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager;
 import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager.ContextWrapper;
-import com.wl4g.infra.common.task.CompleteTaskListener;
 import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
 import com.wl4g.rengine.common.exception.ExecutionScriptException;
 
@@ -85,9 +85,9 @@ public class ScriptExecutor {
         isTrueOf(timeoutMs > 1, "timeoutMs>1");
 
         final AtomicInteger index = new AtomicInteger(0);
-        final List<Runnable> jobs = safeList(jsLambdas).stream().map(jsLambda -> {
+        final List<Callable<Object>> jobs = safeList(jsLambdas).stream().map(jsLambda -> {
             final String script = jsLambda.toString();
-            return (Runnable) () -> {
+            return (Callable<Object>) () -> {
                 // The same context restricted of graal.js does not allow
                 // multi-threaded access, a new context must be used to execute
                 // in the thread pool asynchronously.
@@ -97,7 +97,7 @@ public class ScriptExecutor {
                             .eval(Source.newBuilder("js", script, format("lambda%s.js", index.getAndIncrement()))
                                     .mimeType("application/javascript+module")
                                     .build());
-                    jsFunction.execute();
+                    return jsFunction.execute();
                 } catch (Exception e) {
                     throw new ExecutionScriptException(e);
                 }
@@ -105,37 +105,6 @@ public class ScriptExecutor {
         }).collect(toList());
 
         this.executor.submitForComplete(jobs, timeoutMs);
-    }
-
-    public @HostAccess.Export void submitForComplete(
-            @NotNull List<Value> jsLambdas,
-            @NotNull CompleteTaskListener listener,
-            @Min(1) long timeoutMs) {
-        notNullOf(jsLambdas, "jsLambdas");
-        notNullOf(listener, "listener");
-        isTrueOf(timeoutMs > 1, "timeoutMs>1");
-
-        final AtomicInteger index = new AtomicInteger(0);
-        final List<Runnable> jobs = safeList(jsLambdas).stream().map(jsLambda -> {
-            final String script = jsLambda.toString();
-            return (Runnable) () -> {
-                // The same context restricted of graal.js does not allow
-                // multi-threaded access, a new context must be used to execute
-                // in the thread pool asynchronously.
-                final Map<String, Object> metadata = singletonMap(KEY_WORKFLOW_ID, workflowId);
-                try (ContextWrapper graalContext = graalPolyglotManager.getContext(metadata);) {
-                    final Value jsFunction = graalContext
-                            .eval(Source.newBuilder("js", script, format("lambda%s.js", index.getAndIncrement()))
-                                    .mimeType("application/javascript+module")
-                                    .build());
-                    jsFunction.execute();
-                } catch (Exception e) {
-                    throw new ExecutionScriptException(e);
-                }
-            };
-        }).collect(toList());
-
-        this.executor.submitForComplete(jobs, listener, timeoutMs);
     }
 
 }

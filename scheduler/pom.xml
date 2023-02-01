@@ -100,22 +100,22 @@
             <groupId>com.wl4g</groupId>
             <artifactId>infra-support</artifactId>
         </dependency>
-        <!-- Spring Webflux(Non default requires) -->
-        <!-- <dependency>-->
-        <!--     <groupId>org.springframework</groupId>-->
-        <!--     <artifactId>spring-webflux</artifactId>-->
-        <!-- </dependency>-->
-        <!-- Spring Boot -->
+        <!-- Security -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-client</artifactId>
+        </dependency>
+        <!-- Redis -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
         <!-- DB -->
         <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
-        <!-- Elastic-Job -->
+        <!-- ElasticJob(Only refer to source code logic custom implementation) -->
         <!-- <dependency> -->
         <!--     <groupId>org.apache.shardingsphere.elasticjob</groupId> -->
         <!--     <artifactId>elasticjob-lite-spring-boot-starter</artifactId> -->

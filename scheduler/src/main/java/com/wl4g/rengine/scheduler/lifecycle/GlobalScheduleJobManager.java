@@ -19,10 +19,10 @@ import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeToList;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.rengine.scheduler.lifecycle.ElasticJobBootstrapBuilder.newDefaultJobConfig;
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.util.List;
 import java.util.Map;
@@ -31,15 +31,19 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import org.apache.curator.framework.recipes.locks.InterProcessSemaphoreMutex;
 import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
 import org.apache.shardingsphere.elasticjob.lite.api.bootstrap.JobBootstrap;
 import org.apache.shardingsphere.elasticjob.lite.api.bootstrap.impl.ScheduleJobBootstrap;
 import org.apache.shardingsphere.elasticjob.reg.base.CoordinatorRegistryCenter;
+import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperRegistryCenter;
 import org.apache.shardingsphere.elasticjob.tracing.api.TracingConfiguration;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 
 import com.wl4g.infra.common.collection.CollectionUtils2;
+import com.wl4g.infra.common.lang.tuples.Tuple2;
+import com.wl4g.rengine.common.entity.ScheduleTrigger;
 import com.wl4g.rengine.common.entity.ScheduleTrigger.CronTriggerConfig;
 import com.wl4g.rengine.scheduler.config.RengineSchedulerProperties;
 import com.wl4g.rengine.scheduler.exception.ScheduleException;
@@ -58,21 +62,22 @@ import lombok.CustomLog;
  */
 @CustomLog
 public class GlobalScheduleJobManager implements ApplicationRunner {
+
     final RengineSchedulerProperties config;
     final List<TracingConfiguration<?>> tracingConfigurations;
-    final CoordinatorRegistryCenter registryCenter;
+    final CoordinatorRegistryCenter regCenter;
     final ScheduleJobBootstrap controllerBootstrap;
-    final Map<String, JobBootstrap> schedulerBootstrapRegistry;
-    // final Map<String, JobBootstrap> executionBootstrapRegistry;
+    final Map<Long, Tuple2> schedulerBootstrapRegistry;
 
     public GlobalScheduleJobManager(final @NotNull RengineSchedulerProperties config,
             final @NotNull List<TracingConfiguration<?>> tracingConfigurations,
             final @NotNull CoordinatorRegistryCenter registryCenter) {
         this.config = notNullOf(config, "config");
         this.tracingConfigurations = notNullOf(tracingConfigurations, "tracingConfigurations");
-        this.registryCenter = notNullOf(registryCenter, "registryCenter");
-        this.controllerBootstrap = createJobBootstrap(config.getScheduleController()
-                .toJobConfiguration(EngineScheduleController.class.getSimpleName() + "@ScheduleJob"));
+        this.regCenter = notNullOf(registryCenter, "registryCenter");
+        final JobConfiguration jobConfig = config.getController()
+                .toJobConfiguration(EngineScheduleController.class.getSimpleName());
+        this.controllerBootstrap = createJobBootstrap(jobConfig);
         this.schedulerBootstrapRegistry = new ConcurrentHashMap<>(16);
     }
 
@@ -87,54 +92,57 @@ public class GlobalScheduleJobManager implements ApplicationRunner {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends JobBootstrap> T get(String jobName) {
-        return (T) schedulerBootstrapRegistry.get(jobName);
+    public <T extends JobBootstrap> T get(Long triggerId) {
+        final Tuple2 job = schedulerBootstrapRegistry.get(triggerId);
+        return nonNull(job) ? (T) job.getItem2() : null;
     }
 
     @SuppressWarnings("unchecked")
     public <T extends JobBootstrap> T add(
+            @NotNull InterProcessSemaphoreMutex lock,
             @NotNull ExecutorJobType jobType,
             @NotBlank String jobName,
-            @NotNull CronTriggerConfig cronTrigger,
-            @NotNull JobParameter jobParameter,
-            boolean force) {
+            @NotNull ScheduleTrigger trigger,
+            @NotNull JobParameter jobParameter) throws Exception {
+        notNullOf(lock, "lock");
         notNullOf(jobType, "jobType");
         hasTextOf(jobName, "jobName");
-        notNullOf(cronTrigger, "cronTrigger");
+        notNullOf(trigger, "trigger");
         notNullOf(jobParameter, "jobParameter");
-        cronTrigger.validate();
+        trigger.validate();
 
-        final JobConfiguration jobConfig = ElasticJobBootstrapBuilder.newDefaultJobConfig(jobType, jobName, cronTrigger,
-                jobParameter);
+        final CronTriggerConfig ctc = ((CronTriggerConfig) notNullOf(trigger.getProperties(), "cronTrigger")).validate();
+        final JobConfiguration jobConfig = newDefaultJobConfig(jobType, jobName, ctc, jobParameter);
         final JobBootstrap bootstrap = createJobBootstrap(jobConfig);
-        final JobBootstrap existing = schedulerBootstrapRegistry.putIfAbsent(jobName, bootstrap);
+        final Tuple2 existing = schedulerBootstrapRegistry.putIfAbsent(trigger.getId(), new Tuple2(bootstrap, lock));
         if (nonNull(existing)) {
-            if (force) {
-                log.warn("Shutdowning for existing job of {} ...", jobName);
-                existing.shutdown();
-            } else {
-                throw new ScheduleException(format("Existing schedule job for %s", jobName));
-            }
+            // if (force) {
+            // log.warn("Shutdowning for existing job of {}/{} ...",
+            // trigger.getId(), jobName);
+            // ((JobBootstrap) existing.getItem1()).shutdown();
+            // } else {
+            throw new ScheduleException(format("Already schedule job for %s/%s", trigger.getId(), jobName));
+            // }
         }
 
         return (T) bootstrap;
     }
 
-    public GlobalScheduleJobManager remove(String jobName) {
-        schedulerBootstrapRegistry.remove(jobName);
+    public GlobalScheduleJobManager remove(Long triggerId) {
+        schedulerBootstrapRegistry.remove(triggerId);
         return this;
     }
 
-    public List<String> start(String... jobNames) {
+    public List<Long> start(Long... triggerIds) {
         log.info("Schedule job bootstrap starting ...");
-        final List<String> _jobNames = safeToList(String.class, jobNames);
+        final List<Long> _triggerIds = safeToList(Long.class, triggerIds);
         return safeMap(schedulerBootstrapRegistry).entrySet()
                 .stream()
-                .filter(e -> _jobNames.isEmpty() || (!_jobNames.isEmpty() && _jobNames.contains(e.getKey())))
+                .filter(e -> _triggerIds.isEmpty() || (!_triggerIds.isEmpty() && _triggerIds.contains(e.getKey())))
                 .map(e -> {
                     try {
-                        if (e.getValue() instanceof ScheduleJobBootstrap) {
-                            ((ScheduleJobBootstrap) e.getValue()).schedule();
+                        if (nonNull(e.getValue()) && e.getValue().getItem1() instanceof ScheduleJobBootstrap) {
+                            ((ScheduleJobBootstrap) e.getValue().getItem1()).schedule();
                             // } else if (e.getValue() instanceof
                             // OneOffJobBootstrap) {
                             // ((OneOffJobBootstrap) e.getValue()).execute();
@@ -146,19 +154,19 @@ public class GlobalScheduleJobManager implements ApplicationRunner {
                     }
                     return e.getKey();
                 })
-                .filter(n -> !isBlank(n))
+                .filter(n -> nonNull(n))
                 .collect(toList());
     }
 
-    public List<String> shutdown(String... jobNames) {
+    public List<Long> shutdown(Long... triggerIds) {
         log.info("Schedule job bootstrap shutdown ...");
-        final List<String> _jobNames = safeToList(String.class, jobNames);
+        final List<Long> _triggerIds = safeToList(Long.class, triggerIds);
         return safeMap(schedulerBootstrapRegistry).entrySet()
                 .stream()
-                .filter(e -> _jobNames.isEmpty() || (!_jobNames.isEmpty() && _jobNames.contains(e.getKey())))
+                .filter(e -> _triggerIds.isEmpty() || (!_triggerIds.isEmpty() && _triggerIds.contains(e.getKey())))
                 .map(e -> {
                     try {
-                        e.getValue().shutdown();
+                        ((ScheduleJobBootstrap) e.getValue().getItem1()).shutdown();
                         log.info("Shutdown job bootstrap : {}", e.getKey());
                     } catch (Exception e1) {
                         log.error("Failed to Shutdown job bootstrap : {}", e.getKey());
@@ -166,18 +174,37 @@ public class GlobalScheduleJobManager implements ApplicationRunner {
                     }
                     return e.getKey();
                 })
-                .filter(n -> !isBlank(n))
+                .filter(n -> nonNull(n))
                 .collect(toList());
+    }
+
+    public InterProcessSemaphoreMutex getMutexLock(final Long triggerId) {
+        if (schedulerBootstrapRegistry.containsKey(triggerId)) {
+            return schedulerBootstrapRegistry.get(triggerId).getItem2();
+        }
+        // Build path for bind trigger.
+        // see:https://curator.apache.org/curator-recipes/shared-lock.html
+        final String path = format("/%s/%s/%s", config.getZookeeper().getNamespace(), PATH_BIND_TRIGGERS,
+                notNullOf(triggerId, "triggerId"));
+        return new InterProcessSemaphoreMutex(((ZookeeperRegistryCenter) regCenter).getClient(), path);
     }
 
     @SuppressWarnings("unchecked")
     private <T extends JobBootstrap> T createJobBootstrap(JobConfiguration jobConfig) {
-        final Map<String, JobBootstrap> bootstraps = new ElasticJobBootstrapBuilder(config, registryCenter, tracingConfigurations)
-                .build(jobConfig);
-        if (CollectionUtils2.isEmpty(bootstraps)) {
-            throw new IllegalStateException(
-                    format("Failed to create schedule job bootstrap, should't to be here. %s", jobConfig));
+        try {
+            final Map<String, JobBootstrap> bootstraps = new ElasticJobBootstrapBuilder(config, regCenter, tracingConfigurations)
+                    .build(jobConfig);
+            if (CollectionUtils2.isEmpty(bootstraps)) {
+                throw new IllegalStateException(
+                        format("Failed to create schedule job bootstrap, should't to be here. %s", jobConfig));
+            }
+            return (T) bootstraps.entrySet().iterator().next().getValue();
+        } catch (Throwable e) {
+            log.error("Failed to build job bootstrap.", e);
+            throw e;
         }
-        return (T) bootstraps.entrySet().iterator().next().getValue();
     }
+
+    public static final String PATH_BIND_TRIGGERS = "mutex-bind-triggers";
+
 }

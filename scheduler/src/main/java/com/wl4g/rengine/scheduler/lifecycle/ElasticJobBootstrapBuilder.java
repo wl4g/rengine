@@ -21,6 +21,7 @@ import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -180,7 +181,6 @@ public class ElasticJobBootstrapBuilder {
     public static class JobParameter {
         private Long triggerId;
         private Long jobId;
-        private List<Integer> shardingRequests;
 
         public JobParameter(@NotNull Long triggerId) {
             this.triggerId = triggerId;
@@ -189,12 +189,6 @@ public class ElasticJobBootstrapBuilder {
         public JobParameter(@NotNull Long triggerId, @NotNull Long jobId) {
             this.triggerId = notNullOf(triggerId, "triggerId");
             this.jobId = notNullOf(jobId, "jobId");
-        }
-
-        public JobParameter(@NotNull Long triggerId, @NotNull Long jobId, @NotNull List<Integer> shardingRequests) {
-            this.triggerId = notNullOf(triggerId, "triggerId");
-            this.jobId = notNullOf(jobId, "jobId");
-            this.shardingRequests = notNullOf(shardingRequests, "shardingRequests");
         }
     }
 
@@ -207,5 +201,5 @@ public class ElasticJobBootstrapBuilder {
     public static final String DEFAULT_JOB_SHARDING_STRATEGY_TYPE = null;
     public static final String DEFAULT_JOB_EXECUTOR_SERVICE_HANDLER_TYPE = null;
     public static final String DEFAULT_JOB_ERROR_HANDLER_TYPE = null;
-    public static final Collection<String> DEFAULT_JOB_LISTENER_TYPES = null;
+    public static final Collection<String> DEFAULT_JOB_LISTENER_TYPES = emptyList();
 }

@@ -80,7 +80,7 @@ public class NotificationServiceImpl implements NotificationService {
         } else {
             provider.preUpdate();
         }
-        Notification saved = mongoTemplate.insert(provider, MongoCollectionDefinition.SYS_NOTIFICATIONS.getName());
+        Notification saved = mongoTemplate.save(provider, MongoCollectionDefinition.SYS_NOTIFICATIONS.getName());
         return SaveNotificationResult.builder().id(saved.getId()).build();
     }
 

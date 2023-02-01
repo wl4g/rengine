@@ -27,6 +27,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.wl4g.rengine.client.core.RengineClient;
 import com.wl4g.rengine.client.core.RengineClient.DefaultFailback;
+import com.wl4g.rengine.client.core.RengineClient.FailbackInfo;
 import com.wl4g.rengine.client.core.config.ClientConfig;
 import com.wl4g.rengine.client.springboot.intercept.DefaultREvaluationHandler;
 import com.wl4g.rengine.client.springboot.intercept.REvaluation;
@@ -56,13 +57,13 @@ public class RengineClientAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public Function<Throwable, ExecuteResult> defaultFailback() {
+    public Function<FailbackInfo, ExecuteResult> defaultFailback() {
         return new DefaultFailback();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public RengineClient rengineClient(ClientCoreProperties config, Function<Throwable, ExecuteResult> defaultFailback) {
+    public RengineClient rengineClient(ClientCoreProperties config, Function<FailbackInfo, ExecuteResult> defaultFailback) {
         final OkHttpClient httpClient = config.getOkHttpClient().newOkHttpClient();
         return RengineClient.builder().config(config).httpClient(httpClient).defaultFailback(defaultFailback).build();
     }

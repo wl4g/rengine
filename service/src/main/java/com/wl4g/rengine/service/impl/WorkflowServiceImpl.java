@@ -94,7 +94,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             workflow.preUpdate();
         }
 
-        Workflow saved = mongoTemplate.insert(workflow, MongoCollectionDefinition.WORKFLOWS.getName());
+        Workflow saved = mongoTemplate.save(workflow, MongoCollectionDefinition.WORKFLOWS.getName());
         return SaveWorkflowResult.builder().id(saved.getId()).build();
     }
 

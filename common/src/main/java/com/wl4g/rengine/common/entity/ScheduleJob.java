@@ -15,15 +15,20 @@
  */
 package com.wl4g.rengine.common.entity;
 
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
+
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
-import javax.annotation.Nullable;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.bean.BaseBean;
+import com.wl4g.rengine.common.model.ExecuteResult.ResultDescription;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -45,38 +50,11 @@ import lombok.experimental.SuperBuilder;
 public class ScheduleJob extends BaseBean {
     private static final long serialVersionUID = 1L;
     private @NotNull Long triggerId;
-    private JobType jobType;
     private String jobName;
     private RunState runState;
     private Date schedTime;
     private Date finishedTime;
-    private List<ResultDescription> results;
-
-    @Getter
-    @Setter
-    @ToString
-    @SuperBuilder
-    @NoArgsConstructor
-    public static class ResultDescription {
-        // Notice: It is currently designed as a scene ID and will evolve into a
-        // general feature platform in the future. Can this field be expressed
-        // as feature???
-        // rengine eventType (all data types as: events) is equivalent to the
-        // features of the feature platform (all data types as: features)
-        // eBay Features Platform see:
-        // https://mp.weixin.qq.com/s/UG4VJ3HuzcBhjLcmtVpLFw
-        @NotNull
-        String scenesCode;
-
-        @NotNull
-        Boolean success;
-
-        @Nullable
-        Map<String, Object> valueMap;
-
-        @Nullable
-        String reason;
-    }
+    private Collection<ResultInformation> results;
 
     @Getter
     @ToString
@@ -85,9 +63,18 @@ public class ScheduleJob extends BaseBean {
     }
 
     @Getter
+    @Setter
     @ToString
-    public static enum JobType {
-        SCHEDULING, EXECUTING
-    }
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ResultInformation {
+        private @NotBlank String requestId;
+        private @NotNull List<ResultDescription> results;
 
+        public ResultInformation validate() {
+            hasTextOf(requestId, "requestId");
+            notEmptyOf(results, "results");
+            return this;
+        }
+    }
 }

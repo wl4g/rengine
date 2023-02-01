@@ -108,7 +108,7 @@ public class ScenesServiceImpl implements ScenesService {
             scenes.preUpdate();
         }
 
-        Scenes saved = mongoTemplate.insert(scenes, MongoCollectionDefinition.SCENESES.getName());
+        Scenes saved = mongoTemplate.save(scenes, MongoCollectionDefinition.SCENESES.getName());
         return SaveScenesResult.builder().id(saved.getId()).build();
     }
 

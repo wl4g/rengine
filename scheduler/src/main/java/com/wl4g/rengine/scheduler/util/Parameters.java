@@ -29,13 +29,13 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 
 /**
- * {@link ParamUtils}
+ * {@link Parameters}
  * 
  * @author James Wong
  * @version 2022-10-21
  * @since v3.0.0
  */
-public abstract class ParamUtils {
+public abstract class Parameters {
 
     public static Map<String, String> parseToMap(String configItems) {
         Map<String, String> configMap = Maps.newHashMap();

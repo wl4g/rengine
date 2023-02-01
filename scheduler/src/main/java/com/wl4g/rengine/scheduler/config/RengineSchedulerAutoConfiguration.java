@@ -31,7 +31,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.wl4g.rengine.scheduler.job.EngineScheduleController;
 import com.wl4g.rengine.scheduler.lifecycle.GlobalScheduleJobManager;
 
 /**
@@ -72,23 +71,6 @@ public class RengineSchedulerAutoConfiguration {
     }
 
     // --- Scheduler components.
-
-    // @Bean
-    // public ElasticJobBootstrapConfiguration
-    // elasticJobBootstrapConfiguration() {
-    // return new ElasticJobBootstrapConfiguration();
-    // }
-    //
-    // @Bean
-    // public ScheduleJobBootstrapStartupRunner
-    // scheduleJobBootstrapStartupRunner() {
-    // return new ScheduleJobBootstrapStartupRunner();
-    // }
-
-    @Bean
-    public EngineScheduleController engineScheduleController() {
-        return new EngineScheduleController();
-    }
 
     @Bean
     public GlobalScheduleJobManager globalScheduleJobManager(

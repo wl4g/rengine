@@ -23,6 +23,7 @@ import java.lang.annotation.Target;
 import java.util.function.Function;
 
 import com.wl4g.rengine.client.core.RengineClient.DefaultFailback;
+import com.wl4g.rengine.client.core.RengineClient.FailbackInfo;
 import com.wl4g.rengine.common.model.ExecuteRequest;
 import com.wl4g.rengine.common.model.ExecuteResult;
 
@@ -96,6 +97,6 @@ public @interface REvaluation {
      * 
      * @return
      */
-    Class<? extends Function<Throwable, ExecuteResult>> failback() default DefaultFailback.class;
+    Class<? extends Function<FailbackInfo, ExecuteResult>> failback() default DefaultFailback.class;
 
 }

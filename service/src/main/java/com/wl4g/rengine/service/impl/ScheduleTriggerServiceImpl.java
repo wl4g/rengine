@@ -103,7 +103,7 @@ public class ScheduleTriggerServiceImpl implements ScheduleTriggerService {
             trigger.preUpdate();
         }
 
-        ScheduleTrigger saved = mongoTemplate.insert(trigger, MongoCollectionDefinition.SCHEDULE_TRIGGER.getName());
+        ScheduleTrigger saved = mongoTemplate.save(trigger, MongoCollectionDefinition.SCHEDULE_TRIGGER.getName());
         return SaveScheduleTriggerResult.builder().id(saved.getId()).build();
     }
 

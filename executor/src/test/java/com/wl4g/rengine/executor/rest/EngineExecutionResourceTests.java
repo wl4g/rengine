@@ -36,7 +36,7 @@ import java.util.Map;
 import org.junit.Test;
 
 import com.wl4g.infra.common.remoting.uri.UriComponentsBuilder;
-import com.wl4g.rengine.common.entity.ScheduleJob.ResultDescription;
+import com.wl4g.rengine.common.model.ExecuteResult.ResultDescription;
 import com.wl4g.rengine.executor.rest.EngineExecutionResource.RequestSettings;
 import com.wl4g.rengine.executor.rest.EngineExecutionResource.ResponseSettings;
 

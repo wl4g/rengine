@@ -41,8 +41,9 @@ import com.wl4g.rengine.service.model.SaveScheduleTriggerResult;
  */
 public interface ScheduleTriggerService {
 
-    default ScheduleTrigger get(@NotNull Long triggerId) {
-        final var result = query(QueryScheduleTrigger.builder().triggerId(notNullOf(triggerId, "triggerId")).build());
+    default ScheduleTrigger get(Long triggerId) {
+        notNullOf(triggerId, "triggerId");
+        final PageHolder<ScheduleTrigger> result = query(QueryScheduleTrigger.builder().triggerId(triggerId).build());
         if (isNull(result) || CollectionUtils2.isEmpty(result.getRecords())) {
             throw new IllegalArgumentException(format("No found schedule trigger by %s", triggerId));
         }

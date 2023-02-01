@@ -110,7 +110,7 @@ public class RuleScriptServiceImpl implements RuleScriptService {
 
         script.setRevision(globalMongoSequenceService.getNextSequence(GlobalMongoSequenceService.SCRIPTS_REVISION_SEQ));
 
-        RuleScript saved = mongoTemplate.insert(script, MongoCollectionDefinition.RULE_SCRIPTS.getName());
+        RuleScript saved = mongoTemplate.save(script, MongoCollectionDefinition.RULE_SCRIPTS.getName());
         return SaveRuleScriptResult.builder().id(saved.getId()).build();
     }
 
