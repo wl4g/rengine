@@ -65,19 +65,19 @@ public class WorkflowGraphTests {
     public static WorkflowGraph buildDefaultWorkflowGraph() {
         List<BaseNode<?>> nodes = new LinkedList<>();
         nodes.add(new BootNode().withId("0").withName("The Boot"));
-        nodes.add(new ProcessNode().withId("11").withName("预处理(如篡改当前时间以用于测试目的)").withRuleId("r100100"));
-        nodes.add(new RelationNode().withId("21").withName("当前时间是否满足(10.1~10.8)").withRuleId("r100222"));
+        nodes.add(new ProcessNode().withId("11").withName("预处理(如篡改当前时间以用于测试目的)").withRuleId(10100101L));
+        nodes.add(new RelationNode().withId("21").withName("当前时间是否满足(10.1~10.8)").withRuleId(10100102L));
         nodes.add(new LogicalNode().withId("31").withName("ALL_AND逻辑运算").withLogical(LogicalType.ALL_AND));
         nodes.add(new LogicalNode().withId("41").withName("AND逻辑运算").withLogical(LogicalType.AND));
         nodes.add(new LogicalNode().withId("42").withName("AND逻辑运算").withLogical(LogicalType.AND));
-        nodes.add(new RelationNode().withId("51").withName("充值是否>=120元").withRuleId("r100101"));
+        nodes.add(new RelationNode().withId("51").withName("充值是否>=120元").withRuleId(10100103L));
         nodes.add(new LogicalNode().withId("52").withName("AND逻辑运算").withLogical(LogicalType.AND));
-        nodes.add(new RelationNode().withId("53").withName("当前时间是否满足(10.5~10.8)").withRuleId("r100223"));
-        nodes.add(new RelationNode().withId("54").withName("充值是否>=50元").withRuleId("r100104"));
-        nodes.add(new RelationNode().withId("61").withName("赠送库存是否<=100").withRuleId("r100102"));
-        nodes.add(new FailbackNode().withId("62").withName("如果赠送余额失败则执行回退规则").withRuleId("r111111"));
-        nodes.add(new RunNode().withId("63").withName("赠送20积分").withRuleId("r100105"));
-        nodes.add(new RunNode().withId("71").withName("赠送10元余额").withRuleId("r100103"));
+        nodes.add(new RelationNode().withId("53").withName("当前时间是否满足(10.5~10.8)").withRuleId(10100104L));
+        nodes.add(new RelationNode().withId("54").withName("充值是否>=50元").withRuleId(10100105L));
+        nodes.add(new RelationNode().withId("61").withName("赠送库存是否<=100").withRuleId(10100105L));
+        nodes.add(new FailbackNode().withId("62").withName("如果赠送余额失败则执行回退规则").withRuleId(10100106L));
+        nodes.add(new RunNode().withId("63").withName("赠送20积分").withRuleId(10100108L));
+        nodes.add(new RunNode().withId("71").withName("赠送10元余额").withRuleId(10100107L));
 
         List<NodeConnection> collections = new LinkedList<>();
         collections.add(new NodeConnection("11", "0"));

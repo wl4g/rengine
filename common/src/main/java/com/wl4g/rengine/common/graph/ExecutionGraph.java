@@ -363,11 +363,11 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
     @Setter
     @ToString(callSuper = true)
     public static class ProcessOperator extends SingleNextOperator<ProcessOperator> implements IRunOperator {
-        private @NotBlank String ruleId;
+        private @NotBlank Long ruleId;
 
         public ProcessOperator(@NotNull ProcessNode node) {
             super(node);
-            this.ruleId = hasTextOf(node.getRuleId(), "ruleId");
+            this.ruleId = notNullOf(node.getRuleId(), "ruleId");
         }
 
         @Override
@@ -598,7 +598,7 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
     }
 
     public static interface IRunOperator {
-        String getRuleId();
+        Long getRuleId();
     }
 
     /**
@@ -614,11 +614,11 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
     @Setter
     @ToString(callSuper = true)
     public static class RunOperator extends BaseOperator<RunOperator> implements IRunOperator {
-        private @NotBlank String ruleId;
+        private @NotBlank Long ruleId;
 
         public RunOperator(@NotNull RunNode node) {
             super(node);
-            this.ruleId = hasTextOf(node.getRuleId(), "ruleId");
+            this.ruleId = notNullOf(node.getRuleId(), "ruleId");
         }
 
         @Override

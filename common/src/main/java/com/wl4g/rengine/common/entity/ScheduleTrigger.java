@@ -108,7 +108,6 @@ public class ScheduleTrigger extends BaseBean {
         private @NotNull @Default Integer reconcileIntervalMinutes = DEFAULT_RECONCILE_INTERVAL_MINUTES;
         // Engine execution configuration.
         private @NotNull @Min(1) @Default Long maxTimeoutMs = DEFAULT_MAX_TIMEOUT_MS;
-        private @NotNull @Min(1) @Default Long awaitMs = DEFAULT_AWAIT_MS;
         private @NotNull List<ExecuteRequest> requests;
 
         public CronTriggerConfig validate() {
@@ -119,9 +118,8 @@ public class ScheduleTrigger extends BaseBean {
             notNullOf(getTimeZone(), "timeZone");
             notNullOf(getMaxTimeDiffSeconds(), "maxTimeDiffSeconds");
             notNullOf(getReconcileIntervalMinutes(), "reconcileIntervalMinutes");
-            notNullOf(getRequests(), "request");
             isTrueOf(getMaxTimeoutMs() > 0, "maxTimeoutMs > 0");
-            isTrueOf(getAwaitMs() > 0, "awaitMs > 0");
+            notNullOf(getRequests(), "request");
             return this;
         }
 
@@ -133,7 +131,6 @@ public class ScheduleTrigger extends BaseBean {
         public static final int DEFAULT_MAX_TIME_DIFF_SECONDS = -1;
         public static final int DEFAULT_RECONCILE_INTERVAL_MINUTES = 0;
         public static final long DEFAULT_MAX_TIMEOUT_MS = 30_000L;
-        public static final long DEFAULT_AWAIT_MS = 50L;
     }
 
     public static enum TriggerType {

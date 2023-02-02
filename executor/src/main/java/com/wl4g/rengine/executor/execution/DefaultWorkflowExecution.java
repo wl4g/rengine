@@ -17,7 +17,6 @@ package com.wl4g.rengine.executor.execution;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static java.lang.String.format;
-import static java.lang.String.valueOf;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toMap;
@@ -82,11 +81,11 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
                     .args(executeRequest.getArgs())
                     .build();
 
-            final Map<String, RuleWrapper> ruleMap = safeList(workflowGraph.getRules()).stream()
-                    .collect(toMap(r -> valueOf(r.getId()), r -> r));
+            final Map<Long, RuleWrapper> ruleMap = safeList(workflowGraph.getRules()).stream()
+                    .collect(toMap(r -> r.getId(), r -> r));
 
             final ExecutionGraphContext graphContext = new ExecutionGraphContext(parameter, ctx -> {
-                final String ruleId = ((IRunOperator) ctx.getCurrentNode()).getRuleId();
+                final Long ruleId = ((IRunOperator) ctx.getCurrentNode()).getRuleId();
 
                 final RuleWrapper rule = Assert2.notNull(ruleMap.get(ruleId),
                         "The rule '%s' is missing. please check workflow graph rules configuration.", ruleId);

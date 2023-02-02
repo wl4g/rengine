@@ -16,6 +16,7 @@
 package com.wl4g.rengine.executor.execution;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
@@ -28,7 +29,6 @@ import static java.util.Objects.nonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 import java.lang.annotation.Annotation;
@@ -142,33 +142,30 @@ public class LifecycleExecutionService {
         final long effectiveTimeoutMs = (long) ((long) executeRequest.getTimeout()
                 * (1 - config.engine().executeTimeoutOffsetRate()));
 
-        for (long count = 0, await = DEFAULT_EXECUTION_AWAIT, total = effectiveTimeoutMs / await; count < total; count++) {
-            if (!futures.isEmpty() && !latch.await(await, MILLISECONDS)) {
-                final Iterator<Entry<String, Future<ResultDescription>>> it = futures.entrySet().iterator();
-                while (it.hasNext()) {
-                    final Entry<String, Future<ResultDescription>> entry = it.next();
-                    final Future<ResultDescription> future = entry.getValue();
-                    //
-                    // Notice: isCancelled a true when the submitted task is
-                    // rejected, see: #EMPTY_FUTURE_CANCELLED
-                    if (future.isDone() || future.isCancelled()) {
-                        // Not need to execution continue.
-                        it.remove();
-                        if (future.isDone()) {
-                            // Collect for completed results.
-                            completed.putIfAbsent(entry.getKey(), future.get());
-                        }
-                        if (future.isCancelled()) {
-                            // Collect for uncompleted results.
-                            uncompleted.add(ResultDescription.builder()
-                                    .scenesCode(entry.getKey())
-                                    .success(false)
-                                    .valueMap(emptyMap())
-                                    .reason(format("Execution time exceeded in total %sms", effectiveTimeoutMs))
-                                    .build());
-                        }
-                    }
+        final Iterator<Entry<String, Future<ResultDescription>>> it = futures.entrySet().iterator();
+        if (!latch.await(effectiveTimeoutMs, MILLISECONDS)) { // Timeout(part-done)
+            while (it.hasNext()) {
+                final Entry<String, Future<ResultDescription>> entry = it.next();
+                final Future<ResultDescription> future = entry.getValue();
+                // Notice: future.isCancelled() a true when the submitted
+                // task is rejected, see: #EMPTY_FUTURE_CANCELLED
+                if (future.isDone()) {
+                    // Collect for completed results.
+                    completed.putIfAbsent(entry.getKey(), future.get());
+                } else { // Collect for uncompleted results.
+                    uncompleted.add(ResultDescription.builder()
+                            .scenesCode(entry.getKey())
+                            .success(false)
+                            .valueMap(emptyMap())
+                            .reason(format("Execution time exceeded in %sms", effectiveTimeoutMs))
+                            .build());
                 }
+            }
+        } else { // All done
+            while (it.hasNext()) {
+                // Collect for completed results.
+                final Entry<String, Future<ResultDescription>> entry = it.next();
+                completed.putIfAbsent(entry.getKey(), entry.getValue().get());
             }
         }
 
@@ -181,11 +178,12 @@ public class LifecycleExecutionService {
                     scenesCodes);
         }
 
-        final Set<ResultDescription> _completed = completed.entrySet().stream().map(e -> e.getValue()).collect(toSet());
+        final List<ResultDescription> allResults = newArrayList(Iterables.concat(completed.values(), uncompleted));
+        final long totalSuccess = safeList(allResults).stream().map(rd -> rd.validate()).filter(rd -> rd.getSuccess()).count();
         return ExecuteResult.builder()
                 .requestId(executeRequest.getRequestId())
-                .results(newArrayList(Iterables.concat(_completed, uncompleted)))
-                .description(_completed.size() == sceneses.size() ? "There are failed executions." : "All executed successfully")
+                .results(allResults)
+                .description(totalSuccess == sceneses.size() ? "All executed successfully" : "There are failed executions")
                 .build();
     }
 

@@ -31,6 +31,7 @@ import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Builder.Default;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -51,8 +52,10 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class ExecuteResult extends BaseRequest {
 
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
     @JsonIgnore
-    Long errorCount;
+    Long _errorCount;
 
     @NotNull
     @Default
@@ -61,15 +64,16 @@ public class ExecuteResult extends BaseRequest {
     @Nullable
     String description;
 
-    public Long getErrorCount() {
-        if (isNull(errorCount)) {
+    @JsonIgnore
+    public Long errorCount() {
+        if (isNull(_errorCount)) {
             synchronized (this) {
-                if (isNull(errorCount)) {
-                    this.errorCount = safeList(results).stream().map(rd -> rd.validate()).map(rd -> !rd.getSuccess()).count();
+                if (isNull(_errorCount)) {
+                    this._errorCount = safeList(results).stream().map(rd -> rd.validate()).filter(rd -> !rd.getSuccess()).count();
                 }
             }
         }
-        return errorCount;
+        return _errorCount;
     }
 
     @Getter
@@ -104,6 +108,7 @@ public class ExecuteResult extends BaseRequest {
         }
     }
 
-    public static final String STATUS_PART_SUCCESS = "PartSuccess";
-    public static final String STATUS_ALL_SUCCESS = "AllSuccess";
+    public static final String STATUS_SUCCESS = "SUCCESS";
+    public static final String STATUS_PART_SUCCESS = "PART_SUCCESS";
+    public static final String STATUS_FAILED = "FAILED";
 }

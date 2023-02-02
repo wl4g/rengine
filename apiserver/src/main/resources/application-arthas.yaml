@@ -15,8 +15,8 @@
 ## see:com.taobao.arthas:arthas-spring-boot-starter(com.alibaba.arthas.spring.ArthasProperties)
 arthas:
   agent-id: renginemanagervfu6y
-  telnet-port: 3658
-  http-port: 8563
+  telnet-port: 3659
+  http-port: 8564
   tunnel-server: ws://localhost:7777/ws
   session-timeout: 1800
   #username: admin

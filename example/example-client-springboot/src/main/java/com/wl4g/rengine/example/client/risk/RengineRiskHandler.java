@@ -49,7 +49,7 @@ public class RengineRiskHandler {
         log.info("Risk checked for result: {}, {} => {}", result, scenesCode, args);
 
         // Assertion risk evaluation result.
-        if (result.getErrorCount() > 0) {
+        if (result.errorCount() > 0) {
             throw new RengineException(format("Unable to operation, detected risk in your environment."));
         }
     }

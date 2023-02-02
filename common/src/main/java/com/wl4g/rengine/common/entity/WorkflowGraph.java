@@ -217,13 +217,13 @@ public class WorkflowGraph extends BaseBean {
         /**
          * The current this node corresponding script rule ID.
          */
-        private @NotBlank String ruleId;
+        private @NotBlank Long ruleId;
 
         public RunNode() {
             setType(NodeType.RUN.name());
         }
 
-        public RunNode withRuleId(String ruleId) {
+        public RunNode withRuleId(Long ruleId) {
             setRuleId(ruleId);
             return this;
         }

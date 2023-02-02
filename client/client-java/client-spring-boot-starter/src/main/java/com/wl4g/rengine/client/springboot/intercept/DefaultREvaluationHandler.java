@@ -95,7 +95,7 @@ public class DefaultREvaluationHandler implements REvaluationHandler<REvaluation
         log.debug("Evaluated of result: {}, {} => {}", result, scenesCode, args);
 
         // Assertion evaluation result.
-        if (nonNull(result) && result.getErrorCount() > 0) {
+        if (nonNull(result) && result.errorCount() > 0) {
             throw new ClientExecuteException(requestId, singletonList(scenesCode), timeoutMs, bestEffort,
                     format("Unable to operation, detected risk in your environment."));
         }

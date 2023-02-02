@@ -154,9 +154,11 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
                 // Execution to workflow graphs.
                 final ExecuteResult result = lifecycleExecutionService.execute(executeRequest, sceneses);
 
-                // Check for success completes.
-                if (safeList(result.getResults()).stream().filter(res -> res.getSuccess()).count() == sceneses.size()) {
-                    resp.setStatus(ExecuteResult.STATUS_ALL_SUCCESS);
+                // Check for success completion.
+                if (sceneses.size() > 0 && result.errorCount() == sceneses.size()) {
+                    resp.setStatus(ExecuteResult.STATUS_FAILED);
+                } else if (result.errorCount() == 0) {
+                    resp.setStatus(ExecuteResult.STATUS_SUCCESS);
                 } else {
                     resp.setStatus(ExecuteResult.STATUS_PART_SUCCESS);
                 }

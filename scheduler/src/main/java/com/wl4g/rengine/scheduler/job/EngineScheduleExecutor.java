@@ -108,15 +108,15 @@ public class EngineScheduleExecutor extends AbstractJobExecutor {
                     .map(request -> new ExecutionWorker(currentShardingTotalCount, context, trigger.getId(), jobId,
                             getRengineClient(), request))
                     .collect(toList());
-            final var result = getExecutor().submitForComplete(jobs, ctc.getMaxTimeoutMs(), ctc.getAwaitMs());
+            final var result = getExecutor().submitForComplete(jobs, ctc.getMaxTimeoutMs());
 
             final boolean isAllSuccess = result.getUncompleted().size() == 0
-                    && result.getCompleted().stream().allMatch(er -> er.getErrorCount() == 0);
+                    && result.getCompleted().stream().allMatch(er -> er.errorCount() == 0);
             RunState runState = RunState.FAILED;
             if (isAllSuccess) {
                 runState = RunState.SUCCESS;
             } else {
-                final boolean partSuccess = result.getCompleted().stream().anyMatch(er -> er.getErrorCount() == 0);
+                final boolean partSuccess = result.getCompleted().stream().anyMatch(er -> er.errorCount() == 0);
                 runState = partSuccess ? RunState.PART_SUCCESS : RunState.FAILED;
             }
 
