@@ -29,7 +29,6 @@ import com.wl4g.rengine.common.entity.ScheduleTrigger;
 import com.wl4g.rengine.service.model.DeleteScheduleTrigger;
 import com.wl4g.rengine.service.model.DeleteScheduleTriggerResult;
 import com.wl4g.rengine.service.model.QueryScheduleTrigger;
-import com.wl4g.rengine.service.model.SaveScheduleTrigger;
 import com.wl4g.rengine.service.model.SaveScheduleTriggerResult;
 
 /**
@@ -57,7 +56,7 @@ public interface ScheduleTriggerService {
             @NotNull Integer divisor,
             @NotNull Integer remainder);
 
-    SaveScheduleTriggerResult save(@NotNull SaveScheduleTrigger model);
+    SaveScheduleTriggerResult save(@NotNull ScheduleTrigger model);
 
     DeleteScheduleTriggerResult delete(@NotNull DeleteScheduleTrigger model);
 

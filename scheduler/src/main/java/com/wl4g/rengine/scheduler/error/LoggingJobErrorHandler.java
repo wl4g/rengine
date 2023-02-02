@@ -44,7 +44,7 @@ public class LoggingJobErrorHandler implements JobErrorHandler {
 
     @Override
     public void handleException(String jobName, Throwable cause) {
-        log.error("------------ ScheduleJob Error Printing: ------------\n", cause);
+        log.error("------------ ScheduleJobLog Error Printing: ------------\n", cause);
     }
 
 }

@@ -15,7 +15,6 @@
  */
 package com.wl4g.rengine.scheduler.config;
 
-import static com.wl4g.infra.common.collection.CollectionUtils2.ensureMap;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.rengine.scheduler.util.Environments.resolveString;
@@ -24,11 +23,9 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -70,8 +67,9 @@ public class RengineSchedulerProperties implements InitializingBean {
     private ZookeeperProperties zookeeper = new ZookeeperProperties();
     private TracingProperties tracing = new TracingProperties();
     private SnapshotDumpProperties dump = new SnapshotDumpProperties();
-    private EngineScheduleControllerProperties controller = new EngineScheduleControllerProperties();
-    private EngineScheduleExecutorProperties executor = new EngineScheduleExecutorProperties();
+    private GlobalEngineScheduleControllerProperties controller = new GlobalEngineScheduleControllerProperties();
+    private EngineClientSchedulerProperties client = new EngineClientSchedulerProperties();
+    private EngineFlinkSchedulerProperties flink = new EngineFlinkSchedulerProperties();
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -96,10 +94,6 @@ public class RengineSchedulerProperties implements InitializingBean {
             jobListenerTypes.set(i, resolveString(environment, jobListenerTypes.get(i)));
         }
         controller.setDescription(resolveString(environment, controller.getDescription()));
-
-        // Resolve extension attributes.
-        final Map<String, String> attributes = ensureMap(controller.getAttributes());
-        ensureMap(controller.getAttributes()).forEach((key, value) -> attributes.put(key, resolveString(environment, value)));
     }
 
     protected void applyDefaultToProperties() {
@@ -266,7 +260,6 @@ public class RengineSchedulerProperties implements InitializingBean {
         private String jobErrorHandlerType;
         private Collection<String> jobListenerTypes = new LinkedList<>();
         private String description;
-        private Map<String, String> attributes = new HashMap<>();
 
         public abstract ExecutorJobType getJobType();
 
@@ -292,8 +285,7 @@ public class RengineSchedulerProperties implements InitializingBean {
             setJobExecutorServiceHandlerType(null);
             setJobErrorHandlerType(null);
             setJobListenerTypes(new ArrayList<>());
-            setDescription("The job engine execution schedules.");
-            setAttributes(new HashMap<>());
+            setDescription("The job engine scheduler job.");
         }
 
         public JobConfiguration toJobConfiguration(final String jobName) {
@@ -323,7 +315,6 @@ public class RengineSchedulerProperties implements InitializingBean {
                     .jobListenerTypes(jobListenerTypes)
                     .description(description)
                     .build();
-            ensureMap(attributes).forEach((key, value) -> jobConfig.getProps().setProperty(key, value));
             return jobConfig;
         }
     }
@@ -331,23 +322,31 @@ public class RengineSchedulerProperties implements InitializingBean {
     @Getter
     @Setter
     @ToString
-    public static class EngineScheduleControllerProperties extends BaseJobProperties {
-        public EngineScheduleControllerProperties() {
+    public static class GlobalEngineScheduleControllerProperties extends BaseJobProperties {
+        public GlobalEngineScheduleControllerProperties() {
             setDescription("The job engine execution schedule controller.");
         }
 
         @JsonIgnore
         @Override
         public ExecutorJobType getJobType() {
-            return ExecutorJobType.ENGINE_SCHEDULE_CONTROLLER;
+            return ExecutorJobType.GLOBAL_CONTROLLER;
         }
     }
 
     @Getter
     @Setter
     @ToString
-    public static class EngineScheduleExecutorProperties {
-        private @Min(1) int concurrency = 1;
+    public static class EngineClientSchedulerProperties {
+        private @Min(1) int concurrency = 10;
+        private @Min(1) int acceptQueue = 2;
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    public static class EngineFlinkSchedulerProperties {
+        private @Min(1) int concurrency = 5;
         private @Min(1) int acceptQueue = 1;
     }
 

@@ -77,13 +77,13 @@ public class UploadServiceImpl implements UploadService {
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
         final List<UploadObject> uploads = mongoTemplate.find(query, UploadObject.class,
-                MongoCollectionDefinition.UPLOADS.getName());
+                MongoCollectionDefinition.T_UPLOADS.getName());
         // Collections.sort(uploads, (o1, o2) ->
         // safeLongToInt(o2.getUpdateDate().getTime() -
         // o1.getUpdateDate().getTime()));
 
         return new PageHolder<UploadObject>(model.getPageNum(), model.getPageSize())
-                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.UPLOADS.getName()))
+                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.T_UPLOADS.getName()))
                 .withRecords(uploads);
     }
 
@@ -120,7 +120,7 @@ public class UploadServiceImpl implements UploadService {
         validator.validate(upload, ValidForEntityMarker.class);
 
         // Save metadata to mongo table.
-        mongoTemplate.save(upload, MongoCollectionDefinition.UPLOADS.getName());
+        mongoTemplate.save(upload, MongoCollectionDefinition.T_UPLOADS.getName());
 
         // New create temporary STS credentials.
         try {
@@ -149,7 +149,7 @@ public class UploadServiceImpl implements UploadService {
     public DeleteUploadResult delete(DeleteUpload model) {
         // 'id' is a keyword, it will be automatically converted to '_id'
         DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
-                MongoCollectionDefinition.UPLOADS.getName());
+                MongoCollectionDefinition.T_UPLOADS.getName());
         return DeleteUploadResult.builder().deletedCount(result.getDeletedCount()).build();
     }
 

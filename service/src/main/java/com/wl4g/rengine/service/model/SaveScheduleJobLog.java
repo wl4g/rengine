@@ -15,7 +15,7 @@
  */
 package com.wl4g.rengine.service.model;
 
-import com.wl4g.rengine.common.entity.ScheduleJob;
+import com.wl4g.rengine.common.entity.ScheduleJobLog;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,7 +24,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link SaveScheduleJob}
+ * {@link SaveScheduleJobLog}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -35,6 +35,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class SaveScheduleJob extends ScheduleJob {
+public class SaveScheduleJobLog extends ScheduleJobLog {
     private static final long serialVersionUID = 1L;
 }

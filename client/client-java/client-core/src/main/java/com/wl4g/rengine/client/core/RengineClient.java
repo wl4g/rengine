@@ -23,6 +23,8 @@ import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_BASE;
+import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_INTERNAL;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.util.Objects.isNull;
@@ -44,7 +46,6 @@ import com.wl4g.infra.common.remoting.uri.UriComponentsBuilder;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.client.core.config.ClientConfig;
 import com.wl4g.rengine.client.core.exception.ClientExecuteException;
-import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.common.model.ExecuteRequest;
 import com.wl4g.rengine.common.model.ExecuteResult;
 import com.wl4g.rengine.common.model.ExecuteResult.ResultDescription;
@@ -149,7 +150,8 @@ public class RengineClient {
 
         final String requestBody = toJSONString(executeRequest);
         final Request request = new Request.Builder().url(UriComponentsBuilder.fromUri(config.getEndpoint())
-                .path(RengineConstants.API_EXECUTOR_EXECUTE_INTERNAL)
+                .path(API_EXECUTOR_EXECUTE_BASE)
+                .path(API_EXECUTOR_EXECUTE_INTERNAL)
                 .build()
                 .toString()).post(FormBody.create(requestBody, MediaType.get("application/json"))).build();
         try (final Response response = httpClient.newBuilder()
@@ -167,6 +169,10 @@ public class RengineClient {
             if (executeRequest.getBestEffort()) {
                 return failback.apply(new FailbackInfo(executeRequest, null));
             }
+            throw new ClientExecuteException(executeRequest.getRequestId(), executeRequest.getScenesCodes(),
+                    executeRequest.getTimeout(), executeRequest.getBestEffort(),
+                    format("Engine execution failed, but you can set 'bestEffort=true' to force return a fallback result."));
+
         } catch (Throwable ex) {
             final String errmsg = format("Could not to execution for '%s'", requestBody);
             if (log.isDebugEnabled()) {
@@ -180,8 +186,6 @@ public class RengineClient {
             throw new ClientExecuteException(executeRequest.getRequestId(), executeRequest.getScenesCodes(),
                     executeRequest.getTimeout(), executeRequest.getBestEffort(), ex);
         }
-
-        return null;
     }
 
     public static class DefaultFailback implements Function<FailbackInfo, ExecuteResult> {
@@ -193,6 +197,7 @@ public class RengineClient {
                     .description("Failure to execution")
                     .results(safeList(f.getRequest().getScenesCodes()).stream()
                             .map(scenesCode -> ResultDescription.builder()
+                                    .scenesCode(scenesCode)
                                     .success(false)
                                     .reason(f.getError().getMessage())
                                     .build())

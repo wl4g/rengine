@@ -56,12 +56,11 @@ public class NotificationServiceImpl implements NotificationService {
             notifications = mongoTemplate.find(new Query(criteria), Notification.class,
                     MongoCollectionDefinition.SYS_NOTIFICATIONS.getName());
         } else {
-            notifications = mongoTemplate.findAll(Notification.class,
-                    MongoCollectionDefinition.SYS_NOTIFICATIONS.getName());
+            notifications = mongoTemplate.findAll(Notification.class, MongoCollectionDefinition.SYS_NOTIFICATIONS.getName());
         }
         // Collections.sort(notifications, (o1, o2) ->
-        // safeLongToInt(o2.getUpdateDate().getTime() -
-        // o1.getUpdateDate().getTime()));
+        // (o2.getUpdateDate().getTime()
+        // - o1.getUpdateDate().getTime()) > 0 ? 1 : -1);
 
         // Mask sensitive information.
         for (Notification notification : notifications) {

@@ -15,14 +15,13 @@
  */
 package com.wl4g.rengine.scheduler.job;
 
+import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
-import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
@@ -37,14 +36,13 @@ import org.apache.shardingsphere.elasticjob.reg.base.CoordinatorRegistryCenter;
 
 import com.wl4g.infra.context.utils.SpringContextHolder;
 import com.wl4g.rengine.client.core.RengineClient;
-import com.wl4g.rengine.common.entity.ScheduleJob;
-import com.wl4g.rengine.common.entity.ScheduleJob.ResultInformation;
-import com.wl4g.rengine.common.entity.ScheduleJob.RunState;
+import com.wl4g.rengine.common.entity.ScheduleTrigger;
+import com.wl4g.rengine.common.entity.ScheduleTrigger.RunState;
 import com.wl4g.rengine.scheduler.config.RengineSchedulerProperties;
 import com.wl4g.rengine.scheduler.lifecycle.GlobalScheduleJobManager;
-import com.wl4g.rengine.service.ScheduleJobService;
+import com.wl4g.rengine.service.ScheduleJobLogService;
 import com.wl4g.rengine.service.ScheduleTriggerService;
-import com.wl4g.rengine.service.model.SaveScheduleJobResult;
+import com.wl4g.rengine.service.model.SaveScheduleTriggerResult;
 
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
@@ -74,7 +72,7 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor {
     private RengineClient rengineClient;
     private GlobalScheduleJobManager globalScheduleJobManager;
     private ScheduleTriggerService scheduleTriggerService;
-    private ScheduleJobService scheduleJobService;
+    private ScheduleJobLogService scheduleJobLogService;
     // private Collection<RengineEventBusService> eventbusServices;
 
     protected RengineSchedulerProperties getConfig() {
@@ -132,15 +130,15 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor {
         return scheduleTriggerService;
     }
 
-    protected ScheduleJobService getScheduleJobService() {
-        if (isNull(scheduleJobService)) {
+    protected ScheduleJobLogService getScheduleJobLogService() {
+        if (isNull(scheduleJobLogService)) {
             synchronized (this) {
-                if (isNull(scheduleJobService)) {
-                    this.scheduleJobService = SpringContextHolder.getBean(ScheduleJobService.class);
+                if (isNull(scheduleJobLogService)) {
+                    this.scheduleJobLogService = SpringContextHolder.getBean(ScheduleJobLogService.class);
                 }
             }
         }
-        return scheduleJobService;
+        return scheduleJobLogService;
     }
 
     // @formatter:off
@@ -199,44 +197,29 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor {
         return shardingTotalCount;
     }
 
-    protected void updateSchedulingJobInfo(
-            final @NotNull Long jobId,
-            final RunState runState,
-            final boolean updateSchedTime,
-            final boolean updateFinishedTime,
-            final Collection<ResultInformation> results) {
-
-        ScheduleJob jobInfo = null;
+    protected ScheduleTrigger updateTriggerRunState(final @NotNull Long triggerId, final @NotNull RunState runState) {
+        notNullOf(runState, "runState");
+        ScheduleTrigger trigger = null;
+        SaveScheduleTriggerResult result = null;
         try {
-            jobInfo = getScheduleJobService().get(notNullOf(jobId, "jobId"));
-            if (nonNull(runState)) {
-                jobInfo.setRunState(runState);
-            }
-            if (updateSchedTime) {
-                jobInfo.setSchedTime(new Date());
-            }
-            if (updateFinishedTime) {
-                jobInfo.setFinishedTime(new Date());
-            }
-            if (nonNull(results)) {
-                results.stream().forEach(r -> r.validate());
-                jobInfo.setResults(results);
-            }
+            trigger = getScheduleTriggerService().get(notNullOf(triggerId, "triggerId"));
+            trigger.setRunState(runState);
+            notNull(trigger, "Not found schedule trigger of triggerId: %s", triggerId);
 
-            log.debug("Updating to scheduling job info : {}", jobInfo);
-            final SaveScheduleJobResult resultSched = getScheduleJobService().save(jobInfo);
-            log.debug("Updated to scheduling job info : {} => {}", jobInfo, resultSched);
-
-        } catch (Exception e2) {
-            log.error(format("Failed to update scheduling job info to DB. - %s", jobInfo), e2);
+            log.debug("Updating to scheduling trigger run-state : {}", trigger);
+            result = getScheduleTriggerService().save(trigger);
+            log.debug("Updated to scheduling trigger run-state : {} => {}", trigger, result);
+        } catch (Exception ex) {
+            log.error(format("Failed to update scheduling trigger run-state to DB. - %s", trigger), ex);
         }
+        return trigger;
     }
 
     @Getter
     @ToString
     @AllArgsConstructor
     public static enum ExecutorJobType {
-        ENGINE_SCHEDULE_CONTROLLER, ENGINE_EXECUTION_SCHEDULER;
+        GLOBAL_CONTROLLER, CLIENT_SCHEDULER, FLINK_SCHEDULER;
     }
 
 }

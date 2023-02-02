@@ -33,15 +33,11 @@ import lombok.Getter;
  */
 public abstract class RengineConstants extends EnvironmentUtil {
 
-    //
-    // Basic definitions.
-    //
+    // ---------- Basic definitions. ----------
 
     public static final String CONF_PREFIX = "rengine";
 
-    //
-    // ApiServer definitions.
-    //
+    // ---------- ApiServer definitions. ----------
 
     public static final String CONF_PREFIX_APISERVER = CONF_PREFIX + ".apiserver";
     public static final String DEFAULT_MONGODB_DATABASE = getStringProperty("mongodb.database", "rengine");
@@ -49,15 +45,11 @@ public abstract class RengineConstants extends EnvironmentUtil {
     public static final String DEFAULT_MINIO_REGION = "us-east-1";
     public static final String DEFAULT_MINIO_BUCKET = "rengine";
 
-    //
-    // Scheduler definitions.
-    //
+    // ---------- Scheduler definitions. ----------
 
     public static final String CONF_PREFIX_SCHEDULER = CONF_PREFIX + ".scheduler";
 
-    //
-    // Executor definitions.
-    //
+    // ---------- Executor definitions. ----------
 
     public static final String CONF_PREFIX_EXECUTOR = CONF_PREFIX + ".executor";
     public static final String API_EXECUTOR_EXECUTE_BASE = "/execution";
@@ -79,26 +71,20 @@ public abstract class RengineConstants extends EnvironmentUtil {
     public static final int DEFAULT_EXECUTOR_S3_OBJECT_MAX_LIMIT = getIntProperty("EXECUTOR_S3_OBJECT_MAX_LIMIT",
             10 * 1024 * 1024);
 
-    //
-    // Eventbus definitions.
-    //
+    // ---------- Client definitions. ----------
+
+    public static final String CONF_PREFIX_CLIENT = CONF_PREFIX + ".client";
+
+    // ---------- Jobs definitions. ----------
+
+    public static final String DEFAULT_EVENTBUS_TOPIC = "rengine_event";
+
+    // ---------- Eventbus definitions. ----------
 
     public static final String CONF_PREFIX_EVENTBUS = CONF_PREFIX + ".eventbus";
     public static final String CONF_PREFIX_EVENTBUS_KAFKA = CONF_PREFIX_EVENTBUS + ".kafka";
     public static final String CONF_PREFIX_EVENTBUS_PULSAR = CONF_PREFIX_EVENTBUS + ".pulsar";
     public static final String CONF_PREFIX_EVENTBUS_ROCKETMQ = CONF_PREFIX_EVENTBUS + ".rabbitmq";
-
-    //
-    // Client definitions.
-    //
-
-    public static final String CONF_PREFIX_CLIENT = CONF_PREFIX + ".client";
-
-    //
-    // Jobs definitions.
-    //
-
-    public static final String DEFAULT_EVENTBUS_TOPIC = "rengine_event";
 
     @Getter
     @AllArgsConstructor
@@ -110,25 +96,25 @@ public abstract class RengineConstants extends EnvironmentUtil {
 
         SYS_NOTIFICATIONS("sys_notifications", true),
 
-        SCENESES("t_sceneses", true),
+        T_SCENESES("t_sceneses", true),
 
-        WORKFLOWS("t_workflows", true),
+        T_WORKFLOWS("t_workflows", true),
 
-        WORKFLOW_GRAPHS("t_workflow_graphs", true),
+        T_WORKFLOW_GRAPHS("t_workflow_graphs", true),
 
-        RULES("t_rules", true),
+        T_RULES("t_rules", true),
 
-        RULE_SCRIPTS("t_rule_scripts", true),
+        T_RULE_SCRIPTS("t_rule_scripts", true),
 
-        UPLOADS("t_uploads", true),
+        T_UPLOADS("t_uploads", true),
 
-        DATASOURCES("t_datasources", true),
+        T_DATASOURCES("t_datasources", true),
 
-        SCHEDULE_TRIGGER("t_schedule_triggers", true),
+        T_SCHEDULE_TRIGGER("t_schedule_triggers", true),
 
-        SCHEDULE_JOBS("t_schedule_jobs", true),
+        T_SCHEDULE_JOB_LOGS("t_schedule_job_logs", true),
 
-        AGGREGATES("t_aggregates", true);
+        R_AGGREGATES("r_aggregates", true);
 
         private final String name;
         private final boolean isWriteConcernSafe;

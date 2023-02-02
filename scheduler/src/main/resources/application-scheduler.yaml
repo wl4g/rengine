@@ -31,8 +31,6 @@ rengine:
       enabled: true
       port: 9888
     controller:
-      concurrency: 1
-      acceptQueue: 1
       disabled: false ## Default by false
       overwrite: true ## Default by true
       monitorExecution: true ## Default by true
@@ -50,6 +48,10 @@ rengine:
       jobExecutorServiceHandlerType: ""
       jobErrorHandlerType: ""
       jobListenerTypes: []
-      attributes:
-        foo: bar
       description: The job engine execution schedule controller.
+    client:
+      concurrency: 10
+      acceptQueue: 2
+    flink:
+      concurrency: 5
+      acceptQueue: 1

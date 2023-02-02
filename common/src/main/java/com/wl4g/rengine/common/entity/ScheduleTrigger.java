@@ -67,79 +67,35 @@ import lombok.experimental.SuperBuilder;
 public class ScheduleTrigger extends BaseBean {
     private static final long serialVersionUID = 1L;
 
-    @NotNull
-    TriggerPropertiesBase<?> properties;
+    // ElasticJob standard configuration.
+    private @NotBlank @Default String cron = DEFAULT_CRON;
+    private @NotNull @Default Boolean monitorExecution = DEFAULT_MONITOR_EXECUTION;
+    private @NotNull @Default Boolean failover = DEFAULT_FAILOVER;
+    private @NotNull @Default Boolean misfire = DEFAULT_MISFIRE;
+    private @NotBlank @Default String timeZone = DEFAULT_TIME_ZONE;
+    private @NotNull @Default Integer maxTimeDiffSeconds = DEFAULT_MAX_TIME_DIFF_SECONDS;
+    private @NotNull @Default Integer reconcileIntervalMinutes = DEFAULT_RECONCILE_INTERVAL_MINUTES;
+    // The engine schedule extra configuration.
+    private @NotNull @Min(1) @Default Long maxTimeoutMs = DEFAULT_MAX_TIMEOUT_MS;
+    private RunState runState;
 
     public ScheduleTrigger validate() {
-        getProperties().validate();
+        hasTextOf(getCron(), "cron");
+        notNullOf(getMonitorExecution(), "monitorExecution");
+        notNullOf(getFailover(), "failover");
+        notNullOf(getMisfire(), "misfire");
+        notNullOf(getTimeZone(), "timeZone");
+        notNullOf(getMaxTimeDiffSeconds(), "maxTimeDiffSeconds");
+        notNullOf(getReconcileIntervalMinutes(), "reconcileIntervalMinutes");
+        isTrueOf(getMaxTimeoutMs() > 0, "maxTimeoutMs > 0");
         return this;
     }
 
-    @Schema(oneOf = { CronTriggerConfig.class }, discriminatorProperty = "type")
-    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", visible = true)
-    @JsonSubTypes({ @Type(value = CronTriggerConfig.class, name = "CRON") })
-    @Getter
-    @Setter
-    @SuperBuilder
-    @ToString(callSuper = true)
-    @NoArgsConstructor
-    public static abstract class TriggerPropertiesBase<T extends TriggerPropertiesBase<T>> {
-        @Schema(name = "type", implementation = TriggerType.class)
-        @JsonProperty(value = "type", access = Access.WRITE_ONLY)
-        @NotNull
-        private @NotBlank @EnumValue(enumCls = TriggerType.class) String type;
+    @NotNull
+    TriggerPropertiesBase<?> properties;
 
-        public abstract T validate();
-    }
-
-    @Getter
-    @Setter
-    @SuperBuilder
-    @ToString
-    @NoArgsConstructor
-    public static class CronTriggerConfig extends TriggerPropertiesBase<CronTriggerConfig> {
-        // ElasticJob standard configuration.
-        private @NotBlank @Default String cron = DEFAULT_CRON;
-        private @NotNull @Default Boolean monitorExecution = DEFAULT_MONITOR_EXECUTION;
-        private @NotNull @Default Boolean failover = DEFAULT_FAILOVER;
-        private @NotNull @Default Boolean misfire = DEFAULT_MISFIRE;
-        private @NotBlank @Default String timeZone = DEFAULT_TIME_ZONE;
-        private @NotNull @Default Integer maxTimeDiffSeconds = DEFAULT_MAX_TIME_DIFF_SECONDS;
-        private @NotNull @Default Integer reconcileIntervalMinutes = DEFAULT_RECONCILE_INTERVAL_MINUTES;
-        // Engine execution configuration.
-        private @NotNull @Min(1) @Default Long maxTimeoutMs = DEFAULT_MAX_TIMEOUT_MS;
-        private @NotNull List<ExecuteRequest> requests;
-
-        public CronTriggerConfig validate() {
-            hasTextOf(getCron(), "cron");
-            notNullOf(getMonitorExecution(), "monitorExecution");
-            notNullOf(getFailover(), "failover");
-            notNullOf(getMisfire(), "misfire");
-            notNullOf(getTimeZone(), "timeZone");
-            notNullOf(getMaxTimeDiffSeconds(), "maxTimeDiffSeconds");
-            notNullOf(getReconcileIntervalMinutes(), "reconcileIntervalMinutes");
-            isTrueOf(getMaxTimeoutMs() > 0, "maxTimeoutMs > 0");
-            notNullOf(getRequests(), "request");
-            return this;
-        }
-
-        public static final String DEFAULT_CRON = "0/10 * * * * ?";
-        public static final boolean DEFAULT_MONITOR_EXECUTION = true;
-        public static final boolean DEFAULT_FAILOVER = true;
-        public static final boolean DEFAULT_MISFIRE = false;
-        public static final String DEFAULT_TIME_ZONE = "GMT+08:00";
-        public static final int DEFAULT_MAX_TIME_DIFF_SECONDS = -1;
-        public static final int DEFAULT_RECONCILE_INTERVAL_MINUTES = 0;
-        public static final long DEFAULT_MAX_TIMEOUT_MS = 30_000L;
-    }
-
-    public static enum TriggerType {
-
-        /**
-         * The periodic tasks. For example, actively scrape prometheus
-         * indicators to realize monitoring and alarming. </br>
-         */
-        CRON,
+    public static enum ScheduleType {
+        CLIENT_SCHEDULER, FLINK_SCHEDULER,
 
         // Notice: The loop controller can be customized in the js rule codes.
         // /**
@@ -150,4 +106,65 @@ public class ScheduleTrigger extends BaseBean {
         // LOOP;
     }
 
+    @Getter
+    @ToString
+    public static enum RunState {
+        PREPARED, SCHED, FAILED_SCHED, RUNNING, PART_SUCCESS, SUCCESS, FAILED, KILLED;
+
+        public boolean isSuccess() {
+            return this == SUCCESS;
+        }
+    }
+
+    @Schema(oneOf = { ClientScheduleConfig.class, FlinkScheduleConfig.class }, discriminatorProperty = "type")
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", visible = true)
+    @JsonSubTypes({ @Type(value = ClientScheduleConfig.class, name = "CLIENT_SCHEDULER"),
+            @Type(value = FlinkScheduleConfig.class, name = "FLINK_SCHEDULER") })
+    @Getter
+    @Setter
+    @SuperBuilder
+    @ToString(callSuper = true)
+    @NoArgsConstructor
+    public static abstract class TriggerPropertiesBase<T extends TriggerPropertiesBase<T>> {
+
+        @Schema(name = "type", implementation = ScheduleType.class)
+        @JsonProperty(value = "type", access = Access.WRITE_ONLY)
+        @NotNull
+        private @NotBlank @EnumValue(enumCls = ScheduleType.class) String type;
+    }
+
+    @Getter
+    @Setter
+    @SuperBuilder
+    @ToString
+    @NoArgsConstructor
+    public static class ClientScheduleConfig extends TriggerPropertiesBase<ClientScheduleConfig> {
+        private @NotNull List<ExecuteRequest> requests;
+
+        public ClientScheduleConfig validate() {
+            notNullOf(getRequests(), "request");
+            return this;
+        }
+    }
+
+    @Getter
+    @Setter
+    @SuperBuilder
+    @ToString
+    @NoArgsConstructor
+    public static class FlinkScheduleConfig extends TriggerPropertiesBase<FlinkScheduleConfig> {
+
+        public FlinkScheduleConfig validate() {
+            return this;
+        }
+    }
+
+    public static final String DEFAULT_CRON = "0/10 * * * * ?";
+    public static final boolean DEFAULT_MONITOR_EXECUTION = true;
+    public static final boolean DEFAULT_FAILOVER = true;
+    public static final boolean DEFAULT_MISFIRE = false;
+    public static final String DEFAULT_TIME_ZONE = "GMT+08:00";
+    public static final int DEFAULT_MAX_TIME_DIFF_SECONDS = -1;
+    public static final int DEFAULT_RECONCILE_INTERVAL_MINUTES = 0;
+    public static final long DEFAULT_MAX_TIMEOUT_MS = 30_000L;
 }

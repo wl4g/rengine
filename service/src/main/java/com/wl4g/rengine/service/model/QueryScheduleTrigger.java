@@ -19,7 +19,7 @@ import javax.annotation.Nullable;
 
 import com.wl4g.infra.common.validation.EnumValue;
 import com.wl4g.rengine.common.entity.ScheduleTrigger;
-import com.wl4g.rengine.common.entity.ScheduleTrigger.TriggerType;
+import com.wl4g.rengine.common.entity.ScheduleTrigger.ScheduleType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -41,7 +41,7 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 @NoArgsConstructor
 public class QueryScheduleTrigger extends QueryBase<ScheduleTrigger> {
-    @Schema(implementation = TriggerType.class)
-    private @Nullable @EnumValue(enumCls = TriggerType.class) String type;
+    @Schema(implementation = ScheduleType.class)
+    private @Nullable @EnumValue(enumCls = ScheduleType.class) String type;
     private @Nullable Long triggerId;
 }

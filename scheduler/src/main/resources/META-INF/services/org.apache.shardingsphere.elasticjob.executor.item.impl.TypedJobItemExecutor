@@ -7,5 +7,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-com.wl4g.rengine.scheduler.job.EngineScheduleController
-com.wl4g.rengine.scheduler.job.EngineScheduleExecutor
+com.wl4g.rengine.scheduler.job.GlobalEngineScheduleController
+com.wl4g.rengine.scheduler.job.EngineClientScheduler
+com.wl4g.rengine.scheduler.job.EngineFlinkScheduler

@@ -35,43 +35,43 @@ import org.springframework.stereotype.Service;
 import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
-import com.wl4g.rengine.common.entity.ScheduleJob;
+import com.wl4g.rengine.common.entity.ScheduleJobLog;
 import com.wl4g.rengine.common.util.IdGenUtils;
-import com.wl4g.rengine.service.ScheduleJobService;
-import com.wl4g.rengine.service.model.DeleteScheduleJob;
+import com.wl4g.rengine.service.ScheduleJobLogService;
+import com.wl4g.rengine.service.model.DeleteScheduleJobLog;
 import com.wl4g.rengine.service.model.DeleteScheduleJobResult;
-import com.wl4g.rengine.service.model.QueryScheduleJob;
-import com.wl4g.rengine.service.model.SaveScheduleJobResult;
+import com.wl4g.rengine.service.model.QueryScheduleJobLog;
+import com.wl4g.rengine.service.model.SaveScheduleJobLogResult;
 
 /**
- * {@link ScheduleJobServiceImpl}
+ * {@link ScheduleJobLogServiceImpl}
  * 
  * @author James Wong
  * @version 2023-01-08
  * @since v1.0.0
  */
 @Service
-public class ScheduleJobServiceImpl implements ScheduleJobService {
+public class ScheduleJobLogServiceImpl implements ScheduleJobLogService {
 
     private @Autowired MongoTemplate mongoTemplate;
 
     @Override
-    public PageHolder<ScheduleJob> query(QueryScheduleJob model) {
+    public PageHolder<ScheduleJobLog> query(QueryScheduleJobLog model) {
         final Query query = new Query(
-                andCriteria(baseCriteria(model), isIdCriteria(model.getJobId()), isCriteria("triggerId", model.getTriggerId())))
+                andCriteria(baseCriteria(model), isIdCriteria(model.getJobLogId()), isCriteria("triggerId", model.getTriggerId())))
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
-        final List<ScheduleJob> jobes = mongoTemplate.find(query, ScheduleJob.class,
-                MongoCollectionDefinition.SCHEDULE_JOBS.getName());
+        final List<ScheduleJobLog> jobes = mongoTemplate.find(query, ScheduleJobLog.class,
+                MongoCollectionDefinition.T_SCHEDULE_JOB_LOGS.getName());
 
-        return new PageHolder<ScheduleJob>(model.getPageNum(), model.getPageSize())
-                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.SCHEDULE_JOBS.getName()))
+        return new PageHolder<ScheduleJobLog>(model.getPageNum(), model.getPageSize())
+                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.T_SCHEDULE_JOB_LOGS.getName()))
                 .withRecords(jobes);
     }
 
     @Override
-    public SaveScheduleJobResult save(ScheduleJob model) {
-        ScheduleJob job = model;
+    public SaveScheduleJobLogResult save(ScheduleJobLog model) {
+        ScheduleJobLog job = model;
         notNullOf(job, "job");
 
         if (isNull(job.getId())) {
@@ -81,15 +81,15 @@ public class ScheduleJobServiceImpl implements ScheduleJobService {
             job.preUpdate();
         }
 
-        final ScheduleJob saved = mongoTemplate.save(job, MongoCollectionDefinition.SCHEDULE_JOBS.getName());
-        return SaveScheduleJobResult.builder().id(saved.getId()).build();
+        final ScheduleJobLog saved = mongoTemplate.save(job, MongoCollectionDefinition.T_SCHEDULE_JOB_LOGS.getName());
+        return SaveScheduleJobLogResult.builder().id(saved.getId()).build();
     }
 
     @Override
-    public DeleteScheduleJobResult delete(DeleteScheduleJob model) {
+    public DeleteScheduleJobResult delete(DeleteScheduleJobLog model) {
         // 'id' is a keyword, it will be automatically converted to '_id'
         final DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
-                MongoCollectionDefinition.SCHEDULE_JOBS.getName());
+                MongoCollectionDefinition.T_SCHEDULE_JOB_LOGS.getName());
         return DeleteScheduleJobResult.builder().deletedCount(result.getDeletedCount()).build();
     }
 

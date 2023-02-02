@@ -60,10 +60,9 @@ public class ScenesServiceImpl implements ScenesService {
         final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getScenesId())))
                 .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
-        final List<Scenes> sceneses = mongoTemplate.find(query, Scenes.class, MongoCollectionDefinition.SCENESES.getName());
-        // Collections.sort(sceneses, (o1, o2) ->
-        // safeLongToInt(o2.getUpdateDate().getTime() -
-        // o1.getUpdateDate().getTime()));
+        final List<Scenes> sceneses = mongoTemplate.find(query, Scenes.class, MongoCollectionDefinition.T_SCENESES.getName());
+        // Collections.sort(sceneses, (o1, o2) -> (o2.getUpdateDate().getTime()
+        // - o1.getUpdateDate().getTime()) > 0 ? 1 : -1);
 
         // QueryScenesResult.builder()
         // .sceneses(safeList(scenes).stream()
@@ -81,7 +80,7 @@ public class ScenesServiceImpl implements ScenesService {
         // .build();
 
         return new PageHolder<Scenes>(model.getPageNum(), model.getPageSize())
-                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.SCENESES.getName()))
+                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.T_SCENESES.getName()))
                 .withRecords(sceneses);
     }
 
@@ -108,7 +107,7 @@ public class ScenesServiceImpl implements ScenesService {
             scenes.preUpdate();
         }
 
-        Scenes saved = mongoTemplate.save(scenes, MongoCollectionDefinition.SCENESES.getName());
+        Scenes saved = mongoTemplate.save(scenes, MongoCollectionDefinition.T_SCENESES.getName());
         return SaveScenesResult.builder().id(saved.getId()).build();
     }
 
@@ -116,7 +115,7 @@ public class ScenesServiceImpl implements ScenesService {
     public DeleteScenesResult delete(DeleteScenes model) {
         // 'id' is a keyword, it will be automatically converted to '_id'
         DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
-                MongoCollectionDefinition.SCENESES.getName());
+                MongoCollectionDefinition.T_SCENESES.getName());
         return DeleteScenesResult.builder().deletedCount(result.getDeletedCount()).build();
     }
 

@@ -64,7 +64,7 @@ public class DataSourceServiceImpl implements DataSourceService {
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
         final List<DataSourceProperties> dataSourceProperties = mongoTemplate.find(query, DataSourceProperties.class,
-                MongoCollectionDefinition.DATASOURCES.getName());
+                MongoCollectionDefinition.T_DATASOURCES.getName());
 
         // Mask sensitive information.
         for (DataSourceProperties ds : dataSourceProperties) {
@@ -72,7 +72,7 @@ public class DataSourceServiceImpl implements DataSourceService {
         }
 
         return new PageHolder<DataSourceProperties>(model.getPageNum(), model.getPageSize())
-                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.DATASOURCES.getName()))
+                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.T_DATASOURCES.getName()))
                 .withRecords(dataSourceProperties);
     }
 
@@ -99,7 +99,7 @@ public class DataSourceServiceImpl implements DataSourceService {
             dataSourceProperties.preUpdate();
         }
 
-        DataSourceProperties saved = mongoTemplate.save(dataSourceProperties, MongoCollectionDefinition.DATASOURCES.getName());
+        DataSourceProperties saved = mongoTemplate.save(dataSourceProperties, MongoCollectionDefinition.T_DATASOURCES.getName());
         return SaveDataSourceResult.builder().id(saved.getId()).build();
     }
 
@@ -107,7 +107,7 @@ public class DataSourceServiceImpl implements DataSourceService {
     public DeleteDataSourceResult delete(DeleteDataSource model) {
         // 'id' is a keyword, it will be automatically converted to '_id'
         DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
-                MongoCollectionDefinition.DATASOURCES.getName());
+                MongoCollectionDefinition.T_DATASOURCES.getName());
         return DeleteDataSourceResult.builder().deletedCount(result.getDeletedCount()).build();
     }
 

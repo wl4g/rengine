@@ -62,12 +62,13 @@ public class WorkflowServiceImpl implements WorkflowService {
                 isCriteria("scenesId", model.getScenesId())))
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
-        final List<Workflow> workflows = mongoTemplate.find(query, Workflow.class, MongoCollectionDefinition.WORKFLOWS.getName());
-        // Collections.sort(workflows, (o1, o2) ->
-        // safeLongToInt(o2.getUpdateDate().getTime()-o1.getUpdateDate().getTime()));
+        final List<Workflow> workflows = mongoTemplate.find(query, Workflow.class,
+                MongoCollectionDefinition.T_WORKFLOWS.getName());
+        // Collections.sort(workflows, (o1, o2) -> (o2.getUpdateDate().getTime()
+        // - o1.getUpdateDate().getTime()) > 0 ? 1 : -1);
 
         return new PageHolder<Workflow>(model.getPageNum(), model.getPageSize())
-                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.WORKFLOWS.getName()))
+                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.T_WORKFLOWS.getName()))
                 .withRecords(workflows);
     }
 
@@ -94,7 +95,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             workflow.preUpdate();
         }
 
-        Workflow saved = mongoTemplate.save(workflow, MongoCollectionDefinition.WORKFLOWS.getName());
+        Workflow saved = mongoTemplate.save(workflow, MongoCollectionDefinition.T_WORKFLOWS.getName());
         return SaveWorkflowResult.builder().id(saved.getId()).build();
     }
 
@@ -102,7 +103,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     public DeleteWorkflowResult delete(DeleteWorkflow model) {
         // 'id' is a keyword, it will be automatically converted to '_id'
         DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
-                MongoCollectionDefinition.WORKFLOWS.getName());
+                MongoCollectionDefinition.T_WORKFLOWS.getName());
         return DeleteWorkflowResult.builder().deletedCount(result.getDeletedCount()).build();
     }
 

@@ -67,12 +67,14 @@ public class RuleScriptServiceImpl implements RuleScriptService {
 
         query.with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
 
-        final List<RuleScript> rules = mongoTemplate.find(query, RuleScript.class,
-                MongoCollectionDefinition.RULE_SCRIPTS.getName());
+        final List<RuleScript> ruleScripts = mongoTemplate.find(query, RuleScript.class,
+                MongoCollectionDefinition.T_RULE_SCRIPTS.getName());
+        // Collections.sort(ruleScripts, (o1, o2) -> (o2.getUpdateDate().getTime()
+        // - o1.getUpdateDate().getTime()) > 0 ? 1 : -1);
 
         return new PageHolder<RuleScript>(model.getPageNum(), model.getPageSize())
-                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.RULE_SCRIPTS.getName()))
-                .withRecords(rules);
+                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.T_RULE_SCRIPTS.getName()))
+                .withRecords(ruleScripts);
     }
 
     @Override
@@ -100,7 +102,7 @@ public class RuleScriptServiceImpl implements RuleScriptService {
         // @formatter:off
         //final Query query = new Query(new Criteria().orOperator(Criteria.where("ruleId").is(model.getRuleId()),
         //        Criteria.where("orgCode").is(model.getOrgCode()))).with(Sort.by(Direction.DESC, "revision")).limit(1);
-        //final Long maxRevision = safeList(mongoTemplate.find(query, Long.class, MongoCollectionDefinition.RULE_SCRIPTS.getName()))
+        //final Long maxRevision = safeList(mongoTemplate.find(query, Long.class, MongoCollectionDefinition.T_RULE_SCRIPTS.getName()))
         //        .stream()
         //        .findFirst()
         //        .orElseThrow(() -> new IllegalStateException(
@@ -110,7 +112,7 @@ public class RuleScriptServiceImpl implements RuleScriptService {
 
         script.setRevision(globalMongoSequenceService.getNextSequence(GlobalMongoSequenceService.SCRIPTS_REVISION_SEQ));
 
-        RuleScript saved = mongoTemplate.save(script, MongoCollectionDefinition.RULE_SCRIPTS.getName());
+        RuleScript saved = mongoTemplate.save(script, MongoCollectionDefinition.T_RULE_SCRIPTS.getName());
         return SaveRuleScriptResult.builder().id(saved.getId()).build();
     }
 
@@ -118,7 +120,7 @@ public class RuleScriptServiceImpl implements RuleScriptService {
     public DeleteRuleScriptResult delete(DeleteRuleScript model) {
         // 'id' is a keyword, it will be automatically converted to '_id'
         DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
-                MongoCollectionDefinition.RULE_SCRIPTS.getName());
+                MongoCollectionDefinition.T_RULE_SCRIPTS.getName());
         return DeleteRuleScriptResult.builder().deletedCount(result.getDeletedCount()).build();
     }
 

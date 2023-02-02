@@ -57,11 +57,12 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
             idpConfigs = mongoTemplate.find(new Query(criteria), IdentityProvider.class,
                     MongoCollectionDefinition.SYS_IDENTITY_PROVIDERS.getName());
         } else {
-            idpConfigs = mongoTemplate.findAll(IdentityProvider.class, MongoCollectionDefinition.SYS_IDENTITY_PROVIDERS.getName());
+            idpConfigs = mongoTemplate.findAll(IdentityProvider.class,
+                    MongoCollectionDefinition.SYS_IDENTITY_PROVIDERS.getName());
         }
         // Collections.sort(idpConfigs, (o1, o2) ->
-        // safeLongToInt(o2.getUpdateDate().getTime() -
-        // o1.getUpdateDate().getTime()));
+        // (o2.getUpdateDate().getTime()
+        // - o1.getUpdateDate().getTime()) > 0 ? 1 : -1);
 
         // Mask sensitive information.
         for (IdentityProvider idp : idpConfigs) {

@@ -59,9 +59,9 @@
 //
 //    @Override
 //    public void afterSingletonsInstantiated() {
-//        log.info("Initial ScheduleJob bootstrap beans ...");
+//        log.info("Initial ScheduleJobLog bootstrap beans ...");
 //        createJobBootstrapBeans();
-//        log.info("ScheduleJob Bootstrap beans initialized.");
+//        log.info("ScheduleJobLog Bootstrap beans initialized.");
 //    }
 //
 //    /**

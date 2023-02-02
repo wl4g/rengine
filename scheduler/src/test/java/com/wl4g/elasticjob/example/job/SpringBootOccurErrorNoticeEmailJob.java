@@ -27,6 +27,6 @@ public class SpringBootOccurErrorNoticeEmailJob implements SimpleJob {
 	@Override
 	public void execute(final ShardingContext shardingContext) {
 		throw new RuntimeException(
-				String.format("An exception has occurred in ScheduleJob, The parameter is %s", shardingContext.getShardingParameter()));
+				String.format("An exception has occurred in ScheduleJobLog, The parameter is %s", shardingContext.getShardingParameter()));
 	}
 }

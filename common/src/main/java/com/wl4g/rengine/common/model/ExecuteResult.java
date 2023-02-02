@@ -47,7 +47,7 @@ import lombok.experimental.SuperBuilder;
  */
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "_errorCount")
 @SuperBuilder
 @NoArgsConstructor
 public class ExecuteResult extends BaseRequest {

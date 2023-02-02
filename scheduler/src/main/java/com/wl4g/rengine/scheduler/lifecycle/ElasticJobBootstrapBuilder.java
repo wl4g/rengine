@@ -42,7 +42,7 @@ import org.apache.shardingsphere.elasticjob.tracing.api.TracingConfiguration;
 
 import com.google.common.base.Preconditions;
 import com.wl4g.infra.common.lang.tuples.Tuple2;
-import com.wl4g.rengine.common.entity.ScheduleTrigger.CronTriggerConfig;
+import com.wl4g.rengine.common.entity.ScheduleTrigger;
 import com.wl4g.rengine.scheduler.config.RengineSchedulerProperties;
 import com.wl4g.rengine.scheduler.job.AbstractJobExecutor.ExecutorJobType;
 
@@ -138,10 +138,10 @@ public class ElasticJobBootstrapBuilder {
     public static JobConfiguration newDefaultJobConfig(
             @NotNull ExecutorJobType jobType,
             @NotBlank String jobName,
-            @NotNull CronTriggerConfig cronTrigger,
+            @NotNull ScheduleTrigger trigger,
             @NotNull JobParameter jobParameter) {
         hasTextOf(jobName, "jobName");
-        notNullOf(cronTrigger, "cronTrigger");
+        notNullOf(trigger, "trigger");
         notNullOf(jobParameter, "jobParameter");
 
         final JobConfiguration jobConfig = JobConfiguration.builder()
@@ -149,11 +149,11 @@ public class ElasticJobBootstrapBuilder {
                 .jobName(jobName)
                 .disabled(DEFAULT_DISABLED)
                 .overwrite(DEFAULT_OVERWRITE)
-                .monitorExecution(cronTrigger.getMonitorExecution())
-                .failover(cronTrigger.getFailover())
-                .misfire(cronTrigger.getMisfire())
-                .cron(cronTrigger.getCron())
-                .timeZone(cronTrigger.getTimeZone())
+                .monitorExecution(trigger.getMonitorExecution())
+                .failover(trigger.getFailover())
+                .misfire(trigger.getMisfire())
+                .cron(trigger.getCron())
+                .timeZone(trigger.getTimeZone())
                 // When setup true, the shardingTotalCount will be ignored,
                 // and the will be automatically allocated according to the
                 // number of cluster nodes priority.
@@ -161,13 +161,13 @@ public class ElasticJobBootstrapBuilder {
                 .shardingTotalCount(DEFAULT_SHARDING_TOTAL_COUNT)
                 .shardingItemParameters(DEFAULT_SHARDING_ITEM_PARAMETERS)
                 .jobParameter(toJSONString(jobParameter))
-                .maxTimeDiffSeconds(cronTrigger.getMaxTimeDiffSeconds())
-                .reconcileIntervalMinutes(cronTrigger.getReconcileIntervalMinutes())
+                .maxTimeDiffSeconds(trigger.getMaxTimeDiffSeconds())
+                .reconcileIntervalMinutes(trigger.getReconcileIntervalMinutes())
                 .jobShardingStrategyType(DEFAULT_JOB_SHARDING_STRATEGY_TYPE)
                 .jobExecutorServiceHandlerType(DEFAULT_JOB_EXECUTOR_SERVICE_HANDLER_TYPE)
                 .jobErrorHandlerType(DEFAULT_JOB_ERROR_HANDLER_TYPE)
                 .jobListenerTypes(DEFAULT_JOB_LISTENER_TYPES)
-                .description(format(isBlank(cronTrigger.getCron()) ? "One off job for %s" : "Cron schedule job for %s", jobName))
+                .description(format(isBlank(trigger.getCron()) ? "One off job for %s" : "Cron schedule job for %s", jobName))
                 .build();
 
         return jobConfig;
@@ -180,15 +180,9 @@ public class ElasticJobBootstrapBuilder {
     @NoArgsConstructor
     public static class JobParameter {
         private Long triggerId;
-        private Long jobId;
 
         public JobParameter(@NotNull Long triggerId) {
-            this.triggerId = triggerId;
-        }
-
-        public JobParameter(@NotNull Long triggerId, @NotNull Long jobId) {
             this.triggerId = notNullOf(triggerId, "triggerId");
-            this.jobId = notNullOf(jobId, "jobId");
         }
     }
 

@@ -67,12 +67,10 @@ public class WorkflowGraphServiceImpl implements WorkflowGraphService {
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
         final List<WorkflowGraph> graphs = mongoTemplate.find(query, WorkflowGraph.class,
-                MongoCollectionDefinition.WORKFLOW_GRAPHS.getName());
-        // Collections.sort(graphs, (o1, o2) ->
-        // safeLongToInt(o2.getUpdateDate().getTime()-o1.getUpdateDate().getTime()));
+                MongoCollectionDefinition.T_WORKFLOW_GRAPHS.getName());
 
         return new PageHolder<WorkflowGraph>(model.getPageNum(), model.getPageSize())
-                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.WORKFLOW_GRAPHS.getName()))
+                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.T_WORKFLOW_GRAPHS.getName()))
                 .withRecords(graphs);
     }
 
@@ -102,7 +100,7 @@ public class WorkflowGraphServiceImpl implements WorkflowGraphService {
         // final Query query = new Query(new Criteria().orOperator(Criteria.where("ruleId").is(graph.getWorkflowId()),
         //         Criteria.where("orgCode").is(model.getOrgCode()))).with(Sort.by(Direction.DESC, "revision")).limit(1);
         // final Long maxRevision = safeList(
-        //         mongoTemplate.find(query, Long.class, MongoCollectionDefinition.WORKFLOW_GRAPHS.getName())).stream()
+        //         mongoTemplate.find(query, Long.class, MongoCollectionDefinition.T_WORKFLOW_GRAPHS.getName())).stream()
         //                 .findFirst()
         //                 .orElseThrow(() -> new IllegalStateException(
         //                         format("Could not get max revision by workflowId: %s, orgCode: %s", graph.getWorkflowId(),
@@ -112,7 +110,7 @@ public class WorkflowGraphServiceImpl implements WorkflowGraphService {
 
         graph.setRevision(mongoSequenceService.getNextSequence(GlobalMongoSequenceService.GRAPHS_REVISION_SEQ));
 
-        WorkflowGraph saved = mongoTemplate.save(graph, MongoCollectionDefinition.WORKFLOW_GRAPHS.getName());
+        WorkflowGraph saved = mongoTemplate.save(graph, MongoCollectionDefinition.T_WORKFLOW_GRAPHS.getName());
         return SaveWorkflowGraphResult.builder().id(saved.getId()).build();
     }
 
@@ -120,7 +118,7 @@ public class WorkflowGraphServiceImpl implements WorkflowGraphService {
     public DeleteWorkflowGraphResult delete(DeleteWorkflowGraph model) {
         // 'id' is a keyword, it will be automatically converted to '_id'
         DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
-                MongoCollectionDefinition.WORKFLOW_GRAPHS.getName());
+                MongoCollectionDefinition.T_WORKFLOW_GRAPHS.getName());
         return DeleteWorkflowGraphResult.builder().deletedCount(result.getDeletedCount()).build();
     }
 

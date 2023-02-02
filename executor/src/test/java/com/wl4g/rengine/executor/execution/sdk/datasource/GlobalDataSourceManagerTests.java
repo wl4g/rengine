@@ -102,7 +102,7 @@ public class GlobalDataSourceManagerTests {
         final List<Map<String, Object>> bsonFilters = new ArrayList<>();
         bsonFilters.add(BsonUtils2.asMap(BsonDocument.parse(queryBson)));
 
-        List<JsonNode> result = mongoSourceFacade.findList(MongoCollectionDefinition.AGGREGATES.getName(), bsonFilters);
+        List<JsonNode> result = mongoSourceFacade.findList(MongoCollectionDefinition.R_AGGREGATES.getName(), bsonFilters);
         System.out.println(toJSONString(result));
     }
 

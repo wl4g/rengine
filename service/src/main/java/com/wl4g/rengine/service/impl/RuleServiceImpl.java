@@ -64,14 +64,12 @@ public class RuleServiceImpl implements RuleService {
 
         query.with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
 
-        List<Rule> rules = mongoTemplate.find(query, Rule.class, MongoCollectionDefinition.RULES.getName());
-
-        // @formatter:off
-        //Collections.sort(rules, (o1, o2) -> safeLongToInt(o2.getUpdateDate().getTime() - o1.getUpdateDate().getTime()));
-        // @formatter:on
+        List<Rule> rules = mongoTemplate.find(query, Rule.class, MongoCollectionDefinition.T_RULES.getName());
+        // Collections.sort(rules, (o1, o2) -> (o2.getUpdateDate().getTime()
+        // - o1.getUpdateDate().getTime()) > 0 ? 1 : -1);
 
         return new PageHolder<Rule>(model.getPageNum(), model.getPageSize())
-                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.RULES.getName()))
+                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.T_RULES.getName()))
                 .withRecords(rules);
     }
 
@@ -97,7 +95,7 @@ public class RuleServiceImpl implements RuleService {
             rule.preUpdate();
         }
 
-        Rule saved = mongoTemplate.save(rule, MongoCollectionDefinition.RULES.getName());
+        Rule saved = mongoTemplate.save(rule, MongoCollectionDefinition.T_RULES.getName());
         return SaveRuleResult.builder().id(saved.getId()).build();
     }
 
@@ -105,7 +103,7 @@ public class RuleServiceImpl implements RuleService {
     public DeleteRuleResult delete(DeleteRule model) {
         // 'id' is a keyword, it will be automatically converted to '_id'
         DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
-                MongoCollectionDefinition.RULES.getName());
+                MongoCollectionDefinition.T_RULES.getName());
         return DeleteRuleResult.builder().deletedCount(result.getDeletedCount()).build();
     }
 

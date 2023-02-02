@@ -22,12 +22,12 @@ import static com.wl4g.infra.common.lang.Assert2.notEmpty;
 import static com.wl4g.infra.common.lang.Exceptions.getRootCausesString;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
-import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RULES;
-import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RULE_SCRIPTS;
-import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SCENESES;
-import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.UPLOADS;
-import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.WORKFLOWS;
-import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.WORKFLOW_GRAPHS;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_RULES;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_RULE_SCRIPTS;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_SCENESES;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_UPLOADS;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_WORKFLOWS;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_WORKFLOW_GRAPHS;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.joining;
@@ -277,19 +277,19 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
         final Bson delFlagFilter = Aggregates.match(Filters.eq("delFlag", BaseBean.DEL_FLAG_NORMAL));
         final Bson project = Aggregates.project(Projections.fields(Projections.exclude("_class", "delFlag")));
 
-        final Bson uploadsLookup = Aggregates.lookup(UPLOADS.getName(), asList(new Variable<>("uploadIds", "$uploadIds")),
+        final Bson uploadsLookup = Aggregates.lookup(T_UPLOADS.getName(), asList(new Variable<>("uploadIds", "$uploadIds")),
                 asList(Aggregates
                         .match(Filters.expr(new Document("$in", asList(new BsonString("$_id"), new BsonString("$$uploadIds"))))),
                         enableFilter, delFlagFilter, project),
                 "uploads");
 
-        final Bson ruleScriptsLookup = Aggregates.lookup(RULE_SCRIPTS.getName(),
+        final Bson ruleScriptsLookup = Aggregates.lookup(T_RULE_SCRIPTS.getName(),
                 asList(new Variable<>("ruleId", BsonDocument.parse("{ $toLong: \"$_id\" }"))),
                 asList(Aggregates.match(Filters.expr(Filters.eq("ruleId", "$ruleId"))), enableFilter, delFlagFilter,
                         Aggregates.sort(new Document("revision", -1)), Aggregates.limit(revisions), project, uploadsLookup),
                 "scripts");
 
-        final Bson rulesLookup = Aggregates.lookup(RULES.getName(), asList(new Variable<>("ruleIds",
+        final Bson rulesLookup = Aggregates.lookup(T_RULES.getName(), asList(new Variable<>("ruleIds",
                 BsonDocument.parse("{ $map: { input: \"$nodes\", in: { $toLong: \"$$this.ruleId\" } } }"))),
         // @formatter:off
         // $in 表达式匹配应直接使用 Document 对象? 否则:
@@ -301,13 +301,13 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
                         enableFilter, delFlagFilter, project, ruleScriptsLookup),
                 "rules");
 
-        final Bson workflowGraphLookup = Aggregates.lookup(WORKFLOW_GRAPHS.getName(),
+        final Bson workflowGraphLookup = Aggregates.lookup(T_WORKFLOW_GRAPHS.getName(),
                 asList(new Variable<>("workflowId", BsonDocument.parse("{ $toLong: \"$workflowId\" }"))),
                 asList(Aggregates.match(Filters.expr(Filters.eq("scenesId", "$$scenesId"))), enableFilter, delFlagFilter,
                         Aggregates.sort(new Document("revision", -1)), Aggregates.limit(revisions), project, rulesLookup),
                 "graphs");
 
-        final Bson workflowLookup = Aggregates.lookup(WORKFLOWS.getName(), asList(new Variable<>("scenesId", "$_id")),
+        final Bson workflowLookup = Aggregates.lookup(T_WORKFLOWS.getName(), asList(new Variable<>("scenesId", "$_id")),
                 asList(workflowGraphLookup), "workflows");
 
         final List<Bson> aggregates = Lists.newArrayList();
@@ -319,7 +319,7 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
         // The temporary collections are automatically created.
         // aggregates.add(Aggregates.merge("_tmp_load_scenes_with_cascade"));
 
-        final ReactiveMongoCollection<Document> collection = mongoRepository.getReactiveCollection(SCENESES);
+        final ReactiveMongoCollection<Document> collection = mongoRepository.getReactiveCollection(T_SCENESES);
         final Multi<Document> scenesesMulti = collection.aggregate(aggregates);
         return scenesesMulti/* .batchSize(config.engine().maxQueryBatch()) */.map(scenesDoc -> {
             // Solution-1:

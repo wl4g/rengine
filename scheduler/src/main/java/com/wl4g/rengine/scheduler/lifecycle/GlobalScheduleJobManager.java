@@ -44,11 +44,10 @@ import org.springframework.boot.ApplicationRunner;
 import com.wl4g.infra.common.collection.CollectionUtils2;
 import com.wl4g.infra.common.lang.tuples.Tuple2;
 import com.wl4g.rengine.common.entity.ScheduleTrigger;
-import com.wl4g.rengine.common.entity.ScheduleTrigger.CronTriggerConfig;
 import com.wl4g.rengine.scheduler.config.RengineSchedulerProperties;
 import com.wl4g.rengine.scheduler.exception.ScheduleException;
 import com.wl4g.rengine.scheduler.job.AbstractJobExecutor.ExecutorJobType;
-import com.wl4g.rengine.scheduler.job.EngineScheduleController;
+import com.wl4g.rengine.scheduler.job.GlobalEngineScheduleController;
 import com.wl4g.rengine.scheduler.lifecycle.ElasticJobBootstrapBuilder.JobParameter;
 
 import lombok.CustomLog;
@@ -76,7 +75,7 @@ public class GlobalScheduleJobManager implements ApplicationRunner {
         this.tracingConfigurations = notNullOf(tracingConfigurations, "tracingConfigurations");
         this.regCenter = notNullOf(registryCenter, "registryCenter");
         final JobConfiguration jobConfig = config.getController()
-                .toJobConfiguration(EngineScheduleController.class.getSimpleName());
+                .toJobConfiguration(GlobalEngineScheduleController.class.getSimpleName());
         this.controllerBootstrap = createJobBootstrap(jobConfig);
         this.schedulerBootstrapRegistry = new ConcurrentHashMap<>(16);
     }
@@ -111,8 +110,7 @@ public class GlobalScheduleJobManager implements ApplicationRunner {
         notNullOf(jobParameter, "jobParameter");
         trigger.validate();
 
-        final CronTriggerConfig ctc = ((CronTriggerConfig) notNullOf(trigger.getProperties(), "cronTrigger")).validate();
-        final JobConfiguration jobConfig = newDefaultJobConfig(jobType, jobName, ctc, jobParameter);
+        final JobConfiguration jobConfig = newDefaultJobConfig(jobType, jobName, trigger, jobParameter);
         final JobBootstrap bootstrap = createJobBootstrap(jobConfig);
         final Tuple2 existing = schedulerBootstrapRegistry.putIfAbsent(trigger.getId(), new Tuple2(bootstrap, lock));
         if (nonNull(existing)) {

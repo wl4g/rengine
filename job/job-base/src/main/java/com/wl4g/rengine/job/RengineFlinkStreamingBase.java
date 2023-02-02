@@ -86,7 +86,7 @@ public abstract class RengineFlinkStreamingBase implements Runnable {
     // FLINK Sink options.
     private Boolean forceUsePrintSink;
 
-    // FLINK ScheduleJob options.
+    // FLINK ScheduleJobLog options.
     private String jobName;
 
     // Command line.
@@ -132,7 +132,7 @@ public abstract class RengineFlinkStreamingBase implements Runnable {
                 .longOption("idleTimeoutMillis", "30000", "The timeout millis for the idleness detection.")
                 // FLINK Sink options.
                 .option("F", "forceUsePrintSink", "false", "Force override set to stdout print sink function.")
-                // ScheduleJob options.
+                // ScheduleJobLog options.
                 .option("J", "jobName", "RengineAggregateFlinkJob", "Flink connect MQ source streaming job name.");
     }
 
@@ -167,7 +167,7 @@ public abstract class RengineFlinkStreamingBase implements Runnable {
         this.idleTimeoutMillis = line.getLong("idleTimeoutMillis");
         // Sink options.
         this.forceUsePrintSink = line.getBoolean("forceUsePrintSink");
-        // ScheduleJob options.
+        // ScheduleJobLog options.
         this.jobName = line.get("jobName");
         return this;
     }
