@@ -87,13 +87,19 @@ public class GlobalEngineScheduleController extends AbstractJobExecutor {
                 // The status of the trigger is disabled, you need to shtudown
                 // the scheduling job.
                 if (trigger.getEnable() == BaseBean.DISABLED) {
-                    log.info("Disabling scheduling job for : {}", trigger.getId());
-                    getGlobalScheduleJobManager().shutdown(trigger.getId());
-                    getGlobalScheduleJobManager().remove(trigger.getId());
-                    // When the trigger is disabled(cancelled), the mutex should
-                    // be released, to allow binding (scheduling) by other nodes
-                    // after trigger re-enabling.
-                    mutexLock.release(); // [#MARK1]
+                    log.info("Disabling trigger scheduling for : {}", trigger.getId());
+                    if (getGlobalScheduleJobManager().exists(trigger.getId())) {
+                        getGlobalScheduleJobManager().shutdown(trigger.getId());
+                        getGlobalScheduleJobManager().remove(trigger.getId());
+                        // When the trigger is disabled(cancelled), the mutex
+                        // should be released, to allow binding (scheduling) by
+                        // other nodes after trigger re-enabling.
+                        try {
+                            mutexLock.release(); // [#MARK1]
+                        } catch (IllegalStateException e) {
+                            // Ignore
+                        }
+                    }
                     return;
                 }
 
@@ -117,7 +123,7 @@ public class GlobalEngineScheduleController extends AbstractJobExecutor {
 
                     updateTriggerRunState(trigger.getId(), RunState.SCHED);
                 } else {
-                    log.debug("Trigger {} are already bound on other nodes.", trigger.getId());
+                    log.debug("Trigger {} is already bound to the this JVM or other nodes.", trigger.getId());
                 }
 
             } catch (Exception e) {
