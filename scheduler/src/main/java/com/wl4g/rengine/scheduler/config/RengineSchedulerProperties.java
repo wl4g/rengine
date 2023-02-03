@@ -39,7 +39,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wl4g.rengine.scheduler.job.AbstractJobExecutor.ExecutorJobType;
 
 import lombok.Getter;
@@ -235,7 +234,7 @@ public class RengineSchedulerProperties implements InitializingBean {
     @Getter
     @Setter
     @ToString
-    public abstract static class BaseJobProperties {
+    public static class GlobalEngineScheduleControllerProperties {
         private String name;
         // private Class<? extends ElasticJob> elasticJobClass;
         private Boolean disabled;
@@ -261,16 +260,14 @@ public class RengineSchedulerProperties implements InitializingBean {
         private Collection<String> jobListenerTypes = new LinkedList<>();
         private String description;
 
-        public abstract ExecutorJobType getJobType();
-
-        public BaseJobProperties() {
+        public GlobalEngineScheduleControllerProperties() {
             setDisabled(false);
             setOverwrite(true);
             setMonitorExecution(true);
             setFailover(true);
             setMisfire(false);
-            setCron("0/5 * * * * ?");
-            setTimeZone("GMT+08:00");
+            setCron(DEFAULT_CRON);
+            setTimeZone(DEFAULT_TIME_ZONE);
             setJobBootstrapBeanName(null);
             // When setup true, the shardingTotalCount will be ignored,
             // and the will be automatically allocated according to the
@@ -285,13 +282,13 @@ public class RengineSchedulerProperties implements InitializingBean {
             setJobExecutorServiceHandlerType(null);
             setJobErrorHandlerType(null);
             setJobListenerTypes(new ArrayList<>());
-            setDescription("The job engine scheduler job.");
+            setDescription("The job engine execution schedule controller.");
         }
 
         public JobConfiguration toJobConfiguration(final String jobName) {
             hasTextOf(jobName, "jobName");
             final JobConfiguration jobConfig = JobConfiguration.builder()
-                    .jobType(getJobType())
+                    .jobType(ExecutorJobType.GLOBAL_CONTROLLER)
                     .jobName(jobName)
                     .disabled(nonNull(disabled) ? disabled : false)
                     .overwrite(nonNull(overwrite) ? overwrite : true)
@@ -317,21 +314,9 @@ public class RengineSchedulerProperties implements InitializingBean {
                     .build();
             return jobConfig;
         }
-    }
 
-    @Getter
-    @Setter
-    @ToString
-    public static class GlobalEngineScheduleControllerProperties extends BaseJobProperties {
-        public GlobalEngineScheduleControllerProperties() {
-            setDescription("The job engine execution schedule controller.");
-        }
-
-        @JsonIgnore
-        @Override
-        public ExecutorJobType getJobType() {
-            return ExecutorJobType.GLOBAL_CONTROLLER;
-        }
+        public static final String DEFAULT_CRON = "0/5 * * * * ?";
+        public static final String DEFAULT_TIME_ZONE = "GMT+08:00";
     }
 
     @Getter
