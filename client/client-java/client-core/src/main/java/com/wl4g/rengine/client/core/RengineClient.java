@@ -176,9 +176,9 @@ public class RengineClient {
         } catch (Throwable ex) {
             final String errmsg = format("Could not to execution for '%s'", requestBody);
             if (log.isDebugEnabled()) {
-                log.debug(errmsg, ex);
+                log.error(errmsg, ex);
             } else {
-                log.warn(format("%s. - %s", errmsg, ex.getMessage()));
+                log.error(format("%s. - reason: %s", errmsg, ex.getMessage()));
             }
             if (executeRequest.getBestEffort()) {
                 return failback.apply(new FailbackInfo(executeRequest, ex));

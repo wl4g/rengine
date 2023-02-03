@@ -120,7 +120,7 @@ public class GlobalScheduleJobManager implements ApplicationRunner {
         final JobBootstrap bootstrap = createJobBootstrap(jobConfig);
         final JobBootstrap existing = schedulerBootstrapRegistry.putIfAbsent(trigger.getId(), bootstrap);
         if (nonNull(existing)) {
-            throw new ScheduleException(format("Already schedule job for %s/%s", trigger.getId(), jobName));
+            throw new ScheduleException(format("Already trigger '%s' scheduling for : %s", trigger.getId(), existing));
         }
         return (T) bootstrap;
     }
@@ -132,6 +132,7 @@ public class GlobalScheduleJobManager implements ApplicationRunner {
             Entry<Long, JobBootstrap> entry = it.next();
             if (_triggerIds.contains(entry.getKey())) {
                 it.remove();
+                scheduleMutexLocksRegistry.remove(entry.getKey());
             }
         }
         return this;

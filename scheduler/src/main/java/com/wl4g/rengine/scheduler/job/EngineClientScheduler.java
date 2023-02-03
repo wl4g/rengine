@@ -150,8 +150,14 @@ public class EngineClientScheduler extends AbstractJobExecutor {
             upsertSchedulingLog(triggerId, jobLog.getId(), false, true, runState.isSuccess(),
                     newHashSet(Iterables.concat(completedResultInfos, uncompletedResultInfos)));
         } catch (Throwable ex) {
-            log.error(format("Failed to executing job of currentShardingTotalCount: %s, context: %s, triggerId: %s, jobLogId: %s",
-                    currentShardingTotalCount, context, trigger.getId(), jobLog.getId()), ex);
+            final String errmsg = format(
+                    "Failed to executing requests job of currentShardingTotalCount: %s, context: %s, triggerId: %s, jobLogId: %s",
+                    currentShardingTotalCount, context, trigger.getId(), jobLog.getId());
+            if (log.isDebugEnabled()) {
+                log.error(errmsg, ex);
+            } else {
+                log.error(format("%s. - reason: %s", errmsg, ex.getMessage()));
+            }
 
             updateTriggerRunState(triggerId, RunState.FAILED);
             upsertSchedulingLog(triggerId, jobLog.getId(), false, true, false, null);
@@ -209,9 +215,13 @@ public class EngineClientScheduler extends AbstractJobExecutor {
                         .build()));
             } catch (Throwable ex) {
                 final String errmsg = format(
-                        "Failed to executing job of currentShardingTotalCount: %s, context: %s, triggerId: %s, jobLogId: %s",
-                        currentShardingTotalCount, context, triggerId, jobLogId);
-                log.error(errmsg, ex);
+                        "Failed to executing request job of currentShardingTotalCount: %s, context: %s, triggerId: %s, jobLogId: %s, request: %s",
+                        currentShardingTotalCount, context, triggerId, jobLogId, request);
+                if (log.isDebugEnabled()) {
+                    log.error(errmsg, ex);
+                } else {
+                    log.error(format("%s. - reason: %s", errmsg, ex.getMessage()));
+                }
 
                 return (this.result = RengineClient.DEFAULT_FAILBACK.apply(new FailbackInfo(request, ex)));
             }

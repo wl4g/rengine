@@ -88,17 +88,15 @@ public class GlobalEngineScheduleController extends AbstractJobExecutor {
                 // the scheduling job.
                 if (trigger.getEnable() == BaseBean.DISABLED) {
                     log.info("Disabling trigger scheduling for : {}", trigger.getId());
-                    if (getGlobalScheduleJobManager().exists(trigger.getId())) {
-                        getGlobalScheduleJobManager().shutdown(trigger.getId());
-                        getGlobalScheduleJobManager().remove(trigger.getId());
-                        // When the trigger is disabled(cancelled), the mutex
-                        // should be released, to allow binding (scheduling) by
-                        // other nodes after trigger re-enabling.
-                        try {
-                            mutexLock.release(); // [#MARK1]
-                        } catch (IllegalStateException e) {
-                            // Ignore
-                        }
+                    getGlobalScheduleJobManager().shutdown(trigger.getId());
+                    getGlobalScheduleJobManager().remove(trigger.getId());
+                    // When the trigger is disabled(cancelled), the mutex
+                    // should be released, to allow binding (scheduling) by
+                    // other nodes after trigger re-enabling.
+                    try {
+                        mutexLock.release(); // [#MARK1]
+                    } catch (IllegalStateException e) {
+                        // Ignore
                     }
                     return;
                 }
@@ -106,14 +104,13 @@ public class GlobalEngineScheduleController extends AbstractJobExecutor {
                 // 1). Binding is allowed as long as the this JVM is not bound
                 // to this trigger (even if disabled and then enabled).
                 // 2). If the this JVM is already bound to this trigger, then
-                // the binding is skipped.
+                // the binding is skipped. (Use non-reentrant locks to solved)
                 // 3). Because the current node (shard) binding trigger
                 // scheduling is stateful, once the lock is acquired, there is
                 // no need to actively release it, unless the trigger is
                 // actively disabled(cancelled), or the current JVM exits
                 // (passive release). refer to: [#MARK1]
-                if (!getGlobalScheduleJobManager().exists(trigger.getId())
-                        || (!mutexLock.isAcquiredInThisProcess() && mutexLock.acquire(1, TimeUnit.MILLISECONDS))) {
+                if (!getGlobalScheduleJobManager().exists(trigger.getId()) && mutexLock.acquire(1, TimeUnit.MILLISECONDS)) {
                     updateTriggerRunState(trigger.getId(), RunState.PREPARED);
 
                     log.info("Scheduling trigger for {} : {}", jobName, trigger);
