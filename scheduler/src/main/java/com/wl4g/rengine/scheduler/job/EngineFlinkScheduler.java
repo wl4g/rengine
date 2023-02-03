@@ -60,7 +60,7 @@ public class EngineFlinkScheduler extends AbstractJobExecutor {
 
     @Override
     public String getType() {
-        return ExecutorJobType.FLINK_SCHEDULER.name();
+        return SchedulerJobType.FLINK_SCHEDULER.name();
     }
 
     @Override

@@ -21,11 +21,13 @@ import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.rengine.scheduler.lifecycle.ElasticJobBootstrapBuilder.newDefaultJobConfig;
 import static java.lang.String.format;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.validation.constraints.NotBlank;
@@ -42,11 +44,10 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 
 import com.wl4g.infra.common.collection.CollectionUtils2;
-import com.wl4g.infra.common.lang.tuples.Tuple2;
 import com.wl4g.rengine.common.entity.ScheduleTrigger;
 import com.wl4g.rengine.scheduler.config.RengineSchedulerProperties;
 import com.wl4g.rengine.scheduler.exception.ScheduleException;
-import com.wl4g.rengine.scheduler.job.AbstractJobExecutor.ExecutorJobType;
+import com.wl4g.rengine.scheduler.job.AbstractJobExecutor.SchedulerJobType;
 import com.wl4g.rengine.scheduler.job.GlobalEngineScheduleController;
 import com.wl4g.rengine.scheduler.lifecycle.ElasticJobBootstrapBuilder.JobParameter;
 
@@ -66,7 +67,8 @@ public class GlobalScheduleJobManager implements ApplicationRunner {
     final List<TracingConfiguration<?>> tracingConfigurations;
     final CoordinatorRegistryCenter regCenter;
     final ScheduleJobBootstrap controllerBootstrap;
-    final Map<Long, Tuple2> schedulerBootstrapRegistry;
+    final Map<Long, JobBootstrap> schedulerBootstrapRegistry;
+    final Map<Long, InterProcessSemaphoreMutex> scheduleMutexLocksRegistry;
 
     public GlobalScheduleJobManager(final @NotNull RengineSchedulerProperties config,
             final @NotNull List<TracingConfiguration<?>> tracingConfigurations,
@@ -78,6 +80,7 @@ public class GlobalScheduleJobManager implements ApplicationRunner {
                 .toJobConfiguration(GlobalEngineScheduleController.class.getSimpleName());
         this.controllerBootstrap = createJobBootstrap(jobConfig);
         this.schedulerBootstrapRegistry = new ConcurrentHashMap<>(16);
+        this.scheduleMutexLocksRegistry = new ConcurrentHashMap<>(16);
     }
 
     @Override
@@ -90,16 +93,19 @@ public class GlobalScheduleJobManager implements ApplicationRunner {
         controllerBootstrap.schedule();
     }
 
+    public boolean exists(Long triggerId) {
+        return schedulerBootstrapRegistry.containsKey(triggerId);
+    }
+
     @SuppressWarnings("unchecked")
     public <T extends JobBootstrap> T get(Long triggerId) {
-        final Tuple2 job = schedulerBootstrapRegistry.get(triggerId);
-        return nonNull(job) ? (T) job.getItem2() : null;
+        return (T) schedulerBootstrapRegistry.get(triggerId);
     }
 
     @SuppressWarnings("unchecked")
     public <T extends JobBootstrap> T add(
             @NotNull InterProcessSemaphoreMutex lock,
-            @NotNull ExecutorJobType jobType,
+            @NotNull SchedulerJobType jobType,
             @NotBlank String jobName,
             @NotNull ScheduleTrigger trigger,
             @NotNull JobParameter jobParameter) throws Exception {
@@ -112,22 +118,22 @@ public class GlobalScheduleJobManager implements ApplicationRunner {
 
         final JobConfiguration jobConfig = newDefaultJobConfig(jobType, jobName, trigger, jobParameter);
         final JobBootstrap bootstrap = createJobBootstrap(jobConfig);
-        final Tuple2 existing = schedulerBootstrapRegistry.putIfAbsent(trigger.getId(), new Tuple2(bootstrap, lock));
+        final JobBootstrap existing = schedulerBootstrapRegistry.putIfAbsent(trigger.getId(), bootstrap);
         if (nonNull(existing)) {
-            // if (force) {
-            // log.warn("Shutdowning for existing job of {}/{} ...",
-            // trigger.getId(), jobName);
-            // ((JobBootstrap) existing.getItem1()).shutdown();
-            // } else {
             throw new ScheduleException(format("Already schedule job for %s/%s", trigger.getId(), jobName));
-            // }
         }
-
         return (T) bootstrap;
     }
 
-    public GlobalScheduleJobManager remove(Long triggerId) {
-        schedulerBootstrapRegistry.remove(triggerId);
+    public GlobalScheduleJobManager remove(Long... triggerIds) {
+        final List<Long> _triggerIds = safeToList(Long.class, triggerIds);
+        final var it = safeMap(schedulerBootstrapRegistry).entrySet().iterator();
+        while (it.hasNext()) {
+            Entry<Long, JobBootstrap> entry = it.next();
+            if (_triggerIds.contains(entry.getKey())) {
+                it.remove();
+            }
+        }
         return this;
     }
 
@@ -139,8 +145,8 @@ public class GlobalScheduleJobManager implements ApplicationRunner {
                 .filter(e -> _triggerIds.isEmpty() || (!_triggerIds.isEmpty() && _triggerIds.contains(e.getKey())))
                 .map(e -> {
                     try {
-                        if (nonNull(e.getValue()) && e.getValue().getItem1() instanceof ScheduleJobBootstrap) {
-                            ((ScheduleJobBootstrap) e.getValue().getItem1()).schedule();
+                        if (nonNull(e.getValue()) && e.getValue() instanceof ScheduleJobBootstrap) {
+                            ((ScheduleJobBootstrap) e.getValue()).schedule();
                             // } else if (e.getValue() instanceof
                             // OneOffJobBootstrap) {
                             // ((OneOffJobBootstrap) e.getValue()).execute();
@@ -164,7 +170,7 @@ public class GlobalScheduleJobManager implements ApplicationRunner {
                 .filter(e -> _triggerIds.isEmpty() || (!_triggerIds.isEmpty() && _triggerIds.contains(e.getKey())))
                 .map(e -> {
                     try {
-                        ((ScheduleJobBootstrap) e.getValue().getItem1()).shutdown();
+                        ((ScheduleJobBootstrap) e.getValue()).shutdown();
                         log.info("Shutdown job bootstrap : {}", e.getKey());
                     } catch (Exception e1) {
                         log.error("Failed to Shutdown job bootstrap : {}", e.getKey());
@@ -177,14 +183,20 @@ public class GlobalScheduleJobManager implements ApplicationRunner {
     }
 
     public InterProcessSemaphoreMutex getMutexLock(final Long triggerId) {
-        if (schedulerBootstrapRegistry.containsKey(triggerId)) {
-            return schedulerBootstrapRegistry.get(triggerId).getItem2();
+        InterProcessSemaphoreMutex mutex = scheduleMutexLocksRegistry.get(triggerId);
+        if (isNull(mutex)) {
+            synchronized (this) {
+                mutex = scheduleMutexLocksRegistry.get(triggerId);
+                if (isNull(mutex)) {
+                    // Build path for bind trigger.
+                    // see:https://curator.apache.org/curator-recipes/shared-lock.html
+                    final String path = format("/%s/%s", PATH_BIND_TRIGGERS, notNullOf(triggerId, "triggerId"));
+                    scheduleMutexLocksRegistry.put(triggerId,
+                            (mutex = new InterProcessSemaphoreMutex(((ZookeeperRegistryCenter) regCenter).getClient(), path)));
+                }
+            }
         }
-        // Build path for bind trigger.
-        // see:https://curator.apache.org/curator-recipes/shared-lock.html
-        final String path = format("/%s/%s/%s", config.getZookeeper().getNamespace(), PATH_BIND_TRIGGERS,
-                notNullOf(triggerId, "triggerId"));
-        return new InterProcessSemaphoreMutex(((ZookeeperRegistryCenter) regCenter).getClient(), path);
+        return mutex;
     }
 
     @SuppressWarnings("unchecked")
@@ -203,6 +215,6 @@ public class GlobalScheduleJobManager implements ApplicationRunner {
         }
     }
 
-    public static final String PATH_BIND_TRIGGERS = "mutex-bind-triggers";
+    public static final String PATH_BIND_TRIGGERS = "mutex-schedule-triggers";
 
 }

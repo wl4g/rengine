@@ -16,8 +16,8 @@
 package com.wl4g.rengine.scheduler.job;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
-import static com.wl4g.rengine.scheduler.job.AbstractJobExecutor.ExecutorJobType.CLIENT_SCHEDULER;
-import static com.wl4g.rengine.scheduler.job.AbstractJobExecutor.ExecutorJobType.GLOBAL_CONTROLLER;
+import static com.wl4g.rengine.scheduler.job.AbstractJobExecutor.SchedulerJobType.CLIENT_SCHEDULER;
+import static com.wl4g.rengine.scheduler.job.AbstractJobExecutor.SchedulerJobType.GLOBAL_CONTROLLER;
 import static java.lang.String.format;
 
 import java.util.List;
@@ -77,27 +77,42 @@ public class GlobalEngineScheduleController extends AbstractJobExecutor {
         safeList(shardingTriggers).stream().forEach(trigger -> {
             final String jobName = buildJobName(trigger);
             try {
-                // The status of the trigger is disabled, you need to shtudown
-                // the scheduling job.
-                if (trigger.getEnable() == BaseBean.DISABLED) {
-                    log.info("Disabling scheduling job for : {}", trigger.getId());
-                    getGlobalScheduleJobManager().shutdown(trigger.getId());
-                }
-
                 // Any a trigger can only be scheduled by one cluster node at
                 // the same time to prevent repeated scheduling of multiple
                 // nodes. Of course, if the current node is down, it will be
                 // transferred to other nodes to continue to be scheduled
                 // according to the elastic-job mechanism.
-                final var schedulingMutexLock = getGlobalScheduleJobManager().getMutexLock(trigger.getId());
+                final var mutexLock = getGlobalScheduleJobManager().getMutexLock(trigger.getId());
 
-                // Infinite timeout unless the current JVM exits.
-                if (schedulingMutexLock.acquire(Long.MAX_VALUE, TimeUnit.MILLISECONDS)) {
+                // The status of the trigger is disabled, you need to shtudown
+                // the scheduling job.
+                if (trigger.getEnable() == BaseBean.DISABLED) {
+                    log.info("Disabling scheduling job for : {}", trigger.getId());
+                    getGlobalScheduleJobManager().shutdown(trigger.getId());
+                    getGlobalScheduleJobManager().remove(trigger.getId());
+                    // When the trigger is disabled(cancelled), the mutex should
+                    // be released, to allow binding (scheduling) by other nodes
+                    // after trigger re-enabling.
+                    mutexLock.release(); // [#MARK1]
+                    return;
+                }
+
+                // 1). Binding is allowed as long as the this JVM is not bound
+                // to this trigger (even if disabled and then enabled).
+                // 2). If the this JVM is already bound to this trigger, then
+                // the binding is skipped.
+                // 3). Because the current node (shard) binding trigger
+                // scheduling is stateful, once the lock is acquired, there is
+                // no need to actively release it, unless the trigger is
+                // actively disabled(cancelled), or the current JVM exits
+                // (passive release). refer to: [#MARK1]
+                if (!getGlobalScheduleJobManager().exists(trigger.getId())
+                        || (!mutexLock.isAcquiredInThisProcess() && mutexLock.acquire(1, TimeUnit.MILLISECONDS))) {
                     updateTriggerRunState(trigger.getId(), RunState.PREPARED);
 
                     log.info("Scheduling trigger for {} : {}", jobName, trigger);
-                    final ScheduleJobBootstrap bootstrap = getGlobalScheduleJobManager().add(schedulingMutexLock,
-                            CLIENT_SCHEDULER, jobName, trigger, new JobParameter(trigger.getId()));
+                    final ScheduleJobBootstrap bootstrap = getGlobalScheduleJobManager().add(mutexLock, CLIENT_SCHEDULER, jobName,
+                            trigger, new JobParameter(trigger.getId()));
                     bootstrap.schedule();
 
                     updateTriggerRunState(trigger.getId(), RunState.SCHED);
@@ -113,7 +128,7 @@ public class GlobalEngineScheduleController extends AbstractJobExecutor {
         });
     }
 
-    private String buildJobName(final ScheduleTrigger trigger) {
+    public static String buildJobName(final ScheduleTrigger trigger) {
         return EngineClientScheduler.class.getSimpleName() + "-" + trigger.getId();
     }
 

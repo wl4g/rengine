@@ -44,7 +44,7 @@ import com.google.common.base.Preconditions;
 import com.wl4g.infra.common.lang.tuples.Tuple2;
 import com.wl4g.rengine.common.entity.ScheduleTrigger;
 import com.wl4g.rengine.scheduler.config.RengineSchedulerProperties;
-import com.wl4g.rengine.scheduler.job.AbstractJobExecutor.ExecutorJobType;
+import com.wl4g.rengine.scheduler.job.AbstractJobExecutor.SchedulerJobType;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -136,7 +136,7 @@ public class ElasticJobBootstrapBuilder {
     }
 
     public static JobConfiguration newDefaultJobConfig(
-            @NotNull ExecutorJobType jobType,
+            @NotNull SchedulerJobType jobType,
             @NotBlank String jobName,
             @NotNull ScheduleTrigger trigger,
             @NotNull JobParameter jobParameter) {

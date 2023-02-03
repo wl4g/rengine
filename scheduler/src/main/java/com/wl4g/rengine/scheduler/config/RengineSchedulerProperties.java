@@ -39,7 +39,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
-import com.wl4g.rengine.scheduler.job.AbstractJobExecutor.ExecutorJobType;
+import com.wl4g.rengine.scheduler.job.AbstractJobExecutor.SchedulerJobType;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -288,7 +288,7 @@ public class RengineSchedulerProperties implements InitializingBean {
         public JobConfiguration toJobConfiguration(final String jobName) {
             hasTextOf(jobName, "jobName");
             final JobConfiguration jobConfig = JobConfiguration.builder()
-                    .jobType(ExecutorJobType.GLOBAL_CONTROLLER)
+                    .jobType(SchedulerJobType.GLOBAL_CONTROLLER)
                     .jobName(jobName)
                     .disabled(nonNull(disabled) ? disabled : false)
                     .overwrite(nonNull(overwrite) ? overwrite : true)

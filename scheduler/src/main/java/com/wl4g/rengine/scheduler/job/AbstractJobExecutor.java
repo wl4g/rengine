@@ -218,7 +218,7 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor {
     @Getter
     @ToString
     @AllArgsConstructor
-    public static enum ExecutorJobType {
+    public static enum SchedulerJobType {
         GLOBAL_CONTROLLER, CLIENT_SCHEDULER, FLINK_SCHEDULER;
     }
 

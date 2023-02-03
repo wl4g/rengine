@@ -90,7 +90,7 @@ public class EngineClientScheduler extends AbstractJobExecutor {
 
     @Override
     public String getType() {
-        return ExecutorJobType.CLIENT_SCHEDULER.name();
+        return SchedulerJobType.CLIENT_SCHEDULER.name();
     }
 
     @Override
