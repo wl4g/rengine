@@ -30,6 +30,7 @@ import org.apache.shardingsphere.elasticjob.api.ShardingContext;
 import org.apache.shardingsphere.elasticjob.executor.JobFacade;
 import org.apache.shardingsphere.elasticjob.lite.api.bootstrap.impl.ScheduleJobBootstrap;
 
+import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.rengine.common.entity.ScheduleTrigger;
 import com.wl4g.rengine.common.entity.ScheduleTrigger.RunState;
 import com.wl4g.rengine.common.entity.ScheduleTrigger.ScheduleType;
@@ -76,15 +77,27 @@ public class GlobalEngineScheduleController extends AbstractJobExecutor {
         safeList(shardingTriggers).stream().forEach(trigger -> {
             final String jobName = buildJobName(trigger);
             try {
-                final var lock = getGlobalScheduleJobManager().getMutexLock(trigger.getId());
+                // The status of the trigger is disabled, you need to shtudown
+                // the scheduling job.
+                if (trigger.getEnable() == BaseBean.DISABLED) {
+                    log.info("Disabling scheduling job for : {}", trigger.getId());
+                    getGlobalScheduleJobManager().shutdown(trigger.getId());
+                }
 
-                // Normally never expires unless the current node jvm exits.
-                if (lock.acquire(Long.MAX_VALUE, TimeUnit.MILLISECONDS)) {
+                // Any a trigger can only be scheduled by one cluster node at
+                // the same time to prevent repeated scheduling of multiple
+                // nodes. Of course, if the current node is down, it will be
+                // transferred to other nodes to continue to be scheduled
+                // according to the elastic-job mechanism.
+                final var schedulingMutexLock = getGlobalScheduleJobManager().getMutexLock(trigger.getId());
+
+                // Infinite timeout unless the current JVM exits.
+                if (schedulingMutexLock.acquire(Long.MAX_VALUE, TimeUnit.MILLISECONDS)) {
                     updateTriggerRunState(trigger.getId(), RunState.PREPARED);
 
                     log.info("Scheduling trigger for {} : {}", jobName, trigger);
-                    final ScheduleJobBootstrap bootstrap = getGlobalScheduleJobManager().add(lock, CLIENT_SCHEDULER, jobName,
-                            trigger, new JobParameter(trigger.getId()));
+                    final ScheduleJobBootstrap bootstrap = getGlobalScheduleJobManager().add(schedulingMutexLock,
+                            CLIENT_SCHEDULER, jobName, trigger, new JobParameter(trigger.getId()));
                     bootstrap.schedule();
 
                     updateTriggerRunState(trigger.getId(), RunState.SCHED);
