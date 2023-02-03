@@ -191,7 +191,7 @@ public class GlobalScheduleJobManager implements ApplicationRunner {
                 if (isNull(mutex)) {
                     // Build path for bind trigger.
                     // see:https://curator.apache.org/curator-recipes/shared-lock.html
-                    final String path = format("/%s/%s", PATH_BIND_TRIGGERS, notNullOf(triggerId, "triggerId"));
+                    final String path = format("/%s/%s", PATH_MUTEX_SCHEDULE_TRIGGERS, notNullOf(triggerId, "triggerId"));
                     scheduleMutexLocksRegistry.put(triggerId,
                             (mutex = new InterProcessSemaphoreMutex(((ZookeeperRegistryCenter) regCenter).getClient(), path)));
                 }
@@ -216,6 +216,6 @@ public class GlobalScheduleJobManager implements ApplicationRunner {
         }
     }
 
-    public static final String PATH_BIND_TRIGGERS = "mutex-schedule-triggers";
+    public static final String PATH_MUTEX_SCHEDULE_TRIGGERS = "mutex-schedule-triggers";
 
 }

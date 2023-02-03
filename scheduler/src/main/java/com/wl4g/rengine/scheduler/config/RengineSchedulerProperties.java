@@ -67,6 +67,7 @@ public class RengineSchedulerProperties implements InitializingBean {
     private TracingProperties tracing = new TracingProperties();
     private SnapshotDumpProperties dump = new SnapshotDumpProperties();
     private GlobalEngineScheduleControllerProperties controller = new GlobalEngineScheduleControllerProperties();
+    private EnginePurgerProperties purger = new EnginePurgerProperties();
     private EngineClientSchedulerProperties client = new EngineClientSchedulerProperties();
     private EngineFlinkSchedulerProperties flink = new EngineFlinkSchedulerProperties();
 
@@ -235,6 +236,7 @@ public class RengineSchedulerProperties implements InitializingBean {
     @Setter
     @ToString
     public static class GlobalEngineScheduleControllerProperties {
+        // Elastic-Job standard configuration.
         private String name;
         // private Class<? extends ElasticJob> elasticJobClass;
         private Boolean disabled;
@@ -317,6 +319,14 @@ public class RengineSchedulerProperties implements InitializingBean {
 
         public static final String DEFAULT_CRON = "0/5 * * * * ?";
         public static final String DEFAULT_TIME_ZONE = "GMT+08:00";
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    public static class EnginePurgerProperties {
+        private @Min(1) Integer logRetentionHours = 7 * 24;
+        private @Min(1) Long logRetentionCount = 1_000_000L;
     }
 
     @Getter

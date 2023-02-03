@@ -15,6 +15,8 @@
  */
 package com.wl4g.rengine.service.model;
 
+import java.util.Date;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -34,4 +36,7 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 @NoArgsConstructor
 public class DeleteScheduleJobLog extends DeleteBase {
+    private Date updateDateLower;
+    private Date updateDateUpper;
+    private Long retentionCount;
 }

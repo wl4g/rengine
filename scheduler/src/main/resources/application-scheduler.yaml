@@ -49,6 +49,9 @@ rengine:
       jobErrorHandlerType: ""
       jobListenerTypes: []
       description: The job engine execution schedule controller.
+    purger:
+      logRetentionHour: 168 ## 7*24
+      logRetentionCount: 1_000_000
     client:
       concurrency: 10
       acceptQueue: 2

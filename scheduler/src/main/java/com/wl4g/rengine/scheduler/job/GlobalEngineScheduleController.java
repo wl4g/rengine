@@ -16,25 +16,35 @@
 package com.wl4g.rengine.scheduler.job;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.rengine.scheduler.job.AbstractJobExecutor.SchedulerJobType.CLIENT_SCHEDULER;
 import static com.wl4g.rengine.scheduler.job.AbstractJobExecutor.SchedulerJobType.GLOBAL_CONTROLLER;
 import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
+import static java.util.Objects.isNull;
 
+import java.time.Duration;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.validation.constraints.NotNull;
 
+import org.apache.curator.framework.recipes.locks.InterProcessSemaphoreMutex;
 import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
 import org.apache.shardingsphere.elasticjob.api.ShardingContext;
 import org.apache.shardingsphere.elasticjob.executor.JobFacade;
 import org.apache.shardingsphere.elasticjob.lite.api.bootstrap.impl.ScheduleJobBootstrap;
+import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperRegistryCenter;
 
 import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.rengine.common.entity.ScheduleTrigger;
 import com.wl4g.rengine.common.entity.ScheduleTrigger.RunState;
 import com.wl4g.rengine.common.entity.ScheduleTrigger.ScheduleType;
+import com.wl4g.rengine.scheduler.config.RengineSchedulerProperties;
 import com.wl4g.rengine.scheduler.lifecycle.ElasticJobBootstrapBuilder.JobParameter;
+import com.wl4g.rengine.service.ScheduleJobLogService;
+import com.wl4g.rengine.service.model.DeleteScheduleJobLog;
 import com.wl4g.rengine.service.model.QueryScheduleTrigger;
 
 import lombok.CustomLog;
@@ -73,7 +83,6 @@ public class GlobalEngineScheduleController extends AbstractJobExecutor {
                 ./* enable(true). */build(), currentShardingTotalCount, context.getShardingItem());
         log.info("Loaded the sharding triggers : {}", shardingTriggers);
 
-        // Actual scheduling to engine execution job.
         safeList(shardingTriggers).stream().forEach(trigger -> {
             final String jobName = buildJobName(trigger);
             try {
@@ -129,10 +138,82 @@ public class GlobalEngineScheduleController extends AbstractJobExecutor {
                 updateTriggerRunState(trigger.getId(), RunState.FAILED_SCHED);
             }
         });
+
+        PurgeJobLogController.get(getConfig(), getScheduleJobLogService(), (ZookeeperRegistryCenter) getRegCenter()).purge();
     }
 
     public static String buildJobName(final ScheduleTrigger trigger) {
         return EngineClientScheduler.class.getSimpleName() + "-" + trigger.getId();
+    }
+
+    @CustomLog
+    static class PurgeJobLogController {
+        private static final String PATH_MUTEX_PURGE = "mutex-purger";
+        private static PurgeJobLogController SINGLETON;
+        private RengineSchedulerProperties config;
+        private ScheduleJobLogService scheduleJobLogService;
+        private InterProcessSemaphoreMutex purgerMutexLock;
+        private Thread executor;
+
+        public static PurgeJobLogController get(
+                final @NotNull RengineSchedulerProperties config,
+                final @NotNull ScheduleJobLogService scheduleJobLogService,
+                final @NotNull ZookeeperRegistryCenter regCenter) {
+            notNullOf(regCenter, "regCenter");
+            if (isNull(SINGLETON)) {
+                synchronized (PurgeJobLogController.class) {
+                    if (isNull(SINGLETON)) {
+                        SINGLETON = new PurgeJobLogController();
+                        SINGLETON.config = notNullOf(config, "config");
+                        SINGLETON.scheduleJobLogService = notNullOf(scheduleJobLogService, "scheduleJobLogService");
+                        // see:https://curator.apache.org/curator-recipes/shared-lock.html
+                        SINGLETON.purgerMutexLock = new InterProcessSemaphoreMutex((regCenter).getClient(), PATH_MUTEX_PURGE);
+                    }
+                }
+            }
+            return SINGLETON;
+        }
+
+        public void purge() {
+            try {
+                if (purgerMutexLock.acquire(1, TimeUnit.MILLISECONDS)) {
+                    if (isNull(executor)) {
+                        this.executor = new Thread(() -> {
+                            try {
+                                log.info("Purging trigger schedule job logs for : {}", config.getPurger());
+
+                                // Purge past logs according to configuration,
+                                // keeping only the most recent period of time.
+                                final var purgeUpperTime = currentTimeMillis()
+                                        - Duration.ofHours(config.getPurger().getLogRetentionHours()).toMillis();
+
+                                final var result = scheduleJobLogService.delete(DeleteScheduleJobLog.builder()
+                                        .updateDateLower(new Date(1))
+                                        .updateDateUpper(new Date(purgeUpperTime)) // TODO-timezone?
+                                        .retentionCount(config.getPurger().getLogRetentionCount())
+                                        .build());
+                                log.info("Purged trigger schedule job logs count : {}", result.getDeletedCount());
+
+                            } catch (Throwable ex) {
+                                log.error(format("Failed to purge logs for : %s", config.getPurger()), ex);
+                            } finally {
+                                this.executor = null;
+                            }
+                        });
+                        this.executor.start();
+                    }
+                }
+            } catch (Throwable ex) {
+                log.error("Failed to acquire purger mutex lock.", ex);
+                throw new IllegalStateException(ex);
+            } finally {
+                try {
+                    purgerMutexLock.release();
+                } catch (Exception ex) {
+                    log.error("Failed to release purger mutex lock.", ex);
+                }
+            }
+        }
     }
 
 }

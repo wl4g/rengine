@@ -86,10 +86,40 @@ public abstract class QueryHolder {
         return null;
     }
 
+    public static @Nullable Criteria gteUpdateDateCriteria(final @Nullable Object fieldValue) {
+        if (nonNull(fieldValue)) {
+            return Criteria.where(DEFAULT_FIELD_UPDATE_DATE).gte(fieldValue);
+        }
+        return null;
+    }
+
+    public static @Nullable Criteria lteUpdateDateCriteria(final @Nullable Object fieldValue) {
+        if (nonNull(fieldValue)) {
+            return Criteria.where(DEFAULT_FIELD_UPDATE_DATE).lte(fieldValue);
+        }
+        return null;
+    }
+
     public static @Nullable Criteria isCriteria(final @NotBlank String fieldName, final @Nullable Object fieldValue) {
         hasTextOf(fieldName, "fieldName");
         if (nonNull(fieldValue)) {
             return Criteria.where(fieldName).is(fieldValue);
+        }
+        return null;
+    }
+
+    public static @Nullable Criteria gteCriteria(final @NotBlank String fieldName, final @Nullable Object fieldValue) {
+        hasTextOf(fieldName, "fieldName");
+        if (nonNull(fieldValue)) {
+            return Criteria.where(fieldName).gte(fieldValue);
+        }
+        return null;
+    }
+
+    public static @Nullable Criteria lteCriteria(final @NotBlank String fieldName, final @Nullable Object fieldValue) {
+        hasTextOf(fieldName, "fieldName");
+        if (nonNull(fieldValue)) {
+            return Criteria.where(fieldName).lte(fieldValue);
         }
         return null;
     }
@@ -121,6 +151,10 @@ public abstract class QueryHolder {
         return new Criteria().andOperator(safeArrayToList(criteria).stream().filter(c -> nonNull(c)).collect(toList()));
     }
 
+    public static Criteria orCriteria(Criteria... criteria) {
+        return new Criteria().orOperator(safeArrayToList(criteria).stream().filter(c -> nonNull(c)).collect(toList()));
+    }
+
     public static Sort defaultSort() {
         return sort(Direction.DESC, "updateDate");
     }
@@ -136,5 +170,6 @@ public abstract class QueryHolder {
     }
 
     public static final String DEFAULT_FIELD_ID = "_id";
+    public static final String DEFAULT_FIELD_UPDATE_DATE = "updateDate";
 
 }
