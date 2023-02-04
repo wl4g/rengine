@@ -27,10 +27,10 @@ import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 
 import javax.validation.constraints.NotNull;
 
@@ -39,14 +39,16 @@ import org.apache.shardingsphere.elasticjob.api.ShardingContext;
 import org.apache.shardingsphere.elasticjob.executor.JobFacade;
 
 import com.google.common.collect.Iterables;
+import com.wl4g.infra.common.lang.tuples.Tuple2;
 import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
+import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor.CompleteResult;
 import com.wl4g.rengine.client.core.RengineClient;
 import com.wl4g.rengine.client.core.RengineClient.FailbackInfo;
 import com.wl4g.rengine.common.entity.ScheduleJobLog;
-import com.wl4g.rengine.common.entity.ScheduleJobLog.ClientScheduleJobLog;
-import com.wl4g.rengine.common.entity.ScheduleJobLog.ClientScheduleJobLog.ResultInformation;
+import com.wl4g.rengine.common.entity.ScheduleJobLog.ExecutionScheduleJobLog;
+import com.wl4g.rengine.common.entity.ScheduleJobLog.ResultInformation;
 import com.wl4g.rengine.common.entity.ScheduleTrigger;
-import com.wl4g.rengine.common.entity.ScheduleTrigger.ClientScheduleConfig;
+import com.wl4g.rengine.common.entity.ScheduleTrigger.ExecutionScheduleConfig;
 import com.wl4g.rengine.common.entity.ScheduleTrigger.RunState;
 import com.wl4g.rengine.common.entity.ScheduleTrigger.ScheduleType;
 import com.wl4g.rengine.common.model.ExecuteRequest;
@@ -54,14 +56,13 @@ import com.wl4g.rengine.common.model.ExecuteResult;
 import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.controller.config.RengineControllerProperties.EngineClientSchedulerProperties;
 import com.wl4g.rengine.controller.lifecycle.ElasticJobBootstrapBuilder.JobParameter;
-import com.wl4g.rengine.service.model.SaveScheduleJobLogResult;
 
 import lombok.CustomLog;
 import lombok.Getter;
 import lombok.ToString;
 
 /**
- * {@link EngineClientScheduler}
+ * {@link EngineExecutionScheduler}
  * 
  * @author James Wong
  * @version 2023-01-11
@@ -69,7 +70,7 @@ import lombok.ToString;
  */
 @Getter
 @CustomLog
-public class EngineClientScheduler extends AbstractJobExecutor {
+public class EngineExecutionScheduler extends AbstractJobExecutor {
 
     private SafeScheduledTaskPoolExecutor executor;
 
@@ -78,8 +79,8 @@ public class EngineClientScheduler extends AbstractJobExecutor {
             synchronized (this) {
                 if (isNull(executor)) {
                     final EngineClientSchedulerProperties cr = getConfig().getClient();
-                    this.executor = newDefaultScheduledExecutor(EngineClientScheduler.class.getSimpleName(), cr.getConcurrency(),
-                            cr.getAcceptQueue());
+                    this.executor = newDefaultScheduledExecutor(EngineExecutionScheduler.class.getSimpleName(),
+                            cr.getConcurrency(), cr.getAcceptQueue());
                     log.info("Initialized schedule executor of concurrency: {}, acceptQueue: {}", cr.getConcurrency(),
                             cr.getAcceptQueue());
                 }
@@ -90,9 +91,10 @@ public class EngineClientScheduler extends AbstractJobExecutor {
 
     @Override
     public String getType() {
-        return SchedulerJobType.CLIENT_SCHEDULER.name();
+        return ScheduleJobType.EXECUTION_SCHEDULER.name();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void execute(
             int currentShardingTotalCount,
@@ -107,48 +109,27 @@ public class EngineClientScheduler extends AbstractJobExecutor {
         final ScheduleJobLog jobLog = upsertSchedulingLog(triggerId, null, true, false, null, null);
 
         final ScheduleTrigger trigger = notNullOf(getScheduleTriggerService().get(triggerId), "trigger");
-        final ClientScheduleConfig csc = ((ClientScheduleConfig) notNullOf(trigger.getProperties(), "cronTrigger")).validate();
+        final ExecutionScheduleConfig esc = ((ExecutionScheduleConfig) notNullOf(trigger.getProperties(), "cronTrigger"))
+                .validate();
 
         try {
-            log.info("Execution job for : {}", trigger);
-            final List<ExecuteRequest> shardingRequests = getShardings(currentShardingTotalCount, context, jobParameter, csc);
+            log.info("Execution scheduling for : {}", trigger);
+            final List<ExecuteRequest> shardingRequests = getShardings(currentShardingTotalCount, context, jobParameter, esc);
 
-            // Execution jobs with await all complete.
+            // Build for execution jobs.
             final List<ExecutionWorker> jobs = shardingRequests.stream()
                     .map(request -> new ExecutionWorker(currentShardingTotalCount, context, trigger.getId(), jobLog.getId(),
                             getRengineClient(), request))
                     .collect(toList());
 
-            final var result = getExecutor().submitForComplete(jobs, trigger.getMaxTimeoutMs());
-            log.info("Completed for result: {}", result);
+            // Submit execute requests job wait for completed
+            doExecuteRequestJobs(trigger, jobLog, jobs, resultAndJobLog -> {
+                final Set<ResultInformation> results = (Set<ResultInformation>) resultAndJobLog.getItem1();
+                results.stream().forEach(rd -> rd.validate());
+                final ScheduleJobLog _jobLog = (ScheduleJobLog) resultAndJobLog.getItem2();
+                ((ExecutionScheduleJobLog) _jobLog.getDetail()).setResults(results);
+            });
 
-            final var completed = safeList(result.getCompleted()).stream().collect(toList());
-            final var uncompleted = safeList(result.getUncompleted()).stream().collect(toList());
-
-            final boolean isAllSuccess = safeList(result.getUncompleted()).size() == 0
-                    && completed.stream().filter(rd -> nonNull(rd)).allMatch(er -> er.errorCount() == 0);
-
-            RunState runState = RunState.FAILED;
-            if (isAllSuccess) {
-                runState = RunState.SUCCESS;
-            } else {
-                final boolean partSuccess = completed.stream().filter(rd -> nonNull(rd)).anyMatch(er -> er.errorCount() == 0);
-                runState = partSuccess ? RunState.PART_SUCCESS : RunState.FAILED;
-            }
-
-            final var completedResultInfos = completed.stream()
-                    .filter(er -> nonNull(er))
-                    .map(er -> new ResultInformation(er.getRequestId(), er.getResults()))
-                    .collect(toList());
-
-            final var uncompletedResultInfos = uncompleted.stream()
-                    .map(ew -> new ResultInformation(((ExecutionWorker) ew).getRequest().getRequestId(),
-                            ((ExecutionWorker) ew).getResult().getResults()))
-                    .collect(toList());
-
-            updateTriggerRunState(triggerId, runState);
-            upsertSchedulingLog(triggerId, jobLog.getId(), false, true, runState.isSuccess(),
-                    newHashSet(Iterables.concat(completedResultInfos, uncompletedResultInfos)));
         } catch (Throwable ex) {
             final String errmsg = format(
                     "Failed to executing requests job of currentShardingTotalCount: %s, context: %s, triggerId: %s, jobLogId: %s",
@@ -164,11 +145,61 @@ public class EngineClientScheduler extends AbstractJobExecutor {
         }
     }
 
+    protected ScheduleJobLog doExecuteRequestJobs(
+            final ScheduleTrigger trigger,
+            final ScheduleJobLog jobLog,
+            final List<ExecutionWorker> jobs,
+            final Consumer<Tuple2> saveJobLogPrepared) {
+
+        final CompleteResult<ExecuteResult> result = getExecutor().submitForComplete(jobs, trigger.getMaxTimeoutMs());
+        log.info("Completed for result: {}", result);
+
+        final var completed = safeList(result.getCompleted()).stream().collect(toList());
+        final var uncompleted = safeList(result.getUncompleted()).stream().collect(toList());
+
+        final boolean isAllSuccess = safeList(result.getUncompleted()).size() == 0
+                && completed.stream().filter(rd -> nonNull(rd)).allMatch(er -> er.errorCount() == 0);
+
+        RunState runState = RunState.FAILED;
+        if (isAllSuccess) {
+            runState = RunState.SUCCESS;
+        } else {
+            final boolean partSuccess = completed.stream().filter(rd -> nonNull(rd)).anyMatch(er -> er.errorCount() == 0);
+            runState = partSuccess ? RunState.PART_SUCCESS : RunState.FAILED;
+        }
+
+        final var completedResultInfos = completed.stream()
+                .filter(er -> nonNull(er))
+                .map(er -> new ResultInformation(er.getRequestId(), er.getResults()))
+                .collect(toList());
+
+        final var uncompletedResultInfos = uncompleted.stream()
+                .map(ew -> new ResultInformation(((ExecutionWorker) ew).getRequest().getRequestId(),
+                        ((ExecutionWorker) ew).getResult().getResults()))
+                .collect(toList());
+
+        updateTriggerRunState(trigger.getId(), runState);
+
+        final var mergedResultInfos = newHashSet(Iterables.concat(completedResultInfos, uncompletedResultInfos));
+        log.debug("Merged result informations: {}", mergedResultInfos);
+
+        return upsertSchedulingLog(trigger.getId(), jobLog.getId(), false, true, runState.isSuccess(),
+                _jobLog -> saveJobLogPrepared.accept(new Tuple2(mergedResultInfos, _jobLog)));
+    }
+
+    @Override
+    protected ScheduleJobLog newDefaultScheduleJobLog(final Long triggerId) {
+        return ScheduleJobLog.builder()
+                .triggerId(triggerId)
+                .detail(ExecutionScheduleJobLog.builder().type(ScheduleType.EXECUTION_SCHEDULER.name()).build())
+                .build();
+    }
+
     private List<ExecuteRequest> getShardings(
             final int currentShardingTotalCount,
             final ShardingContext context,
             final JobParameter jobParameter,
-            final ClientScheduleConfig ctc) {
+            final ExecutionScheduleConfig ctc) {
         // Assgin current sharding requests.
         final List<ExecuteRequest> totalRequests = safeList(ctc.getRequests());
         final List<ExecuteRequest> shardingRequests = new ArrayList<>(totalRequests.size());
@@ -194,25 +225,25 @@ public class EngineClientScheduler extends AbstractJobExecutor {
         public ExecutionWorker(int currentShardingTotalCount, ShardingContext context, Long triggerId, Long jobLogId,
                 RengineClient rengineClient, ExecuteRequest request) {
             this.currentShardingTotalCount = currentShardingTotalCount;
-            this.context = context;
-            this.triggerId = triggerId;
-            this.jobLogId = jobLogId;
-            this.rengineClient = rengineClient;
-            this.request = request;
+            this.context = notNullOf(context, "context");
+            this.triggerId = notNullOf(triggerId, "triggerId");
+            this.jobLogId = notNullOf(jobLogId, "jobLogId");
+            this.rengineClient = notNullOf(rengineClient, "rengineClient");
+            this.request = notNullOf(request, "request");
         }
 
         @Override
         public ExecuteResult call() throws Exception {
             try {
                 request.setRequestId(IdGenUtils.next());
-                return (this.result = rengineClient.execute(ExecuteRequest.builder()
+                return (this.result = rengineClient.execute(beforeExecution(ExecuteRequest.builder()
                         .clientId(request.getClientId())
                         .clientSecret(request.getClientId())
                         .scenesCodes(request.getScenesCodes())
                         .bestEffort(request.getBestEffort())
                         .timeout(request.getTimeout())
                         .args(safeMap(request.getArgs()))
-                        .build()));
+                        .build())));
             } catch (Throwable ex) {
                 final String errmsg = format(
                         "Failed to executing request job of currentShardingTotalCount: %s, context: %s, triggerId: %s, jobLogId: %s, request: %s",
@@ -226,52 +257,10 @@ public class EngineClientScheduler extends AbstractJobExecutor {
                 return (this.result = RengineClient.DEFAULT_FAILBACK.apply(new FailbackInfo(request, ex)));
             }
         }
-    }
 
-    private ScheduleJobLog upsertSchedulingLog(
-            final @NotNull Long triggerId,
-            final Long jobLogId,
-            final boolean updateStatupTime,
-            final boolean updateFinishedTime,
-            final Boolean success,
-            final Collection<ResultInformation> results) {
-        notNullOf(triggerId, "triggerId");
-        ScheduleJobLog jogLog = null;
-        SaveScheduleJobLogResult result = null;
-        try {
-            if (nonNull(jobLogId)) {
-                jogLog = getScheduleJobLogService().get(jobLogId);
-            } else {
-                jogLog = ScheduleJobLog.builder()
-                        .triggerId(triggerId)
-                        .detail(ClientScheduleJobLog.builder().type(ScheduleType.CLIENT_SCHEDULER.name()).build())
-                        .build();
-                log.debug("Upserting to scheduling job info : {}", jogLog);
-                result = getScheduleJobLogService().save(jogLog);
-                jogLog.setId(result.getId());
-            }
-            if (updateStatupTime) {
-                jogLog.setStartupTime(new Date());
-            }
-            if (updateFinishedTime) {
-                jogLog.setFinishedTime(new Date());
-            }
-            if (nonNull(success)) {
-                jogLog.setSuccess(success);
-            }
-            if (nonNull(results)) {
-                results.stream().forEach(rd -> rd.validate());
-                ((ClientScheduleJobLog) jogLog.getDetail()).setResults(results);
-            }
-
-            log.debug("Upserting to scheduling job log : {}", jogLog);
-            result = getScheduleJobLogService().save(jogLog);
-            log.debug("Upserted to scheduling job log : {} => {}", jogLog, result);
-
-        } catch (Exception e2) {
-            log.error(format("Failed to upsert scheduling job log to DB. - %s", jogLog), e2);
+        protected ExecuteRequest beforeExecution(final ExecuteRequest request) {
+            return request;
         }
-        return jogLog;
     }
 
 }

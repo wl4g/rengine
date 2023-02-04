@@ -19,12 +19,12 @@ import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_BASE;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_CUSTOM;
-import static com.wl4g.rengine.executor.rest.EngineExecutionResource.PARAM_ARGS;
-import static com.wl4g.rengine.executor.rest.EngineExecutionResource.PARAM_BEST_EFFORT;
-import static com.wl4g.rengine.executor.rest.EngineExecutionResource.PARAM_CLIENT_ID;
-import static com.wl4g.rengine.executor.rest.EngineExecutionResource.PARAM_CLIENT_SECRET;
-import static com.wl4g.rengine.executor.rest.EngineExecutionResource.PARAM_SCENES_CODES;
-import static com.wl4g.rengine.executor.rest.EngineExecutionResource.PARAM_TIMEOUT;
+import static com.wl4g.rengine.executor.rest.EngineExecutionEndpoint.PARAM_ARGS;
+import static com.wl4g.rengine.executor.rest.EngineExecutionEndpoint.PARAM_BEST_EFFORT;
+import static com.wl4g.rengine.executor.rest.EngineExecutionEndpoint.PARAM_CLIENT_ID;
+import static com.wl4g.rengine.executor.rest.EngineExecutionEndpoint.PARAM_CLIENT_SECRET;
+import static com.wl4g.rengine.executor.rest.EngineExecutionEndpoint.PARAM_SCENES_CODES;
+import static com.wl4g.rengine.executor.rest.EngineExecutionEndpoint.PARAM_TIMEOUT;
 import static java.lang.String.format;
 import static java.util.Collections.singletonMap;
 
@@ -37,8 +37,8 @@ import org.junit.Test;
 
 import com.wl4g.infra.common.remoting.uri.UriComponentsBuilder;
 import com.wl4g.rengine.common.model.ExecuteResult.ResultDescription;
-import com.wl4g.rengine.executor.rest.EngineExecutionResource.RequestSettings;
-import com.wl4g.rengine.executor.rest.EngineExecutionResource.ResponseSettings;
+import com.wl4g.rengine.executor.rest.EngineExecutionEndpoint.RequestSettings;
+import com.wl4g.rengine.executor.rest.EngineExecutionEndpoint.ResponseSettings;
 
 /**
  * {@link EngineExecutionResourceTests}

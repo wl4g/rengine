@@ -44,8 +44,6 @@ import com.wl4g.rengine.controller.lifecycle.GlobalControllerJobManager;
 @Configuration
 public class RengineControllerAutoConfiguration {
 
-    // --- Scheduler configurations.
-
     @Bean
     @ConfigurationProperties(prefix = CONF_PREFIX_CONTROLLER)
     public RengineControllerProperties rengineControllerProperties() {
@@ -70,7 +68,7 @@ public class RengineControllerAutoConfiguration {
         return new SnapshotService(registryCenter, config.getDump().getPort());
     }
 
-    // --- Scheduler components.
+    // --- Controller components.
 
     @Bean
     public GlobalControllerJobManager globalControllerJobManager(

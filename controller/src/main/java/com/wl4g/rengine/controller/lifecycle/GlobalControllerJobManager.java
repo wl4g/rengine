@@ -25,6 +25,8 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -47,7 +49,7 @@ import com.wl4g.infra.common.collection.CollectionUtils2;
 import com.wl4g.rengine.common.entity.ScheduleTrigger;
 import com.wl4g.rengine.controller.config.RengineControllerProperties;
 import com.wl4g.rengine.controller.exception.ScheduleException;
-import com.wl4g.rengine.controller.job.AbstractJobExecutor.SchedulerJobType;
+import com.wl4g.rengine.controller.job.AbstractJobExecutor.ScheduleJobType;
 import com.wl4g.rengine.controller.job.GlobalEngineScheduleController;
 import com.wl4g.rengine.controller.lifecycle.ElasticJobBootstrapBuilder.JobParameter;
 
@@ -61,13 +63,13 @@ import lombok.CustomLog;
  * @since v1.0.0
  */
 @CustomLog
-public class GlobalControllerJobManager implements ApplicationRunner {
+public class GlobalControllerJobManager implements ApplicationRunner, Closeable {
 
     final RengineControllerProperties config;
     final List<TracingConfiguration<?>> tracingConfigurations;
     final CoordinatorRegistryCenter regCenter;
     final ScheduleJobBootstrap controllerBootstrap;
-    final Map<Long, JobBootstrap> schedulerBootstrapRegistry;
+    final Map<Long, JobBootstrap> bootstrapRegistry;
     final Map<Long, InterProcessSemaphoreMutex> scheduleMutexLocksRegistry;
 
     public GlobalControllerJobManager(final @NotNull RengineControllerProperties config,
@@ -79,8 +81,12 @@ public class GlobalControllerJobManager implements ApplicationRunner {
         final JobConfiguration jobConfig = config.getController()
                 .toJobConfiguration(GlobalEngineScheduleController.class.getSimpleName());
         this.controllerBootstrap = createJobBootstrap(jobConfig);
-        this.schedulerBootstrapRegistry = new ConcurrentHashMap<>(16);
+        this.bootstrapRegistry = new ConcurrentHashMap<>(16);
         this.scheduleMutexLocksRegistry = new ConcurrentHashMap<>(16);
+    }
+
+    @Override
+    public void close() throws IOException {
     }
 
     @Override
@@ -94,18 +100,18 @@ public class GlobalControllerJobManager implements ApplicationRunner {
     }
 
     public boolean exists(Long triggerId) {
-        return schedulerBootstrapRegistry.containsKey(triggerId);
+        return bootstrapRegistry.containsKey(triggerId);
     }
 
     @SuppressWarnings("unchecked")
     public <T extends JobBootstrap> T get(Long triggerId) {
-        return (T) schedulerBootstrapRegistry.get(triggerId);
+        return (T) bootstrapRegistry.get(triggerId);
     }
 
     @SuppressWarnings("unchecked")
     public <T extends JobBootstrap> T add(
             @NotNull InterProcessSemaphoreMutex lock,
-            @NotNull SchedulerJobType jobType,
+            @NotNull ScheduleJobType jobType,
             @NotBlank String jobName,
             @NotNull ScheduleTrigger trigger,
             @NotNull JobParameter jobParameter) throws Exception {
@@ -118,7 +124,7 @@ public class GlobalControllerJobManager implements ApplicationRunner {
 
         final JobConfiguration jobConfig = newDefaultJobConfig(jobType, jobName, trigger, jobParameter);
         final JobBootstrap bootstrap = createJobBootstrap(jobConfig);
-        final JobBootstrap existing = schedulerBootstrapRegistry.putIfAbsent(trigger.getId(), bootstrap);
+        final JobBootstrap existing = bootstrapRegistry.putIfAbsent(trigger.getId(), bootstrap);
         if (nonNull(existing)) {
             throw new ScheduleException(format("Already trigger '%s' scheduling for : %s", trigger.getId(), existing));
         }
@@ -127,7 +133,7 @@ public class GlobalControllerJobManager implements ApplicationRunner {
 
     public GlobalControllerJobManager remove(Long... triggerIds) {
         final List<Long> _triggerIds = safeToList(Long.class, triggerIds);
-        final var it = safeMap(schedulerBootstrapRegistry).entrySet().iterator();
+        final var it = safeMap(bootstrapRegistry).entrySet().iterator();
         while (it.hasNext()) {
             Entry<Long, JobBootstrap> entry = it.next();
             if (_triggerIds.contains(entry.getKey())) {
@@ -141,7 +147,7 @@ public class GlobalControllerJobManager implements ApplicationRunner {
     public List<Long> start(Long... triggerIds) {
         log.info("Schedule job bootstrap starting ...");
         final List<Long> _triggerIds = safeToList(Long.class, triggerIds);
-        return safeMap(schedulerBootstrapRegistry).entrySet()
+        return safeMap(bootstrapRegistry).entrySet()
                 .stream()
                 .filter(e -> _triggerIds.isEmpty() || (!_triggerIds.isEmpty() && _triggerIds.contains(e.getKey())))
                 .map(e -> {
@@ -166,7 +172,7 @@ public class GlobalControllerJobManager implements ApplicationRunner {
     public List<Long> shutdown(Long... triggerIds) {
         log.info("Schedule job bootstrap shutdown ...");
         final List<Long> _triggerIds = safeToList(Long.class, triggerIds);
-        return safeMap(schedulerBootstrapRegistry).entrySet()
+        return safeMap(bootstrapRegistry).entrySet()
                 .stream()
                 .filter(e -> _triggerIds.isEmpty() || (!_triggerIds.isEmpty() && _triggerIds.contains(e.getKey())))
                 .map(e -> {
@@ -191,7 +197,7 @@ public class GlobalControllerJobManager implements ApplicationRunner {
                 if (isNull(mutex)) {
                     // Build path for bind trigger.
                     // see:https://curator.apache.org/curator-recipes/shared-lock.html
-                    final String path = format("%s/%s", PATH_MUTEX_SCHEDULE_TRIGGERS, notNullOf(triggerId, "triggerId"));
+                    final String path = format("%s/%s", PATH_MUTEX_TRIGGERS, notNullOf(triggerId, "triggerId"));
                     scheduleMutexLocksRegistry.put(triggerId,
                             (mutex = new InterProcessSemaphoreMutex(((ZookeeperRegistryCenter) regCenter).getClient(), path)));
                 }
@@ -216,6 +222,6 @@ public class GlobalControllerJobManager implements ApplicationRunner {
         }
     }
 
-    public static final String PATH_MUTEX_SCHEDULE_TRIGGERS = "/mutex-schedule-triggers";
+    public static final String PATH_MUTEX_TRIGGERS = "/mutex-triggers";
 
 }

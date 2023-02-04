@@ -43,8 +43,9 @@ import org.apache.shardingsphere.elasticjob.tracing.api.TracingConfiguration;
 import com.google.common.base.Preconditions;
 import com.wl4g.infra.common.lang.tuples.Tuple2;
 import com.wl4g.rengine.common.entity.ScheduleTrigger;
+import com.wl4g.rengine.common.entity.ScheduleTrigger.ExecutionScheduleConfig;
 import com.wl4g.rengine.controller.config.RengineControllerProperties;
-import com.wl4g.rengine.controller.job.AbstractJobExecutor.SchedulerJobType;
+import com.wl4g.rengine.controller.job.AbstractJobExecutor.ScheduleJobType;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -136,22 +137,27 @@ public class ElasticJobBootstrapBuilder {
     }
 
     public static JobConfiguration newDefaultJobConfig(
-            @NotNull SchedulerJobType jobType,
+            @NotNull ScheduleJobType jobType,
             @NotBlank String jobName,
             @NotNull ScheduleTrigger trigger,
             @NotNull JobParameter jobParameter) {
         hasTextOf(jobName, "jobName");
         notNullOf(trigger, "trigger");
         notNullOf(jobParameter, "jobParameter");
+
+        String cron = null; // OneOffJobBootstrap
+        if (trigger.getProperties() instanceof ExecutionScheduleConfig) { // ScheduleJobBootstrap
+            cron = ((ExecutionScheduleConfig) trigger.getProperties()).getCron();
+        }
         return JobConfiguration.builder()
                 .jobType(jobType)
                 .jobName(jobName)
+                .cron(cron)
                 .disabled(DEFAULT_DISABLED)
                 .overwrite(DEFAULT_OVERWRITE)
                 .monitorExecution(trigger.getMonitorExecution())
                 .failover(trigger.getFailover())
                 .misfire(trigger.getMisfire())
-                .cron(trigger.getCron())
                 .timeZone(trigger.getTimeZone())
                 // When setup true, the shardingTotalCount will be ignored,
                 // and the will be automatically allocated according to the
@@ -166,7 +172,7 @@ public class ElasticJobBootstrapBuilder {
                 .jobExecutorServiceHandlerType(DEFAULT_JOB_EXECUTOR_SERVICE_HANDLER_TYPE)
                 .jobErrorHandlerType(DEFAULT_JOB_ERROR_HANDLER_TYPE)
                 .jobListenerTypes(DEFAULT_JOB_LISTENER_TYPES)
-                .description(format(isBlank(trigger.getCron()) ? "One off job for %s" : "Cron schedule job for %s", jobName))
+                .description(format(isBlank(cron) ? "One off job for %s" : "Cron schedule job for %s", jobName))
                 .build();
     }
 

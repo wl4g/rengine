@@ -106,7 +106,12 @@
             <groupId>org.apache.shardingsphere.elasticjob</groupId>
             <artifactId>elasticjob-lite-core</artifactId>
         </dependency>
-        <!-- Devel -->
+        <!-- KAFKA -->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+        <!-- DEVEL -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
@@ -370,35 +375,5 @@
                 </dependency>
             </dependencies>
         </profile>
-        <!--        <profile>-->
-        <!--            <id>with:eventbus-kafka</id>-->
-        <!--            <activation>-->
-        <!--                <activeByDefault>true</activeByDefault>-->
-        <!--            </activation>-->
-        <!--            <dependencies>-->
-        <!--                <dependency>-->
-        <!--                    <groupId>com.wl4g</groupId>-->
-        <!--                    <artifactId>rengine-eventbus-kafka</artifactId>-->
-        <!--                </dependency>-->
-        <!--            </dependencies>-->
-        <!--        </profile>-->
-        <!--        <profile>-->
-        <!--            <id>with:eventbus-pulsar</id>-->
-        <!--            <dependencies>-->
-        <!--                <dependency>-->
-        <!--                    <groupId>com.wl4g</groupId>-->
-        <!--                    <artifactId>rengine-eventbus-pulsar</artifactId>-->
-        <!--                </dependency>-->
-        <!--            </dependencies>-->
-        <!--        </profile>-->
-        <!--        <profile>-->
-        <!--            <id>with:eventbus-rabbitmq</id>-->
-        <!--            <dependencies>-->
-        <!--                <dependency>-->
-        <!--                    <groupId>com.wl4g</groupId>-->
-        <!--                    <artifactId>rengine-eventbus-rabbitmq</artifactId>-->
-        <!--                </dependency>-->
-        <!--            </dependencies>-->
-        <!--        </profile>-->
     </profiles>
 </project>

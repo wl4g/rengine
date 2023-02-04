@@ -22,7 +22,9 @@ import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
+import java.util.Date;
 import java.util.List;
+import java.util.function.Consumer;
 
 import javax.validation.constraints.NotNull;
 
@@ -36,13 +38,16 @@ import org.apache.shardingsphere.elasticjob.reg.base.CoordinatorRegistryCenter;
 
 import com.wl4g.infra.context.utils.SpringContextHolder;
 import com.wl4g.rengine.client.core.RengineClient;
+import com.wl4g.rengine.common.entity.ScheduleJobLog;
 import com.wl4g.rengine.common.entity.ScheduleTrigger;
 import com.wl4g.rengine.common.entity.ScheduleTrigger.RunState;
+import com.wl4g.rengine.common.entity.ScheduleTrigger.ScheduleType;
 import com.wl4g.rengine.controller.config.RengineControllerProperties;
 import com.wl4g.rengine.controller.lifecycle.GlobalControllerJobManager;
 import com.wl4g.rengine.service.ScheduleJobLogService;
 import com.wl4g.rengine.service.ScheduleTriggerService;
 import com.wl4g.rengine.service.meter.RengineMeterService;
+import com.wl4g.rengine.service.model.SaveScheduleJobLogResult;
 import com.wl4g.rengine.service.model.SaveScheduleTriggerResult;
 
 import lombok.AllArgsConstructor;
@@ -228,11 +233,83 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor {
         return trigger;
     }
 
+    protected ScheduleJobLog upsertSchedulingLog(
+            final @NotNull Long triggerId,
+            final Long jobLogId,
+            final boolean updateStatupTime,
+            final boolean updateFinishedTime,
+            final Boolean success,
+            final Consumer<ScheduleJobLog> saveJobLogPrepared) {
+        notNullOf(triggerId, "triggerId");
+        ScheduleJobLog jogLog = null;
+        SaveScheduleJobLogResult result = null;
+        try {
+            if (nonNull(jobLogId)) {
+                jogLog = getScheduleJobLogService().get(jobLogId);
+            } else {
+                jogLog = newDefaultScheduleJobLog(triggerId);
+                log.debug("Upserting to scheduling job info : {}", jogLog);
+                result = getScheduleJobLogService().save(jogLog);
+                jogLog.setId(result.getId());
+            }
+            if (updateStatupTime) {
+                jogLog.setStartupTime(new Date());
+            }
+            if (updateFinishedTime) {
+                jogLog.setFinishedTime(new Date());
+            }
+            if (nonNull(success)) {
+                jogLog.setSuccess(success);
+            }
+            if (nonNull(saveJobLogPrepared)) {
+                saveJobLogPrepared.accept(jogLog);
+            }
+
+            log.debug("Upserting to scheduling job log : {}", jogLog);
+            result = getScheduleJobLogService().save(jogLog);
+            log.debug("Upserted to scheduling job log : {} => {}", jogLog, result);
+
+        } catch (Exception e2) {
+            log.error(format("Failed to upsert scheduling job log to DB. - %s", jogLog), e2);
+        }
+        return jogLog;
+    }
+
+    protected ScheduleJobLog newDefaultScheduleJobLog(final Long triggerId) {
+        throw new UnsupportedOperationException();
+    }
+
     @Getter
     @ToString
     @AllArgsConstructor
-    public static enum SchedulerJobType {
-        GLOBAL_CONTROLLER, CLIENT_SCHEDULER, FLINK_SCHEDULER;
+    public static enum ScheduleJobType {
+        GLOBAL_ENGINE_CONTROLLER(null),
+
+        EXECUTION_SCHEDULER(ScheduleType.EXECUTION_SCHEDULER),
+
+        KAFKA_SUBSCRIBE_SCHEDULER(ScheduleType.KAFKA_SUBSCRIBE_SCHEDULER),
+
+        FLINK_SUBMIT_SCHEDULER(ScheduleType.FLINK_SUBMIT_SCHEDULER);
+
+        private final ScheduleType scheduleType;
+
+        public static ScheduleJobType get(ScheduleType scheduleType) {
+            final ScheduleJobType type = safeGet(scheduleType);
+            if (isNull(type)) {
+                throw new IllegalStateException(format("Unsupported schedule type of %s", scheduleType));
+            }
+            return type;
+        }
+
+        public static ScheduleJobType safeGet(ScheduleType scheduleType) {
+            for (ScheduleJobType t : values()) {
+                if (t.getScheduleType() == scheduleType) {
+                    return t;
+                }
+            }
+            return null;
+        }
+
     }
 
 }

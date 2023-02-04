@@ -22,12 +22,15 @@ import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseMapObject;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
+import static java.util.Objects.nonNull;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.equalsAnyIgnoreCase;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 
 import javax.validation.constraints.Min;
@@ -302,7 +305,10 @@ public class DataSourceProperties extends BaseBean {
     }
 
     /**
-     * {@link org.apache.kafka.clients.producer.ProducerConfig#CONFIG}
+     * Here is the properties configuration of kafka producer see
+     * {@link org.apache.kafka.clients.producer.ProducerConfig#CONFIG}, and the
+     * properties configuration of kafka consumer see
+     * {@link com.wl4g.rengine.common.entity.ScheduleTrigger.KafkaSubscribeScheduleConfig}
      */
     @Getter
     @Setter
@@ -311,6 +317,8 @@ public class DataSourceProperties extends BaseBean {
     @NoArgsConstructor
     public static class KafkaDataSourceProperties extends DataSourcePropertiesBase {
         static final long serialVersionUID = -3103084992456055117L;
+
+        // Common config options.
 
         @JsonProperty("key.serializer")
         @NotBlank
@@ -327,15 +335,136 @@ public class DataSourceProperties extends BaseBean {
         @Default
         String bootstrapServers = "localhost:9092";
 
-        @JsonProperty("buffer.memory")
+        /**
+         * @see {@link org.apache.kafka.clients.ClientDnsLookup}
+         */
+        @JsonProperty("client.dns.lookup")
+        @NotBlank
+        String clientDnsLookup;
+
+        @JsonProperty("metadata.max.age.ms")
+        @NotNull
+        @Default
+        @Min(0)
+        Long metadataMaxAgeMs = 5 * 60 * 1000L;
+
+        @JsonProperty("send.buffer.bytes")
+        @NotNull
+        @Default
+        @Min(-1)
+        Integer sendBufferBytes = 128 * 1024;
+
+        @JsonProperty("receive.buffer.bytes")
+        @NotNull
+        @Default
+        @Min(-1)
+        Integer receiveBufferBytes = 64 * 1024;
+
+        @JsonProperty("client.id")
+        String clientId;
+
+        @JsonProperty("client.rack")
+        @Default
+        String clientRack = "";
+
+        @JsonProperty("reconnect.backoff.ms")
+        @NotBlank
+        @Default
+        @Min(0)
+        Long reconnectBackoffMs = 50L;
+
+        @JsonProperty("reconnect.backoff.max.ms")
         @Min(0)
         @Default
-        Long bufferMemory = 32 * 1024 * 1024L;
+        Long reconnectBackoffMaxMs = 1000L;
 
         @JsonProperty("retries")
         @Min(0)
         @Default
         Integer retries = Integer.MAX_VALUE;
+
+        @JsonProperty("retry.backoff.ms")
+        @Min(0)
+        @Default
+        Long retryBackoffMs = 100L;
+
+        @JsonProperty("metrics.sample.window.ms")
+        @Min(0)
+        @Default
+        Long metricsSampleWindowMs = 3000L;
+
+        @JsonProperty("metrics.num.samples")
+        @Min(1)
+        @Default
+        Integer metricsNumSamples = 2;
+
+        @JsonProperty("metrics.recording.level")
+        @Default
+        String metricsRecordingLevel = "INFO";
+
+        @JsonProperty("metric.reporters")
+        @Default
+        List<String> metricsReporters = emptyList();
+
+        @JsonProperty("security.protocol")
+        @Default
+        String securityProtocol = "PLAINTEXT";
+
+        @JsonProperty("socket.connection.setup.timeout.ms")
+        @Min(0)
+        @Default
+        Long socketConnectionSetupTimeoutMs = 10 * 1000L;
+
+        @JsonProperty("socket.connection.setup.timeout.max.ms")
+        @Min(0)
+        @Default
+        Long socketConnectionSetupTimeoutMaxMs = 30 * 1000L;
+
+        @JsonProperty("connections.max.idle.ms")
+        @Default
+        Long connectionsMaxIdleMs = 9 * 60 * 1000L;
+
+        @JsonProperty("request.timeout.ms")
+        @Min(0)
+        @Default
+        Integer requestTimeoutMs = 30 * 1000;
+
+        @JsonProperty("group.id")
+        @Default
+        String groupId = "default-rengine-controller";
+
+        @JsonProperty("group.instance.id")
+        String groupInstanceId;
+
+        @JsonProperty("max.poll.interval.ms")
+        @Default
+        @Min(1)
+        Integer maxPollIntervalMs = 300000;
+
+        @JsonProperty("rebalance.timeout.ms")
+        Integer rebalanceTimeoutMs;
+
+        @JsonProperty("session.timeout.ms")
+        @Default
+        Integer sessionTimeoutMs = 45000;
+
+        @JsonProperty("heartbeat.interval.ms")
+        @Default
+        Integer heartbeatIntervalMs = 3000;
+
+        @JsonProperty("default.api.timeout.ms")
+        @NotNull
+        @Min(0)
+        @Default
+        Integer defaultApiTimeoutMs = 60 * 1000;
+
+        // Producer config options.
+
+        @JsonProperty("buffer.memory")
+        @NotNull
+        @Min(0)
+        @Default
+        Long bufferMemory = 32 * 1024 * 1024L;
 
         @JsonProperty("acks")
         @NotBlank
@@ -377,53 +506,20 @@ public class DataSourceProperties extends BaseBean {
         @Default
         Integer maxRequestSize = 1024 * 1024;
 
-        @JsonProperty("reconnect.backoff.ms")
-        @Min(0)
-        @Default
-        Long reconnectBackoffMs = 50L;
-
-        @JsonProperty("reconnect.backoff.max.ms")
-        @Min(0)
-        @Default
-        Long reconnectBackoffMaxMs = 1000L;
-
-        @JsonProperty("retry.backoff.ms")
-        @Min(0)
-        @Default
-        Long retryBackoffMs = 100L;
-
         @JsonProperty("max.block.ms")
         @Min(0)
         @Default
         Long maxBlockMs = 60 * 1000L;
-
-        @JsonProperty("request.timeout.ms")
-        @Min(0)
-        @Default
-        Integer requestTimeoutMs = 30 * 1000;
 
         @JsonProperty("metadata.max.idle.ms")
         @Min(5000)
         @Default
         Long metadataMaxAge = 5 * 60 * 1000L;
 
-        @JsonProperty("metrics.sample.window.ms")
-        @Min(0)
-        @Default
-        Long metricsSampleWindowMs = 3000L;
-
-        @JsonProperty("metrics.recording.level")
-        @Default
-        String metricsRecordingLevel = "INFO";
-
         @JsonProperty("max.in.flight.requests.per.connection")
         @Min(1)
         @Default
         Integer maxInFlightRequestsPerConnection = 5;
-
-        @JsonProperty("connections.max.idle.ms")
-        @Default
-        Long connectionsMaxIdleMs = 9 * 60 * 1000L;
 
         @JsonProperty("transaction.timeout.ms")
         @Min(0)
@@ -435,12 +531,52 @@ public class DataSourceProperties extends BaseBean {
         }
 
         @Override
-        public DataSourcePropertiesBase validate() {
+        public KafkaDataSourceProperties validate() {
+            // Common config options.
+            hasTextOf(keySerializer, "keySerializer");
+            hasTextOf(valueSerializer, "valueSerializer");
             hasTextOf(bootstrapServers, "bootstrapServers");
-            isTrueOf(bufferMemory > 0, "bufferMemory>0");
-            isTrueOf(retries > 0, "retries>0");
+            hasTextOf(clientDnsLookup, "clientDnsLookup");
+            isTrueOf(nonNull(metadataMaxAgeMs) && metadataMaxAgeMs >= 0, "metadataMaxAgeMs >= 0");
+            isTrueOf(nonNull(sendBufferBytes) && sendBufferBytes >= -1, "sendBufferBytes >= -1");
+            isTrueOf(nonNull(receiveBufferBytes) && receiveBufferBytes >= -1, "receiveBufferBytes >= -1");
+            isTrueOf(nonNull(reconnectBackoffMs) && reconnectBackoffMs >= 0, "reconnectBackoffMs >= 0");
+            isTrueOf(nonNull(reconnectBackoffMaxMs) && reconnectBackoffMaxMs >= 0, "reconnectBackoffMaxMs >= 0");
+            isTrueOf(nonNull(retries) && retries >= 0, "retries >= 0");
+            isTrueOf(nonNull(retryBackoffMs) && retryBackoffMs >= 0, "retryBackoffMs >= 0");
+            isTrueOf(nonNull(metricsSampleWindowMs) && metricsSampleWindowMs >= 0, "metricsSampleWindowMs >= 0");
+            isTrueOf(nonNull(metricsNumSamples) && metricsNumSamples >= 1, "retryBackoffMs >= 1");
+            hasTextOf(metricsRecordingLevel, "metricsRecordingLevel");
+            hasTextOf(securityProtocol, "securityProtocol");
+            isTrueOf(nonNull(socketConnectionSetupTimeoutMs) && socketConnectionSetupTimeoutMs >= 0,
+                    "socketConnectionSetupTimeoutMs >= 0");
+            isTrueOf(nonNull(socketConnectionSetupTimeoutMaxMs) && socketConnectionSetupTimeoutMaxMs >= 0,
+                    "socketConnectionSetupTimeoutMaxMs >= 0");
+            isTrueOf(nonNull(connectionsMaxIdleMs) && connectionsMaxIdleMs >= 0, "connectionsMaxIdleMs >= 0");
+            isTrueOf(nonNull(requestTimeoutMs) && requestTimeoutMs >= 0, "requestTimeoutMs >= 0");
+            hasTextOf(groupId, "groupId");
+            isTrueOf(nonNull(maxPollIntervalMs) && maxPollIntervalMs >= 1, "maxPollIntervalMs >= 1");
+            // isTrueOf(nonNull(rebalanceTimeoutMs) && rebalanceTimeoutMs >= 1,
+            // "rebalanceTimeoutMs >= 1");
+            // isTrueOf(nonNull(sessionTimeoutMs) && sessionTimeoutMs >= 1,
+            // "sessionTimeoutMs >= 1");
+            // isTrueOf(nonNull(heartbeatIntervalMs) && heartbeatIntervalMs >=
+            // 1, "heartbeatIntervalMs >= 1");
+            // Producer config options.
+            isTrueOf(nonNull(bufferMemory) && bufferMemory >= 0, "bufferMemory >= 0");
             isTrueOf(equalsAnyIgnoreCase(acks, "all", "1", "0", "-1"), "acks must in (all, 1, 0, -1)");
-            // TODO
+            hasTextOf(compressionType, "compressionType");
+            isTrueOf(nonNull(batchSize) && batchSize >= 0, "batchSize >= 0");
+            isTrueOf(nonNull(lingerMs) && lingerMs >= 0, "lingerMs >= 0");
+            isTrueOf(nonNull(deliveryTimeoutMs) && deliveryTimeoutMs >= 0, "deliveryTimeoutMs >= 0");
+            isTrueOf(nonNull(sendBuffer) && sendBuffer >= -1, "sendBuffer >= -1");
+            isTrueOf(nonNull(receiveBuffer) && receiveBuffer >= -1, "receiveBuffer >= -1");
+            isTrueOf(nonNull(maxRequestSize) && maxRequestSize >= 0, "maxRequestSize >= 0");
+            isTrueOf(nonNull(maxBlockMs) && maxBlockMs >= 0, "maxBlockMs >= 0");
+            isTrueOf(nonNull(metadataMaxAge) && metadataMaxAge >= 5000, "metadataMaxAge >= 5000");
+            isTrueOf(nonNull(maxInFlightRequestsPerConnection) && maxInFlightRequestsPerConnection >= 1,
+                    "maxInFlightRequestsPerConnection >= 1");
+            isTrueOf(nonNull(transactionTimeout) && transactionTimeout >= 0, "transactionTimeout >= 0");
             return this;
         }
     }

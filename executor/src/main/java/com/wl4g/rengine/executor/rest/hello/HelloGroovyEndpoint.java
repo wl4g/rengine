@@ -47,7 +47,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link HelloGroovyResource}
+ * {@link HelloGroovyEndpoint}
  * 
  * @author James Wong
  * @version 2022-09-18
@@ -62,7 +62,7 @@ import lombok.extern.slf4j.Slf4j;
 // 注1: 当编译为native运行时, 必须显示指定单例, 否则方法体中使用成员属性会空指针. (但使用JVM运行时却不会?)
 @Singleton
 @VisibleForTesting
-public class HelloGroovyResource {
+public class HelloGroovyEndpoint {
 
     @NotNull
     GroovyClassLoader gcl;

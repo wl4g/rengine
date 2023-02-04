@@ -31,7 +31,7 @@ import lombok.CustomLog;
 import lombok.Getter;
 
 /**
- * {@link EngineFlinkScheduler}
+ * {@link EngineFlinkSubmitScheduler}
  * 
  * @author James Wong
  * @version 2023-01-11
@@ -39,7 +39,7 @@ import lombok.Getter;
  */
 @Getter
 @CustomLog
-public class EngineFlinkScheduler extends AbstractJobExecutor {
+public class EngineFlinkSubmitScheduler extends AbstractJobExecutor {
 
     private SafeScheduledTaskPoolExecutor executor;
 
@@ -48,7 +48,7 @@ public class EngineFlinkScheduler extends AbstractJobExecutor {
             synchronized (this) {
                 if (isNull(executor)) {
                     final EngineFlinkSchedulerProperties fr = getConfig().getFlink();
-                    this.executor = newDefaultScheduledExecutor(EngineFlinkScheduler.class.getSimpleName(), fr.getConcurrency(),
+                    this.executor = newDefaultScheduledExecutor(EngineFlinkSubmitScheduler.class.getSimpleName(), fr.getConcurrency(),
                             fr.getAcceptQueue());
                     log.info("Initialized schedule executor of concurrency: {}, acceptQueue: {}", fr.getConcurrency(),
                             fr.getAcceptQueue());
@@ -60,7 +60,7 @@ public class EngineFlinkScheduler extends AbstractJobExecutor {
 
     @Override
     public String getType() {
-        return SchedulerJobType.FLINK_SCHEDULER.name();
+        return ScheduleJobType.FLINK_SUBMIT_SCHEDULER.name();
     }
 
     @Override

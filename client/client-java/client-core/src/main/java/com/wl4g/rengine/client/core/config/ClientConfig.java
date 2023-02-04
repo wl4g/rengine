@@ -32,7 +32,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link ClientScheduleConfig}
+ * {@link ExecutionScheduleConfig}
  * 
  * @author James Wong
  * @version 2022-10-17

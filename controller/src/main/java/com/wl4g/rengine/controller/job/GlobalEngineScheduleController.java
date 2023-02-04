@@ -17,8 +17,7 @@ package com.wl4g.rengine.controller.job;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static com.wl4g.rengine.controller.job.AbstractJobExecutor.SchedulerJobType.CLIENT_SCHEDULER;
-import static com.wl4g.rengine.controller.job.AbstractJobExecutor.SchedulerJobType.GLOBAL_CONTROLLER;
+import static com.wl4g.rengine.controller.job.AbstractJobExecutor.ScheduleJobType.GLOBAL_ENGINE_CONTROLLER;
 import static com.wl4g.rengine.service.meter.RengineMeterService.DEFAULT_PERCENTILES;
 import static com.wl4g.rengine.service.meter.RengineMeterService.MetricsName.global_schedule_controller;
 import static com.wl4g.rengine.service.meter.RengineMeterService.MetricsName.global_schedule_controller_failure;
@@ -49,6 +48,7 @@ import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperRegistryCente
 import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.rengine.common.entity.ScheduleTrigger;
 import com.wl4g.rengine.common.entity.ScheduleTrigger.RunState;
+import com.wl4g.rengine.common.entity.ScheduleTrigger.ScheduleType;
 import com.wl4g.rengine.controller.config.RengineControllerProperties;
 import com.wl4g.rengine.controller.lifecycle.ElasticJobBootstrapBuilder.JobParameter;
 import com.wl4g.rengine.service.ScheduleJobLogService;
@@ -74,7 +74,7 @@ public class GlobalEngineScheduleController extends AbstractJobExecutor {
 
     @Override
     public String getType() {
-        return GLOBAL_CONTROLLER.name();
+        return GLOBAL_ENGINE_CONTROLLER.name();
     }
 
     @Override
@@ -93,8 +93,8 @@ public class GlobalEngineScheduleController extends AbstractJobExecutor {
                 .increment();
 
         final List<ScheduleTrigger> shardingTriggers = getScheduleTriggerService().findWithSharding(QueryScheduleTrigger.builder()
-                // .type(ScheduleType.CLIENT_SCHEDULER.name())
                 // .enable(true)
+                // .type(ScheduleType.EXECUTION_SCHEDULER.name())
                 .build(), currentShardingTotalCount, context.getShardingItem());
         log.info("Loaded the sharding triggers : {}", shardingTriggers);
 
@@ -118,17 +118,20 @@ public class GlobalEngineScheduleController extends AbstractJobExecutor {
                             // to shtudown the scheduling job.
                             if (trigger.getEnable() == BaseBean.DISABLED) {
                                 log.info("Disabling trigger scheduling for : {}", trigger.getId());
-                                getGlobalScheduleJobManager().shutdown(trigger.getId());
-                                getGlobalScheduleJobManager().remove(trigger.getId());
-                                // When the trigger is disabled(cancelled), the
-                                // mutex
-                                // should be released, to allow binding
-                                // (scheduling) by
-                                // other nodes after trigger re-enabling.
-                                try {
-                                    mutexLock.release(); // [#MARK1]
-                                } catch (IllegalStateException e) {
-                                    // Ignore
+                                if (getGlobalScheduleJobManager().exists(trigger.getId())) {
+                                    getGlobalScheduleJobManager().shutdown(trigger.getId());
+                                    getGlobalScheduleJobManager().remove(trigger.getId());
+                                    // When the trigger is disabled(cancelled),
+                                    // the
+                                    // mutex should be released, to allow
+                                    // binding
+                                    // (scheduling) by other nodes after trigger
+                                    // re-enabling.
+                                    try {
+                                        mutexLock.release(); // [#MARK1]
+                                    } catch (IllegalStateException e) {
+                                        // Ignore
+                                    }
                                 }
                                 return;
                             }
@@ -153,8 +156,9 @@ public class GlobalEngineScheduleController extends AbstractJobExecutor {
                                 updateTriggerRunState(trigger.getId(), RunState.PREPARED);
 
                                 log.info("Scheduling trigger for {} : {}", jobName, trigger);
-                                final JobBootstrap bootstrap = getGlobalScheduleJobManager().add(mutexLock, CLIENT_SCHEDULER,
-                                        jobName, trigger, new JobParameter(trigger.getId()));
+                                final JobBootstrap bootstrap = getGlobalScheduleJobManager().add(mutexLock,
+                                        ScheduleJobType.get(ScheduleType.valueOf(trigger.getProperties().getType())), jobName,
+                                        trigger, new JobParameter(trigger.getId()));
 
                                 if (bootstrap instanceof ScheduleJobBootstrap) {
                                     ((ScheduleJobBootstrap) bootstrap).schedule();
@@ -195,7 +199,7 @@ public class GlobalEngineScheduleController extends AbstractJobExecutor {
     }
 
     public static String buildJobName(final ScheduleTrigger trigger) {
-        return EngineClientScheduler.class.getSimpleName() + "-" + trigger.getId();
+        return EngineExecutionScheduler.class.getSimpleName() + "-" + trigger.getId();
     }
 
     @CustomLog

@@ -32,8 +32,8 @@ import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.infra.common.validation.EnumValue;
-import com.wl4g.rengine.common.entity.ScheduleTrigger.ClientScheduleConfig;
-import com.wl4g.rengine.common.entity.ScheduleTrigger.FlinkScheduleConfig;
+import com.wl4g.rengine.common.entity.ScheduleTrigger.ExecutionScheduleConfig;
+import com.wl4g.rengine.common.entity.ScheduleTrigger.FlinkSubmitScheduleConfig;
 import com.wl4g.rengine.common.entity.ScheduleTrigger.ScheduleType;
 import com.wl4g.rengine.common.model.ExecuteResult.ResultDescription;
 
@@ -73,10 +73,10 @@ public class ScheduleJobLog extends BaseBean {
     @NotNull
     JogLogDetailBase<?> detail;
 
-    @Schema(oneOf = { ClientScheduleConfig.class, FlinkScheduleConfig.class }, discriminatorProperty = "type")
+    @Schema(oneOf = { ExecutionScheduleConfig.class, FlinkSubmitScheduleConfig.class }, discriminatorProperty = "type")
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", visible = true)
-    @JsonSubTypes({ @Type(value = ClientScheduleConfig.class, name = "CLIENT_SCHEDULER"),
-            @Type(value = FlinkScheduleConfig.class, name = "FLINK_SCHEDULER") })
+    @JsonSubTypes({ @Type(value = ExecutionScheduleConfig.class, name = "CLIENT_SCHEDULER"),
+            @Type(value = FlinkSubmitScheduleConfig.class, name = "FLINK_SCHEDULER") })
     @Getter
     @Setter
     @SuperBuilder
@@ -95,23 +95,33 @@ public class ScheduleJobLog extends BaseBean {
     @ToString
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ClientScheduleJobLog extends JogLogDetailBase<ClientScheduleJobLog> {
+    public static class ExecutionScheduleJobLog extends JogLogDetailBase<ExecutionScheduleJobLog> {
         private Collection<ResultInformation> results;
+    }
 
-        @Getter
-        @Setter
-        @ToString
-        @NoArgsConstructor
-        @AllArgsConstructor
-        public static class ResultInformation {
-            private @NotBlank String requestId;
-            private @NotNull List<ResultDescription> results;
+    @Getter
+    @Setter
+    @SuperBuilder
+    @ToString
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class KafkaSubscribeScheduleJobLog extends JogLogDetailBase<KafkaSubscribeScheduleJobLog> {
+        private ResultInformation result;
+    }
 
-            public ResultInformation validate() {
-                hasTextOf(requestId, "requestId");
-                notEmptyOf(results, "results");
-                return this;
-            }
+    @Getter
+    @Setter
+    @ToString
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ResultInformation {
+        private @NotBlank String requestId;
+        private @NotNull List<ResultDescription> results;
+
+        public ResultInformation validate() {
+            hasTextOf(requestId, "requestId");
+            notEmptyOf(results, "results");
+            return this;
         }
     }
 

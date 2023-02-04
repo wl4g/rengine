@@ -85,7 +85,7 @@ curl -v localhost:28002/healthz/started
 curl -v localhost:28002/metrics
 ```
 
-- Testing for API execute. [EngineExecutionResource.java](../../executor/src/main/java/com/wl4g/rengine/executor/rest/EngineExecutionResource.java)
+- Testing for API execute. [EngineExecutionEndpoint.java](../../executor/src/main/java/com/wl4g/rengine/executor/rest/EngineExecutionEndpoint.java)
 
 ```bash
 curl -v -XPOST \
@@ -147,7 +147,7 @@ clientId=JVqEpEwIaqkEkeD5\
 
 ### Mock testing dynamic `groovy` script execution?
 
-- Source codes see: [HelloGroovyResource.java](../../executor/src/main/java/com/wl4g/rengine/executor/rest/hello/HelloGroovyResource.java)
+- Source codes see: [HelloGroovyEndpoint.java](../../executor/src/main/java/com/wl4g/rengine/executor/rest/hello/HelloGroovyEndpoint.java)
 
 - Generate testing script to local path.
 
@@ -178,7 +178,7 @@ tail -f /tmp/rengine/executor.log | jq -r '.message'
 
 ### Mock testing dynamic `js` script execution?
 
-- Source codes see: [HelloGraalJSResource.java](../../executor/src/main/java/com/wl4g/rengine/executor/rest/hello/HelloGraalJSResource.java)
+- Source codes see: [HelloGraalJSEndpoint.java](../../executor/src/main/java/com/wl4g/rengine/executor/rest/hello/HelloGraalJSEndpoint.java)
 
 - Generate testing script to local path.
 

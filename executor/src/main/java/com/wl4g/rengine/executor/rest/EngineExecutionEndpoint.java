@@ -30,8 +30,8 @@ import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EX
 import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_INTERNAL;
 import static com.wl4g.rengine.common.model.ExecuteRequest.DEFAULT_BESTEFFORT;
 import static com.wl4g.rengine.common.model.ExecuteRequest.DEFAULT_TIMEOUT;
-import static com.wl4g.rengine.executor.rest.EngineExecutionResource.RequestSettings.PARAM_REQ_SETTINGS;
-import static com.wl4g.rengine.executor.rest.EngineExecutionResource.ResponseSettings.PARAM_RESP_SETTINGS;
+import static com.wl4g.rengine.executor.rest.EngineExecutionEndpoint.RequestSettings.PARAM_REQ_SETTINGS;
+import static com.wl4g.rengine.executor.rest.EngineExecutionEndpoint.ResponseSettings.PARAM_RESP_SETTINGS;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Long.parseLong;
 import static java.lang.String.format;
@@ -92,7 +92,7 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link EngineExecutionResource}
+ * {@link EngineExecutionEndpoint}
  * 
  * @author James Wong
  * @version 2022-09-18
@@ -102,7 +102,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @CustomValid
 @Path(API_EXECUTOR_EXECUTE_BASE)
-public class EngineExecutionResource {
+public class EngineExecutionEndpoint {
 
     /**
      * Tips: Quarkus 使用 GraalVM 构建 native 可执行文件。GraalVM

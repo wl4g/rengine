@@ -61,7 +61,7 @@ import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link HelloGraalJSResource}
+ * {@link HelloGraalJSEndpoint}
  * 
  * @author James Wong
  * @version 2022-09-18
@@ -77,7 +77,7 @@ import lombok.extern.slf4j.Slf4j;
 // 注1: 当编译为native运行时, 必须显示指定单例, 否则方法体中使用成员属性会空指针. (但使用JVM运行时却不会?)
 @Singleton
 @VisibleForTesting
-public class HelloGraalJSResource {
+public class HelloGraalJSEndpoint {
 
     // 注: 同一 Context 实例不允许多线程并发调用.
     @Inject

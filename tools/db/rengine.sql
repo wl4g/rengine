@@ -11,7 +11,7 @@
  Target Server Version : 40406
  File Encoding         : 65001
 
- Date: 03/02/2023 23:25:52
+ Date: 05/02/2023 22:09:00
 */
 
 
@@ -447,75 +447,20 @@ session = db.getMongo().startSession();
 session.startTransaction();
 db = session.getDatabase("rengine");
 db.getCollection("t_schedule_job_logs").insert([ {
-    _id: NumberLong("6333792344211456"),
+    _id: NumberLong("6335562311041026"),
     triggerId: NumberLong("62208697108652458"),
-    startupTime: ISODate("2023-02-03T10:09:40.042Z"),
-    finishedTime: ISODate("2023-02-03T10:09:40.658Z"),
-    success: true,
+    startupTime: ISODate("2023-02-04T16:10:10.359Z"),
+    finishedTime: ISODate("2023-02-04T16:10:10.657Z"),
+    success: false,
     detail: {
         results: [
             {
-                requestId: "84b33dd9-5eb2-4da6-88da-64bba4ddcbe3",
+                requestId: "29b88044-3fc0-4850-9d63-b4c8f6b30a11",
                 results: [
                     {
                         scenesCode: "ecommerce_trade_gift",
-                        success: true,
-                        valueMap: {
-                            jdbcResult: [
-                                {
-                                    Host: "%",
-                                    User: "root",
-                                    "Select_priv": "Y",
-                                    "Insert_priv": "Y",
-                                    "Update_priv": "Y",
-                                    "Delete_priv": "Y",
-                                    "Create_priv": "Y",
-                                    "Drop_priv": "Y",
-                                    "Reload_priv": "Y",
-                                    "Shutdown_priv": "Y",
-                                    "Process_priv": "Y",
-                                    "File_priv": "Y",
-                                    "Grant_priv": "Y",
-                                    "References_priv": "Y",
-                                    "Index_priv": "Y",
-                                    "Alter_priv": "Y",
-                                    "Show_db_priv": "Y",
-                                    "Super_priv": "Y",
-                                    "Create_tmp_table_priv": "Y",
-                                    "Lock_tables_priv": "Y",
-                                    "Execute_priv": "Y",
-                                    "Repl_slave_priv": "Y",
-                                    "Repl_client_priv": "Y",
-                                    "Create_view_priv": "Y",
-                                    "Show_view_priv": "Y",
-                                    "Create_routine_priv": "Y",
-                                    "Alter_routine_priv": "Y",
-                                    "Create_user_priv": "Y",
-                                    "Event_priv": "Y",
-                                    "Trigger_priv": "Y",
-                                    "Create_tablespace_priv": "Y",
-                                    "ssl_type": "",
-                                    "ssl_cipher": "",
-                                    "x509_issuer": "",
-                                    "x509_subject": "",
-                                    "max_questions": NumberInt("0"),
-                                    "max_updates": NumberInt("0"),
-                                    "max_connections": NumberInt("0"),
-                                    "max_user_connections": NumberInt("0"),
-                                    plugin: "mysql_native_password",
-                                    "authentication_string": "*E5B181C8229925C680B0E7ECDDF1CF8F29D97257",
-                                    "password_expired": "N",
-                                    "password_last_changed": "2020-07-20T22:42:29.000+00:00",
-                                    "password_lifetime": null,
-                                    "account_locked": "N"
-                                }
-                            ],
-                            dateHolderResult: "2023-02-03T10:09:40.628+00:00",
-                            codingResult: "75M7MfQsC4p2rUNe7dDjXK",
-                            hashingResult: "z/EfkNDTK/okjQ+jyOQ+vI22o9zFjK38cTtL9r9sEy1a5thhkF4b9sr6LZdR1yE4wIPwNIzApzX7mBcKg0nT+Q==",
-                            aesResult: "abcdefghijklmnopqrstuvwxyz",
-                            rsaResult: "abcdefghijklmnopqrstuvwxyz"
-                        }
+                        success: false,
+                        reason: "java.net.ConnectException: Failed to connect to localhost/0.0.0.0:28002"
                     }
                 ]
             }
@@ -524,247 +469,26 @@ db.getCollection("t_schedule_job_logs").insert([ {
         _class: "com.wl4g.rengine.common.entity.ScheduleJobLog$ClientScheduleJobLog"
     },
     enable: NumberInt("1"),
-    createDate: ISODate("2023-02-03T10:09:40.041Z"),
-    updateDate: ISODate("2023-02-03T10:09:40.659Z"),
+    createDate: ISODate("2023-02-04T16:10:10.243Z"),
+    updateDate: ISODate("2023-02-04T16:10:10.662Z"),
     delFlag: NumberInt("0"),
     _class: "com.wl4g.rengine.common.entity.ScheduleJobLog"
 } ]);
 db.getCollection("t_schedule_job_logs").insert([ {
-    _id: NumberLong("6333792344244224"),
-    triggerId: NumberLong("62208697108652456"),
-    startupTime: ISODate("2023-02-03T10:09:40.045Z"),
-    finishedTime: ISODate("2023-02-03T10:09:40.459Z"),
-    success: true,
-    detail: {
-        results: [
-            {
-                requestId: "65b0731b-8a17-4c11-9fc9-9052fec6868a",
-                results: [
-                    {
-                        scenesCode: "ecommerce_trade_gift",
-                        success: true,
-                        valueMap: {
-                            jdbcResult: [
-                                {
-                                    Host: "%",
-                                    User: "root",
-                                    "Select_priv": "Y",
-                                    "Insert_priv": "Y",
-                                    "Update_priv": "Y",
-                                    "Delete_priv": "Y",
-                                    "Create_priv": "Y",
-                                    "Drop_priv": "Y",
-                                    "Reload_priv": "Y",
-                                    "Shutdown_priv": "Y",
-                                    "Process_priv": "Y",
-                                    "File_priv": "Y",
-                                    "Grant_priv": "Y",
-                                    "References_priv": "Y",
-                                    "Index_priv": "Y",
-                                    "Alter_priv": "Y",
-                                    "Show_db_priv": "Y",
-                                    "Super_priv": "Y",
-                                    "Create_tmp_table_priv": "Y",
-                                    "Lock_tables_priv": "Y",
-                                    "Execute_priv": "Y",
-                                    "Repl_slave_priv": "Y",
-                                    "Repl_client_priv": "Y",
-                                    "Create_view_priv": "Y",
-                                    "Show_view_priv": "Y",
-                                    "Create_routine_priv": "Y",
-                                    "Alter_routine_priv": "Y",
-                                    "Create_user_priv": "Y",
-                                    "Event_priv": "Y",
-                                    "Trigger_priv": "Y",
-                                    "Create_tablespace_priv": "Y",
-                                    "ssl_type": "",
-                                    "ssl_cipher": "",
-                                    "x509_issuer": "",
-                                    "x509_subject": "",
-                                    "max_questions": NumberInt("0"),
-                                    "max_updates": NumberInt("0"),
-                                    "max_connections": NumberInt("0"),
-                                    "max_user_connections": NumberInt("0"),
-                                    plugin: "mysql_native_password",
-                                    "authentication_string": "*E5B181C8229925C680B0E7ECDDF1CF8F29D97257",
-                                    "password_expired": "N",
-                                    "password_last_changed": "2020-07-20T22:42:29.000+00:00",
-                                    "password_lifetime": null,
-                                    "account_locked": "N"
-                                }
-                            ],
-                            dateHolderResult: "2023-02-03T10:09:40.418+00:00",
-                            codingResult: "75M7MfQsC4p2rUNe7dDjXK",
-                            hashingResult: "z/EfkNDTK/okjQ+jyOQ+vI22o9zFjK38cTtL9r9sEy1a5thhkF4b9sr6LZdR1yE4wIPwNIzApzX7mBcKg0nT+Q==",
-                            aesResult: "abcdefghijklmnopqrstuvwxyz",
-                            rsaResult: "abcdefghijklmnopqrstuvwxyz"
-                        }
-                    }
-                ]
-            }
-        ],
-        type: "CLIENT_SCHEDULER",
-        _class: "com.wl4g.rengine.common.entity.ScheduleJobLog$ClientScheduleJobLog"
-    },
-    enable: NumberInt("1"),
-    createDate: ISODate("2023-02-03T10:09:40.044Z"),
-    updateDate: ISODate("2023-02-03T10:09:40.46Z"),
-    delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.ScheduleJobLog"
-} ]);
-db.getCollection("t_schedule_job_logs").insert([ {
-    _id: NumberLong("6333792344276992"),
-    triggerId: NumberLong("62208697108652459"),
-    startupTime: ISODate("2023-02-03T10:09:40.046Z"),
-    finishedTime: ISODate("2023-02-03T10:09:40.459Z"),
-    success: true,
-    detail: {
-        results: [
-            {
-                requestId: "d1ceb13f-f1ad-43ab-af89-c1c7fe26ff72",
-                results: [
-                    {
-                        scenesCode: "ecommerce_trade_gift",
-                        success: true,
-                        valueMap: {
-                            jdbcResult: [
-                                {
-                                    Host: "%",
-                                    User: "root",
-                                    "Select_priv": "Y",
-                                    "Insert_priv": "Y",
-                                    "Update_priv": "Y",
-                                    "Delete_priv": "Y",
-                                    "Create_priv": "Y",
-                                    "Drop_priv": "Y",
-                                    "Reload_priv": "Y",
-                                    "Shutdown_priv": "Y",
-                                    "Process_priv": "Y",
-                                    "File_priv": "Y",
-                                    "Grant_priv": "Y",
-                                    "References_priv": "Y",
-                                    "Index_priv": "Y",
-                                    "Alter_priv": "Y",
-                                    "Show_db_priv": "Y",
-                                    "Super_priv": "Y",
-                                    "Create_tmp_table_priv": "Y",
-                                    "Lock_tables_priv": "Y",
-                                    "Execute_priv": "Y",
-                                    "Repl_slave_priv": "Y",
-                                    "Repl_client_priv": "Y",
-                                    "Create_view_priv": "Y",
-                                    "Show_view_priv": "Y",
-                                    "Create_routine_priv": "Y",
-                                    "Alter_routine_priv": "Y",
-                                    "Create_user_priv": "Y",
-                                    "Event_priv": "Y",
-                                    "Trigger_priv": "Y",
-                                    "Create_tablespace_priv": "Y",
-                                    "ssl_type": "",
-                                    "ssl_cipher": "",
-                                    "x509_issuer": "",
-                                    "x509_subject": "",
-                                    "max_questions": NumberInt("0"),
-                                    "max_updates": NumberInt("0"),
-                                    "max_connections": NumberInt("0"),
-                                    "max_user_connections": NumberInt("0"),
-                                    plugin: "mysql_native_password",
-                                    "authentication_string": "*E5B181C8229925C680B0E7ECDDF1CF8F29D97257",
-                                    "password_expired": "N",
-                                    "password_last_changed": "2020-07-20T22:42:29.000+00:00",
-                                    "password_lifetime": null,
-                                    "account_locked": "N"
-                                }
-                            ],
-                            dateHolderResult: "2023-02-03T10:09:40.213+00:00",
-                            codingResult: "75M7MfQsC4p2rUNe7dDjXK",
-                            hashingResult: "z/EfkNDTK/okjQ+jyOQ+vI22o9zFjK38cTtL9r9sEy1a5thhkF4b9sr6LZdR1yE4wIPwNIzApzX7mBcKg0nT+Q==",
-                            aesResult: "abcdefghijklmnopqrstuvwxyz",
-                            rsaResult: "abcdefghijklmnopqrstuvwxyz"
-                        }
-                    }
-                ]
-            }
-        ],
-        type: "CLIENT_SCHEDULER",
-        _class: "com.wl4g.rengine.common.entity.ScheduleJobLog$ClientScheduleJobLog"
-    },
-    enable: NumberInt("1"),
-    createDate: ISODate("2023-02-03T10:09:40.045Z"),
-    updateDate: ISODate("2023-02-03T10:09:40.46Z"),
-    delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.ScheduleJobLog"
-} ]);
-db.getCollection("t_schedule_job_logs").insert([ {
-    _id: NumberLong("6333792344309760"),
+    _id: NumberLong("6335562311024640"),
     triggerId: NumberLong("62208697108652457"),
-    startupTime: ISODate("2023-02-03T10:09:40.049Z"),
-    finishedTime: ISODate("2023-02-03T10:09:40.457Z"),
-    success: true,
+    startupTime: ISODate("2023-02-04T16:10:10.359Z"),
+    finishedTime: ISODate("2023-02-04T16:10:10.66Z"),
+    success: false,
     detail: {
         results: [
             {
-                requestId: "4092a43c-bbb5-4fab-b222-03932375e855",
+                requestId: "a5315ffc-fbf3-484f-bf45-e05fbb9d2df3",
                 results: [
                     {
                         scenesCode: "ecommerce_trade_gift",
-                        success: true,
-                        valueMap: {
-                            jdbcResult: [
-                                {
-                                    Host: "%",
-                                    User: "root",
-                                    "Select_priv": "Y",
-                                    "Insert_priv": "Y",
-                                    "Update_priv": "Y",
-                                    "Delete_priv": "Y",
-                                    "Create_priv": "Y",
-                                    "Drop_priv": "Y",
-                                    "Reload_priv": "Y",
-                                    "Shutdown_priv": "Y",
-                                    "Process_priv": "Y",
-                                    "File_priv": "Y",
-                                    "Grant_priv": "Y",
-                                    "References_priv": "Y",
-                                    "Index_priv": "Y",
-                                    "Alter_priv": "Y",
-                                    "Show_db_priv": "Y",
-                                    "Super_priv": "Y",
-                                    "Create_tmp_table_priv": "Y",
-                                    "Lock_tables_priv": "Y",
-                                    "Execute_priv": "Y",
-                                    "Repl_slave_priv": "Y",
-                                    "Repl_client_priv": "Y",
-                                    "Create_view_priv": "Y",
-                                    "Show_view_priv": "Y",
-                                    "Create_routine_priv": "Y",
-                                    "Alter_routine_priv": "Y",
-                                    "Create_user_priv": "Y",
-                                    "Event_priv": "Y",
-                                    "Trigger_priv": "Y",
-                                    "Create_tablespace_priv": "Y",
-                                    "ssl_type": "",
-                                    "ssl_cipher": "",
-                                    "x509_issuer": "",
-                                    "x509_subject": "",
-                                    "max_questions": NumberInt("0"),
-                                    "max_updates": NumberInt("0"),
-                                    "max_connections": NumberInt("0"),
-                                    "max_user_connections": NumberInt("0"),
-                                    plugin: "mysql_native_password",
-                                    "authentication_string": "*E5B181C8229925C680B0E7ECDDF1CF8F29D97257",
-                                    "password_expired": "N",
-                                    "password_last_changed": "2020-07-20T22:42:29.000+00:00",
-                                    "password_lifetime": null,
-                                    "account_locked": "N"
-                                }
-                            ],
-                            dateHolderResult: "2023-02-03T10:09:40.416+00:00",
-                            codingResult: "75M7MfQsC4p2rUNe7dDjXK",
-                            hashingResult: "z/EfkNDTK/okjQ+jyOQ+vI22o9zFjK38cTtL9r9sEy1a5thhkF4b9sr6LZdR1yE4wIPwNIzApzX7mBcKg0nT+Q==",
-                            aesResult: "abcdefghijklmnopqrstuvwxyz",
-                            rsaResult: "abcdefghijklmnopqrstuvwxyz"
-                        }
+                        success: false,
+                        reason: "java.net.ConnectException: Failed to connect to localhost/0.0.0.0:28002"
                     }
                 ]
             }
@@ -773,81 +497,26 @@ db.getCollection("t_schedule_job_logs").insert([ {
         _class: "com.wl4g.rengine.common.entity.ScheduleJobLog$ClientScheduleJobLog"
     },
     enable: NumberInt("1"),
-    createDate: ISODate("2023-02-03T10:09:40.047Z"),
-    updateDate: ISODate("2023-02-03T10:09:40.458Z"),
+    createDate: ISODate("2023-02-04T16:10:10.243Z"),
+    updateDate: ISODate("2023-02-04T16:10:10.666Z"),
     delFlag: NumberInt("0"),
     _class: "com.wl4g.rengine.common.entity.ScheduleJobLog"
 } ]);
 db.getCollection("t_schedule_job_logs").insert([ {
-    _id: NumberLong("6333792426082304"),
+    _id: NumberLong("6335562311041025"),
     triggerId: NumberLong("62208697108652456"),
-    startupTime: ISODate("2023-02-03T10:09:45.04Z"),
-    finishedTime: ISODate("2023-02-03T10:09:45.728Z"),
-    success: true,
+    startupTime: ISODate("2023-02-04T16:10:10.359Z"),
+    finishedTime: ISODate("2023-02-04T16:10:10.657Z"),
+    success: false,
     detail: {
         results: [
             {
-                requestId: "a07b9ab0-c016-4739-bdc1-611dc4152fdf",
+                requestId: "bfbc7bee-2a2b-4016-8bee-1b6f0a506947",
                 results: [
                     {
                         scenesCode: "ecommerce_trade_gift",
-                        success: true,
-                        valueMap: {
-                            jdbcResult: [
-                                {
-                                    Host: "%",
-                                    User: "root",
-                                    "Select_priv": "Y",
-                                    "Insert_priv": "Y",
-                                    "Update_priv": "Y",
-                                    "Delete_priv": "Y",
-                                    "Create_priv": "Y",
-                                    "Drop_priv": "Y",
-                                    "Reload_priv": "Y",
-                                    "Shutdown_priv": "Y",
-                                    "Process_priv": "Y",
-                                    "File_priv": "Y",
-                                    "Grant_priv": "Y",
-                                    "References_priv": "Y",
-                                    "Index_priv": "Y",
-                                    "Alter_priv": "Y",
-                                    "Show_db_priv": "Y",
-                                    "Super_priv": "Y",
-                                    "Create_tmp_table_priv": "Y",
-                                    "Lock_tables_priv": "Y",
-                                    "Execute_priv": "Y",
-                                    "Repl_slave_priv": "Y",
-                                    "Repl_client_priv": "Y",
-                                    "Create_view_priv": "Y",
-                                    "Show_view_priv": "Y",
-                                    "Create_routine_priv": "Y",
-                                    "Alter_routine_priv": "Y",
-                                    "Create_user_priv": "Y",
-                                    "Event_priv": "Y",
-                                    "Trigger_priv": "Y",
-                                    "Create_tablespace_priv": "Y",
-                                    "ssl_type": "",
-                                    "ssl_cipher": "",
-                                    "x509_issuer": "",
-                                    "x509_subject": "",
-                                    "max_questions": NumberInt("0"),
-                                    "max_updates": NumberInt("0"),
-                                    "max_connections": NumberInt("0"),
-                                    "max_user_connections": NumberInt("0"),
-                                    plugin: "mysql_native_password",
-                                    "authentication_string": "*E5B181C8229925C680B0E7ECDDF1CF8F29D97257",
-                                    "password_expired": "N",
-                                    "password_last_changed": "2020-07-20T22:42:29.000+00:00",
-                                    "password_lifetime": null,
-                                    "account_locked": "N"
-                                }
-                            ],
-                            dateHolderResult: "2023-02-03T10:09:45.547+00:00",
-                            codingResult: "75M7MfQsC4p2rUNe7dDjXK",
-                            hashingResult: "z/EfkNDTK/okjQ+jyOQ+vI22o9zFjK38cTtL9r9sEy1a5thhkF4b9sr6LZdR1yE4wIPwNIzApzX7mBcKg0nT+Q==",
-                            aesResult: "abcdefghijklmnopqrstuvwxyz",
-                            rsaResult: "abcdefghijklmnopqrstuvwxyz"
-                        }
+                        success: false,
+                        reason: "java.net.ConnectException: Failed to connect to localhost/0.0.0.0:28002"
                     }
                 ]
             }
@@ -856,81 +525,82 @@ db.getCollection("t_schedule_job_logs").insert([ {
         _class: "com.wl4g.rengine.common.entity.ScheduleJobLog$ClientScheduleJobLog"
     },
     enable: NumberInt("1"),
-    createDate: ISODate("2023-02-03T10:09:45.038Z"),
-    updateDate: ISODate("2023-02-03T10:09:45.73Z"),
+    createDate: ISODate("2023-02-04T16:10:10.243Z"),
+    updateDate: ISODate("2023-02-04T16:10:10.661Z"),
     delFlag: NumberInt("0"),
     _class: "com.wl4g.rengine.common.entity.ScheduleJobLog"
 } ]);
 db.getCollection("t_schedule_job_logs").insert([ {
-    _id: NumberLong("6333792426180608"),
+    _id: NumberLong("6335562311041024"),
+    triggerId: NumberLong("62208697108652459"),
+    startupTime: ISODate("2023-02-04T16:10:10.369Z"),
+    finishedTime: ISODate("2023-02-04T16:10:10.658Z"),
+    success: false,
+    detail: {
+        results: [
+            {
+                requestId: "7dfdb469-491c-4114-884f-0ea7a7a601a1",
+                results: [
+                    {
+                        scenesCode: "ecommerce_trade_gift",
+                        success: false,
+                        reason: "java.net.ConnectException: Failed to connect to localhost/0.0.0.0:28002"
+                    }
+                ]
+            }
+        ],
+        type: "CLIENT_SCHEDULER",
+        _class: "com.wl4g.rengine.common.entity.ScheduleJobLog$ClientScheduleJobLog"
+    },
+    enable: NumberInt("1"),
+    createDate: ISODate("2023-02-04T16:10:10.243Z"),
+    updateDate: ISODate("2023-02-04T16:10:10.661Z"),
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.ScheduleJobLog"
+} ]);
+db.getCollection("t_schedule_job_logs").insert([ {
+    _id: NumberLong("6335562390257664"),
+    triggerId: NumberLong("62208697108652456"),
+    startupTime: ISODate("2023-02-04T16:10:15.087Z"),
+    finishedTime: ISODate("2023-02-04T16:10:15.2Z"),
+    success: false,
+    detail: {
+        results: [
+            {
+                requestId: "ed62beb6-002b-4389-a3f2-cc914a53c63f",
+                results: [
+                    {
+                        scenesCode: "ecommerce_trade_gift",
+                        success: false,
+                        reason: "java.net.ConnectException: Failed to connect to localhost/0.0.0.0:28002"
+                    }
+                ]
+            }
+        ],
+        type: "CLIENT_SCHEDULER",
+        _class: "com.wl4g.rengine.common.entity.ScheduleJobLog$ClientScheduleJobLog"
+    },
+    enable: NumberInt("1"),
+    createDate: ISODate("2023-02-04T16:10:15.078Z"),
+    updateDate: ISODate("2023-02-04T16:10:15.205Z"),
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.ScheduleJobLog"
+} ]);
+db.getCollection("t_schedule_job_logs").insert([ {
+    _id: NumberLong("6335562390519809"),
     triggerId: NumberLong("62208697108652458"),
-    startupTime: ISODate("2023-02-03T10:09:45.046Z"),
-    finishedTime: ISODate("2023-02-03T10:09:45.416Z"),
-    success: true,
+    startupTime: ISODate("2023-02-04T16:10:15.101Z"),
+    finishedTime: ISODate("2023-02-04T16:10:15.204Z"),
+    success: false,
     detail: {
         results: [
             {
-                requestId: "4781fad4-2d6d-43be-b84c-d06bd1ee22f6",
+                requestId: "6c48c9d6-a051-4405-97cd-99c85d59942c",
                 results: [
                     {
                         scenesCode: "ecommerce_trade_gift",
-                        success: true,
-                        valueMap: {
-                            jdbcResult: [
-                                {
-                                    Host: "%",
-                                    User: "root",
-                                    "Select_priv": "Y",
-                                    "Insert_priv": "Y",
-                                    "Update_priv": "Y",
-                                    "Delete_priv": "Y",
-                                    "Create_priv": "Y",
-                                    "Drop_priv": "Y",
-                                    "Reload_priv": "Y",
-                                    "Shutdown_priv": "Y",
-                                    "Process_priv": "Y",
-                                    "File_priv": "Y",
-                                    "Grant_priv": "Y",
-                                    "References_priv": "Y",
-                                    "Index_priv": "Y",
-                                    "Alter_priv": "Y",
-                                    "Show_db_priv": "Y",
-                                    "Super_priv": "Y",
-                                    "Create_tmp_table_priv": "Y",
-                                    "Lock_tables_priv": "Y",
-                                    "Execute_priv": "Y",
-                                    "Repl_slave_priv": "Y",
-                                    "Repl_client_priv": "Y",
-                                    "Create_view_priv": "Y",
-                                    "Show_view_priv": "Y",
-                                    "Create_routine_priv": "Y",
-                                    "Alter_routine_priv": "Y",
-                                    "Create_user_priv": "Y",
-                                    "Event_priv": "Y",
-                                    "Trigger_priv": "Y",
-                                    "Create_tablespace_priv": "Y",
-                                    "ssl_type": "",
-                                    "ssl_cipher": "",
-                                    "x509_issuer": "",
-                                    "x509_subject": "",
-                                    "max_questions": NumberInt("0"),
-                                    "max_updates": NumberInt("0"),
-                                    "max_connections": NumberInt("0"),
-                                    "max_user_connections": NumberInt("0"),
-                                    plugin: "mysql_native_password",
-                                    "authentication_string": "*E5B181C8229925C680B0E7ECDDF1CF8F29D97257",
-                                    "password_expired": "N",
-                                    "password_last_changed": "2020-07-20T22:42:29.000+00:00",
-                                    "password_lifetime": null,
-                                    "account_locked": "N"
-                                }
-                            ],
-                            dateHolderResult: "2023-02-03T10:09:45.389+00:00",
-                            codingResult: "75M7MfQsC4p2rUNe7dDjXK",
-                            hashingResult: "z/EfkNDTK/okjQ+jyOQ+vI22o9zFjK38cTtL9r9sEy1a5thhkF4b9sr6LZdR1yE4wIPwNIzApzX7mBcKg0nT+Q==",
-                            aesResult: "abcdefghijklmnopqrstuvwxyz",
-                            rsaResult: "abcdefghijklmnopqrstuvwxyz"
-                        }
+                        success: false,
+                        reason: "java.net.ConnectException: Failed to connect to localhost/0.0.0.0:28002"
                     }
                 ]
             }
@@ -939,164 +609,26 @@ db.getCollection("t_schedule_job_logs").insert([ {
         _class: "com.wl4g.rengine.common.entity.ScheduleJobLog$ClientScheduleJobLog"
     },
     enable: NumberInt("1"),
-    createDate: ISODate("2023-02-03T10:09:45.044Z"),
-    updateDate: ISODate("2023-02-03T10:09:45.416Z"),
+    createDate: ISODate("2023-02-04T16:10:15.094Z"),
+    updateDate: ISODate("2023-02-04T16:10:15.205Z"),
     delFlag: NumberInt("0"),
     _class: "com.wl4g.rengine.common.entity.ScheduleJobLog"
 } ]);
 db.getCollection("t_schedule_job_logs").insert([ {
-    _id: NumberLong("6333792426229760"),
-    triggerId: NumberLong("62208697108652459"),
-    startupTime: ISODate("2023-02-03T10:09:45.05Z"),
-    finishedTime: ISODate("2023-02-03T10:09:45.414Z"),
-    success: true,
-    detail: {
-        results: [
-            {
-                requestId: "95454643-5bcf-4d57-bf94-8369cea8c46c",
-                results: [
-                    {
-                        scenesCode: "ecommerce_trade_gift",
-                        success: true,
-                        valueMap: {
-                            jdbcResult: [
-                                {
-                                    Host: "%",
-                                    User: "root",
-                                    "Select_priv": "Y",
-                                    "Insert_priv": "Y",
-                                    "Update_priv": "Y",
-                                    "Delete_priv": "Y",
-                                    "Create_priv": "Y",
-                                    "Drop_priv": "Y",
-                                    "Reload_priv": "Y",
-                                    "Shutdown_priv": "Y",
-                                    "Process_priv": "Y",
-                                    "File_priv": "Y",
-                                    "Grant_priv": "Y",
-                                    "References_priv": "Y",
-                                    "Index_priv": "Y",
-                                    "Alter_priv": "Y",
-                                    "Show_db_priv": "Y",
-                                    "Super_priv": "Y",
-                                    "Create_tmp_table_priv": "Y",
-                                    "Lock_tables_priv": "Y",
-                                    "Execute_priv": "Y",
-                                    "Repl_slave_priv": "Y",
-                                    "Repl_client_priv": "Y",
-                                    "Create_view_priv": "Y",
-                                    "Show_view_priv": "Y",
-                                    "Create_routine_priv": "Y",
-                                    "Alter_routine_priv": "Y",
-                                    "Create_user_priv": "Y",
-                                    "Event_priv": "Y",
-                                    "Trigger_priv": "Y",
-                                    "Create_tablespace_priv": "Y",
-                                    "ssl_type": "",
-                                    "ssl_cipher": "",
-                                    "x509_issuer": "",
-                                    "x509_subject": "",
-                                    "max_questions": NumberInt("0"),
-                                    "max_updates": NumberInt("0"),
-                                    "max_connections": NumberInt("0"),
-                                    "max_user_connections": NumberInt("0"),
-                                    plugin: "mysql_native_password",
-                                    "authentication_string": "*E5B181C8229925C680B0E7ECDDF1CF8F29D97257",
-                                    "password_expired": "N",
-                                    "password_last_changed": "2020-07-20T22:42:29.000+00:00",
-                                    "password_lifetime": null,
-                                    "account_locked": "N"
-                                }
-                            ],
-                            dateHolderResult: "2023-02-03T10:09:45.233+00:00",
-                            codingResult: "75M7MfQsC4p2rUNe7dDjXK",
-                            hashingResult: "z/EfkNDTK/okjQ+jyOQ+vI22o9zFjK38cTtL9r9sEy1a5thhkF4b9sr6LZdR1yE4wIPwNIzApzX7mBcKg0nT+Q==",
-                            aesResult: "abcdefghijklmnopqrstuvwxyz",
-                            rsaResult: "abcdefghijklmnopqrstuvwxyz"
-                        }
-                    }
-                ]
-            }
-        ],
-        type: "CLIENT_SCHEDULER",
-        _class: "com.wl4g.rengine.common.entity.ScheduleJobLog$ClientScheduleJobLog"
-    },
-    enable: NumberInt("1"),
-    createDate: ISODate("2023-02-03T10:09:45.047Z"),
-    updateDate: ISODate("2023-02-03T10:09:45.414Z"),
-    delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.ScheduleJobLog"
-} ]);
-db.getCollection("t_schedule_job_logs").insert([ {
-    _id: NumberLong("6333792426246144"),
+    _id: NumberLong("6335562390519808"),
     triggerId: NumberLong("62208697108652457"),
-    startupTime: ISODate("2023-02-03T10:09:45.056Z"),
-    finishedTime: ISODate("2023-02-03T10:09:45.728Z"),
-    success: true,
+    startupTime: ISODate("2023-02-04T16:10:15.101Z"),
+    finishedTime: ISODate("2023-02-04T16:10:15.219Z"),
+    success: false,
     detail: {
         results: [
             {
-                requestId: "520b1046-2c7a-4605-8467-1740a90eed06",
+                requestId: "4e504c6c-70a2-460c-af67-7862e3452000",
                 results: [
                     {
                         scenesCode: "ecommerce_trade_gift",
-                        success: true,
-                        valueMap: {
-                            jdbcResult: [
-                                {
-                                    Host: "%",
-                                    User: "root",
-                                    "Select_priv": "Y",
-                                    "Insert_priv": "Y",
-                                    "Update_priv": "Y",
-                                    "Delete_priv": "Y",
-                                    "Create_priv": "Y",
-                                    "Drop_priv": "Y",
-                                    "Reload_priv": "Y",
-                                    "Shutdown_priv": "Y",
-                                    "Process_priv": "Y",
-                                    "File_priv": "Y",
-                                    "Grant_priv": "Y",
-                                    "References_priv": "Y",
-                                    "Index_priv": "Y",
-                                    "Alter_priv": "Y",
-                                    "Show_db_priv": "Y",
-                                    "Super_priv": "Y",
-                                    "Create_tmp_table_priv": "Y",
-                                    "Lock_tables_priv": "Y",
-                                    "Execute_priv": "Y",
-                                    "Repl_slave_priv": "Y",
-                                    "Repl_client_priv": "Y",
-                                    "Create_view_priv": "Y",
-                                    "Show_view_priv": "Y",
-                                    "Create_routine_priv": "Y",
-                                    "Alter_routine_priv": "Y",
-                                    "Create_user_priv": "Y",
-                                    "Event_priv": "Y",
-                                    "Trigger_priv": "Y",
-                                    "Create_tablespace_priv": "Y",
-                                    "ssl_type": "",
-                                    "ssl_cipher": "",
-                                    "x509_issuer": "",
-                                    "x509_subject": "",
-                                    "max_questions": NumberInt("0"),
-                                    "max_updates": NumberInt("0"),
-                                    "max_connections": NumberInt("0"),
-                                    "max_user_connections": NumberInt("0"),
-                                    plugin: "mysql_native_password",
-                                    "authentication_string": "*E5B181C8229925C680B0E7ECDDF1CF8F29D97257",
-                                    "password_expired": "N",
-                                    "password_last_changed": "2020-07-20T22:42:29.000+00:00",
-                                    "password_lifetime": null,
-                                    "account_locked": "N"
-                                }
-                            ],
-                            dateHolderResult: "2023-02-03T10:09:45.702+00:00",
-                            codingResult: "75M7MfQsC4p2rUNe7dDjXK",
-                            hashingResult: "z/EfkNDTK/okjQ+jyOQ+vI22o9zFjK38cTtL9r9sEy1a5thhkF4b9sr6LZdR1yE4wIPwNIzApzX7mBcKg0nT+Q==",
-                            aesResult: "abcdefghijklmnopqrstuvwxyz",
-                            rsaResult: "abcdefghijklmnopqrstuvwxyz"
-                        }
+                        success: false,
+                        reason: "java.net.ConnectException: Failed to connect to localhost/0.0.0.0:28002"
                     }
                 ]
             }
@@ -1105,8 +637,92 @@ db.getCollection("t_schedule_job_logs").insert([ {
         _class: "com.wl4g.rengine.common.entity.ScheduleJobLog$ClientScheduleJobLog"
     },
     enable: NumberInt("1"),
-    createDate: ISODate("2023-02-03T10:09:45.048Z"),
-    updateDate: ISODate("2023-02-03T10:09:45.729Z"),
+    createDate: ISODate("2023-02-04T16:10:15.094Z"),
+    updateDate: ISODate("2023-02-04T16:10:15.22Z"),
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.ScheduleJobLog"
+} ]);
+db.getCollection("t_schedule_job_logs").insert([ {
+    _id: NumberLong("6335562390667264"),
+    triggerId: NumberLong("62208697108652459"),
+    startupTime: ISODate("2023-02-04T16:10:15.108Z"),
+    finishedTime: ISODate("2023-02-04T16:10:15.195Z"),
+    success: false,
+    detail: {
+        results: [
+            {
+                requestId: "d50832c0-1336-4d27-b8ed-1ee840f635ea",
+                results: [
+                    {
+                        scenesCode: "ecommerce_trade_gift",
+                        success: false,
+                        reason: "java.net.ConnectException: Failed to connect to localhost/0.0.0.0:28002"
+                    }
+                ]
+            }
+        ],
+        type: "CLIENT_SCHEDULER",
+        _class: "com.wl4g.rengine.common.entity.ScheduleJobLog$ClientScheduleJobLog"
+    },
+    enable: NumberInt("1"),
+    createDate: ISODate("2023-02-04T16:10:15.103Z"),
+    updateDate: ISODate("2023-02-04T16:10:15.195Z"),
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.ScheduleJobLog"
+} ]);
+db.getCollection("t_schedule_job_logs").insert([ {
+    _id: NumberLong("6335564441387011"),
+    triggerId: NumberLong("62208697108652457"),
+    startupTime: ISODate("2023-02-04T16:12:20.358Z"),
+    detail: {
+        type: "CLIENT_SCHEDULER",
+        _class: "com.wl4g.rengine.common.entity.ScheduleJobLog$ClientScheduleJobLog"
+    },
+    enable: NumberInt("1"),
+    createDate: ISODate("2023-02-04T16:12:20.269Z"),
+    updateDate: ISODate("2023-02-04T16:12:20.359Z"),
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.ScheduleJobLog"
+} ]);
+db.getCollection("t_schedule_job_logs").insert([ {
+    _id: NumberLong("6335564441387010"),
+    triggerId: NumberLong("62208697108652456"),
+    startupTime: ISODate("2023-02-04T16:12:20.356Z"),
+    detail: {
+        type: "CLIENT_SCHEDULER",
+        _class: "com.wl4g.rengine.common.entity.ScheduleJobLog$ClientScheduleJobLog"
+    },
+    enable: NumberInt("1"),
+    createDate: ISODate("2023-02-04T16:12:20.269Z"),
+    updateDate: ISODate("2023-02-04T16:12:20.357Z"),
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.ScheduleJobLog"
+} ]);
+db.getCollection("t_schedule_job_logs").insert([ {
+    _id: NumberLong("6335564441387008"),
+    triggerId: NumberLong("62208697108652458"),
+    startupTime: ISODate("2023-02-04T16:12:20.357Z"),
+    detail: {
+        type: "CLIENT_SCHEDULER",
+        _class: "com.wl4g.rengine.common.entity.ScheduleJobLog$ClientScheduleJobLog"
+    },
+    enable: NumberInt("1"),
+    createDate: ISODate("2023-02-04T16:12:20.269Z"),
+    updateDate: ISODate("2023-02-04T16:12:20.358Z"),
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.ScheduleJobLog"
+} ]);
+db.getCollection("t_schedule_job_logs").insert([ {
+    _id: NumberLong("6335564441387009"),
+    triggerId: NumberLong("62208697108652459"),
+    startupTime: ISODate("2023-02-04T16:12:20.362Z"),
+    detail: {
+        type: "CLIENT_SCHEDULER",
+        _class: "com.wl4g.rengine.common.entity.ScheduleJobLog$ClientScheduleJobLog"
+    },
+    enable: NumberInt("1"),
+    createDate: ISODate("2023-02-04T16:12:20.269Z"),
+    updateDate: ISODate("2023-02-04T16:12:20.363Z"),
     delFlag: NumberInt("0"),
     _class: "com.wl4g.rengine.common.entity.ScheduleJobLog"
 } ]);
@@ -1126,33 +742,7 @@ session.startTransaction();
 db = session.getDatabase("rengine");
 db.getCollection("t_schedule_triggers").insert([ {
     _id: NumberLong("62208697108652456"),
-    cron: "0/5 * * * * ?",
-    monitorExecution: true,
-    failover: true,
-    misfire: true,
-    timeZone: "GMT+08:00",
-    maxTimeDiffSeconds: NumberInt("-1"),
-    reconcileIntervalMinutes: NumberInt("0"),
-    maxTimeoutMs: NumberLong("30000"),
-    runState: "SUCCESS",
-    properties: {
-        requests: [
-            {
-                clientId: "JVqEpEwIaqkEkeD5",
-                clientSecret: "Uf6nJDyJQHKRP43ycl9vZ9zs7s1nyu77",
-                scenesCodes: [
-                    "ecommerce_trade_gift"
-                ],
-                timeout: NumberLong("10000"),
-                bestEffort: false,
-                args: {
-                    foo1: "bar1"
-                }
-            }
-        ],
-        type: "CLIENT_SCHEDULER",
-        _class: "com.wl4g.rengine.common.entity.ScheduleTrigger$ClientScheduleConfig"
-    },
+    name: "monitor_node_vm",
     enable: NumberInt("1"),
     labels: [
         "safecloud",
@@ -1161,23 +751,15 @@ db.getCollection("t_schedule_triggers").insert([ {
         "node",
         "vm"
     ],
-    remark: "safecloud monitor for vm",
-    updateDate: ISODate("2023-02-03T10:09:45.721Z"),
-    delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.ScheduleTrigger"
-} ]);
-db.getCollection("t_schedule_triggers").insert([ {
-    _id: NumberLong("62208697108652457"),
-    cron: "0/5 * * * * ?",
     monitorExecution: true,
     failover: true,
     misfire: true,
     timeZone: "GMT+08:00",
-    maxTimeDiffSeconds: NumberInt("-1"),
-    reconcileIntervalMinutes: NumberInt("0"),
-    maxTimeoutMs: NumberLong("30000"),
-    runState: "SUCCESS",
+    maxTimeoutMs: 30000,
+    runState: null,
     properties: {
+        type: "EXECUTION_SCHEDULER",
+        cron: "0/5 * * * * ?",
         requests: [
             {
                 clientId: "JVqEpEwIaqkEkeD5",
@@ -1185,16 +767,23 @@ db.getCollection("t_schedule_triggers").insert([ {
                 scenesCodes: [
                     "ecommerce_trade_gift"
                 ],
-                timeout: NumberLong("10000"),
                 bestEffort: false,
+                timeout: 10000,
                 args: {
                     foo1: "bar1"
                 }
             }
         ],
-        type: "CLIENT_SCHEDULER",
-        _class: "com.wl4g.rengine.common.entity.ScheduleTrigger$ClientScheduleConfig"
+        _class: "com.wl4g.rengine.common.entity.ScheduleTrigger$ExecutionScheduleConfig"
     },
+    remark: "safecloud monitor for vm",
+    updateDate: ISODate("2022-12-27T04:51:08.533Z"),
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.ScheduleTrigger"
+} ]);
+db.getCollection("t_schedule_triggers").insert([ {
+    _id: NumberLong("62208697108652457"),
+    name: "monitor_app_mysql_elec_bill_history",
     enable: NumberInt("1"),
     labels: [
         "safecloud",
@@ -1204,23 +793,15 @@ db.getCollection("t_schedule_triggers").insert([ {
         "mysql",
         "elec_bill_history"
     ],
-    remark: "safecloud monitor for mysql",
-    updateDate: ISODate("2023-02-03T10:09:45.721Z"),
-    delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.ScheduleTrigger"
-} ]);
-db.getCollection("t_schedule_triggers").insert([ {
-    _id: NumberLong("62208697108652458"),
-    cron: "0/5 * * * * ?",
     monitorExecution: true,
     failover: true,
     misfire: true,
     timeZone: "GMT+08:00",
-    maxTimeDiffSeconds: NumberInt("-1"),
-    reconcileIntervalMinutes: NumberInt("0"),
-    maxTimeoutMs: NumberLong("30000"),
-    runState: "SUCCESS",
+    maxTimeoutMs: 30000,
+    runState: null,
     properties: {
+        type: "EXECUTION_SCHEDULER",
+        cron: "0/5 * * * * ?",
         requests: [
             {
                 clientId: "JVqEpEwIaqkEkeD5",
@@ -1228,16 +809,23 @@ db.getCollection("t_schedule_triggers").insert([ {
                 scenesCodes: [
                     "ecommerce_trade_gift"
                 ],
-                timeout: NumberLong("10000"),
                 bestEffort: false,
+                timeout: 10000,
                 args: {
                     foo1: "bar1"
                 }
             }
         ],
-        type: "CLIENT_SCHEDULER",
-        _class: "com.wl4g.rengine.common.entity.ScheduleTrigger$ClientScheduleConfig"
+        _class: "com.wl4g.rengine.common.entity.ScheduleTrigger$ExecutionScheduleConfig"
     },
+    remark: "safecloud monitor for mysql",
+    updateDate: ISODate("2022-12-27T04:51:08.533Z"),
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.ScheduleTrigger"
+} ]);
+db.getCollection("t_schedule_triggers").insert([ {
+    _id: NumberLong("62208697108652458"),
+    name: "monitor_app_mysql_water_bill_history",
     enable: NumberInt("1"),
     labels: [
         "safecloud",
@@ -1247,23 +835,15 @@ db.getCollection("t_schedule_triggers").insert([ {
         "mysql",
         "water_bill_history"
     ],
-    remark: "safecloud monitor for mysql",
-    updateDate: ISODate("2023-02-03T10:09:45.41Z"),
-    delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.ScheduleTrigger"
-} ]);
-db.getCollection("t_schedule_triggers").insert([ {
-    _id: NumberLong("62208697108652459"),
-    cron: "0/5 * * * * ?",
     monitorExecution: true,
     failover: true,
     misfire: true,
     timeZone: "GMT+08:00",
-    maxTimeDiffSeconds: NumberInt("-1"),
-    reconcileIntervalMinutes: NumberInt("0"),
-    maxTimeoutMs: NumberLong("30000"),
-    runState: "SUCCESS",
+    maxTimeoutMs: 30000,
+    runState: null,
     properties: {
+        type: "EXECUTION_SCHEDULER",
+        cron: "0/5 * * * * ?",
         requests: [
             {
                 clientId: "JVqEpEwIaqkEkeD5",
@@ -1271,16 +851,23 @@ db.getCollection("t_schedule_triggers").insert([ {
                 scenesCodes: [
                     "ecommerce_trade_gift"
                 ],
-                timeout: NumberLong("10000"),
                 bestEffort: false,
+                timeout: 10000,
                 args: {
                     foo1: "bar1"
                 }
             }
         ],
-        type: "CLIENT_SCHEDULER",
-        _class: "com.wl4g.rengine.common.entity.ScheduleTrigger$ClientScheduleConfig"
+        _class: "com.wl4g.rengine.common.entity.ScheduleTrigger$ExecutionScheduleConfig"
     },
+    remark: "safecloud monitor for mysql",
+    updateDate: ISODate("2022-12-27T04:51:08.533Z"),
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.ScheduleTrigger"
+} ]);
+db.getCollection("t_schedule_triggers").insert([ {
+    _id: NumberLong("62208697108652459"),
+    name: "monitor_emr_spark_history_stream_job",
     enable: NumberInt("1"),
     labels: [
         "safecloud",
@@ -1290,8 +877,72 @@ db.getCollection("t_schedule_triggers").insert([ {
         "spark",
         "history_stream_job"
     ],
+    monitorExecution: true,
+    failover: true,
+    misfire: true,
+    timeZone: "GMT+08:00",
+    maxTimeoutMs: 30000,
+    runState: null,
+    properties: {
+        type: "EXECUTION_SCHEDULER",
+        cron: "0/5 * * * * ?",
+        requests: [
+            {
+                clientId: "JVqEpEwIaqkEkeD5",
+                clientSecret: "Uf6nJDyJQHKRP43ycl9vZ9zs7s1nyu77",
+                scenesCodes: [
+                    "ecommerce_trade_gift"
+                ],
+                bestEffort: false,
+                timeout: 10000,
+                args: {
+                    foo1: "bar1"
+                }
+            }
+        ],
+        _class: "com.wl4g.rengine.common.entity.ScheduleTrigger$ExecutionScheduleConfig"
+    },
     remark: "safecloud monitor for emr",
-    updateDate: ISODate("2023-02-03T10:09:45.408Z"),
+    updateDate: ISODate("2022-12-27T04:51:08.533Z"),
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.ScheduleTrigger"
+} ]);
+db.getCollection("t_schedule_triggers").insert([ {
+    _id: NumberLong("62208697108652460"),
+    name: "subscribe_kafka_notification_msg",
+    enable: NumberInt("1"),
+    labels: [
+        "safecloud",
+        "production",
+        "kafka subscribe",
+        "notification"
+    ],
+    monitorExecution: true,
+    failover: true,
+    misfire: true,
+    timeZone: "GMT+08:00",
+    maxTimeoutMs: 30000,
+    runState: null,
+    properties: {
+        type: "KAFKA_SUBSCRIBE_SCHEDULER",
+        requests: [
+            {
+                clientId: "JVqEpEwIaqkEkeD5",
+                clientSecret: "Uf6nJDyJQHKRP43ycl9vZ9zs7s1nyu77",
+                scenesCodes: [
+                    "ecommerce_trade_gift"
+                ],
+                bestEffort: false,
+                timeout: 10000,
+                args: {
+                    foo1: "bar1"
+                }
+            }
+        ],
+        _class: "com.wl4g.rengine.common.entity.ScheduleTrigger$KafkaSubscribeScheduleConfig"
+    },
+    remark: "safecloud subscribe for kafka",
+    updateDate: ISODate("2022-12-27T04:51:08.533Z"),
     delFlag: NumberInt("0"),
     _class: "com.wl4g.rengine.common.entity.ScheduleTrigger"
 } ]);

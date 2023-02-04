@@ -39,7 +39,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
-import com.wl4g.rengine.controller.job.AbstractJobExecutor.SchedulerJobType;
+import com.wl4g.rengine.controller.job.AbstractJobExecutor.ScheduleJobType;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -79,7 +79,6 @@ public class RengineControllerProperties implements InitializingBean {
     }
 
     protected void resolveJobProperties() {
-        controller.setName(resolveString(environment, controller.getName()));
         controller.setCron(resolveString(environment, controller.getCron()));
         controller.setTimeZone(resolveString(environment, controller.getTimeZone()));
         controller.setJobBootstrapBeanName(resolveString(environment, controller.getJobBootstrapBeanName()));
@@ -237,8 +236,6 @@ public class RengineControllerProperties implements InitializingBean {
     @ToString
     public static class GlobalEngineScheduleControllerProperties {
         // Elastic-Job standard configuration.
-        private String name;
-        // private Class<? extends ElasticJob> elasticJobClass;
         private Boolean disabled;
         private Boolean overwrite;
         private Boolean monitorExecution;
@@ -290,7 +287,7 @@ public class RengineControllerProperties implements InitializingBean {
         public JobConfiguration toJobConfiguration(final String jobName) {
             hasTextOf(jobName, "jobName");
             final JobConfiguration jobConfig = JobConfiguration.builder()
-                    .jobType(SchedulerJobType.GLOBAL_CONTROLLER)
+                    .jobType(ScheduleJobType.GLOBAL_ENGINE_CONTROLLER)
                     .jobName(jobName)
                     .disabled(nonNull(disabled) ? disabled : false)
                     .overwrite(nonNull(overwrite) ? overwrite : true)
