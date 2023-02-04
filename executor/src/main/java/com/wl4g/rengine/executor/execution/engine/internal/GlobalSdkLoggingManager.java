@@ -35,7 +35,7 @@ import org.quartz.SchedulerException;
 import com.wl4g.infra.common.task.QuartzUtils2;
 import com.wl4g.rengine.common.entity.UploadObject;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
-import com.wl4g.rengine.executor.metrics.ExecutorMeterService;
+import com.wl4g.rengine.executor.meter.RengineExecutorMeterService;
 import com.wl4g.rengine.executor.minio.MinioConfig;
 import com.wl4g.rengine.executor.minio.MinioManager;
 
@@ -58,7 +58,7 @@ public class GlobalSdkLoggingManager {
     ExecutionConfig executionConfig;
 
     @Inject
-    ExecutorMeterService meterService;
+    RengineExecutorMeterService meterService;
 
     @Inject
     MinioConfig minioConfig;

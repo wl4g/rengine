@@ -35,7 +35,7 @@ import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.MsgKeyTy
 import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.SampleActionCard6Param;
 import com.wl4g.infra.common.notification.email.internal.EmailSenderAPI;
 import com.wl4g.infra.common.serialize.JacksonUtils;
-import com.wl4g.rengine.executor.metrics.TestDefaultMeterSetup;
+import com.wl4g.rengine.executor.meter.TestDefaultMeterSetup;
 import com.wl4g.rengine.executor.util.TestDefaultBaseSetup;
 import com.wl4g.rengine.executor.util.TestDefaultRedisSetup;
 

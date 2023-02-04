@@ -28,7 +28,7 @@ import org.junit.jupiter.api.RepeatedTest;
 
 import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
 import com.wl4g.rengine.common.model.ExecuteRequest;
-import com.wl4g.rengine.executor.metrics.TestDefaultMeterSetup;
+import com.wl4g.rengine.executor.meter.TestDefaultMeterSetup;
 import com.wl4g.rengine.executor.util.TestDefaultBaseSetup;
 import com.wl4g.rengine.executor.util.TestDefaultRedisSetup;
 

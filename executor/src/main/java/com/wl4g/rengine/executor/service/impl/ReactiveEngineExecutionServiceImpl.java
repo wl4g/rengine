@@ -67,7 +67,7 @@ import com.wl4g.rengine.common.model.ExecuteResult;
 import com.wl4g.rengine.common.util.BsonEntitySerializers;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
 import com.wl4g.rengine.executor.execution.LifecycleExecutionService;
-import com.wl4g.rengine.executor.metrics.ExecutorMeterService;
+import com.wl4g.rengine.executor.meter.RengineExecutorMeterService;
 import com.wl4g.rengine.executor.repository.MongoRepository;
 import com.wl4g.rengine.executor.service.EngineExecutionService;
 
@@ -94,7 +94,7 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
     ExecutionConfig config;
 
     @Inject
-    ExecutorMeterService meterService;
+    RengineExecutorMeterService meterService;
 
     @Inject
     MongoRepository mongoRepository;

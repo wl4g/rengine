@@ -71,7 +71,7 @@ import com.wl4g.rengine.executor.execution.sdk.tools.RSA;
 import com.wl4g.rengine.executor.execution.sdk.tools.RandomHolder;
 import com.wl4g.rengine.executor.execution.sdk.tools.RengineEvent;
 import com.wl4g.rengine.executor.execution.sdk.tools.UUID;
-import com.wl4g.rengine.executor.metrics.ExecutorMeterService;
+import com.wl4g.rengine.executor.meter.RengineExecutorMeterService;
 import com.wl4g.rengine.executor.minio.MinioConfig;
 import com.wl4g.rengine.executor.minio.MinioManager;
 import com.wl4g.rengine.executor.minio.MinioManager.ObjectResource;
@@ -96,7 +96,7 @@ public abstract class AbstractScriptEngine implements IEngine {
     MinioConfig minioConfig;
 
     @Inject
-    ExecutorMeterService meterService;
+    RengineExecutorMeterService meterService;
 
     @Inject
     RedisDataSource redisDS;

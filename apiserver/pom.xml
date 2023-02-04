@@ -92,89 +92,27 @@
             <groupId>com.wl4g</groupId>
             <artifactId>infra-context</artifactId>
         </dependency>
-        <!-- Spring -->
+        <!-- SECURITY -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-oauth2-client</artifactId>
         </dependency>
         <!-- Native -->
         <dependency>
             <groupId>org.springframework.experimental</groupId>
             <artifactId>spring-native</artifactId>
         </dependency>
-        <!-- Docs -->
-        <!-- see:https://springdoc.org/#demos -->
-        <!-- see:https://github.com/springdoc/springdoc-openapi-demos -->
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-ui</artifactId>
-        </dependency>
-        <!-- see:https://springdoc.org/#spring-native-support -->
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-native</artifactId>
-        </dependency>
-        <!-- Security -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-oauth2-client</artifactId>
-        </dependency>
-        <!-- Logging -->
-        <!-- see:https://loki4j.github.io/loki-logback-appender/#quick-start -->
-        <!-- see:https://www.elastic.co/guide/en/ecs-logging/java/current/setup.html#setup -->
-        <!-- <dependency>-->
-        <!--     <groupId>co.elastic.logging</groupId>-->
-        <!--     <artifactId>logback-ecs-encoder</artifactId>-->
-        <!--     <version>${elastic-logback.version}</version>-->
-        <!-- </dependency>-->
-        <dependency>
-            <groupId>net.logstash.logback</groupId>
-            <artifactId>logstash-logback-encoder</artifactId>
-            <!-- <version>7.2</version> -->
-        </dependency>
-        <!-- APM -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-sleuth</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-actuator-autoconfigure</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-registry-jmx</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-registry-prometheus</artifactId>
-        </dependency>
         <!-- Redis -->
         <!-- For com.wl4g:rengine-common(RedisDataSourceProperties) -->
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-pool2</artifactId>
-        </dependency>
-        <!-- DB -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-mongodb</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
+            <scope>provided</scope>
         </dependency>
         <!-- OSS -->
         <dependency>

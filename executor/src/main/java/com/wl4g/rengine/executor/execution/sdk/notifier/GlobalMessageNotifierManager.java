@@ -20,10 +20,10 @@ import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
-import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_notifier_manager_failure;
-import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_notifier_manager_time;
-import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_notifier_manager_total;
-import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_sdk_notifier_manager_success;
+import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsName.execution_sdk_notifier_manager_failure;
+import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsName.execution_sdk_notifier_manager_success;
+import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsName.execution_sdk_notifier_manager_time;
+import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsName.execution_sdk_notifier_manager_total;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
@@ -57,8 +57,8 @@ import com.wl4g.rengine.common.util.BsonEntitySerializers;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
 import com.wl4g.rengine.executor.execution.sdk.ScriptRedisLockClient;
 import com.wl4g.rengine.executor.execution.sdk.notifier.ScriptMessageNotifier.RefreshedInfo;
-import com.wl4g.rengine.executor.metrics.ExecutorMeterService;
-import com.wl4g.rengine.executor.metrics.MeterUtil;
+import com.wl4g.rengine.executor.meter.RengineExecutorMeterService;
+import com.wl4g.rengine.executor.meter.MeterUtil;
 import com.wl4g.rengine.executor.repository.MongoRepository;
 
 import io.quarkus.arc.All;
@@ -84,7 +84,7 @@ public class GlobalMessageNotifierManager {
 
     @NotNull
     @Inject
-    ExecutorMeterService meterService;
+    RengineExecutorMeterService meterService;
 
     @NotNull
     @Inject

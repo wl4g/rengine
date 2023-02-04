@@ -143,11 +143,11 @@
         <module>bom</module>
         <module>common</module>
         <module>eventbus</module>
-        <module>scheduler</module>
-        <module>executor</module>
-        <module>apiserver</module>
-        <module>job</module>
         <module>client</module>
+        <module>apiserver</module>
+        <module>controller</module>
+        <module>executor</module>
+        <module>job</module>
         <!-- <module>example</module> -->
     </modules>
     <build>

@@ -20,9 +20,9 @@ import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_failure;
-import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_success;
-import static com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsName.execution_total;
+import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsName.execution_failure;
+import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsName.execution_success;
+import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsName.execution_total;
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.nonNull;
@@ -64,8 +64,8 @@ import com.wl4g.rengine.common.exception.RengineException;
 import com.wl4g.rengine.common.model.ExecuteRequest;
 import com.wl4g.rengine.common.model.ExecuteResult;
 import com.wl4g.rengine.common.model.ExecuteResult.ResultDescription;
-import com.wl4g.rengine.executor.metrics.ExecutorMeterService;
-import com.wl4g.rengine.executor.metrics.ExecutorMeterService.MetricsTag;
+import com.wl4g.rengine.executor.meter.RengineExecutorMeterService;
+import com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsTag;
 import com.wl4g.rengine.executor.service.impl.ReactiveEngineExecutionServiceImpl;
 
 import lombok.AllArgsConstructor;
@@ -90,7 +90,7 @@ public class LifecycleExecutionService {
     ExecutionConfig config;
 
     @Inject
-    ExecutorMeterService meterService;
+    RengineExecutorMeterService meterService;
 
     @Inject
     DefaultWorkflowExecution workflowExecution;

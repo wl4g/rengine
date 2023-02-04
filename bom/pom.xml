@@ -161,17 +161,17 @@
             </dependency>
             <dependency>
                 <groupId>com.wl4g</groupId>
-                <artifactId>rengine-executor</artifactId>
-                <version>${project.parent.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wl4g</groupId>
                 <artifactId>rengine-apiserver</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wl4g</groupId>
-                <artifactId>rengine-scheduler</artifactId>
+                <artifactId>rengine-controller</artifactId>
+                <version>${project.parent.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.wl4g</groupId>
+                <artifactId>rengine-executor</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <dependency>

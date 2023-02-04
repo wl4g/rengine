@@ -15,14 +15,18 @@
  */
 package com.wl4g.rengine.service.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 import com.wl4g.rengine.common.constants.RengineConstants;
+import com.wl4g.rengine.service.meter.RengineMeterService;
 import com.wl4g.rengine.service.minio.MinioClientAutoConfiguration;
 import com.wl4g.rengine.service.mongo.CustomMongoConfigure;
+
+import io.micrometer.prometheus.PrometheusMeterRegistry;
 
 /**
  * {@link RengineServiceAutoConfiguration}
@@ -39,6 +43,14 @@ public class RengineServiceAutoConfiguration {
     @ConfigurationProperties(prefix = RengineConstants.CONF_PREFIX)
     public RengineServiceProperties rengineServiceProperties() {
         return new RengineServiceProperties();
+    }
+
+    @Bean
+    public RengineMeterService rengineMeterService(
+            PrometheusMeterRegistry meterRegistry,
+            @Value("${spring.application.name}") String serviceId,
+            @Value("${server.port}") int port) {
+        return new RengineMeterService(meterRegistry, serviceId, port);
     }
 
 }
