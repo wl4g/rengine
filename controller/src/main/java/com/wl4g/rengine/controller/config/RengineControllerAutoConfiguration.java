@@ -15,7 +15,7 @@
  */
 package com.wl4g.rengine.controller.config;
 
-import static com.wl4g.rengine.common.constants.RengineConstants.CONF_PREFIX_SCHEDULER;
+import static com.wl4g.rengine.common.constants.RengineConstants.CONF_PREFIX_CONTROLLER;
 
 import java.util.List;
 
@@ -47,7 +47,7 @@ public class RengineControllerAutoConfiguration {
     // --- Scheduler configurations.
 
     @Bean
-    @ConfigurationProperties(prefix = CONF_PREFIX_SCHEDULER)
+    @ConfigurationProperties(prefix = CONF_PREFIX_CONTROLLER)
     public RengineControllerProperties rengineControllerProperties() {
         return new RengineControllerProperties();
     }
@@ -59,12 +59,12 @@ public class RengineControllerAutoConfiguration {
 
     @Bean
     @ConditionalOnBean(DataSource.class)
-    @ConditionalOnProperty(name = CONF_PREFIX_SCHEDULER + ".tracing.type", havingValue = "RDB")
+    @ConditionalOnProperty(name = CONF_PREFIX_CONTROLLER + ".tracing.type", havingValue = "RDB")
     public TracingConfiguration<DataSource> tracingConfiguration(DataSource dataSource) {
         return new TracingConfiguration<>("RDB", dataSource);
     }
 
-    @ConditionalOnProperty(name = CONF_PREFIX_SCHEDULER + ".dump.port")
+    @ConditionalOnProperty(name = CONF_PREFIX_CONTROLLER + ".dump.port")
     @Bean(initMethod = "listen", destroyMethod = "close")
     public SnapshotService snapshotService(CoordinatorRegistryCenter registryCenter, RengineControllerProperties config) {
         return new SnapshotService(registryCenter, config.getDump().getPort());

@@ -45,9 +45,9 @@ public abstract class RengineConstants extends EnvironmentUtil {
     public static final String DEFAULT_MINIO_REGION = "us-east-1";
     public static final String DEFAULT_MINIO_BUCKET = "rengine";
 
-    // ---------- Scheduler definitions. ----------
+    // ---------- Controller definitions. ----------
 
-    public static final String CONF_PREFIX_SCHEDULER = CONF_PREFIX + ".scheduler";
+    public static final String CONF_PREFIX_CONTROLLER = CONF_PREFIX + ".controller";
 
     // ---------- Executor definitions. ----------
 
