@@ -28,6 +28,7 @@ import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -80,6 +81,18 @@ public class EngineKafkaSubscribeScheduler extends EngineExecutionScheduler {
     @Override
     public String getType() {
         return ScheduleJobType.KAFKA_SUBSCRIBE_SCHEDULER.name();
+    }
+
+    @Override
+    public void close() throws IOException {
+        super.close();
+        subscriberRegistry.entrySet().forEach(e -> {
+            try {
+                e.getValue().stop();
+            } catch (Throwable ex) {
+                log.warn(format("Unable to closing subscriber for triggerId: %s", e.getKey()), ex);
+            }
+        });
     }
 
     @SuppressWarnings("unchecked")

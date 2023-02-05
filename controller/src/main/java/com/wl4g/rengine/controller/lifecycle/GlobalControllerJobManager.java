@@ -19,14 +19,17 @@ import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeToList;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.infra.common.reflect.ReflectionUtils2.getField;
 import static com.wl4g.rengine.controller.lifecycle.ElasticJobBootstrapBuilder.newDefaultJobConfig;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
+import static org.springframework.util.ReflectionUtils.findField;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -36,9 +39,13 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import org.apache.curator.framework.recipes.locks.InterProcessSemaphoreMutex;
+import org.apache.shardingsphere.elasticjob.api.ElasticJob;
 import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
+import org.apache.shardingsphere.elasticjob.executor.ElasticJobExecutor;
+import org.apache.shardingsphere.elasticjob.executor.item.JobItemExecutor;
 import org.apache.shardingsphere.elasticjob.lite.api.bootstrap.JobBootstrap;
 import org.apache.shardingsphere.elasticjob.lite.api.bootstrap.impl.ScheduleJobBootstrap;
+import org.apache.shardingsphere.elasticjob.lite.internal.schedule.JobScheduler;
 import org.apache.shardingsphere.elasticjob.reg.base.CoordinatorRegistryCenter;
 import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperRegistryCenter;
 import org.apache.shardingsphere.elasticjob.tracing.api.TracingConfiguration;
@@ -49,6 +56,7 @@ import com.wl4g.infra.common.collection.CollectionUtils2;
 import com.wl4g.rengine.common.entity.ScheduleTrigger;
 import com.wl4g.rengine.controller.config.RengineControllerProperties;
 import com.wl4g.rengine.controller.exception.ScheduleException;
+import com.wl4g.rengine.controller.job.AbstractJobExecutor;
 import com.wl4g.rengine.controller.job.AbstractJobExecutor.ScheduleJobType;
 import com.wl4g.rengine.controller.job.GlobalEngineScheduleController;
 import com.wl4g.rengine.controller.lifecycle.ElasticJobBootstrapBuilder.JobParameter;
@@ -87,6 +95,24 @@ public class GlobalControllerJobManager implements ApplicationRunner, Closeable 
 
     @Override
     public void close() throws IOException {
+        safeMap(bootstrapRegistry).entrySet().forEach(e -> {
+            try {
+                final Field jobSchedulerField = findField(e.getValue().getClass(), "jobScheduler");
+                final JobScheduler jobScheduler = getField(jobSchedulerField, e.getValue(), true);
+
+                final Field jobExecutorField = findField(JobScheduler.class, "jobExecutor");
+                final ElasticJobExecutor jobExecutor = getField(jobExecutorField, jobScheduler, true);
+
+                final Field jobItemExecutorField = findField(ElasticJobExecutor.class, "jobItemExecutor");
+                final JobItemExecutor<ElasticJob> jobItemExecutor = getField(jobItemExecutorField, jobExecutor, true);
+
+                if (jobItemExecutor instanceof AbstractJobExecutor) {
+                    ((AbstractJobExecutor) jobItemExecutor).close();
+                }
+            } catch (IOException ex) {
+                log.warn(format("Unable to closing job item executor for triggerId: %s", e.getKey()), ex);
+            }
+        });
     }
 
     @Override

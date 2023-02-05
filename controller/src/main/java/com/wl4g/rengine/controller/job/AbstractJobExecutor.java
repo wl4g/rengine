@@ -22,6 +22,8 @@ import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
@@ -72,7 +74,7 @@ import lombok.ToString;
  * @since v1.0.0
  */
 @CustomLog
-public abstract class AbstractJobExecutor implements TypedJobItemExecutor {
+public abstract class AbstractJobExecutor implements TypedJobItemExecutor, Closeable {
     private RengineControllerProperties config;
     private RengineMeterService meterService;
     private CoordinatorRegistryCenter regCenter;
@@ -167,6 +169,10 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor {
     //    return eventbusServices;
     //}
     // @formatter:on
+
+    @Override
+    public void close() throws IOException {
+    }
 
     @Override
     public void process(ElasticJob elasticJob, JobConfiguration jobConfig, JobFacade jobFacade, ShardingContext context) {

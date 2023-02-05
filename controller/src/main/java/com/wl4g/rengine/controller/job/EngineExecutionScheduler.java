@@ -26,6 +26,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -92,6 +93,11 @@ public class EngineExecutionScheduler extends AbstractJobExecutor {
     @Override
     public String getType() {
         return ScheduleJobType.EXECUTION_SCHEDULER.name();
+    }
+
+    @Override
+    public void close() throws IOException {
+        getExecutor().shutdownNow();
     }
 
     @SuppressWarnings("unchecked")
