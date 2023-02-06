@@ -10,4 +10,4 @@
 com.wl4g.rengine.controller.job.GlobalEngineScheduleController
 com.wl4g.rengine.controller.job.EngineExecutionScheduler
 com.wl4g.rengine.controller.job.EngineKafkaSubscribeScheduler
-com.wl4g.rengine.controller.job.EngineFlinkSubmitScheduler
+#com.wl4g.rengine.controller.job.EngineFlinkSubmitScheduler

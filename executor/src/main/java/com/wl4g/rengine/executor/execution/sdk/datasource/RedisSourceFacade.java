@@ -30,6 +30,7 @@ import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.startsWithAny;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Map;
 
 import javax.inject.Singleton;
@@ -40,6 +41,7 @@ import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.wl4g.infra.common.jedis.JedisClient;
 import com.wl4g.infra.common.jedis.JedisClientBuilder;
+import com.wl4g.infra.common.jedis.JedisClientBuilder.JedisConfig;
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourcePropertiesBase;
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
 import com.wl4g.rengine.common.entity.DataSourceProperties.RedisDataSourceProperties;
@@ -50,6 +52,7 @@ import com.wl4g.rengine.executor.meter.MeterUtil;
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
 import lombok.Getter;
+import redis.clients.jedis.JedisPoolConfig;
 
 /**
  * {@link RedisSourceFacade}
@@ -333,8 +336,36 @@ public class RedisSourceFacade implements DataSourceFacade {
             notNullOf(globalDataSourceManager, "globalDataSourceManager");
             hasTextOf(dataSourceName, "dataSourceName");
 
-            final RedisDataSourceProperties _config = (RedisDataSourceProperties) dataSourceProperties;
-            final JedisClient jedisClient = new JedisClientBuilder(_config.getJedisConfig()).build();
+            final RedisDataSourceProperties rdsp = (RedisDataSourceProperties) dataSourceProperties;
+            final JedisPoolConfig poolConfig = new JedisPoolConfig();
+            poolConfig.setMaxIdle(rdsp.getPoolConfig().getMaxIdle());
+            poolConfig.setMinIdle(rdsp.getPoolConfig().getMinIdle());
+            poolConfig.setLifo(rdsp.getPoolConfig().getLifo());
+            poolConfig.setFairness(rdsp.getPoolConfig().getFairness());
+            poolConfig.setMaxIdle(rdsp.getPoolConfig().getMaxIdle());
+            poolConfig.setMinEvictableIdleTime(Duration.ofMillis(rdsp.getPoolConfig().getMinEvictableIdleMs()));
+            poolConfig.setEvictorShutdownTimeout(Duration.ofMillis(rdsp.getPoolConfig().getEvictorShutdownTimeoutMs()));
+            poolConfig.setSoftMinEvictableIdleTime(Duration.ofMillis(rdsp.getPoolConfig().getSoftMinEvictableIdleMs()));
+            poolConfig.setNumTestsPerEvictionRun(rdsp.getPoolConfig().getNumTestsPerEvictionRun());
+            poolConfig.setTimeBetweenEvictionRuns(Duration.ofMillis(rdsp.getPoolConfig().getDurationBetweenEvictionRunsMs()));
+            poolConfig.setTestOnCreate(rdsp.getPoolConfig().getTestOnCreate());
+            poolConfig.setTestOnBorrow(rdsp.getPoolConfig().getTestOnBorrow());
+            poolConfig.setTestOnReturn(rdsp.getPoolConfig().getTestOnReturn());
+            poolConfig.setTestWhileIdle(rdsp.getPoolConfig().getTestWhileIdle());
+            poolConfig.setBlockWhenExhausted(rdsp.getPoolConfig().getBlockWhenExhausted());
+            final JedisConfig jedisConfig = JedisConfig.builder()
+                    .nodes(rdsp.getNodes())
+                    .username(rdsp.getUsername())
+                    .password(rdsp.getPassword())
+                    .clientName(rdsp.getClientName())
+                    .connTimeout(rdsp.getConnTimeout())
+                    .soTimeout(rdsp.getSoTimeout())
+                    .maxAttempts(rdsp.getMaxAttempts())
+                    .database(rdsp.getDatabase())
+                    .safeMode(true)
+                    .poolConfig(poolConfig)
+                    .build();
+            final JedisClient jedisClient = new JedisClientBuilder(jedisConfig).build();
             return new RedisSourceFacade(config, globalDataSourceManager, dataSourceName, jedisClient);
         }
 

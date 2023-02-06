@@ -144,6 +144,7 @@
         <module>common</module>
         <module>eventbus</module>
         <module>client</module>
+        <module>service</module>
         <module>apiserver</module>
         <module>controller</module>
         <module>executor</module>

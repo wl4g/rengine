@@ -113,7 +113,7 @@ public class KafkaSourceFacade implements DataSourceFacade {
                 final @NotNull DataSourcePropertiesBase dataSourceProperties) {
             notNullOf(config, "properties");
             hasTextOf(dataSourceName, "dataSourceName");
-            final Map<String, Object> configMap = ((KafkaDataSourceProperties) dataSourceProperties).toConfigMap();
+            final Map<String, Object> configMap = ((KafkaDataSourceProperties) dataSourceProperties).toProducerConfigProperties();
             return new KafkaSourceFacade(config, globalDataSourceManager, dataSourceName, new KafkaProducer<>(configMap));
         }
 

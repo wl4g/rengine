@@ -32,8 +32,6 @@ import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.infra.common.validation.EnumValue;
-import com.wl4g.rengine.common.entity.ScheduleTrigger.ExecutionScheduleConfig;
-import com.wl4g.rengine.common.entity.ScheduleTrigger.FlinkSubmitScheduleConfig;
 import com.wl4g.rengine.common.entity.ScheduleTrigger.ScheduleType;
 import com.wl4g.rengine.common.model.ExecuteResult.ResultDescription;
 
@@ -73,10 +71,10 @@ public class ScheduleJobLog extends BaseBean {
     @NotNull
     JogLogDetailBase<?> detail;
 
-    @Schema(oneOf = { ExecutionScheduleConfig.class, FlinkSubmitScheduleConfig.class }, discriminatorProperty = "type")
+    @Schema(oneOf = { ExecutionScheduleJobLog.class, KafkaSubscribeScheduleJobLog.class }, discriminatorProperty = "type")
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", visible = true)
-    @JsonSubTypes({ @Type(value = ExecutionScheduleConfig.class, name = "CLIENT_SCHEDULER"),
-            @Type(value = FlinkSubmitScheduleConfig.class, name = "FLINK_SCHEDULER") })
+    @JsonSubTypes({ @Type(value = ExecutionScheduleJobLog.class, name = "EXECUTION_SCHEDULER"),
+            @Type(value = KafkaSubscribeScheduleJobLog.class, name = "KAFKA_SUBSCRIBE_SCHEDULER") })
     @Getter
     @Setter
     @SuperBuilder

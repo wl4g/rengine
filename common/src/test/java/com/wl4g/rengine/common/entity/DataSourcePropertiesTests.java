@@ -24,11 +24,11 @@ import java.util.Map;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.junit.Test;
 
-import com.wl4g.infra.common.jedis.JedisClientBuilder.JedisConfig;
 import com.wl4g.rengine.common.entity.DataSourceProperties.JDBCDataSourceProperties;
 import com.wl4g.rengine.common.entity.DataSourceProperties.KafkaDataSourceProperties;
 import com.wl4g.rengine.common.entity.DataSourceProperties.MongoDataSourceProperties;
 import com.wl4g.rengine.common.entity.DataSourceProperties.RedisDataSourceProperties;
+import com.wl4g.rengine.common.entity.DataSourceProperties.RedisDataSourceProperties.JedisPoolConfig;
 
 /**
  * {@link DataSourcePropertiesTests}
@@ -88,12 +88,10 @@ public class DataSourcePropertiesTests {
         datasource.setName("default");
         datasource.setProperties(RedisDataSourceProperties.builder()
                 // .type(DataSourceType.REDIS)
-                .jedisConfig(JedisConfig.builder()
-                        .nodes(asList(
-                                "localhost:6379,localhost:6380,localhost:6381,localhost:7379,localhost:7380,localhost:7381"))
-                        .connTimeout(3000)
-                        .password("123456")
-                        .build())
+                .nodes(asList("localhost:6379,localhost:6380,localhost:6381,localhost:7379,localhost:7380,localhost:7381"))
+                .connTimeout(3000)
+                .password("123456")
+                .poolConfig(JedisPoolConfig.builder().maxTotal(10).maxWait(10_000L).build())
                 .build());
 
         String json = toJSONString(datasource, true);
@@ -107,27 +105,30 @@ public class DataSourcePropertiesTests {
 
     @Test
     public void testKafkaDataSourcePropertiesSerialize() {
-        final DataSourceProperties datasource = new DataSourceProperties();
-        datasource.setId(10101001L);
-        datasource.setName("default");
-        datasource.setProperties(KafkaDataSourceProperties.builder()
+        final DataSourceProperties datasource1 = new DataSourceProperties();
+        datasource1.setId(10101001L);
+        datasource1.setName("default");
+        datasource1.setProperties(KafkaDataSourceProperties.builder()
                 // .type(DataSourceType.KAFKA)
                 .bootstrapServers("localhost:9092")
                 .acks("all")
                 .bufferMemory(1024_000_000L)
                 .build());
 
-        String json = toJSONString(datasource, true);
-        System.out.println(json);
+        final String json1 = toJSONString(datasource1, true);
+        System.out.println("json1: " + json1);
 
-        DataSourceProperties datasource2 = parseJSON(json, DataSourceProperties.class);
-        System.out.println(datasource2);
+        final DataSourceProperties datasource2 = parseJSON(json1, DataSourceProperties.class);
+        System.out.println("datasource2: " + datasource2);
 
         assert datasource2.getProperties() instanceof KafkaDataSourceProperties;
 
         // Assertion for kafka producer configure.
-        final Map<String, Object> configMap = ((KafkaDataSourceProperties) datasource2.getProperties()).toConfigMap();
-        new ProducerConfig(configMap);
+        final Map<String, Object> producerConfigProps = ((KafkaDataSourceProperties) datasource2.getProperties())
+                .toProducerConfigProperties();
+        System.out.println("producerConfigProps: " + producerConfigProps);
+
+        new ProducerConfig(producerConfigProps);
     }
 
 }

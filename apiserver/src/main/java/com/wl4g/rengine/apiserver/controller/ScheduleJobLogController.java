@@ -42,17 +42,17 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link ScheduleJobController}
+ * {@link ScheduleJobLogController}
  * 
  * @author James Wong
  * @version 2022-08-28
  * @since v1.0.0
  */
-@Tag(name = "ScheduleJobAPI", description = "The ScheduleJobLog management API")
+@Tag(name = "ScheduleJobLogAPI", description = "The ScheduleJobLog management API")
 @Slf4j
 @RestController
-@RequestMapping("/admin/scheduleJob")
-public class ScheduleJobController {
+@RequestMapping("/admin/scheduleJobLog")
+public class ScheduleJobLogController {
 
     private @Autowired ScheduleJobLogService scheduleJobLogService;
 

@@ -275,8 +275,8 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor, Close
             result = getScheduleJobLogService().save(jogLog);
             log.debug("Upserted to scheduling job log : {} => {}", jogLog, result);
 
-        } catch (Exception e2) {
-            log.error(format("Failed to upsert scheduling job log to DB. - %s", jogLog), e2);
+        } catch (Exception ex) {
+            log.error(format("Failed to upsert scheduling job log to DB. - %s", jogLog), ex);
         }
         return jogLog;
     }
@@ -293,9 +293,9 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor, Close
 
         EXECUTION_SCHEDULER(ScheduleType.EXECUTION_SCHEDULER),
 
-        KAFKA_SUBSCRIBE_SCHEDULER(ScheduleType.KAFKA_SUBSCRIBE_SCHEDULER),
+        KAFKA_SUBSCRIBE_SCHEDULER(ScheduleType.KAFKA_SUBSCRIBE_SCHEDULER);
 
-        FLINK_SUBMIT_SCHEDULER(ScheduleType.FLINK_SUBMIT_SCHEDULER);
+        // FLINK_SUBMIT_SCHEDULER(ScheduleType.FLINK_SUBMIT_SCHEDULER)
 
         private final ScheduleType scheduleType;
 

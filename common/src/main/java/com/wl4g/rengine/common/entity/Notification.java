@@ -18,6 +18,7 @@ package com.wl4g.rengine.common.entity;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -138,6 +139,12 @@ public class Notification extends BaseBean {
         // is appKey.
         private String corpId;
 
+        // Note: Since it is only used for system-level notifications, there
+        // will not be too much data, so the temporary design is saved to this
+        // single object.
+        private List<DingtalkUserInfo> users;
+        private List<DingtalkScenesGroupInfo> scenesGroups;
+
         public DingtalkConfig validate(boolean checkCallbackAPIProperties) {
             hasTextOf(appKey, "appKey");
             hasTextOf(appSecret, "appSecret");
@@ -147,6 +154,88 @@ public class Notification extends BaseBean {
                 hasTextOf(corpId, "corpId");
             }
             return this;
+        }
+
+        @Getter
+        @Setter
+        @SuperBuilder
+        @ToString
+        public static class DingtalkUserInfo {
+            @NotBlank
+            String mobile;
+            String userId;
+
+            public DingtalkUserInfo validate(boolean checkForUserId) {
+                hasTextOf(mobile, "mobile");
+                if (checkForUserId) {
+                    hasTextOf(userId, "userId");
+                }
+                return this;
+            }
+        }
+
+        @Getter
+        @Setter
+        @SuperBuilder
+        @ToString
+        public static class DingtalkScenesGroupInfo {
+            @NotBlank
+            String title; // Scenes group display name.
+
+            @NotBlank
+            String templateId; // Scenes group create template
+
+            String chatId;
+
+            @NotBlank
+            String openConversationId;
+
+            @NotBlank
+            String ownerUserId;
+
+            List<String> adminUserIds;
+
+            List<String> userIds;
+
+            String uuid;
+
+            String icon;
+
+            String mentionAllAuthority;
+
+            String showHistoryType;
+
+            String validationType;
+
+            String searchable;
+
+            String chatVannedType;
+
+            String managementType;
+
+            String onlyAdminCanDing;
+
+            String allMembersCanCreateMcsConf;
+
+            String allMembersCanCreateCalendar;
+
+            String groupEmailDisabled;
+
+            String onlyAdminCanSetMsgTop;
+
+            String addFriendForbidden;
+
+            String groupLiveSwitch;
+
+            String membersToAdminChat;
+
+            public DingtalkScenesGroupInfo validate() {
+                hasTextOf(title, "title");
+                hasTextOf(templateId, "templateId");
+                hasTextOf(openConversationId, "openConversationId");
+                hasTextOf(ownerUserId, "ownerUserId");
+                return this;
+            }
         }
     }
 

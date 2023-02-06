@@ -33,6 +33,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.validation.constraints.NotNull;
 
@@ -195,7 +196,8 @@ public class GlobalEngineScheduleController extends AbstractJobExecutor {
                     }
                 });
 
-        PurgeJobLogController.get(getConfig(), getScheduleJobLogService(), (ZookeeperRegistryCenter) getRegCenter()).purge();
+        // The start the log purger, ignore if condition not met.
+        PurgeJobLogController.get(getConfig(), getScheduleJobLogService(), (ZookeeperRegistryCenter) getRegCenter()).start();
     }
 
     public static String buildJobName(final ScheduleTrigger trigger) {
@@ -205,11 +207,13 @@ public class GlobalEngineScheduleController extends AbstractJobExecutor {
     @CustomLog
     static class PurgeJobLogController {
         private static final String PATH_MUTEX_PURGE = "/mutex-purger";
+        private static final Long DEFAULT_PURGE_INTERNAL_MS = Duration.ofHours(1).toMillis();
         private static PurgeJobLogController SINGLETON;
         private RengineControllerProperties config;
         private ScheduleJobLogService scheduleJobLogService;
         private InterProcessSemaphoreMutex purgerMutexLock;
         private Thread executor;
+        private AtomicLong lastPurgeTime = new AtomicLong(0);
 
         public static PurgeJobLogController get(
                 final @NotNull RengineControllerProperties config,
@@ -230,44 +234,43 @@ public class GlobalEngineScheduleController extends AbstractJobExecutor {
             return SINGLETON;
         }
 
-        public void purge() {
-            try {
-                if (purgerMutexLock.acquire(1, TimeUnit.MILLISECONDS)) {
-                    if (isNull(executor)) {
-                        this.executor = new Thread(() -> {
-                            try {
-                                log.info("Purging trigger schedule job logs for : {}", config.getPurger());
+        public void start() {
+            if (currentTimeMillis() - lastPurgeTime.get() > DEFAULT_PURGE_INTERNAL_MS) {
+                log.debug("Started for purge controller.");
+                return;
+            }
+            this.lastPurgeTime.set(currentTimeMillis());
+            if (isNull(executor)) {
+                this.executor = new Thread(() -> {
+                    try {
+                        if (purgerMutexLock.acquire(1, TimeUnit.MILLISECONDS)) {
+                            log.info("Purging trigger schedule job logs for : {}", config.getPurger());
 
-                                // Purge past logs according to configuration,
-                                // keeping only the most recent period of time.
-                                final var purgeUpperTime = currentTimeMillis()
-                                        - Duration.ofHours(config.getPurger().getLogRetentionHours()).toMillis();
+                            // Purge past logs according to configuration,
+                            // keeping only the most recent period of time.
+                            final var purgeUpperTime = currentTimeMillis()
+                                    - Duration.ofHours(config.getPurger().getLogRetentionHours()).toMillis();
 
-                                final var result = scheduleJobLogService.delete(DeleteScheduleJobLog.builder()
-                                        .updateDateLower(new Date(1))
-                                        .updateDateUpper(new Date(purgeUpperTime)) // TODO-timezone?
-                                        .retentionCount(config.getPurger().getLogRetentionCount())
-                                        .build());
-                                log.info("Purged trigger schedule job logs count : {}", result.getDeletedCount());
-
-                            } catch (Throwable ex) {
-                                log.error(format("Failed to purge logs for : %s", config.getPurger()), ex);
-                            } finally {
-                                this.executor = null;
-                            }
-                        });
-                        this.executor.start();
+                            final var result = scheduleJobLogService.delete(DeleteScheduleJobLog.builder()
+                                    .updateDateLower(new Date(1))
+                                    // TODO notice timezone?
+                                    .updateDateUpper(new Date(purgeUpperTime))
+                                    .retentionCount(config.getPurger().getLogRetentionCount())
+                                    .build());
+                            log.info("Purged to trigger schedule job logs of count : {}", result.getDeletedCount());
+                        }
+                    } catch (Throwable ex) {
+                        log.error(format("Failed to purge logs for : %s", config.getPurger()), ex);
+                    } finally {
+                        this.executor = null;
+                        try {
+                            this.purgerMutexLock.release();
+                        } catch (Exception ex) {
+                            log.error("Failed to release purger mutex lock.", ex);
+                        }
                     }
-                }
-            } catch (Throwable ex) {
-                log.error("Failed to acquire purger mutex lock.", ex);
-                throw new IllegalStateException(ex);
-            } finally {
-                try {
-                    purgerMutexLock.release();
-                } catch (Exception ex) {
-                    log.error("Failed to release purger mutex lock.", ex);
-                }
+                });
+                this.executor.start();
             }
         }
     }

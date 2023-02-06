@@ -11,7 +11,7 @@
  Target Server Version : 40406
  File Encoding         : 65001
 
- Date: 05/02/2023 22:09:00
+ Date: 07/02/2023 00:21:31
 */
 
 
@@ -47,8 +47,59 @@ db.getCollection("sys_dicts").insert([ {
 db.getCollection("sys_dicts").insert([ {
     _id: NumberLong("6305460145405953"),
     type: "API_CONFIG_DEFINITION",
+    key: "sdk_datasource_mongo",
+    value: "[{\"type\":\"string\",\"name\":\"connectionString\",\"defaultValue\":\"localhost:9092\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null}]",
+    sort: NumberInt("0"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: null,
+    createDate: ISODate("2023-01-14T09:48:39.86Z"),
+    updateDate: ISODate("2023-01-14T09:48:39.86Z"),
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.service.model.SaveDict"
+} ]);
+db.getCollection("sys_dicts").insert([ {
+    _id: NumberLong("6305460145405954"),
+    type: "API_CONFIG_DEFINITION",
+    key: "sdk_datasource_redis",
+    value: "[{\"type\":\"array\",\"name\":\"nodes\",\"defaultValue\":\"localhost:6379,localhost:6380,localhost:6381,localhost:7379,localhost:7380,localhost:7381\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"username\",\"defaultValue\":null,\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"password\",\"defaultValue\":null,\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"clientName\",\"defaultValue\":null,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"connTimeout\",\"defaultValue\":\"10000\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"soTimeout\",\"defaultValue\":\"10000\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"maxAttempts\",\"defaultValue\":3,\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"database\",\"defaultValue\":\"0\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"safeMode\",\"defaultValue\":\"true\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"object\",\"name\":\"poolConfig\",\"defaultValue\":null,\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null,\"childrens\":[{\"type\":\"int\",\"name\":\"maxIdle\",\"defaultValue\":\"5\",\"required\":false,\"maxValue\":1000,\"minValue\":1,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"minIdle\",\"defaultValue\":\"\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"maxTotal\",\"defaultValue\":\"10\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"lifo\",\"defaultValue\":true,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"fairness\",\"defaultValue\":false,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"maxWait\",\"defaultValue\":\"10000\",\"required\":true,\"maxValue\":null,\"minValue\":1,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"minEvictableIdleMs\",\"defaultValue\":\"1800000\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"evictorShutdownTimeoutMs\",\"defaultValue\":\"10000\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"softMinEvictableIdleMs\",\"defaultValue\":\"-1\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"numTestsPerEvictionRun\",\"defaultValue\":\"3\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},,{\"type\":\"int64\",\"name\":\"durationBetweenEvictionRunsMs\",\"defaultValue\":\"-1\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null}{\"type\":\"boolean\",\"name\":\"testOnCreate\",\"defaultValue\":\"false\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"testOnBorrow\",\"defaultValue\":\"false\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"testOnReturn\",\"defaultValue\":\"false\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"testWhileIdle\",\"defaultValue\":\"true\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"blockWhenExhausted\",\"defaultValue\":\"true\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null}]}]}]",
+    sort: NumberInt("0"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: null,
+    createDate: ISODate("2023-01-14T09:48:39.86Z"),
+    updateDate: ISODate("2023-01-14T09:48:39.86Z"),
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.service.model.SaveDict"
+} ]);
+db.getCollection("sys_dicts").insert([ {
+    _id: NumberLong("6305460145405955"),
+    type: "API_CONFIG_DEFINITION",
+    key: "sdk_datasource_jdbc",
+    value: "[{\"type\":\"int\",\"name\":\"fetchDirection\",\"defaultValue\":null,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"fetchSize\",\"defaultValue\":10000,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"maxFieldSize\",\"defaultValue\":64,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"maxRows\",\"defaultValue\":1024,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"queryTimeoutMs\",\"defaultValue\":null,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"driverClassName\",\"defaultValue\":\"com.mysql.cj.jdbc.Driver\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"jdbcUrl\",\"defaultValue\":\"jdbc:mysql://localhost:3306/mysql?useUnicode=true&serverTimezone=UTC&characterEncoding=utf-8&useSSL=false\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"username\",\"defaultValue\":\"root\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"password\",\"defaultValue\":\"123456\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"connectionTimeout\",\"defaultValue\":\"123456\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"validationTimeout\",\"defaultValue\":null,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"validationTestSql\",\"defaultValue\":\"SELECT 1\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"long\",\"name\":\"idleTimeout\",\"defaultValue\":null,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"long\",\"name\":\"softMinIdleTimeout\",\"defaultValue\":-1,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"long\",\"name\":\"maxConnLifeTime\",\"defaultValue\":-1,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"long\",\"name\":\"evictionRunsBetweenTime\",\"defaultValue\":-1,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"initPoolSize\",\"defaultValue\":5,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"maximumPoolSize\",\"defaultValue\":20,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"minimumIdle\",\"defaultValue\":1,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"autoCommit\",\"defaultValue\":true,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"cacheState\",\"defaultValue\":true,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"testOnBorrow\",\"defaultValue\":false,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"testOnCreate\",\"defaultValue\":false,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"testOnReturn\",\"defaultValue\":false,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"testWhileIdle\",\"defaultValue\":false,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null}]",
+    sort: NumberInt("0"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: null,
+    createDate: ISODate("2023-01-14T09:48:39.86Z"),
+    updateDate: ISODate("2023-01-14T09:48:39.86Z"),
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.service.model.SaveDict"
+} ]);
+db.getCollection("sys_dicts").insert([ {
+    _id: NumberLong("6305460145405956"),
+    type: "API_CONFIG_DEFINITION",
     key: "sdk_datasource_kafka",
-    value: "{\"MONGO\":[{\"type\":\"string\",\"name\":\"connectionString\",\"defaultValue\":\"localhost:9092\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null}],\"JDBC\":[{\"type\":\"int\",\"name\":\"fetchDirection\",\"defaultValue\":null,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"fetchSize\",\"defaultValue\":10000,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"maxFieldSize\",\"defaultValue\":64,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"maxRows\",\"defaultValue\":1024,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"queryTimeoutMs\",\"defaultValue\":null,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"driverClassName\",\"defaultValue\":\"com.mysql.cj.jdbc.Driver\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"jdbcUrl\",\"defaultValue\":\"jdbc:mysql://localhost:3306/mysql?useUnicode=true&serverTimezone=UTC&characterEncoding=utf-8&useSSL=false\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"username\",\"defaultValue\":\"root\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"password\",\"defaultValue\":\"123456\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"connectionTimeout\",\"defaultValue\":\"123456\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"validationTimeout\",\"defaultValue\":null,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"validationTestSql\",\"defaultValue\":\"SELECT 1\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"long\",\"name\":\"idleTimeout\",\"defaultValue\":null,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"long\",\"name\":\"softMinIdleTimeout\",\"defaultValue\":-1,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"long\",\"name\":\"maxConnLifeTime\",\"defaultValue\":-1,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"long\",\"name\":\"evictionRunsBetweenTime\",\"defaultValue\":-1,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"initPoolSize\",\"defaultValue\":5,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"maximumPoolSize\",\"defaultValue\":20,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"minimumIdle\",\"defaultValue\":1,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"autoCommit\",\"defaultValue\":true,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"cacheState\",\"defaultValue\":true,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"testOnBorrow\",\"defaultValue\":false,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"testOnCreate\",\"defaultValue\":false,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"testOnReturn\",\"defaultValue\":false,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"testWhileIdle\",\"defaultValue\":false,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null}],\"REDIS\":[{\"type\":\"object\",\"name\":\"jedisConfig\",\"defaultValue\":false,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null,\"childrens\":[{\"type\":\"string\",\"name\":\"nodes\",\"defaultValue\":\"localhost:6379,localhost:6380,localhost:6381,localhost:7379,localhost:7380,localhost:7381\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"username\",\"defaultValue\":null,\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"password\",\"defaultValue\":\"123456\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"clientName\",\"defaultValue\":null,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"connTimeout\",\"defaultValue\":10000,\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"soTimeout\",\"defaultValue\":10000,\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"maxAttempts\",\"defaultValue\":3,\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"database\",\"defaultValue\":0,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"safeMode\",\"defaultValue\":\"\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"object\",\"name\":\"poolConfig\",\"defaultValue\":\"\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null,\"childrens\":[{\"type\":\"boolean\",\"name\":\"lifo\",\"defaultValue\":true,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"fairness\",\"defaultValue\":false,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"numTestsPerEvictionRun\",\"defaultValue\":-1,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"testOnCreate\",\"defaultValue\":false,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"testOnBorrow\",\"defaultValue\":false,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"testOnReturn\",\"defaultValue\":false,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"testWhileIdle\",\"defaultValue\":true,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"maxTotal\",\"defaultValue\":60000,\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"maxIdle\",\"defaultValue\":100,\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"minIdle\",\"defaultValue\":10,\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"duration\",\"name\":\"maxWaitDuration\",\"defaultValue\":\"10s\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"duration\",\"name\":\"minEvictableIdleDuration\",\"defaultValue\":\"\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"duration\",\"name\":\"evictorShutdownTimeoutDuration\",\"defaultValue\":10000,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"duration\",\"name\":\"softMinEvictableIdleDuration\",\"defaultValue\":-1,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"duration\",\"name\":\"durationBetweenEvictionRuns\",\"defaultValue\":-1,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null}]}]}],\"KAFKA\":[{\"type\":\"string\",\"name\":\"bootstrapServers\",\"defaultValue\":\"localhost: 9092\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"keySerializer\",\"defaultValue\":\"org.apache.kafka.common.serialization.StringSerializer\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"bufferMemory\",\"defaultValue\":\"32 * 1024 * 1024\",\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"retries\",\"defaultValue\":\"0\",\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"acks\",\"defaultValue\":\"all\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"compressionType \",\"defaultValue\":\"none\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"batchSize\",\"defaultValue\":16384,\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"lingerMs\",\"defaultValue\":16384,\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"deliveryTimeoutMs\",\"defaultValue\":120000,\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"sendBuffer\",\"defaultValue\":131072,\"required\":false,\"maxValue\":null,\"minValue\":-1,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"receiveBuffer\",\"defaultValue\":32768,\"required\":false,\"maxValue\":null,\"minValue\":-1,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"maxRequestSize\",\"defaultValue\":1048576,\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"reconnectBackoffMs\",\"defaultValue\":50,\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"reconnectBackoffMs\",\"defaultValue\":50,\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"reconnectBackoffMaxMs\",\"defaultValue\":1000,\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"retryBackoffMs\",\"defaultValue\":100,\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"maxBlockMs\",\"defaultValue\":60000,\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"requestTimeoutMs\",\"defaultValue\":30000,\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"metadataMaxAge\",\"defaultValue\":300000,\"required\":false,\"maxValue\":null,\"minValue\":5000,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"metricsSampleWindowMs\",\"defaultValue\":3000,\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"metricsRecordingLevel\",\"defaultValue\":\"INFO\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"maxInFlightRequestsPerConnection\",\"defaultValue\":5,\"required\":false,\"maxValue\":null,\"minValue\":1,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"maxInFlightRequestsPerConnection\",\"defaultValue\":5,\"required\":false,\"maxValue\":null,\"minValue\":1,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"connectionsMaxIdleMs\",\"defaultValue\":540000,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"transactionTimeout\",\"defaultValue\":60000,\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null}]}",
+    value: "[{\"type\":\"string\",\"name\":\"key_serializer\",\"defaultValue\":\"org.apache.kafka.common.serialization.StringSerializer\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"bootstrap_servers\",\"defaultValue\":\"localhost:9092\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"client_dns_lookup\",\"defaultValue\":\"use_all_dns_ips\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"metadata_max_age_ms\",\"defaultValue\":\"300000\",\"required\":true,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"send_buffer_bytes\",\"defaultValue\":\"131072\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"receive_buffer_bytes\",\"defaultValue\":\"65536\",\"required\":true,\"maxValue\":null,\"minValue\":-1,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"clientId\",\"defaultValue\":null,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"clientRack\",\"defaultValue\":\"\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"reconnect_backoff_ms\",\"defaultValue\":\"50\",\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"reconnect_backoff_max_ms\",\"defaultValue\":\"1000\",\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"retries\",\"defaultValue\":\"50\",\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"retry_backoff_ms\",\"defaultValue\":\"1000\",\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"metrics_sample_window_ms\",\"defaultValue\":\"3000\",\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"metricsNumSamples\",\"defaultValue\":\"2\",\"required\":false,\"maxValue\":1,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"metrics_recording_level\",\"defaultValue\":\"INFO\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"array\",\"name\":\"metric_reporters\",\"defaultValue\":null,\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"security_protocol\",\"defaultValue\":\"PLAINTEXT\",\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"socket_connection_setup_timeout_ms\",\"defaultValue\":\"10000\",\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"socket_connection_setup_timeout_max_ms\",\"defaultValue\":\"30000\",\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"connections_max_idle_ms\",\"defaultValue\":\"540000\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"request_timeout_ms\",\"defaultValue\":\"30000\",\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"group_id\",\"defaultValue\":\"default-rengine-controller\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"group_instance_id\",\"defaultValue\":null,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"max_poll_interval_ms\",\"defaultValue\":\"300000\",\"required\":false,\"maxValue\":null,\"minValue\":1,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"rebalance_timeout_ms\",\"defaultValue\":null,\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"session_timeout_ms\",\"defaultValue\":\"45000\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"heartbeat_interval_ms\",\"defaultValue\":\"3000\",\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"default_api_timeout_ms\",\"defaultValue\":\"60000\",\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"buffer_memory\",\"defaultValue\":\"33554432\",\"required\":false,\"maxValue\":null,\"minValue\":5000,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"acks\",\"defaultValue\":\"all\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"compression_type\",\"defaultValue\":\"none\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"batch_size\",\"defaultValue\":\"16384\",\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"linger_ms\",\"defaultValue\":\"0\",\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"delivery_timeout_ms\",\"defaultValue\":\"120000\",\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"send_buffer\",\"defaultValue\":\"131072\",\"required\":false,\"maxValue\":null,\"minValue\":-1,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"receive_buffer\",\"defaultValue\":\"32768\",\"required\":false,\"maxValue\":null,\"minValue\":-1,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"max_request_size\",\"defaultValue\":\"1048576\",\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"max_block_ms\",\"defaultValue\":\"60000\",\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"metadata_max_idle_ms\",\"defaultValue\":\"300000\",\"required\":false,\"maxValue\":null,\"minValue\":5000,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"max_in_flight_requests_per_connection\",\"defaultValue\":\"5\",\"required\":false,\"maxValue\":null,\"minValue\":1,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"transaction_timeout_ms\",\"defaultValue\":\"60000\",\"required\":false,\"maxValue\":null,\"minValue\":0,\"help\":\"\",\"unit\":null}]",
     sort: NumberInt("0"),
     orgCode: "string",
     enable: NumberInt("1"),
@@ -109,13 +160,51 @@ db.getCollection("sys_notifications").insert([ {
         appSecret: "9N8nPoRB-gyeYXUJMHDU3YauNIwHVk5wtUEVROp5XgDsPjlu47bKl_xN067lQPzK",
         token: "H792gCFQzB2BP",
         aesKey: "bnGUZ3cqz6GgsG7B8LxBQeLcwYFDXKGMwXczNXBwCg9",
-        corpId: "dingbhyrzjxx6qjhjcdr"
+        corpId: "dingbhyrzjxx6qjhjcdr",
+        users: [
+            {
+                mobile: "180xxxxxxxx",
+                userId: "6165471647114842627"
+            }
+        ],
+        scenesGroups: [
+            {
+                title: "SAFECLOUD自动化监控告警测试群1",
+                templateId: "4ba6847f-b9b0-42ca-96ea-22c4ed8a3fbd",
+                chatId: "chat7b43308b68ec835f9ba9a5e440a4cce6",
+                openConversationId: "cide3M7a7Ldu5TG9+8BH75JWA==",
+                ownerUserId: "6165471647114842627",
+                adminUserIds: [
+                    "6165471647114842627"
+                ],
+                userIds: [
+                    "6165471647114842627"
+                ],
+                uuid: null,
+                icon: null,
+                mentionAllAuthority: null,
+                showHistoryType: null,
+                validationType: null,
+                searchable: null,
+                chatVannedType: null,
+                managementType: null,
+                onlyAdminCanDing: null,
+                allMembersCanCreateMcsConf: null,
+                allMembersCanCreateCalendar: null,
+                groupEmailDisabled: null,
+                onlyAdminCanSetMsgTop: null,
+                addFriendForbidden: null,
+                groupLiveSwitch: null,
+                membersToAdminChat: null
+            }
+        ]
     },
     orgCode: "string",
     remark: "local test",
     createDate: ISODate("2023-01-07T11:22:48.314Z"),
     updateDate: ISODate("2023-01-07T11:22:48.314Z"),
-    delFlag: NumberInt("0")
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.Notification$DingtalkConfig"
 } ]);
 db.getCollection("sys_notifications").insert([ {
     _id: NumberLong("6295643646476289"),
@@ -136,7 +225,8 @@ db.getCollection("sys_notifications").insert([ {
     remark: "local test",
     createDate: ISODate("2023-01-07T11:22:48.314Z"),
     updateDate: ISODate("2023-01-07T11:22:48.314Z"),
-    delFlag: NumberInt("0")
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.Notification$DingtalkConfig"
 } ]);
 session.commitTransaction(); session.endSession();
 
@@ -446,286 +536,6 @@ db.createCollection("t_schedule_job_logs");
 session = db.getMongo().startSession();
 session.startTransaction();
 db = session.getDatabase("rengine");
-db.getCollection("t_schedule_job_logs").insert([ {
-    _id: NumberLong("6335562311041026"),
-    triggerId: NumberLong("62208697108652458"),
-    startupTime: ISODate("2023-02-04T16:10:10.359Z"),
-    finishedTime: ISODate("2023-02-04T16:10:10.657Z"),
-    success: false,
-    detail: {
-        results: [
-            {
-                requestId: "29b88044-3fc0-4850-9d63-b4c8f6b30a11",
-                results: [
-                    {
-                        scenesCode: "ecommerce_trade_gift",
-                        success: false,
-                        reason: "java.net.ConnectException: Failed to connect to localhost/0.0.0.0:28002"
-                    }
-                ]
-            }
-        ],
-        type: "CLIENT_SCHEDULER",
-        _class: "com.wl4g.rengine.common.entity.ScheduleJobLog$ClientScheduleJobLog"
-    },
-    enable: NumberInt("1"),
-    createDate: ISODate("2023-02-04T16:10:10.243Z"),
-    updateDate: ISODate("2023-02-04T16:10:10.662Z"),
-    delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.ScheduleJobLog"
-} ]);
-db.getCollection("t_schedule_job_logs").insert([ {
-    _id: NumberLong("6335562311024640"),
-    triggerId: NumberLong("62208697108652457"),
-    startupTime: ISODate("2023-02-04T16:10:10.359Z"),
-    finishedTime: ISODate("2023-02-04T16:10:10.66Z"),
-    success: false,
-    detail: {
-        results: [
-            {
-                requestId: "a5315ffc-fbf3-484f-bf45-e05fbb9d2df3",
-                results: [
-                    {
-                        scenesCode: "ecommerce_trade_gift",
-                        success: false,
-                        reason: "java.net.ConnectException: Failed to connect to localhost/0.0.0.0:28002"
-                    }
-                ]
-            }
-        ],
-        type: "CLIENT_SCHEDULER",
-        _class: "com.wl4g.rengine.common.entity.ScheduleJobLog$ClientScheduleJobLog"
-    },
-    enable: NumberInt("1"),
-    createDate: ISODate("2023-02-04T16:10:10.243Z"),
-    updateDate: ISODate("2023-02-04T16:10:10.666Z"),
-    delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.ScheduleJobLog"
-} ]);
-db.getCollection("t_schedule_job_logs").insert([ {
-    _id: NumberLong("6335562311041025"),
-    triggerId: NumberLong("62208697108652456"),
-    startupTime: ISODate("2023-02-04T16:10:10.359Z"),
-    finishedTime: ISODate("2023-02-04T16:10:10.657Z"),
-    success: false,
-    detail: {
-        results: [
-            {
-                requestId: "bfbc7bee-2a2b-4016-8bee-1b6f0a506947",
-                results: [
-                    {
-                        scenesCode: "ecommerce_trade_gift",
-                        success: false,
-                        reason: "java.net.ConnectException: Failed to connect to localhost/0.0.0.0:28002"
-                    }
-                ]
-            }
-        ],
-        type: "CLIENT_SCHEDULER",
-        _class: "com.wl4g.rengine.common.entity.ScheduleJobLog$ClientScheduleJobLog"
-    },
-    enable: NumberInt("1"),
-    createDate: ISODate("2023-02-04T16:10:10.243Z"),
-    updateDate: ISODate("2023-02-04T16:10:10.661Z"),
-    delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.ScheduleJobLog"
-} ]);
-db.getCollection("t_schedule_job_logs").insert([ {
-    _id: NumberLong("6335562311041024"),
-    triggerId: NumberLong("62208697108652459"),
-    startupTime: ISODate("2023-02-04T16:10:10.369Z"),
-    finishedTime: ISODate("2023-02-04T16:10:10.658Z"),
-    success: false,
-    detail: {
-        results: [
-            {
-                requestId: "7dfdb469-491c-4114-884f-0ea7a7a601a1",
-                results: [
-                    {
-                        scenesCode: "ecommerce_trade_gift",
-                        success: false,
-                        reason: "java.net.ConnectException: Failed to connect to localhost/0.0.0.0:28002"
-                    }
-                ]
-            }
-        ],
-        type: "CLIENT_SCHEDULER",
-        _class: "com.wl4g.rengine.common.entity.ScheduleJobLog$ClientScheduleJobLog"
-    },
-    enable: NumberInt("1"),
-    createDate: ISODate("2023-02-04T16:10:10.243Z"),
-    updateDate: ISODate("2023-02-04T16:10:10.661Z"),
-    delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.ScheduleJobLog"
-} ]);
-db.getCollection("t_schedule_job_logs").insert([ {
-    _id: NumberLong("6335562390257664"),
-    triggerId: NumberLong("62208697108652456"),
-    startupTime: ISODate("2023-02-04T16:10:15.087Z"),
-    finishedTime: ISODate("2023-02-04T16:10:15.2Z"),
-    success: false,
-    detail: {
-        results: [
-            {
-                requestId: "ed62beb6-002b-4389-a3f2-cc914a53c63f",
-                results: [
-                    {
-                        scenesCode: "ecommerce_trade_gift",
-                        success: false,
-                        reason: "java.net.ConnectException: Failed to connect to localhost/0.0.0.0:28002"
-                    }
-                ]
-            }
-        ],
-        type: "CLIENT_SCHEDULER",
-        _class: "com.wl4g.rengine.common.entity.ScheduleJobLog$ClientScheduleJobLog"
-    },
-    enable: NumberInt("1"),
-    createDate: ISODate("2023-02-04T16:10:15.078Z"),
-    updateDate: ISODate("2023-02-04T16:10:15.205Z"),
-    delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.ScheduleJobLog"
-} ]);
-db.getCollection("t_schedule_job_logs").insert([ {
-    _id: NumberLong("6335562390519809"),
-    triggerId: NumberLong("62208697108652458"),
-    startupTime: ISODate("2023-02-04T16:10:15.101Z"),
-    finishedTime: ISODate("2023-02-04T16:10:15.204Z"),
-    success: false,
-    detail: {
-        results: [
-            {
-                requestId: "6c48c9d6-a051-4405-97cd-99c85d59942c",
-                results: [
-                    {
-                        scenesCode: "ecommerce_trade_gift",
-                        success: false,
-                        reason: "java.net.ConnectException: Failed to connect to localhost/0.0.0.0:28002"
-                    }
-                ]
-            }
-        ],
-        type: "CLIENT_SCHEDULER",
-        _class: "com.wl4g.rengine.common.entity.ScheduleJobLog$ClientScheduleJobLog"
-    },
-    enable: NumberInt("1"),
-    createDate: ISODate("2023-02-04T16:10:15.094Z"),
-    updateDate: ISODate("2023-02-04T16:10:15.205Z"),
-    delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.ScheduleJobLog"
-} ]);
-db.getCollection("t_schedule_job_logs").insert([ {
-    _id: NumberLong("6335562390519808"),
-    triggerId: NumberLong("62208697108652457"),
-    startupTime: ISODate("2023-02-04T16:10:15.101Z"),
-    finishedTime: ISODate("2023-02-04T16:10:15.219Z"),
-    success: false,
-    detail: {
-        results: [
-            {
-                requestId: "4e504c6c-70a2-460c-af67-7862e3452000",
-                results: [
-                    {
-                        scenesCode: "ecommerce_trade_gift",
-                        success: false,
-                        reason: "java.net.ConnectException: Failed to connect to localhost/0.0.0.0:28002"
-                    }
-                ]
-            }
-        ],
-        type: "CLIENT_SCHEDULER",
-        _class: "com.wl4g.rengine.common.entity.ScheduleJobLog$ClientScheduleJobLog"
-    },
-    enable: NumberInt("1"),
-    createDate: ISODate("2023-02-04T16:10:15.094Z"),
-    updateDate: ISODate("2023-02-04T16:10:15.22Z"),
-    delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.ScheduleJobLog"
-} ]);
-db.getCollection("t_schedule_job_logs").insert([ {
-    _id: NumberLong("6335562390667264"),
-    triggerId: NumberLong("62208697108652459"),
-    startupTime: ISODate("2023-02-04T16:10:15.108Z"),
-    finishedTime: ISODate("2023-02-04T16:10:15.195Z"),
-    success: false,
-    detail: {
-        results: [
-            {
-                requestId: "d50832c0-1336-4d27-b8ed-1ee840f635ea",
-                results: [
-                    {
-                        scenesCode: "ecommerce_trade_gift",
-                        success: false,
-                        reason: "java.net.ConnectException: Failed to connect to localhost/0.0.0.0:28002"
-                    }
-                ]
-            }
-        ],
-        type: "CLIENT_SCHEDULER",
-        _class: "com.wl4g.rengine.common.entity.ScheduleJobLog$ClientScheduleJobLog"
-    },
-    enable: NumberInt("1"),
-    createDate: ISODate("2023-02-04T16:10:15.103Z"),
-    updateDate: ISODate("2023-02-04T16:10:15.195Z"),
-    delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.ScheduleJobLog"
-} ]);
-db.getCollection("t_schedule_job_logs").insert([ {
-    _id: NumberLong("6335564441387011"),
-    triggerId: NumberLong("62208697108652457"),
-    startupTime: ISODate("2023-02-04T16:12:20.358Z"),
-    detail: {
-        type: "CLIENT_SCHEDULER",
-        _class: "com.wl4g.rengine.common.entity.ScheduleJobLog$ClientScheduleJobLog"
-    },
-    enable: NumberInt("1"),
-    createDate: ISODate("2023-02-04T16:12:20.269Z"),
-    updateDate: ISODate("2023-02-04T16:12:20.359Z"),
-    delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.ScheduleJobLog"
-} ]);
-db.getCollection("t_schedule_job_logs").insert([ {
-    _id: NumberLong("6335564441387010"),
-    triggerId: NumberLong("62208697108652456"),
-    startupTime: ISODate("2023-02-04T16:12:20.356Z"),
-    detail: {
-        type: "CLIENT_SCHEDULER",
-        _class: "com.wl4g.rengine.common.entity.ScheduleJobLog$ClientScheduleJobLog"
-    },
-    enable: NumberInt("1"),
-    createDate: ISODate("2023-02-04T16:12:20.269Z"),
-    updateDate: ISODate("2023-02-04T16:12:20.357Z"),
-    delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.ScheduleJobLog"
-} ]);
-db.getCollection("t_schedule_job_logs").insert([ {
-    _id: NumberLong("6335564441387008"),
-    triggerId: NumberLong("62208697108652458"),
-    startupTime: ISODate("2023-02-04T16:12:20.357Z"),
-    detail: {
-        type: "CLIENT_SCHEDULER",
-        _class: "com.wl4g.rengine.common.entity.ScheduleJobLog$ClientScheduleJobLog"
-    },
-    enable: NumberInt("1"),
-    createDate: ISODate("2023-02-04T16:12:20.269Z"),
-    updateDate: ISODate("2023-02-04T16:12:20.358Z"),
-    delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.ScheduleJobLog"
-} ]);
-db.getCollection("t_schedule_job_logs").insert([ {
-    _id: NumberLong("6335564441387009"),
-    triggerId: NumberLong("62208697108652459"),
-    startupTime: ISODate("2023-02-04T16:12:20.362Z"),
-    detail: {
-        type: "CLIENT_SCHEDULER",
-        _class: "com.wl4g.rengine.common.entity.ScheduleJobLog$ClientScheduleJobLog"
-    },
-    enable: NumberInt("1"),
-    createDate: ISODate("2023-02-04T16:12:20.269Z"),
-    updateDate: ISODate("2023-02-04T16:12:20.363Z"),
-    delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.ScheduleJobLog"
-} ]);
 session.commitTransaction(); session.endSession();
 
 // ----------------------------
@@ -743,7 +553,7 @@ db = session.getDatabase("rengine");
 db.getCollection("t_schedule_triggers").insert([ {
     _id: NumberLong("62208697108652456"),
     name: "monitor_node_vm",
-    enable: NumberInt("1"),
+    enable: NumberInt("0"),
     labels: [
         "safecloud",
         "production",
@@ -784,7 +594,7 @@ db.getCollection("t_schedule_triggers").insert([ {
 db.getCollection("t_schedule_triggers").insert([ {
     _id: NumberLong("62208697108652457"),
     name: "monitor_app_mysql_elec_bill_history",
-    enable: NumberInt("1"),
+    enable: NumberInt("0"),
     labels: [
         "safecloud",
         "production",
@@ -826,7 +636,7 @@ db.getCollection("t_schedule_triggers").insert([ {
 db.getCollection("t_schedule_triggers").insert([ {
     _id: NumberLong("62208697108652458"),
     name: "monitor_app_mysql_water_bill_history",
-    enable: NumberInt("1"),
+    enable: NumberInt("0"),
     labels: [
         "safecloud",
         "production",
@@ -868,7 +678,7 @@ db.getCollection("t_schedule_triggers").insert([ {
 db.getCollection("t_schedule_triggers").insert([ {
     _id: NumberLong("62208697108652459"),
     name: "monitor_emr_spark_history_stream_job",
-    enable: NumberInt("1"),
+    enable: NumberInt("0"),
     labels: [
         "safecloud",
         "production",
@@ -909,7 +719,70 @@ db.getCollection("t_schedule_triggers").insert([ {
 } ]);
 db.getCollection("t_schedule_triggers").insert([ {
     _id: NumberLong("62208697108652460"),
-    name: "subscribe_kafka_notification_msg",
+    name: "subscribe_kafka_notification_warning",
+    monitorExecution: true,
+    failover: true,
+    misfire: true,
+    timeZone: "GMT+08:00",
+    maxTimeDiffSeconds: NumberInt("-1"),
+    reconcileIntervalMinutes: NumberInt("0"),
+    maxTimeoutMs: NumberLong("30000"),
+    runState: "RUNNING",
+    properties: {
+        topics: [
+            "test_topic"
+        ],
+        concurrency: NumberInt("1"),
+        autoAcknowledgment: true,
+        request: {
+            clientId: "JVqEpEwIaqkEkeD5",
+            clientSecret: "Uf6nJDyJQHKRP43ycl9vZ9zs7s1nyu77",
+            scenesCodes: [
+                "ecommerce_trade_gift"
+            ],
+            timeout: NumberLong("10000"),
+            bestEffort: false,
+            args: {
+                foo1: "bar1"
+            }
+        },
+        consumerOptions: {
+            keySerializer: "org.apache.kafka.common.serialization.StringDeserializer",
+            valueSerializer: "org.apache.kafka.common.serialization.StringDeserializer",
+            bootstrapServers: "localhost:9092",
+            clientDnsLookup: "use_all_dns_ips",
+            metadataMaxAgeMs: NumberLong("300000"),
+            sendBufferBytes: NumberInt("131072"),
+            receiveBufferBytes: NumberInt("65536"),
+            clientRack: "",
+            reconnectBackoffMs: NumberLong("50"),
+            reconnectBackoffMaxMs: NumberLong("1000"),
+            retries: NumberInt("2147483647"),
+            retryBackoffMs: NumberLong("100"),
+            metricsSampleWindowMs: NumberLong("3000"),
+            metricsNumSamples: NumberInt("2"),
+            metricsRecordingLevel: "INFO",
+            metricsReporters: [ ],
+            securityProtocol: "PLAINTEXT",
+            socketConnectionSetupTimeoutMs: NumberLong("10000"),
+            socketConnectionSetupTimeoutMaxMs: NumberLong("30000"),
+            connectionsMaxIdleMs: NumberLong("540000"),
+            requestTimeoutMs: NumberInt("30000"),
+            groupId: "default-rengine-controller-subscriber",
+            maxPollIntervalMs: NumberInt("300000"),
+            sessionTimeoutMs: NumberInt("45000"),
+            heartbeatIntervalMs: NumberInt("3000"),
+            defaultApiTimeoutMs: NumberInt("60000"),
+            enableAutoCommit: false,
+            autoCommitIntervalMs: NumberInt("5000"),
+            autoOffsetReset: "latest",
+            fetchMinBytes: NumberInt("1"),
+            fetchMaxBytes: NumberInt("52428800"),
+            fetchMaxWaitMs: NumberInt("500")
+        },
+        type: "KAFKA_SUBSCRIBE_SCHEDULER",
+        _class: "com.wl4g.rengine.common.entity.ScheduleTrigger$KafkaSubscribeScheduleConfig"
+    },
     enable: NumberInt("1"),
     labels: [
         "safecloud",
@@ -917,32 +790,8 @@ db.getCollection("t_schedule_triggers").insert([ {
         "kafka subscribe",
         "notification"
     ],
-    monitorExecution: true,
-    failover: true,
-    misfire: true,
-    timeZone: "GMT+08:00",
-    maxTimeoutMs: 30000,
-    runState: null,
-    properties: {
-        type: "KAFKA_SUBSCRIBE_SCHEDULER",
-        requests: [
-            {
-                clientId: "JVqEpEwIaqkEkeD5",
-                clientSecret: "Uf6nJDyJQHKRP43ycl9vZ9zs7s1nyu77",
-                scenesCodes: [
-                    "ecommerce_trade_gift"
-                ],
-                bestEffort: false,
-                timeout: 10000,
-                args: {
-                    foo1: "bar1"
-                }
-            }
-        ],
-        _class: "com.wl4g.rengine.common.entity.ScheduleTrigger$KafkaSubscribeScheduleConfig"
-    },
     remark: "safecloud subscribe for kafka",
-    updateDate: ISODate("2022-12-27T04:51:08.533Z"),
+    updateDate: ISODate("2023-02-06T08:49:01.296Z"),
     delFlag: NumberInt("0"),
     _class: "com.wl4g.rengine.common.entity.ScheduleTrigger"
 } ]);

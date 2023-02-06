@@ -56,6 +56,7 @@ import com.wl4g.rengine.common.entity.ScheduleJobLog.KafkaSubscribeScheduleJobLo
 import com.wl4g.rengine.common.entity.ScheduleJobLog.ResultInformation;
 import com.wl4g.rengine.common.entity.ScheduleTrigger;
 import com.wl4g.rengine.common.entity.ScheduleTrigger.KafkaSubscribeScheduleConfig;
+import com.wl4g.rengine.common.entity.ScheduleTrigger.KafkaSubscribeScheduleConfig.KafkaConsumerOptions;
 import com.wl4g.rengine.common.entity.ScheduleTrigger.RunState;
 import com.wl4g.rengine.common.entity.ScheduleTrigger.ScheduleType;
 import com.wl4g.rengine.common.model.ExecuteRequest;
@@ -88,7 +89,7 @@ public class EngineKafkaSubscribeScheduler extends EngineExecutionScheduler {
         super.close();
         subscriberRegistry.entrySet().forEach(e -> {
             try {
-                e.getValue().stop();
+                e.getValue().stop(true);
             } catch (Throwable ex) {
                 log.warn(format("Unable to closing subscriber for triggerId: %s", e.getKey()), ex);
             }
@@ -120,9 +121,9 @@ public class EngineKafkaSubscribeScheduler extends EngineExecutionScheduler {
 
             // Register to subscriber registry.
             final KafkaSubscribeScheduleConfig kssc = ((KafkaSubscribeScheduleConfig) trigger.getProperties()).validate();
-            final ConcurrentMessageListenerContainer<String, String> subscriber = new KafkaSubscribeController(kssc.toConfigMap())
-                    .buildSubscriber(kssc.getTopics(), generateGroupId(trigger), kssc.getConcurrency(),
-                            (records, acknowledgment) -> {
+            final ConcurrentMessageListenerContainer<String, String> subscriber = new KafkaSubscribeBuilder(
+                    kssc.getConsumerOptions().toConsumerConfigProperties()).buildSubscriber(kssc.getTopics(),
+                            generateGroupId(trigger), kssc.getConcurrency(), (records, acknowledgment) -> {
                                 // Build for execution jobs.
                                 final List<ExecutionWorker> jobs = singletonList(
                                         new KafkaSubscribeExecutionWorker(currentShardingTotalCount, context, trigger.getId(),
@@ -170,10 +171,21 @@ public class EngineKafkaSubscribeScheduler extends EngineExecutionScheduler {
 
             updateTriggerRunState(triggerId, RunState.FAILED);
             upsertSchedulingLog(triggerId, jobLog.getId(), false, true, false, null);
+
+            // When the job scheduling of this trigger fails, destroy it and let
+            // the global controller scanning reschedule it next time.
+            destroyThisScheduleJob(trigger);
         }
     }
 
-    @Override
+    private void destroyThisScheduleJob(ScheduleTrigger trigger) {
+        final ConcurrentMessageListenerContainer<String, String> subscriber = subscriberRegistry.remove(trigger.getId());
+        if (nonNull(subscriber)) {
+            subscriber.stop(false);
+        }
+        getGlobalScheduleJobManager().remove(trigger.getId());
+    }
+
     protected ScheduleJobLog newDefaultScheduleJobLog(final Long triggerId) {
         return ScheduleJobLog.builder()
                 .triggerId(triggerId)
@@ -186,10 +198,10 @@ public class EngineKafkaSubscribeScheduler extends EngineExecutionScheduler {
     }
 
     @Getter
-    static class KafkaSubscribeController {
+    static class KafkaSubscribeBuilder {
         final ConcurrentKafkaListenerContainerFactory<String, String> factory;
 
-        public KafkaSubscribeController(@NotNull Map<String, Object> consumerProps) {
+        public KafkaSubscribeBuilder(@NotNull Map<String, Object> consumerProps) {
             this.factory = newKafkaListenerContainerFactory(notNullOf(consumerProps, "consumerProps"));
         }
 
@@ -212,7 +224,7 @@ public class EngineKafkaSubscribeScheduler extends EngineExecutionScheduler {
             container.getContainerProperties().setMessageListener(listener);
             container.getContainerProperties().setGroupId(groupId);
             // see:org.springframework.kafka.listener.KafkaMessageListenerContainer.ListenerConsumer#isAnyManualAck
-            // see:org.springframework.kafka.listener.KafkaMessageListenerContainer.ListenerConsumer#doInvokeBatchOnMessage
+            // see:org.springframework.kafka.listener.KafkaMessageListenerContainer.ListenerConsumer#doInvokeBatchOnMessage()
             container.getContainerProperties().setAckMode(AckMode.MANUAL);
             container.setBeanName(groupId.concat("_Bean"));
             container.setConcurrency(concurrency);
@@ -228,7 +240,7 @@ public class EngineKafkaSubscribeScheduler extends EngineExecutionScheduler {
             consumerProps.putIfAbsent(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
             consumerProps.putIfAbsent(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
             consumerProps.putIfAbsent(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-            consumerProps.putIfAbsent(ConsumerConfig.GROUP_ID_CONFIG, KafkaSubscribeScheduleConfig.DEFAULT_GROUP_ID);
+            consumerProps.putIfAbsent(ConsumerConfig.GROUP_ID_CONFIG, KafkaConsumerOptions.DEFAULT_GROUP_ID);
             consumerProps.putIfAbsent(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
             consumerProps.putIfAbsent(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest"); // none,latest,earliest
             final ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
@@ -237,6 +249,8 @@ public class EngineKafkaSubscribeScheduler extends EngineExecutionScheduler {
                     .filter(e -> !isBlank(e.getKey()) && nonNull(e.getValue()))
                     .collect(toMap(e -> e.getKey(), e -> e.getValue()));
             factory.setConsumerFactory(new DefaultKafkaConsumerFactory<>(consumerProps));
+            // see:org.springframework.kafka.listener.KafkaMessageListenerContainer.ListenerConsumer#doPoll()
+            // see:org.apache.kafka.clients.consumer.ConsumerConfig#FETCH_MAX_BYTES_CONFIG="fetch.max.bytes"
             factory.setBatchListener(true);
             factory.afterPropertiesSet();
             return factory;

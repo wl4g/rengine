@@ -150,9 +150,10 @@ public class DictServiceImpl implements DictService {
         // The third priority get from DB, and save to cache.
         long total = 0;
         if (CollectionUtils2.isEmpty(dicts)) {
-            final Query query = new Query(andCriteria(baseCriteria(model), isCriteria("type", model.getType().name()),
-                    isCriteria("key", model.getKey()), isCriteria("value", model.getValue())))
-                            .with(PageRequest.of(model.getPageNum(), model.getPageSize(), descSort("sort", "updateDate")));
+            final Query query = new Query(
+                    andCriteria(baseCriteria(model), isCriteria("type", nonNull(model.getType()) ? model.getType().name() : null),
+                            isCriteria("key", model.getKey()), isCriteria("value", model.getValue()))).with(
+                                    PageRequest.of(model.getPageNum(), model.getPageSize(), descSort("sort", "updateDate")));
             dicts = mongoTemplate.find(query, Dict.class, MongoCollectionDefinition.SYS_DICTS.getName());
             total = mongoTemplate.count(query, MongoCollectionDefinition.SYS_DICTS.getName());
 

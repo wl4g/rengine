@@ -14,8 +14,8 @@
 spring:
   application.name: rengine-apiserver
   profiles:
-    #include: mongo,redis,minio,telemetry,swagger,arthas,security-oauth,security-static,devtool
-    include: mongo,redis,minio,telemetry,swagger,arthas,security-static
+    #include: arthas,telemetry,swagger,mongo,redis,minio,security-oauth,security-static,devtool
+    include: arthas,telemetry,swagger,mongo,redis,minio,security-static
     active: dev
   banner:
       location: classpath:META-INF/banner.txt

@@ -15,10 +15,10 @@
  */
 package com.wl4g.rengine.common.entity;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
 import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
-import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseMapObject;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.String.format;
@@ -26,13 +26,19 @@ import static java.util.Collections.emptyList;
 import static java.util.Objects.nonNull;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.equalsAnyIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.replace;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -43,7 +49,6 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.wl4g.infra.common.bean.BaseBean;
-import com.wl4g.infra.common.jedis.JedisClientBuilder.JedisConfig;
 import com.wl4g.rengine.common.exception.ConfigRengineException;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -273,34 +278,94 @@ public class DataSourceProperties extends BaseBean {
     @NoArgsConstructor
     public static class RedisDataSourceProperties extends DataSourcePropertiesBase {
         static final long serialVersionUID = -3103084992456055157L;
+        private final static int DEFAULT_CONN_TIMEOUT = 10_000;
+        private final static int DEFAULT_SO_TIMEOUT = 10_000;
+        private final static int DEFAULT_MAX_ATTEMPTS = 3;
+        private final static int DEFAULT_DATABASE = 0;
+        private final static boolean DEFAULT_SAFE_MOE = true;
 
-        @NotNull
-        @Default
-        JedisConfig jedisConfig = new JedisConfig();
+        private @Default List<String> nodes = new ArrayList<>();
+        private @Nullable String username; // redis6.x
+        private @Nullable String password;
+        private @Nullable String clientName;
+        private @Default int connTimeout = DEFAULT_CONN_TIMEOUT;
+        private @Default int soTimeout = DEFAULT_SO_TIMEOUT;
+        private @Default int maxAttempts = DEFAULT_MAX_ATTEMPTS;
+        private @Default int database = DEFAULT_DATABASE;
+        private @Default boolean safeMode = DEFAULT_SAFE_MOE;
+        // see:redis.clients.jedis.JedisPoolConfig
+        private @Default JedisPoolConfig poolConfig = new JedisPoolConfig();
 
         @Override
         public DataSourcePropertiesBase validate() {
-            notNullOf(jedisConfig, "jedisConfig");
-            notEmptyOf(jedisConfig.getNodes(), "nodes");
-            // hasTextOf(jedisConfig.getUsername(), "username");
-            hasTextOf(jedisConfig.getPassword(), "password");
-
-            // Check redis nodes size.
-            if (isEmpty(jedisConfig.getNodes())) {
+            notEmptyOf(getNodes(), "nodes");
+            if (isEmpty(getNodes())) {
                 throw new ConfigRengineException(format(
                         "The number of redis single or cluster connection nodes must be >=1, but actual properties nodes : %s",
-                        jedisConfig.getNodes()));
+                        getNodes()));
             }
-
+            // hasTextOf(getUsername(), "username");
+            hasTextOf(getPassword(), "password");
             // @formatter:off
             // Check redis nodes size with cluster.
-            //if (jedisConfig.getNodes().size() < 6) {
-            //    throw new ConfigRengineException(format("The number of redis cluster connection nodes must be >=6, but actual properties nodes : %s",
-            //                jedisConfig.getNodes()));
+            //if (getNodes().size() < 6) {
+            //    throw new ConfigRengineException(format("The number of redis cluster connection nodes must be >=6, but actual properties nodes : %s", getNodes()));
             //}
             // @formatter:on
-
+            poolConfig.validate();
             return this;
+        }
+
+        @Getter
+        @Setter
+        @ToString
+        @SuperBuilder
+        @NoArgsConstructor
+        public static class JedisPoolConfig {
+            public static final int DEFAULT_MAX_TOTAL = 10;
+            public static final int DEFAULT_MAX_IDLE = 5;
+            public static final int DEFAULT_MIN_IDLE = 1;
+
+            public static final boolean DEFAULT_LIFO = true;
+            public static final boolean DEFAULT_FAIRNESS = false;
+            public static final long DEFAULT_MAX_WAIT_MILLIS = 10_000L;
+            public static final long DEFAULT_MIN_EVICTABLE_IDLE_TIME_MILLIS = 1000L * 60L * 30L;
+            public static final long DEFAULT_SOFT_MIN_EVICTABLE_IDLE_TIME_MILLIS = -1;
+            public static final long DEFAULT_EVICTOR_SHUTDOWN_TIMEOUT_MILLIS = 10L * 1000L;
+            public static final int DEFAULT_NUM_TESTS_PER_EVICTION_RUN = 3;
+            public static final long DEFAULT_TIME_BETWEEN_EVICTION_RUNS_MILLIS = -1L;
+            public static final boolean DEFAULT_TEST_ON_CREATE = false;
+            public static final boolean DEFAULT_TEST_ON_BORROW = false;
+            public static final boolean DEFAULT_TEST_ON_RETURN = false;
+            public static final boolean DEFAULT_TEST_WHILE_IDLE = false;
+            public static final boolean DEFAULT_BLOCK_WHEN_EXHAUSTED = true;
+            public static final boolean DEFAULT_JMX_ENABLE = true;
+            public static final String DEFAULT_JMX_NAME_PREFIX = "pool";
+            public static final String DEFAULT_JMX_NAME_BASE = null;
+
+            private @Default @Min(1) @Max(1000) Integer maxTotal = DEFAULT_MAX_TOTAL;
+            private @Default Integer maxIdle = DEFAULT_MAX_IDLE;
+            private @Default Integer minIdle = DEFAULT_MIN_IDLE;
+
+            private @Default Boolean lifo = DEFAULT_LIFO;
+            private @Default Boolean fairness = DEFAULT_FAIRNESS;
+            private @Default @Min(1) Long maxWait = DEFAULT_MAX_WAIT_MILLIS;
+            private @Default Long minEvictableIdleMs = DEFAULT_MIN_EVICTABLE_IDLE_TIME_MILLIS;
+            private @Default Long evictorShutdownTimeoutMs = DEFAULT_EVICTOR_SHUTDOWN_TIMEOUT_MILLIS;
+            private @Default Long softMinEvictableIdleMs = DEFAULT_SOFT_MIN_EVICTABLE_IDLE_TIME_MILLIS;
+            private @Default Integer numTestsPerEvictionRun = DEFAULT_NUM_TESTS_PER_EVICTION_RUN;
+            private @Default Long durationBetweenEvictionRunsMs = DEFAULT_TIME_BETWEEN_EVICTION_RUNS_MILLIS;
+            private @Default Boolean testOnCreate = DEFAULT_TEST_ON_CREATE;
+            private @Default Boolean testOnBorrow = DEFAULT_TEST_ON_BORROW;
+            private @Default Boolean testOnReturn = DEFAULT_TEST_ON_RETURN;
+            private @Default Boolean testWhileIdle = DEFAULT_TEST_WHILE_IDLE;
+            private @Default Boolean blockWhenExhausted = DEFAULT_BLOCK_WHEN_EXHAUSTED;
+
+            public JedisPoolConfig validate() {
+                isTrueOf(nonNull(maxTotal) && maxTotal >= 1 && maxTotal <= 1000, "maxTotal >= 1 && maxTotal <= 1000");
+                isTrueOf(nonNull(maxWait) && maxWait >= 1, "maxWait >= 1");
+                return this;
+            }
         }
     }
 
@@ -316,21 +381,21 @@ public class DataSourceProperties extends BaseBean {
     @ToString(callSuper = true)
     @NoArgsConstructor
     public static class KafkaDataSourceProperties extends DataSourcePropertiesBase {
-        static final long serialVersionUID = -3103084992456055117L;
+        public static final long serialVersionUID = -3103084992456055117L;
 
         // Common config options.
 
-        @JsonProperty("key.serializer")
+        @JsonProperty("key_serializer")
         @NotBlank
         @Default
         String keySerializer = "org.apache.kafka.common.serialization.StringSerializer";
 
-        @JsonProperty("value.serializer")
+        @JsonProperty("value_serializer")
         @NotBlank
         @Default
         String valueSerializer = "org.apache.kafka.common.serialization.StringSerializer";
 
-        @JsonProperty("bootstrap.servers")
+        @JsonProperty("bootstrap_servers")
         @NotBlank
         @Default
         String bootstrapServers = "localhost:9092";
@@ -338,42 +403,43 @@ public class DataSourceProperties extends BaseBean {
         /**
          * @see {@link org.apache.kafka.clients.ClientDnsLookup}
          */
-        @JsonProperty("client.dns.lookup")
+        @JsonProperty("client_dns_lookup")
         @NotBlank
-        String clientDnsLookup;
+        @Default
+        String clientDnsLookup = "use_all_dns_ips";
 
-        @JsonProperty("metadata.max.age.ms")
+        @JsonProperty("metadata_max_age_ms")
         @NotNull
         @Default
         @Min(0)
         Long metadataMaxAgeMs = 5 * 60 * 1000L;
 
-        @JsonProperty("send.buffer.bytes")
+        @JsonProperty("send_buffer_bytes")
         @NotNull
         @Default
         @Min(-1)
         Integer sendBufferBytes = 128 * 1024;
 
-        @JsonProperty("receive.buffer.bytes")
+        @JsonProperty("receive_buffer_bytes")
         @NotNull
         @Default
         @Min(-1)
         Integer receiveBufferBytes = 64 * 1024;
 
-        @JsonProperty("client.id")
+        @JsonProperty("client_id")
         String clientId;
 
-        @JsonProperty("client.rack")
+        @JsonProperty("client_rack")
         @Default
         String clientRack = "";
 
-        @JsonProperty("reconnect.backoff.ms")
+        @JsonProperty("reconnect_backoff_ms")
         @NotBlank
         @Default
         @Min(0)
         Long reconnectBackoffMs = 50L;
 
-        @JsonProperty("reconnect.backoff.max.ms")
+        @JsonProperty("reconnect_backoff_max_ms")
         @Min(0)
         @Default
         Long reconnectBackoffMaxMs = 1000L;
@@ -383,76 +449,76 @@ public class DataSourceProperties extends BaseBean {
         @Default
         Integer retries = Integer.MAX_VALUE;
 
-        @JsonProperty("retry.backoff.ms")
+        @JsonProperty("retry_backoff_ms")
         @Min(0)
         @Default
         Long retryBackoffMs = 100L;
 
-        @JsonProperty("metrics.sample.window.ms")
+        @JsonProperty("metrics_sample_window_ms")
         @Min(0)
         @Default
         Long metricsSampleWindowMs = 3000L;
 
-        @JsonProperty("metrics.num.samples")
+        @JsonProperty("metrics_num_samples")
         @Min(1)
         @Default
         Integer metricsNumSamples = 2;
 
-        @JsonProperty("metrics.recording.level")
+        @JsonProperty("metrics_recording_level")
         @Default
         String metricsRecordingLevel = "INFO";
 
-        @JsonProperty("metric.reporters")
+        @JsonProperty("metric_reporters")
         @Default
         List<String> metricsReporters = emptyList();
 
-        @JsonProperty("security.protocol")
+        @JsonProperty("security_protocol")
         @Default
         String securityProtocol = "PLAINTEXT";
 
-        @JsonProperty("socket.connection.setup.timeout.ms")
+        @JsonProperty("socket_connection_setup_timeout_ms")
         @Min(0)
         @Default
         Long socketConnectionSetupTimeoutMs = 10 * 1000L;
 
-        @JsonProperty("socket.connection.setup.timeout.max.ms")
+        @JsonProperty("socket_connection_setup_timeout_max_ms")
         @Min(0)
         @Default
         Long socketConnectionSetupTimeoutMaxMs = 30 * 1000L;
 
-        @JsonProperty("connections.max.idle.ms")
+        @JsonProperty("connections_max_idle_ms")
         @Default
         Long connectionsMaxIdleMs = 9 * 60 * 1000L;
 
-        @JsonProperty("request.timeout.ms")
+        @JsonProperty("request_timeout_ms")
         @Min(0)
         @Default
         Integer requestTimeoutMs = 30 * 1000;
 
-        @JsonProperty("group.id")
+        @JsonProperty("group_id")
         @Default
         String groupId = "default-rengine-controller";
 
-        @JsonProperty("group.instance.id")
+        @JsonProperty("group_instance_id")
         String groupInstanceId;
 
-        @JsonProperty("max.poll.interval.ms")
+        @JsonProperty("max_poll_interval_ms")
         @Default
         @Min(1)
         Integer maxPollIntervalMs = 300000;
 
-        @JsonProperty("rebalance.timeout.ms")
+        @JsonProperty("rebalance_timeout_ms")
         Integer rebalanceTimeoutMs;
 
-        @JsonProperty("session.timeout.ms")
+        @JsonProperty("session_timeout_ms")
         @Default
         Integer sessionTimeoutMs = 45000;
 
-        @JsonProperty("heartbeat.interval.ms")
+        @JsonProperty("heartbeat_interval_ms")
         @Default
         Integer heartbeatIntervalMs = 3000;
 
-        @JsonProperty("default.api.timeout.ms")
+        @JsonProperty("default_api_timeout_ms")
         @NotNull
         @Min(0)
         @Default
@@ -460,7 +526,7 @@ public class DataSourceProperties extends BaseBean {
 
         // Producer config options.
 
-        @JsonProperty("buffer.memory")
+        @JsonProperty("buffer_memory")
         @NotNull
         @Min(0)
         @Default
@@ -471,63 +537,67 @@ public class DataSourceProperties extends BaseBean {
         @Default
         String acks = "all";
 
-        @JsonProperty("compression.type")
+        @JsonProperty("compression_type")
         @NotBlank
         @Default
         String compressionType = "none";
 
-        @JsonProperty("batch.size")
+        @JsonProperty("batch_size")
         @Min(0)
         @Default
         Integer batchSize = 16384;
 
-        @JsonProperty("linger.ms")
+        @JsonProperty("linger_ms")
         @Min(0)
         @Default
         Integer lingerMs = 0;
 
-        @JsonProperty("delivery.timeout.ms")
+        @JsonProperty("delivery_timeout_ms")
         @Min(0)
         @Default
         Integer deliveryTimeoutMs = 120 * 1000;
 
-        @JsonProperty("send.buffer")
+        @JsonProperty("send_buffer")
         @Min(-1)
         @Default
         Integer sendBuffer = 128 * 1024;
 
-        @JsonProperty("receive.buffer")
+        @JsonProperty("receive_buffer")
         @Min(-1)
         @Default
         Integer receiveBuffer = 32 * 1024;
 
-        @JsonProperty("max.request.size")
+        @JsonProperty("max_request_size")
         @Min(0)
         @Default
         Integer maxRequestSize = 1024 * 1024;
 
-        @JsonProperty("max.block.ms")
+        @JsonProperty("max_block_ms")
         @Min(0)
         @Default
         Long maxBlockMs = 60 * 1000L;
 
-        @JsonProperty("metadata.max.idle.ms")
+        @JsonProperty("metadata_max_idle_ms")
         @Min(5000)
         @Default
         Long metadataMaxAge = 5 * 60 * 1000L;
 
-        @JsonProperty("max.in.flight.requests.per.connection")
+        @JsonProperty("max_in_flight_requests_per_connection")
         @Min(1)
         @Default
         Integer maxInFlightRequestsPerConnection = 5;
 
-        @JsonProperty("transaction.timeout.ms")
+        @JsonProperty("transaction_timeout_ms")
         @Min(0)
         @Default
         Integer transactionTimeout = 60000;
 
-        public Map<String, Object> toConfigMap() {
-            return parseMapObject(toJSONString(this));
+        public Map<String, Object> toProducerConfigProperties() {
+            return safeMap(parseMapObject(toJSONString(this))).entrySet()
+                    .stream()
+                    .filter(e -> !isBlank(e.getKey()) && nonNull(e.getValue()))
+                    .filter(e -> !"type".equalsIgnoreCase(e.getKey()))
+                    .collect(toMap(e -> replace(e.getKey(), "_", "."), e -> e.getValue()));
         }
 
         @Override
