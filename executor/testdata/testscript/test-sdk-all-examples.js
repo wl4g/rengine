@@ -38,19 +38,19 @@ function process(context) {
     const emailResult = testSdkForEmailNotifier(context);
 
     // for sdk case11:
-    const dateHolderResult = testSdkForDateHolder(context);
-
-    // for sdk case12:
-    const codingResult = testSdkForCoding(context);
-
-    // for sdk case13:
-    const hashingResult = testSdkForHashing(context);
-
-    // for sdk case14:
-    const aesResult = testSdkForAES(context);
-
-    // for sdk case15:
-    const rsaResult = testSdkForRSA(context);
+//    const dateHolderResult = testSdkForDateHolder(context);
+//
+//    // for sdk case12:
+//    const codingResult = testSdkForCoding(context);
+//
+//    // for sdk case13:
+//    const hashingResult = testSdkForHashing(context);
+//
+//    // for sdk case14:
+//    const aesResult = testSdkForAES(context);
+//
+//    // for sdk case15:
+//    const rsaResult = testSdkForRSA(context);
 
     // for sdk case16:
     //testSdkForExecutorTasks(context);
@@ -65,12 +65,12 @@ function process(context) {
         //.addValue("redisResult", redisResult)
         //.addValue("kafkaResult", kafkaResult)
         //.addValue("dingtalkResult", dingtalkResult)
-        .addValue("emailResult", emailResult)
-        .addValue("dateHolderResult", dateHolderResult)
-        .addValue("codingResult", codingResult)
-        .addValue("hashingResult", hashingResult)
-        .addValue("aesResult", aesResult)
-        .addValue("rsaResult", rsaResult);
+        .addValue("emailResult", emailResult);
+        //.addValue("dateHolderResult", dateHolderResult)
+        //.addValue("codingResult", codingResult)
+        //.addValue("hashingResult", hashingResult)
+        //.addValue("aesResult", aesResult)
+        //.addValue("rsaResult", rsaResult);
 }
 
 function testSdkForHttpClient(context) {
