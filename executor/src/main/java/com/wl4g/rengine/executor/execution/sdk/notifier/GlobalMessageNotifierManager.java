@@ -57,14 +57,15 @@ import com.wl4g.rengine.common.util.BsonEntitySerializers;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
 import com.wl4g.rengine.executor.execution.sdk.ScriptRedisLockClient;
 import com.wl4g.rengine.executor.execution.sdk.notifier.ScriptMessageNotifier.RefreshedInfo;
-import com.wl4g.rengine.executor.meter.RengineExecutorMeterService;
 import com.wl4g.rengine.executor.meter.MeterUtil;
+import com.wl4g.rengine.executor.meter.RengineExecutorMeterService;
 import com.wl4g.rengine.executor.repository.MongoRepository;
 
 import io.quarkus.arc.All;
 import io.quarkus.redis.datasource.RedisDataSource;
 import io.quarkus.redis.datasource.string.SetArgs;
 import io.quarkus.redis.datasource.string.StringCommands;
+import io.vertx.core.Vertx;
 import lombok.CustomLog;
 
 /**
@@ -85,6 +86,10 @@ public class GlobalMessageNotifierManager {
     @NotNull
     @Inject
     RengineExecutorMeterService meterService;
+
+    @NotNull
+    @Inject
+    Vertx vertx;
 
     @NotNull
     @Inject
@@ -172,7 +177,7 @@ public class GlobalMessageNotifierManager {
         }
 
         // Sets to current effective refreshed.
-        notifier.update(refreshed);
+        notifier.update(refreshed, vertx);
 
         return notifier;
     }

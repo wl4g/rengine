@@ -15,6 +15,8 @@
  */
 package com.wl4g.rengine.executor.execution.sdk;
 
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+
 import javax.validation.constraints.NotBlank;
 
 import org.graalvm.polyglot.HostAccess;
@@ -26,7 +28,6 @@ import com.wl4g.rengine.executor.execution.sdk.datasource.GlobalDataSourceManage
 import com.wl4g.rengine.executor.execution.sdk.notifier.GlobalMessageNotifierManager;
 import com.wl4g.rengine.executor.execution.sdk.notifier.ScriptMessageNotifier;
 
-import lombok.AllArgsConstructor;
 import lombok.ToString;
 
 /**
@@ -37,7 +38,6 @@ import lombok.ToString;
  * @since v1.0.0
  */
 @ToString
-@AllArgsConstructor
 public class ScriptDataService {
     final ScriptHttpClient defaultHttpClient;
     final ScriptSSHClient defaultSSHClient;
@@ -46,6 +46,19 @@ public class ScriptDataService {
     final ScriptRedisLockClient defaultRedisLockClient;
     final GlobalDataSourceManager globalDataSourceManager;
     final GlobalMessageNotifierManager globalMessageNotifierManager;
+
+    public ScriptDataService(ScriptHttpClient defaultHttpClient, ScriptSSHClient defaultSSHClient,
+            ScriptTCPClient defaultTCPClient, ScriptProcessClient defaultProcessClient,
+            ScriptRedisLockClient defaultRedisLockClient, GlobalDataSourceManager globalDataSourceManager,
+            GlobalMessageNotifierManager globalMessageNotifierManager) {
+        this.defaultHttpClient = notNullOf(defaultHttpClient, "defaultHttpClient");
+        this.defaultSSHClient = notNullOf(defaultSSHClient, "defaultSSHClient");
+        this.defaultTCPClient = notNullOf(defaultTCPClient, "defaultTCPClient");
+        this.defaultProcessClient = notNullOf(defaultProcessClient, "defaultProcessClient");
+        this.defaultRedisLockClient = notNullOf(defaultRedisLockClient, "defaultRedisLockClient");
+        this.globalDataSourceManager = notNullOf(globalDataSourceManager, "globalDataSourceManager");
+        this.globalMessageNotifierManager = notNullOf(globalMessageNotifierManager, "globalMessageNotifierManager");
+    }
 
     // --- SDK Utility Clients. ----
 

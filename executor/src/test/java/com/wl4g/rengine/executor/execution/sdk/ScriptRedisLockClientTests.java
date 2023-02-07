@@ -27,6 +27,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.wl4g.rengine.executor.meter.TestDefaultMeterSetup;
+import com.wl4g.rengine.executor.util.TestDefaultBaseSetup;
 import com.wl4g.rengine.executor.util.TestDefaultRedisSetup;
 
 import io.vertx.mutiny.redis.client.RedisAPI;
@@ -50,7 +51,7 @@ public class ScriptRedisLockClientTests {
     @Test
     public void testQuarksRedisEvalScript() {
         final RedisAPI redisApi = TestDefaultRedisSetup
-                .buildRedisAPIDefault(TestDefaultRedisSetup.buildRedisDefault(TestDefaultRedisSetup.buildVertxDefault()));
+                .buildRedisAPIDefault(TestDefaultRedisSetup.buildRedisDefault(TestDefaultBaseSetup.buildCoreVertxDefault()));
 
         final List<String> keys = asList("testLocks");
         final int numkeys = keys.size();

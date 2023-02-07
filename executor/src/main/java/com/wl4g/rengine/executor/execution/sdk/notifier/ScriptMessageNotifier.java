@@ -31,6 +31,7 @@ import com.wl4g.infra.common.notification.MessageNotifier;
 import com.wl4g.infra.common.notification.MessageNotifier.NotifierKind;
 import com.wl4g.rengine.common.entity.Notification;
 
+import io.vertx.core.Vertx;
 import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -61,7 +62,7 @@ public interface ScriptMessageNotifier {
                 "Internal error! Should not be here, the current local cached refreshed is null, it should have been initialized before calling the notifier sending method.");
     }
 
-    default void update(@NotNull RefreshedInfo refreshed) {
+    default void update(@NotNull RefreshedInfo refreshed, @NotNull Vertx vertx) {
         notNull(refreshed, "Internal error! The setup current refreshed is required.");
         setRefreshed(refreshed);
     }

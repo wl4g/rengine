@@ -8,31 +8,31 @@ function process(context) {
     console.info("context.getAttributes()['objId']:", context.getAttributes()["objId"]);
 
     // for sdk case1:
-    //const httpResult = testSdkForHttpClient(context);
-
-    // for sdk case2:
-    //const processResult = testSdkForProcessClient(context);
-
-    // for sdk case3:
-    //const sshResult = testSdkForSSHClient(context);
-
-    // for sdk case4:
-    //const lockResult = testSdkForRedisLockClient(context);
-
-    // for sdk case5:
-    //const mongoResult = testSdkForMongoSourceFacade(context);
-
-    // for sdk case6:
-    const jdbcResult = testSdkForJdbcSourceFacade(context);
-
-    // for sdk case7:
-    //const redisResult = testSdkForRedisSourceFacade(context);
-
-    // for sdk case8:
-    //const kafkaResult = testSdkForKafkaSourceFacade(context);
-
-    // for sdk case9:
-    const dingtalkResult = testSdkForDingtalkNotifier(context);
+//    const httpResult = testSdkForHttpClient(context);
+//
+//    // for sdk case2:
+//    const processResult = testSdkForProcessClient(context);
+//
+//    // for sdk case3:
+//    const sshResult = testSdkForSSHClient(context);
+//
+//    // for sdk case4:
+//    const lockResult = testSdkForRedisLockClient(context);
+//
+//    // for sdk case5:
+//    const mongoResult = testSdkForMongoSourceFacade(context);
+//
+//    // for sdk case6:
+//    const jdbcResult = testSdkForJdbcSourceFacade(context);
+//
+//    // for sdk case7:
+//    const redisResult = testSdkForRedisSourceFacade(context);
+//
+//    // for sdk case8:
+//    const kafkaResult = testSdkForKafkaSourceFacade(context);
+//
+//    // for sdk case9:
+//    const dingtalkResult = testSdkForDingtalkNotifier(context);
 
     // for sdk case10:
     const emailResult = testSdkForEmailNotifier(context);
@@ -61,10 +61,10 @@ function process(context) {
         //.addValue("sshResult", sshResult)
         //.addValue("lockResult", lockResult)
         //.addValue("mongoResult", mongoResult)
+        //.addValue("jdbcResult", jdbcResult)
         //.addValue("redisResult", redisResult)
-        .addValue("jdbcResult", jdbcResult)
         //.addValue("kafkaResult", kafkaResult)
-        .addValue("dingtalkResult", dingtalkResult)
+        //.addValue("dingtalkResult", dingtalkResult)
         .addValue("emailResult", emailResult)
         .addValue("dateHolderResult", dateHolderResult)
         .addValue("codingResult", codingResult)
@@ -81,7 +81,7 @@ function testSdkForHttpClient(context) {
         console.info("httpResult1('/headers'):", httpResult1.at("/headers").toString());
         //return httpResult1;
     } catch(e) {
-        console.error(">>>", e);
+        console.error("ScriptHttpClient1 >>>", e);
     }
 
     // metnod2:
@@ -93,7 +93,7 @@ function testSdkForHttpClient(context) {
         console.info("httpResult2:", httpResult2);
         return httpResult2;
     } catch(e) {
-        console.error("ScriptHttpClient >>>", e);
+        console.error("ScriptHttpClient2 >>>", e);
     }
 }
 
@@ -222,14 +222,16 @@ function testSdkForEmailNotifier(context) {
         console.info("emailNotifier: " + emailNotifier);
 
         const parameter = {
-            "msgType": "MIME",
             "subject": "Testing Sender",
-            "toUsers": "983708408@qq.com",
-            "msgContent": "This testing <b>MIME<b> message!!!</br><font color=red>It's is red font.</font>"
+            "to": ["983708408@qq.com"],
+            //"replyTo": [],
+            //"cc": [],
+            //"bcc": [],
+            "msg": "This testing <b>MIME<b> message!!!</br><font color=red>It's is red font.</font>"
         };
-        const result = emailNotifier.send(parameter);
-        console.info("emailNotifierResult: " + result);
-        return result;
+        const emailResult = emailNotifier.send(parameter);
+        console.info("emailNotifierResult: " + emailResult);
+        return emailResult;
     } catch(e) {
         console.error("EmailNotifier >>>", e);
     }

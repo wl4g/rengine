@@ -44,9 +44,7 @@ import lombok.experimental.SuperBuilder;
 public class ScriptContext implements Serializable {
     private static final long serialVersionUID = 1106545214350173531L;
 
-    //
-    // Runtime context attributes.
-    //
+    // --- Runtime Core APIs. ---
 
     final @NotBlank String id;
     final @NotBlank String type;
@@ -54,13 +52,11 @@ public class ScriptContext implements Serializable {
     final @NotNull @Default ProxyObject attributes = ProxyObject.fromMap(new HashMap<>());
     final @Nullable ScriptResult lastResult;
 
-    //
-    // Helper attributes.
-    //
+    // --- Helper APIs. ---
 
-    transient ScriptDataService dataService;
-    // transient ScriptLogger logger;
-    transient ScriptExecutor executor;
+    final ScriptDataService dataService;
+    // final ScriptLogger logger;
+    final ScriptExecutor executor;
 
     public @HostAccess.Export String getId() {
         return id;
@@ -82,9 +78,7 @@ public class ScriptContext implements Serializable {
         return lastResult;
     }
 
-    //
-    // Helper functions.
-    //
+    // --- Helper functions. ---
 
     public @HostAccess.Export ScriptDataService getDataService() {
         return dataService;

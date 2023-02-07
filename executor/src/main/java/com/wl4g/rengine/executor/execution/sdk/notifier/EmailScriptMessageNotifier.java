@@ -15,6 +15,7 @@
  */
 package com.wl4g.rengine.executor.execution.sdk.notifier;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
@@ -26,26 +27,34 @@ import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.Metric
 import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsName.execution_sdk_notifier_total;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonMap;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.split;
 
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Singleton;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import com.wl4g.infra.common.notification.GenericNotifierParam;
+import com.wl4g.infra.common.lang.Assert2;
 import com.wl4g.infra.common.notification.MessageNotifier.NotifierKind;
-import com.wl4g.infra.common.notification.email.EmailNotifierProperties;
-import com.wl4g.infra.common.notification.email.internal.EmailSenderAPI;
-import com.wl4g.infra.common.notification.email.internal.JavaMailSender;
 import com.wl4g.rengine.common.entity.Notification;
 import com.wl4g.rengine.common.entity.Notification.EmailConfig;
 import com.wl4g.rengine.executor.meter.MeterUtil;
+import com.wl4g.rengine.executor.util.VertxMailerFactory;
 
+import io.quarkus.mailer.Mail;
+import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.mail.LoginOption;
+import io.vertx.ext.mail.MailConfig;
+import io.vertx.ext.mail.StartTLSOptions;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -55,14 +64,16 @@ import lombok.Setter;
  * @author James Wong
  * @version 2023-01-06
  * @since v1.0.0
+ * @see https://github.com/quarkusio/quarkus/issues/1840
+ * @see https://quarkus.io/guides/mailer-reference
+ * @see https://quarkus.io/guides/mailer#implement-the-http-endpoint
  */
 @Getter
 @Setter
 @Singleton
 public class EmailScriptMessageNotifier implements ScriptMessageNotifier {
 
-    EmailNotifierProperties usingConfig;
-    volatile JavaMailSender mailSender;
+    volatile VertxMailerFactory factory;
     volatile RefreshedInfo refreshed;
 
     @Override
@@ -70,78 +81,33 @@ public class EmailScriptMessageNotifier implements ScriptMessageNotifier {
         return NotifierKind.EMAIL;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Object send(final @NotEmpty Map<String, Object> parameter) {
         try {
             MeterUtil.counter(execution_sdk_notifier_total, kind(), METHOD_SEND);
             return MeterUtil.timer(execution_sdk_notifier_time, kind(), METHOD_SEND, () -> {
                 notNullOf(parameter, "parameter");
-                final String content = (String) parameter.get(KEY_MAIL_MSG);
-                hasTextOf(content, format("parameter['%s']", KEY_MAIL_MSG));
+                final String subject = getStringParam(parameter, KEY_MAIL_SUBJECT, true);
+                final List<String> to = getArrayParam(parameter, KEY_MAIL_TO_USERS, true);
+                final List<String> replyTo = getArrayParam(parameter, KEY_MAIL_REPLYTO, false);
+                final List<String> cc = getArrayParam(parameter, KEY_MAIL_CC, false);
+                final List<String> bcc = getArrayParam(parameter, KEY_MAIL_BCC, false);
+                final String msg = getStringParam(parameter, KEY_MAIL_MSG, true);
 
-                final Object toUsers = parameter.get(KEY_MAIL_TO_USERS);
-                notNullOf(toUsers, format("parameter['%s']", KEY_MAIL_TO_USERS));
-                List<String> toUserList = null;
-                if (toUsers instanceof List) {
-                    toUserList = (List<String>) toUsers;
-                } else if (toUsers instanceof String) {
-                    toUserList = asList(split((String) toUsers, ","));
-                } else {
-                    throw new UnsupportedOperationException(
-                            format("Unsupported toUsers parameter type, please check whether the parameters are correct, "
-                                    + "only arrays or comma-separated strings are supported. toUsers: %s", toUsers));
-                }
-
-                EmailSenderAPI.send(mailSender, usingConfig,
-                        new GenericNotifierParam().setToObjects(toUserList).addParameters(parameter), content);
+                factory.getMailer()
+                        .send(new Mail().setSubject(subject)
+                                .setFrom(factory.getMailConfig().getUsername())
+                                .setTo(to)
+                                .setReplyTo(replyTo.toArray(new String[0]))
+                                .setCc(cc)
+                                .setBcc(bcc)
+                                .setText(msg));
 
                 MeterUtil.counter(execution_sdk_notifier_success, kind(), METHOD_SEND);
                 return null;
             });
         } catch (Exception e) {
             MeterUtil.counter(execution_sdk_notifier_failure, kind(), METHOD_SEND);
-            throw e;
-        }
-    }
-
-    @Override
-    public void update(@NotNull RefreshedInfo refreshed) {
-        notNullOf(refreshed, "refreshed");
-        try {
-            MeterUtil.counter(execution_sdk_notifier_total, kind(), METHOD_UPDATE);
-            MeterUtil.timer(execution_sdk_notifier_time, kind(), METHOD_UPDATE, () -> {
-                ScriptMessageNotifier.super.update(refreshed);
-
-                // Initialze for config properties.
-                final EmailConfig config = parseJSON((String) refreshed.getAttributes().get(KEY_MAIL_CONFIG), EmailConfig.class);
-                notNull(config,
-                        "Internal error! Please check the redis cache configuration data, email config json is required. refreshed: %s",
-                        refreshed);
-
-                usingConfig = new EmailNotifierProperties();
-                usingConfig.setProtocol(config.getProtocol());
-                usingConfig.setHost(config.getHost());
-                usingConfig.setPort(config.getPort());
-                usingConfig.setUsername(config.getUsername());
-                usingConfig.setPassword(config.getPassword());
-                usingConfig.setDefaultEncoding(config.getDefaultEncoding());
-                usingConfig.setProperties(config.getProperties());
-
-                // Initialze for sender.
-                if (isNull(mailSender)) {
-                    synchronized (this) {
-                        if (isNull(mailSender)) {
-                            mailSender = EmailSenderAPI.buildSender(usingConfig);
-                        }
-                    }
-                }
-
-                MeterUtil.counter(execution_sdk_notifier_success, kind(), METHOD_UPDATE);
-                return null;
-            });
-        } catch (Exception e) {
-            MeterUtil.counter(execution_sdk_notifier_failure, kind(), METHOD_UPDATE);
             throw e;
         }
     }
@@ -161,8 +127,7 @@ public class EmailScriptMessageNotifier implements ScriptMessageNotifier {
                         // .appSecret(null)
                         // .accessToken(null)
                         // The accessToken is not actually needed, so it is set
-                        // to never
-                        // expire
+                        // to never expire
                         .expireSeconds(Integer.MAX_VALUE)
                         .attributes(singletonMap(KEY_MAIL_CONFIG, toJSONString(config)))
                         .build();
@@ -173,7 +138,99 @@ public class EmailScriptMessageNotifier implements ScriptMessageNotifier {
         }
     }
 
+    @Override
+    public void update(@NotNull RefreshedInfo refreshed, @NotNull Vertx vertx) {
+        notNullOf(refreshed, "refreshed");
+        notNullOf(vertx, "vertx");
+        try {
+            MeterUtil.counter(execution_sdk_notifier_total, kind(), METHOD_UPDATE);
+            MeterUtil.timer(execution_sdk_notifier_time, kind(), METHOD_UPDATE, () -> {
+                ScriptMessageNotifier.super.update(refreshed, vertx);
+
+                // Initialze for config properties.
+                final EmailConfig config = parseJSON((String) refreshed.getAttributes().get(KEY_MAIL_CONFIG), EmailConfig.class);
+                notNull(config,
+                        "Internal error! Please check the redis cache configuration data, email config json is required. refreshed: %s",
+                        refreshed);
+
+                // Initialze for sender.
+                if (isNull(factory)) {
+                    synchronized (this) {
+                        if (isNull(factory)) {
+                            this.factory = new VertxMailerFactory(vertx,
+                                    new MailConfig(new JsonObject(safeMap(config.getProperties()))).setHostname(config.getHost())
+                                            .setPort(config.getPort())
+                                            .setStarttls(StartTLSOptions.REQUIRED)
+                                            .setLogin(LoginOption.REQUIRED)
+                                            .setSsl(true)
+                                            .setUsername(config.getUsername())
+                                            .setPassword(config.getPassword())
+                                            .setConnectTimeout(6_000)
+                                            .setSslHandshakeTimeout(10_000)
+                                            // io.vertx.core.net.TCPSSLOptions#DEFAULT_IDLE_TIMEOUT
+                                            .setIdleTimeout(0)
+                                            .setSoLinger(-1)
+                                            .setKeepAlive(false)
+                                            .setTcpNoDelay(true));
+                        }
+                    }
+                }
+
+                MeterUtil.counter(execution_sdk_notifier_success, kind(), METHOD_UPDATE);
+                return null;
+            });
+        } catch (Exception e) {
+            MeterUtil.counter(execution_sdk_notifier_failure, kind(), METHOD_UPDATE);
+            throw e;
+        }
+    }
+
+    public static String getStringParam(@NotEmpty Map<String, Object> parameter, @NotBlank String paramName, boolean required) {
+        final Object paramObj = parameter.get(hasTextOf(paramName, "paramName"));
+        if (required && (isNull(paramObj) || isBlank(paramObj.toString()))) {
+            throw new IllegalArgumentException(format("parameter['%s'] is required", paramName));
+        }
+        if (nonNull(paramObj)) {
+            return paramObj.toString();
+        }
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<String> getArrayParam(
+            @NotEmpty Map<String, Object> parameter,
+            @NotBlank String paramName,
+            boolean required) {
+        final Object paramObj = parameter.get(hasTextOf(paramName, "paramName"));
+        if (required && (isNull(paramObj) || isBlank(paramObj.toString()))) {
+            throw new IllegalArgumentException(format("parameter['%s'] is required", paramName));
+        }
+        if (nonNull(paramObj)) {
+            List<String> params = emptyList();
+            if (paramObj instanceof List) {
+                params = (List<String>) paramObj;
+            } else if (paramObj instanceof String) {
+                params = asList(split((String) paramObj, ","));
+            } else {
+                throw new UnsupportedOperationException(format(
+                        "Unsupported %s parameter type, please check whether the parameters are correct, "
+                                + "only arrays or comma-separated strings are supported. %s: %s",
+                        paramName, paramName, paramObj));
+            }
+            if (required) {
+                Assert2.notEmpty(params, format("parameter['%s']", paramName));
+            }
+            return params;
+        }
+        return emptyList();
+    }
+
     public static final String KEY_MAIL_CONFIG = EmailConfig.class.getName();
-    public static final String KEY_MAIL_TO_USERS = "toUsers";
-    public static final String KEY_MAIL_MSG = "msgContent";
+    public static final String KEY_MAIL_SUBJECT = "subject";
+    public static final String KEY_MAIL_TO_USERS = "to";
+    public static final String KEY_MAIL_REPLYTO = "replyTo";
+    public static final String KEY_MAIL_CC = "cc";
+    public static final String KEY_MAIL_BCC = "bcc";
+    public static final String KEY_MAIL_MSG = "msg";
+
 }

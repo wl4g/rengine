@@ -121,7 +121,7 @@ public class Notification extends BaseBean {
         /**
          * Additional JavaMail session properties.
          */
-        private @Nullable @Default Map<String, String> properties = new HashMap<>();
+        private @Nullable @Default Map<String, Object> properties = new HashMap<>();
     }
 
     @Getter

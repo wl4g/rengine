@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -121,8 +120,7 @@ public abstract class AbstractScriptEngine implements IEngine {
     ScriptProcessClient defaultProcessClient;
     ScriptRedisLockClient defaultRedisLockClient;
 
-    @PostConstruct
-    void init() {
+    protected void init() {
         this.defaultHttpClient = new ScriptHttpClient();
         this.defaultSSHClient = new ScriptSSHClient();
         this.defaultTCPClient = new ScriptTCPClient();

@@ -86,7 +86,8 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
     GraalPolyglotManager graalPolyglotManager;
 
     @PostConstruct
-    void init() {
+    protected void init() {
+        super.init();
         try {
             log.info("Initialzing graal JS script engine ...");
             final ScriptLogConfig scriptLogConfig = config.log();

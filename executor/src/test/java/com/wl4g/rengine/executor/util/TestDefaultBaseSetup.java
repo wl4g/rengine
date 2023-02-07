@@ -22,6 +22,8 @@ import static com.wl4g.infra.common.reflect.ReflectionUtils2.setField;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.time.Duration;
+import java.util.OptionalInt;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -47,6 +49,13 @@ import com.wl4g.rengine.executor.repository.MongoRepository;
 
 import io.quarkus.mongodb.impl.ReactiveMongoClientImpl;
 import io.quarkus.mongodb.reactive.ReactiveMongoClient;
+import io.quarkus.runtime.LaunchMode;
+import io.quarkus.vertx.core.runtime.QuarkusExecutorFactory;
+import io.quarkus.vertx.core.runtime.config.VertxConfiguration;
+import io.vertx.core.Vertx;
+import io.vertx.core.impl.VertxBuilder;
+import io.vertx.core.net.impl.transport.Transport;
+import io.vertx.core.spi.VertxThreadFactory;
 
 /**
  * {@link TestDefaultBaseSetup}
@@ -56,6 +65,24 @@ import io.quarkus.mongodb.reactive.ReactiveMongoClient;
  * @since v1.0.0
  */
 public abstract class TestDefaultBaseSetup {
+
+    public static io.vertx.mutiny.core.Vertx buildMutinyVertxDefault() {
+        return new io.vertx.mutiny.core.Vertx(buildCoreVertxDefault());
+    }
+
+    public static Vertx buildCoreVertxDefault() {
+        final VertxConfiguration conf = new VertxConfiguration();
+        conf.queueSize = OptionalInt.of(2);
+        conf.workerPoolSize = 2;
+        conf.eventLoopsPoolSize = OptionalInt.of(2);
+        conf.internalBlockingPoolSize = 2;
+        conf.keepAliveTime = Duration.ofSeconds(3);
+        conf.maxWorkerExecuteTime = Duration.ofSeconds(3);
+        return new VertxBuilder().transport(Transport.transport(true))
+                .executorServiceFactory(new QuarkusExecutorFactory(conf, LaunchMode.TEST))
+                .threadFactory(VertxThreadFactory.INSTANCE)
+                .vertx();
+    }
 
     public static MongoRepository createMongoRepository() {
         MongoRepository mongoRepository = new MongoRepository();

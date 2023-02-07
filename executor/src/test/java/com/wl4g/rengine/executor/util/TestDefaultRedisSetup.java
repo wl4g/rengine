@@ -16,16 +16,9 @@
 package com.wl4g.rengine.executor.util;
 
 import java.time.Duration;
-import java.util.OptionalInt;
 
 import io.quarkus.redis.datasource.RedisDataSource;
-import io.quarkus.runtime.LaunchMode;
-import io.quarkus.vertx.core.runtime.QuarkusExecutorFactory;
-import io.quarkus.vertx.core.runtime.config.VertxConfiguration;
 import io.vertx.core.Vertx;
-import io.vertx.core.impl.VertxBuilder;
-import io.vertx.core.net.impl.transport.Transport;
-import io.vertx.core.spi.VertxThreadFactory;
 import io.vertx.mutiny.redis.client.Redis;
 import io.vertx.mutiny.redis.client.RedisAPI;
 import io.vertx.redis.client.RedisClientType;
@@ -40,20 +33,6 @@ import io.vertx.redis.client.RedisOptions;
  */
 public class TestDefaultRedisSetup {
 
-    public static Vertx buildVertxDefault() {
-        final VertxConfiguration conf = new VertxConfiguration();
-        conf.queueSize = OptionalInt.of(2);
-        conf.workerPoolSize = 2;
-        conf.eventLoopsPoolSize = OptionalInt.of(2);
-        conf.internalBlockingPoolSize = 2;
-        conf.keepAliveTime = Duration.ofSeconds(3);
-        conf.maxWorkerExecuteTime = Duration.ofSeconds(3);
-        return new VertxBuilder().transport(Transport.transport(true))
-                .executorServiceFactory(new QuarkusExecutorFactory(conf, LaunchMode.TEST))
-                .threadFactory(VertxThreadFactory.INSTANCE)
-                .vertx();
-    }
-
     public static Redis buildRedisDefault(final Vertx vertx) {
         final RedisOptions options = new RedisOptions().addConnectionString("redis://localhost:6379")
                 .addConnectionString("redis://localhost:6380")
@@ -67,7 +46,7 @@ public class TestDefaultRedisSetup {
         // final io.vertx.redis.client.impl.RedisClient redisClient = new
         // io.vertx.redis.client.impl.RedisClient(vertx, options);
 
-        return Redis.createClient(new io.vertx.mutiny.core.Vertx(vertx), options);
+        return Redis.createClient(TestDefaultBaseSetup.buildMutinyVertxDefault(), options);
     }
 
     public static RedisAPI buildRedisAPIDefault(final Redis redis) {
@@ -75,7 +54,7 @@ public class TestDefaultRedisSetup {
     }
 
     public static RedisDataSource buildRedisDataSourceDefault() {
-        final Vertx vertx = buildVertxDefault();
+        final Vertx vertx = TestDefaultBaseSetup.buildCoreVertxDefault();
         final Redis redis = buildRedisDefault(vertx);
         final RedisAPI redisAPI = buildRedisAPIDefault(redis);
         return new io.quarkus.redis.runtime.datasource.BlockingRedisDataSourceImpl(new io.vertx.mutiny.core.Vertx(vertx), redis,

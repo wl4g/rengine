@@ -48,6 +48,7 @@ import com.wl4g.rengine.common.entity.Notification;
 import com.wl4g.rengine.common.entity.Notification.DingtalkConfig;
 import com.wl4g.rengine.executor.meter.MeterUtil;
 
+import io.vertx.core.Vertx;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -149,22 +150,6 @@ public class DingtalkScriptMessageNotifier implements ScriptMessageNotifier {
     }
 
     @Override
-    public void update(@NotNull RefreshedInfo refreshed) {
-        notNullOf(refreshed, "refreshed");
-        try {
-            MeterUtil.counter(execution_sdk_notifier_total, kind(), METHOD_UPDATE);
-            MeterUtil.timer(execution_sdk_notifier_time, kind(), METHOD_UPDATE, () -> {
-                ScriptMessageNotifier.super.update(refreshed);
-                MeterUtil.counter(execution_sdk_notifier_success, kind(), METHOD_UPDATE);
-                return null;
-            });
-        } catch (Exception e) {
-            MeterUtil.counter(execution_sdk_notifier_failure, kind(), METHOD_UPDATE);
-            throw e;
-        }
-    }
-
-    @Override
     public RefreshedInfo refresh(@NotNull Notification notification) {
         notNullOf(notification, "notification");
         try {
@@ -191,6 +176,22 @@ public class DingtalkScriptMessageNotifier implements ScriptMessageNotifier {
             });
         } catch (Exception e) {
             MeterUtil.counter(execution_sdk_notifier_failure, kind(), METHOD_REFRESH);
+            throw e;
+        }
+    }
+
+    @Override
+    public void update(@NotNull RefreshedInfo refreshed, @NotNull Vertx vertx) {
+        notNullOf(refreshed, "refreshed");
+        try {
+            MeterUtil.counter(execution_sdk_notifier_total, kind(), METHOD_UPDATE);
+            MeterUtil.timer(execution_sdk_notifier_time, kind(), METHOD_UPDATE, () -> {
+                ScriptMessageNotifier.super.update(refreshed, vertx);
+                MeterUtil.counter(execution_sdk_notifier_success, kind(), METHOD_UPDATE);
+                return null;
+            });
+        } catch (Exception e) {
+            MeterUtil.counter(execution_sdk_notifier_failure, kind(), METHOD_UPDATE);
             throw e;
         }
     }
