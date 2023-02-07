@@ -196,15 +196,15 @@
             <artifactId>eddsa</artifactId>
             <version>0.3.0</version>
         </dependency>
-        <!-- Email(see:com.wl4g.infra.common.remoting.parse.FormHttpMessageParser) -->
-        <!-- <dependency>-->
-        <!--     <groupId>javax.mail</groupId>-->
-        <!--     <artifactId>javax.mail-api</artifactId>-->
-        <!-- </dependency>-->
-        <!-- <dependency>-->
-        <!--     <groupId>com.sun.mail</groupId>-->
-        <!--     <artifactId>javax.mail</artifactId>-->
-        <!-- </dependency>-->
+        <!-- Mail media type (see:com.wl4g.infra.common.remoting.parse.FormHttpMessageParser) -->
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>javax.mail-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+        </dependency>
         <!-- see:https://github.com/quarkusio/quarkus/issues/1840 -->
         <!-- see:https://quarkus.io/guides/mailer-reference -->
         <!-- see:https://quarkus.io/guides/mailer#implement-the-http-endpoint -->

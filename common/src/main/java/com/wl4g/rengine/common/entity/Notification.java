@@ -89,7 +89,9 @@ public class Notification extends BaseBean {
     public static class EmailConfig extends NotifierConfigPropertiesBase {
 
         /**
-         * Protocol used by the Email(SMTP) server.
+         * Notice: 暂仅支持SMTP, 原因是 rengine executor 服务的
+         * {@link com.wl4g.rengine.executor.execution.sdk.notifier.EmailScriptMessageNotifier}
+         * 使用了 quarkus-mailer 模块(当前2023/02仅支持SMTP)
          */
         private @NotBlank @Default String protocol = "smtp";
 
@@ -112,11 +114,6 @@ public class Notification extends BaseBean {
          * Login password of the Email(SMTP) server.
          */
         private @NotBlank String password;
-
-        /**
-         * Default MimeMessage encoding.
-         */
-        private @NotBlank @Default String defaultEncoding = "UTF-8";
 
         /**
          * Additional JavaMail session properties.

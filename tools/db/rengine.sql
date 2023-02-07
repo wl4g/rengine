@@ -11,7 +11,7 @@
  Target Server Version : 40406
  File Encoding         : 65001
 
- Date: 07/02/2023 12:23:44
+ Date: 08/02/2023 00:39:13
 */
 
 
@@ -65,7 +65,7 @@ db.getCollection("sys_dicts").insert([ {
     _id: NumberLong("6305460145405954"),
     type: "API_CONFIG_DEFINITION",
     key: "sdk_datasource_redis",
-    value: "[{\"type\":\"array\",\"name\":\"nodes\",\"defaultValue\":\"localhost:6379,localhost:6380,localhost:6381,localhost:7379,localhost:7380,localhost:7381\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"username\",\"defaultValue\":null,\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"password\",\"defaultValue\":null,\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"string\",\"name\":\"clientName\",\"defaultValue\":null,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"connTimeout\",\"defaultValue\":\"10000\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"soTimeout\",\"defaultValue\":\"10000\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"maxAttempts\",\"defaultValue\":3,\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"database\",\"defaultValue\":\"0\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"safeMode\",\"defaultValue\":\"true\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"object\",\"name\":\"poolConfig\",\"defaultValue\":null,\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null,\"childrens\":[{\"type\":\"int\",\"name\":\"maxIdle\",\"defaultValue\":\"5\",\"required\":false,\"maxValue\":1000,\"minValue\":1,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"minIdle\",\"defaultValue\":\"\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"maxTotal\",\"defaultValue\":\"10\",\"required\":true,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"lifo\",\"defaultValue\":true,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"fairness\",\"defaultValue\":false,\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"maxWait\",\"defaultValue\":\"10000\",\"required\":true,\"maxValue\":null,\"minValue\":1,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"minEvictableIdleMs\",\"defaultValue\":\"1800000\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"evictorShutdownTimeoutMs\",\"defaultValue\":\"10000\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int64\",\"name\":\"softMinEvictableIdleMs\",\"defaultValue\":\"-1\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"int\",\"name\":\"numTestsPerEvictionRun\",\"defaultValue\":\"3\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},,{\"type\":\"int64\",\"name\":\"durationBetweenEvictionRunsMs\",\"defaultValue\":\"-1\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null}{\"type\":\"boolean\",\"name\":\"testOnCreate\",\"defaultValue\":\"false\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"testOnBorrow\",\"defaultValue\":\"false\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"testOnReturn\",\"defaultValue\":\"false\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"testWhileIdle\",\"defaultValue\":\"true\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null},{\"type\":\"boolean\",\"name\":\"blockWhenExhausted\",\"defaultValue\":\"true\",\"required\":false,\"maxValue\":null,\"minValue\":null,\"help\":\"\",\"unit\":null}]}]}]",
+    value: "[{\"type\": \"array\", \t\"name\": \"nodes\", \t\"defaultValue\": \"localhost:6379,localhost:6380,localhost:6381,localhost:7379,localhost:7380,localhost:7381\", \t\"required\": true, \t\"maxValue\": null, \t\"minValue\": null, \t\"help\": \"\", \t\"unit\": null }, { \t\"type\": \"string\", \t\"name\": \"username\", \t\"defaultValue\": null, \t\"required\": true, \t\"maxValue\": null, \t\"minValue\": null, \t\"help\": \"\", \t\"unit\": null }, { \t\"type\": \"string\", \t\"name\": \"password\", \t\"defaultValue\": null, \t\"required\": true, \t\"maxValue\": null, \t\"minValue\": null, \t\"help\": \"\", \t\"unit\": null }, { \t\"type\": \"string\", \t\"name\": \"clientName\", \t\"defaultValue\": null, \t\"required\": false, \t\"maxValue\": null, \t\"minValue\": null, \t\"help\": \"\", \t\"unit\": null }, { \t\"type\": \"int\", \t\"name\": \"connTimeout\", \t\"defaultValue\": \"10000\", \t\"required\": true, \t\"maxValue\": null, \t\"minValue\": null, \t\"help\": \"\", \t\"unit\": null }, { \t\"type\": \"int\", \t\"name\": \"soTimeout\", \t\"defaultValue\": \"10000\", \t\"required\": true, \t\"maxValue\": null, \t\"minValue\": null, \t\"help\": \"\", \t\"unit\": null }, { \t\"type\": \"int\", \t\"name\": \"maxAttempts\", \t\"defaultValue\": 3, \t\"required\": true, \t\"maxValue\": null, \t\"minValue\": null, \t\"help\": \"\", \t\"unit\": null }, { \t\"type\": \"int\", \t\"name\": \"database\", \t\"defaultValue\": \"0\", \t\"required\": false, \t\"maxValue\": null, \t\"minValue\": null, \t\"help\": \"\", \t\"unit\": null }, { \t\"type\": \"boolean\", \t\"name\": \"safeMode\", \t\"defaultValue\": \"true\", \t\"required\": false, \t\"maxValue\": null, \t\"minValue\": null, \t\"help\": \"\", \t\"unit\": null }, { \t\"type\": \"object\", \t\"name\": \"poolConfig\", \t\"defaultValue\": null, \t\"required\": true, \t\"maxValue\": null, \t\"minValue\": null, \t\"help\": \"\", \t\"unit\": null, \t\"childrens\": [{ \t\t\"type\": \"int\", \t\t\"name\": \"maxIdle\", \t\t\"defaultValue\": \"5\", \t\t\"required\": false, \t\t\"maxValue\": 1000, \t\t\"minValue\": 1, \t\t\"help\": \"\", \t\t\"unit\": null \t}, { \t\t\"type\": \"int\", \t\t\"name\": \"minIdle\", \t\t\"defaultValue\": \"\", \t\t\"required\": true, \t\t\"maxValue\": null, \t\t\"minValue\": null, \t\t\"help\": \"\", \t\t\"unit\": null \t}, { \t\t\"type\": \"int\", \t\t\"name\": \"maxTotal\", \t\t\"defaultValue\": \"10\", \t\t\"required\": true, \t\t\"maxValue\": null, \t\t\"minValue\": null, \t\t\"help\": \"\", \t\t\"unit\": null \t}, { \t\t\"type\": \"boolean\", \t\t\"name\": \"lifo\", \t\t\"defaultValue\": true, \t\t\"required\": false, \t\t\"maxValue\": null, \t\t\"minValue\": null, \t\t\"help\": \"\", \t\t\"unit\": null \t}, { \t\t\"type\": \"boolean\", \t\t\"name\": \"fairness\", \t\t\"defaultValue\": false, \t\t\"required\": false, \t\t\"maxValue\": null, \t\t\"minValue\": null, \t\t\"help\": \"\", \t\t\"unit\": null \t}, { \t\t\"type\": \"int64\", \t\t\"name\": \"maxWait\", \t\t\"defaultValue\": \"10000\", \t\t\"required\": true, \t\t\"maxValue\": null, \t\t\"minValue\": 1, \t\t\"help\": \"\", \t\t\"unit\": null \t}, { \t\t\"type\": \"int64\", \t\t\"name\": \"minEvictableIdleMs\", \t\t\"defaultValue\": \"1800000\", \t\t\"required\": false, \t\t\"maxValue\": null, \t\t\"minValue\": null, \t\t\"help\": \"\", \t\t\"unit\": null \t}, { \t\t\"type\": \"int64\", \t\t\"name\": \"evictorShutdownTimeoutMs\", \t\t\"defaultValue\": \"10000\", \t\t\"required\": false, \t\t\"maxValue\": null, \t\t\"minValue\": null, \t\t\"help\": \"\", \t\t\"unit\": null \t}, { \t\t\"type\": \"int64\", \t\t\"name\": \"softMinEvictableIdleMs\", \t\t\"defaultValue\": \"-1\", \t\t\"required\": false, \t\t\"maxValue\": null, \t\t\"minValue\": null, \t\t\"help\": \"\", \t\t\"unit\": null \t}, { \t\t\"type\": \"int\", \t\t\"name\": \"numTestsPerEvictionRun\", \t\t\"defaultValue\": \"3\", \t\t\"required\": false, \t\t\"maxValue\": null, \t\t\"minValue\": null, \t\t\"help\": \"\", \t\t\"unit\": null \t}, { \t\t\"type\": \"int64\", \t\t\"name\": \"durationBetweenEvictionRunsMs\", \t\t\"defaultValue\": \"-1\", \t\t\"required\": false, \t\t\"maxValue\": null, \t\t\"minValue\": null, \t\t\"help\": \"\", \t\t\"unit\": null \t}, { \t\t\"type\": \"boolean\", \t\t\"name\": \"testOnCreate\", \t\t\"defaultValue\": \"false\", \t\t\"required\": false, \t\t\"maxValue\": null, \t\t\"minValue\": null, \t\t\"help\": \"\", \t\t\"unit\": null \t}, { \t\t\"type\": \"boolean\", \t\t\"name\": \"testOnBorrow\", \t\t\"defaultValue\": \"false\", \t\t\"required\": false, \t\t\"maxValue\": null, \t\t\"minValue\": null, \t\t\"help\": \"\", \t\t\"unit\": null \t}, { \t\t\"type\": \"boolean\", \t\t\"name\": \"testOnReturn\", \t\t\"defaultValue\": \"false\", \t\t\"required\": false, \t\t\"maxValue\": null, \t\t\"minValue\": null, \t\t\"help\": \"\", \t\t\"unit\": null \t}, { \t\t\"type\": \"boolean\", \t\t\"name\": \"testWhileIdle\", \t\t\"defaultValue\": \"true\", \t\t\"required\": false, \t\t\"maxValue\": null, \t\t\"minValue\": null, \t\t\"help\": \"\", \t\t\"unit\": null \t}, { \t\t\"type\": \"boolean\", \t\t\"name\": \"blockWhenExhausted\", \t\t\"defaultValue\": \"true\", \t\t\"required\": false, \t\t\"maxValue\": null, \t\t\"minValue\": null, \t\t\"help\": \"\", \t\t\"unit\": null \t}] }]",
     sort: NumberInt("0"),
     orgCode: "string",
     enable: NumberInt("1"),
@@ -284,7 +284,7 @@ db.getCollection("t_datasources").insert([ {
         type: "MONGO",
         connectionString: "mongodb://localhost:27017/rengine"
     },
-    remark: "local test",
+    remark: "test",
     updateDate: ISODate("2022-12-27T04:51:08.533Z"),
     delFlag: NumberInt("0")
 } ]);
@@ -302,80 +302,7 @@ db.getCollection("t_datasources").insert([ {
         driverClassName: "com.mysql.cj.jdbc.Driver",
         jdbcUrl: "jdbc:mysql://localhost:3306/mysql?useUnicode=true&serverTimezone=UTC&characterEncoding=utf-8&useSSL=false",
         username: "root",
-        password: "zzx!@#$%",
-        maximumPoolSize: 10,
-        validationTimeout: 3000,
-        connectionTimeout: 30000
-    },
-    remark: "local test",
-    updateDate: ISODate("2022-12-27T04:51:08.533Z"),
-    delFlag: NumberInt("0")
-} ]);
-db.getCollection("t_datasources").insert([ {
-    _id: NumberLong("6220869710864224"),
-    name: "default",
-    enable: NumberInt("1"),
-    labels: [
-        "foo",
-        "bar"
-    ],
-    properties: {
-        type: "REDIS",
-        jedisConfig: {
-            nodes: [
-                "localhost:6379",
-                "localhost:6380",
-                "localhost:6381",
-                "localhost:7379",
-                "localhost:7380",
-                "localhost:7381"
-            ],
-            password: "zzx!@#$%",
-            connTimeout: 10000
-        }
-    },
-    remark: "local test",
-    updateDate: ISODate("2022-12-27T04:51:08.533Z"),
-    delFlag: NumberInt("0")
-} ]);
-db.getCollection("t_datasources").insert([ {
-    _id: NumberLong("6220869710864225"),
-    name: "default",
-    enable: NumberInt("1"),
-    labels: [
-        "foo",
-        "bar"
-    ],
-    properties: {
-        type: "KAFKA",
-        bootstrapServers: "localhost:9092"
-    },
-    remark: "local test",
-    updateDate: ISODate("2022-12-27T04:51:08.533Z"),
-    delFlag: NumberInt("0")
-} ]);
-db.getCollection("t_datasources").insert([ {
-    _id: NumberLong("6220869710864227"),
-    name: "sc-uat-redis",
-    enable: NumberInt("1"),
-    labels: [
-        "foo",
-        "bar"
-    ],
-    properties: {
-        type: "REDIS",
-        jedisConfig: {
-            nodes: [
-                "owner-node5:6379",
-                "owner-node5:6380",
-                "owner-node5:6381",
-                "owner-node5:7379",
-                "owner-node5:7380",
-                "owner-node5:7381"
-            ],
-            password: "zzx!@#$%",
-            connTimeout: 10000
-        }
+        password: "zzx!@#$%"
     },
     remark: "test",
     updateDate: ISODate("2022-12-27T04:51:08.533Z"),
@@ -396,6 +323,82 @@ db.getCollection("t_datasources").insert([ {
         jdbcUrl: "jdbc:mysql://owner-node5:3306/mysql?useUnicode=true&serverTimezone=UTC&characterEncoding=utf-8&useSSL=false",
         username: "root",
         password: "zzx!@#$%"
+    },
+    remark: "test",
+    updateDate: ISODate("2022-12-27T04:51:08.533Z"),
+    delFlag: NumberInt("0")
+} ]);
+db.getCollection("t_datasources").insert([ {
+    _id: NumberLong("6220869710864224"),
+    name: "default",
+    enable: NumberInt("1"),
+    labels: [
+        "foo",
+        "bar"
+    ],
+    properties: {
+        type: "REDIS",
+        nodes: [
+            "localhost:6379",
+            "localhost:6380",
+            "localhost:6381",
+            "localhost:7379",
+            "localhost:7380",
+            "localhost:7381"
+        ],
+        password: "zzx!@#$%",
+        connTimeout: 10000,
+        soTimeout: 10000,
+        poolConfig: {
+            maxTotal: 10,
+            maxWait: 10000
+        }
+    },
+    remark: "test",
+    updateDate: ISODate("2022-12-27T04:51:08.533Z"),
+    delFlag: NumberInt("0")
+} ]);
+db.getCollection("t_datasources").insert([ {
+    _id: NumberLong("6220869710864227"),
+    name: "sc-uat-redis",
+    enable: NumberInt("1"),
+    labels: [
+        "foo",
+        "bar"
+    ],
+    properties: {
+        type: "REDIS",
+        nodes: [
+            "owner-node5:6379",
+            "owner-node5:6380",
+            "owner-node5:6381",
+            "owner-node5:7379",
+            "owner-node5:7380",
+            "owner-node5:7381"
+        ],
+        password: "zzx!@#$%",
+        connTimeout: 10000,
+        soTimeout: 10000,
+        poolConfig: {
+            maxTotal: 10,
+            maxWait: 10000
+        }
+    },
+    remark: "test",
+    updateDate: ISODate("2022-12-27T04:51:08.533Z"),
+    delFlag: NumberInt("0")
+} ]);
+db.getCollection("t_datasources").insert([ {
+    _id: NumberLong("6220869710864225"),
+    name: "default",
+    enable: NumberInt("1"),
+    labels: [
+        "foo",
+        "bar"
+    ],
+    properties: {
+        type: "KAFKA",
+        bootstrapServers: "localhost:9092"
     },
     remark: "test",
     updateDate: ISODate("2022-12-27T04:51:08.533Z"),

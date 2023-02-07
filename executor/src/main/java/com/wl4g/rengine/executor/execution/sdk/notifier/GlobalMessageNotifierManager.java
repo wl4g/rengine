@@ -128,9 +128,10 @@ public class GlobalMessageNotifierManager {
                 MeterUtil.counter(execution_sdk_notifier_manager_success, notifierType, METHOD_OBTAIN);
                 return notifier;
             });
-        } catch (Exception e) {
+        } catch (Throwable ex) {
             MeterUtil.counter(execution_sdk_notifier_manager_failure, notifierType, METHOD_OBTAIN);
-            throw e;
+            log.error(format("Failed to obtain script notifier for %s", notifierType), ex);
+            throw ex;
         }
     }
 
@@ -166,7 +167,7 @@ public class GlobalMessageNotifierManager {
                                 saveRefreshed(refreshed);
                             }
                         }
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
                         log.error(format("Failed to refresh notifier for '%s'.", notifierType), e);
                         throw e;
                     } finally {
@@ -188,7 +189,7 @@ public class GlobalMessageNotifierManager {
             return MeterUtil.timer(execution_sdk_notifier_manager_time, notifierType, METHOD_LOADREFRESHED, () -> {
                 return parseJSON(redisStringCommands.get(buildRefreshedCachedKey(notifierType)), RefreshedInfo.class);
             });
-        } catch (Exception e) {
+        } catch (Throwable e) {
             MeterUtil.counter(execution_sdk_notifier_manager_failure, notifierType, METHOD_LOADREFRESHED);
             throw e;
         }
@@ -207,7 +208,7 @@ public class GlobalMessageNotifierManager {
                         new SetArgs().px(Duration.ofSeconds(effectiveExpireSec)));
                 return null;
             });
-        } catch (Exception e) {
+        } catch (Throwable e) {
             MeterUtil.counter(execution_sdk_notifier_manager_failure, refreshed.getNotifierType(), METHOD_SAVEREFRESHED);
             throw e;
         }
@@ -230,7 +231,7 @@ public class GlobalMessageNotifierManager {
                 }
                 return notifications.get(0);
             });
-        } catch (Exception e) {
+        } catch (Throwable e) {
             MeterUtil.counter(execution_sdk_notifier_manager_failure, notifierType, METHOD_FINDNOTIFICATION);
             throw e;
         }

@@ -1,5 +1,41 @@
 [
 {
+  "name": "io.vertx.core.Future",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": []
+},
+{
+  "name": "io.quarkus.mailer.runtime.MutinyMailerImpl",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": []
+},
+{
+  "name": "io.quarkus.mailer.runtime.BlockingMailerImpl",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": []
+},
+{
+  "name":"com.wl4g.rengine.executor.util.VertxMailerFactory",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": []
+},
+{
   "name": "com.wl4g.rengine.executor.minio.MinioManager",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
@@ -256,7 +292,6 @@
   "queryAllDeclaredConstructors": true,
   "methods": [
     {"name": "<init>", "parameterTypes": []},
-    {"name": "getInstance", "parameterTypes": []},
     {"name": "parse", "parameterTypes": ["java.lang.String"]},
     {"name": "stringify", "parameterTypes": ["java.lang.Object"]},
     {"name": "stringify", "parameterTypes": ["java.lang.Object","boolean"]}
@@ -271,7 +306,6 @@
   "queryAllDeclaredConstructors": true,
   "methods": [
     {"name": "<init>", "parameterTypes": []},
-    {"name": "getInstance", "parameterTypes": []},
     {"name": "isNull", "parameterTypes": ["java.lang.Object","java.lang.String","[Ljava.lang.Object;"]},
     {"name": "isTrueOf", "parameterTypes": ["boolean","java.lang.String"]},
     {"name": "isTrue", "parameterTypes": ["boolean","java.lang.String","[Ljava.lang.Object;"]},
@@ -325,7 +359,6 @@
   "queryAllDeclaredConstructors": true,
   "methods": [
     {"name": "<init>", "parameterTypes": []},
-    {"name": "getInstance", "parameterTypes": []},
     {"name": "generateKeyToBase64", "parameterTypes": []},
     {"name": "encryptCbcNoPaddingToBase64", "parameterTypes": ["java.lang.String","java.lang.String","java.lang.String"]},
     {"name": "decryptCbcNoPaddingFromBase64", "parameterTypes": ["java.lang.String","java.lang.String","java.lang.String"]},
@@ -361,7 +394,6 @@
   "methods": [
     {"name": "<init>", "parameterTypes": []},
     {"name": "getDate", "parameterTypes": []},
-    {"name": "getInstance", "parameterTypes": []},
     {"name": "parseDate", "parameterTypes": ["java.lang.String","java.lang.String"]},
     {"name": "currentMillis", "parameterTypes": []},
     {"name": "currentNanoTime", "parameterTypes": []},
@@ -405,7 +437,6 @@
   "queryAllDeclaredConstructors": true,
   "methods": [
     {"name": "<init>", "parameterTypes": []},
-    {"name": "getInstance", "parameterTypes": []},
     {"name": "toHex", "parameterTypes": ["java.lang.String"]},
     {"name": "fromBase64", "parameterTypes": ["java.lang.String"]},
     {"name": "toBase64", "parameterTypes": ["java.lang.String"]},
@@ -427,7 +458,6 @@
   "queryAllDeclaredConstructors": true,
   "methods": [
     {"name": "<init>", "parameterTypes": []},
-    {"name": "getInstance", "parameterTypes": []},
     {"name": "md5", "parameterTypes": ["java.lang.String"]},
     {"name": "sha1", "parameterTypes": ["java.lang.String"]},
     {"name": "sha256", "parameterTypes": ["java.lang.String"]},
@@ -462,7 +492,6 @@
   "queryAllDeclaredConstructors": true,
   "methods": [
     {"name": "<init>", "parameterTypes": []},
-    {"name": "getInstance", "parameterTypes": []},
     {"name": "nextInt", "parameterTypes": []},
     {"name": "nextInt", "parameterTypes": ["int","int"]},
     {"name": "random", "parameterTypes": ["int"]},
@@ -525,7 +554,6 @@
   "queryAllDeclaredConstructors": true,
   "methods": [
     {"name": "<init>", "parameterTypes": []},
-    {"name": "getInstance", "parameterTypes": []},
     {"name": "encryptToBase64", "parameterTypes": ["boolean","java.lang.String","java.lang.String"]},
     {"name": "decryptFromBase64", "parameterTypes": ["boolean","java.lang.String","java.lang.String"]},
     {"name": "generateKeyToBase64", "parameterTypes": []}
@@ -540,7 +568,6 @@
   "queryAllDeclaredConstructors": true,
   "methods": [
     {"name": "<init>", "parameterTypes": []},
-    {"name": "getInstance", "parameterTypes": []},
     {"name": "parse", "parameterTypes": ["java.lang.String"]}
   ]
 },
@@ -553,7 +580,6 @@
   "queryAllDeclaredConstructors": true,
   "methods": [
     {"name": "<init>", "parameterTypes": []},
-    {"name": "getInstance", "parameterTypes": []},
     {"name": "randomUUID", "parameterTypes": []}
   ]
 },

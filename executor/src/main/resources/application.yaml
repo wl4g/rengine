@@ -74,7 +74,7 @@ quarkus:
     file:
       enable: true
       format: '%d{yyyy-dd-mm HH:mm:ss} %-5p [%c{2.}] (%t) %s%e%n'
-      path: /tmp/${quarkus.application.name}/${quarkus.application.name}.log
+      path: /mnt/disk1/log/${quarkus.application.name}/${quarkus.application.name}.log
       async: false
         #queue-length: 128
         #overflow: block # block,discard

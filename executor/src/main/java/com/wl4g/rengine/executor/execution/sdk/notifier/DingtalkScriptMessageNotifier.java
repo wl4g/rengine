@@ -91,7 +91,7 @@ public class DingtalkScriptMessageNotifier implements ScriptMessageNotifier {
                 MeterUtil.counter(execution_sdk_notifier_success, kind(), METHOD_SEND);
                 return DingtalkAPI.getInstance().sendRobotGroupMessages(accessToken, request);
             });
-        } catch (Exception e) {
+        } catch (Throwable e) {
             MeterUtil.counter(execution_sdk_notifier_failure, kind(), METHOD_SEND);
             throw e;
         }
@@ -118,7 +118,7 @@ public class DingtalkScriptMessageNotifier implements ScriptMessageNotifier {
                 MeterUtil.counter(execution_sdk_notifier_success, kind(), METHOD_CREATESCENEGROUPV2);
                 return DingtalkAPI.getInstance().createSceneGroupV2(accessToken, request);
             });
-        } catch (Exception e) {
+        } catch (Throwable e) {
             MeterUtil.counter(execution_sdk_notifier_failure, kind(), METHOD_CREATESCENEGROUPV2);
             throw e;
         }
@@ -174,7 +174,7 @@ public class DingtalkScriptMessageNotifier implements ScriptMessageNotifier {
                         .attributes(attributes)
                         .build();
             });
-        } catch (Exception e) {
+        } catch (Throwable e) {
             MeterUtil.counter(execution_sdk_notifier_failure, kind(), METHOD_REFRESH);
             throw e;
         }
@@ -190,7 +190,7 @@ public class DingtalkScriptMessageNotifier implements ScriptMessageNotifier {
                 MeterUtil.counter(execution_sdk_notifier_success, kind(), METHOD_UPDATE);
                 return null;
             });
-        } catch (Exception e) {
+        } catch (Throwable e) {
             MeterUtil.counter(execution_sdk_notifier_failure, kind(), METHOD_UPDATE);
             throw e;
         }

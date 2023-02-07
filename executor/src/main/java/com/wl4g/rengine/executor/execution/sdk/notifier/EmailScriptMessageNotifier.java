@@ -16,7 +16,6 @@
 package com.wl4g.rengine.executor.execution.sdk.notifier;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
-import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
@@ -25,24 +24,16 @@ import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.Metric
 import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsName.execution_sdk_notifier_success;
 import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsName.execution_sdk_notifier_time;
 import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsName.execution_sdk_notifier_total;
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonMap;
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.split;
 
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Singleton;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import com.wl4g.infra.common.lang.Assert2;
 import com.wl4g.infra.common.notification.MessageNotifier.NotifierKind;
 import com.wl4g.rengine.common.entity.Notification;
 import com.wl4g.rengine.common.entity.Notification.EmailConfig;
@@ -50,10 +41,12 @@ import com.wl4g.rengine.executor.meter.MeterUtil;
 import com.wl4g.rengine.executor.util.VertxMailerFactory;
 
 import io.quarkus.mailer.Mail;
+import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mail.LoginOption;
 import io.vertx.ext.mail.MailConfig;
+import io.vertx.ext.mail.MailResult;
 import io.vertx.ext.mail.StartTLSOptions;
 import lombok.Getter;
 import lombok.Setter;
@@ -94,21 +87,22 @@ public class EmailScriptMessageNotifier implements ScriptMessageNotifier {
                 final List<String> bcc = getArrayParam(parameter, KEY_MAIL_BCC, false);
                 final String msg = getStringParam(parameter, KEY_MAIL_MSG, true);
 
-                factory.getMailer()
-                        .send(new Mail().setSubject(subject)
-                                .setFrom(factory.getMailConfig().getUsername())
-                                .setTo(to)
-                                .setReplyTo(replyTo.toArray(new String[0]))
-                                .setCc(cc)
-                                .setBcc(bcc)
-                                .setText(msg));
+                final Mail sendMail = new Mail().setSubject(subject)
+                        .setFrom(factory.getMailConfig().getUsername())
+                        .setTo(to)
+                        .setReplyTo(replyTo.toArray(new String[0]))
+                        .setCc(cc)
+                        .setBcc(bcc)
+                        .setText(msg);
+
+                final Future<MailResult> future = factory.getMailClient().sendMail(VertxMailerFactory.toMailMessage(sendMail));
 
                 MeterUtil.counter(execution_sdk_notifier_success, kind(), METHOD_SEND);
-                return null;
+                return future;
             });
-        } catch (Exception e) {
+        } catch (Throwable ex) {
             MeterUtil.counter(execution_sdk_notifier_failure, kind(), METHOD_SEND);
-            throw e;
+            throw ex;
         }
     }
 
@@ -132,9 +126,9 @@ public class EmailScriptMessageNotifier implements ScriptMessageNotifier {
                         .attributes(singletonMap(KEY_MAIL_CONFIG, toJSONString(config)))
                         .build();
             });
-        } catch (Exception e) {
+        } catch (Throwable ex) {
             MeterUtil.counter(execution_sdk_notifier_failure, kind(), METHOD_REFRESH);
-            throw e;
+            throw ex;
         }
     }
 
@@ -179,50 +173,10 @@ public class EmailScriptMessageNotifier implements ScriptMessageNotifier {
                 MeterUtil.counter(execution_sdk_notifier_success, kind(), METHOD_UPDATE);
                 return null;
             });
-        } catch (Exception e) {
+        } catch (Throwable ex) {
             MeterUtil.counter(execution_sdk_notifier_failure, kind(), METHOD_UPDATE);
-            throw e;
+            throw ex;
         }
-    }
-
-    public static String getStringParam(@NotEmpty Map<String, Object> parameter, @NotBlank String paramName, boolean required) {
-        final Object paramObj = parameter.get(hasTextOf(paramName, "paramName"));
-        if (required && (isNull(paramObj) || isBlank(paramObj.toString()))) {
-            throw new IllegalArgumentException(format("parameter['%s'] is required", paramName));
-        }
-        if (nonNull(paramObj)) {
-            return paramObj.toString();
-        }
-        return null;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static List<String> getArrayParam(
-            @NotEmpty Map<String, Object> parameter,
-            @NotBlank String paramName,
-            boolean required) {
-        final Object paramObj = parameter.get(hasTextOf(paramName, "paramName"));
-        if (required && (isNull(paramObj) || isBlank(paramObj.toString()))) {
-            throw new IllegalArgumentException(format("parameter['%s'] is required", paramName));
-        }
-        if (nonNull(paramObj)) {
-            List<String> params = emptyList();
-            if (paramObj instanceof List) {
-                params = (List<String>) paramObj;
-            } else if (paramObj instanceof String) {
-                params = asList(split((String) paramObj, ","));
-            } else {
-                throw new UnsupportedOperationException(format(
-                        "Unsupported %s parameter type, please check whether the parameters are correct, "
-                                + "only arrays or comma-separated strings are supported. %s: %s",
-                        paramName, paramName, paramObj));
-            }
-            if (required) {
-                Assert2.notEmpty(params, format("parameter['%s']", paramName));
-            }
-            return params;
-        }
-        return emptyList();
     }
 
     public static final String KEY_MAIL_CONFIG = EmailConfig.class.getName();
