@@ -36,13 +36,9 @@ import com.wl4g.infra.common.lang.DateUtils2;
  * @since v1.0.0
  */
 public class DateHolder {
-    private static final DateHolder DEFAULT = new DateHolder();
+    public static final DateHolder DEFAULT = new DateHolder();
 
-    public static @HostAccess.Export DateHolder getInstance() {
-        return DEFAULT;
-    }
-
-    public @HostAccess.Export DateHolder() {
+    private DateHolder() {
     }
 
     public @HostAccess.Export long currentMillis() {

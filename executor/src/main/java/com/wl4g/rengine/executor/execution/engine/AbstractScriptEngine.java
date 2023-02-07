@@ -69,8 +69,10 @@ import com.wl4g.rengine.executor.execution.sdk.tools.JSON;
 import com.wl4g.rengine.executor.execution.sdk.tools.PrometheusParser;
 import com.wl4g.rengine.executor.execution.sdk.tools.RSA;
 import com.wl4g.rengine.executor.execution.sdk.tools.RandomHolder;
+//import com.wl4g.rengine.executor.execution.sdk.tools.RandomHolder;
 import com.wl4g.rengine.executor.execution.sdk.tools.RengineEvent;
 import com.wl4g.rengine.executor.execution.sdk.tools.UUID;
+//import com.wl4g.rengine.executor.execution.sdk.tools.UUID;
 import com.wl4g.rengine.executor.meter.RengineExecutorMeterService;
 import com.wl4g.rengine.executor.minio.MinioConfig;
 import com.wl4g.rengine.executor.minio.MinioManager;
@@ -214,16 +216,16 @@ public abstract class AbstractScriptEngine implements IEngine {
         // uiltity class in JavaScript, you must register the sdk tool class as
         // an instance member, otherwise you can only use the method of new
         // MyTool().myMethod() to call.
-        bindingMembers.put(RandomHolder.class.getSimpleName(), RandomHolder.getInstance());
-        bindingMembers.put(DateHolder.class.getSimpleName(), DateHolder.getInstance());
-        bindingMembers.put(UUID.class.getSimpleName(), UUID.getInstance());
-        bindingMembers.put(Coding.class.getSimpleName(), Coding.getInstance());
-        bindingMembers.put(Hashing.class.getSimpleName(), Hashing.getInstance());
-        bindingMembers.put(AES.class.getSimpleName(), AES.getInstance());
-        bindingMembers.put(RSA.class.getSimpleName(), RSA.getInstance());
-        bindingMembers.put(JSON.class.getSimpleName(), JSON.getInstance());
-        bindingMembers.put(Assert.class.getSimpleName(), Assert.getInstance());
-        bindingMembers.put(PrometheusParser.class.getSimpleName(), PrometheusParser.getInstance());
+        bindingMembers.put(Assert.class.getSimpleName(), Assert.DEFAULT);
+        bindingMembers.put(AES.class.getSimpleName(), AES.DEFAULT);
+        bindingMembers.put(RSA.class.getSimpleName(), RSA.DEFAULT);
+        bindingMembers.put(Coding.class.getSimpleName(), Coding.DEFAULT);
+        bindingMembers.put(Hashing.class.getSimpleName(), Hashing.DEFAULT);
+        bindingMembers.put(JSON.class.getSimpleName(), JSON.DEFAULT);
+        bindingMembers.put(DateHolder.class.getSimpleName(), DateHolder.DEFAULT);
+        bindingMembers.put(PrometheusParser.class.getSimpleName(), PrometheusParser.DEFAULT);
+        bindingMembers.put(RandomHolder.class.getSimpleName(), RandomHolder.DEFAULT);
+        bindingMembers.put(UUID.class.getSimpleName(), UUID.DEFAULT);
         REGISTER_MEMBERS = unmodifiableMap(bindingMembers);
     }
 

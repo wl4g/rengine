@@ -34,7 +34,7 @@ public class AESTests {
 
     @Test
     public void testCbcNoPaddingGenerateKeyAndEncryptAndDecrypt() {
-        final AES aes = new AES();
+        final AES aes = AES.DEFAULT;
 
         final String base64Iv = new CodecSource("1234567890abcdef").toBase64();
         System.out.println("base64Iv: " + base64Iv);
@@ -57,7 +57,7 @@ public class AESTests {
 
     @Test
     public void testCbcPkcs7GenerateKeyAndEncryptAndDecrypt() {
-        final AES aes = new AES();
+        final AES aes = AES.DEFAULT;
 
         final String base64Iv = new CodecSource("1234567890abcdef").toBase64();
         System.out.println("base64Iv: " + base64Iv);
@@ -82,7 +82,7 @@ public class AESTests {
 
     @Test
     public void testEcbNoPaddingGenerateKeyAndEncryptAndDecrypt() {
-        final AES aes = new AES();
+        final AES aes = AES.DEFAULT;
 
         final String base64Key = aes.generateKeyToBase64();
         System.out.println("base64Key: " + base64Key);
@@ -103,7 +103,7 @@ public class AESTests {
 
     @Test
     public void testEcbPkcs7GenerateKeyAndEncryptAndDecrypt() {
-        final AES aes = new AES();
+        final AES aes = AES.DEFAULT;
 
         final String base64Key = aes.generateKeyToBase64();
         System.out.println("base64Key: " + base64Key);

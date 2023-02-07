@@ -36,6 +36,7 @@ import com.wl4g.infra.common.validation.EnumValue;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder.Default;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -160,6 +161,8 @@ public class Notification extends BaseBean {
         @Setter
         @SuperBuilder
         @ToString
+        @NoArgsConstructor
+        @AllArgsConstructor
         public static class DingtalkUserInfo {
             @NotBlank
             String mobile;
@@ -178,6 +181,8 @@ public class Notification extends BaseBean {
         @Setter
         @SuperBuilder
         @ToString
+        @NoArgsConstructor
+        @AllArgsConstructor
         public static class DingtalkScenesGroupInfo {
             @NotBlank
             String title; // Scenes group display name.

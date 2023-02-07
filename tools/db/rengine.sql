@@ -11,7 +11,7 @@
  Target Server Version : 40406
  File Encoding         : 65001
 
- Date: 07/02/2023 00:21:31
+ Date: 07/02/2023 12:23:44
 */
 
 
@@ -870,8 +870,7 @@ db.getCollection("t_workflow_graphs").insert([ {
                 top: "10px",
                 color: "#5f5f5f",
                 left: "10px"
-            },
-            ruleId: null
+            }
         },
         {
             "@type": "PROCESS",
@@ -882,7 +881,7 @@ db.getCollection("t_workflow_graphs").insert([ {
                 color: "#5f5f5f",
                 left: "10px"
             },
-            ruleId: NumberLong("6150869239922688")
+            ruleId: "6150869239922688"
         },
         {
             "@type": "RELATION",
@@ -893,7 +892,7 @@ db.getCollection("t_workflow_graphs").insert([ {
                 color: "#5f5f5f",
                 left: "10px"
             },
-            ruleId: NumberLong("6150869239922689")
+            ruleId: "6169046602203136"
         },
         {
             "@type": "LOGICAL",
@@ -904,8 +903,7 @@ db.getCollection("t_workflow_graphs").insert([ {
                 color: "#5f5f5f",
                 left: "10px"
             },
-            logical: "ALL_AND",
-            ruleId: null
+            logical: "ALL_AND"
         },
         {
             "@type": "LOGICAL",
@@ -916,8 +914,7 @@ db.getCollection("t_workflow_graphs").insert([ {
                 color: "#5f5f5f",
                 left: "10px"
             },
-            logical: "AND",
-            ruleId: null
+            logical: "AND"
         },
         {
             "@type": "LOGICAL",
@@ -928,8 +925,7 @@ db.getCollection("t_workflow_graphs").insert([ {
                 color: "#5f5f5f",
                 left: "10px"
             },
-            logical: "AND",
-            ruleId: null
+            logical: "AND"
         },
         {
             "@type": "RELATION",
@@ -940,7 +936,7 @@ db.getCollection("t_workflow_graphs").insert([ {
                 color: "#5f5f5f",
                 left: "10px"
             },
-            ruleId: NumberLong("6150869239922688")
+            ruleId: "6150869239922688"
         },
         {
             "@type": "LOGICAL",
@@ -951,8 +947,7 @@ db.getCollection("t_workflow_graphs").insert([ {
                 color: "#5f5f5f",
                 left: "10px"
             },
-            logical: "AND",
-            ruleId: null
+            logical: "AND"
         },
         {
             "@type": "RELATION",
@@ -963,7 +958,7 @@ db.getCollection("t_workflow_graphs").insert([ {
                 color: "#5f5f5f",
                 left: "10px"
             },
-            ruleId: NumberLong("6150869239922689")
+            ruleId: "6169046602203136"
         },
         {
             "@type": "RELATION",
@@ -974,7 +969,7 @@ db.getCollection("t_workflow_graphs").insert([ {
                 color: "#5f5f5f",
                 left: "10px"
             },
-            ruleId: NumberLong("6150869239922689")
+            ruleId: "6169046602203136"
         },
         {
             "@type": "FAILBACK",
@@ -985,7 +980,7 @@ db.getCollection("t_workflow_graphs").insert([ {
                 color: "#5f5f5f",
                 left: "10px"
             },
-            ruleId: NumberLong("6150869239922689")
+            ruleId: "6169046816178176"
         },
         {
             "@type": "RUN",
@@ -996,7 +991,7 @@ db.getCollection("t_workflow_graphs").insert([ {
                 color: "#5f5f5f",
                 left: "10px"
             },
-            ruleId: NumberLong("6150869239922689")
+            ruleId: "6169046816178176"
         },
         {
             "@type": "RUN",
@@ -1007,7 +1002,7 @@ db.getCollection("t_workflow_graphs").insert([ {
                 color: "#5f5f5f",
                 left: "10px"
             },
-            ruleId: NumberLong("6150869239922689")
+            ruleId: "6169046816178176"
         }
     ],
     connections: [

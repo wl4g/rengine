@@ -31,13 +31,9 @@ import com.wl4g.infra.common.lang.Assert2;
  * @since v1.0.0
  */
 public class Assert {
-    private static final Assert DEFAULT = new Assert();
+    public static final Assert DEFAULT = new Assert();
 
-    public static @HostAccess.Export Assert getInstance() {
-        return DEFAULT;
-    }
-
-    public @HostAccess.Export Assert() {
+    private Assert() {
     }
 
     public @HostAccess.Export void isTrue(boolean expression, String fmtMessage, Object... args) {

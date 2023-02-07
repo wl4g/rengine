@@ -61,7 +61,7 @@ public class PrometheusParserTests {
                 + "jvm_memory_pool_allocated_bytes_created{pool=\"Metaspace\",} 1.672820506685E9";
         // @formatter:on
 
-        final List<PrometheusMetrics> parsed = PrometheusParser.getInstance().parse(metricsString);
+        final List<PrometheusMetrics> parsed = PrometheusParser.DEFAULT.parse(metricsString);
         final String metricsJson = toJSONString(parsed, true);
         System.out.println(metricsJson);
     }

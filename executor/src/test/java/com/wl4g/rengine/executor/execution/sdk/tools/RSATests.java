@@ -32,7 +32,7 @@ public class RSATests {
 
     @Test
     public void testGenerateKeyAndPublicKeyEncryptAndPrivateDecrypt() {
-        final RSA rsa = new RSA();
+        final RSA rsa = RSA.DEFAULT;
 
         final RsaKeyPair base64Key = rsa.generateKeyToBase64();
         System.out.println("base64Key: " + base64Key);

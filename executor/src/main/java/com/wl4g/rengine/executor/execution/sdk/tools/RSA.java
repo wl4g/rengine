@@ -39,13 +39,9 @@ import lombok.ToString;
  * @since v1.0.0
  */
 public class RSA {
-    private static final RSA DEFAULT = new RSA();
+    public static final RSA DEFAULT = new RSA();
 
-    public static @HostAccess.Export RSA getInstance() {
-        return DEFAULT;
-    }
-
-    public @HostAccess.Export RSA() {
+    private RSA() {
     }
 
     public @HostAccess.Export String encryptToBase64(

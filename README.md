@@ -10,7 +10,7 @@ A real-time + near real-time general rule engine platform, suitable for such as 
 
 - JDK 11.x +
 
-- GraalVM-java11-22.1 + (Recommands)
+- GraalVM-java11-22.3 + (Recommands)
 
 - Maven 3.6 +
 
@@ -18,9 +18,9 @@ A real-time + near real-time general rule engine platform, suitable for such as 
 
 - Quarkus 2.12.2
 
-- Redis Cluster 5 +
+- Redis Cluster 6 +
 
-- MongoDB 4.6.x +
+- MongoDB 4.4.6 +
 
 - MinIO 2021.x +
 

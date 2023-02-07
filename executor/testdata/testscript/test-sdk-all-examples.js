@@ -199,11 +199,13 @@ function testSdkForDingtalkNotifier(context) {
         const dingtalkNotifier = context.getDataService().obtainNotifier("DINGTALK");
         console.info("dingtalkNotifier: " + dingtalkNotifier);
 
+        const openConversationId = Assert.hasTextOf(context.getAttributes()["openConversationId"], "attributes.openConversationId");
+        const robotCode = Assert.hasTextOf(context.getAttributes()["robotCode"], "attributes.robotCode");
         const parameter = {
             "msgParam": "{\"title\":\"(故障演练)异常告警\",\"text\":\"- 告警时间: 2023-01-01 01:01:01\n- 持续时间: 10m\n- 应用服务: mqttcollect\n- 集群环境: production\n- 节点 IP: 10.0.0.112\n- 节点 CPU(10s): 200%\n- 节点 Free Mem(5m): 10%\n- 节点 InNet(1m): 1234mbps\n- 节点 OutNet(1m): 1234mbps\n- 节点 IOPS(1m): 512/1501\n- 节点 Free Disks: 99GB/250GB\n- 诊断信息: <font color='#ff0000' size=3>send_kafka_fail_rate > 30%</font>\n- **[更多指标](http://grafana.example.com/123)**\",\"buttonTitle1\":\"Restart Now\",\"buttonUrl1\":\"https://qq.com\",\"buttonTitle2\":\"Cancel\",\"buttonUrl2\":\"https://qq.com\"}",
             "msgKey": "sampleActionCard6",
-            "openConversationId": "cidG+niQ3Ny\\/NwUc5KE7mANUQ==",
-            "robotCode": "dingbhyrzjxx6qjhjcdr"
+            "openConversationId": openConversationId,
+            "robotCode": robotCode
         };
         const notifierResult = dingtalkNotifier.send(parameter);
         console.info("dingtalkNotifierResult: " + notifierResult);

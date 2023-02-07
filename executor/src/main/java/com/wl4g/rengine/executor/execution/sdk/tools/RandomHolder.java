@@ -27,14 +27,9 @@ import org.graalvm.polyglot.HostAccess;
  * @since v1.0.0
  */
 public class RandomHolder {
+    public static final RandomHolder DEFAULT = new RandomHolder();
 
-    private static final RandomHolder DEFAULT = new RandomHolder();
-
-    public static @HostAccess.Export RandomHolder getInstance() {
-        return DEFAULT;
-    }
-
-    public @HostAccess.Export RandomHolder() {
+    private RandomHolder() {
     }
 
     // --------- Random for Number ---------.

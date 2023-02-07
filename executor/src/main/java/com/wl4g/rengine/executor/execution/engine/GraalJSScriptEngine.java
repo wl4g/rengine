@@ -31,6 +31,7 @@ import static java.util.stream.Collectors.toSet;
 
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 
 import javax.annotation.PostConstruct;
@@ -154,8 +155,8 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
             // Buried-point: execute cost-time.
             final Set<String> scriptFileNames = scripts.stream().map(s -> getFilename(s.getObjectPrefix())).collect(toSet());
             final Timer executeTimer = meterService.timer(execution_time.getName(), execution_time.getHelp(),
-                    RengineExecutorMeterService.DEFAULT_PERCENTILES, MetricsTag.CLIENT_ID, clientId, MetricsTag.SCENESCODE, scenesCode,
-                    MetricsTag.ENGINE, rule.getEngine().name(), MetricsTag.LIBRARY, scriptFileNames.toString());
+                    RengineExecutorMeterService.DEFAULT_PERCENTILES, MetricsTag.CLIENT_ID, clientId, MetricsTag.SCENESCODE,
+                    scenesCode, MetricsTag.ENGINE, rule.getEngine().name(), MetricsTag.LIBRARY, scriptFileNames.toString());
 
             final long begin = currentTimeMillis();
             final Value result = mainFunction.execute(scriptContext);
@@ -169,10 +170,18 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
         }
     }
 
+    @SuppressWarnings("rawtypes")
     private void bindingMembers(final @NotNull ScriptContext scriptContext, final @NotNull Value bindings) {
         // Try not to bind implicit objects, let users create new objects by
         // self or get default objects from the graal context.
-        REGISTER_MEMBERS.forEach((name, member) -> bindings.putMember(name, member));
+        REGISTER_MEMBERS.forEach((name, member) -> {
+            // Allowed for obtain lazy member supplier.
+            if (member instanceof Supplier) {
+                bindings.putMember(name, ((Supplier) member).get());
+            } else {
+                bindings.putMember(name, member);
+            }
+        });
     }
 
     @Override

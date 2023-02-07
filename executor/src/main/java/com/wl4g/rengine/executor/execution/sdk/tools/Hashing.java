@@ -30,13 +30,9 @@ import org.graalvm.polyglot.HostAccess;
  */
 @SuppressWarnings("deprecation")
 public class Hashing {
-    private static final Hashing DEFAULT = new Hashing();
+    public static final Hashing DEFAULT = new Hashing();
 
-    public static @HostAccess.Export Hashing getInstance() {
-        return DEFAULT;
-    }
-
-    public @HostAccess.Export Hashing() {
+    private @HostAccess.Export Hashing() {
     }
 
     public @HostAccess.Export String md5(String str) {

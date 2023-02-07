@@ -33,13 +33,9 @@ import com.wl4g.infra.common.codec.Base58;
  * @since v1.0.0
  */
 public class Coding {
-    private static final Coding DEFAULT = new Coding();
+    public static final Coding DEFAULT = new Coding();
 
-    public static @HostAccess.Export Coding getInstance() {
-        return DEFAULT;
-    }
-
-    public @HostAccess.Export Coding() {
+    private Coding() {
     }
 
     public @HostAccess.Export String toBase58(String str) {

@@ -30,13 +30,9 @@ import org.graalvm.polyglot.HostAccess;
  * @since v1.0.0
  */
 public class JSON {
-    private static final JSON DEFAULT = new JSON();
+    public static final JSON DEFAULT = new JSON();
 
-    public static @HostAccess.Export JSON getInstance() {
-        return DEFAULT;
-    }
-
-    public @HostAccess.Export JSON() {
+    private JSON() {
     }
 
     public @HostAccess.Export Object parse(String json) {

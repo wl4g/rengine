@@ -25,13 +25,9 @@ import org.graalvm.polyglot.HostAccess;
  * @since v1.0.0
  */
 public class UUID {
-    private static final UUID DEFAULT = new UUID();
+    public static final UUID DEFAULT = new UUID();
 
-    public static @HostAccess.Export UUID getInstance() {
-        return DEFAULT;
-    }
-
-    public @HostAccess.Export UUID() {
+    private UUID() {
     }
 
     public @HostAccess.Export java.util.UUID randomUUID() {

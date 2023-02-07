@@ -44,13 +44,9 @@ import lombok.experimental.SuperBuilder;
  * @since v1.0.0
  */
 public class PrometheusParser {
-    private static final PrometheusParser DEFAULT = new PrometheusParser();
+    public static final PrometheusParser DEFAULT = new PrometheusParser();
 
-    public static @HostAccess.Export PrometheusParser getInstance() {
-        return DEFAULT;
-    }
-
-    public @HostAccess.Export PrometheusParser() {
+    private PrometheusParser() {
     }
 
     /**

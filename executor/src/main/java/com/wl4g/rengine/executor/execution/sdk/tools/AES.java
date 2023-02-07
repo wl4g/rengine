@@ -37,13 +37,9 @@ import com.wl4g.infra.common.crypto.symmetric.AES256ECBPKCS7;
  * @see https://github.com/open-dingtalk/dingtalk-callback-Crypto/blob/main/DingCallbackCrypto.java#L143
  */
 public class AES {
-    private static final AES DEFAULT = new AES();
+    public static final AES DEFAULT = new AES();
 
-    public static @HostAccess.Export AES getInstance() {
-        return DEFAULT;
-    }
-
-    public @HostAccess.Export AES() {
+    private AES() {
     }
 
     // --- AES/CBC ---
