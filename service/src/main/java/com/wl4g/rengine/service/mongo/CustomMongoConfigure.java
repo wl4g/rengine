@@ -19,7 +19,7 @@ import org.springframework.data.mongodb.core.convert.MongoCustomConversions.Mong
 
 import com.wl4g.rengine.common.entity.DataSourceProperties;
 import com.wl4g.rengine.common.entity.Notification;
-import com.wl4g.rengine.common.entity.ScheduleTrigger;
+import com.wl4g.rengine.common.entity.ControllerSchedule;
 import com.wl4g.rengine.common.entity.WorkflowGraph;
 import com.wl4g.rengine.common.util.BsonEntitySerializers;
 
@@ -128,18 +128,18 @@ public class CustomMongoConfigure extends AbstractMongoClientConfiguration {
     }
 
     @WritingConverter
-    static class SchedulingTriggerToDocumentConverter implements Converter<ScheduleTrigger, Document> {
+    static class SchedulingTriggerToDocumentConverter implements Converter<ControllerSchedule, Document> {
         @Override
-        public Document convert(final ScheduleTrigger source) {
+        public Document convert(final ControllerSchedule source) {
             return BsonEntitySerializers.toDocument(source);
         }
     }
 
     @ReadingConverter
-    static class DocumentToSchedulingTriggerConverter implements Converter<Document, ScheduleTrigger> {
+    static class DocumentToSchedulingTriggerConverter implements Converter<Document, ControllerSchedule> {
         @Override
-        public ScheduleTrigger convert(Document source) {
-            return BsonEntitySerializers.fromDocument(source, ScheduleTrigger.class);
+        public ControllerSchedule convert(Document source) {
+            return BsonEntitySerializers.fromDocument(source, ControllerSchedule.class);
         }
     }
 

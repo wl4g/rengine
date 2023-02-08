@@ -15,8 +15,13 @@
  */
 package com.wl4g.rengine.service.model;
 
-import com.wl4g.rengine.common.entity.ScheduleTrigger;
+import javax.annotation.Nullable;
 
+import com.wl4g.infra.common.validation.EnumValue;
+import com.wl4g.rengine.common.entity.ControllerSchedule;
+import com.wl4g.rengine.common.entity.ControllerSchedule.ScheduleType;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,7 +29,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link ScheduleTriggerSave}
+ * {@link ControllerScheduleQuery}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -35,6 +40,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class ScheduleTriggerSave extends ScheduleTrigger {
-    private static final long serialVersionUID = 1L;
+public class ControllerScheduleQuery extends BaseQuery<ControllerSchedule> {
+    @Schema(implementation = ScheduleType.class)
+    private @Nullable @EnumValue(enumCls = ScheduleType.class) String type;
+    private @Nullable Long scheduleId;
 }

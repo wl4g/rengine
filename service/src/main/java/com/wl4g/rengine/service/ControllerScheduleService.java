@@ -25,39 +25,39 @@ import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.collection.CollectionUtils2;
-import com.wl4g.rengine.common.entity.ScheduleTrigger;
-import com.wl4g.rengine.service.model.ScheduleTriggerDelete;
-import com.wl4g.rengine.service.model.ScheduleTriggerDeleteResult;
-import com.wl4g.rengine.service.model.ScheduleTriggerQuery;
-import com.wl4g.rengine.service.model.ScheduleTriggerSaveResult;
+import com.wl4g.rengine.common.entity.ControllerSchedule;
+import com.wl4g.rengine.service.model.ControllerScheduleDelete;
+import com.wl4g.rengine.service.model.ControllerScheduleDeleteResult;
+import com.wl4g.rengine.service.model.ControllerScheduleQuery;
+import com.wl4g.rengine.service.model.ControllerScheduleSaveResult;
 
 /**
- * {@link ScheduleTriggerService}
+ * {@link ControllerScheduleService}
  * 
  * @author James Wong
  * @version 2022-08-29
  * @since v1.0.0
  */
-public interface ScheduleTriggerService {
+public interface ControllerScheduleService {
 
-    default ScheduleTrigger get(Long triggerId) {
-        notNullOf(triggerId, "triggerId");
-        final PageHolder<ScheduleTrigger> result = query(ScheduleTriggerQuery.builder().triggerId(triggerId).build());
+    default ControllerSchedule get(Long scheduleId) {
+        notNullOf(scheduleId, "scheduleId");
+        final PageHolder<ControllerSchedule> result = query(ControllerScheduleQuery.builder().scheduleId(scheduleId).build());
         if (isNull(result) || CollectionUtils2.isEmpty(result.getRecords())) {
-            throw new IllegalArgumentException(format("No found schedule trigger by %s", triggerId));
+            throw new IllegalArgumentException(format("No found schedule trigger by %s", scheduleId));
         }
         return result.getRecords().get(0);
     }
 
-    PageHolder<ScheduleTrigger> query(@NotNull ScheduleTriggerQuery model);
+    PageHolder<ControllerSchedule> query(@NotNull ControllerScheduleQuery model);
 
-    List<ScheduleTrigger> findWithSharding(
-            @NotNull ScheduleTriggerQuery model,
+    List<ControllerSchedule> findWithSharding(
+            @NotNull ControllerScheduleQuery model,
             @NotNull Integer divisor,
             @NotNull Integer remainder);
 
-    ScheduleTriggerSaveResult save(@NotNull ScheduleTrigger model);
+    ControllerScheduleSaveResult save(@NotNull ControllerSchedule model);
 
-    ScheduleTriggerDeleteResult delete(@NotNull ScheduleTriggerDelete model);
+    ControllerScheduleDeleteResult delete(@NotNull ControllerScheduleDelete model);
 
 }

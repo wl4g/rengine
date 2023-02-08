@@ -14,10 +14,6 @@
 ## see:https://arthas.aliyun.com/doc/spring-boot-starter.html
 ## see:com.taobao.arthas:arthas-spring-boot-starter(com.alibaba.arthas.spring.ArthasProperties)
 arthas:
-  agent-id: renginecontrollervfu6y
-  telnet-port: 3660
-  http-port: 8565
-  tunnel-server: ws://localhost:7777/ws
-  session-timeout: 1800
-  #username: admin
-  #password: admin
+  agent-id: rengineapiservervfu6y
+  telnet-port: 3659
+  http-port: 8564

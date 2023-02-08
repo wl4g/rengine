@@ -9,30 +9,29 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.common.entity;
+package com.wl4g.rengine.service.model;
 
-import java.util.TimeZone;
-
-import org.junit.Test;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 /**
- * {@link ScheduleTriggerTests}
+ * {@link ControllerLogSaveResult}
  * 
  * @author James Wong
- * @version 2023-01-20
+ * @version 2022-08-28
  * @since v1.0.0
  */
-public class ScheduleTriggerTests {
-
-    @Test
-    public void testOthers() {
-        System.out.println(TimeZone.getDefault());
-        System.out.println(TimeZone.getDefault().getID());
-        System.out.println(TimeZone.getDefault().getDisplayName());
-    }
-
+@Getter
+@Setter
+@SuperBuilder
+@ToString(callSuper = true)
+@NoArgsConstructor
+public class ControllerLogSaveResult extends BaseSaveResult {
 }

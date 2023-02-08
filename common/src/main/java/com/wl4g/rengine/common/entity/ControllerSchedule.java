@@ -76,7 +76,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class ScheduleTrigger extends BaseBean {
+public class ControllerSchedule extends BaseBean {
     private static final long serialVersionUID = 1L;
 
     private @NotBlank String name;
@@ -92,7 +92,7 @@ public class ScheduleTrigger extends BaseBean {
     private @NotNull @Min(1) @Default Long maxTimeoutMs = DEFAULT_MAX_TIMEOUT_MS;
     private RunState runState;
 
-    public ScheduleTrigger validate() {
+    public ControllerSchedule validate() {
         // hasTextOf(getCron(), "cron");
         notNullOf(getMonitorExecution(), "monitorExecution");
         notNullOf(getFailover(), "failover");
@@ -105,12 +105,12 @@ public class ScheduleTrigger extends BaseBean {
     }
 
     @NotNull
-    TriggerPropertiesBase<?> properties;
+    ScheduleDetailBase<?> properties;
 
     public static enum ScheduleType {
-        EXECUTION_SCHEDULER,
+        GENERIC_EXECUTION_CONTROLLER,
 
-        KAFKA_SUBSCRIBE_SCHEDULER,
+        KAFKA_EXECUTION_CONTROLLER,
 
         // Notice: The flink cep job can be automatically scheduled, but
         // currently it is recommended to use a professional scheduling platform
@@ -136,16 +136,16 @@ public class ScheduleTrigger extends BaseBean {
         }
     }
 
-    @Schema(oneOf = { ExecutionScheduleConfig.class, KafkaSubscribeScheduleConfig.class }, discriminatorProperty = "type")
+    @Schema(oneOf = { GenericExecutionScheduleConfig.class, KafkaExecutionScheduleConfig.class }, discriminatorProperty = "type")
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", visible = true)
-    @JsonSubTypes({ @Type(value = ExecutionScheduleConfig.class, name = "EXECUTION_SCHEDULER"),
-            @Type(value = KafkaSubscribeScheduleConfig.class, name = "KAFKA_SUBSCRIBE_SCHEDULER") })
+    @JsonSubTypes({ @Type(value = GenericExecutionScheduleConfig.class, name = "GENERIC_EXECUTION_CONTROLLER"),
+            @Type(value = KafkaExecutionScheduleConfig.class, name = "KAFKA_EXECUTION_CONTROLLER") })
     @Getter
     @Setter
     @SuperBuilder
     @ToString(callSuper = true)
     @NoArgsConstructor
-    public static abstract class TriggerPropertiesBase<T extends TriggerPropertiesBase<T>> {
+    public static abstract class ScheduleDetailBase<T extends ScheduleDetailBase<T>> {
 
         @Schema(name = "type", implementation = ScheduleType.class)
         @JsonProperty(value = "type", access = Access.WRITE_ONLY)
@@ -158,13 +158,13 @@ public class ScheduleTrigger extends BaseBean {
     @SuperBuilder
     @ToString
     @NoArgsConstructor
-    public static class ExecutionScheduleConfig extends TriggerPropertiesBase<ExecutionScheduleConfig> {
+    public static class GenericExecutionScheduleConfig extends ScheduleDetailBase<GenericExecutionScheduleConfig> {
         // ElasticJob standard configuration.
         private @NotBlank @Default String cron = DEFAULT_CRON; // ScheduleJobBootstrap
         // Other configuration.
         private @NotNull List<ExecuteRequest> requests;
 
-        public ExecutionScheduleConfig validate() {
+        public GenericExecutionScheduleConfig validate() {
             hasTextOf(getCron(), "cron");
             notNullOf(getRequests(), "request");
             return this;
@@ -176,7 +176,7 @@ public class ScheduleTrigger extends BaseBean {
     @SuperBuilder
     @ToString
     @NoArgsConstructor
-    public static class KafkaSubscribeScheduleConfig extends TriggerPropertiesBase<KafkaSubscribeScheduleConfig> {
+    public static class KafkaExecutionScheduleConfig extends ScheduleDetailBase<KafkaExecutionScheduleConfig> {
 
         @NotBlank
         List<String> topics;
@@ -197,7 +197,7 @@ public class ScheduleTrigger extends BaseBean {
         @NotNull
         KafkaConsumerOptions consumerOptions;
 
-        public KafkaSubscribeScheduleConfig validate() {
+        public KafkaExecutionScheduleConfig validate() {
             notEmptyOf(topics, "topics");
             isTrueOf(nonNull(concurrency) && concurrency >= 0 && concurrency <= 100, "concurrency >= 1 && concurrency <= 100");
             notNullOf(autoAcknowledgment, "autoAcknowledgment");
@@ -463,7 +463,7 @@ public class ScheduleTrigger extends BaseBean {
     //@SuperBuilder
     //@ToString
     //@NoArgsConstructor
-    //public static class FlinkSubmitScheduleConfig extends TriggerPropertiesBase<FlinkSubmitScheduleConfig> {
+    //public static class FlinkSubmitScheduleConfig extends ScheduleDetailBase<FlinkSubmitScheduleConfig> {
     //    public FlinkSubmitScheduleConfig validate() {
     //        return this;
     //    }

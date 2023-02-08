@@ -9,34 +9,30 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.service.model;
+package com.wl4g.rengine.common.entity;
 
-import java.util.Date;
+import java.util.TimeZone;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.SuperBuilder;
+import org.junit.Test;
 
 /**
- * {@link ScheduleJobLogDelete}
+ * {@link ControllerScheduleTests}
  * 
  * @author James Wong
- * @version 2022-08-28
+ * @version 2023-01-20
  * @since v1.0.0
  */
-@Getter
-@Setter
-@SuperBuilder
-@ToString(callSuper = true)
-@NoArgsConstructor
-public class ScheduleJobLogDelete extends BaseDelete {
-    private Date updateDateLower;
-    private Date updateDateUpper;
-    private Long retentionCount;
+public class ControllerScheduleTests {
+
+    @Test
+    public void testOthers() {
+        System.out.println(TimeZone.getDefault());
+        System.out.println(TimeZone.getDefault().getID());
+        System.out.println(TimeZone.getDefault().getDisplayName());
+    }
+
 }

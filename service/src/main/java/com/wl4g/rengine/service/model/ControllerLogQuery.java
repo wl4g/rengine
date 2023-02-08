@@ -15,6 +15,13 @@
  */
 package com.wl4g.rengine.service.model;
 
+import javax.annotation.Nullable;
+
+import com.wl4g.infra.common.validation.EnumValue;
+import com.wl4g.rengine.common.entity.ControllerLog;
+import com.wl4g.rengine.common.entity.ControllerSchedule.ScheduleType;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,7 +29,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link ScheduleTriggerDelete}
+ * {@link ControllerLogQuery}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -33,5 +40,9 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class ScheduleTriggerDelete extends BaseDelete {
+public class ControllerLogQuery extends BaseQuery<ControllerLog> {
+    @Schema(implementation = ScheduleType.class)
+    private @Nullable @EnumValue(enumCls = ScheduleType.class) String type;
+    private @Nullable Long scheduleId;
+    private @Nullable Long controllerLogId;
 }

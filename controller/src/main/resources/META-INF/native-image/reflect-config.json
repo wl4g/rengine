@@ -1,6 +1,6 @@
 [
 {
-  "name":"com.wl4g.rengine.client.scheduler.error.LoggingJobErrorHandler",
+  "name":"com.wl4g.rengine.client.controller.error.LoggingJobErrorHandler",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
@@ -8,7 +8,7 @@
   ]
 },
 {
-  "name":"com.wl4g.rengine.client.scheduler.job.CollectJobExecutor",
+  "name":"com.wl4g.rengine.client.controller.job.AbstractJobExecutor",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
@@ -16,55 +16,7 @@
   ]
 },
 {
-  "name":"com.wl4g.rengine.client.scheduler.job.CollectJobExecutor$BodyConverter",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true,
-  "methods":[
-  ]
-},
-{
-  "name":"com.wl4g.rengine.client.scheduler.job.PrometheusCollectJobExecutor",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true,
-  "methods":[
-  ]
-},
-{
-  "name":"com.wl4g.rengine.client.scheduler.job.SimpleHttpCollectJobExecutor",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true,
-  "methods":[
-  ]
-},
-{
-  "name":"com.wl4g.rengine.client.scheduler.job.SimpleJdbcCollectJobExecutor",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true,
-  "methods":[
-  ]
-},
-{
-  "name":"com.wl4g.rengine.client.scheduler.job.SimpleRedisCollectJobExecutor",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true,
-  "methods":[
-  ]
-},
-{
-  "name":"com.wl4g.rengine.client.scheduler.job.SimpleSSHCollectJobExecutor",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true,
-  "methods":[
-  ]
-},
-{
-  "name":"com.wl4g.rengine.client.scheduler.job.SimpleTcpCollectJobExecutor",
+  "name":"com.wl4g.rengine.client.controller.job.GlobalEngineScheduleController",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,

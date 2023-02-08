@@ -27,13 +27,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.common.entity.ScheduleJobLog;
-import com.wl4g.rengine.service.ScheduleJobLogService;
-import com.wl4g.rengine.service.model.ScheduleJobDeleteResult;
-import com.wl4g.rengine.service.model.ScheduleJobLogDelete;
-import com.wl4g.rengine.service.model.ScheduleJobLogQuery;
-import com.wl4g.rengine.service.model.ScheduleJobLogSave;
-import com.wl4g.rengine.service.model.ScheduleJobLogSaveResult;
+import com.wl4g.rengine.common.entity.ControllerSchedule;
+import com.wl4g.rengine.service.ControllerScheduleService;
+import com.wl4g.rengine.service.model.ControllerScheduleDelete;
+import com.wl4g.rengine.service.model.ControllerScheduleDeleteResult;
+import com.wl4g.rengine.service.model.ControllerScheduleQuery;
+import com.wl4g.rengine.service.model.ControllerScheduleSave;
+import com.wl4g.rengine.service.model.ControllerScheduleSaveResult;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -42,50 +42,50 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link ScheduleJobLogController}
+ * {@link ControllerScheduleController}
  * 
  * @author James Wong
  * @version 2022-08-28
  * @since v1.0.0
  */
-@Tag(name = "ScheduleJobLogAPI", description = "The ScheduleJobLog management API")
+@Tag(name = "ControllerScheduleAPI", description = "The Controller Schedule management API")
 @Slf4j
 @RestController
-@RequestMapping("/admin/scheduleJobLog")
-public class ScheduleJobLogController {
+@RequestMapping("/admin/scheduleTrigger")
+public class ControllerScheduleController {
 
-    private @Autowired ScheduleJobLogService scheduleJobLogService;
+    private @Autowired ControllerScheduleService controllerScheduleService;
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Query schedule jobs.")
+    @Operation(description = "Query schedule triggers.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
-    public RespBase<PageHolder<ScheduleJobLog>> query(@Validated ScheduleJobLogQuery model) {
+    public RespBase<PageHolder<ControllerSchedule>> query(@Validated ControllerScheduleQuery model) {
         log.debug("called: model={}", model);
-        RespBase<PageHolder<ScheduleJobLog>> resp = RespBase.create();
-        resp.setData(scheduleJobLogService.query(model));
+        RespBase<PageHolder<ControllerSchedule>> resp = RespBase.create();
+        resp.setData(controllerScheduleService.query(model));
         return resp;
     }
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Save schedule job.")
+    @Operation(description = "Save schedule trigger.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    public RespBase<ScheduleJobLogSaveResult> save(@Validated @RequestBody ScheduleJobLogSave model) {
+    public RespBase<ControllerScheduleSaveResult> save(@Validated @RequestBody ControllerScheduleSave model) {
         log.debug("called: model={}", model);
-        RespBase<ScheduleJobLogSaveResult> resp = RespBase.create();
-        resp.setData(scheduleJobLogService.save(model));
+        RespBase<ControllerScheduleSaveResult> resp = RespBase.create();
+        resp.setData(controllerScheduleService.save(model));
         return resp;
     }
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Delete schedule job.")
+    @Operation(description = "Delete schedule trigger.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
-    public RespBase<ScheduleJobDeleteResult> delete(@Validated @RequestBody ScheduleJobLogDelete model) {
+    public RespBase<ControllerScheduleDeleteResult> delete(@Validated @RequestBody ControllerScheduleDelete model) {
         log.debug("called: model={}", model);
-        RespBase<ScheduleJobDeleteResult> resp = RespBase.create();
-        resp.setData(scheduleJobLogService.delete(model));
+        RespBase<ControllerScheduleDeleteResult> resp = RespBase.create();
+        resp.setData(controllerScheduleService.delete(model));
         return resp;
     }
 

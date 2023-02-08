@@ -17,7 +17,7 @@ package com.wl4g.rengine.service.impl;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_SCHEDULE_JOB_LOGS;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_CONTROLLER_LOG;
 import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
@@ -53,18 +53,18 @@ import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.jedis.BasicJedisClient;
 import com.wl4g.infra.common.locks.JedisLockManager;
-import com.wl4g.rengine.common.entity.ScheduleJobLog;
+import com.wl4g.rengine.common.entity.ControllerLog;
 import com.wl4g.rengine.common.util.IdGenUtils;
-import com.wl4g.rengine.service.ScheduleJobLogService;
-import com.wl4g.rengine.service.model.ScheduleJobDeleteResult;
-import com.wl4g.rengine.service.model.ScheduleJobLogDelete;
-import com.wl4g.rengine.service.model.ScheduleJobLogQuery;
-import com.wl4g.rengine.service.model.ScheduleJobLogSaveResult;
+import com.wl4g.rengine.service.ControllerLogService;
+import com.wl4g.rengine.service.model.ControllerLogDeleteResult;
+import com.wl4g.rengine.service.model.ControllerLogDelete;
+import com.wl4g.rengine.service.model.ControllerLogQuery;
+import com.wl4g.rengine.service.model.ControllerLogSaveResult;
 
 import lombok.CustomLog;
 
 /**
- * {@link ScheduleJobLogServiceImpl}
+ * {@link ControllerLogServiceImpl}
  * 
  * @author James Wong
  * @version 2023-01-08
@@ -72,7 +72,7 @@ import lombok.CustomLog;
  */
 @CustomLog
 @Service
-public class ScheduleJobLogServiceImpl implements ScheduleJobLogService {
+public class ControllerLogServiceImpl implements ControllerLogService {
 
     @Autowired
     MongoTemplate mongoTemplate;
@@ -108,21 +108,21 @@ public class ScheduleJobLogServiceImpl implements ScheduleJobLogService {
     }
 
     @Override
-    public PageHolder<ScheduleJobLog> query(ScheduleJobLogQuery model) {
-        final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getJobLogId()),
-                isCriteria("triggerId", model.getTriggerId())))
+    public PageHolder<ControllerLog> query(ControllerLogQuery model) {
+        final Query query = new Query(orCriteria(isIdCriteria(model.getControllerLogId()),
+                andCriteria(baseCriteria(model), isCriteria("scheduleId", model.getControllerLogId()))))
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
-        final List<ScheduleJobLog> jobes = mongoTemplate.find(query, ScheduleJobLog.class, T_SCHEDULE_JOB_LOGS.getName());
+        final List<ControllerLog> jobes = mongoTemplate.find(query, ControllerLog.class, T_CONTROLLER_LOG.getName());
 
-        return new PageHolder<ScheduleJobLog>(model.getPageNum(), model.getPageSize())
-                .withTotal(mongoTemplate.count(query, T_SCHEDULE_JOB_LOGS.getName()))
+        return new PageHolder<ControllerLog>(model.getPageNum(), model.getPageSize())
+                .withTotal(mongoTemplate.count(query, T_CONTROLLER_LOG.getName()))
                 .withRecords(jobes);
     }
 
     @Override
-    public ScheduleJobLogSaveResult save(ScheduleJobLog model) {
-        ScheduleJobLog job = model;
+    public ControllerLogSaveResult save(ControllerLog model) {
+        ControllerLog job = model;
         notNullOf(job, "job");
 
         if (isNull(job.getId())) {
@@ -132,8 +132,8 @@ public class ScheduleJobLogServiceImpl implements ScheduleJobLogService {
             job.preUpdate();
         }
 
-        final ScheduleJobLog saved = mongoTemplate.save(job, T_SCHEDULE_JOB_LOGS.getName());
-        return ScheduleJobLogSaveResult.builder().id(saved.getId()).build();
+        final ControllerLog saved = mongoTemplate.save(job, T_CONTROLLER_LOG.getName());
+        return ControllerLogSaveResult.builder().id(saved.getId()).build();
     }
 
     /**
@@ -215,11 +215,11 @@ public class ScheduleJobLogServiceImpl implements ScheduleJobLogService {
      * </pre>
      */
     @Override
-    public ScheduleJobDeleteResult delete(ScheduleJobLogDelete model) {
+    public ControllerLogDeleteResult delete(ControllerLogDelete model) {
         // (Defaults) Delete all data older than a certain time by updateDate.
         final Criteria filter = orCriteria(isIdCriteria(model.getId()), andCriteria(
                 gteUpdateDateCriteria(model.getUpdateDateLower()), lteUpdateDateCriteria(model.getUpdateDateUpper())));
-        final DeleteResult result = mongoTemplate.remove(new Query(filter), T_SCHEDULE_JOB_LOGS.getName());
+        final DeleteResult result = mongoTemplate.remove(new Query(filter), T_CONTROLLER_LOG.getName());
 
         // Delete all data except the reserved quantity according to the
         // descending order of updateDate.
@@ -228,19 +228,19 @@ public class ScheduleJobLogServiceImpl implements ScheduleJobLogService {
             try {
                 if (deletingLock.tryLock()) {
                     log.info("Deleting job logs by retention count ...");
-                    final long totalCount = mongoTemplate.getCollection(T_SCHEDULE_JOB_LOGS.getName()).countDocuments();
+                    final long totalCount = mongoTemplate.getCollection(T_CONTROLLER_LOG.getName()).countDocuments();
 
                     final List<Bson> outToTempBsons = new ArrayList<>(3);
                     outToTempBsons.add(BsonDocument.parse("{ $sort: { updateDate: -1 } }"));
                     outToTempBsons.add(BsonDocument.parse(format("{ $limit: %s }", model.getRetentionCount())));
                     outToTempBsons.add(BsonDocument.parse(format("{ $out: '%s'}", TMP_JOB_LOG_DELETING_COLLECTION)));
-                    mongoTemplate.getCollection(T_SCHEDULE_JOB_LOGS.getName()).aggregate(outToTempBsons).toCollection();
+                    mongoTemplate.getCollection(T_CONTROLLER_LOG.getName()).aggregate(outToTempBsons).toCollection();
 
                     // TODO It is best to lock collection large batches deleting
                     // of data?
-                    mongoTemplate.remove(new Query(), T_SCHEDULE_JOB_LOGS.getName());
+                    mongoTemplate.remove(new Query(), T_CONTROLLER_LOG.getName());
 
-                    final String outToSrcBson = format("{ $out: '%s' }", T_SCHEDULE_JOB_LOGS.getName());
+                    final String outToSrcBson = format("{ $out: '%s' }", T_CONTROLLER_LOG.getName());
                     mongoTemplate.getCollection(TMP_JOB_LOG_DELETING_COLLECTION)
                             .aggregate(singletonList(BsonDocument.parse(outToSrcBson)))
                             .toCollection();
@@ -256,10 +256,10 @@ public class ScheduleJobLogServiceImpl implements ScheduleJobLogService {
                 deletingLock.unlock();
             }
         }
-        return ScheduleJobDeleteResult.builder().deletedCount(result.getDeletedCount() + deletedCount).build();
+        return ControllerLogDeleteResult.builder().deletedCount(result.getDeletedCount() + deletedCount).build();
     }
 
-    public static final String DELETING_LOCK_NAME = ScheduleJobLog.class.getSimpleName() + ".deleting";
+    public static final String DELETING_LOCK_NAME = ControllerLog.class.getSimpleName() + ".deleting";
     public static final Long DEFAULT_DELETING_LOCK_TIMEOUT = 60_000L;
     public static final String TMP_JOB_LOG_DELETING_COLLECTION = "tmp_job_log_deleting";
 

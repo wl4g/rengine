@@ -20,6 +20,7 @@ import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
+import static com.wl4g.rengine.service.mongo.QueryHolder.orCriteria;
 import static java.util.Objects.isNull;
 
 import java.util.List;
@@ -57,7 +58,7 @@ public class ScenesServiceImpl implements ScenesService {
 
     @Override
     public PageHolder<Scenes> query(ScenesQuery model) {
-        final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getScenesId())))
+        final Query query = new Query(orCriteria(isIdCriteria(model.getScenesId()), andCriteria(baseCriteria(model))))
                 .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
         final List<Scenes> sceneses = mongoTemplate.find(query, Scenes.class, MongoCollectionDefinition.T_SCENESES.getName());

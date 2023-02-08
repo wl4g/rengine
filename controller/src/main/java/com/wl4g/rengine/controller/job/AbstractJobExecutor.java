@@ -40,17 +40,17 @@ import org.apache.shardingsphere.elasticjob.reg.base.CoordinatorRegistryCenter;
 
 import com.wl4g.infra.context.utils.SpringContextHolder;
 import com.wl4g.rengine.client.core.RengineClient;
-import com.wl4g.rengine.common.entity.ScheduleJobLog;
-import com.wl4g.rengine.common.entity.ScheduleTrigger;
-import com.wl4g.rengine.common.entity.ScheduleTrigger.RunState;
-import com.wl4g.rengine.common.entity.ScheduleTrigger.ScheduleType;
+import com.wl4g.rengine.common.entity.ControllerLog;
+import com.wl4g.rengine.common.entity.ControllerSchedule;
+import com.wl4g.rengine.common.entity.ControllerSchedule.RunState;
+import com.wl4g.rengine.common.entity.ControllerSchedule.ScheduleType;
 import com.wl4g.rengine.controller.config.RengineControllerProperties;
 import com.wl4g.rengine.controller.lifecycle.GlobalControllerJobManager;
-import com.wl4g.rengine.service.ScheduleJobLogService;
-import com.wl4g.rengine.service.ScheduleTriggerService;
+import com.wl4g.rengine.service.ControllerLogService;
+import com.wl4g.rengine.service.ControllerScheduleService;
 import com.wl4g.rengine.service.meter.RengineMeterService;
-import com.wl4g.rengine.service.model.ScheduleJobLogSaveResult;
-import com.wl4g.rengine.service.model.ScheduleTriggerSaveResult;
+import com.wl4g.rengine.service.model.ControllerLogSaveResult;
+import com.wl4g.rengine.service.model.ControllerScheduleSaveResult;
 
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
@@ -80,8 +80,8 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor, Close
     private CoordinatorRegistryCenter regCenter;
     private RengineClient rengineClient;
     private GlobalControllerJobManager globalControllerJobManager;
-    private ScheduleTriggerService scheduleTriggerService;
-    private ScheduleJobLogService scheduleJobLogService;
+    private ControllerScheduleService controllerScheduleService;
+    private ControllerLogService controllerLogService;
     // private Collection<RengineEventBusService> eventbusServices;
 
     protected RengineControllerProperties getConfig() {
@@ -139,26 +139,26 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor, Close
         return globalControllerJobManager;
     }
 
-    protected ScheduleTriggerService getScheduleTriggerService() {
-        if (isNull(scheduleTriggerService)) {
+    protected ControllerScheduleService getControllerScheduleService() {
+        if (isNull(controllerScheduleService)) {
             synchronized (this) {
-                if (isNull(scheduleTriggerService)) {
-                    this.scheduleTriggerService = SpringContextHolder.getBean(ScheduleTriggerService.class);
+                if (isNull(controllerScheduleService)) {
+                    this.controllerScheduleService = SpringContextHolder.getBean(ControllerScheduleService.class);
                 }
             }
         }
-        return scheduleTriggerService;
+        return controllerScheduleService;
     }
 
-    protected ScheduleJobLogService getScheduleJobLogService() {
-        if (isNull(scheduleJobLogService)) {
+    protected ControllerLogService getControllerLogService() {
+        if (isNull(controllerLogService)) {
             synchronized (this) {
-                if (isNull(scheduleJobLogService)) {
-                    this.scheduleJobLogService = SpringContextHolder.getBean(ScheduleJobLogService.class);
+                if (isNull(controllerLogService)) {
+                    this.controllerLogService = SpringContextHolder.getBean(ControllerLogService.class);
                 }
             }
         }
-        return scheduleJobLogService;
+        return controllerLogService;
     }
 
     // @formatter:off
@@ -221,17 +221,17 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor, Close
         return shardingTotalCount;
     }
 
-    protected ScheduleTrigger updateTriggerRunState(final @NotNull Long triggerId, final @NotNull RunState runState) {
+    protected ControllerSchedule updateTriggerRunState(final @NotNull Long scheduleId, final @NotNull RunState runState) {
         notNullOf(runState, "runState");
-        ScheduleTrigger trigger = null;
-        ScheduleTriggerSaveResult result = null;
+        ControllerSchedule trigger = null;
+        ControllerScheduleSaveResult result = null;
         try {
-            trigger = getScheduleTriggerService().get(notNullOf(triggerId, "triggerId"));
+            trigger = getControllerScheduleService().get(notNullOf(scheduleId, "scheduleId"));
             trigger.setRunState(runState);
-            notNull(trigger, "Not found schedule trigger of triggerId: %s", triggerId);
+            notNull(trigger, "Not found schedule trigger of scheduleId: %s", scheduleId);
 
             log.debug("Updating to scheduling trigger run-state : {}", trigger);
-            result = getScheduleTriggerService().save(trigger);
+            result = getControllerScheduleService().save(trigger);
             log.debug("Updated to scheduling trigger run-state : {} => {}", trigger, result);
         } catch (Exception ex) {
             log.error(format("Failed to update scheduling trigger run-state to DB. - %s", trigger), ex);
@@ -239,49 +239,50 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor, Close
         return trigger;
     }
 
-    protected ScheduleJobLog upsertSchedulingLog(
-            final @NotNull Long triggerId,
-            final Long jobLogId,
+    protected ControllerLog upsertSchedulingLog(
+            final @NotNull Long scheduleId,
+            final Long controllerLogId,
             final boolean updateStatupTime,
             final boolean updateFinishedTime,
             final Boolean success,
-            final Consumer<ScheduleJobLog> saveJobLogPrepared) {
-        notNullOf(triggerId, "triggerId");
-        ScheduleJobLog jogLog = null;
-        ScheduleJobLogSaveResult result = null;
+            final Consumer<ControllerLog> saveJobLogPrepared) {
+        notNullOf(scheduleId, "scheduleId");
+        ControllerLog controllerLog = null;
+        ControllerLogSaveResult result = null;
         try {
-            if (nonNull(jobLogId)) {
-                jogLog = getScheduleJobLogService().get(jobLogId);
+            if (nonNull(controllerLogId)) {
+                controllerLog = getControllerLogService().get(controllerLogId);
+                notNull(controllerLog, "Could't get controller log for %s", controllerLogId);
             } else {
-                jogLog = newDefaultScheduleJobLog(triggerId);
-                log.debug("Upserting to scheduling job info : {}", jogLog);
-                result = getScheduleJobLogService().save(jogLog);
-                jogLog.setId(result.getId());
+                controllerLog = newDefaultScheduleJobLog(scheduleId);
+                log.debug("Upserting to scheduling job info : {}", controllerLog);
+                result = getControllerLogService().save(controllerLog);
+                controllerLog.setId(result.getId());
             }
             if (updateStatupTime) {
-                jogLog.setStartupTime(new Date());
+                controllerLog.setStartupTime(new Date());
             }
             if (updateFinishedTime) {
-                jogLog.setFinishedTime(new Date());
+                controllerLog.setFinishedTime(new Date());
             }
             if (nonNull(success)) {
-                jogLog.setSuccess(success);
+                controllerLog.setSuccess(success);
             }
             if (nonNull(saveJobLogPrepared)) {
-                saveJobLogPrepared.accept(jogLog);
+                saveJobLogPrepared.accept(controllerLog);
             }
 
-            log.debug("Upserting to scheduling job log : {}", jogLog);
-            result = getScheduleJobLogService().save(jogLog);
-            log.debug("Upserted to scheduling job log : {} => {}", jogLog, result);
+            log.debug("Upserting to scheduling job log : {}", controllerLog);
+            result = getControllerLogService().save(controllerLog);
+            log.debug("Upserted to scheduling job log : {} => {}", controllerLog, result);
 
-        } catch (Exception ex) {
-            log.error(format("Failed to upsert scheduling job log to DB. - %s", jogLog), ex);
+        } catch (Throwable ex) {
+            log.error(format("Failed to upsert scheduling job log to DB. - %s", controllerLog), ex);
         }
-        return jogLog;
+        return controllerLog;
     }
 
-    protected ScheduleJobLog newDefaultScheduleJobLog(final Long triggerId) {
+    protected ControllerLog newDefaultScheduleJobLog(final Long scheduleId) {
         throw new UnsupportedOperationException();
     }
 
@@ -291,9 +292,9 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor, Close
     public static enum ScheduleJobType {
         GLOBAL_ENGINE_CONTROLLER(null),
 
-        EXECUTION_SCHEDULER(ScheduleType.EXECUTION_SCHEDULER),
+        GENERIC_EXECUTION_CONTROLLER(ScheduleType.GENERIC_EXECUTION_CONTROLLER),
 
-        KAFKA_SUBSCRIBE_SCHEDULER(ScheduleType.KAFKA_SUBSCRIBE_SCHEDULER);
+        KAFKA_EXECUTION_CONTROLLER(ScheduleType.KAFKA_EXECUTION_CONTROLLER);
 
         // FLINK_SUBMIT_SCHEDULER(ScheduleType.FLINK_SUBMIT_SCHEDULER)
 

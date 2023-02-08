@@ -47,14 +47,14 @@ import org.apache.shardingsphere.elasticjob.lite.api.bootstrap.impl.ScheduleJobB
 import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperRegistryCenter;
 
 import com.wl4g.infra.common.bean.BaseBean;
-import com.wl4g.rengine.common.entity.ScheduleTrigger;
-import com.wl4g.rengine.common.entity.ScheduleTrigger.RunState;
-import com.wl4g.rengine.common.entity.ScheduleTrigger.ScheduleType;
+import com.wl4g.rengine.common.entity.ControllerSchedule;
+import com.wl4g.rengine.common.entity.ControllerSchedule.RunState;
+import com.wl4g.rengine.common.entity.ControllerSchedule.ScheduleType;
 import com.wl4g.rengine.controller.config.RengineControllerProperties;
 import com.wl4g.rengine.controller.lifecycle.ElasticJobBootstrapBuilder.JobParameter;
-import com.wl4g.rengine.service.ScheduleJobLogService;
-import com.wl4g.rengine.service.model.ScheduleJobLogDelete;
-import com.wl4g.rengine.service.model.ScheduleTriggerQuery;
+import com.wl4g.rengine.service.ControllerLogService;
+import com.wl4g.rengine.service.model.ControllerLogDelete;
+import com.wl4g.rengine.service.model.ControllerScheduleQuery;
 
 import lombok.CustomLog;
 import lombok.Getter;
@@ -85,48 +85,50 @@ public class GlobalEngineScheduleController extends AbstractJobExecutor {
             @NotNull JobFacade jobFacade,
             @NotNull ShardingContext context) throws Exception {
 
-        // Scanning for current sharding scheduling triggers.
-        log.info("Loading the sharding triggers for currentShardingTotalCount: {}, jobConfig: {}, jobFacade: {}, context: {}",
+        // Scanning for current sharding scheduling schedules.
+        log.info("Loading the sharding schedules for currentShardingTotalCount: {}, jobConfig: {}, jobFacade: {}, context: {}",
                 currentShardingTotalCount, jobConfig, jobFacade, context);
 
         getMeterService()
                 .counter(global_schedule_controller.getName(), global_schedule_controller.getHelp(), METHOD_NAME, METHOD_EXECUTE)
                 .increment();
 
-        final List<ScheduleTrigger> shardingTriggers = getScheduleTriggerService().findWithSharding(ScheduleTriggerQuery.builder()
-                // .enable(true)
-                // .type(ScheduleType.EXECUTION_SCHEDULER.name())
-                .build(), currentShardingTotalCount, context.getShardingItem());
-        log.info("Loaded the sharding triggers : {}", shardingTriggers);
+        final List<ControllerSchedule> shardingSchedules = getControllerScheduleService()
+                .findWithSharding(ControllerScheduleQuery.builder()
+                        // .enable(true)
+                        // .type(ScheduleType.GENERIC_EXECUTION_CONTROLLER.name())
+                        .build(), currentShardingTotalCount, context.getShardingItem());
+        log.info("Loaded the sharding schedules : {}", shardingSchedules);
 
         getMeterService()
                 .timer(global_schedule_controller_time.getName(), global_schedule_controller_time.getHelp(), DEFAULT_PERCENTILES,
                         METHOD_NAME, METHOD_EXECUTE)
                 .record(() -> {
                     final AtomicBoolean hasFailure = new AtomicBoolean(false);
-                    safeList(shardingTriggers).stream().forEach(trigger -> {
-                        final String jobName = buildJobName(trigger);
+                    safeList(shardingSchedules).stream().forEach(schedule -> {
+                        final String jobName = buildJobName(schedule);
                         try {
-                            // Any a trigger can only be scheduled by one
+                            // Any a schedule can only be scheduled by one
                             // cluster node at the same time to prevent repeated
                             // scheduling of multiple nodes. Of course, if the
                             // current node is down, it will be transferred to
                             // other nodes to continue to be scheduled according
                             // to the elastic-job mechanism.
-                            final var mutexLock = getGlobalScheduleJobManager().getMutexLock(trigger.getId());
+                            final var mutexLock = getGlobalScheduleJobManager().getMutexLock(schedule.getId());
 
-                            // The status of the trigger is disabled, you need
+                            // The status of the schedule is disabled, you need
                             // to shtudown the scheduling job.
-                            if (trigger.getEnable() == BaseBean.DISABLED) {
-                                log.info("Disabling trigger scheduling for : {}", trigger.getId());
-                                if (getGlobalScheduleJobManager().exists(trigger.getId())) {
-                                    getGlobalScheduleJobManager().shutdown(trigger.getId());
-                                    getGlobalScheduleJobManager().remove(trigger.getId());
-                                    // When the trigger is disabled(cancelled),
+                            if (schedule.getEnable() == BaseBean.DISABLED) {
+                                log.info("Disabling schedule scheduling for : {}", schedule.getId());
+                                if (getGlobalScheduleJobManager().exists(schedule.getId())) {
+                                    getGlobalScheduleJobManager().shutdown(schedule.getId());
+                                    getGlobalScheduleJobManager().remove(schedule.getId());
+                                    // When the schedule is disabled(cancelled),
                                     // the
                                     // mutex should be released, to allow
                                     // binding
-                                    // (scheduling) by other nodes after trigger
+                                    // (scheduling) by other nodes after
+                                    // schedule
                                     // re-enabling.
                                     try {
                                         mutexLock.release(); // [#MARK1]
@@ -138,28 +140,28 @@ public class GlobalEngineScheduleController extends AbstractJobExecutor {
                             }
 
                             // 1). Binding is allowed as long as the this JVM is
-                            // not bound to this trigger (even if disabled and
+                            // not bound to this schedule (even if disabled and
                             // then enabled).
                             //
                             // 2). If the this JVM is already bound to this
-                            // trigger, then the binding is skipped. (Use
+                            // schedule, then the binding is skipped. (Use
                             // non-reentrant locks to solved)
                             //
                             // 3). Because the current node (shard) binding
                             //
-                            // trigger scheduling is stateful, once the lock is
+                            // schedule scheduling is stateful, once the lock is
                             // acquired, there is no need to actively release
-                            // it, unless the trigger is actively
+                            // it, unless the schedule is actively
                             // disabled(cancelled), or the current JVM exits
                             // (passive release). refer to: [#MARK1]
-                            if (!getGlobalScheduleJobManager().exists(trigger.getId())
+                            if (!getGlobalScheduleJobManager().exists(schedule.getId())
                                     && mutexLock.acquire(1, TimeUnit.MILLISECONDS)) {
-                                updateTriggerRunState(trigger.getId(), RunState.PREPARED);
+                                updateTriggerRunState(schedule.getId(), RunState.PREPARED);
 
-                                log.info("Scheduling trigger for {} : {}", jobName, trigger);
+                                log.info("Scheduling schedule for {} : {}", jobName, schedule);
                                 final JobBootstrap bootstrap = getGlobalScheduleJobManager().add(mutexLock,
-                                        ScheduleJobType.get(ScheduleType.valueOf(trigger.getProperties().getType())), jobName,
-                                        trigger, new JobParameter(trigger.getId()));
+                                        ScheduleJobType.get(ScheduleType.valueOf(schedule.getProperties().getType())), jobName,
+                                        schedule, new JobParameter(schedule.getId()));
 
                                 if (bootstrap instanceof ScheduleJobBootstrap) {
                                     ((ScheduleJobBootstrap) bootstrap).schedule();
@@ -170,16 +172,16 @@ public class GlobalEngineScheduleController extends AbstractJobExecutor {
                                             format("Unsupported the schedule job bootstrap type of : %s", bootstrap));
                                 }
 
-                                updateTriggerRunState(trigger.getId(), RunState.SCHED);
+                                updateTriggerRunState(schedule.getId(), RunState.SCHED);
                             } else {
-                                log.debug("Trigger {} is already bound to the this JVM or other nodes.", trigger.getId());
+                                log.debug("Trigger {} is already bound to the this JVM or other nodes.", schedule.getId());
                             }
 
-                        } catch (Exception e) {
+                        } catch (Throwable e) {
                             hasFailure.set(true);
                             log.error(format("Failed to scheduling for currentShardingTotalCount: %s, context: %s, jobName: %s",
                                     currentShardingTotalCount, context, jobName), e);
-                            updateTriggerRunState(trigger.getId(), RunState.FAILED_SCHED);
+                            updateTriggerRunState(schedule.getId(), RunState.FAILED_SCHED);
                         }
                     });
 
@@ -197,11 +199,11 @@ public class GlobalEngineScheduleController extends AbstractJobExecutor {
                 });
 
         // The start the log purger, ignore if condition not met.
-        PurgeJobLogController.get(getConfig(), getScheduleJobLogService(), (ZookeeperRegistryCenter) getRegCenter()).start();
+        PurgeJobLogController.get(getConfig(), getControllerLogService(), (ZookeeperRegistryCenter) getRegCenter()).start();
     }
 
-    public static String buildJobName(final ScheduleTrigger trigger) {
-        return EngineExecutionScheduler.class.getSimpleName() + "-" + trigger.getId();
+    public static String buildJobName(final ControllerSchedule schedule) {
+        return EngineGenericExecutionController.class.getSimpleName() + "-" + schedule.getId();
     }
 
     @CustomLog
@@ -210,14 +212,14 @@ public class GlobalEngineScheduleController extends AbstractJobExecutor {
         private static final Long DEFAULT_PURGE_INTERNAL_MS = Duration.ofHours(1).toMillis();
         private static PurgeJobLogController SINGLETON;
         private RengineControllerProperties config;
-        private ScheduleJobLogService scheduleJobLogService;
+        private ControllerLogService controllerLogService;
         private InterProcessSemaphoreMutex purgerMutexLock;
         private Thread executor;
         private AtomicLong lastPurgeTime = new AtomicLong(0);
 
         public static PurgeJobLogController get(
                 final @NotNull RengineControllerProperties config,
-                final @NotNull ScheduleJobLogService scheduleJobLogService,
+                final @NotNull ControllerLogService controllerLogService,
                 final @NotNull ZookeeperRegistryCenter regCenter) {
             notNullOf(regCenter, "regCenter");
             if (isNull(SINGLETON)) {
@@ -225,7 +227,7 @@ public class GlobalEngineScheduleController extends AbstractJobExecutor {
                     if (isNull(SINGLETON)) {
                         SINGLETON = new PurgeJobLogController();
                         SINGLETON.config = notNullOf(config, "config");
-                        SINGLETON.scheduleJobLogService = notNullOf(scheduleJobLogService, "scheduleJobLogService");
+                        SINGLETON.controllerLogService = notNullOf(controllerLogService, "controllerLogService");
                         // see:https://curator.apache.org/curator-recipes/shared-lock.html
                         SINGLETON.purgerMutexLock = new InterProcessSemaphoreMutex((regCenter).getClient(), PATH_MUTEX_PURGE);
                     }
@@ -244,20 +246,20 @@ public class GlobalEngineScheduleController extends AbstractJobExecutor {
                 this.executor = new Thread(() -> {
                     try {
                         if (purgerMutexLock.acquire(1, TimeUnit.MILLISECONDS)) {
-                            log.info("Purging trigger schedule job logs for : {}", config.getPurger());
+                            log.info("Purging schedule schedule job logs for : {}", config.getPurger());
 
                             // Purge past logs according to configuration,
                             // keeping only the most recent period of time.
                             final var purgeUpperTime = currentTimeMillis()
                                     - Duration.ofHours(config.getPurger().getLogRetentionHours()).toMillis();
 
-                            final var result = scheduleJobLogService.delete(ScheduleJobLogDelete.builder()
+                            final var result = controllerLogService.delete(ControllerLogDelete.builder()
                                     .updateDateLower(new Date(1))
                                     // TODO notice timezone?
                                     .updateDateUpper(new Date(purgeUpperTime))
                                     .retentionCount(config.getPurger().getLogRetentionCount())
                                     .build());
-                            log.info("Purged to trigger schedule job logs of count : {}", result.getDeletedCount());
+                            log.info("Purged to scheduling job logs of count : {}", result.getDeletedCount());
                         }
                     } catch (Throwable ex) {
                         log.error(format("Failed to purge logs for : %s", config.getPurger()), ex);

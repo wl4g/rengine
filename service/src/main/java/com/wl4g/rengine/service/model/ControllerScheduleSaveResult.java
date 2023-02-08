@@ -22,7 +22,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link ScheduleTriggerDeleteResult}
+ * {@link ControllerScheduleSaveResult}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -33,5 +33,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class ScheduleTriggerDeleteResult extends BaseDeleteResult {
+public class ControllerScheduleSaveResult extends BaseSaveResult {
 }

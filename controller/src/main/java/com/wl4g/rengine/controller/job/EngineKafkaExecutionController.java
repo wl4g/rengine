@@ -51,14 +51,14 @@ import org.springframework.kafka.listener.ContainerProperties.AckMode;
 
 import com.fasterxml.jackson.databind.deser.std.StringDeserializer;
 import com.wl4g.rengine.client.core.RengineClient;
-import com.wl4g.rengine.common.entity.ScheduleJobLog;
-import com.wl4g.rengine.common.entity.ScheduleJobLog.KafkaSubscribeScheduleJobLog;
-import com.wl4g.rengine.common.entity.ScheduleJobLog.ResultInformation;
-import com.wl4g.rengine.common.entity.ScheduleTrigger;
-import com.wl4g.rengine.common.entity.ScheduleTrigger.KafkaSubscribeScheduleConfig;
-import com.wl4g.rengine.common.entity.ScheduleTrigger.KafkaSubscribeScheduleConfig.KafkaConsumerOptions;
-import com.wl4g.rengine.common.entity.ScheduleTrigger.RunState;
-import com.wl4g.rengine.common.entity.ScheduleTrigger.ScheduleType;
+import com.wl4g.rengine.common.entity.ControllerLog;
+import com.wl4g.rengine.common.entity.ControllerLog.KafkaSubscribeControllerLog;
+import com.wl4g.rengine.common.entity.ControllerLog.ResultInformation;
+import com.wl4g.rengine.common.entity.ControllerSchedule;
+import com.wl4g.rengine.common.entity.ControllerSchedule.KafkaExecutionScheduleConfig;
+import com.wl4g.rengine.common.entity.ControllerSchedule.KafkaExecutionScheduleConfig.KafkaConsumerOptions;
+import com.wl4g.rengine.common.entity.ControllerSchedule.RunState;
+import com.wl4g.rengine.common.entity.ControllerSchedule.ScheduleType;
 import com.wl4g.rengine.common.model.ExecuteRequest;
 import com.wl4g.rengine.controller.lifecycle.ElasticJobBootstrapBuilder.JobParameter;
 
@@ -67,21 +67,21 @@ import lombok.Getter;
 import lombok.ToString;
 
 /**
- * {@link EngineKafkaSubscribeScheduler}
+ * {@link EngineKafkaExecutionController}
  * 
  * @author James Wong
  * @version 2023-01-11
  * @since v1.0.0
  */
 @CustomLog
-public class EngineKafkaSubscribeScheduler extends EngineExecutionScheduler {
+public class EngineKafkaExecutionController extends EngineGenericExecutionController {
 
     private static final Map<Long, ConcurrentMessageListenerContainer<String, String>> subscriberRegistry = new ConcurrentHashMap<>(
             16);
 
     @Override
     public String getType() {
-        return ScheduleJobType.KAFKA_SUBSCRIBE_SCHEDULER.name();
+        return ScheduleJobType.KAFKA_EXECUTION_CONTROLLER.name();
     }
 
     @Override
@@ -91,7 +91,7 @@ public class EngineKafkaSubscribeScheduler extends EngineExecutionScheduler {
             try {
                 e.getValue().stop(true);
             } catch (Throwable ex) {
-                log.warn(format("Unable to closing subscriber for triggerId: %s", e.getKey()), ex);
+                log.warn(format("Unable to closing subscriber for scheduleId: %s", e.getKey()), ex);
             }
         });
     }
@@ -105,12 +105,12 @@ public class EngineKafkaSubscribeScheduler extends EngineExecutionScheduler {
             @NotNull ShardingContext context) throws Exception {
 
         final JobParameter jobParameter = notNullOf(parseJSON(jobConfig.getJobParameter(), JobParameter.class), "jobParameter");
-        final Long triggerId = notNullOf(jobParameter.getTriggerId(), "triggerId");
+        final Long scheduleId = notNullOf(jobParameter.getScheduleId(), "scheduleId");
 
-        updateTriggerRunState(triggerId, RunState.RUNNING);
-        final ScheduleJobLog jobLog = upsertSchedulingLog(triggerId, null, true, false, null, null);
+        updateTriggerRunState(scheduleId, RunState.RUNNING);
+        final ControllerLog jobLog = upsertSchedulingLog(scheduleId, null, true, false, null, null);
 
-        final ScheduleTrigger trigger = notNullOf(getScheduleTriggerService().get(triggerId), "trigger");
+        final ControllerSchedule trigger = notNullOf(getControllerScheduleService().get(scheduleId), "trigger");
         try {
             log.info("Consuming kafka to engine execution scheduling for : {}", trigger);
 
@@ -120,7 +120,7 @@ public class EngineKafkaSubscribeScheduler extends EngineExecutionScheduler {
             }
 
             // Register to subscriber registry.
-            final KafkaSubscribeScheduleConfig kssc = ((KafkaSubscribeScheduleConfig) trigger.getProperties()).validate();
+            final KafkaExecutionScheduleConfig kssc = ((KafkaExecutionScheduleConfig) trigger.getProperties()).validate();
             final ConcurrentMessageListenerContainer<String, String> subscriber = new KafkaSubscribeBuilder(
                     kssc.getConsumerOptions().toConsumerConfigProperties()).buildSubscriber(kssc.getTopics(),
                             generateGroupId(trigger), kssc.getConcurrency(), (records, acknowledgment) -> {
@@ -131,15 +131,15 @@ public class EngineKafkaSubscribeScheduler extends EngineExecutionScheduler {
 
                                 // Submit execute requests job wait for
                                 // completed
-                                final ScheduleJobLog finishedJobLog = doExecuteRequestJobs(trigger, jobLog, jobs,
+                                final ControllerLog finishedJobLog = doExecuteRequestJobs(trigger, jobLog, jobs,
                                         resultAndJobLog -> {
                                             final Set<ResultInformation> results = (Set<ResultInformation>) resultAndJobLog
                                                     .getItem1();
                                             results.stream().forEach(rd -> rd.validate());
                                             if (!results.isEmpty()) {
                                                 final ResultInformation result = results.iterator().next();
-                                                final ScheduleJobLog _jobLog = (ScheduleJobLog) resultAndJobLog.getItem2();
-                                                ((KafkaSubscribeScheduleJobLog) _jobLog.getDetail()).setResult(result);
+                                                final ControllerLog _jobLog = (ControllerLog) resultAndJobLog.getItem2();
+                                                ((KafkaSubscribeControllerLog) _jobLog.getDetail()).setResult(result);
                                             }
                                         });
 
@@ -147,10 +147,10 @@ public class EngineKafkaSubscribeScheduler extends EngineExecutionScheduler {
                                 // configured in manual acknowledgment mode.
                                 if (nonNull(acknowledgment)) {
                                     if (kssc.getAutoAcknowledgment()) {
-                                        log.info("Automatically committing acknowledgement of triggerId: {}", trigger.getId());
+                                        log.info("Automatically committing acknowledgement of scheduleId: {}", trigger.getId());
                                         acknowledgment.acknowledge();
                                     } else if (nonNull(finishedJobLog.getSuccess() && finishedJobLog.getSuccess())) {
-                                        log.info("Manual committing acknowledgement of triggerId: {}", trigger.getId());
+                                        log.info("Manual committing acknowledgement of scheduleId: {}", trigger.getId());
                                         acknowledgment.acknowledge();
                                     }
                                 }
@@ -161,7 +161,7 @@ public class EngineKafkaSubscribeScheduler extends EngineExecutionScheduler {
 
         } catch (Throwable ex) {
             final String errmsg = format(
-                    "Failed to executing requests job of currentShardingTotalCount: %s, context: %s, triggerId: %s, jobLogId: %s",
+                    "Failed to executing requests job of currentShardingTotalCount: %s, context: %s, scheduleId: %s, jobLogId: %s",
                     currentShardingTotalCount, context, trigger.getId(), jobLog.getId());
             if (log.isDebugEnabled()) {
                 log.error(errmsg, ex);
@@ -169,8 +169,8 @@ public class EngineKafkaSubscribeScheduler extends EngineExecutionScheduler {
                 log.error(format("%s. - reason: %s", errmsg, ex.getMessage()));
             }
 
-            updateTriggerRunState(triggerId, RunState.FAILED);
-            upsertSchedulingLog(triggerId, jobLog.getId(), false, true, false, null);
+            updateTriggerRunState(scheduleId, RunState.FAILED);
+            upsertSchedulingLog(scheduleId, jobLog.getId(), false, true, false, null);
 
             // When the job scheduling of this trigger fails, destroy it and let
             // the global controller scanning reschedule it next time.
@@ -178,7 +178,7 @@ public class EngineKafkaSubscribeScheduler extends EngineExecutionScheduler {
         }
     }
 
-    private void destroyThisScheduleJob(ScheduleTrigger trigger) {
+    private void destroyThisScheduleJob(ControllerSchedule trigger) {
         final ConcurrentMessageListenerContainer<String, String> subscriber = subscriberRegistry.remove(trigger.getId());
         if (nonNull(subscriber)) {
             subscriber.stop(false);
@@ -186,15 +186,15 @@ public class EngineKafkaSubscribeScheduler extends EngineExecutionScheduler {
         getGlobalScheduleJobManager().remove(trigger.getId());
     }
 
-    protected ScheduleJobLog newDefaultScheduleJobLog(final Long triggerId) {
-        return ScheduleJobLog.builder()
-                .triggerId(triggerId)
-                .detail(KafkaSubscribeScheduleJobLog.builder().type(ScheduleType.KAFKA_SUBSCRIBE_SCHEDULER.name()).build())
+    protected ControllerLog newDefaultScheduleJobLog(final Long scheduleId) {
+        return ControllerLog.builder()
+                .scheduleId(scheduleId)
+                .detail(KafkaSubscribeControllerLog.builder().type(ScheduleType.KAFKA_EXECUTION_CONTROLLER.name()).build())
                 .build();
     }
 
-    public static String generateGroupId(ScheduleTrigger trigger) {
-        return EngineKafkaSubscribeScheduler.class.getSimpleName() + "-" + trigger.getId();
+    public static String generateGroupId(ControllerSchedule trigger) {
+        return EngineKafkaExecutionController.class.getSimpleName() + "-" + trigger.getId();
     }
 
     @Getter
@@ -262,10 +262,10 @@ public class EngineKafkaSubscribeScheduler extends EngineExecutionScheduler {
     public static class KafkaSubscribeExecutionWorker extends ExecutionWorker {
         final List<ConsumerRecord<String, String>> records;
 
-        public KafkaSubscribeExecutionWorker(int currentShardingTotalCount, ShardingContext context, Long triggerId,
+        public KafkaSubscribeExecutionWorker(int currentShardingTotalCount, ShardingContext context, Long scheduleId,
                 Long jobLogId, RengineClient rengineClient, ExecuteRequest request,
                 List<ConsumerRecord<String, String>> records) {
-            super(currentShardingTotalCount, context, triggerId, jobLogId, rengineClient, request);
+            super(currentShardingTotalCount, context, scheduleId, jobLogId, rengineClient, request);
             this.records = notNullOf(records, "records");
         }
 

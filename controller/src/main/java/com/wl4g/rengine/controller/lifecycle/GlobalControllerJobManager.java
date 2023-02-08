@@ -53,7 +53,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 
 import com.wl4g.infra.common.collection.CollectionUtils2;
-import com.wl4g.rengine.common.entity.ScheduleTrigger;
+import com.wl4g.rengine.common.entity.ControllerSchedule;
 import com.wl4g.rengine.controller.config.RengineControllerProperties;
 import com.wl4g.rengine.controller.exception.ScheduleException;
 import com.wl4g.rengine.controller.job.AbstractJobExecutor;
@@ -110,7 +110,7 @@ public class GlobalControllerJobManager implements ApplicationRunner, Closeable 
                     ((AbstractJobExecutor) jobItemExecutor).close();
                 }
             } catch (IOException ex) {
-                log.warn(format("Unable to closing job item executor for triggerId: %s", e.getKey()), ex);
+                log.warn(format("Unable to closing job item executor for scheduleId: %s", e.getKey()), ex);
             }
         });
     }
@@ -125,13 +125,13 @@ public class GlobalControllerJobManager implements ApplicationRunner, Closeable 
         controllerBootstrap.schedule();
     }
 
-    public boolean exists(Long triggerId) {
-        return bootstrapRegistry.containsKey(triggerId);
+    public boolean exists(Long scheduleId) {
+        return bootstrapRegistry.containsKey(scheduleId);
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends JobBootstrap> T get(Long triggerId) {
-        return (T) bootstrapRegistry.get(triggerId);
+    public <T extends JobBootstrap> T get(Long scheduleId) {
+        return (T) bootstrapRegistry.get(scheduleId);
     }
 
     @SuppressWarnings("unchecked")
@@ -139,7 +139,7 @@ public class GlobalControllerJobManager implements ApplicationRunner, Closeable 
             @NotNull InterProcessSemaphoreMutex lock,
             @NotNull ScheduleJobType jobType,
             @NotBlank String jobName,
-            @NotNull ScheduleTrigger trigger,
+            @NotNull ControllerSchedule trigger,
             @NotNull JobParameter jobParameter) throws Exception {
         notNullOf(lock, "lock");
         notNullOf(jobType, "jobType");
@@ -157,12 +157,12 @@ public class GlobalControllerJobManager implements ApplicationRunner, Closeable 
         return (T) bootstrap;
     }
 
-    public GlobalControllerJobManager remove(Long... triggerIds) {
-        final List<Long> _triggerIds = safeToList(Long.class, triggerIds);
+    public GlobalControllerJobManager remove(Long... scheduleIds) {
+        final List<Long> _scheduleIds = safeToList(Long.class, scheduleIds);
         final var it = safeMap(bootstrapRegistry).entrySet().iterator();
         while (it.hasNext()) {
             Entry<Long, JobBootstrap> entry = it.next();
-            if (_triggerIds.contains(entry.getKey())) {
+            if (_scheduleIds.contains(entry.getKey())) {
                 it.remove();
                 scheduleMutexLocksRegistry.remove(entry.getKey());
             }
@@ -170,12 +170,12 @@ public class GlobalControllerJobManager implements ApplicationRunner, Closeable 
         return this;
     }
 
-    public List<Long> start(Long... triggerIds) {
+    public List<Long> start(Long... scheduleIds) {
         log.info("Schedule job bootstrap starting ...");
-        final List<Long> _triggerIds = safeToList(Long.class, triggerIds);
+        final List<Long> _scheduleIds = safeToList(Long.class, scheduleIds);
         return safeMap(bootstrapRegistry).entrySet()
                 .stream()
-                .filter(e -> _triggerIds.isEmpty() || (!_triggerIds.isEmpty() && _triggerIds.contains(e.getKey())))
+                .filter(e -> _scheduleIds.isEmpty() || (!_scheduleIds.isEmpty() && _scheduleIds.contains(e.getKey())))
                 .map(e -> {
                     try {
                         if (nonNull(e.getValue()) && e.getValue() instanceof ScheduleJobBootstrap) {
@@ -195,12 +195,12 @@ public class GlobalControllerJobManager implements ApplicationRunner, Closeable 
                 .collect(toList());
     }
 
-    public List<Long> shutdown(Long... triggerIds) {
+    public List<Long> shutdown(Long... scheduleIds) {
         log.info("Schedule job bootstrap shutdown ...");
-        final List<Long> _triggerIds = safeToList(Long.class, triggerIds);
+        final List<Long> _scheduleIds = safeToList(Long.class, scheduleIds);
         return safeMap(bootstrapRegistry).entrySet()
                 .stream()
-                .filter(e -> _triggerIds.isEmpty() || (!_triggerIds.isEmpty() && _triggerIds.contains(e.getKey())))
+                .filter(e -> _scheduleIds.isEmpty() || (!_scheduleIds.isEmpty() && _scheduleIds.contains(e.getKey())))
                 .map(e -> {
                     try {
                         ((ScheduleJobBootstrap) e.getValue()).shutdown();
@@ -215,16 +215,16 @@ public class GlobalControllerJobManager implements ApplicationRunner, Closeable 
                 .collect(toList());
     }
 
-    public InterProcessSemaphoreMutex getMutexLock(final Long triggerId) {
-        InterProcessSemaphoreMutex mutex = scheduleMutexLocksRegistry.get(triggerId);
+    public InterProcessSemaphoreMutex getMutexLock(final Long scheduleId) {
+        InterProcessSemaphoreMutex mutex = scheduleMutexLocksRegistry.get(scheduleId);
         if (isNull(mutex)) {
             synchronized (this) {
-                mutex = scheduleMutexLocksRegistry.get(triggerId);
+                mutex = scheduleMutexLocksRegistry.get(scheduleId);
                 if (isNull(mutex)) {
                     // Build path for bind trigger.
                     // see:https://curator.apache.org/curator-recipes/shared-lock.html
-                    final String path = format("%s/%s", PATH_MUTEX_TRIGGERS, notNullOf(triggerId, "triggerId"));
-                    scheduleMutexLocksRegistry.put(triggerId,
+                    final String path = format("%s/%s", PATH_MUTEX_TRIGGERS, notNullOf(scheduleId, "scheduleId"));
+                    scheduleMutexLocksRegistry.put(scheduleId,
                             (mutex = new InterProcessSemaphoreMutex(((ZookeeperRegistryCenter) regCenter).getClient(), path)));
                 }
             }

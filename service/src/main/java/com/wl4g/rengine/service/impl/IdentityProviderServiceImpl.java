@@ -53,7 +53,7 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
     public IdentityProviderQueryResult query(IdentityProviderQuery model) {
         List<IdentityProvider> idpConfigs = null;
         if (!isBlank(model.getKind())) {
-            Criteria criteria = new Criteria().orOperator(Criteria.where("kind").is(model.getKind()));
+            final Criteria criteria = new Criteria().orOperator(Criteria.where("kind").is(model.getKind()));
             idpConfigs = mongoTemplate.find(new Query(criteria), IdentityProvider.class,
                     MongoCollectionDefinition.SYS_IDENTITY_PROVIDERS.getName());
         } else {

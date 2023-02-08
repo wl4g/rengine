@@ -32,7 +32,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * ScheduleJobLog configuration POJO.
+ * ControllerLog configuration POJO.
  */
 @Getter
 @Setter

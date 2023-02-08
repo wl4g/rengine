@@ -42,8 +42,8 @@ import org.apache.shardingsphere.elasticjob.tracing.api.TracingConfiguration;
 
 import com.google.common.base.Preconditions;
 import com.wl4g.infra.common.lang.tuples.Tuple2;
-import com.wl4g.rengine.common.entity.ScheduleTrigger;
-import com.wl4g.rengine.common.entity.ScheduleTrigger.ExecutionScheduleConfig;
+import com.wl4g.rengine.common.entity.ControllerSchedule;
+import com.wl4g.rengine.common.entity.ControllerSchedule.GenericExecutionScheduleConfig;
 import com.wl4g.rengine.controller.config.RengineControllerProperties;
 import com.wl4g.rengine.controller.job.AbstractJobExecutor.ScheduleJobType;
 
@@ -139,15 +139,15 @@ public class ElasticJobBootstrapBuilder {
     public static JobConfiguration newDefaultJobConfig(
             @NotNull ScheduleJobType jobType,
             @NotBlank String jobName,
-            @NotNull ScheduleTrigger trigger,
+            @NotNull ControllerSchedule trigger,
             @NotNull JobParameter jobParameter) {
         hasTextOf(jobName, "jobName");
         notNullOf(trigger, "trigger");
         notNullOf(jobParameter, "jobParameter");
 
         String cron = null; // OneOffJobBootstrap
-        if (trigger.getProperties() instanceof ExecutionScheduleConfig) { // ScheduleJobBootstrap
-            cron = ((ExecutionScheduleConfig) trigger.getProperties()).getCron();
+        if (trigger.getProperties() instanceof GenericExecutionScheduleConfig) { // ScheduleJobBootstrap
+            cron = ((GenericExecutionScheduleConfig) trigger.getProperties()).getCron();
         }
         return JobConfiguration.builder()
                 .jobType(jobType)
@@ -182,10 +182,10 @@ public class ElasticJobBootstrapBuilder {
     @ToString
     @NoArgsConstructor
     public static class JobParameter {
-        private Long triggerId;
+        private Long scheduleId;
 
-        public JobParameter(@NotNull Long triggerId) {
-            this.triggerId = notNullOf(triggerId, "triggerId");
+        public JobParameter(@NotNull Long scheduleId) {
+            this.scheduleId = notNullOf(scheduleId, "scheduleId");
         }
     }
 

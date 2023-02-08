@@ -69,7 +69,8 @@ public class RuleScriptServiceImpl implements RuleScriptService {
 
         final List<RuleScript> ruleScripts = mongoTemplate.find(query, RuleScript.class,
                 MongoCollectionDefinition.T_RULE_SCRIPTS.getName());
-        // Collections.sort(ruleScripts, (o1, o2) -> (o2.getUpdateDate().getTime()
+        // Collections.sort(ruleScripts, (o1, o2) ->
+        // (o2.getUpdateDate().getTime()
         // - o1.getUpdateDate().getTime()) > 0 ? 1 : -1);
 
         return new PageHolder<RuleScript>(model.getPageNum(), model.getPageSize())

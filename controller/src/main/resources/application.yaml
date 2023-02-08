@@ -14,7 +14,7 @@
 spring:
   application.name: rengine-controller
   profiles:
-    include: arthas,telemetry,mongo,redis,controller,security,devtool
+    include: arthas,arthas-override,telemetry,telemetry-override,mongo,redis,controller,security,devtool
     active: dev
   banner:
     location: classpath:META-INF/banner.txt

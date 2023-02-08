@@ -20,6 +20,7 @@ import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
+import static com.wl4g.rengine.service.mongo.QueryHolder.orCriteria;
 import static java.util.Objects.isNull;
 
 import java.util.List;
@@ -59,10 +60,9 @@ public class RuleServiceImpl implements RuleService {
 
     @Override
     public PageHolder<Rule> query(RuleQuery model) {
-        Query query = new Query(
-                andCriteria(baseCriteria(model), isIdCriteria(model.getRuleId()), isCriteria("scenesId", model.getScenesId())));
-
-        query.with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
+        final Query query = new Query(orCriteria(isIdCriteria(model.getRuleId()),
+                andCriteria(baseCriteria(model), isCriteria("scenesId", model.getScenesId()))))
+                        .with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
 
         List<Rule> rules = mongoTemplate.find(query, Rule.class, MongoCollectionDefinition.T_RULES.getName());
         // Collections.sort(rules, (o1, o2) -> (o2.getUpdateDate().getTime()

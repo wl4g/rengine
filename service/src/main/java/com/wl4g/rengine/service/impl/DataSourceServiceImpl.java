@@ -20,6 +20,8 @@ import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isCriteria;
+import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
+import static com.wl4g.rengine.service.mongo.QueryHolder.orCriteria;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
@@ -59,9 +61,10 @@ public class DataSourceServiceImpl implements DataSourceService {
 
     @Override
     public PageHolder<DataSourceProperties> query(DataSourceQuery model) {
-        final Query query = new Query(andCriteria(baseCriteria(model),
-                isCriteria("properties.type", nonNull(model.getType()) ? model.getType().name() : null)))
-                        .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
+        final Query query = new Query(orCriteria(isIdCriteria(model.getDataSourceId()),
+                andCriteria(baseCriteria(model),
+                        isCriteria("properties.type", nonNull(model.getType()) ? model.getType().name() : null))))
+                                .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
         final List<DataSourceProperties> dataSourceProperties = mongoTemplate.find(query, DataSourceProperties.class,
                 MongoCollectionDefinition.T_DATASOURCES.getName());

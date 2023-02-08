@@ -45,13 +45,13 @@ import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
 import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor.CompleteResult;
 import com.wl4g.rengine.client.core.RengineClient;
 import com.wl4g.rengine.client.core.RengineClient.FailbackInfo;
-import com.wl4g.rengine.common.entity.ScheduleJobLog;
-import com.wl4g.rengine.common.entity.ScheduleJobLog.ExecutionScheduleJobLog;
-import com.wl4g.rengine.common.entity.ScheduleJobLog.ResultInformation;
-import com.wl4g.rengine.common.entity.ScheduleTrigger;
-import com.wl4g.rengine.common.entity.ScheduleTrigger.ExecutionScheduleConfig;
-import com.wl4g.rengine.common.entity.ScheduleTrigger.RunState;
-import com.wl4g.rengine.common.entity.ScheduleTrigger.ScheduleType;
+import com.wl4g.rengine.common.entity.ControllerLog;
+import com.wl4g.rengine.common.entity.ControllerLog.ExecutionControllerLog;
+import com.wl4g.rengine.common.entity.ControllerLog.ResultInformation;
+import com.wl4g.rengine.common.entity.ControllerSchedule;
+import com.wl4g.rengine.common.entity.ControllerSchedule.GenericExecutionScheduleConfig;
+import com.wl4g.rengine.common.entity.ControllerSchedule.RunState;
+import com.wl4g.rengine.common.entity.ControllerSchedule.ScheduleType;
 import com.wl4g.rengine.common.model.ExecuteRequest;
 import com.wl4g.rengine.common.model.ExecuteResult;
 import com.wl4g.rengine.common.util.IdGenUtils;
@@ -63,7 +63,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 /**
- * {@link EngineExecutionScheduler}
+ * {@link EngineGenericExecutionController}
  * 
  * @author James Wong
  * @version 2023-01-11
@@ -71,7 +71,7 @@ import lombok.ToString;
  */
 @Getter
 @CustomLog
-public class EngineExecutionScheduler extends AbstractJobExecutor {
+public class EngineGenericExecutionController extends AbstractJobExecutor {
 
     private SafeScheduledTaskPoolExecutor executor;
 
@@ -80,7 +80,7 @@ public class EngineExecutionScheduler extends AbstractJobExecutor {
             synchronized (this) {
                 if (isNull(executor)) {
                     final EngineClientSchedulerProperties cr = getConfig().getClient();
-                    this.executor = newDefaultScheduledExecutor(EngineExecutionScheduler.class.getSimpleName(),
+                    this.executor = newDefaultScheduledExecutor(EngineGenericExecutionController.class.getSimpleName(),
                             cr.getConcurrency(), cr.getAcceptQueue());
                     log.info("Initialized schedule executor of concurrency: {}, acceptQueue: {}", cr.getConcurrency(),
                             cr.getAcceptQueue());
@@ -92,7 +92,7 @@ public class EngineExecutionScheduler extends AbstractJobExecutor {
 
     @Override
     public String getType() {
-        return ScheduleJobType.EXECUTION_SCHEDULER.name();
+        return ScheduleJobType.GENERIC_EXECUTION_CONTROLLER.name();
     }
 
     @Override
@@ -109,55 +109,55 @@ public class EngineExecutionScheduler extends AbstractJobExecutor {
             @NotNull ShardingContext context) throws Exception {
 
         final JobParameter jobParameter = notNullOf(parseJSON(jobConfig.getJobParameter(), JobParameter.class), "jobParameter");
-        final Long triggerId = notNullOf(jobParameter.getTriggerId(), "triggerId");
+        final Long scheduleId = notNullOf(jobParameter.getScheduleId(), "scheduleId");
 
-        updateTriggerRunState(triggerId, RunState.RUNNING);
-        final ScheduleJobLog jobLog = upsertSchedulingLog(triggerId, null, true, false, null, null);
+        updateTriggerRunState(scheduleId, RunState.RUNNING);
+        final ControllerLog controllerLog = upsertSchedulingLog(scheduleId, null, true, false, null, null);
 
-        final ScheduleTrigger trigger = notNullOf(getScheduleTriggerService().get(triggerId), "trigger");
-        final ExecutionScheduleConfig esc = ((ExecutionScheduleConfig) notNullOf(trigger.getProperties(), "cronTrigger"))
-                .validate();
+        final ControllerSchedule schedule = notNullOf(getControllerScheduleService().get(scheduleId), "trigger");
+        final GenericExecutionScheduleConfig gesc = ((GenericExecutionScheduleConfig) notNullOf(schedule.getProperties(),
+                "genericExecutionScheduleConfig")).validate();
 
         try {
-            log.info("Execution scheduling for : {}", trigger);
-            final List<ExecuteRequest> shardingRequests = getShardings(currentShardingTotalCount, context, jobParameter, esc);
+            log.info("Execution scheduling for : {}", schedule);
+            final List<ExecuteRequest> shardingRequests = getShardings(currentShardingTotalCount, context, jobParameter, gesc);
 
             // Build for execution jobs.
             final List<ExecutionWorker> jobs = shardingRequests.stream()
-                    .map(request -> new ExecutionWorker(currentShardingTotalCount, context, trigger.getId(), jobLog.getId(),
-                            getRengineClient(), request))
+                    .map(request -> new ExecutionWorker(currentShardingTotalCount, context, schedule.getId(),
+                            controllerLog.getId(), getRengineClient(), request))
                     .collect(toList());
 
             // Submit execute requests job wait for completed
-            doExecuteRequestJobs(trigger, jobLog, jobs, resultAndJobLog -> {
+            doExecuteRequestJobs(schedule, controllerLog, jobs, resultAndJobLog -> {
                 final Set<ResultInformation> results = (Set<ResultInformation>) resultAndJobLog.getItem1();
                 results.stream().forEach(rd -> rd.validate());
-                final ScheduleJobLog _jobLog = (ScheduleJobLog) resultAndJobLog.getItem2();
-                ((ExecutionScheduleJobLog) _jobLog.getDetail()).setResults(results);
+                final ControllerLog _jobLog = (ControllerLog) resultAndJobLog.getItem2();
+                ((ExecutionControllerLog) _jobLog.getDetail()).setResults(results);
             });
 
         } catch (Throwable ex) {
             final String errmsg = format(
-                    "Failed to executing requests job of currentShardingTotalCount: %s, context: %s, triggerId: %s, jobLogId: %s",
-                    currentShardingTotalCount, context, trigger.getId(), jobLog.getId());
+                    "Failed to executing requests job of currentShardingTotalCount: %s, context: %s, scheduleId: %s, jobLogId: %s",
+                    currentShardingTotalCount, context, schedule.getId(), controllerLog.getId());
             if (log.isDebugEnabled()) {
                 log.error(errmsg, ex);
             } else {
                 log.error(format("%s. - reason: %s", errmsg, ex.getMessage()));
             }
 
-            updateTriggerRunState(triggerId, RunState.FAILED);
-            upsertSchedulingLog(triggerId, jobLog.getId(), false, true, false, null);
+            updateTriggerRunState(scheduleId, RunState.FAILED);
+            upsertSchedulingLog(scheduleId, controllerLog.getId(), false, true, false, null);
         }
     }
 
-    protected ScheduleJobLog doExecuteRequestJobs(
-            final ScheduleTrigger trigger,
-            final ScheduleJobLog jobLog,
+    protected ControllerLog doExecuteRequestJobs(
+            final ControllerSchedule controllerSchedule,
+            final ControllerLog controllerLog,
             final List<ExecutionWorker> jobs,
             final Consumer<Tuple2> saveJobLogPrepared) {
 
-        final CompleteResult<ExecuteResult> result = getExecutor().submitForComplete(jobs, trigger.getMaxTimeoutMs());
+        final CompleteResult<ExecuteResult> result = getExecutor().submitForComplete(jobs, controllerSchedule.getMaxTimeoutMs());
         log.info("Completed for result: {}", result);
 
         final var completed = safeList(result.getCompleted()).stream().collect(toList());
@@ -184,20 +184,20 @@ public class EngineExecutionScheduler extends AbstractJobExecutor {
                         ((ExecutionWorker) ew).getResult().getResults()))
                 .collect(toList());
 
-        updateTriggerRunState(trigger.getId(), runState);
+        updateTriggerRunState(controllerSchedule.getId(), runState);
 
         final var mergedResultInfos = newHashSet(Iterables.concat(completedResultInfos, uncompletedResultInfos));
         log.debug("Merged result informations: {}", mergedResultInfos);
 
-        return upsertSchedulingLog(trigger.getId(), jobLog.getId(), false, true, runState.isSuccess(),
+        return upsertSchedulingLog(controllerSchedule.getId(), controllerLog.getId(), false, true, runState.isSuccess(),
                 _jobLog -> saveJobLogPrepared.accept(new Tuple2(mergedResultInfos, _jobLog)));
     }
 
     @Override
-    protected ScheduleJobLog newDefaultScheduleJobLog(final Long triggerId) {
-        return ScheduleJobLog.builder()
-                .triggerId(triggerId)
-                .detail(ExecutionScheduleJobLog.builder().type(ScheduleType.EXECUTION_SCHEDULER.name()).build())
+    protected ControllerLog newDefaultScheduleJobLog(final Long scheduleId) {
+        return ControllerLog.builder()
+                .scheduleId(scheduleId)
+                .detail(ExecutionControllerLog.builder().type(ScheduleType.GENERIC_EXECUTION_CONTROLLER.name()).build())
                 .build();
     }
 
@@ -205,7 +205,7 @@ public class EngineExecutionScheduler extends AbstractJobExecutor {
             final int currentShardingTotalCount,
             final ShardingContext context,
             final JobParameter jobParameter,
-            final ExecutionScheduleConfig ctc) {
+            final GenericExecutionScheduleConfig ctc) {
         // Assgin current sharding requests.
         final List<ExecuteRequest> totalRequests = safeList(ctc.getRequests());
         final List<ExecuteRequest> shardingRequests = new ArrayList<>(totalRequests.size());
@@ -222,17 +222,17 @@ public class EngineExecutionScheduler extends AbstractJobExecutor {
     public static class ExecutionWorker implements Callable<ExecuteResult> {
         private final int currentShardingTotalCount;
         private final ShardingContext context;
-        private final Long triggerId;
+        private final Long scheduleId;
         private final Long jobLogId;
         private final RengineClient rengineClient;
         private final ExecuteRequest request;
         private ExecuteResult result;
 
-        public ExecutionWorker(int currentShardingTotalCount, ShardingContext context, Long triggerId, Long jobLogId,
+        public ExecutionWorker(int currentShardingTotalCount, ShardingContext context, Long scheduleId, Long jobLogId,
                 RengineClient rengineClient, ExecuteRequest request) {
             this.currentShardingTotalCount = currentShardingTotalCount;
             this.context = notNullOf(context, "context");
-            this.triggerId = notNullOf(triggerId, "triggerId");
+            this.scheduleId = notNullOf(scheduleId, "scheduleId");
             this.jobLogId = notNullOf(jobLogId, "jobLogId");
             this.rengineClient = notNullOf(rengineClient, "rengineClient");
             this.request = notNullOf(request, "request");
@@ -252,8 +252,8 @@ public class EngineExecutionScheduler extends AbstractJobExecutor {
                         .build())));
             } catch (Throwable ex) {
                 final String errmsg = format(
-                        "Failed to executing request job of currentShardingTotalCount: %s, context: %s, triggerId: %s, jobLogId: %s, request: %s",
-                        currentShardingTotalCount, context, triggerId, jobLogId, request);
+                        "Failed to executing request job of currentShardingTotalCount: %s, context: %s, scheduleId: %s, jobLogId: %s, request: %s",
+                        currentShardingTotalCount, context, scheduleId, jobLogId, request);
                 if (log.isDebugEnabled()) {
                     log.error(errmsg, ex);
                 } else {
