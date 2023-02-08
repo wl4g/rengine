@@ -11,7 +11,7 @@
  Target Server Version : 40406
  File Encoding         : 65001
 
- Date: 08/02/2023 00:39:13
+ Date: 08/02/2023 23:16:12
 */
 
 
@@ -420,7 +420,7 @@ session.startTransaction();
 db = session.getDatabase("rengine");
 db.getCollection("t_rule_scripts").insert([ {
     _id: NumberLong("6150868953455678"),
-    revision: NumberLong("1"),
+    revision: NumberInt("1"),
     ruleId: NumberLong("6150869239922688"),
     uploadIds: [
         NumberLong("6150869710864384"),
@@ -431,7 +431,7 @@ db.getCollection("t_rule_scripts").insert([ {
     labels: [
         "test"
     ],
-    remark: "string",
+    remark: "test",
     createDate: ISODate("2022-09-27T04:50:22.304Z"),
     updateDate: ISODate("2022-09-27T04:50:22.304Z"),
     delFlag: NumberInt("0"),
@@ -895,7 +895,7 @@ db.getCollection("t_workflow_graphs").insert([ {
                 color: "#5f5f5f",
                 left: "10px"
             },
-            ruleId: "6169046602203136"
+            ruleId: "6150869239922688"
         },
         {
             "@type": "LOGICAL",
@@ -961,7 +961,7 @@ db.getCollection("t_workflow_graphs").insert([ {
                 color: "#5f5f5f",
                 left: "10px"
             },
-            ruleId: "6169046602203136"
+            ruleId: "6150869239922688"
         },
         {
             "@type": "RELATION",
@@ -972,7 +972,7 @@ db.getCollection("t_workflow_graphs").insert([ {
                 color: "#5f5f5f",
                 left: "10px"
             },
-            ruleId: "6169046602203136"
+            ruleId: "6150869239922688"
         },
         {
             "@type": "FAILBACK",
@@ -983,7 +983,7 @@ db.getCollection("t_workflow_graphs").insert([ {
                 color: "#5f5f5f",
                 left: "10px"
             },
-            ruleId: "6169046816178176"
+            ruleId: "6150869239922689"
         },
         {
             "@type": "RUN",
@@ -994,7 +994,7 @@ db.getCollection("t_workflow_graphs").insert([ {
                 color: "#5f5f5f",
                 left: "10px"
             },
-            ruleId: "6169046816178176"
+            ruleId: "6150869239922689"
         },
         {
             "@type": "RUN",
@@ -1005,7 +1005,7 @@ db.getCollection("t_workflow_graphs").insert([ {
                 color: "#5f5f5f",
                 left: "10px"
             },
-            ruleId: "6169046816178176"
+            ruleId: "6150869239922689"
         }
     ],
     connections: [
