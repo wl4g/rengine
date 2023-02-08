@@ -19,11 +19,11 @@ import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.entity.Rule;
-import com.wl4g.rengine.service.model.DeleteRule;
-import com.wl4g.rengine.service.model.DeleteRuleResult;
-import com.wl4g.rengine.service.model.QueryRule;
-import com.wl4g.rengine.service.model.SaveRule;
-import com.wl4g.rengine.service.model.SaveRuleResult;
+import com.wl4g.rengine.service.model.RuleDelete;
+import com.wl4g.rengine.service.model.RuleDeleteResult;
+import com.wl4g.rengine.service.model.RuleQuery;
+import com.wl4g.rengine.service.model.RuleSave;
+import com.wl4g.rengine.service.model.RuleSaveResult;
 
 /**
  * {@link RuleService}
@@ -34,10 +34,10 @@ import com.wl4g.rengine.service.model.SaveRuleResult;
  */
 public interface RuleService {
 
-    PageHolder<Rule> query(@NotNull QueryRule model);
+    PageHolder<Rule> query(@NotNull RuleQuery model);
 
-    SaveRuleResult save(@NotNull SaveRule model);
+    RuleSaveResult save(@NotNull RuleSave model);
 
-    DeleteRuleResult delete(@NotNull DeleteRule model);
+    RuleDeleteResult delete(@NotNull RuleDelete model);
 
 }

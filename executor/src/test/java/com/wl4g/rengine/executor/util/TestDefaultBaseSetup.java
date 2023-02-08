@@ -44,6 +44,7 @@ import com.mongodb.internal.connection.Cluster;
 import com.mongodb.internal.connection.DefaultClusterFactory;
 import com.mongodb.internal.connection.InternalConnectionPoolSettings;
 import com.mongodb.lang.Nullable;
+import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
 import com.wl4g.rengine.executor.repository.MongoRepository;
 
@@ -173,77 +174,78 @@ public abstract class TestDefaultBaseSetup {
                     }
 
                     @Override
-                    public @NotNull @Min(1) @Max(10240) Integer executorAcceptQueue() {
+                    public @NotNull @Min(1) @Max(1024) Integer executorAcceptQueue() {
                         return EngineConfig.DEFAULT_EXECUTOR_ACCEPT_QUEUE;
-                    }
-
-                    @Override
-                    public @NotNull @Min(0) @Max(1024) Integer perExecutorThreadPools() {
-                        return EngineConfig.DEFAULT_PER_EXECUTOR_THREAD_POOLS;
-                    }
-
-                    @Override
-                    public @NotNull @Min(0) @Max(100000) Integer maxQueryBatch() {
-                        return EngineConfig.DEFAULT_MAX_QUERY_BATCH;
                     }
 
                     @Override
                     public @NotNull @Min(0) @Max(1) Float executeTimeoutOffsetRate() {
                         return EngineConfig.DEFAULT_TIMEOUT_OFFSET_RATE;
                     }
+
+                    @Override
+                    public @NotNull ScriptLogConfig log() {
+                        return new ScriptLogConfig() {
+                            @Override
+                            public @NotBlank String baseDir() {
+                                return RengineConstants.DEFAULT_EXECUTOR_SCRIPT_LOG_BASE_DIR;
+                            }
+
+                            @Override
+                            public @NotNull Boolean enableConsole() {
+                                return ScriptLogConfig.DEFAULT_SCRIPT_LOG_ENABLE_CONSOLE;
+                            }
+
+                            @Override
+                            public @NotNull @Min(1024) Integer fileMaxSize() {
+                                return ScriptLogConfig.DEFAULT_SCRIPT_LOG_FILE_MAX_SIZE;
+                            }
+
+                            @Override
+                            public @NotNull @Min(1) Integer fileMaxCount() {
+                                return ScriptLogConfig.DEFAULT_SCRIPT_LOG_FILE_MAX_COUNT;
+                            }
+
+                            @Override
+                            public @NotBlank String uploaderCron() {
+                                return ScriptLogConfig.DEFAULT_SCRIPT_LOG_UPLOADER_CRON;
+                            }
+                        };
+                    }
+
+                    @Override
+                    public @NotNull SdkNotifierConfig notifier() {
+                        return new SdkNotifierConfig() {
+
+                            @Override
+                            public @NotNull @Min(0) Long refreshLockTimeout() {
+                                return SdkNotifierConfig.DEFAULT_NOTIFIER_REFRESH_LOCK_TIMEOUT;
+                            }
+
+                            @Override
+                            public @NotBlank String refreshedCachedPrefix() {
+                                return SdkNotifierConfig.DEFAULT_NOTIFIER_REFRESHED_CACHED_PREFIX;
+                            }
+
+                            @Override
+                            public @NotNull @Min(0) @Max(1) Float refreshedCachedExpireOffsetRate() {
+                                return SdkNotifierConfig.DEFAULT_NOTIFIER_EXPIRE_OFFSET_RATE;
+                            }
+                        };
+                    }
+
+                    @Override
+                    public @NotNull SdkExecutorConfig executor() {
+                        return new SdkExecutorConfig() {
+                            @Override
+                            public @NotNull @Min(0) @Max(1024) Integer perExecutorThreadPools() {
+                                return SdkExecutorConfig.DEFAULT_PER_EXECUTOR_THREAD_POOLS;
+                            }
+                        };
+                    }
                 };
             }
 
-            @Override
-            public @NotNull ScriptLogConfig log() {
-                return new ScriptLogConfig() {
-                    @Override
-                    public @NotBlank String baseDir() {
-                        return ScriptLogConfig.DEFAULT_SCRIPT_LOG_BASE_DIR;
-                    }
-
-                    @Override
-                    public @NotNull Boolean enableConsole() {
-                        return ScriptLogConfig.DEFAULT_SCRIPT_LOG_ENABLE_CONSOLE;
-                    }
-
-                    @Override
-                    public @NotNull @Min(1024) Integer fileMaxSize() {
-                        return ScriptLogConfig.DEFAULT_SCRIPT_LOG_FILE_MAX_SIZE;
-                    }
-
-                    @Override
-                    public @NotNull @Min(1) Integer fileMaxCount() {
-                        return ScriptLogConfig.DEFAULT_SCRIPT_LOG_FILE_MAX_COUNT;
-                    }
-
-                    @Override
-                    public @NotBlank String uploaderCron() {
-                        return ScriptLogConfig.DEFAULT_SCRIPT_LOG_UPLOADER_CRON;
-                    }
-                };
-            }
-
-            @Override
-            public @NotNull NotifierConfig notifier() {
-                return new NotifierConfig() {
-
-                    @Override
-                    public @NotNull @Min(0) Long refreshLockTimeout() {
-                        return NotifierConfig.DEFAULT_NOTIFIER_REFRESH_LOCK_TIMEOUT;
-                    }
-
-                    @Override
-                    public @NotBlank String refreshedCachedPrefix() {
-                        return NotifierConfig.DEFAULT_NOTIFIER_REFRESHED_CACHED_PREFIX;
-                    }
-
-                    @Override
-                    public @NotNull @Min(0) @Max(1) Float refreshedCachedExpireOffsetRate() {
-                        return NotifierConfig.DEFAULT_NOTIFIER_EXPIRE_OFFSET_RATE;
-                    }
-                };
-            }
         };
     }
 

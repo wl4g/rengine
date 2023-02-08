@@ -29,11 +29,11 @@ import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.common.entity.Workflow;
 import com.wl4g.rengine.service.WorkflowService;
-import com.wl4g.rengine.service.model.DeleteWorkflow;
-import com.wl4g.rengine.service.model.DeleteWorkflowResult;
-import com.wl4g.rengine.service.model.QueryWorkflow;
-import com.wl4g.rengine.service.model.SaveWorkflow;
-import com.wl4g.rengine.service.model.SaveWorkflowResult;
+import com.wl4g.rengine.service.model.WorkflowDelete;
+import com.wl4g.rengine.service.model.WorkflowDeleteResult;
+import com.wl4g.rengine.service.model.WorkflowQuery;
+import com.wl4g.rengine.service.model.WorkflowSave;
+import com.wl4g.rengine.service.model.WorkflowSaveResult;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -60,8 +60,8 @@ public class WorkflowController {
     @Operation(description = "Query workflows.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
-    public RespBase<PageHolder<Workflow>> query(@Validated QueryWorkflow model) {
-        log.info("called: model={}", model);
+    public RespBase<PageHolder<Workflow>> query(@Validated WorkflowQuery model) {
+        log.debug("called: model={}", model);
         RespBase<PageHolder<Workflow>> resp = RespBase.create();
         resp.setData(workflowService.query(model));
         return resp;
@@ -71,9 +71,9 @@ public class WorkflowController {
     @Operation(description = "Save workflow.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    public RespBase<SaveWorkflowResult> save(@Validated @RequestBody SaveWorkflow model) {
-        log.info("called: model={}", model);
-        RespBase<SaveWorkflowResult> resp = RespBase.create();
+    public RespBase<WorkflowSaveResult> save(@Validated @RequestBody WorkflowSave model) {
+        log.debug("called: model={}", model);
+        RespBase<WorkflowSaveResult> resp = RespBase.create();
         resp.setData(workflowService.save(model));
         return resp;
     }
@@ -82,9 +82,9 @@ public class WorkflowController {
     @Operation(description = "Delete workflow.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
-    public RespBase<DeleteWorkflowResult> delete(@Validated @RequestBody DeleteWorkflow model) {
-        log.info("called: model={}", model);
-        RespBase<DeleteWorkflowResult> resp = RespBase.create();
+    public RespBase<WorkflowDeleteResult> delete(@Validated @RequestBody WorkflowDelete model) {
+        log.debug("called: model={}", model);
+        RespBase<WorkflowDeleteResult> resp = RespBase.create();
         resp.setData(workflowService.delete(model));
         return resp;
     }

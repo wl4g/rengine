@@ -26,10 +26,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.service.NotificationService;
-import com.wl4g.rengine.service.model.QueryNotification;
-import com.wl4g.rengine.service.model.QueryNotificationResult;
-import com.wl4g.rengine.service.model.SaveNotification;
-import com.wl4g.rengine.service.model.SaveNotificationResult;
+import com.wl4g.rengine.service.model.NotificationQuery;
+import com.wl4g.rengine.service.model.NotificationQueryResult;
+import com.wl4g.rengine.service.model.NotificationSave;
+import com.wl4g.rengine.service.model.NotificationSaveResult;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -56,9 +56,9 @@ public class NotificationController {
     @Operation(description = "Query notification settings.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
-    public RespBase<QueryNotificationResult> query(@Validated QueryNotification model) {
-        log.info("called: model={}", model);
-        RespBase<QueryNotificationResult> resp = RespBase.create();
+    public RespBase<NotificationQueryResult> query(@Validated NotificationQuery model) {
+        log.debug("called: model={}", model);
+        RespBase<NotificationQueryResult> resp = RespBase.create();
         resp.setData(notificationService.query(model));
         return resp;
     }
@@ -67,9 +67,9 @@ public class NotificationController {
     @Operation(description = "Save notification settings.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    public RespBase<SaveNotificationResult> save(@Validated @RequestBody SaveNotification model) {
-        log.info("called: model={}", model);
-        RespBase<SaveNotificationResult> resp = RespBase.create();
+    public RespBase<NotificationSaveResult> save(@Validated @RequestBody NotificationSave model) {
+        log.debug("called: model={}", model);
+        RespBase<NotificationSaveResult> resp = RespBase.create();
         resp.setData(notificationService.save(model));
         return resp;
     }

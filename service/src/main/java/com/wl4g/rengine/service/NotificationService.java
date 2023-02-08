@@ -17,10 +17,10 @@ package com.wl4g.rengine.service;
 
 import javax.validation.constraints.NotNull;
 
-import com.wl4g.rengine.service.model.QueryNotification;
-import com.wl4g.rengine.service.model.QueryNotificationResult;
-import com.wl4g.rengine.service.model.SaveNotification;
-import com.wl4g.rengine.service.model.SaveNotificationResult;
+import com.wl4g.rengine.service.model.NotificationQuery;
+import com.wl4g.rengine.service.model.NotificationQueryResult;
+import com.wl4g.rengine.service.model.NotificationSave;
+import com.wl4g.rengine.service.model.NotificationSaveResult;
 
 /**
  * {@link NotificationService}
@@ -31,8 +31,8 @@ import com.wl4g.rengine.service.model.SaveNotificationResult;
  */
 public interface NotificationService {
 
-    QueryNotificationResult query(@NotNull QueryNotification model);
+    NotificationQueryResult query(@NotNull NotificationQuery model);
 
-    SaveNotificationResult save(@NotNull SaveNotification model);
+    NotificationSaveResult save(@NotNull NotificationSave model);
 
 }

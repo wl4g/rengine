@@ -49,10 +49,10 @@ import com.wl4g.rengine.service.UploadService;
 import com.wl4g.rengine.service.minio.MinioClientManager;
 import com.wl4g.rengine.service.minio.MinioClientProperties;
 import com.wl4g.rengine.service.model.DeleteUpload;
-import com.wl4g.rengine.service.model.DeleteUploadResult;
-import com.wl4g.rengine.service.model.QueryUpload;
-import com.wl4g.rengine.service.model.SaveUpload;
-import com.wl4g.rengine.service.model.SaveUploadResult;
+import com.wl4g.rengine.service.model.UploadDeleteResult;
+import com.wl4g.rengine.service.model.UploadQuery;
+import com.wl4g.rengine.service.model.UploadSave;
+import com.wl4g.rengine.service.model.UploadSaveResult;
 
 import io.minio.credentials.Credentials;
 
@@ -71,7 +71,7 @@ public class UploadServiceImpl implements UploadService {
     private @Autowired(required = false) MinioClientManager minioManager;
 
     @Override
-    public PageHolder<UploadObject> query(QueryUpload model) {
+    public PageHolder<UploadObject> query(UploadQuery model) {
         final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getUploadId()),
                 isCriteria("uploadType", model.getUploadType())))
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
@@ -87,7 +87,7 @@ public class UploadServiceImpl implements UploadService {
                 .withRecords(uploads);
     }
 
-    public SaveUploadResult apply(SaveUpload model) {
+    public UploadSaveResult apply(UploadSave model) {
         // Authentication authentication =
         // SecurityContextHolder.getContext().getAuthentication();
         // System.out.println(authentication);
@@ -126,7 +126,7 @@ public class UploadServiceImpl implements UploadService {
         try {
             Credentials credentials = minioManager.createSTSCredentials(objectPrefix);
             final MinioClientProperties config = minioManager.getConfig();
-            return SaveUploadResult.builder()
+            return UploadSaveResult.builder()
                     .id(upload.getId())
                     .endpoint(config.getEndpoint())
                     .region(minioManager.getConfig().getRegion())
@@ -146,11 +146,11 @@ public class UploadServiceImpl implements UploadService {
     }
 
     @Override
-    public DeleteUploadResult delete(DeleteUpload model) {
+    public UploadDeleteResult delete(DeleteUpload model) {
         // 'id' is a keyword, it will be automatically converted to '_id'
         DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
                 MongoCollectionDefinition.T_UPLOADS.getName());
-        return DeleteUploadResult.builder().deletedCount(result.getDeletedCount()).build();
+        return UploadDeleteResult.builder().deletedCount(result.getDeletedCount()).build();
     }
 
 }

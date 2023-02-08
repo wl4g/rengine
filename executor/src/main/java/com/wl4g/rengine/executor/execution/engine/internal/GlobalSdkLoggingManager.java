@@ -83,8 +83,8 @@ public class GlobalSdkLoggingManager {
             final String triggerId = "trigger-".concat(ScriptLoggingUploader.class.getSimpleName())
                     .concat("@")
                     .concat(getClass().getSimpleName());
-            final var uploaderTrigger = QuartzUtils2.newDefaultJobTrigger(triggerId, executionConfig.log().uploaderCron(), true,
-                    new JobDataMap() {
+            final var uploaderTrigger = QuartzUtils2.newDefaultJobTrigger(triggerId,
+                    executionConfig.engine().log().uploaderCron(), true, new JobDataMap() {
                         private static final long serialVersionUID = 1L;
                         {
                             put(ExecutionConfig.class.getName(), executionConfig);
@@ -116,11 +116,11 @@ public class GlobalSdkLoggingManager {
             notNullOf(minioConfig, "minioConfig");
 
             // Scanner all script logs upload to MinIO.
-            getAllLogDirs(config.log().baseDir(), false).parallelStream().forEach(dirname -> {
+            getAllLogDirs(config.engine().log().baseDir(), false).parallelStream().forEach(dirname -> {
                 final Long workflowId = notNullOf(parseLongOrNull(dirname), "workflowId");
                 log.info("Scan script log dir for workflowId: {}", workflowId);
 
-                getAllLogFilenames(config.log().baseDir(), workflowId, true).parallelStream()
+                getAllLogFilenames(config.engine().log().baseDir(), workflowId, true).parallelStream()
                         .map(f -> new File(f))
                         // TODO
                         // 1) S3/minio limit min size for 5MB.

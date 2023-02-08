@@ -26,10 +26,10 @@ import javax.validation.constraints.NotNull;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.collection.CollectionUtils2;
 import com.wl4g.rengine.common.entity.ScheduleTrigger;
-import com.wl4g.rengine.service.model.DeleteScheduleTrigger;
-import com.wl4g.rengine.service.model.DeleteScheduleTriggerResult;
-import com.wl4g.rengine.service.model.QueryScheduleTrigger;
-import com.wl4g.rengine.service.model.SaveScheduleTriggerResult;
+import com.wl4g.rengine.service.model.ScheduleTriggerDelete;
+import com.wl4g.rengine.service.model.ScheduleTriggerDeleteResult;
+import com.wl4g.rengine.service.model.ScheduleTriggerQuery;
+import com.wl4g.rengine.service.model.ScheduleTriggerSaveResult;
 
 /**
  * {@link ScheduleTriggerService}
@@ -42,22 +42,22 @@ public interface ScheduleTriggerService {
 
     default ScheduleTrigger get(Long triggerId) {
         notNullOf(triggerId, "triggerId");
-        final PageHolder<ScheduleTrigger> result = query(QueryScheduleTrigger.builder().triggerId(triggerId).build());
+        final PageHolder<ScheduleTrigger> result = query(ScheduleTriggerQuery.builder().triggerId(triggerId).build());
         if (isNull(result) || CollectionUtils2.isEmpty(result.getRecords())) {
             throw new IllegalArgumentException(format("No found schedule trigger by %s", triggerId));
         }
         return result.getRecords().get(0);
     }
 
-    PageHolder<ScheduleTrigger> query(@NotNull QueryScheduleTrigger model);
+    PageHolder<ScheduleTrigger> query(@NotNull ScheduleTriggerQuery model);
 
     List<ScheduleTrigger> findWithSharding(
-            @NotNull QueryScheduleTrigger model,
+            @NotNull ScheduleTriggerQuery model,
             @NotNull Integer divisor,
             @NotNull Integer remainder);
 
-    SaveScheduleTriggerResult save(@NotNull ScheduleTrigger model);
+    ScheduleTriggerSaveResult save(@NotNull ScheduleTrigger model);
 
-    DeleteScheduleTriggerResult delete(@NotNull DeleteScheduleTrigger model);
+    ScheduleTriggerDeleteResult delete(@NotNull ScheduleTriggerDelete model);
 
 }

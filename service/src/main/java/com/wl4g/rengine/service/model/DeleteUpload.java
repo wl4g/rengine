@@ -33,5 +33,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class DeleteUpload extends DeleteBase {
+public class DeleteUpload extends BaseDelete {
 }

@@ -19,11 +19,11 @@ import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.entity.Workflow;
-import com.wl4g.rengine.service.model.DeleteWorkflow;
-import com.wl4g.rengine.service.model.DeleteWorkflowResult;
-import com.wl4g.rengine.service.model.QueryWorkflow;
-import com.wl4g.rengine.service.model.SaveWorkflow;
-import com.wl4g.rengine.service.model.SaveWorkflowResult;
+import com.wl4g.rengine.service.model.WorkflowDelete;
+import com.wl4g.rengine.service.model.WorkflowDeleteResult;
+import com.wl4g.rengine.service.model.WorkflowQuery;
+import com.wl4g.rengine.service.model.WorkflowSave;
+import com.wl4g.rengine.service.model.WorkflowSaveResult;
 
 /**
  * {@link WorkflowService}
@@ -34,10 +34,10 @@ import com.wl4g.rengine.service.model.SaveWorkflowResult;
  */
 public interface WorkflowService {
 
-    PageHolder<Workflow> query(@NotNull QueryWorkflow model);
+    PageHolder<Workflow> query(@NotNull WorkflowQuery model);
 
-    SaveWorkflowResult save(@NotNull SaveWorkflow model);
+    WorkflowSaveResult save(@NotNull WorkflowSave model);
 
-    DeleteWorkflowResult delete(@NotNull DeleteWorkflow model);
+    WorkflowDeleteResult delete(@NotNull WorkflowDelete model);
 
 }

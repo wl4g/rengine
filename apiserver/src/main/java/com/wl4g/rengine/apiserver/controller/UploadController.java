@@ -31,10 +31,10 @@ import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.common.entity.UploadObject;
 import com.wl4g.rengine.service.UploadService;
 import com.wl4g.rengine.service.model.DeleteUpload;
-import com.wl4g.rengine.service.model.DeleteUploadResult;
-import com.wl4g.rengine.service.model.QueryUpload;
-import com.wl4g.rengine.service.model.SaveUpload;
-import com.wl4g.rengine.service.model.SaveUploadResult;
+import com.wl4g.rengine.service.model.UploadDeleteResult;
+import com.wl4g.rengine.service.model.UploadQuery;
+import com.wl4g.rengine.service.model.UploadSave;
+import com.wl4g.rengine.service.model.UploadSaveResult;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -63,8 +63,8 @@ public class UploadController {
     @Operation(description = "Query upload files.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
-    public RespBase<PageHolder<UploadObject>> query(@Validated QueryUpload model) {
-        log.info("called: model={}", model);
+    public RespBase<PageHolder<UploadObject>> query(@Validated UploadQuery model) {
+        log.debug("called: model={}", model);
         RespBase<PageHolder<UploadObject>> resp = RespBase.create();
         resp.setData(uploadService.query(model));
         return resp;
@@ -75,9 +75,9 @@ public class UploadController {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful",
             content = { @Content(mediaType = "application/json") }) })
     @RequestMapping(path = { "apply" }, method = { POST })
-    public RespBase<SaveUploadResult> apply(@Validated @RequestBody SaveUpload model) {
-        log.info("called: model={}", model);
-        RespBase<SaveUploadResult> resp = RespBase.create();
+    public RespBase<UploadSaveResult> apply(@Validated @RequestBody UploadSave model) {
+        log.debug("called: model={}", model);
+        RespBase<UploadSaveResult> resp = RespBase.create();
         resp.setData(uploadService.apply(model));
         return resp;
     }
@@ -86,9 +86,9 @@ public class UploadController {
     @Operation(description = "Delete upload.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
-    public RespBase<DeleteUploadResult> delete(@Validated @RequestBody DeleteUpload model) {
-        log.info("called: model={}", model);
-        RespBase<DeleteUploadResult> resp = RespBase.create();
+    public RespBase<UploadDeleteResult> delete(@Validated @RequestBody DeleteUpload model) {
+        log.debug("called: model={}", model);
+        RespBase<UploadDeleteResult> resp = RespBase.create();
         resp.setData(uploadService.delete(model));
         return resp;
     }

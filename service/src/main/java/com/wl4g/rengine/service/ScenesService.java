@@ -19,11 +19,11 @@ import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.entity.Scenes;
-import com.wl4g.rengine.service.model.DeleteScenes;
-import com.wl4g.rengine.service.model.DeleteScenesResult;
-import com.wl4g.rengine.service.model.QueryScenes;
-import com.wl4g.rengine.service.model.SaveScenes;
-import com.wl4g.rengine.service.model.SaveScenesResult;
+import com.wl4g.rengine.service.model.ScenesDelete;
+import com.wl4g.rengine.service.model.ScenesDeleteResult;
+import com.wl4g.rengine.service.model.ScenesQuery;
+import com.wl4g.rengine.service.model.ScenesSave;
+import com.wl4g.rengine.service.model.ScenesSaveResult;
 
 /**
  * {@link ScenesService}
@@ -34,10 +34,10 @@ import com.wl4g.rengine.service.model.SaveScenesResult;
  */
 public interface ScenesService {
 
-    PageHolder<Scenes> query(@NotNull QueryScenes model);
+    PageHolder<Scenes> query(@NotNull ScenesQuery model);
 
-    SaveScenesResult save(@NotNull SaveScenes model);
+    ScenesSaveResult save(@NotNull ScenesSave model);
 
-    DeleteScenesResult delete(@NotNull DeleteScenes model);
+    ScenesDeleteResult delete(@NotNull ScenesDelete model);
 
 }

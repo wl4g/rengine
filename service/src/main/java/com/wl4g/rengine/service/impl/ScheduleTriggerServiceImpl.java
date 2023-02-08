@@ -42,10 +42,10 @@ import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinit
 import com.wl4g.rengine.common.entity.ScheduleTrigger;
 import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.service.ScheduleTriggerService;
-import com.wl4g.rengine.service.model.DeleteScheduleTrigger;
-import com.wl4g.rengine.service.model.DeleteScheduleTriggerResult;
-import com.wl4g.rengine.service.model.QueryScheduleTrigger;
-import com.wl4g.rengine.service.model.SaveScheduleTriggerResult;
+import com.wl4g.rengine.service.model.ScheduleTriggerDelete;
+import com.wl4g.rengine.service.model.ScheduleTriggerDeleteResult;
+import com.wl4g.rengine.service.model.ScheduleTriggerQuery;
+import com.wl4g.rengine.service.model.ScheduleTriggerSaveResult;
 
 /**
  * {@link ScheduleTriggerServiceImpl}
@@ -60,7 +60,7 @@ public class ScheduleTriggerServiceImpl implements ScheduleTriggerService {
     private @Autowired MongoTemplate mongoTemplate;
 
     @Override
-    public PageHolder<ScheduleTrigger> query(QueryScheduleTrigger model) {
+    public PageHolder<ScheduleTrigger> query(ScheduleTriggerQuery model) {
         final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getTriggerId()),
                 isCriteria("properties.type", model.getType())))
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
@@ -75,7 +75,7 @@ public class ScheduleTriggerServiceImpl implements ScheduleTriggerService {
 
     @Override
     public List<ScheduleTrigger> findWithSharding(
-            final @NotNull QueryScheduleTrigger model,
+            final @NotNull ScheduleTriggerQuery model,
             final @NotNull Integer divisor,
             final @NotNull Integer remainder) {
 
@@ -90,7 +90,7 @@ public class ScheduleTriggerServiceImpl implements ScheduleTriggerService {
     }
 
     @Override
-    public SaveScheduleTriggerResult save(ScheduleTrigger model) {
+    public ScheduleTriggerSaveResult save(ScheduleTrigger model) {
         ScheduleTrigger trigger = model;
         notNullOf(trigger, "trigger");
 
@@ -102,15 +102,15 @@ public class ScheduleTriggerServiceImpl implements ScheduleTriggerService {
         }
 
         ScheduleTrigger saved = mongoTemplate.save(trigger, MongoCollectionDefinition.T_SCHEDULE_TRIGGER.getName());
-        return SaveScheduleTriggerResult.builder().id(saved.getId()).build();
+        return ScheduleTriggerSaveResult.builder().id(saved.getId()).build();
     }
 
     @Override
-    public DeleteScheduleTriggerResult delete(DeleteScheduleTrigger model) {
+    public ScheduleTriggerDeleteResult delete(ScheduleTriggerDelete model) {
         // 'id' is a keyword, it will be automatically converted to '_id'
         DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
                 MongoCollectionDefinition.T_SCHEDULE_TRIGGER.getName());
-        return DeleteScheduleTriggerResult.builder().deletedCount(result.getDeletedCount()).build();
+        return ScheduleTriggerDeleteResult.builder().deletedCount(result.getDeletedCount()).build();
     }
 
 }

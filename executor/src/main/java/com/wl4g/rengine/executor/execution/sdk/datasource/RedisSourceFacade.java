@@ -317,7 +317,7 @@ public class RedisSourceFacade implements DataSourceFacade {
     private void checkPermission(final @NotBlank String key, final boolean forUpdate) {
         if (forUpdate) {
             if (startsWithAny(key, executionConfig.engine().scenesRulesCachedPrefix(),
-                    executionConfig.service().dictCachedPrefix(), executionConfig.notifier().refreshedCachedPrefix())) {
+                    executionConfig.service().dictCachedPrefix(), executionConfig.engine().notifier().refreshedCachedPrefix())) {
                 throw new RengineException(format("Forbidden to modify system cache prefix of '%s'", key));
             }
         }

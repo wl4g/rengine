@@ -29,11 +29,11 @@ import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.common.entity.RuleScript;
 import com.wl4g.rengine.service.RuleScriptService;
-import com.wl4g.rengine.service.model.DeleteRuleScript;
-import com.wl4g.rengine.service.model.DeleteRuleScriptResult;
-import com.wl4g.rengine.service.model.QueryRuleScript;
-import com.wl4g.rengine.service.model.SaveRuleScript;
-import com.wl4g.rengine.service.model.SaveRuleScriptResult;
+import com.wl4g.rengine.service.model.RuleScriptDelete;
+import com.wl4g.rengine.service.model.RuleScriptDeleteResult;
+import com.wl4g.rengine.service.model.RuleScriptQuery;
+import com.wl4g.rengine.service.model.RuleScriptSave;
+import com.wl4g.rengine.service.model.RuleScriptSaveResult;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -62,8 +62,8 @@ public class RuleScriptController {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful",
             content = { @Content(mediaType = "application/json") }) })
     @RequestMapping(path = { "query" }, method = { GET })
-    public RespBase<PageHolder<RuleScript>> query(@Validated QueryRuleScript model) {
-        log.info("called: model={}", model);
+    public RespBase<PageHolder<RuleScript>> query(@Validated RuleScriptQuery model) {
+        log.debug("called: model={}", model);
         RespBase<PageHolder<RuleScript>> resp = RespBase.create();
         resp.setData(ruleScriptService.query(model));
         return resp;
@@ -73,9 +73,9 @@ public class RuleScriptController {
     @Operation(description = "Save rule script.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    public RespBase<SaveRuleScriptResult> save(@Validated @RequestBody SaveRuleScript model) {
-        log.info("called: model={}", model);
-        RespBase<SaveRuleScriptResult> resp = RespBase.create();
+    public RespBase<RuleScriptSaveResult> save(@Validated @RequestBody RuleScriptSave model) {
+        log.debug("called: model={}", model);
+        RespBase<RuleScriptSaveResult> resp = RespBase.create();
         resp.setData(ruleScriptService.save(model));
         return resp;
     }
@@ -84,9 +84,9 @@ public class RuleScriptController {
     @Operation(description = "Delete rule script.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
-    public RespBase<DeleteRuleScriptResult> delete(@Validated @RequestBody DeleteRuleScript model) {
-        log.info("called: model={}", model);
-        RespBase<DeleteRuleScriptResult> resp = RespBase.create();
+    public RespBase<RuleScriptDeleteResult> delete(@Validated @RequestBody RuleScriptDelete model) {
+        log.debug("called: model={}", model);
+        RespBase<RuleScriptDeleteResult> resp = RespBase.create();
         resp.setData(ruleScriptService.delete(model));
         return resp;
     }

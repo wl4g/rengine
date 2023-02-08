@@ -55,11 +55,11 @@ import com.wl4g.rengine.common.entity.Dict;
 import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.service.DictService;
 import com.wl4g.rengine.service.config.RengineServiceProperties;
-import com.wl4g.rengine.service.model.DeleteDict;
-import com.wl4g.rengine.service.model.DeleteDictResult;
-import com.wl4g.rengine.service.model.QueryDict;
-import com.wl4g.rengine.service.model.SaveDict;
-import com.wl4g.rengine.service.model.SaveDictResult;
+import com.wl4g.rengine.service.model.DictDelete;
+import com.wl4g.rengine.service.model.DictDeleteResult;
+import com.wl4g.rengine.service.model.DictQuery;
+import com.wl4g.rengine.service.model.DictSave;
+import com.wl4g.rengine.service.model.DictSaveResult;
 
 import lombok.CustomLog;
 
@@ -92,12 +92,12 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
-    public PageHolder<Dict> query(QueryDict model) {
+    public PageHolder<Dict> query(DictQuery model) {
         List<Dict> dicts = null;
 
         // The first priority get single from cache.
         if (nonNull(model.getType()) && !isBlank(model.getKey())) {
-            final Dict dict = parseJSON(hashOperations.get(config.getService().getDictCachedPrefix(),
+            final Dict dict = parseJSON(hashOperations.get(config.getDict().getDictCachedPrefix(),
                     Dict.buildCacheHashKey(model.getType().name(), model.getKey())), Dict.class);
             if (nonNull(dict)) {
                 dicts = singletonList(dict);
@@ -105,7 +105,7 @@ public class DictServiceImpl implements DictService {
         }
         // The second priority get all from cache, and filter.
         else if (isNull(model.getType()) || isBlank(model.getKey())) {
-            final Map<String, String> allDictJsonMap = hashOperations.entries(config.getService().getDictCachedPrefix());
+            final Map<String, String> allDictJsonMap = hashOperations.entries(config.getDict().getDictCachedPrefix());
             dicts = safeMap(allDictJsonMap).entrySet()
                     .parallelStream()
                     .map(e -> parseJSON(e.getValue(), Dict.class))
@@ -159,7 +159,7 @@ public class DictServiceImpl implements DictService {
 
             // Save to cache.
             safeList(dicts).parallelStream().forEach(dict -> {
-                hashOperations.put(config.getService().getDictCachedPrefix(),
+                hashOperations.put(config.getDict().getDictCachedPrefix(),
                         Dict.buildCacheHashKey(dict.getType().name(), dict.getKey()), toJSONString(dict));
             });
         }
@@ -171,7 +171,7 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
-    public SaveDictResult save(SaveDict model) {
+    public DictSaveResult save(DictSave model) {
         Dict dicts = model;
         notNullOf(dicts, "dicts");
 
@@ -186,17 +186,17 @@ public class DictServiceImpl implements DictService {
 
         // Save to cached.
         if (nonNull(saved.getId()) && saved.getId() > 0) {
-            hashOperations.put(config.getService().getDictCachedPrefix(),
+            hashOperations.put(config.getDict().getDictCachedPrefix(),
                     Dict.buildCacheHashKey(saved.getType().name(), saved.getKey()), toJSONString(saved));
             // Sets cached expire.
             setDictCachedExpire();
         }
 
-        return SaveDictResult.builder().id(saved.getId()).build();
+        return DictSaveResult.builder().id(saved.getId()).build();
     }
 
     @Override
-    public DeleteDictResult delete(DeleteDict model) {
+    public DictDeleteResult delete(DictDelete model) {
         final Query idQuery = new Query(isIdCriteria(model.getId()));
 
         // Gets pre deletion dict for cache.
@@ -212,15 +212,15 @@ public class DictServiceImpl implements DictService {
                     log.warn("Failed to remove cache for dict : {}, {}", preDelete.getType(), preDelete.getKey());
                 }
             }
-            return DeleteDictResult.builder().deletedCount(result.getDeletedCount()).build();
+            return DictDeleteResult.builder().deletedCount(result.getDeletedCount()).build();
         }
         log.warn("Cannot delete non-existent dict for : {}", model.getId());
 
-        return DeleteDictResult.builder().deletedCount(0L).build();
+        return DictDeleteResult.builder().deletedCount(0L).build();
     }
 
     private Boolean setDictCachedExpire() {
-        return redisTemplate.expire(config.getService().getDictCachedPrefix(), config.getService().getDictCachedExpire(),
+        return redisTemplate.expire(config.getDict().getDictCachedPrefix(), config.getDict().getDictCachedExpire(),
                 TimeUnit.MILLISECONDS);
     }
 

@@ -29,11 +29,11 @@ import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.common.entity.Scenes;
 import com.wl4g.rengine.service.ScenesService;
-import com.wl4g.rengine.service.model.DeleteScenes;
-import com.wl4g.rengine.service.model.DeleteScenesResult;
-import com.wl4g.rengine.service.model.QueryScenes;
-import com.wl4g.rengine.service.model.SaveScenes;
-import com.wl4g.rengine.service.model.SaveScenesResult;
+import com.wl4g.rengine.service.model.ScenesDelete;
+import com.wl4g.rengine.service.model.ScenesDeleteResult;
+import com.wl4g.rengine.service.model.ScenesQuery;
+import com.wl4g.rengine.service.model.ScenesSave;
+import com.wl4g.rengine.service.model.ScenesSaveResult;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -60,8 +60,8 @@ public class ScenesController {
     @Operation(description = "Query sceneses.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
-    public RespBase<PageHolder<Scenes>> query(@Validated QueryScenes model) {
-        log.info("called: model={}", model);
+    public RespBase<PageHolder<Scenes>> query(@Validated ScenesQuery model) {
+        log.debug("called: model={}", model);
         RespBase<PageHolder<Scenes>> resp = RespBase.create();
         resp.setData(scenesService.query(model));
         return resp;
@@ -71,9 +71,9 @@ public class ScenesController {
     @Operation(description = "Save scenes.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    public RespBase<SaveScenesResult> save(@Validated @RequestBody SaveScenes model) {
-        log.info("called: model={}", model);
-        RespBase<SaveScenesResult> resp = RespBase.create();
+    public RespBase<ScenesSaveResult> save(@Validated @RequestBody ScenesSave model) {
+        log.debug("called: model={}", model);
+        RespBase<ScenesSaveResult> resp = RespBase.create();
         resp.setData(scenesService.save(model));
         return resp;
     }
@@ -82,9 +82,9 @@ public class ScenesController {
     @Operation(description = "Delete scenes.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
-    public RespBase<DeleteScenesResult> delete(@Validated @RequestBody DeleteScenes model) {
-        log.info("called: model={}", model);
-        RespBase<DeleteScenesResult> resp = RespBase.create();
+    public RespBase<ScenesDeleteResult> delete(@Validated @RequestBody ScenesDelete model) {
+        log.debug("called: model={}", model);
+        RespBase<ScenesDeleteResult> resp = RespBase.create();
         resp.setData(scenesService.delete(model));
         return resp;
     }

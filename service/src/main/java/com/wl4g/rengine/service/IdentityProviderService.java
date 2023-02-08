@@ -17,10 +17,10 @@ package com.wl4g.rengine.service;
 
 import javax.validation.constraints.NotNull;
 
-import com.wl4g.rengine.service.model.QueryIdentityProvider;
-import com.wl4g.rengine.service.model.QueryIdentityProviderResult;
-import com.wl4g.rengine.service.model.SaveIdentityProvider;
-import com.wl4g.rengine.service.model.SaveIdentityProviderResult;
+import com.wl4g.rengine.service.model.IdentityProviderQuery;
+import com.wl4g.rengine.service.model.IdentityProviderQueryResult;
+import com.wl4g.rengine.service.model.IdentityProviderSave;
+import com.wl4g.rengine.service.model.IdentityProviderSaveResult;
 
 /**
  * {@link IdentityProviderService}
@@ -31,8 +31,8 @@ import com.wl4g.rengine.service.model.SaveIdentityProviderResult;
  */
 public interface IdentityProviderService {
 
-    QueryIdentityProviderResult query(@NotNull QueryIdentityProvider model);
+    IdentityProviderQueryResult query(@NotNull IdentityProviderQuery model);
 
-    SaveIdentityProviderResult save(@NotNull SaveIdentityProvider model);
+    IdentityProviderSaveResult save(@NotNull IdentityProviderSave model);
 
 }

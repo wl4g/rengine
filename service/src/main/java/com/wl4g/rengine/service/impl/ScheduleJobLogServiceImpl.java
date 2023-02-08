@@ -56,10 +56,10 @@ import com.wl4g.infra.common.locks.JedisLockManager;
 import com.wl4g.rengine.common.entity.ScheduleJobLog;
 import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.service.ScheduleJobLogService;
-import com.wl4g.rengine.service.model.DeleteScheduleJobLog;
-import com.wl4g.rengine.service.model.DeleteScheduleJobResult;
-import com.wl4g.rengine.service.model.QueryScheduleJobLog;
-import com.wl4g.rengine.service.model.SaveScheduleJobLogResult;
+import com.wl4g.rengine.service.model.ScheduleJobDeleteResult;
+import com.wl4g.rengine.service.model.ScheduleJobLogDelete;
+import com.wl4g.rengine.service.model.ScheduleJobLogQuery;
+import com.wl4g.rengine.service.model.ScheduleJobLogSaveResult;
 
 import lombok.CustomLog;
 
@@ -75,10 +75,10 @@ import lombok.CustomLog;
 public class ScheduleJobLogServiceImpl implements ScheduleJobLogService {
 
     @Autowired
-    RedisTemplate<String, String> redisTemplate;
+    MongoTemplate mongoTemplate;
 
     @Autowired
-    MongoTemplate mongoTemplate;
+    RedisTemplate<String, String> redisTemplate;
 
     JedisLockManager jedisLockManager;
 
@@ -108,7 +108,7 @@ public class ScheduleJobLogServiceImpl implements ScheduleJobLogService {
     }
 
     @Override
-    public PageHolder<ScheduleJobLog> query(QueryScheduleJobLog model) {
+    public PageHolder<ScheduleJobLog> query(ScheduleJobLogQuery model) {
         final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getJobLogId()),
                 isCriteria("triggerId", model.getTriggerId())))
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
@@ -121,7 +121,7 @@ public class ScheduleJobLogServiceImpl implements ScheduleJobLogService {
     }
 
     @Override
-    public SaveScheduleJobLogResult save(ScheduleJobLog model) {
+    public ScheduleJobLogSaveResult save(ScheduleJobLog model) {
         ScheduleJobLog job = model;
         notNullOf(job, "job");
 
@@ -133,7 +133,7 @@ public class ScheduleJobLogServiceImpl implements ScheduleJobLogService {
         }
 
         final ScheduleJobLog saved = mongoTemplate.save(job, T_SCHEDULE_JOB_LOGS.getName());
-        return SaveScheduleJobLogResult.builder().id(saved.getId()).build();
+        return ScheduleJobLogSaveResult.builder().id(saved.getId()).build();
     }
 
     /**
@@ -215,7 +215,7 @@ public class ScheduleJobLogServiceImpl implements ScheduleJobLogService {
      * </pre>
      */
     @Override
-    public DeleteScheduleJobResult delete(DeleteScheduleJobLog model) {
+    public ScheduleJobDeleteResult delete(ScheduleJobLogDelete model) {
         // (Defaults) Delete all data older than a certain time by updateDate.
         final Criteria filter = orCriteria(isIdCriteria(model.getId()), andCriteria(
                 gteUpdateDateCriteria(model.getUpdateDateLower()), lteUpdateDateCriteria(model.getUpdateDateUpper())));
@@ -256,7 +256,7 @@ public class ScheduleJobLogServiceImpl implements ScheduleJobLogService {
                 deletingLock.unlock();
             }
         }
-        return DeleteScheduleJobResult.builder().deletedCount(result.getDeletedCount() + deletedCount).build();
+        return ScheduleJobDeleteResult.builder().deletedCount(result.getDeletedCount() + deletedCount).build();
     }
 
     public static final String DELETING_LOCK_NAME = ScheduleJobLog.class.getSimpleName() + ".deleting";

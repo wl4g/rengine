@@ -31,10 +31,10 @@ import com.wl4g.rengine.common.entity.Notification;
 import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.common.util.BeanSensitiveTransforms;
 import com.wl4g.rengine.service.NotificationService;
-import com.wl4g.rengine.service.model.QueryNotification;
-import com.wl4g.rengine.service.model.QueryNotificationResult;
-import com.wl4g.rengine.service.model.SaveNotification;
-import com.wl4g.rengine.service.model.SaveNotificationResult;
+import com.wl4g.rengine.service.model.NotificationQuery;
+import com.wl4g.rengine.service.model.NotificationQueryResult;
+import com.wl4g.rengine.service.model.NotificationSave;
+import com.wl4g.rengine.service.model.NotificationSaveResult;
 
 /**
  * {@link NotificationServiceImpl}
@@ -49,7 +49,7 @@ public class NotificationServiceImpl implements NotificationService {
     private @Autowired MongoTemplate mongoTemplate;
 
     @Override
-    public QueryNotificationResult query(QueryNotification model) {
+    public NotificationQueryResult query(NotificationQuery model) {
         List<Notification> notifications = null;
         if (!isBlank(model.getType())) {
             final Criteria criteria = new Criteria().orOperator(Criteria.where("properties.type").is(model.getType()));
@@ -67,11 +67,11 @@ public class NotificationServiceImpl implements NotificationService {
             BeanSensitiveTransforms.transform(notification.getProperties());
         }
 
-        return QueryNotificationResult.builder().providers(notifications).build();
+        return NotificationQueryResult.builder().providers(notifications).build();
     }
 
     @Override
-    public SaveNotificationResult save(SaveNotification model) {
+    public NotificationSaveResult save(NotificationSave model) {
         Notification provider = model.getProvider();
         if (isNull(provider.getId())) {
             provider.setId(IdGenUtils.nextLong());
@@ -80,7 +80,7 @@ public class NotificationServiceImpl implements NotificationService {
             provider.preUpdate();
         }
         Notification saved = mongoTemplate.save(provider, MongoCollectionDefinition.SYS_NOTIFICATIONS.getName());
-        return SaveNotificationResult.builder().id(saved.getId()).build();
+        return NotificationSaveResult.builder().id(saved.getId()).build();
     }
 
 }

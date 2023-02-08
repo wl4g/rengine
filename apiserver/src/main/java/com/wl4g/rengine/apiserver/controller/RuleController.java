@@ -29,11 +29,11 @@ import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.common.entity.Rule;
 import com.wl4g.rengine.service.RuleService;
-import com.wl4g.rengine.service.model.DeleteRule;
-import com.wl4g.rengine.service.model.DeleteRuleResult;
-import com.wl4g.rengine.service.model.QueryRule;
-import com.wl4g.rengine.service.model.SaveRule;
-import com.wl4g.rengine.service.model.SaveRuleResult;
+import com.wl4g.rengine.service.model.RuleDelete;
+import com.wl4g.rengine.service.model.RuleDeleteResult;
+import com.wl4g.rengine.service.model.RuleQuery;
+import com.wl4g.rengine.service.model.RuleSave;
+import com.wl4g.rengine.service.model.RuleSaveResult;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -62,8 +62,8 @@ public class RuleController {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful",
             content = { @Content(mediaType = "application/json") }) })
     @RequestMapping(path = { "query" }, method = { GET })
-    public RespBase<PageHolder<Rule>> query(@Validated QueryRule model) {
-        log.info("called: model={}", model);
+    public RespBase<PageHolder<Rule>> query(@Validated RuleQuery model) {
+        log.debug("called: model={}", model);
         RespBase<PageHolder<Rule>> resp = RespBase.create();
         resp.setData(ruleService.query(model));
         return resp;
@@ -73,9 +73,9 @@ public class RuleController {
     @Operation(description = "Save rule.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    public RespBase<SaveRuleResult> save(@Validated @RequestBody SaveRule model) {
-        log.info("called: model={}", model);
-        RespBase<SaveRuleResult> resp = RespBase.create();
+    public RespBase<RuleSaveResult> save(@Validated @RequestBody RuleSave model) {
+        log.debug("called: model={}", model);
+        RespBase<RuleSaveResult> resp = RespBase.create();
         resp.setData(ruleService.save(model));
         return resp;
     }
@@ -84,9 +84,9 @@ public class RuleController {
     @Operation(description = "Delete rule.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
-    public RespBase<DeleteRuleResult> delete(@Validated @RequestBody DeleteRule model) {
-        log.info("called: model={}", model);
-        RespBase<DeleteRuleResult> resp = RespBase.create();
+    public RespBase<RuleDeleteResult> delete(@Validated @RequestBody RuleDelete model) {
+        log.debug("called: model={}", model);
+        RespBase<RuleDeleteResult> resp = RespBase.create();
         resp.setData(ruleService.delete(model));
         return resp;
     }

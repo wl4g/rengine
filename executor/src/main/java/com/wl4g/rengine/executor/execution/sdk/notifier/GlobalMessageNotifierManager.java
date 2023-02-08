@@ -157,7 +157,7 @@ public class GlobalMessageNotifierManager {
                     // execution. In this way, multi-level locks are used to
                     // ensure performance as much as possible.
                     final Lock lock = lockManager.getLock(DEFAULT_LOCK_PREFIX.concat(notifierType.name()),
-                            config.notifier().refreshLockTimeout(), TimeUnit.MILLISECONDS);
+                            config.engine().notifier().refreshLockTimeout(), TimeUnit.MILLISECONDS);
                     try {
                         if (lock.tryLock()) {
                             refreshed = loadRefreshed(notifierType);
@@ -200,7 +200,7 @@ public class GlobalMessageNotifierManager {
             MeterUtil.counter(execution_sdk_notifier_manager_total, refreshed.getNotifierType(), METHOD_SAVEREFRESHED);
             MeterUtil.timer(execution_sdk_notifier_manager_time, refreshed.getNotifierType(), METHOD_SAVEREFRESHED, () -> {
                 final int effectiveExpireSec = (int) (refreshed.getExpireSeconds()
-                        * (1 - config.notifier().refreshedCachedExpireOffsetRate()));
+                        * (1 - config.engine().notifier().refreshedCachedExpireOffsetRate()));
                 // Sets effective expire.
                 refreshed.setEffectiveExpireSeconds(effectiveExpireSec);
 
@@ -216,7 +216,7 @@ public class GlobalMessageNotifierManager {
 
     String buildRefreshedCachedKey(final @NotNull NotifierKind notifierType) {
         notNullOf(notifierType, "notifierType");
-        return config.notifier().refreshedCachedPrefix().concat(notifierType.name());
+        return config.engine().notifier().refreshedCachedPrefix().concat(notifierType.name());
     }
 
     @NotNull

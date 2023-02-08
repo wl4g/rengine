@@ -291,18 +291,18 @@ rengine:
         scenes-rules-cached-expire: 900000 # 15m
         executor-thread-pools: 10
         executor-accept-queue: 10
-        per-executor-thread-pools: 2
-        max-query-batch: 1024
         execute-timeout-offset-rate: 0.1f
-      log:
-        base-dir: /tmp/__rengine_script_log
-        enable-console: true
-        file-max-size: 536870912 # Default by 512MB
-        file-max-count: 10
-      notifier:
-        refresh-lock-timeout: 60000
-        refreshed-cached-prefix: 'rengine:executor:sdk:notifier:refreshed:'
-        refreshed-cached-expire-offset-rate: 0.1f
+        log:
+          base-dir: /tmp/__rengine_script_log
+          enable-console: true
+          file-max-size: 536870912 # Default by 512MB
+          file-max-count: 10
+        notifier:
+          refresh-lock-timeout: 60000
+          refreshed-cached-prefix: 'rengine:executor:sdk:notifier:refreshed:'
+          refreshed-cached-expire-offset-rate: 0.1f
+        executor:
+          per-executor-thread-pools: 2
     minio:
       endpoint: http://localhost:9000
       region: us-east-1

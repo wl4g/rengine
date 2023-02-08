@@ -99,7 +99,7 @@ public final class RengineMinioTool {
                     .version(S3Policy.DEFAULT_POLICY_VERSION)
                     .statement(singletonList(Statement.builder()
                             .effect(EffectType.Allow)
-                            // see:https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazons3.html#amazons3-actions-as-permissions
+                            // see:https://docs.aws.amazon.com/dict-authorization/latest/reference/list_amazons3.html#amazons3-actions-as-permissions
                             .action(asList(CreateBucketAction, GetBucketLocationAction, GetBucketPolicyStatusAction,
                                     ListBucketAction, ListAllMyBucketsAction, ListBucketMultipartUploadsAction,
                                     ListMultipartUploadPartsAction, PutObjectAction, PutObjectLegalHoldAction, GetObjectAction,

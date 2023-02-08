@@ -29,11 +29,11 @@ import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.common.entity.Dict;
 import com.wl4g.rengine.service.DictService;
-import com.wl4g.rengine.service.model.DeleteDict;
-import com.wl4g.rengine.service.model.DeleteDictResult;
-import com.wl4g.rengine.service.model.QueryDict;
-import com.wl4g.rengine.service.model.SaveDict;
-import com.wl4g.rengine.service.model.SaveDictResult;
+import com.wl4g.rengine.service.model.DictDelete;
+import com.wl4g.rengine.service.model.DictDeleteResult;
+import com.wl4g.rengine.service.model.DictQuery;
+import com.wl4g.rengine.service.model.DictSave;
+import com.wl4g.rengine.service.model.DictSaveResult;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -60,8 +60,8 @@ public class DictController {
     @Operation(description = "Query dicts.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
-    public RespBase<PageHolder<Dict>> query(@Validated QueryDict model) {
-        log.info("called: model={}", model);
+    public RespBase<PageHolder<Dict>> query(@Validated DictQuery model) {
+        log.debug("called: model={}", model);
         RespBase<PageHolder<Dict>> resp = RespBase.create();
         resp.setData(dictService.query(model));
         return resp;
@@ -71,9 +71,9 @@ public class DictController {
     @Operation(description = "Save dict.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    public RespBase<SaveDictResult> save(@Validated @RequestBody SaveDict model) {
-        log.info("called: model={}", model);
-        RespBase<SaveDictResult> resp = RespBase.create();
+    public RespBase<DictSaveResult> save(@Validated @RequestBody DictSave model) {
+        log.debug("called: model={}", model);
+        RespBase<DictSaveResult> resp = RespBase.create();
         resp.setData(dictService.save(model));
         return resp;
     }
@@ -82,9 +82,9 @@ public class DictController {
     @Operation(description = "Delete dict.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
-    public RespBase<DeleteDictResult> delete(@Validated @RequestBody DeleteDict model) {
-        log.info("called: model={}", model);
-        RespBase<DeleteDictResult> resp = RespBase.create();
+    public RespBase<DictDeleteResult> delete(@Validated @RequestBody DictDelete model) {
+        log.debug("called: model={}", model);
+        RespBase<DictDeleteResult> resp = RespBase.create();
         resp.setData(dictService.delete(model));
         return resp;
     }

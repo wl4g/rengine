@@ -160,7 +160,7 @@ public abstract class AbstractScriptEngine implements IEngine {
                         graphContext.getLastResult().getValueMap());
 
         final SafeScheduledTaskPoolExecutor executor = globalSdkExecutorManager.getExecutor(parameter.getWorkflowId(),
-                executionConfig.engine().perExecutorThreadPools());
+                executionConfig.engine().executor().perExecutorThreadPools());
 
         return ScriptContext.builder()
                 .id(graphContext.getCurrentNode().getId())

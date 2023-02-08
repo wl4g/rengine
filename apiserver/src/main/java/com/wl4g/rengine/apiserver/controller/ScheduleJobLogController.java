@@ -29,11 +29,11 @@ import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.common.entity.ScheduleJobLog;
 import com.wl4g.rengine.service.ScheduleJobLogService;
-import com.wl4g.rengine.service.model.DeleteScheduleJobLog;
-import com.wl4g.rengine.service.model.DeleteScheduleJobResult;
-import com.wl4g.rengine.service.model.QueryScheduleJobLog;
-import com.wl4g.rengine.service.model.SaveScheduleJobLog;
-import com.wl4g.rengine.service.model.SaveScheduleJobLogResult;
+import com.wl4g.rengine.service.model.ScheduleJobDeleteResult;
+import com.wl4g.rengine.service.model.ScheduleJobLogDelete;
+import com.wl4g.rengine.service.model.ScheduleJobLogQuery;
+import com.wl4g.rengine.service.model.ScheduleJobLogSave;
+import com.wl4g.rengine.service.model.ScheduleJobLogSaveResult;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -60,8 +60,8 @@ public class ScheduleJobLogController {
     @Operation(description = "Query schedule jobs.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
-    public RespBase<PageHolder<ScheduleJobLog>> query(@Validated QueryScheduleJobLog model) {
-        log.info("called: model={}", model);
+    public RespBase<PageHolder<ScheduleJobLog>> query(@Validated ScheduleJobLogQuery model) {
+        log.debug("called: model={}", model);
         RespBase<PageHolder<ScheduleJobLog>> resp = RespBase.create();
         resp.setData(scheduleJobLogService.query(model));
         return resp;
@@ -71,9 +71,9 @@ public class ScheduleJobLogController {
     @Operation(description = "Save schedule job.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    public RespBase<SaveScheduleJobLogResult> save(@Validated @RequestBody SaveScheduleJobLog model) {
-        log.info("called: model={}", model);
-        RespBase<SaveScheduleJobLogResult> resp = RespBase.create();
+    public RespBase<ScheduleJobLogSaveResult> save(@Validated @RequestBody ScheduleJobLogSave model) {
+        log.debug("called: model={}", model);
+        RespBase<ScheduleJobLogSaveResult> resp = RespBase.create();
         resp.setData(scheduleJobLogService.save(model));
         return resp;
     }
@@ -82,9 +82,9 @@ public class ScheduleJobLogController {
     @Operation(description = "Delete schedule job.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
-    public RespBase<DeleteScheduleJobResult> delete(@Validated @RequestBody DeleteScheduleJobLog model) {
-        log.info("called: model={}", model);
-        RespBase<DeleteScheduleJobResult> resp = RespBase.create();
+    public RespBase<ScheduleJobDeleteResult> delete(@Validated @RequestBody ScheduleJobLogDelete model) {
+        log.debug("called: model={}", model);
+        RespBase<ScheduleJobDeleteResult> resp = RespBase.create();
         resp.setData(scheduleJobLogService.delete(model));
         return resp;
     }

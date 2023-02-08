@@ -16,6 +16,7 @@
 package com.wl4g.rengine.executor.execution;
 
 import static com.wl4g.rengine.common.constants.RengineConstants.CONF_PREFIX_EXECUTOR;
+import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_SCRIPT_LOG_BASE_DIR;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -46,12 +47,6 @@ public interface ExecutionConfig {
     @NotNull
     EngineConfig engine();
 
-    @NotNull
-    ScriptLogConfig log();
-
-    @NotNull
-    NotifierConfig notifier();
-
     /**
      * @see {@link com.wl4g.rengine.service.config.RengineServiceProperties.ServiceProperties}
      */
@@ -71,29 +66,6 @@ public interface ExecutionConfig {
     }
 
     public static interface EngineConfig {
-        @WithDefault(DEFAULT_EXECUTOR_THREAD_POOLS + "")
-        @NotNull
-        @Min(1)
-        @Max(1024)
-        Integer executorThreadPools();
-
-        @WithDefault(DEFAULT_EXECUTOR_ACCEPT_QUEUE + "")
-        @NotNull
-        @Min(1)
-        @Max(10240)
-        Integer executorAcceptQueue();
-
-        @WithDefault(DEFAULT_PER_EXECUTOR_THREAD_POOLS + "")
-        @NotNull
-        @Min(0)
-        @Max(1024)
-        Integer perExecutorThreadPools();
-
-        @WithDefault(DEFAULT_TIMEOUT_OFFSET_RATE + "")
-        @NotNull
-        @Min(0)
-        @Max(1)
-        Float executeTimeoutOffsetRate();
 
         @WithDefault(DEFAULT_SCENES_RULES_CACHED_PREFIX)
         @NotBlank
@@ -104,72 +76,100 @@ public interface ExecutionConfig {
         @Min(0)
         Long scenesRulesCachedExpire();
 
-        @WithDefault(DEFAULT_MAX_QUERY_BATCH + "")
+        @WithDefault(DEFAULT_EXECUTOR_THREAD_POOLS + "")
+        @NotNull
+        @Min(1)
+        @Max(1024)
+        Integer executorThreadPools();
+
+        @WithDefault(DEFAULT_EXECUTOR_ACCEPT_QUEUE + "")
+        @NotNull
+        @Min(1)
+        @Max(1024)
+        Integer executorAcceptQueue();
+
+        @WithDefault(DEFAULT_TIMEOUT_OFFSET_RATE + "")
         @NotNull
         @Min(0)
-        @Max(10_0000)
-        Integer maxQueryBatch();
+        @Max(1)
+        Float executeTimeoutOffsetRate();
+
+        @NotNull
+        ScriptLogConfig log();
+
+        @NotNull
+        SdkNotifierConfig notifier();
+
+        @NotNull
+        SdkExecutorConfig executor();
+
+        public static interface ScriptLogConfig {
+            @WithDefault(DEFAULT_EXECUTOR_SCRIPT_LOG_BASE_DIR)
+            @NotBlank
+            String baseDir();
+
+            @WithDefault(DEFAULT_SCRIPT_LOG_ENABLE_CONSOLE + "")
+            @NotNull
+            Boolean enableConsole();
+
+            @WithDefault(DEFAULT_SCRIPT_LOG_FILE_MAX_SIZE + "")
+            @NotNull
+            @Min(1024)
+            Integer fileMaxSize();
+
+            @WithDefault(DEFAULT_SCRIPT_LOG_FILE_MAX_COUNT + "")
+            @NotNull
+            @Min(1)
+            Integer fileMaxCount();
+
+            @WithDefault(DEFAULT_SCRIPT_LOG_UPLOADER_CRON)
+            @NotBlank
+            String uploaderCron();
+
+            public static final boolean DEFAULT_SCRIPT_LOG_ENABLE_CONSOLE = true;
+            public static final int DEFAULT_SCRIPT_LOG_FILE_MAX_SIZE = 512 * 1024 * 1024;
+            public static final int DEFAULT_SCRIPT_LOG_FILE_MAX_COUNT = 10;
+            public static final String DEFAULT_SCRIPT_LOG_UPLOADER_CRON = "0 1 * * * * ?";
+        }
+
+        public static interface SdkNotifierConfig {
+            @WithDefault(DEFAULT_NOTIFIER_REFRESH_LOCK_TIMEOUT + "")
+            @NotNull
+            @Min(0)
+            Long refreshLockTimeout();
+
+            @WithDefault(DEFAULT_NOTIFIER_REFRESHED_CACHED_PREFIX + "")
+
+            @NotBlank
+            String refreshedCachedPrefix();
+
+            @WithDefault(DEFAULT_NOTIFIER_EXPIRE_OFFSET_RATE + "")
+            @NotNull
+            @Min(0)
+            @Max(1)
+            Float refreshedCachedExpireOffsetRate();
+
+            public static final long DEFAULT_NOTIFIER_REFRESH_LOCK_TIMEOUT = 60 * 1000L;
+            public static final String DEFAULT_NOTIFIER_REFRESHED_CACHED_PREFIX = "rengine:executor:sdk:notifier:refreshed:";
+            public static final float DEFAULT_NOTIFIER_EXPIRE_OFFSET_RATE = 0.1f;
+        }
+
+        public static interface SdkExecutorConfig {
+
+            @WithDefault(DEFAULT_PER_EXECUTOR_THREAD_POOLS + "")
+            @NotNull
+            @Min(0)
+            @Max(1024)
+            Integer perExecutorThreadPools();
+
+            public static final int DEFAULT_PER_EXECUTOR_THREAD_POOLS = 2;
+        }
 
         public static final String DEFAULT_SCENES_RULES_CACHED_PREFIX = "rengine:executor:engine:scenes:rules:";
         public static final long DEFAULT_SCENES_RULES_CACHED_EXPIRE = 15 * 60 * 1000; // 15m
         public static final int DEFAULT_EXECUTOR_THREAD_POOLS = 10;
         public static final int DEFAULT_EXECUTOR_ACCEPT_QUEUE = 10;
-        public static final int DEFAULT_PER_EXECUTOR_THREAD_POOLS = 2;
-        public static final int DEFAULT_MAX_QUERY_BATCH = 1024;
         public static final float DEFAULT_TIMEOUT_OFFSET_RATE = 0.1f;
-    }
-
-    public static interface ScriptLogConfig {
-        @WithDefault(DEFAULT_SCRIPT_LOG_BASE_DIR)
-        @NotBlank
-        String baseDir();
-
-        @WithDefault(DEFAULT_SCRIPT_LOG_ENABLE_CONSOLE + "")
-        @NotNull
-        Boolean enableConsole();
-
-        @WithDefault(DEFAULT_SCRIPT_LOG_FILE_MAX_SIZE + "")
-        @NotNull
-        @Min(1024)
-        Integer fileMaxSize();
-
-        @WithDefault(DEFAULT_SCRIPT_LOG_FILE_MAX_COUNT + "")
-        @NotNull
-        @Min(1)
-        Integer fileMaxCount();
-
-        @WithDefault(DEFAULT_SCRIPT_LOG_UPLOADER_CRON)
-        @NotBlank
-        String uploaderCron();
-
-        public static final String DEFAULT_SCRIPT_LOG_BASE_DIR = "/tmp/__rengine_script_log";
-        public static final boolean DEFAULT_SCRIPT_LOG_ENABLE_CONSOLE = true;
-        public static final int DEFAULT_SCRIPT_LOG_FILE_MAX_SIZE = 512 * 1024 * 1024;
-        public static final int DEFAULT_SCRIPT_LOG_FILE_MAX_COUNT = 10;
-        public static final String DEFAULT_SCRIPT_LOG_UPLOADER_CRON = "0 1 * * * * ?";
-
-    }
-
-    public static interface NotifierConfig {
-        @WithDefault(DEFAULT_NOTIFIER_REFRESH_LOCK_TIMEOUT + "")
-        @NotNull
-        @Min(0)
-        Long refreshLockTimeout();
-
-        @WithDefault(DEFAULT_NOTIFIER_REFRESHED_CACHED_PREFIX + "")
-
-        @NotBlank
-        String refreshedCachedPrefix();
-
-        @WithDefault(DEFAULT_NOTIFIER_EXPIRE_OFFSET_RATE + "")
-        @NotNull
-        @Min(0)
-        @Max(1)
-        Float refreshedCachedExpireOffsetRate();
-
-        public static final long DEFAULT_NOTIFIER_REFRESH_LOCK_TIMEOUT = 60 * 1000L;
-        public static final String DEFAULT_NOTIFIER_REFRESHED_CACHED_PREFIX = "rengine:executor:sdk:notifier:refreshed:";
-        public static final float DEFAULT_NOTIFIER_EXPIRE_OFFSET_RATE = 0.1f;
     }
 
 }

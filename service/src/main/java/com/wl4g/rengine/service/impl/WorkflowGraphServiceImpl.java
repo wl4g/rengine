@@ -21,8 +21,12 @@ import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
+import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.util.List;
+
+import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -33,15 +37,21 @@ import org.springframework.stereotype.Service;
 
 import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
+import com.wl4g.infra.common.io.FileIOUtils;
+import com.wl4g.infra.common.io.FileIOUtils.ReadTailFrame;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.WorkflowGraph;
 import com.wl4g.rengine.common.util.IdGenUtils;
+import com.wl4g.rengine.common.util.ScriptEngineUtil;
 import com.wl4g.rengine.service.WorkflowGraphService;
-import com.wl4g.rengine.service.model.DeleteWorkflowGraph;
-import com.wl4g.rengine.service.model.DeleteWorkflowGraphResult;
-import com.wl4g.rengine.service.model.QueryWorkflowGraph;
-import com.wl4g.rengine.service.model.SaveWorkflowGraph;
-import com.wl4g.rengine.service.model.SaveWorkflowGraphResult;
+import com.wl4g.rengine.service.config.RengineServiceProperties;
+import com.wl4g.rengine.service.model.WorkflowDeleteGraph;
+import com.wl4g.rengine.service.model.WorkflowGraphDeleteResult;
+import com.wl4g.rengine.service.model.WorkflowGraphLogfile;
+import com.wl4g.rengine.service.model.WorkflowGraphLogfileResult;
+import com.wl4g.rengine.service.model.WorkflowGraphQuery;
+import com.wl4g.rengine.service.model.WorkflowGraphResultSave;
+import com.wl4g.rengine.service.model.WorkflowGraphSave;
 import com.wl4g.rengine.service.mongo.GlobalMongoSequenceService;
 
 /**
@@ -55,13 +65,19 @@ import com.wl4g.rengine.service.mongo.GlobalMongoSequenceService;
 public class WorkflowGraphServiceImpl implements WorkflowGraphService {
 
     @Autowired
+    RengineServiceProperties config;
+
+    @Autowired
     MongoTemplate mongoTemplate;
 
     @Autowired
     GlobalMongoSequenceService mongoSequenceService;
 
+    // @Autowired
+    // MinioClientManager minioClientManager;
+
     @Override
-    public PageHolder<WorkflowGraph> query(QueryWorkflowGraph model) {
+    public PageHolder<WorkflowGraph> query(WorkflowGraphQuery model) {
         final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getGraphId()),
                 isCriteria("workflowId", model.getWorkflowId())))
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
@@ -75,7 +91,7 @@ public class WorkflowGraphServiceImpl implements WorkflowGraphService {
     }
 
     @Override
-    public SaveWorkflowGraphResult save(SaveWorkflowGraph model) {
+    public WorkflowGraphResultSave save(WorkflowGraphSave model) {
         WorkflowGraph graph = model;
         notNullOf(graph, "graph");
         notNullOf(graph.getWorkflowId(), "workflowId");
@@ -111,15 +127,66 @@ public class WorkflowGraphServiceImpl implements WorkflowGraphService {
         graph.setRevision(mongoSequenceService.getNextSequence(GlobalMongoSequenceService.GRAPHS_REVISION_SEQ));
 
         WorkflowGraph saved = mongoTemplate.save(graph, MongoCollectionDefinition.T_WORKFLOW_GRAPHS.getName());
-        return SaveWorkflowGraphResult.builder().id(saved.getId()).build();
+        return WorkflowGraphResultSave.builder().id(saved.getId()).build();
     }
 
     @Override
-    public DeleteWorkflowGraphResult delete(DeleteWorkflowGraph model) {
+    public WorkflowGraphDeleteResult delete(WorkflowDeleteGraph model) {
         // 'id' is a keyword, it will be automatically converted to '_id'
         DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
                 MongoCollectionDefinition.T_WORKFLOW_GRAPHS.getName());
-        return DeleteWorkflowGraphResult.builder().deletedCount(result.getDeletedCount()).build();
+        return WorkflowGraphDeleteResult.builder().deletedCount(result.getDeletedCount()).build();
+    }
+
+    @Override
+    public WorkflowGraphLogfileResult logtail(@NotNull WorkflowGraphLogfile model) {
+        /**
+         * TODO The best way is to let the rengine executor write to OSS in real
+         * time, but unfortunately MinIO/S3 does not support append writing
+         * (although it supports object merging, but it is still difficult to
+         * achieve), unless you use Alibaba Cloud OSS (supports real-time append
+         * writing), but this not a neutral approach. Therefore, at present,
+         * only direct reading and writing of disks is realized, and then shared
+         * mounts such as juiceFS, s3fs-fuse, ossfs, etc. can be used to realize
+         * clustering. see to:
+         * {@link com.wl4g.rengine.executor.execution.engine.GraalJSScriptEngine#init}
+         */
+        //// @formatter:off
+        //final GetObjectArgs args = GetObjectArgs.builder()
+        //        // .bucket(config.bucket())
+        //        // .region(config.region())
+        //        // .object(objectPrefix)
+        //        .build();
+        //final File localFile = null;
+        //try (GetObjectResponse result = minioClientManager.getMinioClient().getObject(args);) {
+        //    int available = minioResult.available();
+        //    isTrue(available <= DEFAULT_EXECUTOR_S3_OBJECT_MAX_LIMIT, "Maximum file object readable limit exceeded: %s",
+        //            DEFAULT_EXECUTOR_S3_OBJECT_MAX_LIMIT);
+        //    try (FileOutputStream out = new FileOutputStream(localFile, false);
+        //            BufferedOutputStream bout = new BufferedOutputStream(out, DEFAULT_EXECUTOR_S3_OBJECT_READ_BUFFER);) {
+        //        // ByteArrayOutputStream out = new ByteArrayOutputStream(4092);
+        //        // result.transferTo(out);
+        //        // out.toByteArray();
+        //        minioResult.transferTo(bout);
+        //        minioResult.skip(0);
+        //        // return new ObjectResource(objectPrefix, binary, localFile,
+        //        // available);
+        //    }
+        //} catch (Exception e) {
+        //    e.printStackTrace();
+        //}
+        //// @formatter:on
+
+        final String latestLogFile = ScriptEngineUtil.getLatestLogFile(config.getScheduleJobLog().getBaseDir(),
+                model.getWorkflowId(), false);
+        if (isBlank(latestLogFile)) {
+            throw new IllegalArgumentException(format("Could't to load workflow log file for %s.", model.getWorkflowId()));
+        }
+
+        final ReadTailFrame result = FileIOUtils.seekReadLines(latestLogFile, model.getStartPos(), model.getLimit(),
+                line -> false);
+
+        return WorkflowGraphLogfileResult.builder().frame(result).build();
     }
 
 }

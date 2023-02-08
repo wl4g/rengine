@@ -39,11 +39,11 @@ import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinit
 import com.wl4g.rengine.common.entity.Rule;
 import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.service.RuleService;
-import com.wl4g.rengine.service.model.DeleteRule;
-import com.wl4g.rengine.service.model.DeleteRuleResult;
-import com.wl4g.rengine.service.model.QueryRule;
-import com.wl4g.rengine.service.model.SaveRule;
-import com.wl4g.rengine.service.model.SaveRuleResult;
+import com.wl4g.rengine.service.model.RuleDelete;
+import com.wl4g.rengine.service.model.RuleDeleteResult;
+import com.wl4g.rengine.service.model.RuleQuery;
+import com.wl4g.rengine.service.model.RuleSave;
+import com.wl4g.rengine.service.model.RuleSaveResult;
 
 /**
  * {@link RuleServiceImpl}
@@ -58,7 +58,7 @@ public class RuleServiceImpl implements RuleService {
     private @Autowired MongoTemplate mongoTemplate;
 
     @Override
-    public PageHolder<Rule> query(QueryRule model) {
+    public PageHolder<Rule> query(RuleQuery model) {
         Query query = new Query(
                 andCriteria(baseCriteria(model), isIdCriteria(model.getRuleId()), isCriteria("scenesId", model.getScenesId())));
 
@@ -74,7 +74,7 @@ public class RuleServiceImpl implements RuleService {
     }
 
     @Override
-    public SaveRuleResult save(SaveRule model) {
+    public RuleSaveResult save(RuleSave model) {
         Rule rule = model;
         // @formatter:off
         //Rule rule = Rule.builder()
@@ -96,15 +96,15 @@ public class RuleServiceImpl implements RuleService {
         }
 
         Rule saved = mongoTemplate.save(rule, MongoCollectionDefinition.T_RULES.getName());
-        return SaveRuleResult.builder().id(saved.getId()).build();
+        return RuleSaveResult.builder().id(saved.getId()).build();
     }
 
     @Override
-    public DeleteRuleResult delete(DeleteRule model) {
+    public RuleDeleteResult delete(RuleDelete model) {
         // 'id' is a keyword, it will be automatically converted to '_id'
         DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
                 MongoCollectionDefinition.T_RULES.getName());
-        return DeleteRuleResult.builder().deletedCount(result.getDeletedCount()).build();
+        return RuleDeleteResult.builder().deletedCount(result.getDeletedCount()).build();
     }
 
 }

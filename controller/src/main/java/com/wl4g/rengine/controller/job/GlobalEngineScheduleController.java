@@ -53,8 +53,8 @@ import com.wl4g.rengine.common.entity.ScheduleTrigger.ScheduleType;
 import com.wl4g.rengine.controller.config.RengineControllerProperties;
 import com.wl4g.rengine.controller.lifecycle.ElasticJobBootstrapBuilder.JobParameter;
 import com.wl4g.rengine.service.ScheduleJobLogService;
-import com.wl4g.rengine.service.model.DeleteScheduleJobLog;
-import com.wl4g.rengine.service.model.QueryScheduleTrigger;
+import com.wl4g.rengine.service.model.ScheduleJobLogDelete;
+import com.wl4g.rengine.service.model.ScheduleTriggerQuery;
 
 import lombok.CustomLog;
 import lombok.Getter;
@@ -93,7 +93,7 @@ public class GlobalEngineScheduleController extends AbstractJobExecutor {
                 .counter(global_schedule_controller.getName(), global_schedule_controller.getHelp(), METHOD_NAME, METHOD_EXECUTE)
                 .increment();
 
-        final List<ScheduleTrigger> shardingTriggers = getScheduleTriggerService().findWithSharding(QueryScheduleTrigger.builder()
+        final List<ScheduleTrigger> shardingTriggers = getScheduleTriggerService().findWithSharding(ScheduleTriggerQuery.builder()
                 // .enable(true)
                 // .type(ScheduleType.EXECUTION_SCHEDULER.name())
                 .build(), currentShardingTotalCount, context.getShardingItem());
@@ -251,7 +251,7 @@ public class GlobalEngineScheduleController extends AbstractJobExecutor {
                             final var purgeUpperTime = currentTimeMillis()
                                     - Duration.ofHours(config.getPurger().getLogRetentionHours()).toMillis();
 
-                            final var result = scheduleJobLogService.delete(DeleteScheduleJobLog.builder()
+                            final var result = scheduleJobLogService.delete(ScheduleJobLogDelete.builder()
                                     .updateDateLower(new Date(1))
                                     // TODO notice timezone?
                                     .updateDateUpper(new Date(purgeUpperTime))

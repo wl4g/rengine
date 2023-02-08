@@ -26,7 +26,7 @@ import org.junit.Test;
 import com.wl4g.rengine.common.entity.DataSourceProperties;
 import com.wl4g.rengine.common.entity.DataSourceProperties.MongoDataSourceProperties;
 import com.wl4g.rengine.common.util.BsonEntitySerializers;
-import com.wl4g.rengine.service.model.SaveDataSource;
+import com.wl4g.rengine.service.model.DataSourceSave;
 
 /**
  * {@link CustomMongoConfigureTests}
@@ -39,7 +39,7 @@ public class CustomMongoConfigureTests {
 
     @Test
     public void testSerializeIgnoreAndTransformProperties() {
-        final DataSourceProperties source = SaveDataSource.builder()
+        final DataSourceProperties source = DataSourceSave.builder()
                 .id(111101001L)
                 .enable(1)
                 .labels(singletonList("foo"))

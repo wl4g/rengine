@@ -33,6 +33,7 @@ import java.util.List;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.wl4g.infra.common.collection.CollectionUtils2;
 import com.wl4g.infra.common.io.FileIOUtils;
 import com.wl4g.infra.common.io.FileIOUtils.ReadTailFrame;
 
@@ -105,6 +106,10 @@ public abstract class ScriptEngineUtil {
                 .sorted((e1, e2) -> e1.getValue() - e2.getValue())
                 .map(e -> e.getKey())
                 .collect(toList());
+
+        if (CollectionUtils2.isEmpty(sortedLogFiles)) {
+            return null;
+        }
 
         return logDir.getAbsolutePath().concat(File.separator).concat(sortedLogFiles.get(sortedLogFiles.size() - 1));
     }

@@ -40,7 +40,7 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
 public class RengineServiceAutoConfiguration {
 
     @Bean
-    @ConfigurationProperties(prefix = RengineConstants.CONF_PREFIX)
+    @ConfigurationProperties(prefix = RengineConstants.CONF_PREFIX + ".services")
     public RengineServiceProperties rengineServiceProperties() {
         return new RengineServiceProperties();
     }

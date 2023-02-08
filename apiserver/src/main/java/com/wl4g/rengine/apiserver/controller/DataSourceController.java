@@ -29,11 +29,11 @@ import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.common.entity.DataSourceProperties;
 import com.wl4g.rengine.service.DataSourceService;
-import com.wl4g.rengine.service.model.DeleteDataSource;
-import com.wl4g.rengine.service.model.DeleteDataSourceResult;
-import com.wl4g.rengine.service.model.QueryDataSource;
-import com.wl4g.rengine.service.model.SaveDataSource;
-import com.wl4g.rengine.service.model.SaveDataSourceResult;
+import com.wl4g.rengine.service.model.DataSourceDelete;
+import com.wl4g.rengine.service.model.DataSourceDeleteResult;
+import com.wl4g.rengine.service.model.DataSourceQuery;
+import com.wl4g.rengine.service.model.DataSourceSave;
+import com.wl4g.rengine.service.model.DataSourceSaveResult;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -62,8 +62,8 @@ public class DataSourceController {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful",
             content = { @Content(mediaType = "application/json") }) })
     @RequestMapping(path = { "query" }, method = { GET })
-    public RespBase<PageHolder<DataSourceProperties>> query(@Validated QueryDataSource model) {
-        log.info("called: model={}", model);
+    public RespBase<PageHolder<DataSourceProperties>> query(@Validated DataSourceQuery model) {
+        log.debug("called: model={}", model);
         RespBase<PageHolder<DataSourceProperties>> resp = RespBase.create();
         resp.setData(dataSourceService.query(model));
         return resp;
@@ -73,9 +73,9 @@ public class DataSourceController {
     @Operation(description = "Save dataSource.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    public RespBase<SaveDataSourceResult> save(@Validated @RequestBody SaveDataSource model) {
-        log.info("called: model={}", model);
-        RespBase<SaveDataSourceResult> resp = RespBase.create();
+    public RespBase<DataSourceSaveResult> save(@Validated @RequestBody DataSourceSave model) {
+        log.debug("called: model={}", model);
+        RespBase<DataSourceSaveResult> resp = RespBase.create();
         resp.setData(dataSourceService.save(model));
         return resp;
     }
@@ -84,9 +84,9 @@ public class DataSourceController {
     @Operation(description = "Delete dataSource.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
-    public RespBase<DeleteDataSourceResult> delete(@Validated @RequestBody DeleteDataSource model) {
-        log.info("called: model={}", model);
-        RespBase<DeleteDataSourceResult> resp = RespBase.create();
+    public RespBase<DataSourceDeleteResult> delete(@Validated @RequestBody DataSourceDelete model) {
+        log.debug("called: model={}", model);
+        RespBase<DataSourceDeleteResult> resp = RespBase.create();
         resp.setData(dataSourceService.delete(model));
         return resp;
     }

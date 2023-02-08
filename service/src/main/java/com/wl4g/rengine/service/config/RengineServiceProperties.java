@@ -21,7 +21,10 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.wl4g.rengine.common.constants.RengineConstants;
+
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -37,9 +40,11 @@ import lombok.ToString;
 @ToString
 public class RengineServiceProperties {
 
-    ServiceProperties service = new ServiceProperties();
+    @NotNull
+    DictServiceProperties dict = new DictServiceProperties();
 
-    MinioProperties minio = new MinioProperties();
+    @NotNull
+    ScheduleJobLogServiceProperties scheduleJobLog = new ScheduleJobLogServiceProperties();
 
     /**
      * @see {@link com.wl4g.rengine.executor.execution.ExecutionConfig.ServiceConfig}
@@ -47,7 +52,8 @@ public class RengineServiceProperties {
     @Getter
     @Setter
     @ToString
-    public static class ServiceProperties {
+    @NoArgsConstructor
+    public static class DictServiceProperties {
 
         @NotBlank
         String dictCachedPrefix = DEFAULT_DICT_CACHED_PREFIX;
@@ -56,21 +62,16 @@ public class RengineServiceProperties {
         @Min(0)
         Long dictCachedExpire = DEFAULT_DICT_CACHED_EXPIRE;
 
-        public static final String DEFAULT_DICT_CACHED_PREFIX = "rengine:service:dict";
+        public static final String DEFAULT_DICT_CACHED_PREFIX = "rengine:services:dict:cache";
         public static final long DEFAULT_DICT_CACHED_EXPIRE = Duration.ofHours(24).toMillis();
     }
 
     @Getter
     @Setter
     @ToString
-    public static class MinioProperties {
-        String endpoint;
-
-        String accessKey;
-
-        String secretKey;
-
-        String filHost;
+    @NoArgsConstructor
+    public static class ScheduleJobLogServiceProperties {
+        private String baseDir = RengineConstants.DEFAULT_EXECUTOR_SCRIPT_LOG_BASE_DIR;
     }
 
 }

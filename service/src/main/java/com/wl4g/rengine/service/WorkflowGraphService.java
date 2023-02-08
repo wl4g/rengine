@@ -19,11 +19,13 @@ import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.entity.WorkflowGraph;
-import com.wl4g.rengine.service.model.DeleteWorkflowGraph;
-import com.wl4g.rengine.service.model.DeleteWorkflowGraphResult;
-import com.wl4g.rengine.service.model.QueryWorkflowGraph;
-import com.wl4g.rengine.service.model.SaveWorkflowGraph;
-import com.wl4g.rengine.service.model.SaveWorkflowGraphResult;
+import com.wl4g.rengine.service.model.WorkflowGraphLogfile;
+import com.wl4g.rengine.service.model.WorkflowGraphLogfileResult;
+import com.wl4g.rengine.service.model.WorkflowDeleteGraph;
+import com.wl4g.rengine.service.model.WorkflowGraphDeleteResult;
+import com.wl4g.rengine.service.model.WorkflowGraphQuery;
+import com.wl4g.rengine.service.model.WorkflowGraphSave;
+import com.wl4g.rengine.service.model.WorkflowGraphResultSave;
 
 /**
  * {@link WorkflowGraphService}
@@ -34,9 +36,12 @@ import com.wl4g.rengine.service.model.SaveWorkflowGraphResult;
  */
 public interface WorkflowGraphService {
 
-    PageHolder<WorkflowGraph> query(@NotNull QueryWorkflowGraph model);
+    PageHolder<WorkflowGraph> query(@NotNull WorkflowGraphQuery model);
 
-    SaveWorkflowGraphResult save(@NotNull SaveWorkflowGraph model);
+    WorkflowGraphResultSave save(@NotNull WorkflowGraphSave model);
 
-    DeleteWorkflowGraphResult delete(@NotNull DeleteWorkflowGraph model);
+    WorkflowGraphDeleteResult delete(@NotNull WorkflowDeleteGraph model);
+
+    WorkflowGraphLogfileResult logtail(@NotNull WorkflowGraphLogfile model);
+
 }

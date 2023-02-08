@@ -29,11 +29,13 @@ import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.common.entity.WorkflowGraph;
 import com.wl4g.rengine.service.WorkflowGraphService;
-import com.wl4g.rengine.service.model.DeleteWorkflowGraph;
-import com.wl4g.rengine.service.model.DeleteWorkflowGraphResult;
-import com.wl4g.rengine.service.model.QueryWorkflowGraph;
-import com.wl4g.rengine.service.model.SaveWorkflowGraph;
-import com.wl4g.rengine.service.model.SaveWorkflowGraphResult;
+import com.wl4g.rengine.service.model.WorkflowDeleteGraph;
+import com.wl4g.rengine.service.model.WorkflowGraphDeleteResult;
+import com.wl4g.rengine.service.model.WorkflowGraphQuery;
+import com.wl4g.rengine.service.model.WorkflowGraphSave;
+import com.wl4g.rengine.service.model.WorkflowGraphLogfile;
+import com.wl4g.rengine.service.model.WorkflowGraphLogfileResult;
+import com.wl4g.rengine.service.model.WorkflowGraphResultSave;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -60,8 +62,8 @@ public class WorkflowGraphController {
     @Operation(description = "Query workflow graphs.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
-    public RespBase<PageHolder<WorkflowGraph>> query(@Validated QueryWorkflowGraph model) {
-        log.info("called: model={}", model);
+    public RespBase<PageHolder<WorkflowGraph>> query(@Validated WorkflowGraphQuery model) {
+        log.debug("called: model={}", model);
         RespBase<PageHolder<WorkflowGraph>> resp = RespBase.create();
         resp.setData(workflowGraphService.query(model));
         return resp;
@@ -71,9 +73,9 @@ public class WorkflowGraphController {
     @Operation(description = "Save workflow graph.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    public RespBase<SaveWorkflowGraphResult> save(@Validated @RequestBody SaveWorkflowGraph model) {
-        log.info("called: model={}", model);
-        RespBase<SaveWorkflowGraphResult> resp = RespBase.create();
+    public RespBase<WorkflowGraphResultSave> save(@Validated @RequestBody WorkflowGraphSave model) {
+        log.debug("called: model={}", model);
+        RespBase<WorkflowGraphResultSave> resp = RespBase.create();
         resp.setData(workflowGraphService.save(model));
         return resp;
     }
@@ -82,10 +84,21 @@ public class WorkflowGraphController {
     @Operation(description = "Delete workflow graph.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
-    public RespBase<DeleteWorkflowGraphResult> delete(@Validated @RequestBody DeleteWorkflowGraph model) {
-        log.info("called: model={}", model);
-        RespBase<DeleteWorkflowGraphResult> resp = RespBase.create();
+    public RespBase<WorkflowGraphDeleteResult> delete(@Validated @RequestBody WorkflowDeleteGraph model) {
+        log.debug("called: model={}", model);
+        RespBase<WorkflowGraphDeleteResult> resp = RespBase.create();
         resp.setData(workflowGraphService.delete(model));
+        return resp;
+    }
+
+    // @SecurityRequirement(name = "default_oauth")
+    @Operation(description = "Tail load for workflow graph log file.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
+    @RequestMapping(path = { "logtail" }, produces = "application/json", method = { GET })
+    public RespBase<WorkflowGraphLogfileResult> logtail(@Validated WorkflowGraphLogfile model) {
+        log.debug("called: model={}", model);
+        RespBase<WorkflowGraphLogfileResult> resp = RespBase.create();
+        resp.setData(workflowGraphService.logtail(model));
         return resp;
     }
 

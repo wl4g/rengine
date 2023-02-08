@@ -20,10 +20,10 @@ import javax.validation.constraints.NotNull;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.entity.UploadObject;
 import com.wl4g.rengine.service.model.DeleteUpload;
-import com.wl4g.rengine.service.model.DeleteUploadResult;
-import com.wl4g.rengine.service.model.QueryUpload;
-import com.wl4g.rengine.service.model.SaveUpload;
-import com.wl4g.rengine.service.model.SaveUploadResult;
+import com.wl4g.rengine.service.model.UploadDeleteResult;
+import com.wl4g.rengine.service.model.UploadQuery;
+import com.wl4g.rengine.service.model.UploadSave;
+import com.wl4g.rengine.service.model.UploadSaveResult;
 
 /**
  * {@link UploadService}
@@ -34,9 +34,9 @@ import com.wl4g.rengine.service.model.SaveUploadResult;
  */
 public interface UploadService {
 
-    PageHolder<UploadObject> query(@NotNull QueryUpload model);
+    PageHolder<UploadObject> query(@NotNull UploadQuery model);
 
-    SaveUploadResult apply(@NotNull SaveUpload model);
+    UploadSaveResult apply(@NotNull UploadSave model);
 
-    DeleteUploadResult delete(@NotNull DeleteUpload model);
+    UploadDeleteResult delete(@NotNull DeleteUpload model);
 }

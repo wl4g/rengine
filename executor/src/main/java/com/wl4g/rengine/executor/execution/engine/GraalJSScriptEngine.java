@@ -22,7 +22,7 @@ import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.FastTimeClock.currentTimeMillis;
 import static com.wl4g.infra.common.lang.StringUtils2.getFilename;
 import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_MAIN_FUNCTION;
-import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_TMP_SCRIPT_CACHE_DIR;
+import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_SCRIPT_TMP_CACHE_DIR;
 import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsName.execution_time;
 import static java.lang.String.format;
 import static java.util.Collections.singletonMap;
@@ -55,7 +55,7 @@ import com.wl4g.rengine.common.exception.ExecutionScriptException;
 import com.wl4g.rengine.common.graph.ExecutionGraphContext;
 import com.wl4g.rengine.common.graph.ExecutionGraphParameter;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
-import com.wl4g.rengine.executor.execution.ExecutionConfig.ScriptLogConfig;
+import com.wl4g.rengine.executor.execution.ExecutionConfig.EngineConfig.ScriptLogConfig;
 import com.wl4g.rengine.executor.execution.sdk.ScriptContext;
 import com.wl4g.rengine.executor.execution.sdk.ScriptExecutor;
 import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
@@ -90,9 +90,21 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
         super.init();
         try {
             log.info("Initialzing graal JS script engine ...");
-            final ScriptLogConfig scriptLogConfig = config.log();
+            final ScriptLogConfig scriptLogConfig = config.engine().log();
 
-            this.graalPolyglotManager = GraalPolyglotManager.newDefaultGraalJS(DEFAULT_EXECUTOR_TMP_SCRIPT_CACHE_DIR,
+            /**
+             * TODO The best way is to let the rengine executor write to OSS in
+             * real time, but unfortunately MinIO/S3 does not support append
+             * writing (although it supports object merging, but it is still
+             * difficult to achieve), unless you use Alibaba Cloud OSS (supports
+             * real-time append writing), but this not a neutral approach.
+             * Therefore, at present, only direct reading and writing of disks
+             * is realized, and then shared mounts such as juiceFS, s3fs-fuse,
+             * ossfs, etc. can be used to realize clustering. see to:
+             * {@link com.wl4g.rengine.service.impl.ScheduleJobLogServiceImpl#logfile}
+             */
+            //
+            this.graalPolyglotManager = GraalPolyglotManager.newDefaultGraalJS(DEFAULT_EXECUTOR_SCRIPT_TMP_CACHE_DIR,
                     metadata -> new JdkLoggingOutputStream(buildScriptLogFilePattern(scriptLogConfig.baseDir(), metadata, false),
                             Level.INFO, scriptLogConfig.fileMaxSize(), scriptLogConfig.fileMaxCount(),
                             scriptLogConfig.enableConsole(), false),

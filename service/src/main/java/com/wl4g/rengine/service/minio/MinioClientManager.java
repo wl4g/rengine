@@ -32,6 +32,7 @@ import com.wl4g.infra.common.minio.S3Policy.EffectType;
 import com.wl4g.infra.common.minio.S3Policy.Statement;
 import com.wl4g.rengine.service.minio.MinioClientProperties.UserUploadAssumeConfig;
 
+import io.minio.MinioClient;
 import io.minio.credentials.AssumeRoleProvider;
 import io.minio.credentials.Credentials;
 import lombok.AllArgsConstructor;
@@ -49,6 +50,7 @@ import okhttp3.OkHttpClient;
 @AllArgsConstructor
 public class MinioClientManager implements ApplicationRunner {
     private final MinioClientProperties config;
+    private final MinioClient minioClient;
     private final OkHttpClient httpClient;
 
     @Override

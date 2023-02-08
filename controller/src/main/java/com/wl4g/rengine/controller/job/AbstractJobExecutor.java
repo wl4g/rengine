@@ -49,8 +49,8 @@ import com.wl4g.rengine.controller.lifecycle.GlobalControllerJobManager;
 import com.wl4g.rengine.service.ScheduleJobLogService;
 import com.wl4g.rengine.service.ScheduleTriggerService;
 import com.wl4g.rengine.service.meter.RengineMeterService;
-import com.wl4g.rengine.service.model.SaveScheduleJobLogResult;
-import com.wl4g.rengine.service.model.SaveScheduleTriggerResult;
+import com.wl4g.rengine.service.model.ScheduleJobLogSaveResult;
+import com.wl4g.rengine.service.model.ScheduleTriggerSaveResult;
 
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
@@ -208,7 +208,7 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor, Close
         // nodes.
         /*
          * Only the instance path indicates the current number of online nodes
-         * (temporary), and the service path indicates the cumulative number of
+         * (temporary), and the dict path indicates the cumulative number of
          * online + offline nodes (permanent). for example:
          * /rengine/node-exporter-job/instances => [10.0.0.114@-@195117]
          */
@@ -224,7 +224,7 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor, Close
     protected ScheduleTrigger updateTriggerRunState(final @NotNull Long triggerId, final @NotNull RunState runState) {
         notNullOf(runState, "runState");
         ScheduleTrigger trigger = null;
-        SaveScheduleTriggerResult result = null;
+        ScheduleTriggerSaveResult result = null;
         try {
             trigger = getScheduleTriggerService().get(notNullOf(triggerId, "triggerId"));
             trigger.setRunState(runState);
@@ -248,7 +248,7 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor, Close
             final Consumer<ScheduleJobLog> saveJobLogPrepared) {
         notNullOf(triggerId, "triggerId");
         ScheduleJobLog jogLog = null;
-        SaveScheduleJobLogResult result = null;
+        ScheduleJobLogSaveResult result = null;
         try {
             if (nonNull(jobLogId)) {
                 jogLog = getScheduleJobLogService().get(jobLogId);

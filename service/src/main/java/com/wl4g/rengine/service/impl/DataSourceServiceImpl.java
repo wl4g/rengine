@@ -39,11 +39,11 @@ import com.wl4g.rengine.common.entity.DataSourceProperties;
 import com.wl4g.rengine.common.util.BeanSensitiveTransforms;
 import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.service.DataSourceService;
-import com.wl4g.rengine.service.model.DeleteDataSource;
-import com.wl4g.rengine.service.model.DeleteDataSourceResult;
-import com.wl4g.rengine.service.model.QueryDataSource;
-import com.wl4g.rengine.service.model.SaveDataSource;
-import com.wl4g.rengine.service.model.SaveDataSourceResult;
+import com.wl4g.rengine.service.model.DataSourceDelete;
+import com.wl4g.rengine.service.model.DataSourceDeleteResult;
+import com.wl4g.rengine.service.model.DataSourceQuery;
+import com.wl4g.rengine.service.model.DataSourceSave;
+import com.wl4g.rengine.service.model.DataSourceSaveResult;
 
 /**
  * {@link DataSourceServiceImpl}
@@ -58,7 +58,7 @@ public class DataSourceServiceImpl implements DataSourceService {
     private @Autowired MongoTemplate mongoTemplate;
 
     @Override
-    public PageHolder<DataSourceProperties> query(QueryDataSource model) {
+    public PageHolder<DataSourceProperties> query(DataSourceQuery model) {
         final Query query = new Query(andCriteria(baseCriteria(model),
                 isCriteria("properties.type", nonNull(model.getType()) ? model.getType().name() : null)))
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
@@ -77,7 +77,7 @@ public class DataSourceServiceImpl implements DataSourceService {
     }
 
     @Override
-    public SaveDataSourceResult save(SaveDataSource model) {
+    public DataSourceSaveResult save(DataSourceSave model) {
         DataSourceProperties dataSourceProperties = model;
         // @formatter:off
         //DataSourceProperties dataSource = DataSourceProperties.builder()
@@ -100,15 +100,15 @@ public class DataSourceServiceImpl implements DataSourceService {
         }
 
         DataSourceProperties saved = mongoTemplate.save(dataSourceProperties, MongoCollectionDefinition.T_DATASOURCES.getName());
-        return SaveDataSourceResult.builder().id(saved.getId()).build();
+        return DataSourceSaveResult.builder().id(saved.getId()).build();
     }
 
     @Override
-    public DeleteDataSourceResult delete(DeleteDataSource model) {
+    public DataSourceDeleteResult delete(DataSourceDelete model) {
         // 'id' is a keyword, it will be automatically converted to '_id'
         DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
                 MongoCollectionDefinition.T_DATASOURCES.getName());
-        return DeleteDataSourceResult.builder().deletedCount(result.getDeletedCount()).build();
+        return DataSourceDeleteResult.builder().deletedCount(result.getDeletedCount()).build();
     }
 
 }

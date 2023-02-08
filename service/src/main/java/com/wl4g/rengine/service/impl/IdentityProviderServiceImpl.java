@@ -32,10 +32,10 @@ import com.wl4g.rengine.common.entity.IdentityProvider;
 import com.wl4g.rengine.common.util.BeanSensitiveTransforms;
 import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.service.IdentityProviderService;
-import com.wl4g.rengine.service.model.QueryIdentityProvider;
-import com.wl4g.rengine.service.model.QueryIdentityProviderResult;
-import com.wl4g.rengine.service.model.SaveIdentityProvider;
-import com.wl4g.rengine.service.model.SaveIdentityProviderResult;
+import com.wl4g.rengine.service.model.IdentityProviderQuery;
+import com.wl4g.rengine.service.model.IdentityProviderQueryResult;
+import com.wl4g.rengine.service.model.IdentityProviderSave;
+import com.wl4g.rengine.service.model.IdentityProviderSaveResult;
 
 /**
  * {@link IdentityProviderServiceImpl}
@@ -50,7 +50,7 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
     private @Autowired MongoTemplate mongoTemplate;
 
     @Override
-    public QueryIdentityProviderResult query(QueryIdentityProvider model) {
+    public IdentityProviderQueryResult query(IdentityProviderQuery model) {
         List<IdentityProvider> idpConfigs = null;
         if (!isBlank(model.getKind())) {
             Criteria criteria = new Criteria().orOperator(Criteria.where("kind").is(model.getKind()));
@@ -69,11 +69,11 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
             BeanSensitiveTransforms.transform(idp);
         }
 
-        return QueryIdentityProviderResult.builder().providers(idpConfigs).build();
+        return IdentityProviderQueryResult.builder().providers(idpConfigs).build();
     }
 
     @Override
-    public SaveIdentityProviderResult save(SaveIdentityProvider model) {
+    public IdentityProviderSaveResult save(IdentityProviderSave model) {
         IdentityProvider provider = model.getProvider();
         if (isNull(provider.getId())) {
             provider.setId(IdGenUtils.nextLong());
@@ -83,7 +83,7 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
         }
         provider.setUpdateDate(new Date());
         IdentityProvider saved = mongoTemplate.save(provider, MongoCollectionDefinition.SYS_IDENTITY_PROVIDERS.getName());
-        return SaveIdentityProviderResult.builder().id(saved.getId()).build();
+        return IdentityProviderSaveResult.builder().id(saved.getId()).build();
     }
 
 }

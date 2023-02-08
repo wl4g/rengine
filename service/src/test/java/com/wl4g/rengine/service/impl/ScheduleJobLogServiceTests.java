@@ -27,7 +27,7 @@ import org.junit.Test;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import com.wl4g.rengine.common.entity.ScheduleJobLog;
-import com.wl4g.rengine.service.model.DeleteScheduleJobLog;
+import com.wl4g.rengine.service.model.ScheduleJobLogDelete;
 import com.wl4g.rengine.service.util.TestDefaultMongoSetup;
 import com.wl4g.rengine.service.util.TestDefaultRedisTemplateSetup;
 
@@ -80,7 +80,7 @@ public class ScheduleJobLogServiceTests {
         final long retentionHours = 168; // 7 days
         final long purgeUpperTime = currentTime - Duration.ofHours(retentionHours).toMillis();
         final var result = scheduleJobLogService
-                .delete(DeleteScheduleJobLog.builder().updateDateUpper(new Date(purgeUpperTime)).retentionCount(3L).build());
+                .delete(ScheduleJobLogDelete.builder().updateDateUpper(new Date(purgeUpperTime)).retentionCount(3L).build());
         System.out.println("Deleted count: " + result);
         assert result.getDeletedCount() == 6L;
     }

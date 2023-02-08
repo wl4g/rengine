@@ -38,11 +38,11 @@ import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinit
 import com.wl4g.rengine.common.entity.Workflow;
 import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.service.WorkflowService;
-import com.wl4g.rengine.service.model.DeleteWorkflow;
-import com.wl4g.rengine.service.model.DeleteWorkflowResult;
-import com.wl4g.rengine.service.model.QueryWorkflow;
-import com.wl4g.rengine.service.model.SaveWorkflow;
-import com.wl4g.rengine.service.model.SaveWorkflowResult;
+import com.wl4g.rengine.service.model.WorkflowDelete;
+import com.wl4g.rengine.service.model.WorkflowDeleteResult;
+import com.wl4g.rengine.service.model.WorkflowQuery;
+import com.wl4g.rengine.service.model.WorkflowSave;
+import com.wl4g.rengine.service.model.WorkflowSaveResult;
 
 /**
  * {@link WorkflowServiceImpl}
@@ -57,7 +57,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     private @Autowired MongoTemplate mongoTemplate;
 
     @Override
-    public PageHolder<Workflow> query(QueryWorkflow model) {
+    public PageHolder<Workflow> query(WorkflowQuery model) {
         final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getWorkflowId()),
                 isCriteria("scenesId", model.getScenesId())))
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
@@ -73,7 +73,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    public SaveWorkflowResult save(SaveWorkflow model) {
+    public WorkflowSaveResult save(WorkflowSave model) {
         final Workflow workflow = model;
         // @formatter:off
         //final Workflow workflow = Workflow.builder()
@@ -96,15 +96,15 @@ public class WorkflowServiceImpl implements WorkflowService {
         }
 
         Workflow saved = mongoTemplate.save(workflow, MongoCollectionDefinition.T_WORKFLOWS.getName());
-        return SaveWorkflowResult.builder().id(saved.getId()).build();
+        return WorkflowSaveResult.builder().id(saved.getId()).build();
     }
 
     @Override
-    public DeleteWorkflowResult delete(DeleteWorkflow model) {
+    public WorkflowDeleteResult delete(WorkflowDelete model) {
         // 'id' is a keyword, it will be automatically converted to '_id'
         DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
                 MongoCollectionDefinition.T_WORKFLOWS.getName());
-        return DeleteWorkflowResult.builder().deletedCount(result.getDeletedCount()).build();
+        return WorkflowDeleteResult.builder().deletedCount(result.getDeletedCount()).build();
     }
 
 }

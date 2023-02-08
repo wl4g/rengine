@@ -26,10 +26,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.service.IdentityProviderService;
-import com.wl4g.rengine.service.model.QueryIdentityProvider;
-import com.wl4g.rengine.service.model.QueryIdentityProviderResult;
-import com.wl4g.rengine.service.model.SaveIdentityProvider;
-import com.wl4g.rengine.service.model.SaveIdentityProviderResult;
+import com.wl4g.rengine.service.model.IdentityProviderQuery;
+import com.wl4g.rengine.service.model.IdentityProviderQueryResult;
+import com.wl4g.rengine.service.model.IdentityProviderSave;
+import com.wl4g.rengine.service.model.IdentityProviderSaveResult;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -56,9 +56,9 @@ public class IdentityProviderController {
     @Operation(description = "Query identity provider settings.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
-    public RespBase<QueryIdentityProviderResult> query(@Validated QueryIdentityProvider model) {
-        log.info("called: model={}", model);
-        RespBase<QueryIdentityProviderResult> resp = RespBase.create();
+    public RespBase<IdentityProviderQueryResult> query(@Validated IdentityProviderQuery model) {
+        log.debug("called: model={}", model);
+        RespBase<IdentityProviderQueryResult> resp = RespBase.create();
         resp.setData(identityProviderService.query(model));
         return resp;
     }
@@ -67,9 +67,9 @@ public class IdentityProviderController {
     @Operation(description = "Save identity provider settings.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    public RespBase<SaveIdentityProviderResult> save(@Validated @RequestBody SaveIdentityProvider model) {
-        log.info("called: model={}", model);
-        RespBase<SaveIdentityProviderResult> resp = RespBase.create();
+    public RespBase<IdentityProviderSaveResult> save(@Validated @RequestBody IdentityProviderSave model) {
+        log.debug("called: model={}", model);
+        RespBase<IdentityProviderSaveResult> resp = RespBase.create();
         resp.setData(identityProviderService.save(model));
         return resp;
     }

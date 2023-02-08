@@ -35,7 +35,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 
 import com.google.common.collect.Lists;
 import com.wl4g.infra.common.bean.BaseBean;
-import com.wl4g.rengine.service.model.QueryBase;
+import com.wl4g.rengine.service.model.BaseQuery;
 
 /**
  * {@link QueryHolder}
@@ -46,12 +46,12 @@ import com.wl4g.rengine.service.model.QueryBase;
  */
 public abstract class QueryHolder {
 
-    public static @NotNull Criteria baseCriteria(final @NotNull QueryBase<? extends BaseBean> model) {
+    public static @NotNull Criteria baseCriteria(final @NotNull BaseQuery<? extends BaseBean> model) {
         return baseCriteria(model, true, true);
     }
 
     public static @NotNull Criteria baseCriteria(
-            final @NotNull QueryBase<? extends BaseBean> model,
+            final @NotNull BaseQuery<? extends BaseBean> model,
             boolean and,
             boolean delFlagNormal) {
         notNullOf(model, "model");

@@ -123,7 +123,7 @@ public class MongoSourceFacade implements DataSourceFacade {
                                 .collect(toList());
 
                         try (MongoCursor<JsonNode> cursor = collection.aggregate(aggregateQuery)
-                                .batchSize(executionConfig.engine().maxQueryBatch())
+                                .batchSize(DEFAULT_QUERY_BATCH)
                                 .map(doc -> parseToNode(doc.toJson()))
                                 .iterator();) {
                             return IteratorUtils.toList(cursor);
@@ -252,5 +252,7 @@ public class MongoSourceFacade implements DataSourceFacade {
         }
 
     }
+
+    public static final int DEFAULT_QUERY_BATCH = 1024;
 
 }

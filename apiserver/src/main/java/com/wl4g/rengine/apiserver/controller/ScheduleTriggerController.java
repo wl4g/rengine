@@ -29,11 +29,11 @@ import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.common.entity.ScheduleTrigger;
 import com.wl4g.rengine.service.ScheduleTriggerService;
-import com.wl4g.rengine.service.model.DeleteScheduleTrigger;
-import com.wl4g.rengine.service.model.DeleteScheduleTriggerResult;
-import com.wl4g.rengine.service.model.QueryScheduleTrigger;
-import com.wl4g.rengine.service.model.SaveScheduleTrigger;
-import com.wl4g.rengine.service.model.SaveScheduleTriggerResult;
+import com.wl4g.rengine.service.model.ScheduleTriggerDelete;
+import com.wl4g.rengine.service.model.ScheduleTriggerDeleteResult;
+import com.wl4g.rengine.service.model.ScheduleTriggerQuery;
+import com.wl4g.rengine.service.model.ScheduleTriggerSave;
+import com.wl4g.rengine.service.model.ScheduleTriggerSaveResult;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -60,8 +60,8 @@ public class ScheduleTriggerController {
     @Operation(description = "Query schedule triggers.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
-    public RespBase<PageHolder<ScheduleTrigger>> query(@Validated QueryScheduleTrigger model) {
-        log.info("called: model={}", model);
+    public RespBase<PageHolder<ScheduleTrigger>> query(@Validated ScheduleTriggerQuery model) {
+        log.debug("called: model={}", model);
         RespBase<PageHolder<ScheduleTrigger>> resp = RespBase.create();
         resp.setData(scheduleTriggerService.query(model));
         return resp;
@@ -71,9 +71,9 @@ public class ScheduleTriggerController {
     @Operation(description = "Save schedule trigger.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    public RespBase<SaveScheduleTriggerResult> save(@Validated @RequestBody SaveScheduleTrigger model) {
-        log.info("called: model={}", model);
-        RespBase<SaveScheduleTriggerResult> resp = RespBase.create();
+    public RespBase<ScheduleTriggerSaveResult> save(@Validated @RequestBody ScheduleTriggerSave model) {
+        log.debug("called: model={}", model);
+        RespBase<ScheduleTriggerSaveResult> resp = RespBase.create();
         resp.setData(scheduleTriggerService.save(model));
         return resp;
     }
@@ -82,9 +82,9 @@ public class ScheduleTriggerController {
     @Operation(description = "Delete schedule trigger.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
-    public RespBase<DeleteScheduleTriggerResult> delete(@Validated @RequestBody DeleteScheduleTrigger model) {
-        log.info("called: model={}", model);
-        RespBase<DeleteScheduleTriggerResult> resp = RespBase.create();
+    public RespBase<ScheduleTriggerDeleteResult> delete(@Validated @RequestBody ScheduleTriggerDelete model) {
+        log.debug("called: model={}", model);
+        RespBase<ScheduleTriggerDeleteResult> resp = RespBase.create();
         resp.setData(scheduleTriggerService.delete(model));
         return resp;
     }

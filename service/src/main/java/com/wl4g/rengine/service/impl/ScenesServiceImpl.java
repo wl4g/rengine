@@ -37,11 +37,11 @@ import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinit
 import com.wl4g.rengine.common.entity.Scenes;
 import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.service.ScenesService;
-import com.wl4g.rengine.service.model.DeleteScenes;
-import com.wl4g.rengine.service.model.DeleteScenesResult;
-import com.wl4g.rengine.service.model.QueryScenes;
-import com.wl4g.rengine.service.model.SaveScenes;
-import com.wl4g.rengine.service.model.SaveScenesResult;
+import com.wl4g.rengine.service.model.ScenesDelete;
+import com.wl4g.rengine.service.model.ScenesDeleteResult;
+import com.wl4g.rengine.service.model.ScenesQuery;
+import com.wl4g.rengine.service.model.ScenesSave;
+import com.wl4g.rengine.service.model.ScenesSaveResult;
 
 /**
  * {@link ScenesServiceImpl}
@@ -56,7 +56,7 @@ public class ScenesServiceImpl implements ScenesService {
     private @Autowired MongoTemplate mongoTemplate;
 
     @Override
-    public PageHolder<Scenes> query(QueryScenes model) {
+    public PageHolder<Scenes> query(ScenesQuery model) {
         final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getScenesId())))
                 .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
@@ -85,7 +85,7 @@ public class ScenesServiceImpl implements ScenesService {
     }
 
     @Override
-    public SaveScenesResult save(SaveScenes model) {
+    public ScenesSaveResult save(ScenesSave model) {
         Scenes scenes = model;
         // @formatter:off
         //Scenes scenes = Scenes.builder()
@@ -108,15 +108,15 @@ public class ScenesServiceImpl implements ScenesService {
         }
 
         Scenes saved = mongoTemplate.save(scenes, MongoCollectionDefinition.T_SCENESES.getName());
-        return SaveScenesResult.builder().id(saved.getId()).build();
+        return ScenesSaveResult.builder().id(saved.getId()).build();
     }
 
     @Override
-    public DeleteScenesResult delete(DeleteScenes model) {
+    public ScenesDeleteResult delete(ScenesDelete model) {
         // 'id' is a keyword, it will be automatically converted to '_id'
         DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
                 MongoCollectionDefinition.T_SCENESES.getName());
-        return DeleteScenesResult.builder().deletedCount(result.getDeletedCount()).build();
+        return ScenesDeleteResult.builder().deletedCount(result.getDeletedCount()).build();
     }
 
 }

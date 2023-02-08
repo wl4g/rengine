@@ -23,7 +23,7 @@ import static com.wl4g.infra.common.lang.StringUtils2.getFilename;
 import static com.wl4g.infra.common.lang.TypeConverts.safeLongToInt;
 import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_S3_OBJECT_MAX_LIMIT;
 import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_S3_OBJECT_READ_BUFFER;
-import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_TMP_SCRIPT_CACHE_DIR;
+import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_SCRIPT_TMP_CACHE_DIR;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.BufferedOutputStream;
@@ -120,7 +120,7 @@ public class MinioManager {
             boolean useCache) throws ErrorResponseException, InsufficientDataException, InternalException, InvalidKeyException,
             InvalidResponseException, IOException, NoSuchAlgorithmException, ServerException, XmlParserException, IOException {
 
-        File localFile = determineLocalFile(uploadType, objectPrefix, scenesCode);
+        final File localFile = determineLocalFile(uploadType, objectPrefix, scenesCode);
 
         // Gets from local cached.
         if (useCache && localFile.exists() && localFile.length() > 0) {
@@ -128,7 +128,11 @@ public class MinioManager {
         }
 
         // Gets from MinIO brokers.
-        GetObjectArgs args = GetObjectArgs.builder().bucket(config.bucket()).region(config.region()).object(objectPrefix).build();
+        final GetObjectArgs args = GetObjectArgs.builder()
+                .bucket(config.bucket())
+                .region(config.region())
+                .object(objectPrefix)
+                .build();
         try (GetObjectResponse result = minioClient.getObject(args);) {
             int available = result.available();
             isTrue(available <= DEFAULT_EXECUTOR_S3_OBJECT_MAX_LIMIT, "Maximum file object readable limit exceeded: %s",
@@ -192,7 +196,7 @@ public class MinioManager {
         hasTextOf(objectPrefix, "objectPrefix");
         hasTextOf(scenesCode, "scenesCode");
 
-        final File localFile = new File(DEFAULT_EXECUTOR_TMP_SCRIPT_CACHE_DIR.concat("/")
+        final File localFile = new File(DEFAULT_EXECUTOR_SCRIPT_TMP_CACHE_DIR.concat("/")
                 .concat(uploadType.name())
                 .concat("/")
                 .concat(scenesCode)

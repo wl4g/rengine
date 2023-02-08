@@ -33,11 +33,11 @@ import lombok.Getter;
  */
 public abstract class RengineConstants extends EnvironmentUtil {
 
-    // ---------- Basic definitions. ----------
+    // ----- for Basic definitions. -----
 
     public static final String CONF_PREFIX = "rengine";
 
-    // ---------- ApiServer definitions. ----------
+    // ----- for ApiServer definitions. -----
 
     public static final String CONF_PREFIX_APISERVER = CONF_PREFIX + ".apiserver";
     public static final String DEFAULT_MONGODB_DATABASE = getStringProperty("mongodb.database", "rengine");
@@ -45,17 +45,16 @@ public abstract class RengineConstants extends EnvironmentUtil {
     public static final String DEFAULT_MINIO_REGION = "us-east-1";
     public static final String DEFAULT_MINIO_BUCKET = "rengine";
 
-    // ---------- Controller definitions. ----------
+    // ----- for Controller definitions. -----
 
     public static final String CONF_PREFIX_CONTROLLER = CONF_PREFIX + ".controller";
 
-    // ---------- Executor definitions. ----------
+    // ----- for Executor definitions. -----
 
     public static final String CONF_PREFIX_EXECUTOR = CONF_PREFIX + ".executor";
     public static final String API_EXECUTOR_EXECUTE_BASE = "/execution";
     // Receive execution request internal from client SDK. For example, a
-    // request from a business application JVM process via a dependent client
-    // SDK.
+    // request from a business application JVM process via a depends client SDK.
     public static final String API_EXECUTOR_EXECUTE_INTERNAL = "/execute/internal";
     // Receive execution requests custom from arbitrary external systems. For
     // example: the request sent when the pushes(or webhook) subscription events
@@ -65,21 +64,22 @@ public abstract class RengineConstants extends EnvironmentUtil {
     public static final String API_EXECUTOR_EXECUTE_CUSTOM = "/execute/custom";
     // Notice: The handcode entrypoint function is 'process'
     public static final String DEFAULT_EXECUTOR_MAIN_FUNCTION = "process";
-    public static final String DEFAULT_EXECUTOR_TMP_SCRIPT_CACHE_DIR = "/tmp/__rengine_script_caches";
+    public static final String DEFAULT_EXECUTOR_SCRIPT_TMP_CACHE_DIR = "/tmp/__rengine_script_caches";
+    public static final String DEFAULT_EXECUTOR_SCRIPT_LOG_BASE_DIR = "/tmp/__rengine_script_log";
     public static final String DEFAULT_EXECUTOR_LOGGING_PREFIX = "log";
     public static final int DEFAULT_EXECUTOR_S3_OBJECT_READ_BUFFER = getIntProperty("EXECUTOR_S3_OBJECT_READ_BUFFER", 4 * 1024);
     public static final int DEFAULT_EXECUTOR_S3_OBJECT_MAX_LIMIT = getIntProperty("EXECUTOR_S3_OBJECT_MAX_LIMIT",
             10 * 1024 * 1024);
 
-    // ---------- Client definitions. ----------
+    // ----- for Client definitions. -----
 
     public static final String CONF_PREFIX_CLIENT = CONF_PREFIX + ".client";
 
-    // ---------- Jobs definitions. ----------
+    // ----- for Job definitions. -----
 
     public static final String DEFAULT_EVENTBUS_TOPIC = "rengine_event";
 
-    // ---------- Eventbus definitions. ----------
+    // ----- for Eventbus definitions. -----
 
     public static final String CONF_PREFIX_EVENTBUS = CONF_PREFIX + ".eventbus";
     public static final String CONF_PREFIX_EVENTBUS_KAFKA = CONF_PREFIX_EVENTBUS + ".kafka";

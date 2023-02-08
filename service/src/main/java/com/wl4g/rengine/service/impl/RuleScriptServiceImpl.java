@@ -37,11 +37,11 @@ import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinit
 import com.wl4g.rengine.common.entity.RuleScript;
 import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.service.RuleScriptService;
-import com.wl4g.rengine.service.model.DeleteRuleScript;
-import com.wl4g.rengine.service.model.DeleteRuleScriptResult;
-import com.wl4g.rengine.service.model.QueryRuleScript;
-import com.wl4g.rengine.service.model.SaveRuleScript;
-import com.wl4g.rengine.service.model.SaveRuleScriptResult;
+import com.wl4g.rengine.service.model.RuleScriptDelete;
+import com.wl4g.rengine.service.model.RuleScriptDeleteResult;
+import com.wl4g.rengine.service.model.RuleScriptQuery;
+import com.wl4g.rengine.service.model.RuleScriptSave;
+import com.wl4g.rengine.service.model.RuleScriptSaveResult;
 import com.wl4g.rengine.service.mongo.GlobalMongoSequenceService;
 
 /**
@@ -61,7 +61,7 @@ public class RuleScriptServiceImpl implements RuleScriptService {
     GlobalMongoSequenceService globalMongoSequenceService;
 
     @Override
-    public PageHolder<RuleScript> query(QueryRuleScript model) {
+    public PageHolder<RuleScript> query(RuleScriptQuery model) {
         final Query query = new Query(andCriteria(baseCriteria(model), isCriteria("_id", model.getScriptId()),
                 isCriteria("ruleId", model.getRuleId())));
 
@@ -78,7 +78,7 @@ public class RuleScriptServiceImpl implements RuleScriptService {
     }
 
     @Override
-    public SaveRuleScriptResult save(SaveRuleScript model) {
+    public RuleScriptSaveResult save(RuleScriptSave model) {
         final RuleScript script = model;
         notNullOf(script, "script");
         notNullOf(script.getRuleId(), "ruleId");
@@ -113,15 +113,15 @@ public class RuleScriptServiceImpl implements RuleScriptService {
         script.setRevision(globalMongoSequenceService.getNextSequence(GlobalMongoSequenceService.SCRIPTS_REVISION_SEQ));
 
         RuleScript saved = mongoTemplate.save(script, MongoCollectionDefinition.T_RULE_SCRIPTS.getName());
-        return SaveRuleScriptResult.builder().id(saved.getId()).build();
+        return RuleScriptSaveResult.builder().id(saved.getId()).build();
     }
 
     @Override
-    public DeleteRuleScriptResult delete(DeleteRuleScript model) {
+    public RuleScriptDeleteResult delete(RuleScriptDelete model) {
         // 'id' is a keyword, it will be automatically converted to '_id'
         DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
                 MongoCollectionDefinition.T_RULE_SCRIPTS.getName());
-        return DeleteRuleScriptResult.builder().deletedCount(result.getDeletedCount()).build();
+        return RuleScriptDeleteResult.builder().deletedCount(result.getDeletedCount()).build();
     }
 
 }
