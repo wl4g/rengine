@@ -1,4 +1,4 @@
-# Rengine for Executor Development Guide
+# Development guide for Rengine Executor
 
 ## Build for JAR
 
@@ -224,3 +224,9 @@ tail -f /tmp/rengine/executor.log | jq -r '.message'
   - a. Multiple threads are not allowed to call the same js script context.
   - b. The native runtime does not support interactive calls to java methods
 
+## FAQ
+
+### If you use the groovy environment, pay attention to the version situation between the components
+  - 1. The **groovy-4.0.5**(current latest) that the rengine-evaluator module depends on only supports **jdk1.8/9/10/16**
+  - 2. The **spring-native-0.12.1*** (current latest) that the rengine-manager module depends on only supports jdk11+
+  - 3. Refer source code: [github.com/apache/groovy/blob/GROOVY_4_0_5/src/main/java/org/codehaus/groovy/vmplugin/VMPluginFactory.java#L39](https://github.com/apache/groovy/blob/GROOVY_4_0_5/src/main/java/org/codehaus/groovy/vmplugin/VMPluginFactory.java#L39)

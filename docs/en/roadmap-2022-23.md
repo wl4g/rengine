@@ -4,7 +4,7 @@ Please refer the following sections for Rengine release plan of H1 2022, new rel
 
 Please let us know if you have urgent needs which are not presented in the plan.
 
-## 1.0.0 [October]
+## 0.1.8
 
 - Configurable scenes, workflows, rules, library, testset in management UI.
 
@@ -12,13 +12,13 @@ Please let us know if you have urgent needs which are not presented in the plan.
 
 - Integrate Arthas (proxy/tunnel) with Rengine Manager for easy troubleshooting by sysadmins
 
-- Support docker-compose one-click deployment demo environment (including all: `manager, evaluator, collector, mongodb, redis, mysql, kafka, flink, hbase`)
+- Support docker-compose one-click deployment demo environment (including all: `apiserver, executor, controller, mongo, redis, mysql, kafka, flink, hbase`)
 
 - Improve the execution graph of the workflow graal.js engine (only for non-flink services)
 
 - Complete client-core, client-eventbus support basic calls, such as the first best practice is to access iot-collector to clean and filter.
 
-## 1.1.0 [November]
+## 0.1.9
 
 - Add built-in core metrics (prometheus) and write official metrics alert rules and grafana view rules.
 
@@ -29,13 +29,14 @@ Please let us know if you have urgent needs which are not presented in the plan.
 
 - Improve Rengine Manager configuration management, friendly to user configuration rules, support online simulation of test-data sets
 
-## 1.2.0 [December]
+## 1.0.0
 
-- Supports one-click deployment to Kubernetes production clusters through helm, including `manager, evaluator, collector, `  
-`mongodb, redis, mysql, kafka, flink`, but excluding HBase (such as CDH/HDP deployment is recommended)
+- Supports one-click deployment to Kubernetes production clusters through helm, including `apiserver, executor, controller, `  
+`mongo, redis, mysql, kafka, flink`, but excluding HBase (such as CDH/HDP deployment is recommended)
 
 - Improve the butt tracking data to the jaeger dashboard, and fully display the call relationship diagram.
 
 - Add the rengine-operator module to make it auto management to the cloud-native environment?
 
 - Improve the Rengine Evaluator(quarkus native) runtime debugging toolchain and documentation, including memory snapshot dumps, real-time thread status dumps
+
