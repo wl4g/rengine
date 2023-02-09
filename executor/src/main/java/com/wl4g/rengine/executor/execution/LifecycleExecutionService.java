@@ -132,9 +132,7 @@ public class LifecycleExecutionService {
                         executionExecutor.submit(new ExecutionRunner(latch, executeRequest, scenes))))
                 .collect(toMap(kv -> (String) kv.getItem1(), kv -> (Future) kv.getItem2()));
 
-        // Completed results.
         final Map<String, ResultDescription> completed = new HashMap<>(futures.size());
-        // Uncompleted results.
         final Set<ResultDescription> uncompleted = new HashSet<>(futures.size());
 
         // Calculate the effective timeout time (ms), minus the network
@@ -152,7 +150,8 @@ public class LifecycleExecutionService {
                 if (future.isDone()) {
                     // Collect for completed results.
                     completed.putIfAbsent(entry.getKey(), future.get());
-                } else { // Collect for uncompleted results.
+                } else {
+                    // Collect for uncompleted results.
                     uncompleted.add(ResultDescription.builder()
                             .scenesCode(entry.getKey())
                             .success(false)
@@ -220,6 +219,7 @@ public class LifecycleExecutionService {
 
         @Override
         public ResultDescription call() {
+            // TODO multi workflows execution supports?
             final RuleEngine engine = scenes.getEffectivePriorityWorkflow().getEngine();
             notNull(engine, "Please check if the configuration is correct, rule engine type of workflow is null.");
 

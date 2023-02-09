@@ -91,7 +91,6 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
         try {
             log.info("Initialzing graal JS script engine ...");
             final ScriptLogConfig scriptLogConfig = config.engine().log();
-
             /**
              * TODO The best way is to let the rengine executor write to OSS in
              * real time, but unfortunately MinIO/S3 does not support append
@@ -103,7 +102,6 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
              * ossfs, etc. can be used to realize clustering. see to:
              * {@link com.wl4g.rengine.service.impl.ScheduleJobLogServiceImpl#logfile}
              */
-            //
             this.graalPolyglotManager = GraalPolyglotManager.newDefaultGraalJS(DEFAULT_EXECUTOR_SCRIPT_TMP_CACHE_DIR,
                     metadata -> new JdkLoggingOutputStream(buildScriptLogFilePattern(scriptLogConfig.baseDir(), metadata, false),
                             Level.INFO, scriptLogConfig.fileMaxSize(), scriptLogConfig.fileMaxCount(),
@@ -128,23 +126,19 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
 
     @Override
     public ScriptResult execute(@NotNull final ExecutionGraphContext graphContext, @NotNull final RuleWrapper rule) {
-        final String traceId = graphContext.getParameter().getTraceId();
-        final String clientId = graphContext.getParameter().getClientId();
-        final String scenesCode = graphContext.getParameter().getScenesCode();
-        final Long workflowId = graphContext.getParameter().getWorkflowId();
-        hasTextOf(traceId, "traceId");
-        hasTextOf(clientId, "clientId");
-        hasTextOf(scenesCode, "scenesCode");
-        notNullOf(workflowId, "workflowId");
+        final String traceId = hasTextOf(graphContext.getParameter().getTraceId(), "traceId");
+        final String clientId = hasTextOf(graphContext.getParameter().getClientId(), "clientId");
+        final String scenesCode = hasTextOf(graphContext.getParameter().getScenesCode(), "scenesCode");
+        final Long workflowId = notNullOf(graphContext.getParameter().getWorkflowId(), "workflowId");
+        log.debug("Executing JS script for scenesCode: {} ...", scenesCode);
 
-        log.debug("Execution JS script for scenesCode: {} ...", scenesCode);
         // see:https://github.com/oracle/graaljs/blob/vm-ee-22.1.0/graal-js/src/com.oracle.truffle.js.test.threading/src/com/oracle/truffle/js/test/threading/AsyncTaskTests.java#L283
         try (ContextWrapper graalContext = graalPolyglotManager.getContext(singletonMap(KEY_WORKFLOW_ID, workflowId));) {
             // New construct script context.
             final ScriptContext scriptContext = newScriptContext(graphContext);
 
             // Load all scripts dependencies.
-            final List<ObjectResource> scripts = safeList(loadScriptResources(scenesCode, rule, true));
+            final List<ObjectResource> scripts = safeList(loadScriptResources(scenesCode, rule));
             for (ObjectResource script : scripts) {
                 isTrue(!script.isBinary(), "invalid js dependency lib type");
                 log.debug("Evaling js-dependencys: {}", script.getObjectPrefix());
@@ -160,9 +154,9 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
             }
 
             final Value bindings = graalContext.getBindings("js");
+            log.trace("Binding js script members ...");
             bindingMembers(scriptContext, bindings);
 
-            log.trace("Loading js script ...");
             final Value mainFunction = bindings.getMember(DEFAULT_EXECUTOR_MAIN_FUNCTION);
 
             // Buried-point: execute cost-time.

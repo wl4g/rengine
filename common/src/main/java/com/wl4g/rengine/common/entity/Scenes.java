@@ -60,13 +60,11 @@ public class Scenes extends BaseBean {
         private @Nullable List<WorkflowWrapper> workflows;
 
         /**
-         * Notice: The temporarily designed to be one-to-one, i.e. the array
-         * should have exactly one workflow element, using the first priority
-         * workflow as a valid value. The advantage of using
+         * TODO Notice: The temporarily designed to be one-to-one, i.e. the
+         * array should have exactly one workflow element, using the first
+         * priority workflow as a valid value. The advantage of using
          * List&lt;{@link WorkflowWrapper}&gt; here is to prepare for future
          * expansion into multiple priorities.
-         * 
-         * @return
          */
         @JsonIgnore
         public WorkflowWrapper getEffectivePriorityWorkflow() {

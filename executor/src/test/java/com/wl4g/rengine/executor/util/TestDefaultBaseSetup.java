@@ -169,6 +169,11 @@ public abstract class TestDefaultBaseSetup {
                     }
 
                     @Override
+                    public @NotNull @Min(0) Long executorScriptCachedExpire() {
+                        return EngineConfig.DEFAULT_SCRIPT_CACHED_EXPIRE;
+                    }
+
+                    @Override
                     public @NotNull @Min(0) @Max(65535) Integer executorThreadPools() {
                         return EngineConfig.DEFAULT_EXECUTOR_THREAD_POOLS;
                     }
@@ -243,6 +248,7 @@ public abstract class TestDefaultBaseSetup {
                             }
                         };
                     }
+
                 };
             }
 

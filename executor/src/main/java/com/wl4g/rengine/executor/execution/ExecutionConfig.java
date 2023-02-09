@@ -76,6 +76,11 @@ public interface ExecutionConfig {
         @Min(0)
         Long scenesRulesCachedExpire();
 
+        @WithDefault(DEFAULT_SCRIPT_CACHED_EXPIRE + "")
+        @NotNull
+        @Min(0)
+        Long executorScriptCachedExpire();
+
         @WithDefault(DEFAULT_EXECUTOR_THREAD_POOLS + "")
         @NotNull
         @Min(1)
@@ -166,7 +171,8 @@ public interface ExecutionConfig {
         }
 
         public static final String DEFAULT_SCENES_RULES_CACHED_PREFIX = "rengine:executor:engine:scenes:rules:";
-        public static final long DEFAULT_SCENES_RULES_CACHED_EXPIRE = 15 * 60 * 1000; // 15m
+        public static final long DEFAULT_SCENES_RULES_CACHED_EXPIRE = 10 * 60 * 1000; // 10m
+        public static final long DEFAULT_SCRIPT_CACHED_EXPIRE = 10 * 60 * 1000; // 10m
         public static final int DEFAULT_EXECUTOR_THREAD_POOLS = 10;
         public static final int DEFAULT_EXECUTOR_ACCEPT_QUEUE = 10;
         public static final float DEFAULT_TIMEOUT_OFFSET_RATE = 0.1f;

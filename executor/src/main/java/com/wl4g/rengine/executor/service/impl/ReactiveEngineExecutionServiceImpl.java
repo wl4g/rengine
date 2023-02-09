@@ -22,14 +22,8 @@ import static com.wl4g.infra.common.lang.Assert2.notEmpty;
 import static com.wl4g.infra.common.lang.Exceptions.getRootCausesString;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
-import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_RULES;
-import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_RULE_SCRIPTS;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_SCENESES;
-import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_UPLOADS;
-import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_WORKFLOWS;
-import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_WORKFLOW_GRAPHS;
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.joining;
 
 import java.time.Duration;
@@ -46,7 +40,6 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import org.bson.BsonDocument;
-import org.bson.BsonString;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
@@ -56,7 +49,6 @@ import com.google.common.hash.Hashing;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
-import com.mongodb.client.model.Variable;
 import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.infra.common.collection.CollectionUtils2;
 import com.wl4g.infra.common.web.rest.RespBase;
@@ -177,89 +169,89 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
      * Query collection dependencies with equivalent bson query codes example:
      * 
      * <pre>
-     *    // Tools: online mongodb aggregate: https://mongoplayground.net/p/bPKYXCJwXdl
-     *    //
-     *    // Query collections dependencies:
-     *    //                                  request evaluate scenesCodes:         —> sceneses
-     *    // ↳ one-to-one (workflows.scenesId = sceneses._id)                       —> workflows
-     *    // ↳ one-to-many (workflow_graphs.workflowId = workflows._id)             —> workflow_graphs
-     *    // ↳ many-to-many (rules._id in workflow_graphs[].nodes[].ruleId)         —> rules
-     *    // ↳ one-to-many (rule_scripts.rule_id = rules[]._id)                     —> rule_scripts
-     *    // ↳ many-to-many (uploads._id in rule_scripts[].uploadIds)               —> uploads
-     *    //
-     *    db.getCollection('t_sceneses').aggregate([
-     *        // 首先过滤 scenesCode (evaluator 接收 client(biz-app) 请求支持批量处理)
-     *        { $match: { "scenesCode": { $in: ["ecommerce_trade_gift"] } } },
-     *        { $match: { "enable": { $eq: 1 } } },
-     *        { $match: { "delFlag": { $eq: 0 } } },
-     *        { $project: { "_class": 0, "delFlag": 0 } }, // 控制 sceneses 集返回列(投射)
-     *        { $lookup: {
-     *            from: "t_workflows", // 关联 workflows 表
-     *            let: { scenesId: { $toLong: "$_id" } }, // 定义外键关联变量
-     *            pipeline: [
-     *                { $match: { $expr: { $eq: [ "$scenesId",  "$$scenesId" ] } } }, // 外键等于关联
-     *                { $match: { "enable": { $eq: 1 } } },
-     *                { $match: { "delFlag": { $eq: 0 } } },
-     *                { $project: { "_class": 0, "delFlag": 0 } },
-     *                { $lookup: {
-     *                    from: "t_workflow_graphs", // 继续关联 workflow_graphs 表
-     *                    let: { workflowId: { $toLong: "$workflowId" } },
-     *                    pipeline: [
-     *                        { $match: { $expr: { $eq: [ "$workflowId", "$workflowId" ] } } },
-     *                        { $match: { "enable": { $eq: 1 } } },
-     *                        { $match: { "delFlag": { $eq: 0 } } },
-     *                        { $sort: { "revision": -1 } }, // 倒序排序, 取 revision(version) 最大的 graph 即最新版
-     *                        { $limit: 2 },
-     *                        { $project: { "_class": 0, "delFlag": 0 } },
-     *                        { $lookup: {
-     *                            from: "t_rules",
-     *                            // 定义外键关联变量, 并通过 $map 函数提取 ruleIds(int64) 列表
-     *                            let: { ruleIds: { $map: { input: "$nodes", in: { $toLong: "$$this.ruleId" } } } },
-     *                            pipeline: [
-     *                                { $match: { $expr: { $in: [ "$_id",  "$$ruleIds" ] } } },
-     *                                { $match: { "enable": { $eq: 1 } } },
-     *                                { $match: { "delFlag": { $eq: 0 } } },
-     *                                { $project: { "_class": 0, "delFlag": 0 } },
-     *                                { $lookup: {
-     *                                    from: "t_rule_scripts",
-     *                                    let: { ruleId: { $toLong: "$_id" } },
-     *                                    pipeline: [
-     *                                        { $match: { $expr: { $eq: [ "$ruleId",  "$ruleId" ] } } },
-     *                                        { $match: { "enable": { $eq: 1 } } },
-     *                                        { $match: { "delFlag": { $eq: 0 } } },
-     *                                        { $sort: { "revision": -1 } }, // 倒序排序, 取 revision(version) 最大的 ruleScript 即最新版
-     *                                        { $limit: 2 },
-     *                                        { $project: { "_class": 0, "delFlag": 0 } },
-     *                                        { $lookup: {
-     *                                            from: "t_uploads", // 继续关联 uploads 表
-     *                                            // 定义外键关联变量 uploadIds(int64), 并通过 $map 函数进行类型转换以确保匹配安全
-     *                                            let: { uploadIds: { $map: { input: "$uploadIds", in: { $toLong: "$$this"} } } },
-     *                                            pipeline: [
-     *                                                { $match: { $expr: { $in: [ "$_id",  "$$uploadIds" ] } } }, // 由于父级未使用 UNWIND 因此这里使用 IN 外键关联
-     *                                                { $match: { "enable": { $eq: 1 } } },
-     *                                                { $match: { "delFlag": { $eq: 0 } } },
-     *                                                { $project: { "_class": 0, "delFlag": 0 } }
-     *                                            ],
-     *                                            as: "uploads"
-     *                                            }
-     *                                        }
-     *                                    ],
-     *                                    as: "scripts"
-     *                                    }
-     *                                }
-     *                            ],
-     *                            as: "rules"
-     *                            }
-     *                        }
-     *                    ],
-     *                    as: "graphs" // 倒序后第一个为最新版
-     *                    }
-     *                }
-     *            ],
-     *            as: "workflows"
-     *            }
-     *        }
-     *    ])
+     *  // Tools: online mongodb aggregate: https://mongoplayground.net/p/bPKYXCJwXdl
+     *  //
+     *  // Query collections dependencies:
+     *  //                             request evaluate scenesCodes:                —> t_sceneses
+     *  // ↳ one-to-many (t_workflows.scenesId = sceneses._id)                      —> t_workflows
+     *  // ↳ one-to-many (t_workflow_graphs.workflowId = workflows._id)             —> t_workflow_graphs
+     *  // ↳ many-to-many (t_rules._id in workflow_graphs[].nodes[].ruleId)         —> t_rules
+     *  // ↳ one-to-many (t_rule_scripts.rule_id = rules[]._id)                     —> t_rule_scripts
+     *  // ↳ many-to-many (t_uploads._id in rule_scripts[].uploadIds)               —> t_uploads
+     *  //
+     *  db.getCollection('t_sceneses').aggregate([
+     *      // 首先过滤 scenesCode (evaluator 接收 client(biz-app) 请求支持批量处理)
+     *      { $match: { "scenesCode": { $in: ["ecommerce_trade_gift", "vm_health_detect", "vm_process_watch_restart", "iot_temp_warning"] } } },
+     *      { $match: { "enable": { $eq: 1 } } },
+     *      { $match: { "delFlag": { $eq: 0 } } },
+     *      { $project: { "_class": 0, "delFlag": 0 } }, // 控制 sceneses 集返回列(投射)
+     *      { $lookup: {
+     *          from: "t_workflows", // 关联 workflows 表
+     *          let: { scenes_id: { $toLong: "$_id" } }, // 定义外键关联变量
+     *          pipeline: [
+     *              { $match: { $expr: { $eq: [ "$scenesId", "$$scenes_id" ] } } }, // 外键等于关联
+     *              { $match: { "enable": { $eq: 1 } } },
+     *              { $match: { "delFlag": { $eq: 0 } } },
+     *              { $project: { "_class": 0, "delFlag": 0 } },
+     *              { $lookup: {
+     *                  from: "t_workflow_graphs", // 继续关联 workflow_graphs 表
+     *                  let: { workflow_id: { $toLong: "$_id" } },
+     *                  pipeline: [
+     *                      { $match: { $expr: { $eq: [ "$workflowId", "$$workflow_id" ] } } },
+     *                      { $match: { "enable": { $eq: 1 } } },
+     *                      { $match: { "delFlag": { $eq: 0 } } },
+     *                                          { $project: { "_class": 0, "delFlag": 0 } },
+     *                      { $sort: { "revision": -1 } }, // 倒序排序, 取 revision(version) 最大的 graph 即最新版
+     *                      { $limit: 1 },
+     *                      { $lookup: {
+     *                          from: "t_rules",
+     *                          // 定义外键关联变量, 并通过 $map 函数提取 ruleIds(int64) 列表
+     *                          let: { rule_ids: { $map: { input: "$nodes", in: { $toLong: "$$this.ruleId" } } } },
+     *                          pipeline: [
+     *                              { $match: { $expr: { $in: [ "$_id",  "$$rule_ids" ] } } },
+     *                              { $match: { "enable": { $eq: 1 } } },
+     *                              { $match: { "delFlag": { $eq: 0 } } },
+     *                              { $project: { "_class": 0, "delFlag": 0 } },
+     *                              { $lookup: {
+     *                                  from: "t_rule_scripts",
+     *                                  let: { rule_id: { $toLong: "$_id" } },
+     *                                  pipeline: [
+     *                                      { $match: { $expr: { $eq: [ "$ruleId",  "$$rule_id" ] } } },
+     *                                      { $match: { "enable": { $eq: 1 } } },
+     *                                      { $match: { "delFlag": { $eq: 0 } } },
+     *                                                                          { $project: { "_class": 0, "delFlag": 0 } },
+     *                                      { $sort: { "revision": -1 } }, // 倒序排序, 取 revision(version) 最大的 ruleScript 即最新版
+     *                                      { $limit: 1 },
+     *                                      { $lookup: {
+     *                                          from: "t_uploads", // 继续关联 uploads 表
+     *                                          // 定义外键关联变量 uploadIds(int64), 并通过 $map 函数进行类型转换以确保匹配安全
+     *                                          let: { upload_ids: { $map: { input: "$uploadIds", in: { $toLong: "$$this"} } } },
+     *                                          pipeline: [
+     *                                              { $match: { $expr: { $in: [ "$_id",  "$$upload_ids" ] } } }, // 由于父级未使用 UNWIND 因此这里使用 IN 外键关联
+     *                                              { $match: { "enable": { $eq: 1 } } },
+     *                                              { $match: { "delFlag": { $eq: 0 } } },
+     *                                              { $project: { "_class": 0, "delFlag": 0 } }
+     *                                          ],
+     *                                          as: "uploads"
+     *                                          }
+     *                                      }
+     *                                  ],
+     *                                  as: "scripts"
+     *                                  }
+     *                              }
+     *                          ],
+     *                          as: "rules"
+     *                          }
+     *                      }
+     *                  ],
+     *                  as: "graphs" // 倒序后第一个为最新版
+     *                  }
+     *              }
+     *          ],
+     *          as: "workflows"
+     *          }
+     *      }
+     *  ])
      * </pre>
      * 
      * @see https://www.notion.so/scenesworkflow-rules-uploads-f8e5a6f14fb64f858479b6565fb52142
@@ -272,50 +264,64 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
         notEmpty(scenesCodes, "scenesCodes");
         isTrue(revisions >= 1 && revisions <= 1024, "revision %s must >= 1 and <= 1024", revisions);
 
-        // Common show projection.
-        final Bson enableFilter = Aggregates.match(Filters.eq("enable", BaseBean.ENABLED));
-        final Bson delFlagFilter = Aggregates.match(Filters.eq("delFlag", BaseBean.DEL_FLAG_NORMAL));
-        final Bson project = Aggregates.project(Projections.fields(Projections.exclude("_class", "delFlag")));
+        // Basic filters.
+        final Bson defaultEnableFilter = Aggregates.match(Filters.eq("enable", BaseBean.ENABLED));
+        final Bson defaultDelFlagFilter = Aggregates.match(Filters.eq("delFlag", BaseBean.DEL_FLAG_NORMAL));
+        final Bson defaultProject = Aggregates.project(Projections.fields(Projections.exclude("_class", "delFlag")));
 
-        final Bson uploadsLookup = Aggregates.lookup(T_UPLOADS.getName(), asList(new Variable<>("uploadIds", "$uploadIds")),
-                asList(Aggregates
-                        .match(Filters.expr(new Document("$in", asList(new BsonString("$_id"), new BsonString("$$uploadIds"))))),
-                        enableFilter, delFlagFilter, project),
-                "uploads");
-
-        final Bson ruleScriptsLookup = Aggregates.lookup(T_RULE_SCRIPTS.getName(),
-                asList(new Variable<>("ruleId", BsonDocument.parse("{ $toLong: \"$_id\" }"))),
-                asList(Aggregates.match(Filters.expr(Filters.eq("ruleId", "$ruleId"))), enableFilter, delFlagFilter,
-                        Aggregates.sort(new Document("revision", -1)), Aggregates.limit(revisions), project, uploadsLookup),
-                "scripts");
-
-        final Bson rulesLookup = Aggregates.lookup(T_RULES.getName(), asList(new Variable<>("ruleIds",
-                BsonDocument.parse("{ $map: { input: \"$nodes\", in: { $toLong: \"$$this.ruleId\" } } }"))),
+        // Notice: The following is almost completely just the Java version
+        // translated into the corresponding mongo js version, but it seems that
+        // the execution will report an error, such as not being able to
+        // recognize $scenes_id??? Therefore, it is forced to use the method of
+        // directly compiling the workflow lookup bson string.
+        //
         // @formatter:off
-        // $in 表达式匹配应直接使用 Document 对象? 否则:
-        // Issue1: 若使用 Filters.in("$_id","$$ruleIds") 则会生成为: {$expr:{$in:["$$ruleIds"]}}} 它会报错至少需要2个参数
-        // Issue2: 若使用 Filters.in("_id","$_id","$$ruleIds") 则会生成: {$expr:{"_id":{$in:["$_id","$$ruleIds"]}}}} 查询结果集不对, 即 rules[] 重复关联了uploads
-        // @formatter:on
-                asList(Aggregates
-                        .match(Filters.expr(new Document("$in", asList(new BsonString("$_id"), new BsonString("$$ruleIds"))))),
-                        enableFilter, delFlagFilter, project, ruleScriptsLookup),
-                "rules");
-
-        final Bson workflowGraphLookup = Aggregates.lookup(T_WORKFLOW_GRAPHS.getName(),
-                asList(new Variable<>("workflowId", BsonDocument.parse("{ $toLong: \"$workflowId\" }"))),
-                asList(Aggregates.match(Filters.expr(Filters.eq("scenesId", "$$scenesId"))), enableFilter, delFlagFilter,
-                        Aggregates.sort(new Document("revision", -1)), Aggregates.limit(revisions), project, rulesLookup),
-                "graphs");
-
-        final Bson workflowLookup = Aggregates.lookup(T_WORKFLOWS.getName(), asList(new Variable<>("scenesId", "$_id")),
-                asList(workflowGraphLookup), "workflows");
+        //final Bson defaultSort = Aggregates.sort(new Document("revision", -1));
+        //final Bson defaultLimit = Aggregates.limit(revisions);
+        //
+        //final Bson uploadsLookup = Aggregates.lookup(T_UPLOADS.getName(),
+        //        asList(new Variable<>("upload_ids",
+        //                BsonDocument.parse("{ $map: { input: \"$uploadIds\", in: { $toLong: \"$$this.ruleId\" } } }"))),
+        //        asList(Aggregates
+        //                .match(Filters.expr(new Document("$in", asList(new BsonString("$_id"), new BsonString("$$upload_ids"))))),
+        //                defaultEnableFilter, defaultDelFlagFilter, defaultProject),
+        //        "uploads");
+        //
+        //final Bson ruleScriptsLookup = Aggregates.lookup(T_RULE_SCRIPTS.getName(),
+        //        asList(new Variable<>("rule_id", BsonDocument.parse("{ $toLong: \"$_id\" }"))),
+        //        asList(Aggregates.match(Filters.expr(Filters.eq("$ruleId", "$$rule_id"))), defaultEnableFilter,
+        //                defaultDelFlagFilter, defaultProject, defaultSort, defaultLimit, uploadsLookup),
+        //        "scripts");
+        //
+        //final Bson rulesLookup = Aggregates.lookup(T_RULES.getName(), asList(new Variable<>("rule_ids",
+        //        BsonDocument.parse("{ $map: { input: \"$nodes\", in: { $toLong: \"$$this.ruleId\" } } }"))),
+        //// $in 表达式匹配应直接使用 Document 对象? 否则:
+        //// Issue1: 若使用 Filters.in("$_id","$$ruleIds") 则会生成为: {$expr:{$in:["$$ruleIds"]}}} 它会报错至少需要2个参数
+        //// Issue2: 若使用 Filters.in("_id","$_id","$$ruleIds") 则会生成: {$expr:{"_id":{$in:["$_id","$$ruleIds"]}}}} 查询结果集不对, 即 rules[] 重复关联了uploads
+        //        asList(Aggregates
+        //                .match(Filters.expr(new Document("$in", asList(new BsonString("$_id"), new BsonString("$$rule_ids"))))),
+        //                defaultEnableFilter, defaultDelFlagFilter, defaultProject, ruleScriptsLookup),
+        //        "rules");
+        //
+        //final Bson workflowGraphLookup = Aggregates.lookup(T_WORKFLOW_GRAPHS.getName(),
+        //        asList(new Variable<>("workflow_id", BsonDocument.parse("{ $toLong: \"$_id\" }"))),
+        //        asList(Aggregates.match(Filters.expr(Filters.eq("$workflowId", "$$workflow_id"))), defaultEnableFilter,
+        //                defaultDelFlagFilter, defaultProject, defaultSort, defaultLimit, rulesLookup),
+        //        "graphs");
+        //
+        //final Bson workflowLookup = Aggregates.lookup(T_WORKFLOWS.getName(), asList(new Variable<>("scenes_id", "$_id")),
+        //        asList(Aggregates.match(Filters.expr(Filters.eq("$scenesId", "$$scenes_id"))), defaultEnableFilter,
+        //                defaultDelFlagFilter, defaultProject, workflowGraphLookup),
+        //        "workflows");
+        //// @formatter:on
 
         final List<Bson> aggregates = Lists.newArrayList();
         aggregates.add(Aggregates.match(Filters.in("scenesCode", scenesCodes)));
-        aggregates.add(enableFilter);
-        aggregates.add(delFlagFilter);
-        aggregates.add(project);
-        aggregates.add(workflowLookup);
+        aggregates.add(defaultEnableFilter);
+        aggregates.add(defaultDelFlagFilter);
+        aggregates.add(defaultProject);
+        // aggregates.add(workflowLookup);
+        aggregates.add(workflowLookupBson);
         // The temporary collections are automatically created.
         // aggregates.add(Aggregates.merge("_tmp_load_scenes_with_cascade"));
 
@@ -414,5 +420,72 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
 
     public static final TypeReference<List<ScenesWrapper>> SCENES_TYPE_REF = new TypeReference<List<ScenesWrapper>>() {
     };
+
+    // @formatter:off
+    public static final Bson workflowLookupBson = BsonDocument.parse("{ $lookup: {\n"
+            + "    from: \"t_workflows\",  \n"
+            + "    let: { scenes_id: { $toLong: \"$_id\" } },  \n"
+            + "    pipeline: [\n"
+            + "        { $match: { $expr: { $eq: [ \"$scenesId\", \"$$scenes_id\" ] } } }, \n"
+            + "        { $match: { \"enable\": { $eq: 1 } } },\n"
+            + "        { $match: { \"delFlag\": { $eq: 0 } } },\n"
+            + "        { $project: { \"_class\": 0, \"delFlag\": 0 } },\n"
+            + "        { $lookup: {\n"
+            + "            from: \"t_workflow_graphs\", \n"
+            + "            let: { workflow_id: { $toLong: \"$_id\" } },\n"
+            + "            pipeline: [\n"
+            + "                { $match: { $expr: { $eq: [ \"$workflowId\", \"$$workflow_id\" ] } } },\n"
+            + "                { $match: { \"enable\": { $eq: 1 } } },\n"
+            + "                { $match: { \"delFlag\": { $eq: 0 } } },\n"
+            + "                                    { $project: { \"_class\": 0, \"delFlag\": 0 } },\n"
+            + "                { $sort: { \"revision\": -1 } }, \n"
+            + "                { $limit: 1 },\n"
+            + "                { $lookup: {\n"
+            + "                    from: \"t_rules\",\n"
+            + "                    let: { rule_ids: { $map: { input: \"$nodes\", in: { $toLong: \"$$this.ruleId\" } } } },\n"
+            + "                    pipeline: [\n"
+            + "                        { $match: { $expr: { $in: [ \"$_id\",  \"$$rule_ids\" ] } } },\n"
+            + "                        { $match: { \"enable\": { $eq: 1 } } },\n"
+            + "                        { $match: { \"delFlag\": { $eq: 0 } } },\n"
+            + "                        { $project: { \"_class\": 0, \"delFlag\": 0 } },\n"
+            + "                        { $lookup: {\n"
+            + "                            from: \"t_rule_scripts\",\n"
+            + "                            let: { rule_id: { $toLong: \"$_id\" } },\n"
+            + "                            pipeline: [\n"
+            + "                                { $match: { $expr: { $eq: [ \"$ruleId\",  \"$$rule_id\" ] } } },\n"
+            + "                                { $match: { \"enable\": { $eq: 1 } } },\n"
+            + "                                { $match: { \"delFlag\": { $eq: 0 } } },\n"
+            + "                                                                    { $project: { \"_class\": 0, \"delFlag\": 0 } },\n"
+            + "                                { $sort: { \"revision\": -1 } },  \n"
+            + "                                { $limit: 1 },\n"
+            + "                                { $lookup: {\n"
+            + "                                    from: \"t_uploads\",  \n"
+            + "                                    let: { upload_ids: { $map: { input: \"$uploadIds\", in: { $toLong: \"$$this\"} } } },\n"
+            + "                                    pipeline: [\n"
+            + "                                        { $match: { $expr: { $in: [ \"$_id\",  \"$$upload_ids\" ] } } }, \n"
+            + "                                        { $match: { \"enable\": { $eq: 1 } } },\n"
+            + "                                        { $match: { \"delFlag\": { $eq: 0 } } },\n"
+            + "                                        { $project: { \"_class\": 0, \"delFlag\": 0 } }\n"
+            + "                                    ],\n"
+            + "                                    as: \"uploads\"\n"
+            + "                                    }\n"
+            + "                                }\n"
+            + "                            ],\n"
+            + "                            as: \"scripts\"\n"
+            + "                            }\n"
+            + "                        }\n"
+            + "                    ],\n"
+            + "                    as: \"rules\"\n"
+            + "                    }\n"
+            + "                }\n"
+            + "            ],\n"
+            + "            as: \"graphs\"  \n"
+            + "            }\n"
+            + "        }\n"
+            + "    ],\n"
+            + "    as: \"workflows\"\n"
+            + "    }\n"
+            + "}");
+    // @formatter:on
 
 }

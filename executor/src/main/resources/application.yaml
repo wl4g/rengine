@@ -288,7 +288,8 @@ rengine:
         dict-cached-expire: 86400000 # 24h
       engine:
         scenes-rules-cached-prefix: 'rengine:executor:engine:scenes:rules:'
-        scenes-rules-cached-expire: 900000 # 15m
+        scenes-rules-cached-expire: 600000 # 10m
+        executor-script-cached-expire: 600000 # 10m
         executor-thread-pools: 10
         executor-accept-queue: 10
         execute-timeout-offset-rate: 0.1f

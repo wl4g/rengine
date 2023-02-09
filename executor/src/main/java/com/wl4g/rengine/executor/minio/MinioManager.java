@@ -24,6 +24,7 @@ import static com.wl4g.infra.common.lang.TypeConverts.safeLongToInt;
 import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_S3_OBJECT_MAX_LIMIT;
 import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_S3_OBJECT_READ_BUFFER;
 import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_SCRIPT_TMP_CACHE_DIR;
+import static java.lang.System.currentTimeMillis;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.BufferedOutputStream;
@@ -42,6 +43,7 @@ import java.util.concurrent.TimeUnit;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -113,21 +115,29 @@ public class MinioManager {
     }
 
     public ObjectResource loadObject(
-            @NotNull UploadType uploadType,
-            @NotBlank String objectPrefix,
-            @NotBlank String scenesCode,
-            boolean binary,
-            boolean useCache) throws ErrorResponseException, InsufficientDataException, InternalException, InvalidKeyException,
+            final @NotNull UploadType uploadType,
+            final @NotBlank String objectPrefix,
+            final @NotBlank String scenesCode,
+            final boolean binary,
+            final @Min(-1) long objectCacheExpireMs)
+            throws ErrorResponseException, InsufficientDataException, InternalException, InvalidKeyException,
             InvalidResponseException, IOException, NoSuchAlgorithmException, ServerException, XmlParserException, IOException {
 
         final File localFile = determineLocalFile(uploadType, objectPrefix, scenesCode);
 
-        // Gets from local cached.
-        if (useCache && localFile.exists() && localFile.length() > 0) {
-            return new ObjectResource(objectPrefix, binary, localFile, safeLongToInt(localFile.length()));
+        // First get from local cached.
+        if (objectCacheExpireMs > 0 && localFile.exists() && localFile.length() > 0) {
+            // Check for expiration is valid.
+            if ((currentTimeMillis() - localFile.lastModified()) < objectCacheExpireMs) {
+                return new ObjectResource(objectPrefix, binary, localFile, safeLongToInt(localFile.length()));
+            }
+            // Expired and clearup
+            if (!localFile.delete()) {
+                log.warn("Unable to remove expired script cached of {}", localFile);
+            }
         }
 
-        // Gets from MinIO brokers.
+        // Then gets from MinIO.
         final GetObjectArgs args = GetObjectArgs.builder()
                 .bucket(config.bucket())
                 .region(config.region())
