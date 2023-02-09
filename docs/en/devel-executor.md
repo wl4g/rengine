@@ -152,7 +152,7 @@ clientId=JVqEpEwIaqkEkeD5\
 - Generate testing script to local path.
 
 ```bash
-curl -L -o /tmp/test.groovy 'https://raw.githubusercontent.com/wl4g/rengine/master/executor/testdata/testscript/test.groovy'
+curl -L -o /tmp/test.groovy 'https://raw.githubusercontent.com/wl4g/rengine/master/executor/testdata/scripts/test.groovy'
 ```
 
 - Run native
@@ -183,7 +183,7 @@ tail -f /tmp/rengine/executor.log | jq -r '.message'
 - Generate testing script to local path.
 
 ```bash
-curl -L -o /tmp/test-js2java.js 'https://raw.githubusercontent.com/wl4g/rengine/master/executor/testdata/testscript/test-js2java.js'
+curl -L -o /tmp/test-js2java.js 'https://raw.githubusercontent.com/wl4g/rengine/master/executor/testdata/scripts/test-sdk-all-examples.js'
 ```
 
 - Run native
