@@ -15,10 +15,18 @@
  */
 package com.wl4g.rengine.service.impl;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static java.lang.String.format;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.util.List;
+import java.util.Map;
+
+import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -26,15 +34,22 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import com.wl4g.infra.common.notification.MessageNotifier.NotifierKind;
+import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI;
+import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.AccessToken;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.Notification;
+import com.wl4g.rengine.common.entity.Notification.DingtalkConfig;
 import com.wl4g.rengine.common.util.IdGenUtils;
-import com.wl4g.rengine.common.util.BeanSensitiveTransforms;
 import com.wl4g.rengine.service.NotificationService;
+import com.wl4g.rengine.service.model.NotificationDingtalkUserIdExchage;
+import com.wl4g.rengine.service.model.NotificationDingtalkUserIdExchageResult;
 import com.wl4g.rengine.service.model.NotificationQuery;
 import com.wl4g.rengine.service.model.NotificationQueryResult;
 import com.wl4g.rengine.service.model.NotificationSave;
 import com.wl4g.rengine.service.model.NotificationSaveResult;
+
+import lombok.CustomLog;
 
 /**
  * {@link NotificationServiceImpl}
@@ -43,6 +58,7 @@ import com.wl4g.rengine.service.model.NotificationSaveResult;
  * @version 2022-08-29
  * @since v1.0.0
  */
+@CustomLog
 @Service
 public class NotificationServiceImpl implements NotificationService {
 
@@ -62,10 +78,20 @@ public class NotificationServiceImpl implements NotificationService {
         // (o2.getUpdateDate().getTime() - o1.getUpdateDate().getTime()) > 0 ? 1
         // : -1);
 
+        // TODO Notice: This cannot be converted to a mask temporarily, because
+        // the userId needs to be obtained according to the mobile when adding
+        // (use appKey/appSecret to obtain accessToken).
+        //
+        // Notice: Unless the dingtalk basic(appkey etc) configuration is
+        // separated from the API of user information and scene group
+        // information later. Since the use of dingtalk only uses system
+        // notifications, there is only a small amount of data information, so
+        // in order to make the API lightweight, all are merged
+        //
         // Mask sensitive information.
-        for (Notification notification : notifications) {
-            BeanSensitiveTransforms.transform(notification.getProperties());
-        }
+        // for (Notification notification : notifications) {
+        // BeanSensitiveTransforms.transform(notification.getProperties());
+        // }
 
         return NotificationQueryResult.builder().providers(notifications).build();
     }
@@ -81,6 +107,51 @@ public class NotificationServiceImpl implements NotificationService {
         }
         Notification saved = mongoTemplate.save(provider, MongoCollectionDefinition.SYS_NOTIFICATIONS.getName());
         return NotificationSaveResult.builder().id(saved.getId()).build();
+    }
+
+    @Override
+    public NotificationDingtalkUserIdExchageResult exchageDingtalkUserId(@NotNull NotificationDingtalkUserIdExchage model) {
+
+        // First load userIds from DB.
+        Map<String, String> existingUsers = null;
+        final NotificationQueryResult result = query(NotificationQuery.builder().type(NotifierKind.DINGTALK.name()).build());
+        if (nonNull(result) && !result.getProviders().isEmpty()) {
+            final DingtalkConfig dingtalk = (DingtalkConfig) result.getProviders().get(0).getProperties();
+            existingUsers = safeList(dingtalk.getUsers()).stream().collect(toMap(u -> u.getMobile(), u -> u.getUserId()));
+        }
+
+        // New obtain access token.
+        String accessToken = model.getAccessToken();
+        if (isBlank(accessToken)) {
+            log.info("Obtainig the dingtalk access token of : {}", model.getAppKey());
+            try {
+                accessToken = DingtalkAPI.getInstance()
+                        .getAccessToken(AccessToken.builder().appKey(model.getAppKey()).appSecret(model.getAppSecret()).build())
+                        .getAccessToken();
+            } catch (Throwable ex) {
+                throw new IllegalStateException("Failed to get access token before obtain userId.", ex);
+            }
+        }
+
+        log.info("Exchanging the dingtalk userIds by mobile numbers : {}", model.getMobiles());
+        final Map<String, String> _existingUsers = existingUsers;
+        return NotificationDingtalkUserIdExchageResult.builder()
+                .appKey(model.getAppKey())
+                .appSecret(model.getAppSecret())
+                .accessToken(accessToken)
+                .userIds(safeList(model.getMobiles()).parallelStream().map(mobile -> {
+                    try {
+                        final String userId = _existingUsers.get(mobile);
+                        if (isBlank(userId)) {
+                            return DingtalkAPI.getInstance().getUserIdByMobile(model.getAccessToken(), mobile).getUserid();
+                        }
+                        return userId;
+                    } catch (Throwable ex) {
+                        log.error(format("Failed to exchage userId by mobile '%s'", mobile), ex);
+                        return null;
+                    }
+                }).collect(toList()))
+                .build();
     }
 
 }

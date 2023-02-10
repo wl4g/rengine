@@ -26,6 +26,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.service.NotificationService;
+import com.wl4g.rengine.service.model.NotificationDingtalkUserIdExchage;
+import com.wl4g.rengine.service.model.NotificationDingtalkUserIdExchageResult;
 import com.wl4g.rengine.service.model.NotificationQuery;
 import com.wl4g.rengine.service.model.NotificationQueryResult;
 import com.wl4g.rengine.service.model.NotificationSave;
@@ -74,4 +76,16 @@ public class NotificationController {
         return resp;
     }
 
+    // @SecurityRequirement(name = "default_oauth")
+    @Operation(description = "Exchanging dingtalk userIds by mobiles.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
+    @RequestMapping(path = { "exchageDingtalkUserId" }, consumes = "application/json", produces = "application/json",
+            method = { POST })
+    public RespBase<NotificationDingtalkUserIdExchageResult> exchageDingtalkUserId(
+            @RequestBody @Validated NotificationDingtalkUserIdExchage model) {
+        log.debug("called: model={}", model);
+        RespBase<NotificationDingtalkUserIdExchageResult> resp = RespBase.create();
+        resp.setData(notificationService.exchageDingtalkUserId(model));
+        return resp;
+    }
 }

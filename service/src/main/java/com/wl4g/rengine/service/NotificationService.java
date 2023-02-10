@@ -17,6 +17,8 @@ package com.wl4g.rengine.service;
 
 import javax.validation.constraints.NotNull;
 
+import com.wl4g.rengine.service.model.NotificationDingtalkUserIdExchage;
+import com.wl4g.rengine.service.model.NotificationDingtalkUserIdExchageResult;
 import com.wl4g.rengine.service.model.NotificationQuery;
 import com.wl4g.rengine.service.model.NotificationQueryResult;
 import com.wl4g.rengine.service.model.NotificationSave;
@@ -34,5 +36,7 @@ public interface NotificationService {
     NotificationQueryResult query(@NotNull NotificationQuery model);
 
     NotificationSaveResult save(@NotNull NotificationSave model);
+
+    NotificationDingtalkUserIdExchageResult exchageDingtalkUserId(@NotNull NotificationDingtalkUserIdExchage model);
 
 }
