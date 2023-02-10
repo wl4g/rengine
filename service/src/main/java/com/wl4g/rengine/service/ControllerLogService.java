@@ -21,8 +21,8 @@ import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.entity.ControllerLog;
-import com.wl4g.rengine.service.model.ControllerLogDeleteResult;
 import com.wl4g.rengine.service.model.ControllerLogDelete;
+import com.wl4g.rengine.service.model.ControllerLogDeleteResult;
 import com.wl4g.rengine.service.model.ControllerLogQuery;
 import com.wl4g.rengine.service.model.ControllerLogSaveResult;
 
@@ -36,7 +36,7 @@ import com.wl4g.rengine.service.model.ControllerLogSaveResult;
 public interface ControllerLogService {
 
     default ControllerLog get(@NotNull Long id) {
-        final var result = query(ControllerLogQuery.builder().controllerLogId(id).build());
+        final PageHolder<ControllerLog> result = query(ControllerLogQuery.builder().controllerLogId(id).build());
         return safeList(result.getRecords()).isEmpty() ? null : result.getRecords().get(0);
     }
 

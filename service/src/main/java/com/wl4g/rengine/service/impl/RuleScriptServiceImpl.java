@@ -19,6 +19,7 @@ import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isCriteria;
+import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
 
 import java.util.List;
 
@@ -62,8 +63,8 @@ public class RuleScriptServiceImpl implements RuleScriptService {
 
     @Override
     public PageHolder<RuleScript> query(RuleScriptQuery model) {
-        final Query query = new Query(andCriteria(baseCriteria(model), isCriteria("_id", model.getScriptId()),
-                isCriteria("ruleId", model.getRuleId())));
+        final Query query = new Query(
+                andCriteria(baseCriteria(model), isIdCriteria(model.getScriptId()), isCriteria("ruleId", model.getRuleId())));
 
         query.with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
 

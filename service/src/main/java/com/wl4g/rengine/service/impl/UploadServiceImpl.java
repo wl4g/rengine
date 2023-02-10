@@ -21,7 +21,6 @@ import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
-import static com.wl4g.rengine.service.mongo.QueryHolder.orCriteria;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toList;
@@ -73,8 +72,8 @@ public class UploadServiceImpl implements UploadService {
 
     @Override
     public PageHolder<UploadObject> query(UploadQuery model) {
-        final Query query = new Query(orCriteria(isIdCriteria(model.getUploadId()),
-                andCriteria(baseCriteria(model), isCriteria("uploadType", model.getUploadType()))))
+        final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getUploadId()),
+                isCriteria("uploadType", model.getUploadType())))
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
         final List<UploadObject> uploads = mongoTemplate.find(query, UploadObject.class,

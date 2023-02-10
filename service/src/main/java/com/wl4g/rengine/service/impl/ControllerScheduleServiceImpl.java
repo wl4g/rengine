@@ -20,7 +20,6 @@ import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isCriteria;
-import static com.wl4g.rengine.service.mongo.QueryHolder.orCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.modIdCriteria;
 import static java.util.Objects.isNull;
@@ -62,8 +61,8 @@ public class ControllerScheduleServiceImpl implements ControllerScheduleService 
 
     @Override
     public PageHolder<ControllerSchedule> query(ControllerScheduleQuery model) {
-        final Query query = new Query(orCriteria(isIdCriteria(model.getScheduleId()),
-                andCriteria(baseCriteria(model), isCriteria("properties.type", model.getType()))))
+        final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getScheduleId()),
+                isCriteria("properties.type", model.getType())))
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
         final List<ControllerSchedule> triggeres = mongoTemplate.find(query, ControllerSchedule.class,

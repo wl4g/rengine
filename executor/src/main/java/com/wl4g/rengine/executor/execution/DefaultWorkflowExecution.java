@@ -106,14 +106,14 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
                     .success(true)
                     .valueMap(result.getValueMap())
                     .build();
-        } catch (Exception e) {
+        } catch (Throwable ex) {
             log.warn(format("Failed to execution workflow graph for scenesCode: %s, workflowId: %s", scenes.getScenesCode(),
-                    workflowGraph.getWorkflowId()), e);
+                    workflowGraph.getWorkflowId()), ex);
 
             return ResultDescription.builder()
                     .scenesCode(scenes.getScenesCode())
                     .success(false)
-                    .reason(format("Failed to execution workflow graph of reason: %s", e.getMessage()))
+                    .reason(format("Failed to execution workflow graph of reason: %s", ex.getMessage()))
                     .build();
         }
     }

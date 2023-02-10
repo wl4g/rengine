@@ -51,7 +51,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "ControllerScheduleAPI", description = "The Controller Schedule management API")
 @Slf4j
 @RestController
-@RequestMapping("/admin/scheduleTrigger")
+@RequestMapping("/admin/controllerscheduler")
 public class ControllerScheduleController {
 
     private @Autowired ControllerScheduleService controllerScheduleService;

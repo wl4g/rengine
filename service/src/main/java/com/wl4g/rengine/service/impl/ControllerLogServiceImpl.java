@@ -109,15 +109,15 @@ public class ControllerLogServiceImpl implements ControllerLogService {
 
     @Override
     public PageHolder<ControllerLog> query(ControllerLogQuery model) {
-        final Query query = new Query(orCriteria(isIdCriteria(model.getControllerLogId()),
-                andCriteria(baseCriteria(model), isCriteria("scheduleId", model.getControllerLogId()))))
+        final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getControllerLogId()),
+                isCriteria("scheduleId", model.getScheduleId())))
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
-        final List<ControllerLog> jobes = mongoTemplate.find(query, ControllerLog.class, T_CONTROLLER_LOG.getName());
+        final List<ControllerLog> jobs = mongoTemplate.find(query, ControllerLog.class, T_CONTROLLER_LOG.getName());
 
         return new PageHolder<ControllerLog>(model.getPageNum(), model.getPageSize())
                 .withTotal(mongoTemplate.count(query, T_CONTROLLER_LOG.getName()))
-                .withRecords(jobes);
+                .withRecords(jobs);
     }
 
     @Override

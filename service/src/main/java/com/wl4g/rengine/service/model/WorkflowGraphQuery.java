@@ -17,6 +17,7 @@ package com.wl4g.rengine.service.model;
 
 import javax.annotation.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wl4g.rengine.common.entity.WorkflowGraph;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -45,6 +46,7 @@ public class WorkflowGraphQuery extends BaseQuery<WorkflowGraph> {
     // Notice: The disable reading and writing of the name field in the swagger
     // document. (because the workflow graph does not have a name field)
     @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
+    @JsonIgnore
     public String getName() {
         return super.getName();
     }

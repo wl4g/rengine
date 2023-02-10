@@ -21,7 +21,6 @@ import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
-import static com.wl4g.rengine.service.mongo.QueryHolder.orCriteria;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -79,8 +78,8 @@ public class WorkflowGraphServiceImpl implements WorkflowGraphService {
 
     @Override
     public PageHolder<WorkflowGraph> query(WorkflowGraphQuery model) {
-        final Query query = new Query(orCriteria(isIdCriteria(model.getGraphId()),
-                andCriteria(baseCriteria(model), isCriteria("workflowId", model.getWorkflowId()))))
+        final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getGraphId()),
+                isCriteria("workflowId", model.getWorkflowId())))
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
         final List<WorkflowGraph> graphs = mongoTemplate.find(query, WorkflowGraph.class,
