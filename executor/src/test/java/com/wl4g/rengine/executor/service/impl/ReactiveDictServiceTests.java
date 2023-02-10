@@ -36,20 +36,30 @@ import com.wl4g.rengine.executor.util.TestDefaultRedisSetup;
 
 import io.quarkus.redis.datasource.ReactiveRedisDataSource;
 import io.quarkus.redis.datasource.ScanArgs;
+import io.quarkus.redis.datasource.autosuggest.ReactiveAutoSuggestCommands;
 import io.quarkus.redis.datasource.bitmap.ReactiveBitMapCommands;
+import io.quarkus.redis.datasource.bloom.ReactiveBloomCommands;
+import io.quarkus.redis.datasource.countmin.ReactiveCountMinCommands;
+import io.quarkus.redis.datasource.cuckoo.ReactiveCuckooCommands;
 import io.quarkus.redis.datasource.geo.ReactiveGeoCommands;
+import io.quarkus.redis.datasource.graph.ReactiveGraphCommands;
 import io.quarkus.redis.datasource.hash.ReactiveHashCommands;
 import io.quarkus.redis.datasource.hash.ReactiveHashScanCursor;
 import io.quarkus.redis.datasource.hyperloglog.ReactiveHyperLogLogCommands;
+import io.quarkus.redis.datasource.json.ReactiveJsonCommands;
 import io.quarkus.redis.datasource.keys.ReactiveKeyCommands;
 import io.quarkus.redis.datasource.list.ReactiveListCommands;
 import io.quarkus.redis.datasource.pubsub.ReactivePubSubCommands;
+import io.quarkus.redis.datasource.search.ReactiveSearchCommands;
 import io.quarkus.redis.datasource.set.ReactiveSetCommands;
 import io.quarkus.redis.datasource.sortedset.ReactiveSortedSetCommands;
 import io.quarkus.redis.datasource.string.ReactiveStringCommands;
+import io.quarkus.redis.datasource.timeseries.ReactiveTimeSeriesCommands;
+import io.quarkus.redis.datasource.topk.ReactiveTopKCommands;
 import io.quarkus.redis.datasource.transactions.OptimisticLockingTransactionResult;
 import io.quarkus.redis.datasource.transactions.ReactiveTransactionalRedisDataSource;
 import io.quarkus.redis.datasource.transactions.TransactionResult;
+import io.quarkus.redis.datasource.value.ReactiveValueCommands;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.redis.client.Command;
 import io.vertx.mutiny.redis.client.Redis;
@@ -62,6 +72,7 @@ import io.vertx.mutiny.redis.client.Response;
  * @version 2022-09-27
  * @since v1.0.0
  */
+@SuppressWarnings("deprecation")
 public class ReactiveDictServiceTests {
 
     static ReactiveDictServiceImpl dictService;
@@ -303,6 +314,11 @@ public class ReactiveDictServiceTests {
                 public Uni<List<V>> hvals(K key) {
                     throw new UnsupportedOperationException();
                 }
+
+                @Override
+                public ReactiveRedisDataSource getDataSource() {
+                    throw new UnsupportedOperationException();
+                }
             };
         }
 
@@ -338,6 +354,56 @@ public class ReactiveDictServiceTests {
 
         @Override
         public <K> ReactiveBitMapCommands<K> bitmap(Class<K> redisKeyType) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public <K> ReactiveAutoSuggestCommands<K> autosuggest(Class<K> arg0) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public <K, V> ReactiveBloomCommands<K, V> bloom(Class<K> redisKeyType, Class<V> valueType) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public <K, V> ReactiveCountMinCommands<K, V> countmin(Class<K> redisKeyType, Class<V> valueType) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public <K, V> ReactiveCuckooCommands<K, V> cuckoo(Class<K> redisKeyType, Class<V> valueType) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public <K> ReactiveGraphCommands<K> graph(Class<K> arg0) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public <K> ReactiveJsonCommands<K> json(Class<K> redisKeyType) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public <K> ReactiveSearchCommands<K> search(Class<K> arg0) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public <K> ReactiveTimeSeriesCommands<K> timeseries(Class<K> arg0) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public <K, V> ReactiveTopKCommands<K, V> topk(Class<K> redisKeyType, Class<V> valueType) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public <K, V> ReactiveValueCommands<K, V> value(Class<K> redisKeyType, Class<V> valueType) {
             throw new UnsupportedOperationException();
         }
     };

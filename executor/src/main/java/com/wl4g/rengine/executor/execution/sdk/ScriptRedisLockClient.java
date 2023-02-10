@@ -55,6 +55,7 @@ import redis.clients.jedis.params.SetParams;
  * @version 2022-09-25
  * @since v1.0.0
  */
+@SuppressWarnings("deprecation")
 @ToString(callSuper = true)
 public class ScriptRedisLockClient {
     final static String METHOD_GET_LOCK = "getLock";

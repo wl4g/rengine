@@ -78,6 +78,7 @@ import lombok.CustomLog;
  * @since v1.0.0
  * @see https://quarkus.io/guides/resteasy-reactive#asyncreactive-support
  */
+@SuppressWarnings("deprecation")
 @CustomLog
 @Singleton
 public class ReactiveEngineExecutionServiceImpl implements EngineExecutionService {
@@ -343,7 +344,6 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
         }).collect().asList();
     }
 
-    @SuppressWarnings("deprecation")
     Uni<List<ScenesWrapper>> findScenesWorkflowGraphRulesWithCached(
             final @NotNull ExecuteRequest executeRequest,
             final @Min(1) @Max(1024) int revisions) {

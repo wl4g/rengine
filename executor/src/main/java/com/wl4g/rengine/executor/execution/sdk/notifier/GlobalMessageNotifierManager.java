@@ -75,6 +75,7 @@ import lombok.CustomLog;
  * @version 2023-01-06
  * @since v1.0.0
  */
+@SuppressWarnings("deprecation")
 @CustomLog
 @Singleton
 public class GlobalMessageNotifierManager {
