@@ -103,6 +103,9 @@ public interface ExecutionConfig {
         ScriptLogConfig log();
 
         @NotNull
+        SdkDataSourceConfig datasource();
+
+        @NotNull
         SdkNotifierConfig notifier();
 
         @NotNull
@@ -137,6 +140,15 @@ public interface ExecutionConfig {
             public static final String DEFAULT_SCRIPT_LOG_UPLOADER_CRON = "0 1 * * * * ?";
         }
 
+        public static interface SdkDataSourceConfig {
+            @WithDefault(DEFAULT_DATASOURCE_TOTAL_LIMITED_MAX + "")
+            @NotNull
+            @Min(1)
+            Integer totalLimitedMax();
+
+            public static final int DEFAULT_DATASOURCE_TOTAL_LIMITED_MAX = 10;
+        }
+
         public static interface SdkNotifierConfig {
             @WithDefault(DEFAULT_NOTIFIER_REFRESH_LOCK_TIMEOUT + "")
             @NotNull
@@ -144,7 +156,6 @@ public interface ExecutionConfig {
             Long refreshLockTimeout();
 
             @WithDefault(DEFAULT_NOTIFIER_REFRESHED_CACHED_PREFIX + "")
-
             @NotBlank
             String refreshedCachedPrefix();
 

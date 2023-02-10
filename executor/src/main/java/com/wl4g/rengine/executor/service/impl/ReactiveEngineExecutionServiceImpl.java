@@ -400,7 +400,9 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
                         // Save to redis cache.
                         .chain(sceneses -> {
                             return reactiveRedisStringCommands
-                                    .setex(batchQueryingKey, config.engine().scenesRulesCachedExpire(), toJSONString(sceneses))
+                                    .setex(batchQueryingKey,
+                                            Duration.ofMillis(config.engine().scenesRulesCachedExpire()).toSeconds(),
+                                            toJSONString(sceneses))
                                     .map(res -> sceneses);
                         });
             }

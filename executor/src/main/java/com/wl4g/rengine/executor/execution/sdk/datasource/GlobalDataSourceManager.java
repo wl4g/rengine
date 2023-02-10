@@ -56,6 +56,7 @@ import com.wl4g.rengine.common.entity.DataSourceProperties;
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourcePropertiesBase;
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
 import com.wl4g.rengine.common.exception.ConfigRengineException;
+import com.wl4g.rengine.common.exception.ExecutionScriptException;
 import com.wl4g.rengine.common.exception.RengineException;
 import com.wl4g.rengine.common.util.BsonEntitySerializers;
 import com.wl4g.rengine.executor.execution.ExecutionConfig;
@@ -80,7 +81,7 @@ public final class GlobalDataSourceManager {
 
     @NotNull
     @Inject
-    ExecutionConfig config;
+    ExecutionConfig executionConfig;
 
     @NotNull
     @Inject
@@ -141,6 +142,14 @@ public final class GlobalDataSourceManager {
                 notNullOf(dataSourceType, "dataSourceType");
                 hasTextOf(dataSourceName, "dataSourceName");
 
+                // Check for limited.
+                final long currentCount = dataSourceRegistry.values().stream().flatMap(dsf -> dsf.values().stream()).count();
+                if (currentCount > executionConfig.engine().datasource().totalLimitedMax()) {
+                    throw new ExecutionScriptException(format("Too many dataSources. total limited max: %s",
+                            executionConfig.engine().datasource().totalLimitedMax()));
+                }
+
+                // Obtain for dataSource facade.
                 Map<String, DataSourceFacade> dataSourceFacades = dataSourceRegistry.get(dataSourceType);
                 if (isNull(dataSourceFacades)) {
                     synchronized (dataSourceType) {
@@ -150,7 +159,6 @@ public final class GlobalDataSourceManager {
                         }
                     }
                 }
-
                 DataSourceFacade dataSourceFacade = dataSourceFacades.get(dataSourceName);
                 if (isNull(dataSourceFacade)) {
                     synchronized (dataSourceName) {
@@ -159,7 +167,7 @@ public final class GlobalDataSourceManager {
                             final DataSourceFacadeBuilder builder = notNull(builderMap.get(dataSourceType),
                                     "Unsupported to data source facade handler type of : %s/%s", dataSourceType, dataSourceName);
                             // New init data source facade.
-                            dataSourceFacades.put(dataSourceName, dataSourceFacade = builder.newInstnace(config, this,
+                            dataSourceFacades.put(dataSourceName, dataSourceFacade = builder.newInstnace(executionConfig, this,
                                     dataSourceName, findDataSourceProperties(dataSourceType, dataSourceName)));
                         }
                     }

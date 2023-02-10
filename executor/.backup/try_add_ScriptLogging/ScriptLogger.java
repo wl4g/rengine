@@ -1,3 +1,4 @@
+// @formatter:off
 ///*
 // * Copyright 2017 ~ 2025 the original author or authors. James Wong <jameswong1376@gmail.com>
 // *

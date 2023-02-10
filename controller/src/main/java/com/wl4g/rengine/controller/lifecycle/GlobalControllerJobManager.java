@@ -55,7 +55,7 @@ import org.springframework.boot.ApplicationRunner;
 import com.wl4g.infra.common.collection.CollectionUtils2;
 import com.wl4g.rengine.common.entity.ControllerSchedule;
 import com.wl4g.rengine.controller.config.RengineControllerProperties;
-import com.wl4g.rengine.controller.exception.ScheduleException;
+import com.wl4g.rengine.controller.exception.RengineControllerException;
 import com.wl4g.rengine.controller.job.AbstractJobExecutor;
 import com.wl4g.rengine.controller.job.AbstractJobExecutor.ScheduleJobType;
 import com.wl4g.rengine.controller.job.GlobalEngineScheduleController;
@@ -152,7 +152,7 @@ public class GlobalControllerJobManager implements ApplicationRunner, Closeable 
         final JobBootstrap bootstrap = createJobBootstrap(jobConfig);
         final JobBootstrap existing = bootstrapRegistry.putIfAbsent(trigger.getId(), bootstrap);
         if (nonNull(existing)) {
-            throw new ScheduleException(format("Already trigger '%s' scheduling for : %s", trigger.getId(), existing));
+            throw new RengineControllerException(format("Already trigger '%s' scheduling for : %s", trigger.getId(), existing));
         }
         return (T) bootstrap;
     }

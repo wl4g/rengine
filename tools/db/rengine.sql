@@ -11,7 +11,7 @@
  Target Server Version : 40406
  File Encoding         : 65001
 
- Date: 09/02/2023 19:13:01
+ Date: 10/02/2023 15:06:40
 */
 
 
@@ -819,6 +819,29 @@ db.getCollection("t_rule_scripts").insert([ {
     _class: "com.wl4g.rengine.common.entity.Rule$RuleScript"
 } ]);
 db.getCollection("t_rule_scripts").insert([ {
+    _id: NumberLong("6150869239922668"),
+    revision: NumberInt("1"),
+    ruleId: NumberLong("6150869239922658"),
+    uploadIds: [
+        NumberLong("6150869710864310"),
+        NumberLong("6150869710864311"),
+        NumberLong("6150869710864381")
+    ],
+    orgCode: "top",
+    enable: NumberInt("1"),
+    labels: [
+        "test",
+        "script",
+        "sdk",
+        "example"
+    ],
+    remark: "Example for built script SDKs testing",
+    createDate: ISODate("2022-09-27T04:50:22.304Z"),
+    updateDate: ISODate("2022-09-27T04:50:22.304Z"),
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.Rule$RuleScript"
+} ]);
+db.getCollection("t_rule_scripts").insert([ {
     _id: NumberLong("6150869239922669"),
     revision: NumberInt("1"),
     ruleId: NumberLong("6150869239922659"),
@@ -941,6 +964,24 @@ db.getCollection("t_rules").insert([ {
     _class: "com.wl4g.rengine.common.entity.Rule"
 } ]);
 db.getCollection("t_rules").insert([ {
+    _id: NumberLong("6150869239922658"),
+    name: "Test built script SDK example",
+    engine: "JS",
+    orgCode: "top",
+    enable: NumberInt("1"),
+    labels: [
+        "test",
+        "script",
+        "sdk",
+        "example"
+    ],
+    remark: "Example for ecommerce trade gift None process(mock)",
+    createDate: ISODate("2022-09-27T04:50:39.789Z"),
+    updateDate: ISODate("2022-09-27T04:50:39.789Z"),
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.Rule"
+} ]);
+db.getCollection("t_rules").insert([ {
     _id: NumberLong("6150869239922659"),
     name: "Ecommerce Trade None process(mock)",
     engine: "JS",
@@ -1028,6 +1069,24 @@ session = db.getMongo().startSession();
 session.startTransaction();
 db = session.getDatabase("rengine");
 db.getCollection("t_sceneses").insert([ {
+    _id: NumberLong("6150865561468928"),
+    name: "测试内置Script SDK示例",
+    scenesCode: "test_script_sdk_example",
+    orgCode: "top",
+    enable: NumberInt("1"),
+    labels: [
+        "test",
+        "script",
+        "sdk",
+        "example"
+    ],
+    remark: "Testing for built script SDKs example.",
+    createDate: ISODate("2023-02-02T04:46:55.274Z"),
+    updateDate: ISODate("2023-02-02T04:46:55.274Z"),
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.Scenes"
+} ]);
+db.getCollection("t_sceneses").insert([ {
     _id: NumberLong("6150865561468929"),
     name: "电商充值活动赠送策略",
     scenesCode: "ecommerce_trade_gift",
@@ -1040,8 +1099,8 @@ db.getCollection("t_sceneses").insert([ {
         "gift"
     ],
     remark: "Example for ecommerce trade gift",
-    createDate: ISODate("2022-09-27T04:46:55.274Z"),
-    updateDate: ISODate("2022-09-27T04:46:55.274Z"),
+    createDate: ISODate("2023-02-02T04:46:55.274Z"),
+    updateDate: ISODate("2023-02-02T04:46:55.274Z"),
     delFlag: NumberInt("0"),
     _class: "com.wl4g.rengine.common.entity.Scenes"
 } ]);
@@ -1058,8 +1117,8 @@ db.getCollection("t_sceneses").insert([ {
         "detect"
     ],
     remark: "Example for VM health detect.",
-    createDate: ISODate("2022-09-27T04:46:55.274Z"),
-    updateDate: ISODate("2022-09-27T04:46:55.274Z"),
+    createDate: ISODate("2023-02-02T04:46:55.274Z"),
+    updateDate: ISODate("2023-02-02T04:46:55.274Z"),
     delFlag: NumberInt("0"),
     _class: "com.wl4g.rengine.common.entity.Scenes"
 } ]);
@@ -1077,8 +1136,8 @@ db.getCollection("t_sceneses").insert([ {
         "restart"
     ],
     remark: "Example for VM process watch and restart.",
-    createDate: ISODate("2022-09-27T04:46:55.274Z"),
-    updateDate: ISODate("2022-09-27T04:46:55.274Z"),
+    createDate: ISODate("2023-02-02T04:46:55.274Z"),
+    updateDate: ISODate("2023-02-02T04:46:55.274Z"),
     delFlag: NumberInt("0"),
     _class: "com.wl4g.rengine.common.entity.Scenes"
 } ]);
@@ -1095,8 +1154,8 @@ db.getCollection("t_sceneses").insert([ {
         "warnning"
     ],
     remark: "Example for Iot device temperature warnning",
-    createDate: ISODate("2022-09-27T04:46:55.274Z"),
-    updateDate: ISODate("2022-09-27T04:46:55.274Z"),
+    createDate: ISODate("2023-02-02T04:46:55.274Z"),
+    updateDate: ISODate("2023-02-02T04:46:55.274Z"),
     delFlag: NumberInt("0"),
     _class: "com.wl4g.rengine.common.entity.Scenes"
 } ]);
@@ -1247,6 +1306,62 @@ db.createCollection("t_workflow_graphs");
 session = db.getMongo().startSession();
 session.startTransaction();
 db = session.getDatabase("rengine");
+db.getCollection("t_workflow_graphs").insert([ {
+    _id: NumberLong("6150868953448848"),
+    revision: NumberLong("1"),
+    workflowId: NumberLong("6150868953448438"),
+    nodes: [
+        {
+            "@type": "BOOT",
+            id: "0",
+            name: "The Boot",
+            attributes: {
+                top: "10px",
+                color: "#5f5f5f",
+                left: "10px"
+            }
+        },
+        {
+            "@type": "PROCESS",
+            id: "1",
+            name: "执行测试内置Script SDK示例",
+            attributes: {
+                top: "10px",
+                color: "#5f5f5f",
+                left: "10px"
+            },
+            ruleId: "6150869239922658"
+        }
+    ],
+    connections: [
+        {
+            name: "Unnamed Connection",
+            to: "1",
+            from: "0",
+            attributes: null
+        }
+    ],
+    attributes: {
+        foo: "bar",
+        openConversationId: "cidG+niQ3Ny/NwUc5KE7mANUQ==",
+        robotCode: "dingbhyrzjxx6qjhjcdr",
+        scenesGroupV2OwnerUserId: "6165471647114842627",
+        scenesGroupV2AdminUserIds: "6165471647114842627",
+        scenesGroupV2UserIds: "6165471647114842627"
+    },
+    orgCode: "top",
+    enable: NumberInt("1"),
+    labels: [
+        "example",
+        "vm",
+        "health"
+    ],
+    remark: "string",
+    createDate: ISODate("2022-09-27T04:50:22.304Z"),
+    updateDate: ISODate("2022-09-27T04:50:22.304Z"),
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.WorkflowGraph"
+} ]);
 db.getCollection("t_workflow_graphs").insert([ {
     _id: NumberLong("6150868953448849"),
     revision: NumberLong("1"),
@@ -1677,6 +1792,25 @@ session = db.getMongo().startSession();
 session.startTransaction();
 db = session.getDatabase("rengine");
 db.getCollection("t_workflows").insert([ {
+    _id: NumberLong("6150868953448438"),
+    name: "测试内置Script SDK示例-流程",
+    scenesId: NumberLong("6150865561468928"),
+    engine: "JS",
+    orgCode: "top",
+    enable: NumberInt("1"),
+    labels: [
+        "test",
+        "script",
+        "sdk",
+        "example"
+    ],
+    remark: "Example for ecommerce trade gift",
+    createDate: ISODate("2023-02-02T04:46:55.274Z"),
+    updateDate: ISODate("2023-02-02T04:46:55.274Z"),
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.Workflow"
+} ]);
+db.getCollection("t_workflows").insert([ {
     _id: NumberLong("6150868953448439"),
     name: "电商充值活动赠送策略-流程",
     scenesId: NumberLong("6150865561468929"),
@@ -1689,8 +1823,8 @@ db.getCollection("t_workflows").insert([ {
         "trade"
     ],
     remark: "Example for ecommerce trade gift",
-    createDate: ISODate("2022-09-27T04:50:22.304Z"),
-    updateDate: ISODate("2022-09-27T04:50:22.304Z"),
+    createDate: ISODate("2023-02-02T04:46:55.274Z"),
+    updateDate: ISODate("2023-02-02T04:46:55.274Z"),
     delFlag: NumberInt("0"),
     _class: "com.wl4g.rengine.common.entity.Workflow"
 } ]);
@@ -1708,8 +1842,8 @@ db.getCollection("t_workflows").insert([ {
         "detect"
     ],
     remark: "Example for VM health detect.",
-    createDate: ISODate("2022-09-27T04:50:22.304Z"),
-    updateDate: ISODate("2022-09-27T04:50:22.304Z"),
+    createDate: ISODate("2023-02-02T04:46:55.274Z"),
+    updateDate: ISODate("2023-02-02T04:46:55.274Z"),
     delFlag: NumberInt("0"),
     _class: "com.wl4g.rengine.common.entity.Workflow"
 } ]);
@@ -1728,8 +1862,8 @@ db.getCollection("t_workflows").insert([ {
         "restart"
     ],
     remark: "Example for VM process watch and restart.",
-    createDate: ISODate("2022-09-27T04:50:22.304Z"),
-    updateDate: ISODate("2022-09-27T04:50:22.304Z"),
+    createDate: ISODate("2023-02-02T04:46:55.274Z"),
+    updateDate: ISODate("2023-02-02T04:46:55.274Z"),
     delFlag: NumberInt("0"),
     _class: "com.wl4g.rengine.common.entity.Workflow"
 } ]);
@@ -1747,8 +1881,8 @@ db.getCollection("t_workflows").insert([ {
         "warnning"
     ],
     remark: "Example for Iot device temperature warnning.",
-    createDate: ISODate("2022-09-27T04:50:22.304Z"),
-    updateDate: ISODate("2022-09-27T04:50:22.304Z"),
+    createDate: ISODate("2023-02-02T04:46:55.274Z"),
+    updateDate: ISODate("2023-02-02T04:46:55.274Z"),
     delFlag: NumberInt("0"),
     _class: "com.wl4g.rengine.common.entity.Workflow"
 } ]);

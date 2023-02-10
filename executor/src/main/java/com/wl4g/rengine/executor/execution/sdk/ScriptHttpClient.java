@@ -15,6 +15,8 @@
  */
 package com.wl4g.rengine.executor.execution.sdk;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
@@ -24,7 +26,11 @@ import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.Metric
 import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsName.execution_sdk_client_time;
 import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsName.execution_sdk_client_total;
 import static java.lang.String.format;
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -95,7 +101,6 @@ public class ScriptHttpClient {
         try {
             final String result = MeterUtil.timer(execution_sdk_client_time, ScriptHttpClient.class, METHOD_GET_FOR_TEXT,
                     () -> restClient.getForObject(url, String.class));
-
             MeterUtil.counter(execution_sdk_client_success, ScriptHttpClient.class, METHOD_GET_FOR_TEXT);
             return result;
         } catch (Exception e) {
@@ -112,7 +117,6 @@ public class ScriptHttpClient {
         try {
             final String result = MeterUtil.timer(execution_sdk_client_time, ScriptHttpClient.class, METHOD_POST_FOR_TEXT,
                     () -> restClient.postForObject(url, request, String.class));
-
             MeterUtil.counter(execution_sdk_client_success, ScriptHttpClient.class, METHOD_POST_FOR_TEXT);
             return result;
         } catch (Exception e) {
@@ -128,7 +132,6 @@ public class ScriptHttpClient {
         try {
             final JsonNode result = MeterUtil.timer(execution_sdk_client_time, ScriptHttpClient.class, METHOD_GET_FOR_JSON,
                     () -> restClient.getForObject(url, JsonNode.class));
-
             MeterUtil.counter(execution_sdk_client_success, ScriptHttpClient.class, METHOD_GET_FOR_JSON);
             return result;
         } catch (Exception e) {
@@ -145,7 +148,6 @@ public class ScriptHttpClient {
         try {
             final JsonNode result = MeterUtil.timer(execution_sdk_client_time, ScriptHttpClient.class, METHOD_POST_FOR_JSON,
                     () -> restClient.postForObject(url, request, JsonNode.class));
-
             MeterUtil.counter(execution_sdk_client_success, ScriptHttpClient.class, METHOD_POST_FOR_JSON);
             return result;
         } catch (Exception e) {
@@ -154,22 +156,57 @@ public class ScriptHttpClient {
         }
     }
 
+    public @HostAccess.Export JsonNode postForJson(
+            final @NotBlank String url,
+            final @NotNull Map<String, String> headers,
+            final @NotNull Object request) {
+        hasTextOf(url, "url");
+        notNullOf(headers, "headers");
+        notNullOf(request, "request");
+        MeterUtil.counter(execution_sdk_client_total, ScriptHttpClient.class, METHOD_POST_FOR_JSON);
+
+        try {
+            final JsonNode result = MeterUtil.timer(execution_sdk_client_time, ScriptHttpClient.class, METHOD_POST_FOR_JSON,
+                    () -> restClient.postForObject(url, request, JsonNode.class));
+            MeterUtil.counter(execution_sdk_client_success, ScriptHttpClient.class, METHOD_POST_FOR_JSON);
+            return result;
+        } catch (Exception e) {
+            MeterUtil.counter(execution_sdk_client_failure, ScriptHttpClient.class, METHOD_POST_FOR_JSON);
+            throw e;
+        }
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public @HostAccess.Export HttpResponseEntity<String> exchange(
             final @NotBlank String url,
             final @NotBlank String method,
             final @Nullable Object request,
-            final @NotNull Map<String, String> headers) {
+            final @Nullable Map<String, Object> headers) {
         hasTextOf(url, "url");
         hasTextOf(method, "method");
-        // notNullOf(request, "request");
-        notNullOf(headers, "headers");
         MeterUtil.counter(execution_sdk_client_total, ScriptHttpClient.class, METHOD_EXCHANGE);
 
         try {
             final HttpResponseEntity<String> result = MeterUtil.timer(execution_sdk_client_time, ScriptHttpClient.class,
                     METHOD_EXCHANGE, () -> {
+                        // Merge to headers.
                         final HttpHeaders httpHeaders = new HttpHeaders();
-                        safeMap(headers).forEach((key, value) -> httpHeaders.add(key, value));
+                        safeMap(headers).entrySet()
+                                .stream()
+                                .filter(e -> !isBlank(e.getKey()) && nonNull(e.getValue()))
+                                .forEach(e -> {
+                                    final String key = e.getKey();
+                                    final Object value = e.getValue();
+                                    if (value instanceof Collection) {
+                                        httpHeaders.put(key, safeList((Collection) value));
+                                    } else if (value.getClass().isArray()) {
+                                        httpHeaders.put(key, (List<String>) safeArrayToList((String[]) value));
+                                    } else if (value instanceof String) {
+                                        httpHeaders.add(key, (String) value);
+                                    } else if (value instanceof Number || value.getClass().isPrimitive()) {
+                                        httpHeaders.add(key, value + "");
+                                    }
+                                });
                         final HttpEntity<?> entity = new HttpEntity<>(request, httpHeaders);
                         return restClient.exchange(url, HttpMethod.valueOf(method), entity, String.class);
                     });

@@ -1,7 +1,7 @@
 // Usually this is used for debugging scenarios where printing.
 function process(context) {
 
-    console.info("==== The current context disassembled print: =====");
+    console.info("========== The current context anatomy print: ==========");
     console.info(" context                                 :", context);
     console.info(" context.getId()                         :", context.getId());
     console.info(" context.getType()                       :", context.getType());

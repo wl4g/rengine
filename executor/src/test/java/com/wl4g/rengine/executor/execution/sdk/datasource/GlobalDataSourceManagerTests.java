@@ -76,7 +76,7 @@ public class GlobalDataSourceManagerTests {
                 if (isNull(globalDataSourceManager)) {
                     TestDefaultMeterSetup.setup();
                     globalDataSourceManager = new GlobalDataSourceManager();
-                    globalDataSourceManager.config = TestDefaultBaseSetup.createExecutionConfig();
+                    globalDataSourceManager.executionConfig = TestDefaultBaseSetup.createExecutionConfig();
                     globalDataSourceManager.mongoRepository = TestDefaultBaseSetup.createMongoRepository();
                     globalDataSourceManager.builders = asList(new MongoSourceFacadeBuilder(), new JDBCSourceFacadeBuilder(),
                             new RedisSourceFacadeBuilder(), new KafkaSourceFacadeBuilder());

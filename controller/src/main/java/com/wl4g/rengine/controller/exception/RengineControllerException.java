@@ -18,32 +18,32 @@ package com.wl4g.rengine.controller.exception;
 import com.wl4g.rengine.common.exception.RengineException;
 
 /**
- * {@link ScheduleException}
+ * {@link RengineControllerException}
  * 
  * @author James Wong
  * @version 2023-01-29
  * @since v1.0.0
  */
-public class ScheduleException extends RengineException {
+public class RengineControllerException extends RengineException {
     private static final long serialVersionUID = 2264797381937290376L;
 
-    public ScheduleException() {
+    public RengineControllerException() {
         super();
     }
 
-    public ScheduleException(String message) {
+    public RengineControllerException(String message) {
         super(message);
     }
 
-    public ScheduleException(String message, Throwable cause) {
+    public RengineControllerException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public ScheduleException(Throwable cause) {
+    public RengineControllerException(Throwable cause) {
         super(cause);
     }
 
-    public ScheduleException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public RengineControllerException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 

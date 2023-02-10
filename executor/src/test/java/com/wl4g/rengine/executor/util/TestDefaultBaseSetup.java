@@ -219,6 +219,16 @@ public abstract class TestDefaultBaseSetup {
                     }
 
                     @Override
+                    public @NotNull SdkDataSourceConfig datasource() {
+                        return new SdkDataSourceConfig() {
+                            @Override
+                            public @NotNull @Min(1) Integer totalLimitedMax() {
+                                return SdkDataSourceConfig.DEFAULT_DATASOURCE_TOTAL_LIMITED_MAX;
+                            }
+                        };
+                    }
+
+                    @Override
                     public @NotNull SdkNotifierConfig notifier() {
                         return new SdkNotifierConfig() {
 
