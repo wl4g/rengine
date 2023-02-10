@@ -117,12 +117,7 @@ public class EmailScriptMessageNotifier implements ScriptMessageNotifier {
                 MeterUtil.counter(execution_sdk_notifier_success, kind(), METHOD_REFRESH);
                 return RefreshedInfo.builder()
                         .notifierType(kind())
-                        // .appKey(null)
-                        // .appSecret(null)
-                        // .accessToken(null)
-                        // The accessToken is not actually needed, so it is set
-                        // to never expire
-                        .expireSeconds(Integer.MAX_VALUE)
+                        .expireSeconds(86400) // 24h
                         .attributes(singletonMap(KEY_MAIL_CONFIG, toJSONString(config)))
                         .build();
             });

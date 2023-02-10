@@ -58,25 +58,25 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
     // Provider<ContainerRequestContext> requestContextProvider;
 
     @Override
-    public Response toResponse(Throwable th) {
-        return wrapExceptionToResponse(th);
+    public Response toResponse(Throwable ex) {
+        return wrapExceptionToResponse(ex);
     }
 
-    private Response wrapExceptionToResponse(Throwable th) {
-        loggingException(th);
+    private Response wrapExceptionToResponse(Throwable ex) {
+        logException(ex);
 
         // Use response from WebApplicationException as they are
-        if (th instanceof WebApplicationException) {
+        if (ex instanceof WebApplicationException) {
             // Overwrite error message
-            Response origErrorResponse = ((WebApplicationException) th).getResponse();
+            Response origErrorResponse = ((WebApplicationException) ex).getResponse();
             return Response.status(200)/* .fromResponse(origErrorResponse) */
                     .entity(RespBase.create().withCode(500).withMessage(origErrorResponse.getStatusInfo().getReasonPhrase()))
                     .build();
         }
         // Special mappings
-        else if (th instanceof IllegalArgumentException) {
+        else if (ex instanceof IllegalArgumentException) {
             return Response.status(200)
-                    ./* status(400). */entity(RespBase.create().withCode(400).withMessage(th.getMessage()))
+                    ./* status(400). */entity(RespBase.create().withCode(400).withMessage(ex.getMessage()))
                     .build();
         }
         // Use 500 (Internal Server Error) for all other
@@ -87,7 +87,7 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
         }
     }
 
-    private void loggingException(Throwable th) {
+    private final void logException(Throwable ex) {
         String _stacktrace = request.getHeader("_stacktrace");
         if (isBlank(_stacktrace)) {
             final var c = request.getCookie("_stacktrace");
@@ -96,7 +96,7 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
             }
         }
         if (StringUtils2.isTrue(_stacktrace, false) || JvmRuntimeTool.isJvmInDebugging) {
-            log.error(format("Processing failed exception for request: %s", uriInfo.getRequestUri()), th);
+            log.error(format("Processing failed exception for request: %s", uriInfo.getRequestUri()), ex);
         }
     }
 

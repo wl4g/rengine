@@ -38,21 +38,27 @@ function process(context) {
     const emailResult = testSdkForEmailNotifier(context);
 
     // for sdk case11:
-//    const dateHolderResult = testSdkForDateHolder(context);
-//
-//    // for sdk case12:
-//    const codingResult = testSdkForCoding(context);
-//
-//    // for sdk case13:
-//    const hashingResult = testSdkForHashing(context);
-//
-//    // for sdk case14:
-//    const aesResult = testSdkForAES(context);
-//
-//    // for sdk case15:
-//    const rsaResult = testSdkForRSA(context);
+    const dateHolderResult = testSdkForDateHolder(context);
+
+    // for sdk case12:
+    const codingResult = testSdkForCoding(context);
+
+    // for sdk case13:
+    const hashingResult = testSdkForHashing(context);
+
+    // for sdk case14:
+    const aesResult = testSdkForAES(context);
+
+    // for sdk case15:
+    const rsaResult = testSdkForRSA(context);
 
     // for sdk case16:
+    const randomHolderResult = testSdkForRandomHolder(context);
+
+    // for sdk case17:
+    const uuidResult = testSdkForUUID(context);
+
+    // for sdk case18:
     //testSdkForExecutorTasks(context);
 
     return new ScriptResult(true)
@@ -65,12 +71,14 @@ function process(context) {
         //.addValue("redisResult", redisResult)
         //.addValue("kafkaResult", kafkaResult)
         //.addValue("dingtalkResult", dingtalkResult)
-        .addValue("emailResult", emailResult);
-        //.addValue("dateHolderResult", dateHolderResult)
-        //.addValue("codingResult", codingResult)
-        //.addValue("hashingResult", hashingResult)
-        //.addValue("aesResult", aesResult)
-        //.addValue("rsaResult", rsaResult);
+        .addValue("emailResult", emailResult)
+        .addValue("dateHolderResult", dateHolderResult)
+        .addValue("codingResult", codingResult)
+        .addValue("hashingResult", hashingResult)
+        .addValue("aesResult", aesResult)
+        .addValue("rsaResult", rsaResult)
+        .addValue("randomHolderResult", randomHolderResult)
+        .addValue("uuidResult", uuidResult);
 }
 
 function testSdkForHttpClient(context) {
@@ -82,6 +90,7 @@ function testSdkForHttpClient(context) {
         //return httpResult1;
     } catch(e) {
         console.error("ScriptHttpClient1 >>>", e);
+        throw e;
     }
 
     // metnod2:
@@ -94,6 +103,7 @@ function testSdkForHttpClient(context) {
         return httpResult2;
     } catch(e) {
         console.error("ScriptHttpClient2 >>>", e);
+        throw e;
     }
 }
 
@@ -106,6 +116,7 @@ function testSdkForProcessClient(context) {
         return processResult;
     } catch(e) {
         console.error("ScriptProcessClient >>>", e);
+        throw e;
     }
 }
 
@@ -118,6 +129,7 @@ function testSdkForSSHClient(context) {
         return sshResult;
     } catch(e) {
         console.error("ScriptSSHClient >>>", e);
+        throw e;
     }
 }
 
@@ -135,6 +147,7 @@ function testSdkForRedisLockClient(context) {
         return redisLock;
     } catch(e) {
         console.error("ScriptRedisLockClient >>>", e);
+        throw e;
     }
 }
 
@@ -151,6 +164,7 @@ function testSdkForMongoSourceFacade(context) {
         return mongoResult;
     } catch(e) {
         console.error("MongoSourceFacade >>>", e);
+        throw e;
     }
 }
 
@@ -164,6 +178,7 @@ function testSdkForRedisSourceFacade(context) {
         return redisResult;
     } catch(e) {
         console.error("RedisSourceFacade >>>", e);
+        throw e;
     }
 }
 
@@ -177,6 +192,7 @@ function testSdkForJdbcSourceFacade(context) {
         return jdbcResult;
     } catch(e) {
         console.error("JdbcSourceFacade >>>", e);
+        throw e;
     }
 }
 
@@ -190,6 +206,7 @@ function testSdkForKafkaSourceFacade(context) {
         return kafkaResult;
     } catch(e) {
         console.error("KafkaSourceFacade >>>", e);
+        throw e;
     }
 }
 
@@ -212,6 +229,7 @@ function testSdkForDingtalkNotifier(context) {
         return notifierResult;
     } catch(e) {
         console.error("DingtalkNotifier >>>", e);
+        throw e;
     }
 }
 
@@ -234,6 +252,7 @@ function testSdkForEmailNotifier(context) {
         return emailResult;
     } catch(e) {
         console.error("EmailNotifier >>>", e);
+        throw e;
     }
 }
 
@@ -248,6 +267,7 @@ function testSdkForDateHolder(context) {
         return date;
     } catch(e) {
         console.error("DateHolder >>>", e);
+        throw e;
     }
 }
 
@@ -267,6 +287,7 @@ function testSdkForCoding(context) {
         return base58;
     } catch(e) {
         console.error("Coding >>>", e);
+        throw e;
     }
 }
 
@@ -284,6 +305,7 @@ function testSdkForHashing(context) {
         return hmacSha512;
     } catch(e) {
         console.error("Hashing >>>", e);
+        throw e;
     }
 }
 
@@ -306,6 +328,7 @@ function testSdkForAES(context) {
         return plaintext2;
     } catch(e) {
         console.error("AES >>>", e);
+        throw e;
     }
 }
 
@@ -325,6 +348,34 @@ function testSdkForRSA(context) {
         return plaintext2;
     } catch(e) {
         console.error("RSA >>>", e);
+        throw e;
+    }
+}
+
+function testSdkForRandomHolder(context) {
+    try {
+        console.info("nextBoolean: " + RandomHolder.nextBoolean());
+        console.info("nextInt: " + RandomHolder.nextInt());
+        console.info("nextLong: " + RandomHolder.nextLong());
+        console.info("randomAlphabetic: " + RandomHolder.randomAlphabetic(16));
+        console.info("randomAlphanumeric: " + RandomHolder.randomAlphanumeric(16));
+        const randomHolderResult = RandomHolder.randomNumeric(16);
+        console.info("randomNumeric: " + randomHolderResult);
+        return randomHolderResult;
+    } catch(e) {
+        console.error("RandomHolder >>>", e);
+        throw e;
+    }
+}
+
+function testSdkForUUID(context) {
+    try {
+        const uuidResult = UUID.randomUUID();
+        console.info("randomUUID: " + uuidResult);
+        return uuidResult;
+    } catch(e) {
+        console.error("UUID >>>", e);
+        throw e;
     }
 }
 
@@ -346,5 +397,6 @@ function testSdkForExecutorTasks(context) {
         }
     } catch(e) {
         console.error("Executor >>>", e);
+        throw e;
     }
 }

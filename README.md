@@ -74,6 +74,8 @@ A real-time + near real-time general rule engine platform, suitable for such as 
 
 - [Best Cases examples](./docs/en/best-cases.md)
 
+- [Benchmarking](./docs/en/benchmarking.md)
+
 ## RoadMap
 
 - [roadmap](./docs/en/roadmap-2022-23.md)

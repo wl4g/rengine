@@ -37,6 +37,21 @@ quarkus:
     max-threads: 128
     queue-size: 4
     keep-alive-time: 30s
+  ## see:https://quarkus.io/guides/vertx-reference
+  vertx:
+    caching: true
+    ## The number of event loops. By default, it matches the number of CPUs detected on the system.
+    #event-loops-pool-size:
+    ## The maximum amount of time the event loop can be blocked.
+    ## VertxException: Thread blocked. see:io.vertx.core.impl.BlockedThreadChecker
+    ## see:https://github.com/eclipse-vertx/vert.x/issues/2798
+    max-event-loop-execute-time: 10s
+    warning-exception-time: 20s
+    worker-pool-size: 50 # Default by 20
+    ## The maximum amount of time the worker thread can be blocked.
+    max-worker-execute-time: 60s
+    ## The queue size. For most applications this should be unbounded.
+    #queue-size: 
   ## see:https://quarkus.io/guides/centralized-log-management#send-logs-to-fluentd-efk
   log:
     level: INFO
@@ -259,7 +274,7 @@ quarkus:
       - redis://localhost:7379
       - redis://localhost:7380
       - redis://localhost:7381
-    timeout: 10s
+    timeout: 8s
     password: 'zzx!@#$%'
     max-pool-size: 6
     max-pool-waiting: 24
@@ -267,7 +282,7 @@ quarkus:
     max-nested-arrays: 32
     pool-cleaner-interval: 30m
     pool-recycle-timeout: 15s
-    reconnect-attempts: 3
+    reconnect-attempts: 0
     reconnect-interval: 1s
     protocol-negotiation: true
     health:
@@ -290,9 +305,9 @@ rengine:
         dict-cached-expire: 86400000 # 24h
       engine:
         scenes-rules-cached-prefix: 'rengine:executor:engine:scenes:rules:'
-        scenes-rules-cached-expire: 600000 # 10m
-        executor-script-cached-expire: 600000 # 10m
-        executor-thread-pools: 10
+        scenes-rules-cached-expire: 600000 # Default by 10m
+        executor-script-cached-expire: 6000000 # Default by 10m
+        executor-thread-pools: 20
         executor-accept-queue: 10
         execute-timeout-offset-rate: 0.1f
         log:

@@ -58,6 +58,7 @@
         <quarkus.platform.version>2.12.2.Final</quarkus.platform.version>
         <!-- see:ubi-quarkus-native-image:22.3-java11 -->
         <!-- <quarkus.platform.version>2.14.3.Final</quarkus.platform.version>-->
+        <!-- <quarkus.platform.version>2.16.2.Final</quarkus.platform.version>-->
         <!-- <groovy.version>4.0.4</groovy.version>-->
         <!-- <graalvm.version>22.1.0</graalvm.version>-->
         <compiler-plugin.version>3.8.1</compiler-plugin.version>

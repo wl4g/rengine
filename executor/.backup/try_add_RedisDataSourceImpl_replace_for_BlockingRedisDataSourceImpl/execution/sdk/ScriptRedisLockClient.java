@@ -40,6 +40,7 @@ import com.wl4g.infra.common.locks.JedisLockManager;
 import com.wl4g.rengine.common.exception.ExecutionScriptException;
 import com.wl4g.rengine.executor.execution.sdk.datasource.RedisSourceFacade;
 import com.wl4g.rengine.executor.meter.MeterUtil;
+import com.wl4g.rengine.executor.util.redis.RedisDataSourceImpl;
 
 import io.quarkus.redis.datasource.RedisDataSource;
 import io.quarkus.redis.datasource.string.SetArgs;
@@ -101,6 +102,35 @@ public class ScriptRedisLockClient {
             @Override
             public Object eval(String script, List<String> keys, List<String> args) {
                 return redisApi.evalAndAwait(asList(script, "1", keys.get(0), args.get(0))).toString();
+            }
+
+            @Override
+            public String get(String key) {
+                return stringCommands.get(key);
+            }
+
+            @Override
+            public String set(String key, String value, SetParams params) {
+                stringCommands.set(key, value, new SetArgs().nx().px(Duration.ofMillis(params.getParam("px"))));
+                return "OK";
+            }
+        });
+    }
+
+    public static JedisLockManager buildJedisLockManagerWithRedis(final @NotNull RedisDataSource blockingRedisDS) {
+        notNullOf(blockingRedisDS, "redisDS");
+
+        final RedisDataSourceImpl redisDS = new RedisDataSourceImpl(blockingRedisDS.getReactive());
+        final StringCommands<String, String> stringCommands = redisDS.string(String.class);
+
+        return new JedisLockManager(new JedisClient() {
+            @Override
+            public void close() throws IOException {
+            }
+
+            @Override
+            public Object eval(String script, List<String> keys, List<String> args) {
+                return redisDS.getRedisAPI().eval(asList(script, "1", keys.get(0), args.get(0))).result().toString();
             }
 
             @Override

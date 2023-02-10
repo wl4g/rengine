@@ -16,6 +16,7 @@
 package com.wl4g.rengine.executor.execution.sdk.notifier;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
@@ -25,19 +26,23 @@ import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.Metric
 import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsName.execution_sdk_notifier_manager_time;
 import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsName.execution_sdk_notifier_manager_total;
 import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
 import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toMap;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -47,6 +52,7 @@ import org.bson.Document;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
+import com.wl4g.infra.common.lang.tuples.Tuple2;
 import com.wl4g.infra.common.locks.JedisLockManager;
 import com.wl4g.infra.common.notification.MessageNotifier.NotifierKind;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
@@ -109,11 +115,17 @@ public class GlobalMessageNotifierManager {
 
     JedisLockManager lockManager;
 
+    FastRefreshedLocalCache localRefreshedCache;
+
     @PostConstruct
     public void init() {
         this.notifierRegistry = safeList(notifiers).stream().collect(toMap(n -> n.kind(), n -> n));
         this.redisStringCommands = redisDS.string(String.class);
-        this.lockManager = ScriptRedisLockClient.buildJedisLockManager(redisDS);
+        // or using sync redis datasource.
+        // this.redisStringCommands = new
+        // RedisDataSourceImpl(redisDS.getReactive()).string(String.class);
+        this.lockManager = ScriptRedisLockClient.buildJedisLockManagerWithBlockingReactiveRedis(redisDS);
+        this.localRefreshedCache = new FastRefreshedLocalCache();
     }
 
     public ScriptMessageNotifier obtain(final @NotNull NotifierKind notifierType) {
@@ -148,8 +160,7 @@ public class GlobalMessageNotifierManager {
         RefreshedInfo refreshed = loadRefreshed(notifierType);
         if (isNull(refreshed)) {
             synchronized (notifierType) {
-                refreshed = loadRefreshed(notifierType);
-                if (isNull(refreshed)) {
+                if (isNull(refreshed = loadRefreshed(notifierType))) {
                     // Here we give priority to using local locks to prevent
                     // local multi-threaded execution. After obtaining local
                     // locks, we also need to obtain distributed locks to
@@ -160,16 +171,13 @@ public class GlobalMessageNotifierManager {
                             config.engine().notifier().refreshLockTimeout(), TimeUnit.MILLISECONDS);
                     try {
                         if (lock.tryLock()) {
-                            refreshed = loadRefreshed(notifierType);
-                            if (isNull(refreshed)) { // expired?
-                                refreshed = notifier.refresh(findNotification(notifierType));
-                                log.info("Refreshed to {} for notifier %s, {}", refreshed, notifierType);
-                                saveRefreshed(refreshed);
-                            }
+                            refreshed = notifier.refresh(findNotification(notifierType));
+                            log.info("Refreshed to {} for notifier %s, {}", refreshed, notifierType);
+                            saveRefreshed(refreshed);
                         }
-                    } catch (Throwable e) {
-                        log.error(format("Failed to refresh notifier for '%s'.", notifierType), e);
-                        throw e;
+                    } catch (Throwable ex) {
+                        log.error(format("Failed to refresh notifier for '%s'.", notifierType), ex);
+                        throw ex;
                     } finally {
                         lock.unlock();
                     }
@@ -187,11 +195,22 @@ public class GlobalMessageNotifierManager {
         try {
             MeterUtil.counter(execution_sdk_notifier_manager_total, notifierType, METHOD_LOADREFRESHED);
             return MeterUtil.timer(execution_sdk_notifier_manager_time, notifierType, METHOD_LOADREFRESHED, () -> {
-                return parseJSON(redisStringCommands.get(buildRefreshedCachedKey(notifierType)), RefreshedInfo.class);
+                final String key = buildRefreshedCachedKey(notifierType);
+
+                // Gets the refreshed info from the 1 level cache(local)
+                RefreshedInfo refreshed = localRefreshedCache.get(key);
+                if (isNull(refreshed)) {
+                    // Gets the refreshed info from the 2 level cache(redis)
+                    refreshed = parseJSON(redisStringCommands.get(key), RefreshedInfo.class);
+                    // Init update to local cache.
+                    localRefreshedCache.loadInit(key, refreshed);
+                }
+
+                return refreshed;
             });
-        } catch (Throwable e) {
+        } catch (Throwable ex) {
             MeterUtil.counter(execution_sdk_notifier_manager_failure, notifierType, METHOD_LOADREFRESHED);
-            throw e;
+            throw ex;
         }
     }
 
@@ -199,13 +218,18 @@ public class GlobalMessageNotifierManager {
         try {
             MeterUtil.counter(execution_sdk_notifier_manager_total, refreshed.getNotifierType(), METHOD_SAVEREFRESHED);
             MeterUtil.timer(execution_sdk_notifier_manager_time, refreshed.getNotifierType(), METHOD_SAVEREFRESHED, () -> {
+                final String key = buildRefreshedCachedKey(refreshed.getNotifierType());
                 final int effectiveExpireSec = (int) (refreshed.getExpireSeconds()
                         * (1 - config.engine().notifier().refreshedCachedExpireOffsetRate()));
+
                 // Sets effective expire.
                 refreshed.setEffectiveExpireSeconds(effectiveExpireSec);
 
-                redisStringCommands.set(buildRefreshedCachedKey(refreshed.getNotifierType()), toJSONString(refreshed),
-                        new SetArgs().px(Duration.ofSeconds(effectiveExpireSec)));
+                // Update to redis.
+                redisStringCommands.set(key, toJSONString(refreshed), new SetArgs().px(Duration.ofSeconds(effectiveExpireSec)));
+
+                // Update to local cache.
+                localRefreshedCache.put(key, refreshed);
                 return null;
             });
         } catch (Throwable e) {
@@ -258,6 +282,49 @@ public class GlobalMessageNotifierManager {
             return ncs;
         } catch (Throwable e) {
             throw new RengineException(e);
+        }
+    }
+
+    static class FastRefreshedLocalCache {
+        // key -> (value, modifiedTimeMs)
+        final Map<String, Tuple2> cached = new ConcurrentHashMap<>(4);
+
+        public RefreshedInfo get(@NotBlank String key) {
+            hasTextOf(key, "key");
+            final Tuple2 tuple2 = cached.get(key);
+            if (nonNull(tuple2)) {
+                // Check for valid.
+                if ((currentTimeMillis() - (long) tuple2.getItem2()) <= ((RefreshedInfo) tuple2.getItem1())
+                        // In order to ensure the consistency of the remote and
+                        // local caches as much as possible, the expiration time
+                        // of the local cache is set to 1/2 of the remote.
+                        .getEffectiveExpireSeconds() * 1000 / 2) {
+                    return notNullOf(tuple2.getItem1(), "localCachedRefreshed");
+                }
+                // Expired and remove.
+                cached.remove(key);
+                return null;
+            }
+            return null;
+        }
+
+        public void loadInit(@NotBlank String key, RefreshedInfo refreshed) {
+            hasTextOf(key, "key");
+            if (nonNull(refreshed)) {
+                long modifiedTime = 0L;
+                final Tuple2 existing = cached.get(key);
+                if (nonNull(existing) && nonNull(existing.getItem2())) {
+                    modifiedTime = existing.getItem2();
+                }
+                cached.put(key, new Tuple2(refreshed, modifiedTime));
+            }
+        }
+
+        public void put(@NotBlank String key, RefreshedInfo refreshed) {
+            hasTextOf(key, "key");
+            if (nonNull(refreshed)) {
+                cached.put(key, new Tuple2(refreshed, currentTimeMillis()));
+            }
         }
     }
 

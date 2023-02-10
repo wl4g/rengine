@@ -15,13 +15,18 @@
  */
 package com.wl4g.rengine.executor.context;
 
+import static java.lang.String.valueOf;
+import static java.lang.System.currentTimeMillis;
+
 import javax.enterprise.event.Observes;
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import com.wl4g.infra.common.web.rest.RespBase;
 
+import io.quarkus.redis.datasource.RedisDataSource;
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -41,13 +46,24 @@ import lombok.extern.slf4j.Slf4j;
 @Singleton
 public class ExecutorApplicationInitializer {
 
+    @Inject
+    RedisDataSource redisDS;
+
     void onStart(@Observes StartupEvent event, @ConfigProperty(name = "quarkus.application.name") String appName) {
-        log.info("The application is starting...");
+        log.info("{} is starting ...", appName);
         RespBase.ErrorPromptMessageBuilder.setPrompt(appName.substring(Math.max(appName.lastIndexOf("-") + 1, 0)));
+        immdiatelyInitializeRedisDS();
     }
 
     void onStop(@Observes ShutdownEvent event) {
         log.info("The application is stopping...");
+    }
+
+    void immdiatelyInitializeRedisDS() {
+        log.info("Immediately initializing redis dataSource ...");
+        redisDS.string(String.class).set("NONE", valueOf(currentTimeMillis()));
+        final var initTime = redisDS.string(String.class).get("NONE");
+        log.info("Initialized redis dataSource for : {}", initTime);
     }
 
 }
