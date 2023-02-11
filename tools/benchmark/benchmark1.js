@@ -138,12 +138,20 @@ function testSdkForRandomHolder(context) {
     try {
         console.info("nextBoolean: " + RandomHolder.nextBoolean());
         console.info("nextInt: " + RandomHolder.nextInt());
+        console.info("nextInt(10, 20): " + RandomHolder.nextInt(10, 20));
+        console.info("nextFloat: " + RandomHolder.nextFloat());
+        console.info("nextFloat(10, 20): " + RandomHolder.nextFloat(10.0, 20.0));
+        console.info("nextDouble: " + RandomHolder.nextDouble());
+        console.info("nextDouble(10, 20): " + RandomHolder.nextDouble(10.0, 20.0));
         console.info("nextLong: " + RandomHolder.nextLong());
+        console.info("nextLong(10, 20): " + RandomHolder.nextLong(10, 20));
+        console.info("randomAscii: " + RandomHolder.randomAscii(16));
         console.info("randomAlphabetic: " + RandomHolder.randomAlphabetic(16));
         console.info("randomAlphanumeric: " + RandomHolder.randomAlphanumeric(16));
-        const randomHolderResult = RandomHolder.randomNumeric(16);
-        console.info("randomNumeric: " + randomHolderResult);
-        return randomHolderResult;
+        console.info("randomGraph: " + RandomHolder.randomGraph(16));
+        console.info("randomNumeric: " + RandomHolder.randomNumeric(16));
+        console.info("randomPrint: " + RandomHolder.randomPrint(16));
+        return RandomHolder.randomNumeric(16);
     } catch(e) {
         console.error("RandomHolder >>>", e);
         throw e;
@@ -153,8 +161,8 @@ function testSdkForRandomHolder(context) {
 function testSdkForUUID(context) {
     try {
         const uuidResult = UUID.randomUUID();
-        console.info("randomUUID: " + uuidResult);
-        return uuidResult;
+        console.info("randomUUID: " + uuidResult.toString());
+        return uuidResult.toString();
     } catch(e) {
         console.error("UUID >>>", e);
         throw e;

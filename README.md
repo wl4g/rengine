@@ -1,6 +1,6 @@
 # Rengine
 
-A real-time + near real-time general rule engine platform, suitable for such as financial risk control, real-time alarm of Iot temperature indicators, online data cleaning and filtering, etc.
+A real-time, near real-time general rule engine platform, suitable for such as financial risk control, real-time alarm of Iot temperature, online data cleaning and filtering, etc.
 
 ## Architectures
 
