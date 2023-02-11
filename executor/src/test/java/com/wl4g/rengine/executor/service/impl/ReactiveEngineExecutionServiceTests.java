@@ -65,7 +65,7 @@ public class ReactiveEngineExecutionServiceTests {
                 if (isNull(engineExecutionService)) {
                     // Manual setup/inject depends.
                     engineExecutionService = new ReactiveEngineExecutionServiceImpl();
-                    engineExecutionService.config = TestDefaultBaseSetup.createExecutionConfig();
+                    engineExecutionService.engineConfig = TestDefaultBaseSetup.createEngineConfig();
                     engineExecutionService.meterService = TestDefaultMeterSetup.setup();
                     // engineExecutionService.lifecycleExecutionService = new
                     // LifecycleExecutionService(); // TODO

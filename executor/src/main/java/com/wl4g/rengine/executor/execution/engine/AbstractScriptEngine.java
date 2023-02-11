@@ -44,7 +44,7 @@ import com.wl4g.rengine.common.graph.ExecutionGraphContext;
 import com.wl4g.rengine.common.graph.ExecutionGraphParameter;
 import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
 import com.wl4g.rengine.common.util.ScriptEngineUtil;
-import com.wl4g.rengine.executor.execution.ExecutionConfig;
+import com.wl4g.rengine.executor.execution.EngineConfig;
 import com.wl4g.rengine.executor.execution.engine.internal.GlobalSdkExecutorManager;
 import com.wl4g.rengine.executor.execution.sdk.ScriptContext;
 import com.wl4g.rengine.executor.execution.sdk.ScriptContext.ScriptParameter;
@@ -91,7 +91,7 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class AbstractScriptEngine implements IEngine {
 
     @Inject
-    ExecutionConfig executionConfig;
+    EngineConfig engineConfig;
 
     @Inject
     MinioConfig minioConfig;
@@ -137,8 +137,7 @@ public abstract class AbstractScriptEngine implements IEngine {
         return safeList(rule.getEffectiveLatestScript().getUploads()).stream().map(upload -> {
             try {
                 return minioManager.loadObject(UploadType.of(upload.getUploadType()), upload.getObjectPrefix(), scenesCode,
-                        ExtensionType.of(upload.getExtension()).isBinary(),
-                        executionConfig.engine().executorScriptCachedExpire());
+                        ExtensionType.of(upload.getExtension()).isBinary(), engineConfig.executorScriptCachedExpire());
             } catch (Exception e) {
                 log.error(format("Unable to load dependency script from MinIO: %s", upload.getObjectPrefix()), e);
                 throw new IllegalStateException(e); // fast-fail:Stay-Strongly-Consistent
@@ -161,7 +160,7 @@ public abstract class AbstractScriptEngine implements IEngine {
                         graphContext.getLastResult().getValueMap());
 
         final SafeScheduledTaskPoolExecutor executor = globalSdkExecutorManager.getExecutor(parameter.getWorkflowId(),
-                executionConfig.engine().executor().perExecutorThreadPools());
+                engineConfig.executor().perExecutorThreadPools());
 
         return ScriptContext.builder()
                 .id(graphContext.getCurrentNode().getId())

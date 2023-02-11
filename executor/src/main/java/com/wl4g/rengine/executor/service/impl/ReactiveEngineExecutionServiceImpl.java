@@ -57,7 +57,7 @@ import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
 import com.wl4g.rengine.common.model.ExecuteRequest;
 import com.wl4g.rengine.common.model.ExecuteResult;
 import com.wl4g.rengine.common.util.BsonEntitySerializers;
-import com.wl4g.rengine.executor.execution.ExecutionConfig;
+import com.wl4g.rengine.executor.execution.EngineConfig;
 import com.wl4g.rengine.executor.execution.LifecycleExecutionService;
 import com.wl4g.rengine.executor.meter.RengineExecutorMeterService;
 import com.wl4g.rengine.executor.repository.MongoRepository;
@@ -83,7 +83,7 @@ import lombok.CustomLog;
 public class ReactiveEngineExecutionServiceImpl implements EngineExecutionService {
 
     @Inject
-    ExecutionConfig config;
+    EngineConfig engineConfig;
 
     @Inject
     RengineExecutorMeterService meterService;
@@ -327,7 +327,7 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
 
         final ReactiveMongoCollection<Document> collection = mongoRepository.getReactiveCollection(T_SCENESES);
         final Multi<Document> scenesesMulti = collection.aggregate(aggregates);
-        return scenesesMulti/* .batchSize(config.engine().maxQueryBatch()) */.map(scenesDoc -> {
+        return scenesesMulti/* .batchSize(engineConfig.maxQueryBatch()) */.map(scenesDoc -> {
             // Solution-1:
             // @formatter:off
                 //    log.debug("Found scenes object by scenesCodes: {} to json: {}", scenesCodes, scenesDoc.toJson());
@@ -356,7 +356,7 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
         //
         // @formatter:off
         //final List<ScenesWrapper> cachedSceneses = safeList(executeRequest.getScenesCodes()).stream()
-        //        .map(scenesCode -> parseJSON(redisStringCommands.get(config.scenesRulesCachedPrefix().concat(scenesCode)),
+        //        .map(scenesCode -> parseJSON(redisStringCommands.get(engineConfig.scenesRulesCachedPrefix().concat(scenesCode)),
         //                ScenesWrapper.class))
         //        .filter(s -> nonNull(s))
         //        .collect(toList());
@@ -370,8 +370,8 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
         //if (!uncachedScenesCodes.isEmpty()) {
         //    final List<ScenesWrapper> sceneses = findScenesWorkflowGraphRules(uncachedScenesCodes, revisions);
         //    sceneses.stream()
-        //            .forEach(s -> redisStringCommands.setex(config.scenesRulesCachedPrefix().concat(s.getScenesCode()),
-        //                    config.scenesRulesCachedExpire(), toJSONString(s)));
+        //            .forEach(s -> redisStringCommands.setex(engineConfig.scenesRulesCachedPrefix().concat(s.getScenesCode()),
+        //                    engineConfig.scenesRulesCachedExpire(), toJSONString(s)));
         //    mergedSceneses.addAll(sceneses);
         //}
         //
@@ -391,7 +391,7 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
         final String scenesCodesHash = Hashing.md5()
                 .hashBytes(safeList(executeRequest.getScenesCodes()).stream().collect(joining("-")).getBytes(UTF_8))
                 .toString();
-        final String batchQueryingKey = config.engine().scenesRulesCachedPrefix().concat(scenesCodesHash);
+        final String batchQueryingKey = engineConfig.scenesRulesCachedPrefix().concat(scenesCodesHash);
 
         final Uni<List<ScenesWrapper>> scenesesUni = reactiveRedisStringCommands.get(batchQueryingKey).flatMap(scenesJsons -> {
             if (Objects.isNull(scenesJsons)) {
@@ -401,7 +401,7 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
                         .chain(sceneses -> {
                             return reactiveRedisStringCommands
                                     .setex(batchQueryingKey,
-                                            Duration.ofMillis(config.engine().scenesRulesCachedExpire()).toSeconds(),
+                                            Duration.ofMillis(engineConfig.scenesRulesCachedExpire()).toSeconds(),
                                             toJSONString(sceneses))
                                     .map(res -> sceneses);
                         });

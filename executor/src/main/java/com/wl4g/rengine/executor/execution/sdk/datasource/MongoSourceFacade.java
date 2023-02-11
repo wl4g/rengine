@@ -64,8 +64,10 @@ import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourcePropertiesB
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
 import com.wl4g.rengine.common.entity.DataSourceProperties.MongoDataSourceProperties;
 import com.wl4g.rengine.common.exception.ConfigRengineException;
-import com.wl4g.rengine.executor.execution.ExecutionConfig;
+import com.wl4g.rengine.executor.execution.EngineConfig;
 import com.wl4g.rengine.executor.meter.MeterUtil;
+import com.wl4g.rengine.executor.minio.MinioConfig;
+import com.wl4g.rengine.executor.service.ServiceConfig;
 
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
@@ -88,7 +90,9 @@ public class MongoSourceFacade implements DataSourceFacade {
     final static String METHOD_UPDATE_MANY = "updateMany";
     final static String METHOD_DELETE_MANY = "deleteMany";
 
-    final ExecutionConfig executionConfig;
+    final EngineConfig engineConfig;
+    final ServiceConfig serviceConfig;
+    final MinioConfig minioConfig;
     final GlobalDataSourceManager globalDataSourceManager;
     final String dataSourceName;
     final MongoClient mongoClient;
@@ -227,11 +231,17 @@ public class MongoSourceFacade implements DataSourceFacade {
 
         @Override
         public DataSourceFacade newInstnace(
-                final @NotNull ExecutionConfig config,
+                final @NotNull EngineConfig engineConfig,
+                final @NotNull ServiceConfig serviceConfig,
+                final @NotNull MinioConfig minioConfig,
                 final @NotNull GlobalDataSourceManager globalDataSourceManager,
                 final @NotBlank String dataSourceName,
                 final @NotNull DataSourcePropertiesBase dataSourceProperties) {
-            notNullOf(config, "properties");
+            notNullOf(engineConfig, "engineConfig");
+            notNullOf(serviceConfig, "serviceConfig");
+            notNullOf(minioConfig, "minioConfig");
+            notNullOf(dataSourceProperties, "dataSourceProperties");
+            notNullOf(globalDataSourceManager, "globalDataSourceManager");
             hasTextOf(dataSourceName, "dataSourceName");
 
             final String connectionString = ((MongoDataSourceProperties) dataSourceProperties).getConnectionString();
@@ -243,7 +253,8 @@ public class MongoSourceFacade implements DataSourceFacade {
                     MongoClientSettings.builder().applyConnectionString(new ConnectionString(connectionString)).build(),
                     MongoDriverInformation.builder().build());
 
-            return new MongoSourceFacade(config, globalDataSourceManager, dataSourceName, mongoClient);
+            return new MongoSourceFacade(engineConfig, serviceConfig, minioConfig, globalDataSourceManager, dataSourceName,
+                    mongoClient);
         }
 
         @Override

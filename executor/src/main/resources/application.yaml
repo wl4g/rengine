@@ -276,8 +276,8 @@ quarkus:
       - redis://localhost:7381
     timeout: 8s
     password: 'zzx!@#$%'
-    max-pool-size: 6
-    max-pool-waiting: 24
+    max-pool-size: 512 ## Default by 6
+    max-pool-waiting: 512 ## Default by 24
     max-waiting-handlers: 2048
     max-nested-arrays: 32
     pool-cleaner-interval: 30m
@@ -299,30 +299,29 @@ quarkus:
 ## Rengine evaluator configuration.
 rengine:
   executor:
-    execution:
-      service:
-        dict-cached-prefix: 'rengine:executor:service:dict'
-        dict-cached-expire: 86400000 # 24h
-      engine:
-        scenes-rules-cached-prefix: 'rengine:executor:engine:scenes:rules:'
-        scenes-rules-cached-expire: 600000 # Default by 10m
-        executor-script-cached-expire: 6000000 # Default by 10m
-        executor-thread-pools: 20
-        executor-accept-queue: 10
-        execute-timeout-offset-rate: 0.1f
-        log:
-          base-dir: /tmp/__rengine_script_log
-          enable-console: true
-          file-max-size: 536870912 # Default by 512MB
-          file-max-count: 10
-        datasource:
-          total-limited-max: 10
-        notifier:
-          refresh-lock-timeout: 60000
-          refreshed-cached-prefix: 'rengine:executor:sdk:notifier:refreshed:'
-          refreshed-cached-expire-offset-rate: 0.1f
-        executor:
-          per-executor-thread-pools: 2
+    services:
+      dict-cached-prefix: 'rengine:executor:service:dict'
+      dict-cached-expire: 86400000 # 24h
+    engine:
+      scenes-rules-cached-prefix: 'rengine:executor:engine:scenes:rules:'
+      scenes-rules-cached-expire: 600000 # Default by 10m
+      executor-script-cached-expire: 6000000 # Default by 10m
+      executor-thread-pools: 20
+      executor-accept-queue: 10
+      execute-timeout-offset-rate: 0.1f
+      log:
+        base-dir: /tmp/__rengine_script_log
+        enable-console: true
+        file-max-size: 536870912 # Default by 512MB
+        file-max-count: 10
+      datasource:
+        total-limited-max: 10
+      notifier:
+        refresh-lock-timeout: 60000
+        refreshed-cached-prefix: 'rengine:executor:sdk:notifier:refreshed:'
+        refreshed-cached-expire-offset-rate: 0.1f
+      executor:
+        per-executor-thread-pools: 2
     minio:
       endpoint: http://localhost:9000
       region: us-east-1

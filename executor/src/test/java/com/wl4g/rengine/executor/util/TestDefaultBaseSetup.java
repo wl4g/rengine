@@ -45,8 +45,9 @@ import com.mongodb.internal.connection.DefaultClusterFactory;
 import com.mongodb.internal.connection.InternalConnectionPoolSettings;
 import com.mongodb.lang.Nullable;
 import com.wl4g.rengine.common.constants.RengineConstants;
-import com.wl4g.rengine.executor.execution.ExecutionConfig;
+import com.wl4g.rengine.executor.execution.EngineConfig;
 import com.wl4g.rengine.executor.repository.MongoRepository;
+import com.wl4g.rengine.executor.service.ServiceConfig;
 
 import io.quarkus.mongodb.impl.ReactiveMongoClientImpl;
 import io.quarkus.mongodb.reactive.ReactiveMongoClient;
@@ -138,130 +139,123 @@ public abstract class TestDefaultBaseSetup {
         }
     }
 
-    public static ExecutionConfig createExecutionConfig() {
-        return new ExecutionConfig() {
+    public static EngineConfig createEngineConfig() {
+        return new EngineConfig() {
             @Override
-            public @NotNull ServiceConfig service() {
-                return new ServiceConfig() {
+            public @NotBlank String scenesRulesCachedPrefix() {
+                return EngineConfig.DEFAULT_SCENES_RULES_CACHED_PREFIX;
+            }
+
+            @Override
+            public @NotNull @Min(0) Long scenesRulesCachedExpire() {
+                return EngineConfig.DEFAULT_SCENES_RULES_CACHED_EXPIRE;
+            }
+
+            @Override
+            public @NotNull @Min(0) Long executorScriptCachedExpire() {
+                return EngineConfig.DEFAULT_SCRIPT_CACHED_EXPIRE;
+            }
+
+            @Override
+            public @NotNull @Min(0) @Max(65535) Integer executorThreadPools() {
+                return EngineConfig.DEFAULT_EXECUTOR_THREAD_POOLS;
+            }
+
+            @Override
+            public @NotNull @Min(1) @Max(1024) Integer executorAcceptQueue() {
+                return EngineConfig.DEFAULT_EXECUTOR_ACCEPT_QUEUE;
+            }
+
+            @Override
+            public @NotNull @Min(0) @Max(1) Float executeTimeoutOffsetRate() {
+                return EngineConfig.DEFAULT_TIMEOUT_OFFSET_RATE;
+            }
+
+            @Override
+            public @NotNull ScriptLogConfig log() {
+                return new ScriptLogConfig() {
                     @Override
-                    public @NotBlank String dictCachedPrefix() {
-                        return ServiceConfig.DEFAULT_DICT_CACHED_PREFIX;
+                    public @NotBlank String baseDir() {
+                        return RengineConstants.DEFAULT_EXECUTOR_SCRIPT_LOG_BASE_DIR;
                     }
 
                     @Override
-                    public @NotNull @Min(0) Long dictCachedExpire() {
-                        return ServiceConfig.DEFAULT_DICT_CACHED_EXPIRE;
+                    public @NotNull Boolean enableConsole() {
+                        return ScriptLogConfig.DEFAULT_SCRIPT_LOG_ENABLE_CONSOLE;
+                    }
+
+                    @Override
+                    public @NotNull @Min(1024) Integer fileMaxSize() {
+                        return ScriptLogConfig.DEFAULT_SCRIPT_LOG_FILE_MAX_SIZE;
+                    }
+
+                    @Override
+                    public @NotNull @Min(1) Integer fileMaxCount() {
+                        return ScriptLogConfig.DEFAULT_SCRIPT_LOG_FILE_MAX_COUNT;
+                    }
+
+                    @Override
+                    public @NotBlank String uploaderCron() {
+                        return ScriptLogConfig.DEFAULT_SCRIPT_LOG_UPLOADER_CRON;
                     }
                 };
             }
 
             @Override
-            public @NotNull EngineConfig engine() {
-                return new EngineConfig() {
+            public @NotNull SdkDataSourceConfig datasource() {
+                return new SdkDataSourceConfig() {
                     @Override
-                    public @NotBlank String scenesRulesCachedPrefix() {
-                        return EngineConfig.DEFAULT_SCENES_RULES_CACHED_PREFIX;
+                    public @NotNull @Min(1) Integer totalLimitedMax() {
+                        return SdkDataSourceConfig.DEFAULT_DATASOURCE_TOTAL_LIMITED_MAX;
                     }
-
-                    @Override
-                    public @NotNull @Min(0) Long scenesRulesCachedExpire() {
-                        return EngineConfig.DEFAULT_SCENES_RULES_CACHED_EXPIRE;
-                    }
-
-                    @Override
-                    public @NotNull @Min(0) Long executorScriptCachedExpire() {
-                        return EngineConfig.DEFAULT_SCRIPT_CACHED_EXPIRE;
-                    }
-
-                    @Override
-                    public @NotNull @Min(0) @Max(65535) Integer executorThreadPools() {
-                        return EngineConfig.DEFAULT_EXECUTOR_THREAD_POOLS;
-                    }
-
-                    @Override
-                    public @NotNull @Min(1) @Max(1024) Integer executorAcceptQueue() {
-                        return EngineConfig.DEFAULT_EXECUTOR_ACCEPT_QUEUE;
-                    }
-
-                    @Override
-                    public @NotNull @Min(0) @Max(1) Float executeTimeoutOffsetRate() {
-                        return EngineConfig.DEFAULT_TIMEOUT_OFFSET_RATE;
-                    }
-
-                    @Override
-                    public @NotNull ScriptLogConfig log() {
-                        return new ScriptLogConfig() {
-                            @Override
-                            public @NotBlank String baseDir() {
-                                return RengineConstants.DEFAULT_EXECUTOR_SCRIPT_LOG_BASE_DIR;
-                            }
-
-                            @Override
-                            public @NotNull Boolean enableConsole() {
-                                return ScriptLogConfig.DEFAULT_SCRIPT_LOG_ENABLE_CONSOLE;
-                            }
-
-                            @Override
-                            public @NotNull @Min(1024) Integer fileMaxSize() {
-                                return ScriptLogConfig.DEFAULT_SCRIPT_LOG_FILE_MAX_SIZE;
-                            }
-
-                            @Override
-                            public @NotNull @Min(1) Integer fileMaxCount() {
-                                return ScriptLogConfig.DEFAULT_SCRIPT_LOG_FILE_MAX_COUNT;
-                            }
-
-                            @Override
-                            public @NotBlank String uploaderCron() {
-                                return ScriptLogConfig.DEFAULT_SCRIPT_LOG_UPLOADER_CRON;
-                            }
-                        };
-                    }
-
-                    @Override
-                    public @NotNull SdkDataSourceConfig datasource() {
-                        return new SdkDataSourceConfig() {
-                            @Override
-                            public @NotNull @Min(1) Integer totalLimitedMax() {
-                                return SdkDataSourceConfig.DEFAULT_DATASOURCE_TOTAL_LIMITED_MAX;
-                            }
-                        };
-                    }
-
-                    @Override
-                    public @NotNull SdkNotifierConfig notifier() {
-                        return new SdkNotifierConfig() {
-
-                            @Override
-                            public @NotNull @Min(0) Long refreshLockTimeout() {
-                                return SdkNotifierConfig.DEFAULT_NOTIFIER_REFRESH_LOCK_TIMEOUT;
-                            }
-
-                            @Override
-                            public @NotBlank String refreshedCachedPrefix() {
-                                return SdkNotifierConfig.DEFAULT_NOTIFIER_REFRESHED_CACHED_PREFIX;
-                            }
-
-                            @Override
-                            public @NotNull @Min(0) @Max(1) Float refreshedCachedExpireOffsetRate() {
-                                return SdkNotifierConfig.DEFAULT_NOTIFIER_EXPIRE_OFFSET_RATE;
-                            }
-                        };
-                    }
-
-                    @Override
-                    public @NotNull SdkExecutorConfig executor() {
-                        return new SdkExecutorConfig() {
-                            @Override
-                            public @NotNull @Min(0) @Max(1024) Integer perExecutorThreadPools() {
-                                return SdkExecutorConfig.DEFAULT_PER_EXECUTOR_THREAD_POOLS;
-                            }
-                        };
-                    }
-
                 };
             }
 
+            @Override
+            public @NotNull SdkNotifierConfig notifier() {
+                return new SdkNotifierConfig() {
+
+                    @Override
+                    public @NotNull @Min(0) Long refreshLockTimeout() {
+                        return SdkNotifierConfig.DEFAULT_NOTIFIER_REFRESH_LOCK_TIMEOUT;
+                    }
+
+                    @Override
+                    public @NotBlank String refreshedCachedPrefix() {
+                        return SdkNotifierConfig.DEFAULT_NOTIFIER_REFRESHED_CACHED_PREFIX;
+                    }
+
+                    @Override
+                    public @NotNull @Min(0) @Max(1) Float refreshedCachedExpireOffsetRate() {
+                        return SdkNotifierConfig.DEFAULT_NOTIFIER_EXPIRE_OFFSET_RATE;
+                    }
+                };
+            }
+
+            @Override
+            public @NotNull SdkExecutorConfig executor() {
+                return new SdkExecutorConfig() {
+                    @Override
+                    public @NotNull @Min(0) @Max(1024) Integer perExecutorThreadPools() {
+                        return SdkExecutorConfig.DEFAULT_PER_EXECUTOR_THREAD_POOLS;
+                    }
+                };
+            }
+
+        };
+    }
+
+    public static ServiceConfig createServiceConfig() {
+        return new ServiceConfig() {
+            @Override
+            public @NotBlank String dictCachedPrefix() {
+                return ServiceConfig.DEFAULT_DICT_CACHED_PREFIX;
+            }
+
+            @Override
+            public @NotNull @Min(0) Long dictCachedExpire() {
+                return ServiceConfig.DEFAULT_DICT_CACHED_EXPIRE;
+            }
         };
     }
 

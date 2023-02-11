@@ -54,8 +54,8 @@ import com.wl4g.rengine.common.exception.EvaluationException;
 import com.wl4g.rengine.common.exception.ExecutionScriptException;
 import com.wl4g.rengine.common.graph.ExecutionGraphContext;
 import com.wl4g.rengine.common.graph.ExecutionGraphParameter;
-import com.wl4g.rengine.executor.execution.ExecutionConfig;
-import com.wl4g.rengine.executor.execution.ExecutionConfig.EngineConfig.ScriptLogConfig;
+import com.wl4g.rengine.executor.execution.EngineConfig;
+import com.wl4g.rengine.executor.execution.EngineConfig.ScriptLogConfig;
 import com.wl4g.rengine.executor.execution.sdk.ScriptContext;
 import com.wl4g.rengine.executor.execution.sdk.ScriptExecutor;
 import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
@@ -80,7 +80,7 @@ import lombok.Getter;
 public class GraalJSScriptEngine extends AbstractScriptEngine {
 
     @Inject
-    ExecutionConfig config;
+    EngineConfig engineConfig;
 
     @NotNull
     GraalPolyglotManager graalPolyglotManager;
@@ -90,7 +90,7 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
         super.init();
         try {
             log.info("Initialzing graal JS script engine ...");
-            final ScriptLogConfig scriptLogConfig = config.engine().log();
+            final ScriptLogConfig scriptLogConfig = engineConfig.log();
             /**
              * TODO The best way is to let the rengine executor write to OSS in
              * real time, but unfortunately MinIO/S3 does not support append

@@ -46,8 +46,10 @@ import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourcePropertiesB
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
 import com.wl4g.rengine.common.entity.DataSourceProperties.RedisDataSourceProperties;
 import com.wl4g.rengine.common.exception.RengineException;
-import com.wl4g.rengine.executor.execution.ExecutionConfig;
+import com.wl4g.rengine.executor.execution.EngineConfig;
 import com.wl4g.rengine.executor.meter.MeterUtil;
+import com.wl4g.rengine.executor.minio.MinioConfig;
+import com.wl4g.rengine.executor.service.ServiceConfig;
 
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
@@ -79,7 +81,9 @@ public class RedisSourceFacade implements DataSourceFacade {
     final static String METHOD_HSETNX = "hsetnx";
     final static String METHOD_EVAL = "eval";
 
-    final ExecutionConfig executionConfig;
+    final EngineConfig engineConfig;
+    final ServiceConfig serviceConfig;
+    final MinioConfig minioConfig;
     final GlobalDataSourceManager globalDataSourceManager;
     final String dataSourceName;
     final JedisClient jedisClient;
@@ -316,8 +320,8 @@ public class RedisSourceFacade implements DataSourceFacade {
      */
     private void checkPermission(final @NotBlank String key, final boolean forUpdate) {
         if (forUpdate) {
-            if (startsWithAny(key, executionConfig.engine().scenesRulesCachedPrefix(),
-                    executionConfig.service().dictCachedPrefix(), executionConfig.engine().notifier().refreshedCachedPrefix())) {
+            if (startsWithAny(key, engineConfig.scenesRulesCachedPrefix(), serviceConfig.dictCachedPrefix(),
+                    engineConfig.notifier().refreshedCachedPrefix())) {
                 throw new RengineException(format("Forbidden to modify system cache prefix of '%s'", key));
             }
         }
@@ -328,11 +332,16 @@ public class RedisSourceFacade implements DataSourceFacade {
 
         @Override
         public DataSourceFacade newInstnace(
-                final @NotNull ExecutionConfig config,
+                final @NotNull EngineConfig engineConfig,
+                final @NotNull ServiceConfig serviceConfig,
+                final @NotNull MinioConfig minioConfig,
                 final @NotNull GlobalDataSourceManager globalDataSourceManager,
                 final @NotBlank String dataSourceName,
                 final @NotNull DataSourcePropertiesBase dataSourceProperties) {
-            notNullOf(config, "properties");
+            notNullOf(engineConfig, "engineConfig");
+            notNullOf(serviceConfig, "serviceConfig");
+            notNullOf(minioConfig, "minioConfig");
+            notNullOf(dataSourceProperties, "dataSourceProperties");
             notNullOf(globalDataSourceManager, "globalDataSourceManager");
             hasTextOf(dataSourceName, "dataSourceName");
 
@@ -366,7 +375,8 @@ public class RedisSourceFacade implements DataSourceFacade {
                     .poolConfig(poolConfig)
                     .build();
             final JedisClient jedisClient = new JedisClientBuilder(jedisConfig).build();
-            return new RedisSourceFacade(config, globalDataSourceManager, dataSourceName, jedisClient);
+            return new RedisSourceFacade(engineConfig, serviceConfig, minioConfig, globalDataSourceManager, dataSourceName,
+                    jedisClient);
         }
 
         @Override

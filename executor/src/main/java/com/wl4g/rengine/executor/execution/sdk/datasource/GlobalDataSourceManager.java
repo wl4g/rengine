@@ -59,11 +59,13 @@ import com.wl4g.rengine.common.exception.ConfigRengineException;
 import com.wl4g.rengine.common.exception.ExecutionScriptException;
 import com.wl4g.rengine.common.exception.RengineException;
 import com.wl4g.rengine.common.util.BsonEntitySerializers;
-import com.wl4g.rengine.executor.execution.ExecutionConfig;
+import com.wl4g.rengine.executor.execution.EngineConfig;
 import com.wl4g.rengine.executor.execution.sdk.datasource.DataSourceFacade.DataSourceFacadeBuilder;
 import com.wl4g.rengine.executor.meter.RengineExecutorMeterService;
+import com.wl4g.rengine.executor.minio.MinioConfig;
 import com.wl4g.rengine.executor.meter.MeterUtil;
 import com.wl4g.rengine.executor.repository.MongoRepository;
+import com.wl4g.rengine.executor.service.ServiceConfig;
 
 import io.quarkus.arc.All;
 import lombok.CustomLog;
@@ -81,7 +83,15 @@ public final class GlobalDataSourceManager {
 
     @NotNull
     @Inject
-    ExecutionConfig executionConfig;
+    EngineConfig engineConfig;
+
+    @NotNull
+    @Inject
+    ServiceConfig serviceConfig;
+
+    @NotNull
+    @Inject
+    MinioConfig minioConfig;
 
     @NotNull
     @Inject
@@ -144,9 +154,9 @@ public final class GlobalDataSourceManager {
 
                 // Check for limited.
                 final long currentCount = dataSourceRegistry.values().stream().flatMap(dsf -> dsf.values().stream()).count();
-                if (currentCount > executionConfig.engine().datasource().totalLimitedMax()) {
-                    throw new ExecutionScriptException(format("Too many dataSources. total limited max: %s",
-                            executionConfig.engine().datasource().totalLimitedMax()));
+                if (currentCount > engineConfig.datasource().totalLimitedMax()) {
+                    throw new ExecutionScriptException(
+                            format("Too many dataSources. total limited max: %s", engineConfig.datasource().totalLimitedMax()));
                 }
 
                 // Obtain for dataSource facade.
@@ -167,8 +177,9 @@ public final class GlobalDataSourceManager {
                             final DataSourceFacadeBuilder builder = notNull(builderMap.get(dataSourceType),
                                     "Unsupported to data source facade handler type of : %s/%s", dataSourceType, dataSourceName);
                             // New init data source facade.
-                            dataSourceFacades.put(dataSourceName, dataSourceFacade = builder.newInstnace(executionConfig, this,
-                                    dataSourceName, findDataSourceProperties(dataSourceType, dataSourceName)));
+                            dataSourceFacades.put(dataSourceName,
+                                    dataSourceFacade = builder.newInstnace(engineConfig, serviceConfig, minioConfig, this,
+                                            dataSourceName, findDataSourceProperties(dataSourceType, dataSourceName)));
                         }
                     }
                 }

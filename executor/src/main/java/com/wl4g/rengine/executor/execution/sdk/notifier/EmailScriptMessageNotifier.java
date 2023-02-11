@@ -136,10 +136,10 @@ public class EmailScriptMessageNotifier implements ScriptMessageNotifier {
             MeterUtil.timer(execution_sdk_notifier_time, kind(), METHOD_UPDATE, () -> {
                 ScriptMessageNotifier.super.update(refreshed, vertx);
 
-                // Initialze for config properties.
+                // Initialze for engineConfig properties.
                 final EmailConfig config = parseJSON((String) refreshed.getAttributes().get(KEY_MAIL_CONFIG), EmailConfig.class);
                 notNull(config,
-                        "Internal error! Please check the redis cache configuration data, email config json is required. refreshed: %s",
+                        "Internal error! Please check the redis cache configuration data, email engineConfig json is required. refreshed: %s",
                         refreshed);
 
                 // Initialze for sender.

@@ -59,7 +59,7 @@ public class GlobalMessageNotifierManagerTests {
                 if (isNull(globalMessageNotifierManager)) {
                     TestDefaultMeterSetup.setup();
                     globalMessageNotifierManager = new GlobalMessageNotifierManager();
-                    globalMessageNotifierManager.config = TestDefaultBaseSetup.createExecutionConfig();
+                    globalMessageNotifierManager.engineConfig = TestDefaultBaseSetup.createEngineConfig();
                     globalMessageNotifierManager.mongoRepository = TestDefaultBaseSetup.createMongoRepository();
                     globalMessageNotifierManager.redisDS = TestDefaultRedisSetup.buildRedisDataSourceDefault();
                     globalMessageNotifierManager.notifiers = asList(new EmailScriptMessageNotifier(),

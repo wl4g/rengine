@@ -41,8 +41,10 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourcePropertiesBase;
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
 import com.wl4g.rengine.common.entity.DataSourceProperties.KafkaDataSourceProperties;
-import com.wl4g.rengine.executor.execution.ExecutionConfig;
+import com.wl4g.rengine.executor.execution.EngineConfig;
 import com.wl4g.rengine.executor.meter.MeterUtil;
+import com.wl4g.rengine.executor.minio.MinioConfig;
+import com.wl4g.rengine.executor.service.ServiceConfig;
 
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
@@ -62,7 +64,9 @@ public class KafkaSourceFacade implements DataSourceFacade {
 
     final static String METHOD_PUBLISH = "publish";
 
-    final ExecutionConfig executionConfig;
+    final EngineConfig engineConfig;
+    final ServiceConfig serviceConfig;
+    final MinioConfig minioConfig;
     final GlobalDataSourceManager globalDataSourceManager;
     final String dataSourceName;
     final KafkaProducer<String, String> kafkaProducer;
@@ -107,14 +111,22 @@ public class KafkaSourceFacade implements DataSourceFacade {
 
         @Override
         public DataSourceFacade newInstnace(
-                final @NotNull ExecutionConfig config,
+                final @NotNull EngineConfig engineConfig,
+                final @NotNull ServiceConfig serviceConfig,
+                final @NotNull MinioConfig minioConfig,
                 final @NotNull GlobalDataSourceManager globalDataSourceManager,
                 final @NotBlank String dataSourceName,
                 final @NotNull DataSourcePropertiesBase dataSourceProperties) {
-            notNullOf(config, "properties");
+            notNullOf(engineConfig, "engineConfig");
+            notNullOf(serviceConfig, "serviceConfig");
+            notNullOf(minioConfig, "minioConfig");
+            notNullOf(dataSourceProperties, "dataSourceProperties");
+            notNullOf(globalDataSourceManager, "globalDataSourceManager");
             hasTextOf(dataSourceName, "dataSourceName");
+
             final Map<String, Object> configMap = ((KafkaDataSourceProperties) dataSourceProperties).toProducerConfigProperties();
-            return new KafkaSourceFacade(config, globalDataSourceManager, dataSourceName, new KafkaProducer<>(configMap));
+            return new KafkaSourceFacade(engineConfig, serviceConfig, minioConfig, globalDataSourceManager, dataSourceName,
+                    new KafkaProducer<>(configMap));
         }
 
         @Override

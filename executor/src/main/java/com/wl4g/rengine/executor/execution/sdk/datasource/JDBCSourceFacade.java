@@ -43,8 +43,10 @@ import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourcePropertiesB
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
 import com.wl4g.rengine.common.entity.DataSourceProperties.JDBCDataSourceProperties;
 import com.wl4g.rengine.common.util.JDBCRunnerHelper;
-import com.wl4g.rengine.executor.execution.ExecutionConfig;
+import com.wl4g.rengine.executor.execution.EngineConfig;
 import com.wl4g.rengine.executor.meter.MeterUtil;
+import com.wl4g.rengine.executor.minio.MinioConfig;
+import com.wl4g.rengine.executor.service.ServiceConfig;
 
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
@@ -68,7 +70,9 @@ public class JDBCSourceFacade implements DataSourceFacade {
     final static String METHOD_UPDATE = "update";
     final static String METHOD_BATCH = "batch";
 
-    final ExecutionConfig executionConfig;
+    final EngineConfig engineConfig;
+    final ServiceConfig serviceConfig;
+    final MinioConfig minioConfig;
     final GlobalDataSourceManager globalDataSourceManager;
     final String dataSourceName;
     final JDBCRunnerHelper helper;
@@ -170,11 +174,17 @@ public class JDBCSourceFacade implements DataSourceFacade {
 
         @Override
         public DataSourceFacade newInstnace(
-                final @NotNull ExecutionConfig config,
+                final @NotNull EngineConfig engineConfig,
+                final @NotNull ServiceConfig serviceConfig,
+                final @NotNull MinioConfig minioConfig,
                 final @NotNull GlobalDataSourceManager globalDataSourceManager,
                 final @NotBlank String dataSourceName,
                 final @NotNull DataSourcePropertiesBase dataSourceProperties) {
-            notNullOf(config, "properties");
+            notNullOf(engineConfig, "engineConfig");
+            notNullOf(serviceConfig, "serviceConfig");
+            notNullOf(minioConfig, "minioConfig");
+            notNullOf(dataSourceProperties, "dataSourceProperties");
+            notNullOf(globalDataSourceManager, "globalDataSourceManager");
             hasTextOf(dataSourceName, "dataSourceName");
 
             final JDBCDataSourceProperties c = (JDBCDataSourceProperties) dataSourceProperties;
@@ -204,7 +214,7 @@ public class JDBCSourceFacade implements DataSourceFacade {
             bds.setTestOnReturn(c.getTestOnReturn());
             bds.setTestWhileIdle(c.getTestWhileIdle());
 
-            return new JDBCSourceFacade(config, globalDataSourceManager, dataSourceName,
+            return new JDBCSourceFacade(engineConfig, serviceConfig, minioConfig, globalDataSourceManager, dataSourceName,
                     new JDBCRunnerHelper(statementConfig, bds));
         }
 

@@ -87,7 +87,7 @@ public class LifecycleExecutionService {
     BeanManager beanManager;
 
     @Inject
-    ExecutionConfig config;
+    EngineConfig config;
 
     @Inject
     RengineExecutorMeterService meterService;
@@ -99,8 +99,8 @@ public class LifecycleExecutionService {
 
     @PostConstruct
     void init() {
-        final int threads = config.engine().executorThreadPools();
-        final int acceptQueue = config.engine().executorAcceptQueue();
+        final int threads = config.executorThreadPools();
+        final int acceptQueue = config.executorAcceptQueue();
         log.info("Initialzing execution executor of threads pool: {}, acceptQueue: {}", threads, acceptQueue);
         this.executionExecutor = GenericTaskRunner
                 .newDefaultScheduledExecutor(ReactiveEngineExecutionServiceImpl.class.getSimpleName(), threads, acceptQueue);
@@ -138,7 +138,7 @@ public class LifecycleExecutionService {
         // Calculate the effective timeout time (ms), minus the network
         // transmission time-consuming deviation.
         final long effectiveTimeoutMs = (long) ((long) executeRequest.getTimeout()
-                * (1 - config.engine().executeTimeoutOffsetRate()));
+                * (1 - config.executeTimeoutOffsetRate()));
 
         final Iterator<Entry<String, Future<ResultDescription>>> it = futures.entrySet().iterator();
         if (!latch.await(effectiveTimeoutMs, MILLISECONDS)) { // Timeout(part-done)

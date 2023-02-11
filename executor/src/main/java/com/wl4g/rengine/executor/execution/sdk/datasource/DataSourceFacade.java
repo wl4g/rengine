@@ -22,7 +22,9 @@ import javax.validation.constraints.NotNull;
 
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourcePropertiesBase;
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
-import com.wl4g.rengine.executor.execution.ExecutionConfig;
+import com.wl4g.rengine.executor.execution.EngineConfig;
+import com.wl4g.rengine.executor.minio.MinioConfig;
+import com.wl4g.rengine.executor.service.ServiceConfig;
 
 /**
  * {@link DataSourceFacade}
@@ -33,13 +35,15 @@ import com.wl4g.rengine.executor.execution.ExecutionConfig;
  */
 public interface DataSourceFacade extends Closeable {
 
-    ExecutionConfig getExecutionConfig();
+    EngineConfig getEngineConfig();
 
     String getDataSourceName();
 
     public static interface DataSourceFacadeBuilder {
         DataSourceFacade newInstnace(
-                final @NotNull ExecutionConfig config,
+                final @NotNull EngineConfig engineConfig,
+                final @NotNull ServiceConfig serviceConfig,
+                final @NotNull MinioConfig minioConfig,
                 final @NotNull GlobalDataSourceManager globalDataSourceManager,
                 final @NotBlank String dataSourceName,
                 final @NotNull DataSourcePropertiesBase dataSourceProperties);

@@ -60,7 +60,7 @@ import com.wl4g.rengine.common.entity.Notification;
 import com.wl4g.rengine.common.exception.ConfigRengineException;
 import com.wl4g.rengine.common.exception.RengineException;
 import com.wl4g.rengine.common.util.BsonEntitySerializers;
-import com.wl4g.rengine.executor.execution.ExecutionConfig;
+import com.wl4g.rengine.executor.execution.EngineConfig;
 import com.wl4g.rengine.executor.execution.sdk.ScriptRedisLockClient;
 import com.wl4g.rengine.executor.execution.sdk.notifier.ScriptMessageNotifier.RefreshedInfo;
 import com.wl4g.rengine.executor.meter.MeterUtil;
@@ -87,7 +87,7 @@ public class GlobalMessageNotifierManager {
 
     @NotNull
     @Inject
-    ExecutionConfig config;
+    EngineConfig engineConfig;
 
     @NotNull
     @Inject
@@ -168,7 +168,7 @@ public class GlobalMessageNotifierManager {
                     // execution. In this way, multi-level locks are used to
                     // ensure performance as much as possible.
                     final Lock lock = lockManager.getLock(DEFAULT_LOCK_PREFIX.concat(notifierType.name()),
-                            config.engine().notifier().refreshLockTimeout(), TimeUnit.MILLISECONDS);
+                            engineConfig.notifier().refreshLockTimeout(), TimeUnit.MILLISECONDS);
                     try {
                         if (lock.tryLock()) {
                             refreshed = notifier.refresh(findNotification(notifierType));
@@ -220,7 +220,7 @@ public class GlobalMessageNotifierManager {
             MeterUtil.timer(execution_sdk_notifier_manager_time, refreshed.getNotifierType(), METHOD_SAVEREFRESHED, () -> {
                 final String key = buildRefreshedCachedKey(refreshed.getNotifierType());
                 final int effectiveExpireSec = (int) (refreshed.getExpireSeconds()
-                        * (1 - config.engine().notifier().refreshedCachedExpireOffsetRate()));
+                        * (1 - engineConfig.notifier().refreshedCachedExpireOffsetRate()));
 
                 // Sets effective expire.
                 refreshed.setEffectiveExpireSeconds(effectiveExpireSec);
@@ -240,7 +240,7 @@ public class GlobalMessageNotifierManager {
 
     String buildRefreshedCachedKey(final @NotNull NotifierKind notifierType) {
         notNullOf(notifierType, "notifierType");
-        return config.engine().notifier().refreshedCachedPrefix().concat(notifierType.name());
+        return engineConfig.notifier().refreshedCachedPrefix().concat(notifierType.name());
     }
 
     @NotNull

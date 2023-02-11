@@ -38,7 +38,7 @@ public class GraalJSScriptEngineTests {
     @Test
     public void testInitWithCustomLog() throws Exception {
         final GraalJSScriptEngine engine = new GraalJSScriptEngine();
-        engine.config = TestDefaultBaseSetup.createExecutionConfig();
+        engine.engineConfig = TestDefaultBaseSetup.createEngineConfig();
         engine.init();
         try (ContextWrapper graalContext = engine.getGraalPolyglotManager()
                 .getContext(singletonMap(KEY_WORKFLOW_ID, 101001010L));) {

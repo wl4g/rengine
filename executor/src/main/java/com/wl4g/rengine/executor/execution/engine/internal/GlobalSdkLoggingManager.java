@@ -35,7 +35,7 @@
 //
 //import com.wl4g.infra.common.task.QuartzUtils2;
 //import com.wl4g.rengine.common.entity.UploadObject;
-//import com.wl4g.rengine.executor.execution.ExecutionConfig;
+//import com.wl4g.rengine.executor.execution.EngineConfig;
 //import com.wl4g.rengine.executor.meter.RengineExecutorMeterService;
 //import com.wl4g.rengine.executor.minio.MinioConfig;
 //import com.wl4g.rengine.executor.minio.MinioManager;
@@ -64,7 +64,7 @@
 //public class GlobalSdkLoggingManager {
 //
 //    @Inject
-//    ExecutionConfig executionConfig;
+//    EngineConfig engineConfig;
 //
 //    @Inject
 //    RengineExecutorMeterService meterService;
@@ -93,10 +93,10 @@
 //                    .concat("@")
 //                    .concat(getClass().getSimpleName());
 //            final var uploaderTrigger = QuartzUtils2.newDefaultJobTrigger(triggerId,
-//                    executionConfig.engine().log().uploaderCron(), true, new JobDataMap() {
+//                    engineConfig.log().uploaderCron(), true, new JobDataMap() {
 //                        private static final long serialVersionUID = 1L;
 //                        {
-//                            put(ExecutionConfig.class.getName(), executionConfig);
+//                            put(EngineConfig.class.getName(), engineConfig);
 //                            put(MinioConfig.class.getName(), minioConfig);
 //                            put(MinioManager.class.getName(), minioManager);
 //                        }
@@ -117,19 +117,19 @@
 //            log.info("Scanning upload script logs to MinIO ...");
 //
 //            final JobDataMap jobDataMap = context.getTrigger().getJobDataMap();
-//            final ExecutionConfig config = (ExecutionConfig) jobDataMap.get(ExecutionConfig.class.getName());
+//            final EngineConfig engineConfig = (EngineConfig) jobDataMap.get(EngineConfig.class.getName());
 //            final MinioConfig minioConfig = (MinioConfig) jobDataMap.get(MinioConfig.class.getName());
 //            final MinioManager minioManager = (MinioManager) jobDataMap.get(MinioManager.class.getName());
-//            notNullOf(config, "config");
+//            notNullOf(engineConfig, "engineConfig");
 //            notNullOf(minioManager, "minioManager");
 //            notNullOf(minioConfig, "minioConfig");
 //
 //            // Scanner all script logs upload to MinIO.
-//            getAllLogDirs(config.engine().log().baseDir(), false).parallelStream().forEach(dirname -> {
+//            getAllLogDirs(engineConfig.log().baseDir(), false).parallelStream().forEach(dirname -> {
 //                final Long workflowId = notNullOf(parseLongOrNull(dirname), "workflowId");
 //                log.info("Scan script log dir for workflowId: {}", workflowId);
 //
-//                getAllLogFilenames(config.engine().log().baseDir(), workflowId, true).parallelStream()
+//                getAllLogFilenames(engineConfig.log().baseDir(), workflowId, true).parallelStream()
 //                        .map(f -> new File(f))
 //                        // TODO
 //                        // 1) S3/minio limit min size for 5MB.

@@ -79,7 +79,7 @@ public class DingtalkScriptMessageNotifier implements ScriptMessageNotifier {
         try {
             MeterUtil.counter(execution_sdk_notifier_total, kind(), METHOD_SEND);
             return MeterUtil.timer(execution_sdk_notifier_time, kind(), METHOD_SEND, () -> {
-                // final DingtalkConfig config = loadCurrentDingtalkConfig();
+                // final DingtalkConfig engineConfig = loadCurrentDingtalkConfig();
 
                 // Load the currently refreshed valid accessToken.
                 final String accessToken = getRequiredRefreshed().getAccessToken();
@@ -102,7 +102,7 @@ public class DingtalkScriptMessageNotifier implements ScriptMessageNotifier {
         try {
             MeterUtil.counter(execution_sdk_notifier_total, kind(), METHOD_CREATESCENEGROUPV2);
             return MeterUtil.timer(execution_sdk_notifier_time, kind(), METHOD_CREATESCENEGROUPV2, () -> {
-                // final DingtalkConfig config = loadCurrentDingtalkConfig();
+                // final DingtalkConfig engineConfig = loadCurrentDingtalkConfig();
 
                 // Load the currently refreshed valid accessToken.
                 final String accessToken = getRequiredRefreshed().getAccessToken();
@@ -140,11 +140,11 @@ public class DingtalkScriptMessageNotifier implements ScriptMessageNotifier {
     }
 
     private DingtalkConfig currentDingtalkConfig() {
-        // Load current effective dingtalk config.
+        // Load current effective dingtalk engineConfig.
         final DingtalkConfig config = parseJSON((String) getRequiredRefreshed().getAttributes().get(KEY_DINGTALK_CONFIG),
                 DingtalkConfig.class);
         notNull(config,
-                "Internal error! Please check the redis cache configuration data, email config json is required. refreshed: %s",
+                "Internal error! Please check the redis cache configuration data, email engineConfig json is required. refreshed: %s",
                 getRefreshed());
         return config;
     }
@@ -168,7 +168,7 @@ public class DingtalkScriptMessageNotifier implements ScriptMessageNotifier {
                 return RefreshedInfo.builder()
                         .notifierType(kind())
                         .appKey(config.getAppKey())
-                        // .appSecret(config.getAppSecret())
+                        // .appSecret(engineConfig.getAppSecret())
                         .accessToken(result.getAccessToken())
                         .expireSeconds(result.getExpireIn())
                         .attributes(attributes)

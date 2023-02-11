@@ -26,7 +26,7 @@ import java.time.Duration;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import com.wl4g.rengine.executor.execution.ExecutionConfig;
+import com.wl4g.rengine.executor.execution.EngineConfig;
 
 import io.quarkus.runtime.annotations.StaticInitSafe;
 import io.smallrye.config.ConfigMapping;
@@ -34,7 +34,7 @@ import io.smallrye.config.ConfigMapping.NamingStrategy;
 import io.smallrye.config.WithDefault;
 
 /**
- * {@link ExecutionConfig}
+ * {@link EngineConfig}
  * 
  * @author James Wong
  * @version 2022-09-18

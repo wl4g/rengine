@@ -31,7 +31,7 @@ import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.task.GenericTaskRunner;
 import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
-import com.wl4g.rengine.executor.execution.ExecutionConfig;
+import com.wl4g.rengine.executor.execution.EngineConfig;
 import com.wl4g.rengine.executor.execution.sdk.ScriptExecutor;
 
 import lombok.CustomLog;
@@ -51,7 +51,7 @@ public class GlobalSdkExecutorManager implements Closeable {
 
     @NotNull
     @Inject
-    ExecutionConfig config;
+    EngineConfig config;
 
     @Override
     public void close() throws IOException {

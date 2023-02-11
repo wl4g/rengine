@@ -71,7 +71,7 @@ public class ReactiveDictServiceTests {
             synchronized (ReactiveDictServiceTests.class) {
                 if (isNull(dictService)) {
                     dictService = new ReactiveDictServiceImpl();
-                    dictService.config = TestDefaultBaseSetup.createExecutionConfig();
+                    dictService.serviceConfig = TestDefaultBaseSetup.createServiceConfig();
                     dictService.mongoRepository = TestDefaultBaseSetup.createMongoRepository();
                     // dictService.reactiveRedisDS =
                     // mockReactiveRedisDataSource;

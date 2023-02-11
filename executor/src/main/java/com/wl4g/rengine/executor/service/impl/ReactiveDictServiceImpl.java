@@ -44,9 +44,9 @@ import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinit
 import com.wl4g.rengine.common.entity.Dict;
 import com.wl4g.rengine.common.entity.Dict.DictType;
 import com.wl4g.rengine.common.util.BsonEntitySerializers;
-import com.wl4g.rengine.executor.execution.ExecutionConfig;
 import com.wl4g.rengine.executor.repository.MongoRepository;
 import com.wl4g.rengine.executor.service.DictService;
+import com.wl4g.rengine.executor.service.ServiceConfig;
 
 import io.quarkus.mongodb.reactive.ReactiveMongoCollection;
 import io.quarkus.redis.datasource.ReactiveRedisDataSource;
@@ -69,7 +69,7 @@ import lombok.CustomLog;
 public class ReactiveDictServiceImpl implements DictService {
 
     @Inject
-    ExecutionConfig config;
+    ServiceConfig serviceConfig;
 
     @Inject
     MongoRepository mongoRepository;
@@ -93,7 +93,7 @@ public class ReactiveDictServiceImpl implements DictService {
 
         // The first priority get all from cache, and filter.
         if (nonNull(type) && !isBlank(key)) {
-            return reactiveHashCommands.hget(config.service().dictCachedPrefix(), Dict.buildCacheHashKey(type.name(), key))
+            return reactiveHashCommands.hget(serviceConfig.dictCachedPrefix(), Dict.buildCacheHashKey(type.name(), key))
                     .chain(dictJson -> {
                         if (!isBlank(dictJson)) {
                             return Uni.createFrom()
@@ -116,7 +116,7 @@ public class ReactiveDictServiceImpl implements DictService {
         // Fix compatibility with Redis 5
         // see:https://github.com/quarkusio/quarkus/pull/28854
         //
-        return reactiveHashCommands.hgetall(config.service().dictCachedPrefix()).map(allDictJsonMap -> {
+        return reactiveHashCommands.hgetall(serviceConfig.dictCachedPrefix()).map(allDictJsonMap -> {
             return safeMap(allDictJsonMap).entrySet()
                     .parallelStream()
                     .map(e -> parseJSON(e.getValue(), Dict.class))
@@ -169,7 +169,7 @@ public class ReactiveDictServiceImpl implements DictService {
         // @formatter:off
         //final MongoCollection<Document> collection = mongoRepository.getCollection(MongoCollectionDefinition.SYS_DICTS);
         //final MongoCursor<Dict> cursor = collection.aggregate(aggregates)
-        //        .batchSize(config.engine().maxQueryBatch())
+        //        .batchSize(engineConfig.maxQueryBatch())
         //        .map(dictDoc -> BsonEntitySerializers.fromDocument(dictDoc, Dict.class))
         //        .iterator();
         //try {
@@ -196,7 +196,7 @@ public class ReactiveDictServiceImpl implements DictService {
         // when elements are larger than 25?
         // see:https://stackoverflow.com/questions/67495287/uni-combine-all-unis-v-s-multi-onitem-transformtomultiandconcatenate
         final List<Uni<Boolean>> allSavedUni = safeList(dicts).parallelStream().map(dict -> {
-            return reactiveHashCommands.hset(config.service().dictCachedPrefix(),
+            return reactiveHashCommands.hset(serviceConfig.dictCachedPrefix(),
                     Dict.buildCacheHashKey(dict.getType().name(), dict.getKey()), toJSONString(dict));
         }).collect(toList());
 
@@ -208,7 +208,7 @@ public class ReactiveDictServiceImpl implements DictService {
     }
 
     private Uni<Boolean> setDictCachedExpire() {
-        return reactiveKeyCommands.pexpire(config.service().dictCachedPrefix(), config.service().dictCachedExpire());
+        return reactiveKeyCommands.pexpire(serviceConfig.dictCachedPrefix(), serviceConfig.dictCachedExpire());
     }
 
 }
