@@ -10,7 +10,7 @@ A real-time + near real-time general rule engine platform, suitable for such as 
 
 - JDK 11.x +
 
-- GraalVM-java11-22.3 + (Recommands)
+- GraalVM java11-22.3 + (Recommands)
 
 - Maven 3.6 +
 
@@ -24,15 +24,13 @@ A real-time + near real-time general rule engine platform, suitable for such as 
 
 - MinIO 2021.x +
 
-- HBase 2.2.x + (Recommands)
+- Docker 20.x +
 
-- HDFS 3.0.x + (Recommands)
+- Kubernetes 1.21 + (Recommands)
 
 - Flink 1.14.4 + (Recommands)
 
-- Docker 20.x + (Recommands)
-
-- Kubernetes 1.21 + (Recommands)
+- HBase 2.2.x + (Optional)
 
 ## Features
 
