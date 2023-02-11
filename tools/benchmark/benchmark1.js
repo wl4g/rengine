@@ -160,25 +160,3 @@ function testSdkForUUID(context) {
         throw e;
     }
 }
-
-function testSdkForExecutorTasks(context) {
-    if (context.getId() != 11) { return; }
-    try {
-        var executor = context.getExecutor();
-        var futures = [];
-        for (var i = 0; i <= 5; i++) {
-            var f = executor.submit(() => {
-                var i =1;
-                console.info("Test task " + i + " running ...");
-                return "result for task "+i;
-            });
-            futures.push(f);
-        }
-        for (var i = 0; i <= futures.length; i++) {
-            console.info("++++result " + i + " is : " + futures[i].get());
-        }
-    } catch(e) {
-        console.error("Executor >>>", e);
-        throw e;
-    }
-}
