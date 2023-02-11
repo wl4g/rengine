@@ -274,11 +274,11 @@ quarkus:
       - redis://localhost:7379
       - redis://localhost:7380
       - redis://localhost:7381
-    timeout: 8s
+    timeout: 10s
     password: 'zzx!@#$%'
     max-pool-size: 512 ## Default by 6
     max-pool-waiting: 512 ## Default by 24
-    max-waiting-handlers: 2048
+    max-waiting-handlers: 2048 ## Default by 2048
     max-nested-arrays: 32
     pool-cleaner-interval: 30m
     pool-recycle-timeout: 15s

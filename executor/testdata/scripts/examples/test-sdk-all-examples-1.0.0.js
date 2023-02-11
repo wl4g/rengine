@@ -35,7 +35,7 @@ function process(context) {
 //    const dingtalkResult = testSdkForDingtalkNotifier(context);
 
     // for sdk case10:
-    const emailResult = testSdkForEmailNotifier(context);
+    //const emailResult = testSdkForEmailNotifier(context);
 
     // for sdk case11:
     const dateHolderResult = testSdkForDateHolder(context);
@@ -71,7 +71,7 @@ function process(context) {
         //.addValue("redisResult", redisResult)
         //.addValue("kafkaResult", kafkaResult)
         //.addValue("dingtalkResult", dingtalkResult)
-        .addValue("emailResult", emailResult)
+        //.addValue("emailResult", emailResult)
         .addValue("dateHolderResult", dateHolderResult)
         .addValue("codingResult", codingResult)
         .addValue("hashingResult", hashingResult)
@@ -356,12 +356,20 @@ function testSdkForRandomHolder(context) {
     try {
         console.info("nextBoolean: " + RandomHolder.nextBoolean());
         console.info("nextInt: " + RandomHolder.nextInt());
+        console.info("nextInt(10, 20): " + RandomHolder.nextInt(10, 20));
+        console.info("nextFloat: " + RandomHolder.nextFloat());
+        console.info("nextFloat(10, 20): " + RandomHolder.nextFloat(10.0, 20.0));
+        console.info("nextDouble: " + RandomHolder.nextDouble());
+        console.info("nextDouble(10, 20): " + RandomHolder.nextDouble(10.0, 20.0));
         console.info("nextLong: " + RandomHolder.nextLong());
+        console.info("nextLong(10, 20): " + RandomHolder.nextLong(10, 20));
+        console.info("randomAscii: " + RandomHolder.randomAscii(16));
         console.info("randomAlphabetic: " + RandomHolder.randomAlphabetic(16));
         console.info("randomAlphanumeric: " + RandomHolder.randomAlphanumeric(16));
-        const randomHolderResult = RandomHolder.randomNumeric(16);
-        console.info("randomNumeric: " + randomHolderResult);
-        return randomHolderResult;
+        console.info("randomGraph: " + RandomHolder.randomGraph(16));
+        console.info("randomNumeric: " + RandomHolder.randomNumeric(16));
+        console.info("randomPrint: " + RandomHolder.randomPrint(16));
+        return RandomHolder.randomNumeric(16);
     } catch(e) {
         console.error("RandomHolder >>>", e);
         throw e;
@@ -371,32 +379,10 @@ function testSdkForRandomHolder(context) {
 function testSdkForUUID(context) {
     try {
         const uuidResult = UUID.randomUUID();
-        console.info("randomUUID: " + uuidResult);
-        return uuidResult;
+        console.info("randomUUID: " + uuidResult.toString());
+        return uuidResult.toString();
     } catch(e) {
         console.error("UUID >>>", e);
-        throw e;
-    }
-}
-
-function testSdkForExecutorTasks(context) {
-    if (context.getId() != 11) { return; }
-    try {
-        var executor = context.getExecutor();
-        var futures = [];
-        for (var i = 0; i <= 5; i++) {
-            var f = executor.submit(() => {
-                var i =1;
-                console.info("Test task " + i + " running ...");
-                return "result for task "+i;
-            });
-            futures.push(f);
-        }
-        for (var i = 0; i <= futures.length; i++) {
-            console.info("++++result " + i + " is : " + futures[i].get());
-        }
-    } catch(e) {
-        console.error("Executor >>>", e);
         throw e;
     }
 }
