@@ -39,7 +39,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link ExecuteResult}
+ * {@link WorkflowExecuteResult}
  * 
  * @author James Wong
  * @version 2022-09-21
@@ -47,15 +47,15 @@ import lombok.experimental.SuperBuilder;
  */
 @Getter
 @Setter
-@ToString(exclude = "_errorCount")
+@ToString(callSuper = true, exclude = "_errorCount")
 @SuperBuilder
 @NoArgsConstructor
-public class ExecuteResult extends BaseRequest {
+public class WorkflowExecuteResult extends BaseRequest {
 
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     @JsonIgnore
-    Long _errorCount;
+    transient Long _errorCount;
 
     @NotNull
     @Default

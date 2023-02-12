@@ -90,7 +90,7 @@ curl -v localhost:28002/metrics
 ```bash
 curl -v -XPOST \
 -H 'Content-Type: application/json' \
-'localhost:28002/execution/execute/internal' \
+'localhost:28002/execute/internal/workflow' \
 -d '{
   "requestId": "b9bc3e0e-d705-4ff2-9edf-970dcf95dea5",
   "clientId": "JVqEpEwIaqkEkeD5",
@@ -120,7 +120,7 @@ curl -v -XPOST \
     "userId": "u10010101",
     "foo": "bar"
   }
-}' 'localhost:28002/execution/execute/custom?reqSettings=eyJmb28iOiJiYXIifQo=&respSettings=eyJ0ZW1wbGF0ZUtleSI6ImRpbmd0YWxrIn0K' \
+}' 'localhost:28002/execute/custom?reqSettings=eyJmb28iOiJiYXIifQo=&respSettings=eyJ0ZW1wbGF0ZUtleSI6ImRpbmd0YWxrIn0K' \
 ```
 
 - Testing for API execute/custom (GET)
@@ -128,7 +128,7 @@ curl -v -XPOST \
 ```bash
 #echo '{"foo":"bar"}' | base64 -w 999 # => eyJmb28iOiJiYXIifQo=
 
-curl -v "http://localhost:28002/execution/execute/custom?\
+curl -v "http://localhost:28002/execute/custom?\
 clientId=JVqEpEwIaqkEkeD5\
 &clientSecret=Uf6nJDyJQHKRP43ycl9vZ9zs7s1nyu77\
 &scenesCodes=dingtalk_event_callback\

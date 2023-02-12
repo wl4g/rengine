@@ -24,7 +24,7 @@ import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_BASE;
-import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_INTERNAL;
+import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_INTERNAL_WORKFLOW;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.util.Objects.isNull;
@@ -46,9 +46,9 @@ import com.wl4g.infra.common.remoting.uri.UriComponentsBuilder;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.client.core.config.ClientConfig;
 import com.wl4g.rengine.client.core.exception.ClientExecuteException;
-import com.wl4g.rengine.common.model.ExecuteRequest;
-import com.wl4g.rengine.common.model.ExecuteResult;
-import com.wl4g.rengine.common.model.ExecuteResult.ResultDescription;
+import com.wl4g.rengine.common.model.WorkflowExecuteRequest;
+import com.wl4g.rengine.common.model.WorkflowExecuteResult;
+import com.wl4g.rengine.common.model.WorkflowExecuteResult.ResultDescription;
 import com.wl4g.rengine.common.util.IdGenUtils;
 
 import lombok.AllArgsConstructor;
@@ -74,25 +74,25 @@ import okhttp3.Response;
 public class RengineClient {
     private @Default ClientConfig config = new ClientConfig();
     private @Default OkHttpClient httpClient = new OkHttpClient().newBuilder().build();
-    private @Default Function<FailbackInfo, ExecuteResult> defaultFailback = DEFAULT_FAILBACK;
+    private @Default Function<FailbackInfo, WorkflowExecuteResult> defaultFailback = DEFAULT_FAILBACK;
 
-    public ExecuteResult execute(@NotEmpty List<String> scenesCodes, @Nullable Map<String, Object> args) {
-        return execute(IdGenUtils.next(), scenesCodes, ExecuteRequest.DEFAULT_TIMEOUT, ExecuteRequest.DEFAULT_BESTEFFORT, args,
+    public WorkflowExecuteResult execute(@NotEmpty List<String> scenesCodes, @Nullable Map<String, Object> args) {
+        return execute(IdGenUtils.next(), scenesCodes, WorkflowExecuteRequest.DEFAULT_TIMEOUT, WorkflowExecuteRequest.DEFAULT_BESTEFFORT, args,
                 null);
     }
 
-    public ExecuteResult execute(@NotEmpty List<String> scenesCodes, @Min(1) Long timeoutMs, @Nullable Map<String, Object> args) {
-        return execute(IdGenUtils.next(), scenesCodes, timeoutMs, ExecuteRequest.DEFAULT_BESTEFFORT, args, null);
+    public WorkflowExecuteResult execute(@NotEmpty List<String> scenesCodes, @Min(1) Long timeoutMs, @Nullable Map<String, Object> args) {
+        return execute(IdGenUtils.next(), scenesCodes, timeoutMs, WorkflowExecuteRequest.DEFAULT_BESTEFFORT, args, null);
     }
 
-    public ExecuteResult execute(
+    public WorkflowExecuteResult execute(
             @NotEmpty List<String> scenesCodes,
             @NotNull Boolean bestEffort,
             @Nullable Map<String, Object> args) {
-        return execute(IdGenUtils.next(), scenesCodes, ExecuteRequest.DEFAULT_TIMEOUT, bestEffort, args, null);
+        return execute(IdGenUtils.next(), scenesCodes, WorkflowExecuteRequest.DEFAULT_TIMEOUT, bestEffort, args, null);
     }
 
-    public ExecuteResult execute(
+    public WorkflowExecuteResult execute(
             String requestId,
             @NotEmpty List<String> scenesCodes,
             @NotNull Boolean bestEffort,
@@ -101,7 +101,7 @@ public class RengineClient {
         return execute(requestId, scenesCodes, timeoutMs, bestEffort, args, null);
     }
 
-    public ExecuteResult execute(
+    public WorkflowExecuteResult execute(
             String requestId,
             @NotEmpty List<String> scenesCodes,
             @NotNull @Min(1) Long timeoutMs,
@@ -110,15 +110,15 @@ public class RengineClient {
         return execute(requestId, scenesCodes, timeoutMs, bestEffort, args, null);
     }
 
-    public ExecuteResult execute(
+    public WorkflowExecuteResult execute(
             String requestId,
             @NotEmpty List<String> scenesCodes,
             @NotNull @Min(1) Long timeoutMs,
             @NotNull Boolean bestEffort,
             @Nullable Map<String, Object> args,
-            Function<FailbackInfo, ExecuteResult> failback) {
+            Function<FailbackInfo, WorkflowExecuteResult> failback) {
         notEmptyOf(scenesCodes, "scenesCodes");
-        return execute(ExecuteRequest.builder()
+        return execute(WorkflowExecuteRequest.builder()
                 .requestId(valueOf(requestId))
                 .clientId(config.getClientId())
                 .clientSecret(config.getClientSecret())
@@ -129,48 +129,48 @@ public class RengineClient {
                 .build(), failback);
     }
 
-    public ExecuteResult execute(@NotNull ExecuteRequest executeRequest) {
-        return execute(executeRequest, null);
+    public WorkflowExecuteResult execute(@NotNull WorkflowExecuteRequest workflowExecuteRequest) {
+        return execute(workflowExecuteRequest, null);
     }
 
-    public ExecuteResult execute(
-            @NotNull final ExecuteRequest executeRequest,
-            @Nullable Function<FailbackInfo, ExecuteResult> failback) {
-        notNullOf(executeRequest, "executeRequest");
-        hasTextOf(executeRequest.getClientId(), "clientId");
-        hasTextOf(executeRequest.getClientSecret(), "clientSecret");
-        notEmptyOf(executeRequest.getScenesCodes(), "scenesCodes");
-        notNullOf(executeRequest.getTimeout(), "timeout");
-        isTrueOf(executeRequest.getTimeout() > 0, "timeout>0");
-        notNullOf(executeRequest.getBestEffort(), "bestEffort");
-        if (isBlank(executeRequest.getRequestId())) {
-            executeRequest.setRequestId(IdGenUtils.next());
+    public WorkflowExecuteResult execute(
+            @NotNull final WorkflowExecuteRequest workflowExecuteRequest,
+            @Nullable Function<FailbackInfo, WorkflowExecuteResult> failback) {
+        notNullOf(workflowExecuteRequest, "executeRequest");
+        hasTextOf(workflowExecuteRequest.getClientId(), "clientId");
+        hasTextOf(workflowExecuteRequest.getClientSecret(), "clientSecret");
+        notEmptyOf(workflowExecuteRequest.getScenesCodes(), "scenesCodes");
+        notNullOf(workflowExecuteRequest.getTimeout(), "timeout");
+        isTrueOf(workflowExecuteRequest.getTimeout() > 0, "timeout>0");
+        notNullOf(workflowExecuteRequest.getBestEffort(), "bestEffort");
+        if (isBlank(workflowExecuteRequest.getRequestId())) {
+            workflowExecuteRequest.setRequestId(IdGenUtils.next());
         }
         failback = isNull(failback) ? defaultFailback : failback;
 
-        final String requestBody = toJSONString(executeRequest);
+        final String requestBody = toJSONString(workflowExecuteRequest);
         final Request request = new Request.Builder().url(UriComponentsBuilder.fromUri(config.getEndpoint())
                 .path(API_EXECUTOR_EXECUTE_BASE)
-                .path(API_EXECUTOR_EXECUTE_INTERNAL)
+                .path(API_EXECUTOR_EXECUTE_INTERNAL_WORKFLOW)
                 .build()
                 .toString()).post(FormBody.create(requestBody, MediaType.get("application/json"))).build();
         try (final Response response = httpClient.newBuilder()
-                .callTimeout(Duration.ofMillis(executeRequest.getTimeout()))
+                .callTimeout(Duration.ofMillis(workflowExecuteRequest.getTimeout()))
                 .build()
                 .newCall(request)
                 .execute();) {
             if (response.isSuccessful()) {
-                final RespBase<ExecuteResult> result = parseJSON(new String(response.body().bytes(), UTF_8), RESULT_TYPEREF);
+                final RespBase<WorkflowExecuteResult> result = parseJSON(new String(response.body().bytes(), UTF_8), RESULT_TYPEREF);
                 if (RespBase.isSuccess(result)) {
                     return result.getData();
                 }
             }
             // Fast failback.
-            if (executeRequest.getBestEffort()) {
-                return failback.apply(new FailbackInfo(executeRequest, null));
+            if (workflowExecuteRequest.getBestEffort()) {
+                return failback.apply(new FailbackInfo(workflowExecuteRequest, null));
             }
-            throw new ClientExecuteException(executeRequest.getRequestId(), executeRequest.getScenesCodes(),
-                    executeRequest.getTimeout(), executeRequest.getBestEffort(),
+            throw new ClientExecuteException(workflowExecuteRequest.getRequestId(), workflowExecuteRequest.getScenesCodes(),
+                    workflowExecuteRequest.getTimeout(), workflowExecuteRequest.getBestEffort(),
                     format("Engine execution failed, but you can set 'bestEffort=true' to force return a fallback result."));
 
         } catch (Throwable ex) {
@@ -180,19 +180,19 @@ public class RengineClient {
             } else {
                 log.error(format("%s. - reason: %s", errmsg, ex.getMessage()));
             }
-            if (executeRequest.getBestEffort()) {
-                return failback.apply(new FailbackInfo(executeRequest, ex));
+            if (workflowExecuteRequest.getBestEffort()) {
+                return failback.apply(new FailbackInfo(workflowExecuteRequest, ex));
             }
-            throw new ClientExecuteException(executeRequest.getRequestId(), executeRequest.getScenesCodes(),
-                    executeRequest.getTimeout(), executeRequest.getBestEffort(), ex);
+            throw new ClientExecuteException(workflowExecuteRequest.getRequestId(), workflowExecuteRequest.getScenesCodes(),
+                    workflowExecuteRequest.getTimeout(), workflowExecuteRequest.getBestEffort(), ex);
         }
     }
 
-    public static class DefaultFailback implements Function<FailbackInfo, ExecuteResult> {
+    public static class DefaultFailback implements Function<FailbackInfo, WorkflowExecuteResult> {
         @Override
-        public ExecuteResult apply(FailbackInfo f) {
+        public WorkflowExecuteResult apply(FailbackInfo f) {
             log.debug("Failed to execution of reason: {}", f.getError().getMessage());
-            return ExecuteResult.builder()
+            return WorkflowExecuteResult.builder()
                     .requestId(f.getRequest().getRequestId())
                     .description("Failure to execution")
                     .results(safeList(f.getRequest().getScenesCodes()).stream()
@@ -209,11 +209,11 @@ public class RengineClient {
     @Getter
     @AllArgsConstructor
     public static class FailbackInfo {
-        private ExecuteRequest request;
+        private WorkflowExecuteRequest request;
         private Throwable error;
     }
 
-    private static final TypeReference<RespBase<ExecuteResult>> RESULT_TYPEREF = new TypeReference<RespBase<ExecuteResult>>() {
+    private static final TypeReference<RespBase<WorkflowExecuteResult>> RESULT_TYPEREF = new TypeReference<RespBase<WorkflowExecuteResult>>() {
     };
-    public static final Function<FailbackInfo, ExecuteResult> DEFAULT_FAILBACK = new DefaultFailback();
+    public static final Function<FailbackInfo, WorkflowExecuteResult> DEFAULT_FAILBACK = new DefaultFailback();
 }

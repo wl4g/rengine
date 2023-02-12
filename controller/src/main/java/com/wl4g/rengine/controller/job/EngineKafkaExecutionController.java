@@ -59,7 +59,7 @@ import com.wl4g.rengine.common.entity.ControllerSchedule.KafkaExecutionScheduleC
 import com.wl4g.rengine.common.entity.ControllerSchedule.KafkaExecutionScheduleConfig.KafkaConsumerOptions;
 import com.wl4g.rengine.common.entity.ControllerSchedule.RunState;
 import com.wl4g.rengine.common.entity.ControllerSchedule.ScheduleType;
-import com.wl4g.rengine.common.model.ExecuteRequest;
+import com.wl4g.rengine.common.model.WorkflowExecuteRequest;
 import com.wl4g.rengine.controller.lifecycle.ElasticJobBootstrapBuilder.JobParameter;
 
 import lombok.CustomLog;
@@ -263,14 +263,14 @@ public class EngineKafkaExecutionController extends EngineGenericExecutionContro
         final List<ConsumerRecord<String, String>> records;
 
         public KafkaSubscribeExecutionWorker(int currentShardingTotalCount, ShardingContext context, Long scheduleId,
-                Long jobLogId, RengineClient rengineClient, ExecuteRequest request,
+                Long jobLogId, RengineClient rengineClient, WorkflowExecuteRequest request,
                 List<ConsumerRecord<String, String>> records) {
             super(currentShardingTotalCount, context, scheduleId, jobLogId, rengineClient, request);
             this.records = notNullOf(records, "records");
         }
 
         @Override
-        protected ExecuteRequest beforeExecution(ExecuteRequest request) {
+        protected WorkflowExecuteRequest beforeExecution(WorkflowExecuteRequest request) {
             final Map<String, Object> args = ensureMap(request.getArgs());
             // Merge all records to args.
             safeList(records).stream().forEach(record -> args.put(record.topic(), record.value()));

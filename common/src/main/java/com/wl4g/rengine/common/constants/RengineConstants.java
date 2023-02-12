@@ -52,16 +52,25 @@ public abstract class RengineConstants extends EnvironmentUtil {
     // ----- for Executor definitions. -----
 
     public static final String CONF_PREFIX_EXECUTOR = CONF_PREFIX + ".executor";
-    public static final String API_EXECUTOR_EXECUTE_BASE = "/execution";
+
+    public static final String API_EXECUTOR_EXECUTE_BASE = "/execute";
+
+    // This API is only used to directly execute rule scripts for testing when
+    // developing in the management console. The underlying implementation is
+    // still the API for calling the workflow executor.
+    public static final String API_EXECUTOR_EXECUTE_INTERNAL_RULE = "/internal/rule";
+
     // Receive execution request internal from client SDK. For example, a
     // request from a business application JVM process via a depends client SDK.
-    public static final String API_EXECUTOR_EXECUTE_INTERNAL = "/execute/internal";
+    public static final String API_EXECUTOR_EXECUTE_INTERNAL_WORKFLOW = "/internal/workflow";
+
     // Receive execution requests custom from arbitrary external systems. For
     // example: the request sent when the pushes(or webhook) subscription events
     // from WeChat, Dingtalk and other social platforms servers.
     // This API is very useful, such as realizing chat interaction with WeChat
     // official account or Dingding robot.
-    public static final String API_EXECUTOR_EXECUTE_CUSTOM = "/execute/custom";
+    public static final String API_EXECUTOR_EXECUTE_CUSTOM = "/custom";
+
     // Notice: The handcode entrypoint function is 'process'
     public static final String DEFAULT_EXECUTOR_MAIN_FUNCTION = "process";
     public static final String DEFAULT_EXECUTOR_SCRIPT_TMP_CACHE_DIR = "/tmp/__rengine_script_caches";

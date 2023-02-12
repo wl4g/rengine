@@ -16,6 +16,7 @@
 package com.wl4g.rengine.common.entity;
 
 import static com.wl4g.infra.common.lang.Assert2.notEmpty;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
 
@@ -73,8 +74,14 @@ public class Workflow extends BaseBean {
             return getGraphs().get(0);
         }
 
+        public WorkflowWrapper validate() {
+            return validate(this);
+        }
+
         public static WorkflowWrapper validate(WorkflowWrapper workflow) {
-            notEmpty(workflow.getGraphs(), "graphs");
+            notNullOf(workflow, "workflow");
+            notNullOf(workflow.getEngine(), "workflow.engine");
+            notEmpty(workflow.getGraphs(), "workflow.graphs");
             for (WorkflowGraphWrapper graph : workflow.getGraphs()) {
                 WorkflowGraphWrapper.validate(graph);
             }
@@ -91,7 +98,12 @@ public class Workflow extends BaseBean {
         private static final long serialVersionUID = 1L;
         private @Nullable List<RuleWrapper> rules = new ArrayList<>(4);
 
+        public WorkflowGraphWrapper validate() {
+            return validate(this);
+        }
+
         public static WorkflowGraphWrapper validate(WorkflowGraphWrapper graph) {
+            notNullOf(graph, "graph");
             notEmpty(graph.getNodes(), "graph.nodes");
             notEmpty(graph.getConnections(), "graph.connections");
             notEmpty(graph.getRules(), "graph.rules");

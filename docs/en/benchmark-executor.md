@@ -10,7 +10,7 @@
 - Benchmarking
 
 ```bash
-$ ab -p /tmp/benchmark1.json -T application/json -n 1000 -c 200 http://localhost:28002/execution/execute/internal
+$ ab -p /tmp/benchmark1.json -T application/json -n 1000 -c 200 http://localhost:28002/execute/internal/workflow
 
 This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
 Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
@@ -33,7 +33,7 @@ Server Software:
 Server Hostname:        localhost
 Server Port:            28002
 
-Document Path:          /execution/execute/internal
+Document Path:          /execute/internal/workflow
 Document Length:        692 bytes
 
 Concurrency Level:      200

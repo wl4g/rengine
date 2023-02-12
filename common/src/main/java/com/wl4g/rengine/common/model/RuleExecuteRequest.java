@@ -10,15 +10,23 @@
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
- * See the License for the specific language governing permissions and
+ * See the License for the specific engine governing permissions and
  * limitations under the License.
  */
 package com.wl4g.rengine.common.model;
 
-import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 
-import javax.validation.constraints.NotBlank;
+import java.util.LinkedList;
+import java.util.List;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
+import com.wl4g.rengine.common.entity.Rule.RuleEngine;
+
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,24 +34,32 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link BaseRequest}
+ * {@link RuleExecuteRequest}
  * 
  * @author James Wong
- * @version 2022-10-17
- * @since v3.0.0
+ * @version 2022-09-18
+ * @since v1.0.0
  */
 @Getter
 @Setter
-@ToString
 @SuperBuilder
+@ToString(callSuper = true)
 @NoArgsConstructor
-public class BaseRequest {
+public class RuleExecuteRequest extends ExecuteRequest {
 
-    @NotBlank
-    String requestId;
+    @NotNull
+    RuleEngine engine;
 
-    public BaseRequest validate() {
-        hasTextOf(requestId, "requestId");
+    @NotEmpty
+    @Default
+    List<Long> ruleScriptIds = new LinkedList<>();
+
+    @Override
+    public RuleExecuteRequest validate() {
+        super.validate();
+        notNullOf(engine, "engine");
+        notEmptyOf(ruleScriptIds, "ruleScriptIds");
         return this;
     }
+
 }

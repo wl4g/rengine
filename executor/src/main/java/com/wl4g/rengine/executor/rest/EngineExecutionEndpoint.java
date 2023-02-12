@@ -27,7 +27,8 @@ import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseMapObject;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_BASE;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_CUSTOM;
-import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_INTERNAL;
+import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_INTERNAL_WORKFLOW;
+import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_INTERNAL_RULE;
 import static com.wl4g.rengine.common.model.ExecuteRequest.DEFAULT_BESTEFFORT;
 import static com.wl4g.rengine.common.model.ExecuteRequest.DEFAULT_TIMEOUT;
 import static com.wl4g.rengine.executor.rest.EngineExecutionEndpoint.RequestSettings.PARAM_REQ_SETTINGS;
@@ -72,8 +73,10 @@ import com.wl4g.infra.common.serialize.JaxbUtils;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.common.entity.Dict.DictType;
 import com.wl4g.rengine.common.exception.RengineException;
-import com.wl4g.rengine.common.model.ExecuteRequest;
-import com.wl4g.rengine.common.model.ExecuteResult;
+import com.wl4g.rengine.common.model.WorkflowExecuteResult;
+import com.wl4g.rengine.common.model.WorkflowExecuteResult.ResultDescription;
+import com.wl4g.rengine.common.model.RuleExecuteRequest;
+import com.wl4g.rengine.common.model.WorkflowExecuteRequest;
 import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.executor.rest.intercept.CustomValid;
 import com.wl4g.rengine.executor.service.DictService;
@@ -123,6 +126,24 @@ public class EngineExecutionEndpoint {
     CurrentVertxRequest currentVertxRequest;
 
     /**
+     * This API is Unit tests for users to run individual rules directly in the
+     * management console.
+     * 
+     * @param workflowExecuteRequest
+     * @return
+     * @throws Exception
+     * @see https://quarkus.io/guides/resteasy-reactive#asyncreactive-support
+     */
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path(API_EXECUTOR_EXECUTE_INTERNAL_RULE)
+    public Uni<RespBase<ResultDescription>> executeInternal(final @NotNull RuleExecuteRequest executeRequest) throws Exception {
+        log.debug("Executing for : {}", executeRequest);
+        return engineExecutionService.execute(executeRequest);
+    }
+
+    /**
      * Receive execution request from client SDK. For example, a request from a
      * business application JVM process via a dependent client SDK.
      * 
@@ -134,8 +155,8 @@ public class EngineExecutionEndpoint {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    @Path(API_EXECUTOR_EXECUTE_INTERNAL)
-    public Uni<RespBase<ExecuteResult>> executeInternal(final @NotNull ExecuteRequest executeRequest) throws Exception {
+    @Path(API_EXECUTOR_EXECUTE_INTERNAL_WORKFLOW)
+    public Uni<RespBase<WorkflowExecuteResult>> executeInternal(final @NotNull WorkflowExecuteRequest executeRequest) throws Exception {
         log.debug("Executing for : {}", executeRequest);
         return engineExecutionService.execute(executeRequest);
     }
@@ -198,7 +219,7 @@ public class EngineExecutionEndpoint {
         final Boolean bestEffort = parseBoolean(getMergedParam(bodyArgs, PARAM_BEST_EFFORT, DEFAULT_BESTEFFORT + "")); // Optional
         final Long timeout = parseLong(getMergedParam(mergedBodyArgs, PARAM_TIMEOUT, DEFAULT_TIMEOUT + "")); // Optional
 
-        final ExecuteRequest executeRequest = ExecuteRequest.builder()
+        final WorkflowExecuteRequest executeRequest = WorkflowExecuteRequest.builder()
                 .requestId(requestId)
                 .clientId(clientId)
                 .clientSecret(clientSecret)

@@ -132,8 +132,6 @@ public class RengineExecutorMeterService extends PrometheusMeterFacade {
         public static final String METHOD_NAME = "method";
 
         public static final String ENGINE = "engine";
-
-        public static final String SCENESCODE = "scenesCode";
         public static final String CLIENT_ID = "clientId";
         public static final String LIBRARY = "library";
     }

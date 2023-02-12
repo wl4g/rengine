@@ -128,9 +128,8 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
     public ScriptResult execute(@NotNull final ExecutionGraphContext graphContext, @NotNull final RuleWrapper rule) {
         final String traceId = hasTextOf(graphContext.getParameter().getTraceId(), "traceId");
         final String clientId = hasTextOf(graphContext.getParameter().getClientId(), "clientId");
-        final String scenesCode = hasTextOf(graphContext.getParameter().getScenesCode(), "scenesCode");
         final Long workflowId = notNullOf(graphContext.getParameter().getWorkflowId(), "workflowId");
-        log.debug("Executing JS script for scenesCode: {} ...", scenesCode);
+        log.debug("Executing JS script for workflowId: {} ...", workflowId);
 
         // see:https://github.com/oracle/graaljs/blob/vm-ee-22.1.0/graal-js/src/com.oracle.truffle.js.test.threading/src/com/oracle/truffle/js/test/threading/AsyncTaskTests.java#L283
         try (ContextWrapper graalContext = graalPolyglotManager.getContext(singletonMap(KEY_WORKFLOW_ID, workflowId));) {
@@ -138,18 +137,18 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
             final ScriptContext scriptContext = newScriptContext(graphContext);
 
             // Load all scripts dependencies.
-            final List<ObjectResource> scripts = safeList(loadScriptResources(scenesCode, rule));
+            final List<ObjectResource> scripts = safeList(loadScriptResources(workflowId, rule));
             for (ObjectResource script : scripts) {
                 isTrue(!script.isBinary(), "invalid js dependency lib type");
                 log.debug("Evaling js-dependencys: {}", script.getObjectPrefix());
 
-                final String scriptName = StringUtils2.getFilename(script.getObjectPrefix()).concat("@").concat(scenesCode);
+                final String scriptName = StringUtils2.getFilename(script.getObjectPrefix()).concat("@").concat(workflowId + "");
                 try {
                     // merge JS library with dependency.
                     graalContext.eval(Source.newBuilder("js", script.readToString(), scriptName).build());
                 } catch (PolyglotException e) {
-                    throw new EvaluationException(traceId, scenesCode,
-                            format("Unable to parse JS dependency of '%s', scenesCode: %s", scriptName, scenesCode), e);
+                    throw new EvaluationException(traceId, clientId, workflowId,
+                            format("Unable to parse JS dependency of '%s', workflowId: %s", scriptName, workflowId), e);
                 }
             }
 
@@ -162,18 +161,18 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
             // Buried-point: execute cost-time.
             final Set<String> scriptFileNames = scripts.stream().map(s -> getFilename(s.getObjectPrefix())).collect(toSet());
             final Timer executeTimer = meterService.timer(execution_time.getName(), execution_time.getHelp(),
-                    RengineExecutorMeterService.DEFAULT_PERCENTILES, MetricsTag.CLIENT_ID, clientId, MetricsTag.SCENESCODE,
-                    scenesCode, MetricsTag.ENGINE, rule.getEngine().name(), MetricsTag.LIBRARY, scriptFileNames.toString());
+                    RengineExecutorMeterService.DEFAULT_PERCENTILES, MetricsTag.CLIENT_ID, clientId, MetricsTag.ENGINE,
+                    rule.getEngine().name(), MetricsTag.LIBRARY, scriptFileNames.toString());
 
             final long begin = currentTimeMillis();
             final Value result = mainFunction.execute(scriptContext);
             final long costTime = currentTimeMillis() - begin;
             executeTimer.record(costTime, MILLISECONDS);
 
-            log.debug("Executed for scenesCode: {}, cost: {}ms, result: {}", scenesCode, costTime, result);
+            log.debug("Executed for workflowId: {}, cost: {}ms, result: {}", workflowId, costTime, result);
             return result.as(ScriptResult.class);
         } catch (Throwable e) {
-            throw new EvaluationException(traceId, clientId, scenesCode, workflowId, "Failed to execution js script", e);
+            throw new EvaluationException(traceId, clientId, workflowId, "Failed to execution js script", e);
         }
     }
 
