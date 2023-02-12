@@ -28,4 +28,4 @@ jobs:
     name: Run
     uses: './.github/workflows/build_and_test.yaml' ## This the calling to workflow.
     secrets: ## see:https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-of-jobsjob_idsecrets
-      access-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      personal-access-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
