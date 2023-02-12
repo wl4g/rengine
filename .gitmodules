@@ -1,0 +1,5 @@
+# see:https://github.com/jaegertracing/jaeger/blob/main/.gitmodules
+[submodule "rengine-ui"]
+	path = rengine-ui
+	url = https://github.com/wl4g/rengine-ui.git
+	branch = master
