@@ -10,16 +10,13 @@
 ## see:https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
 ## see:https://github.com/apache/spark/blob/master/.github/workflows/build_main.yml
 
-name: "Build"
+name: "Build on Daily"
 
 on:
   ## see:https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onschedule
   ## see:https://pubs.opengroup.org/onlinepubs/9699919799/utilities/crontab.html#tag_20_25_07
   schedule:
     - cron: '0 1 * * *'
-  push:
-    branches:
-    - '**'
 
 jobs:
   call-build-and-test:
