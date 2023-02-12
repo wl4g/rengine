@@ -60,10 +60,15 @@ public class RuleScript extends BaseBean {
         private static final long serialVersionUID = 1L;
         private List<UploadObject> uploads;
 
-        public static RuleScriptWrapper validate(RuleScriptWrapper rule) {
-            notNullOf(rule.getRevision(), "revision");
-            notEmptyOf(rule.getUploads(), "uploads");
-            return rule;
+        public RuleScriptWrapper validate() {
+            return validate(this);
+        }
+
+        public static RuleScriptWrapper validate(RuleScriptWrapper ruleScript) {
+            notNullOf(ruleScript, "ruleScript");
+            notNullOf(ruleScript.getRevision(), "revision");
+            notEmptyOf(ruleScript.getUploads(), "uploads");
+            return ruleScript;
         }
     }
 }

@@ -44,7 +44,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.infra.common.validation.EnumValue;
-import com.wl4g.rengine.common.model.ExecuteRequest;
+import com.wl4g.rengine.common.model.WorkflowExecuteRequest;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder.Default;
@@ -162,7 +162,7 @@ public class ControllerSchedule extends BaseBean {
         // ElasticJob standard configuration.
         private @NotBlank @Default String cron = DEFAULT_CRON; // ScheduleJobBootstrap
         // Other configuration.
-        private @NotNull List<ExecuteRequest> requests;
+        private @NotNull List<WorkflowExecuteRequest> requests;
 
         public GenericExecutionScheduleConfig validate() {
             hasTextOf(getCron(), "cron");
@@ -192,7 +192,7 @@ public class ControllerSchedule extends BaseBean {
         Boolean autoAcknowledgment = true;
 
         @NotNull
-        ExecuteRequest request;
+        WorkflowExecuteRequest request;
 
         @NotNull
         KafkaConsumerOptions consumerOptions;

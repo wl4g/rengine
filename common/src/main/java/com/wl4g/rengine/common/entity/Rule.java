@@ -71,6 +71,7 @@ public class Rule extends BaseBean {
 
     @Getter
     @Setter
+    @SuperBuilder
     @ToString
     @NoArgsConstructor
     public static class RuleWrapper extends Rule {
@@ -89,13 +90,19 @@ public class Rule extends BaseBean {
             return getScripts().get(0);
         }
 
+        public RuleWrapper validate() {
+            return validate(this);
+        }
+
         public static RuleWrapper validate(RuleWrapper rule) {
-            notNullOf(rule.getEngine(), "engine");
-            notNullOf(rule.getScripts(), "scripts");
+            notNullOf(rule, "rule");
+            notNullOf(rule.getEngine(), "rule.engine");
+            notNullOf(rule.getScripts(), "rule.scripts");
             for (RuleScriptWrapper script : rule.getScripts()) {
                 RuleScriptWrapper.validate(script);
             }
             return rule;
         }
     }
+
 }

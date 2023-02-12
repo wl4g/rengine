@@ -162,7 +162,6 @@
     {"name":"getClientId","parameterTypes":[] },
     {"name":"getTraceId","parameterTypes":[] },
     {"name":"isTrace","parameterTypes":[] },
-    {"name":"getScenesCode","parameterTypes":[] },
     {"name":"getWorkflowId","parameterTypes":[] },
     {"name":"getArgs","parameterTypes":[] },
     {"name":"toString","parameterTypes":[] }

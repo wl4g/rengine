@@ -26,8 +26,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.RepeatedTest;
 
+import com.wl4g.rengine.common.entity.RuleScript.RuleScriptWrapper;
 import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
-import com.wl4g.rengine.common.model.ExecuteRequest;
+import com.wl4g.rengine.common.model.WorkflowExecuteRequest;
 import com.wl4g.rengine.executor.meter.TestDefaultMeterSetup;
 import com.wl4g.rengine.executor.util.TestDefaultBaseSetup;
 import com.wl4g.rengine.executor.util.TestDefaultRedisSetup;
@@ -59,7 +60,6 @@ public class ReactiveEngineExecutionServiceTests {
         // MockitoAnnotations.openMocks(this);
         // DictService mock = Mockito.mock(DictService.class);
         // QuarkusMock.installMockForType(mock, DictService.class);
-
         if (isNull(engineExecutionService)) {
             synchronized (ReactiveEngineExecutionServiceTests.class) {
                 if (isNull(engineExecutionService)) {
@@ -79,10 +79,28 @@ public class ReactiveEngineExecutionServiceTests {
     }
 
     @Test
+    public void testFindRuleScripts() {
+        setup();
+        try {
+            Uni<List<RuleScriptWrapper>> ruleScriptsUni = engineExecutionService
+                    .findRuleScripts(singletonList(6150869239922100L));
+            System.out.println("Await for " + ruleScriptsUni + " ...");
+            System.out.println("----------------");
+
+            final List<RuleScriptWrapper> ruleScripts = ruleScriptsUni.await().atMost(Duration.ofSeconds(60));
+            System.out.println(toJSONString(ruleScripts, true));
+            assert !ruleScripts.isEmpty();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    @Test
     @RepeatedTest(5)
     public void testFindScenesWorkflowGraphRules() {
         setup();
-
         try {
             Uni<List<ScenesWrapper>> scenesesUni = engineExecutionService
                     .findScenesWorkflowGraphRules(singletonList("ecommerce_trade_gift"), 1);
@@ -107,7 +125,7 @@ public class ReactiveEngineExecutionServiceTests {
 
         try {
             Uni<List<ScenesWrapper>> scenesesUni = engineExecutionService
-                    .findScenesWorkflowGraphRulesWithCached(ExecuteRequest.builder()
+                    .findScenesWorkflowGraphRulesWithCached(WorkflowExecuteRequest.builder()
                             .scenesCodes(singletonList("ecommerce_trade_gift"))
                             .bestEffort(true)
                             .timeout(60_000L)

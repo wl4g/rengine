@@ -39,7 +39,7 @@ public class MinioManagerTests {
     @Test
     public void testDetermineLocalFile() throws IOException {
         File localFile = MinioManager.determineLocalFile(UploadType.USER_LIBRARY_WITH_JS,
-                "/rengine/library/js/commons-lang-3.0.0.js", "ecommerce_trade_gift");
+                "/rengine/library/js/commons-lang-3.0.0.js", 101001001L);
         System.out.println(localFile);
     }
 
@@ -92,13 +92,11 @@ public class MinioManagerTests {
 
                             @Override
                             public int port() {
-                                // TODO Auto-generated method stub
                                 return 0;
                             }
 
                             @Override
                             public String address() {
-                                // TODO Auto-generated method stub
                                 return null;
                             }
                         };

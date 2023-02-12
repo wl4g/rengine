@@ -29,8 +29,8 @@ import org.junit.jupiter.api.Assertions;
 
 import com.wl4g.rengine.client.core.config.ClientConfig;
 import com.wl4g.rengine.common.exception.RengineException;
-import com.wl4g.rengine.common.model.ExecuteResult;
-import com.wl4g.rengine.common.model.ExecuteResult.ResultDescription;
+import com.wl4g.rengine.common.model.WorkflowExecuteResult;
+import com.wl4g.rengine.common.model.WorkflowExecuteResult.ResultDescription;
 import com.wl4g.rengine.common.util.IdGenUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +51,7 @@ public class RengineClientTests {
             .clientSecret("abcdefghijklmnopqrstuvwxyz")
             .build();
 
-    ExecuteResult defaultFailbackResult = ExecuteResult.builder()
+    WorkflowExecuteResult defaultFailbackResult = WorkflowExecuteResult.builder()
             .results(singletonList(ResultDescription.builder().scenesCode("s1001001").build()))
             .build();
 
@@ -75,7 +75,7 @@ public class RengineClientTests {
     @Test
     public void testNewRengineClientExecutionWithDefault() {
         Map<String, Object> args = new HashMap<>();
-        final ExecuteResult result = defaultClient.execute(singletonList("ecommerce_trade_gift"), args);
+        final WorkflowExecuteResult result = defaultClient.execute(singletonList("ecommerce_trade_gift"), args);
         out.println("Executed result: " + result);
     }
 
@@ -86,7 +86,7 @@ public class RengineClientTests {
             return defaultFailbackResult;
         }).build();
 
-        final ExecuteResult result = timeoutClient.execute(IdGenUtils.next(), singletonList("ecommerce_trade_gift"), 1000L, false,
+        final WorkflowExecuteResult result = timeoutClient.execute(IdGenUtils.next(), singletonList("ecommerce_trade_gift"), 1000L, false,
                 emptyMap());
         out.println("Executed result: " + result);
     }

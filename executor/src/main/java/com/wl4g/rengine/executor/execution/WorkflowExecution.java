@@ -17,9 +17,9 @@ package com.wl4g.rengine.executor.execution;
 
 import javax.validation.constraints.NotNull;
 
-import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
+import com.wl4g.rengine.common.entity.Workflow.WorkflowWrapper;
 import com.wl4g.rengine.common.model.ExecuteRequest;
-import com.wl4g.rengine.common.model.ExecuteResult.ResultDescription;
+import com.wl4g.rengine.common.model.WorkflowExecuteResult.ResultDescription;
 
 /**
  * {@link WorkflowExecution}
@@ -29,5 +29,5 @@ import com.wl4g.rengine.common.model.ExecuteResult.ResultDescription;
  * @since v1.0.0
  */
 public interface WorkflowExecution {
-    ResultDescription execute(@NotNull final ExecuteRequest executeRequest, @NotNull final ScenesWrapper scenes);
+    ResultDescription execute(final @NotNull ExecuteRequest executeRequest, final @NotNull WorkflowWrapper workflow);
 }
