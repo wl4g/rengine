@@ -2,7 +2,7 @@
 
 Unified and flexible rules engine platform, naturally suitable for scenarios where rules change frequently, such as real-time or near-real-time financial risk control, e-commerce promotion rules, operation and maintenance monitoring, IoT device alarms, online data cleaning and filtering, etc.
 
-- [![Build](https://github.com/wl4g/rengine/actions/workflows/build_main.yaml/badge.svg)](https://github.com/wl4g/rengine/actions/workflows/build_main.yaml)
+- [![Build](https://github.com/wl4g/rengine/actions/workflows/build_main.yaml/badge.svg)](https://github.com/wl4g/rengine/actions/workflows/build_on_daily.yaml)
 
 ## Architectures
 
