@@ -59,8 +59,7 @@ public class Rule extends BaseBean {
         /**
          * Noice: The temporarily unable to support graalvm native mode.
          */
-        @Deprecated
-        GROOVY,
+        // GROOVY,
 
         JS,
 

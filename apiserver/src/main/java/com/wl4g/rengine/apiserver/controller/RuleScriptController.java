@@ -28,6 +28,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.common.entity.RuleScript;
+import com.wl4g.rengine.common.model.RuleScriptExecuteRequest;
+import com.wl4g.rengine.common.model.RuleScriptExecuteResult;
 import com.wl4g.rengine.service.RuleScriptService;
 import com.wl4g.rengine.service.model.RuleScriptDelete;
 import com.wl4g.rengine.service.model.RuleScriptDeleteResult;
@@ -52,7 +54,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "RuleScriptAPI", description = "The rule script models management API")
 @Slf4j
 @RestController
-@RequestMapping("/admin/rulescript")
+@RequestMapping("/api/v1/rulescript")
 public class RuleScriptController {
 
     private @Autowired RuleScriptService ruleScriptService;
@@ -89,6 +91,15 @@ public class RuleScriptController {
         RespBase<RuleScriptDeleteResult> resp = RespBase.create();
         resp.setData(ruleScriptService.delete(model));
         return resp;
+    }
+
+    // @SecurityRequirement(name = "default_oauth")
+    @Operation(description = "Execute rule script for testing.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
+    @RequestMapping(path = { "execute" }, consumes = "application/json", produces = "application/json", method = { POST })
+    public RespBase<RuleScriptExecuteResult> execute(@RequestBody RuleScriptExecuteRequest model) {
+        log.debug("called: model={}", model);
+        return ruleScriptService.execute(model);
     }
 
 }

@@ -15,6 +15,7 @@
  */
 package com.wl4g.rengine.service.config;
 
+import java.net.URI;
 import java.time.Duration;
 
 import javax.validation.constraints.Min;
@@ -40,11 +41,14 @@ import lombok.ToString;
 @ToString
 public class RengineServiceProperties {
 
+    @NotBlank
+    URI executorEndpoint = URI.create("http://localhost:28002");
+
     @NotNull
     DictServiceProperties dict = new DictServiceProperties();
 
     @NotNull
-    ScheduleJobLogServiceProperties scheduleJobLog = new ScheduleJobLogServiceProperties();
+    ControllerLogServiceProperties controllerLog = new ControllerLogServiceProperties();
 
     /**
      * @see {@link com.wl4g.rengine.executor.execution.ExecutionConfig.ServiceConfig}
@@ -70,7 +74,7 @@ public class RengineServiceProperties {
     @Setter
     @ToString
     @NoArgsConstructor
-    public static class ScheduleJobLogServiceProperties {
+    public static class ControllerLogServiceProperties {
         private String baseDir = RengineConstants.DEFAULT_EXECUTOR_SCRIPT_LOG_BASE_DIR;
     }
 

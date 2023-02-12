@@ -61,8 +61,8 @@ import com.wl4g.rengine.common.entity.WorkflowGraph.BaseNode;
 import com.wl4g.rengine.common.entity.WorkflowGraph.BootNode;
 import com.wl4g.rengine.common.entity.WorkflowGraph.NodeConnection;
 import com.wl4g.rengine.common.entity.WorkflowGraph.ProcessNode;
-import com.wl4g.rengine.common.model.RuleExecuteRequest;
-import com.wl4g.rengine.common.model.RuleExecuteResult;
+import com.wl4g.rengine.common.model.RuleScriptExecuteRequest;
+import com.wl4g.rengine.common.model.RuleScriptExecuteResult;
 import com.wl4g.rengine.common.model.WorkflowExecuteRequest;
 import com.wl4g.rengine.common.model.WorkflowExecuteResult;
 import com.wl4g.rengine.common.model.WorkflowExecuteResult.ResultDescription;
@@ -116,7 +116,7 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
     }
 
     @Override
-    public Uni<RespBase<ResultDescription>> execute(@NotNull RuleExecuteRequest executeRequest) {
+    public Uni<RespBase<ResultDescription>> execute(@NotNull RuleScriptExecuteRequest executeRequest) {
         executeRequest.validate();
         return findRuleScripts(executeRequest.getRuleScriptIds()).map(rss -> {
             final RespBase<ResultDescription> resp = RespBase.create();
@@ -156,7 +156,7 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
 
             return resp.withRequestId(executeRequest.getRequestId())
                     .withCode(RetCode.OK)
-                    .withData(RuleExecuteResult.builder()
+                    .withData(RuleScriptExecuteResult.builder()
                             .success(result.getSuccess())
                             .valueMap(result.getValueMap())
                             .reason(result.getReason())

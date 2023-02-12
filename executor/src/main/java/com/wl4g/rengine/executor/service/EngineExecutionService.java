@@ -37,7 +37,7 @@ import com.wl4g.rengine.common.entity.RuleScript.RuleScriptWrapper;
 import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
 import com.wl4g.rengine.common.model.WorkflowExecuteResult;
 import com.wl4g.rengine.common.model.WorkflowExecuteResult.ResultDescription;
-import com.wl4g.rengine.common.model.RuleExecuteRequest;
+import com.wl4g.rengine.common.model.RuleScriptExecuteRequest;
 import com.wl4g.rengine.common.model.WorkflowExecuteRequest;
 
 import io.smallrye.mutiny.Uni;
@@ -51,7 +51,7 @@ import io.smallrye.mutiny.Uni;
  */
 public interface EngineExecutionService {
 
-    Uni<RespBase<ResultDescription>> execute(final @NotNull RuleExecuteRequest model);
+    Uni<RespBase<ResultDescription>> execute(final @NotNull RuleScriptExecuteRequest model);
 
     Uni<RespBase<WorkflowExecuteResult>> execute(final @NotNull WorkflowExecuteRequest model);
 

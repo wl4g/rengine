@@ -18,7 +18,10 @@ package com.wl4g.rengine.service;
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
+import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.common.entity.RuleScript;
+import com.wl4g.rengine.common.model.RuleScriptExecuteRequest;
+import com.wl4g.rengine.common.model.RuleScriptExecuteResult;
 import com.wl4g.rengine.service.model.RuleScriptDelete;
 import com.wl4g.rengine.service.model.RuleScriptDeleteResult;
 import com.wl4g.rengine.service.model.RuleScriptQuery;
@@ -39,4 +42,7 @@ public interface RuleScriptService {
     RuleScriptSaveResult save(@NotNull RuleScriptSave model);
 
     RuleScriptDeleteResult delete(@NotNull RuleScriptDelete model);
+
+    RespBase<RuleScriptExecuteResult> execute(@NotNull RuleScriptExecuteRequest model);
+
 }

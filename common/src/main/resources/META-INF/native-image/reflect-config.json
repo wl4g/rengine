@@ -1326,7 +1326,7 @@
   ]
 },
 {
-  "name": "com.wl4g.rengine.common.model.BaseRequest",
+  "name": "com.wl4g.rengine.common.model.WorkflowExecuteRequest",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
@@ -1334,10 +1334,10 @@
   "queryAllDeclaredConstructors": true,
   "methods": [
     {"name": "<init>", "parameterTypes": []},
-    {"name": "getRequestId", "parameterTypes": []},
-    {"name": "setRequestId", "parameterTypes": ["java.lang.String"]},
     {"name": "toString", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": []}
+    {"name": "validate", "parameterTypes": []},
+    {"name": "getScenesCodes", "parameterTypes": []},
+    {"name": "setScenesCodes", "parameterTypes": ["java.util.List"]}
   ]
 },
 {
@@ -1349,12 +1349,61 @@
   "queryAllDeclaredConstructors": true,
   "methods": [
     {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
     {"name": "getDescription", "parameterTypes": []},
     {"name": "setDescription", "parameterTypes": ["java.lang.String"]},
     {"name": "errorCount", "parameterTypes": []},
     {"name": "getResults", "parameterTypes": []},
-    {"name": "setResults", "parameterTypes": ["java.util.List"]},
-    {"name": "toString", "parameterTypes": []}
+    {"name": "setResults", "parameterTypes": ["java.util.List"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.model.BaseRequest",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": []},
+    {"name": "getRequestId", "parameterTypes": []},
+    {"name": "setRequestId", "parameterTypes": ["java.lang.String"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.model.RuleScriptExecuteResult",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": []},
+    {"name": "getScenesCode", "parameterTypes": []},
+    {"name": "setScenesCode", "parameterTypes": ["java.lang.String"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.model.RuleScriptExecuteRequest",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": []},
+    {"name": "setBestEffort", "parameterTypes": ["java.lang.Boolean"]},
+    {"name": "setEngine", "parameterTypes": ["com.wl4g.rengine.common.entity.Rule$RuleEngine"]},
+    {"name": "setRuleScriptIds", "parameterTypes": ["java.util.List"]},
+    {"name": "getBestEffort", "parameterTypes": []},
+    {"name": "getEngine", "parameterTypes": []},
+    {"name": "getRuleScriptIds", "parameterTypes": []}
   ]
 },
 {
@@ -1366,6 +1415,8 @@
   "queryAllDeclaredConstructors": true,
   "methods": [
     {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": []},
     {"name": "getArgs", "parameterTypes": []},
     {"name": "setArgs", "parameterTypes": ["java.util.Map"]},
     {"name": "getClientId", "parameterTypes": []},
@@ -1377,41 +1428,7 @@
     {"name": "setClientSecret", "parameterTypes": ["java.lang.String"]},
     {"name": "setTrace", "parameterTypes": ["boolean"]},
     {"name": "setTimeout", "parameterTypes": ["java.lang.Long"]},
-    {"name": "setBestEffort", "parameterTypes": ["java.lang.Boolean"]},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": []}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.model.RuleExecuteRequest",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "getEngine", "parameterTypes": []},
-    {"name": "getRuleScriptIds", "parameterTypes": []},
-    {"name": "setEngine", "parameterTypes": ["com.wl4g.rengine.common.entity.Rule$RuleEngine"]},
-    {"name": "setRuleScriptIds", "parameterTypes": ["java.util.List"]},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": []}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.model.RuleExecuteResult$RuleResultDescription",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "getScenesCode", "parameterTypes": []},
-    {"name": "setScenesCode", "parameterTypes": ["java.lang.String"]},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": []}
+    {"name": "setBestEffort", "parameterTypes": ["java.lang.Boolean"]}
   ]
 },
 {
@@ -1423,6 +1440,8 @@
   "queryAllDeclaredConstructors": true,
   "methods": [
     {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": []},
     {"name": "getReason", "parameterTypes": []},
     {"name": "getScenesCode", "parameterTypes": []},
     {"name": "getSuccess", "parameterTypes": []},
@@ -1430,39 +1449,6 @@
     {"name": "setScenesCode", "parameterTypes": ["java.lang.String"]},
     {"name": "setSuccess", "parameterTypes": ["java.lang.Boolean"]},
     {"name": "setValueMap", "parameterTypes": ["java.util.Map"]},
-    {"name": "setReason", "parameterTypes": ["java.lang.String"]},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": []}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.model.WorkflowExecuteRequest",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "getScenesCodes", "parameterTypes": []},
-    {"name": "setScenesCodes", "parameterTypes": ["java.util.List"]},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": []}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.model.RuleExecuteResult",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "getResult", "parameterTypes": []},
-    {"name": "setResult", "parameterTypes": ["com.wl4g.rengine.common.model.RuleExecuteResult$RuleResultDescription"]},
-    {"name": "getDescription", "parameterTypes": []},
-    {"name": "setDescription", "parameterTypes": ["java.lang.String"]},
-    {"name": "toString", "parameterTypes": []}
+    {"name": "setReason", "parameterTypes": ["java.lang.String"]}
   ]
 }]

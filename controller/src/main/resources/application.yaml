@@ -28,6 +28,8 @@ spring:
   #    matching-strategy: /**/swagger-ui/**
   infra:
     core:
+      smart-proxies:
+        enabled: false
       logging:
         enabled: true
 
