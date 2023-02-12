@@ -52,8 +52,8 @@ import com.wl4g.rengine.common.entity.ControllerSchedule;
 import com.wl4g.rengine.common.entity.ControllerSchedule.GenericExecutionScheduleConfig;
 import com.wl4g.rengine.common.entity.ControllerSchedule.RunState;
 import com.wl4g.rengine.common.entity.ControllerSchedule.ScheduleType;
-import com.wl4g.rengine.common.model.ExecuteRequest;
-import com.wl4g.rengine.common.model.ExecuteResult;
+import com.wl4g.rengine.common.model.WorkflowExecuteRequest;
+import com.wl4g.rengine.common.model.WorkflowExecuteResult;
 import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.controller.config.RengineControllerProperties.EngineClientSchedulerProperties;
 import com.wl4g.rengine.controller.lifecycle.ElasticJobBootstrapBuilder.JobParameter;
@@ -120,7 +120,7 @@ public class EngineGenericExecutionController extends AbstractJobExecutor {
 
         try {
             log.info("Execution scheduling for : {}", schedule);
-            final List<ExecuteRequest> shardingRequests = getShardings(currentShardingTotalCount, context, jobParameter, gesc);
+            final List<WorkflowExecuteRequest> shardingRequests = getShardings(currentShardingTotalCount, context, jobParameter, gesc);
 
             // Build for execution jobs.
             final List<ExecutionWorker> jobs = shardingRequests.stream()
@@ -157,7 +157,7 @@ public class EngineGenericExecutionController extends AbstractJobExecutor {
             final List<ExecutionWorker> jobs,
             final Consumer<Tuple2> saveJobLogPrepared) {
 
-        final CompleteResult<ExecuteResult> result = getExecutor().submitForComplete(jobs, controllerSchedule.getMaxTimeoutMs());
+        final CompleteResult<WorkflowExecuteResult> result = getExecutor().submitForComplete(jobs, controllerSchedule.getMaxTimeoutMs());
         log.info("Completed for result: {}", result);
 
         final var completed = safeList(result.getCompleted()).stream().collect(toList());
@@ -201,14 +201,14 @@ public class EngineGenericExecutionController extends AbstractJobExecutor {
                 .build();
     }
 
-    private List<ExecuteRequest> getShardings(
+    private List<WorkflowExecuteRequest> getShardings(
             final int currentShardingTotalCount,
             final ShardingContext context,
             final JobParameter jobParameter,
             final GenericExecutionScheduleConfig ctc) {
         // Assgin current sharding requests.
-        final List<ExecuteRequest> totalRequests = safeList(ctc.getRequests());
-        final List<ExecuteRequest> shardingRequests = new ArrayList<>(totalRequests.size());
+        final List<WorkflowExecuteRequest> totalRequests = safeList(ctc.getRequests());
+        final List<WorkflowExecuteRequest> shardingRequests = new ArrayList<>(totalRequests.size());
         for (int i = 0; i < totalRequests.size(); i++) {
             if (i % currentShardingTotalCount == context.getShardingItem()) {
                 shardingRequests.add(totalRequests.get(i));
@@ -219,17 +219,17 @@ public class EngineGenericExecutionController extends AbstractJobExecutor {
 
     @Getter
     @ToString(exclude = { "rengineClient", "request", "result" })
-    public static class ExecutionWorker implements Callable<ExecuteResult> {
+    public static class ExecutionWorker implements Callable<WorkflowExecuteResult> {
         private final int currentShardingTotalCount;
         private final ShardingContext context;
         private final Long scheduleId;
         private final Long jobLogId;
         private final RengineClient rengineClient;
-        private final ExecuteRequest request;
-        private ExecuteResult result;
+        private final WorkflowExecuteRequest request;
+        private WorkflowExecuteResult result;
 
         public ExecutionWorker(int currentShardingTotalCount, ShardingContext context, Long scheduleId, Long jobLogId,
-                RengineClient rengineClient, ExecuteRequest request) {
+                RengineClient rengineClient, WorkflowExecuteRequest request) {
             this.currentShardingTotalCount = currentShardingTotalCount;
             this.context = notNullOf(context, "context");
             this.scheduleId = notNullOf(scheduleId, "scheduleId");
@@ -239,10 +239,10 @@ public class EngineGenericExecutionController extends AbstractJobExecutor {
         }
 
         @Override
-        public ExecuteResult call() throws Exception {
+        public WorkflowExecuteResult call() throws Exception {
             try {
                 request.setRequestId(IdGenUtils.next());
-                return (this.result = rengineClient.execute(beforeExecution(ExecuteRequest.builder()
+                return (this.result = rengineClient.execute(beforeExecution(WorkflowExecuteRequest.builder()
                         .clientId(request.getClientId())
                         .clientSecret(request.getClientId())
                         .scenesCodes(request.getScenesCodes())
@@ -264,7 +264,7 @@ public class EngineGenericExecutionController extends AbstractJobExecutor {
             }
         }
 
-        protected ExecuteRequest beforeExecution(final ExecuteRequest request) {
+        protected WorkflowExecuteRequest beforeExecution(final WorkflowExecuteRequest request) {
             return request;
         }
     }

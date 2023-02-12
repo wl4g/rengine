@@ -31,7 +31,7 @@ springdoc:
   use-management-port: false ## Default by false
   group-configs:
     - group: apiserver-docs
-      pathsToMatch: /admin/**
+      pathsToMatch: /api/**
       packagesToScan: com.wl4g.rengine.apiserver
   swagger-ui:
     enabled: true ## Default by true

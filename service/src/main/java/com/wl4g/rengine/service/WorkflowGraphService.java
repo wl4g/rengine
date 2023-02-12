@@ -18,14 +18,17 @@ package com.wl4g.rengine.service;
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
+import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.common.entity.WorkflowGraph;
-import com.wl4g.rengine.service.model.WorkflowGraphLogfile;
-import com.wl4g.rengine.service.model.WorkflowGraphLogfileResult;
+import com.wl4g.rengine.common.model.WorkflowExecuteRequest;
+import com.wl4g.rengine.common.model.WorkflowExecuteResult;
 import com.wl4g.rengine.service.model.WorkflowDeleteGraph;
 import com.wl4g.rengine.service.model.WorkflowGraphDeleteResult;
+import com.wl4g.rengine.service.model.WorkflowGraphLogfile;
+import com.wl4g.rengine.service.model.WorkflowGraphLogfileResult;
 import com.wl4g.rengine.service.model.WorkflowGraphQuery;
-import com.wl4g.rengine.service.model.WorkflowGraphSave;
 import com.wl4g.rengine.service.model.WorkflowGraphResultSave;
+import com.wl4g.rengine.service.model.WorkflowGraphSave;
 
 /**
  * {@link WorkflowGraphService}
@@ -43,5 +46,7 @@ public interface WorkflowGraphService {
     WorkflowGraphDeleteResult delete(@NotNull WorkflowDeleteGraph model);
 
     WorkflowGraphLogfileResult logtail(@NotNull WorkflowGraphLogfile model);
+
+    RespBase<WorkflowExecuteResult> execute(@NotNull WorkflowExecuteRequest model);
 
 }

@@ -33,31 +33,26 @@ public class EvaluationException extends RengineException {
 
     private String requestId;
     private String clientId;
-    private String scenesCode;
     private Long workflowId;
 
-    public EvaluationException(String requestId, String clientId, String scenesCode, Long workflowId, String message) {
+    public EvaluationException(String requestId, String clientId, Long workflowId, String message) {
         super(message);
         this.requestId = hasTextOf(requestId, "requestId");
         this.clientId = hasTextOf(clientId, "clientId");
-        this.scenesCode = hasTextOf(scenesCode, "scenesCode");
         this.workflowId = notNullOf(workflowId, "workflowId");
     }
 
-    public EvaluationException(String requestId, String clientId, String scenesCode, Long workflowId, String message,
-            Throwable cause) {
+    public EvaluationException(String requestId, String clientId, Long workflowId, String message, Throwable cause) {
         super(message, cause);
         this.requestId = hasTextOf(requestId, "requestId");
         this.clientId = hasTextOf(clientId, "clientId");
-        this.scenesCode = hasTextOf(scenesCode, "scenesCode");
         this.workflowId = notNullOf(workflowId, "workflowId");
     }
 
-    public EvaluationException(String requestId, String clientId, String scenesCode, Throwable cause) {
+    public EvaluationException(String requestId, String clientId, Throwable cause) {
         super(cause);
         this.requestId = hasTextOf(requestId, "requestId");
         this.clientId = hasTextOf(clientId, "clientId");
-        this.scenesCode = hasTextOf(scenesCode, "scenesCode");
     }
 
 }

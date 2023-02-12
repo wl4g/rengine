@@ -68,7 +68,7 @@ select * from "rengine"."t_dws_event_with_aggregated_of_10m" where "ROW"='221016
 
 - Notice: The `matchesVersion` represents the workflow version number corresponding to the aggregation computing, which can be used history to calculate the backtracking. format as: (**workflowId:version**)
 
-## Evaluator DWS aggregates data + rules workflow computing
+## Executor DWS aggregates data + rules workflow computing
 
 ```bash
 #TODO

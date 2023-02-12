@@ -57,9 +57,11 @@ public class Dict extends BaseBean {
 
     public static enum DictType {
 
-        API_CONFIG_DEFINITION,
+        ENGINE_TYPE,
 
         ENGINE_EXECUTION_CUSTOM_RESP_TPL,
+
+        API_CONFIG_DEFINITION,
 
         OTHER_TYPE;
     }

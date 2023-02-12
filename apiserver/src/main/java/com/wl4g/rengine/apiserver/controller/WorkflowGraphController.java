@@ -28,14 +28,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.common.entity.WorkflowGraph;
+import com.wl4g.rengine.common.model.WorkflowExecuteRequest;
+import com.wl4g.rengine.common.model.WorkflowExecuteResult;
 import com.wl4g.rengine.service.WorkflowGraphService;
 import com.wl4g.rengine.service.model.WorkflowDeleteGraph;
 import com.wl4g.rengine.service.model.WorkflowGraphDeleteResult;
-import com.wl4g.rengine.service.model.WorkflowGraphQuery;
-import com.wl4g.rengine.service.model.WorkflowGraphSave;
 import com.wl4g.rengine.service.model.WorkflowGraphLogfile;
 import com.wl4g.rengine.service.model.WorkflowGraphLogfileResult;
+import com.wl4g.rengine.service.model.WorkflowGraphQuery;
 import com.wl4g.rengine.service.model.WorkflowGraphResultSave;
+import com.wl4g.rengine.service.model.WorkflowGraphSave;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -53,7 +55,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "WorkflowGraphAPI", description = "The workflow graph management API")
 @Slf4j
 @RestController
-@RequestMapping("/admin/workflowgraph")
+@RequestMapping("/api/v1/workflowgraph")
 public class WorkflowGraphController {
 
     private @Autowired WorkflowGraphService workflowGraphService;
@@ -100,6 +102,15 @@ public class WorkflowGraphController {
         RespBase<WorkflowGraphLogfileResult> resp = RespBase.create();
         resp.setData(workflowGraphService.logtail(model));
         return resp;
+    }
+
+    // @SecurityRequirement(name = "default_oauth")
+    @Operation(description = "Execute workflow for testing.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
+    @RequestMapping(path = { "execute" }, consumes = "application/json", produces = "application/json", method = { POST })
+    public RespBase<WorkflowExecuteResult> execute(@RequestBody WorkflowExecuteRequest model) {
+        log.debug("called: model={}", model);
+        return workflowGraphService.execute(model);
     }
 
 }

@@ -33,7 +33,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.infra.common.validation.EnumValue;
 import com.wl4g.rengine.common.entity.ControllerSchedule.ScheduleType;
-import com.wl4g.rengine.common.model.ExecuteResult.ResultDescription;
+import com.wl4g.rengine.common.model.WorkflowExecuteResult.ResultDescription;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

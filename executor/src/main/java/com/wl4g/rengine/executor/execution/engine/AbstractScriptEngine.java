@@ -129,14 +129,15 @@ public abstract class AbstractScriptEngine implements IEngine {
     }
 
     @NotNull
-    protected List<ObjectResource> loadScriptResources(final @NotBlank String scenesCode, final @NotNull RuleWrapper rule) {
+    protected List<ObjectResource> loadScriptResources(final @NotNull Long workflowId, final @NotNull RuleWrapper rule) {
+        notNullOf(workflowId, "workflowId");
         notNullOf(rule, "rule");
-        log.debug("Loading script {} by scenesCode: {}, ruleId: {}", scenesCode, rule.getId());
+        log.debug("Loading script {} by workflowId: {}, ruleId: {}", workflowId, rule.getId());
 
         // Add upload object script dependencies all by scenes.workflow.rules
         return safeList(rule.getEffectiveLatestScript().getUploads()).stream().map(upload -> {
             try {
-                return minioManager.loadObject(UploadType.of(upload.getUploadType()), upload.getObjectPrefix(), scenesCode,
+                return minioManager.loadObject(UploadType.of(upload.getUploadType()), upload.getObjectPrefix(), workflowId,
                         ExtensionType.of(upload.getExtension()).isBinary(), engineConfig.executorScriptCachedExpire());
             } catch (Exception e) {
                 log.error(format("Unable to load dependency script from MinIO: %s", upload.getObjectPrefix()), e);
@@ -170,7 +171,6 @@ public abstract class AbstractScriptEngine implements IEngine {
                         .clientId(parameter.getClientId())
                         .traceId(parameter.getTraceId())
                         .trace(parameter.isTrace())
-                        .scenesCode(parameter.getScenesCode())
                         .workflowId(parameter.getWorkflowId())
                         .args(ProxyObject.fromMap((Map) parameter.getArgs()))
                         .build())

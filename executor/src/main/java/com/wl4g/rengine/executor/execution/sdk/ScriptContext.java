@@ -99,7 +99,6 @@ public class ScriptContext implements Serializable {
         private final @NotBlank String clientId;
         private final @NotBlank String traceId;
         private final @Default boolean trace = true;
-        private final @NotBlank String scenesCode;
         private final @NotBlank Long workflowId;
         private final @NotNull @Default ProxyObject args = ProxyObject.fromMap(new HashMap<>());
 
@@ -117,10 +116,6 @@ public class ScriptContext implements Serializable {
 
         public @HostAccess.Export boolean isTrace() {
             return trace;
-        }
-
-        public @HostAccess.Export String getScenesCode() {
-            return scenesCode;
         }
 
         public @HostAccess.Export Long getWorkflowId() {

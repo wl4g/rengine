@@ -47,7 +47,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "IdentityProviderAPI", description = "The Identity Provider setting management API")
 @Slf4j
 @RestController
-@RequestMapping("/admin/idp")
+@RequestMapping("/api/v1/idp")
 public class IdentityProviderController {
 
     private @Autowired IdentityProviderService identityProviderService;

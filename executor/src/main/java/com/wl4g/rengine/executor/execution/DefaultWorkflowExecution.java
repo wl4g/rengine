@@ -25,11 +25,11 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.lang.Assert2;
 import com.wl4g.rengine.common.entity.Rule.RuleEngine;
 import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
-import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
 import com.wl4g.rengine.common.entity.Workflow.WorkflowGraphWrapper;
 import com.wl4g.rengine.common.entity.Workflow.WorkflowWrapper;
 import com.wl4g.rengine.common.graph.ExecutionGraph;
@@ -39,7 +39,7 @@ import com.wl4g.rengine.common.graph.ExecutionGraphParameter;
 import com.wl4g.rengine.common.graph.ExecutionGraphResult;
 import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
 import com.wl4g.rengine.common.model.ExecuteRequest;
-import com.wl4g.rengine.common.model.ExecuteResult.ResultDescription;
+import com.wl4g.rengine.common.model.WorkflowExecuteResult.ResultDescription;
 import com.wl4g.rengine.executor.execution.engine.GraalJSScriptEngine;
 import com.wl4g.rengine.executor.execution.engine.IEngine;
 import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
@@ -64,8 +64,8 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
     GraalJSScriptEngine graalJSScriptEngine;
 
     @Override
-    public ResultDescription execute(final ExecuteRequest executeRequest, final ScenesWrapper scenes) {
-        final WorkflowWrapper workflow = scenes.getEffectivePriorityWorkflow();
+    public ResultDescription execute(final @NotNull ExecuteRequest executeRequest, final @NotNull WorkflowWrapper workflow) {
+        workflow.validate();
         final WorkflowGraphWrapper workflowGraph = workflow.getEffectiveLatestGraph();
         final IEngine engine = getEngine(workflow.getEngine());
 
@@ -73,9 +73,8 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
             final ExecutionGraphParameter parameter = ExecutionGraphParameter.builder()
                     .requestTime(currentTimeMillis())
                     .traceId(executeRequest.getRequestId())
-                    .trace(true)
+                    .trace(executeRequest.isTrace())
                     .clientId(executeRequest.getClientId())
-                    .scenesCode(scenes.getScenesCode())
                     .workflowId(workflowGraph.getWorkflowId())
                     .attributes(workflowGraph.getAttributes())
                     .args(executeRequest.getArgs())
@@ -88,7 +87,7 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
                 final Long ruleId = ((IRunOperator) ctx.getCurrentNode()).getRuleId();
 
                 final RuleWrapper rule = Assert2.notNull(ruleMap.get(ruleId),
-                        "The rule '%s' is missing. please check workflow graph rules configuration.", ruleId);
+                        "Rule '%s' is missing. please check workflow graph rules configuration.", ruleId);
 
                 final ScriptResult result = engine.execute(ctx, rule);
                 if (nonNull(result)) {
@@ -101,18 +100,13 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
             final ExecutionGraph<?> graph = ExecutionGraph.from(workflowGraph);
             final ExecutionGraphResult result = graph.apply(graphContext);
 
-            return ResultDescription.builder()
-                    .scenesCode(scenes.getScenesCode())
-                    .success(true)
-                    .valueMap(result.getValueMap())
-                    .build();
+            return ResultDescription.builder().success(true).valueMap(result.getValueMap()).build();
         } catch (Throwable ex) {
-            log.warn(format("Failed to execution workflow graph for scenesCode: %s, workflowId: %s", scenes.getScenesCode(),
-                    workflowGraph.getWorkflowId()), ex);
+            log.warn(format("Failed to execution workflow graph for workflowId: %s", workflowGraph.getWorkflowId()), ex);
 
             return ResultDescription.builder()
-                    .scenesCode(scenes.getScenesCode())
                     .success(false)
+                    // Only the outermost reason is returned.
                     .reason(format("Failed to execution workflow graph of reason: %s", ex.getMessage()))
                     .build();
         }

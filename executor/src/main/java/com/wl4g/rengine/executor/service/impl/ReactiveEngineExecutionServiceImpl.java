@@ -19,43 +19,53 @@ import static com.google.common.base.Charsets.UTF_8;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.lang.Assert2.notEmpty;
+import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
 import static com.wl4g.infra.common.lang.Exceptions.getRootCausesString;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_RULE_SCRIPTS;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_SCENESES;
 import static java.lang.String.format;
+import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.joining;
 
 import java.time.Duration;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import com.google.common.hash.Hashing;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Projections;
-import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.infra.common.collection.CollectionUtils2;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.common.web.rest.RespBase.RetCode;
+import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
+import com.wl4g.rengine.common.entity.RuleScript.RuleScriptWrapper;
 import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
-import com.wl4g.rengine.common.model.ExecuteRequest;
-import com.wl4g.rengine.common.model.ExecuteResult;
+import com.wl4g.rengine.common.entity.Workflow.WorkflowGraphWrapper;
+import com.wl4g.rengine.common.entity.Workflow.WorkflowWrapper;
+import com.wl4g.rengine.common.entity.WorkflowGraph.BaseNode;
+import com.wl4g.rengine.common.entity.WorkflowGraph.BootNode;
+import com.wl4g.rengine.common.entity.WorkflowGraph.NodeConnection;
+import com.wl4g.rengine.common.entity.WorkflowGraph.ProcessNode;
+import com.wl4g.rengine.common.model.RuleScriptExecuteRequest;
+import com.wl4g.rengine.common.model.RuleScriptExecuteResult;
+import com.wl4g.rengine.common.model.WorkflowExecuteRequest;
+import com.wl4g.rengine.common.model.WorkflowExecuteResult;
+import com.wl4g.rengine.common.model.WorkflowExecuteResult.ResultDescription;
 import com.wl4g.rengine.common.util.BsonEntitySerializers;
 import com.wl4g.rengine.executor.execution.EngineConfig;
 import com.wl4g.rengine.executor.execution.LifecycleExecutionService;
@@ -106,23 +116,74 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
     }
 
     @Override
-    public Uni<RespBase<ExecuteResult>> execute(final @NotNull @Valid ExecuteRequest executeRequest) {
+    public Uni<RespBase<ResultDescription>> execute(@NotNull RuleScriptExecuteRequest executeRequest) {
+        executeRequest.validate();
+        return findRuleScripts(executeRequest.getRuleScriptIds()).map(rss -> {
+            final RespBase<ResultDescription> resp = RespBase.create();
+
+            final RuleWrapper rule = RuleWrapper.builder().engine(executeRequest.getEngine()).scripts(rss).build();
+            final Long ruleScriptId = rule.getEffectiveLatestScript().getId();
+
+            // Notice: The purpose here is to execute a single Rule script (not
+            // a real workflow), so you only need to generate a virtual
+            // workflow objects to meet the parameters of the underlying API.
+            rule.setId(ruleScriptId);
+            final Long virtualGraphId = ruleScriptId;
+            final Long virtualWorkflowId = ruleScriptId;
+
+            final List<BaseNode<?>> virtualNodes = new LinkedList<>();
+            virtualNodes.add(new BootNode().withId("0").withName("The Boot"));
+            virtualNodes.add(new ProcessNode().withId("1").withName("For Execution Rule").withRuleId(rule.getId()));
+
+            final List<NodeConnection> virtualCollections = new LinkedList<>();
+            virtualCollections.add(new NodeConnection("1", "0"));
+
+            final WorkflowGraphWrapper virtualGraph = new WorkflowGraphWrapper();
+            virtualGraph.setId(virtualGraphId);
+            virtualGraph.setWorkflowId(virtualWorkflowId);
+            virtualGraph.setNodes(virtualNodes);
+            virtualGraph.setConnections(virtualCollections);
+            virtualGraph.setRules(singletonList(rule));
+
+            final WorkflowWrapper virtualWorkflow = WorkflowWrapper.builder()
+                    .id(virtualWorkflowId)
+                    .engine(rule.getEngine())
+                    .graphs(singletonList(virtualGraph))
+                    .build();
+
+            final ResultDescription result = lifecycleExecutionService.getExecution(rule.getEngine())
+                    .execute(executeRequest, virtualWorkflow);
+
+            return resp.withRequestId(executeRequest.getRequestId())
+                    .withCode(RetCode.OK)
+                    .withData(RuleScriptExecuteResult.builder()
+                            .success(result.getSuccess())
+                            .valueMap(result.getValueMap())
+                            .reason(result.getReason())
+                            .build());
+        });
+    }
+
+    @Override
+    public Uni<RespBase<WorkflowExecuteResult>> execute(@NotNull WorkflowExecuteRequest executeRequest) {
+        executeRequest.validate();
+
         // @formatter:off
         //return Uni.createFrom().item(() -> {
-        //    RespBase<ExecuteResult> resp = RespBase.create();
+        //    RespBase<WorkflowExecuteResult> resp = RespBase.create();
         //    try {
         //        // Query the sceneses of cascade by scenesCode.
         //        final List<ScenesWrapper> sceneses = safeList(
         //                findScenesWorkflowGraphRulesWithCaching(executeRequest, 1));
         //
         //        // Execution to workflow graphs.
-        //        final ExecuteResult result = lifecycleExecutionService.execute(executeRequest, sceneses);
+        //        final WorkflowExecuteResult result = lifecycleExecutionService.execute(executeRequest, sceneses);
         //
         //        // Check for success completes.
         //        if (safeList(result.getResults()).stream().filter(res -> res.getSuccess()).count() == sceneses.size()) {
-        //            resp.setStatus(ExecuteResult.STATUS_ALL_SUCCESS);
+        //            resp.setStatus(WorkflowExecuteResult.STATUS_ALL_SUCCESS);
         //        } else {
-        //            resp.setStatus(ExecuteResult.STATUS_PART_SUCCESS);
+        //            resp.setStatus(WorkflowExecuteResult.STATUS_PART_SUCCESS);
         //        }
         //        resp.setData(result);
         //    } catch (Throwable e) {
@@ -136,23 +197,22 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
         // @formatter:on
 
         return findScenesWorkflowGraphRulesWithCached(executeRequest, 1).chain(sceneses -> {
-            final RespBase<ExecuteResult> resp = RespBase.create();
+            final RespBase<WorkflowExecuteResult> resp = RespBase.create();
             resp.setRequestId(executeRequest.getRequestId());
             try {
                 if (CollectionUtils2.isEmpty(sceneses)) {
                     return Uni.createFrom().item(() -> resp.withMessage("Invalid scenesCodes"));
                 }
-
                 // Execution to workflow graphs.
-                final ExecuteResult result = lifecycleExecutionService.execute(executeRequest, sceneses);
+                final WorkflowExecuteResult result = lifecycleExecutionService.execute(executeRequest, sceneses);
 
                 // Check for success completion.
                 if (sceneses.size() > 0 && result.errorCount() == sceneses.size()) {
-                    resp.setStatus(ExecuteResult.STATUS_FAILED);
+                    resp.setStatus(WorkflowExecuteResult.STATUS_FAILED);
                 } else if (result.errorCount() == 0) {
-                    resp.setStatus(ExecuteResult.STATUS_SUCCESS);
+                    resp.setStatus(WorkflowExecuteResult.STATUS_SUCCESS);
                 } else {
-                    resp.setStatus(ExecuteResult.STATUS_PART_SUCCESS);
+                    resp.setStatus(WorkflowExecuteResult.STATUS_PART_SUCCESS);
                 }
                 resp.setData(result);
             } catch (Throwable e) {
@@ -165,8 +225,24 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
         });
     }
 
+    @Override
+    public Uni<List<RuleScriptWrapper>> findRuleScripts(@NotEmpty List<Long> ruleScriptIds) {
+        notEmptyOf(ruleScriptIds, "ruleScriptIds");
+
+        final List<Bson> aggregates = Lists.newArrayList();
+        aggregates.add(Aggregates.match(Filters.in("_id", ruleScriptIds)));
+        RULE_SCRIPT_LOOKUP_FILTER_WITH_UNIT_RUN.stream().forEach(rs -> aggregates.add(rs.asDocument()));
+
+        final ReactiveMongoCollection<Document> collection = mongoRepository.getReactiveCollection(T_RULE_SCRIPTS);
+        return collection.aggregate(aggregates)
+                .map(ruleScriptDoc -> RuleScriptWrapper
+                        .validate(BsonEntitySerializers.fromDocument(ruleScriptDoc, RuleScriptWrapper.class)))
+                .collect()
+                .asList();
+    }
+
     /**
-     * Query collection dependencies with equivalent bson query codes example:
+     * Query collection dependencies with equivalent bson codes example:
      * 
      * <pre>
      *  // Tools: online mongodb aggregate: https://mongoplayground.net/p/bPKYXCJwXdl
@@ -200,7 +276,7 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
      *                      { $match: { $expr: { $eq: [ "$workflowId", "$$workflow_id" ] } } },
      *                      { $match: { "enable": { $eq: 1 } } },
      *                      { $match: { "delFlag": { $eq: 0 } } },
-     *                                          { $project: { "_class": 0, "delFlag": 0 } },
+     *                      { $project: { "_class": 0, "delFlag": 0 } },
      *                      { $sort: { "revision": -1 } }, // 倒序排序, 取 revision(version) 最大的 graph 即最新版
      *                      { $limit: 1 },
      *                      { $lookup: {
@@ -219,7 +295,7 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
      *                                      { $match: { $expr: { $eq: [ "$ruleId",  "$$rule_id" ] } } },
      *                                      { $match: { "enable": { $eq: 1 } } },
      *                                      { $match: { "delFlag": { $eq: 0 } } },
-     *                                                                          { $project: { "_class": 0, "delFlag": 0 } },
+     *                                      { $project: { "_class": 0, "delFlag": 0 } },
      *                                      { $sort: { "revision": -1 } }, // 倒序排序, 取 revision(version) 最大的 ruleScript 即最新版
      *                                      { $limit: 1 },
      *                                      { $lookup: {
@@ -264,33 +340,25 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
         notEmpty(scenesCodes, "scenesCodes");
         isTrue(revisions >= 1 && revisions <= 1024, "revision %s must >= 1 and <= 1024", revisions);
 
-        // Basic filters.
-        final Bson defaultEnableFilter = Aggregates.match(Filters.eq("enable", BaseBean.ENABLED));
-        final Bson defaultDelFlagFilter = Aggregates.match(Filters.eq("delFlag", BaseBean.DEL_FLAG_NORMAL));
-        final Bson defaultProject = Aggregates.project(Projections.fields(Projections.exclude("_class", "delFlag")));
-
         // Notice: The following is almost completely just the Java version
         // translated into the corresponding mongo js version, but it seems that
         // the execution will report an error, such as not being able to
         // recognize $scenes_id??? Therefore, it is forced to use the method of
         // directly compiling the workflow lookup bson string.
         //
-        // @formatter:off
-        //final Bson defaultSort = Aggregates.sort(new Document("revision", -1));
-        //final Bson defaultLimit = Aggregates.limit(revisions);
-        //
+        //// @formatter:off
         //final Bson uploadsLookup = Aggregates.lookup(T_UPLOADS.getName(),
         //        asList(new Variable<>("upload_ids",
         //                BsonDocument.parse("{ $map: { input: \"$uploadIds\", in: { $toLong: \"$$this.ruleId\" } } }"))),
         //        asList(Aggregates
         //                .match(Filters.expr(new Document("$in", asList(new BsonString("$_id"), new BsonString("$$upload_ids"))))),
-        //                defaultEnableFilter, defaultDelFlagFilter, defaultProject),
+        //                DEFAULT_ENABLE_FILTER, DEFAULT_DELFLAT_FILTER, DEFAULT_PROJECT_FILTER),
         //        "uploads");
         //
         //final Bson ruleScriptsLookup = Aggregates.lookup(T_RULE_SCRIPTS.getName(),
         //        asList(new Variable<>("rule_id", BsonDocument.parse("{ $toLong: \"$_id\" }"))),
-        //        asList(Aggregates.match(Filters.expr(Filters.eq("$ruleId", "$$rule_id"))), defaultEnableFilter,
-        //                defaultDelFlagFilter, defaultProject, defaultSort, defaultLimit, uploadsLookup),
+        //        asList(Aggregates.match(Filters.expr(Filters.eq("$ruleId", "$$rule_id"))), DEFAULT_ENABLE_FILTER,
+        //                DEFAULT_DELFLAT_FILTER, DEFAULT_PROJECT_FILTER, DEFAULT_SORT, DEFAULT_LIMIT, uploadsLookup),
         //        "scripts");
         //
         //final Bson rulesLookup = Aggregates.lookup(T_RULES.getName(), asList(new Variable<>("rule_ids",
@@ -300,34 +368,34 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
         //// Issue2: 若使用 Filters.in("_id","$_id","$$ruleIds") 则会生成: {$expr:{"_id":{$in:["$_id","$$ruleIds"]}}}} 查询结果集不对, 即 rules[] 重复关联了uploads
         //        asList(Aggregates
         //                .match(Filters.expr(new Document("$in", asList(new BsonString("$_id"), new BsonString("$$rule_ids"))))),
-        //                defaultEnableFilter, defaultDelFlagFilter, defaultProject, ruleScriptsLookup),
+        //                DEFAULT_ENABLE_FILTER, DEFAULT_DELFLAT_FILTER, DEFAULT_PROJECT_FILTER, ruleScriptsLookup),
         //        "rules");
         //
         //final Bson workflowGraphLookup = Aggregates.lookup(T_WORKFLOW_GRAPHS.getName(),
         //        asList(new Variable<>("workflow_id", BsonDocument.parse("{ $toLong: \"$_id\" }"))),
-        //        asList(Aggregates.match(Filters.expr(Filters.eq("$workflowId", "$$workflow_id"))), defaultEnableFilter,
-        //                defaultDelFlagFilter, defaultProject, defaultSort, defaultLimit, rulesLookup),
+        //        asList(Aggregates.match(Filters.expr(Filters.eq("$workflowId", "$$workflow_id"))), DEFAULT_ENABLE_FILTER,
+        //                DEFAULT_DELFLAT_FILTER, DEFAULT_PROJECT_FILTER, DEFAULT_SORT, DEFAULT_LIMIT, rulesLookup),
         //        "graphs");
         //
         //final Bson workflowLookup = Aggregates.lookup(T_WORKFLOWS.getName(), asList(new Variable<>("scenes_id", "$_id")),
-        //        asList(Aggregates.match(Filters.expr(Filters.eq("$scenesId", "$$scenes_id"))), defaultEnableFilter,
-        //                defaultDelFlagFilter, defaultProject, workflowGraphLookup),
+        //        asList(Aggregates.match(Filters.expr(Filters.eq("$scenesId", "$$scenes_id"))), DEFAULT_ENABLE_FILTER,
+        //                DEFAULT_DELFLAT_FILTER, DEFAULT_PROJECT_FILTER, workflowGraphLookup),
         //        "workflows");
         //// @formatter:on
 
         final List<Bson> aggregates = Lists.newArrayList();
         aggregates.add(Aggregates.match(Filters.in("scenesCode", scenesCodes)));
-        aggregates.add(defaultEnableFilter);
-        aggregates.add(defaultDelFlagFilter);
-        aggregates.add(defaultProject);
+        aggregates.add(DEFAULT_ENABLE_FILTER);
+        aggregates.add(DEFAULT_DELFLAT_FILTER);
+        aggregates.add(DEFAULT_PROJECT_FILTER);
         // aggregates.add(workflowLookup);
-        aggregates.add(workflowLookupBson);
+        aggregates.add(WORKFLOW_LOOKUP_FILTER);
         // The temporary collections are automatically created.
         // aggregates.add(Aggregates.merge("_tmp_load_scenes_with_cascade"));
 
         final ReactiveMongoCollection<Document> collection = mongoRepository.getReactiveCollection(T_SCENESES);
         final Multi<Document> scenesesMulti = collection.aggregate(aggregates);
-        return scenesesMulti/* .batchSize(engineConfig.maxQueryBatch()) */.map(scenesDoc -> {
+        return scenesesMulti.map(scenesDoc -> {
             // Solution-1:
             // @formatter:off
                 //    log.debug("Found scenes object by scenesCodes: {} to json: {}", scenesCodes, scenesDoc.toJson());
@@ -337,7 +405,7 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
                 //    final String scenesJson = toJSONString(scenesMap).replaceAll("\"_id\":", "\"id\":");
                 //    final ScenesWrapper scenes = parseJSON(scenesJson, ScenesWrapper.class);
                 //    return ScenesWrapper.validate(scenes);
-                // @formatter:on
+            // @formatter:on
             // Solution-2:
             return BsonEntitySerializers.fromDocument(scenesDoc, ScenesWrapper.class).validate();
         }).collect().asList();
@@ -345,8 +413,10 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
 
     @SuppressWarnings("deprecation")
     Uni<List<ScenesWrapper>> findScenesWorkflowGraphRulesWithCached(
-            final @NotNull ExecuteRequest executeRequest,
+            final @NotNull WorkflowExecuteRequest executeRequest,
             final @Min(1) @Max(1024) int revisions) {
+        executeRequest.validate();
+
         //
         // Notice: Since the bottom layer of ordinary blocking redisCommands is
         // also implemented using non-blocking redisReactiveCommands + await,
@@ -399,10 +469,8 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
                 return findScenesWorkflowGraphRules(executeRequest.getScenesCodes(), revisions)
                         // Save to redis cache.
                         .chain(sceneses -> {
-                            return reactiveRedisStringCommands
-                                    .setex(batchQueryingKey,
-                                            Duration.ofMillis(engineConfig.scenesRulesCachedExpire()).toSeconds(),
-                                            toJSONString(sceneses))
+                            return reactiveRedisStringCommands.setex(batchQueryingKey,
+                                    Duration.ofMillis(engineConfig.scenesRulesCachedExpire()).toSeconds(), toJSONString(sceneses))
                                     .map(res -> sceneses);
                         });
             }
@@ -419,75 +487,5 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
         // Uni.combine().all().unis(scenesesUni).combinedWith(_sceneses->_sceneses);
         return scenesesUni;
     }
-
-    public static final TypeReference<List<ScenesWrapper>> SCENES_TYPE_REF = new TypeReference<List<ScenesWrapper>>() {
-    };
-
-    // @formatter:off
-    public static final Bson workflowLookupBson = BsonDocument.parse("{ $lookup: {\n"
-            + "    from: \"t_workflows\",  \n"
-            + "    let: { scenes_id: { $toLong: \"$_id\" } },  \n"
-            + "    pipeline: [\n"
-            + "        { $match: { $expr: { $eq: [ \"$scenesId\", \"$$scenes_id\" ] } } }, \n"
-            + "        { $match: { \"enable\": { $eq: 1 } } },\n"
-            + "        { $match: { \"delFlag\": { $eq: 0 } } },\n"
-            + "        { $project: { \"_class\": 0, \"delFlag\": 0 } },\n"
-            + "        { $lookup: {\n"
-            + "            from: \"t_workflow_graphs\", \n"
-            + "            let: { workflow_id: { $toLong: \"$_id\" } },\n"
-            + "            pipeline: [\n"
-            + "                { $match: { $expr: { $eq: [ \"$workflowId\", \"$$workflow_id\" ] } } },\n"
-            + "                { $match: { \"enable\": { $eq: 1 } } },\n"
-            + "                { $match: { \"delFlag\": { $eq: 0 } } },\n"
-            + "                                    { $project: { \"_class\": 0, \"delFlag\": 0 } },\n"
-            + "                { $sort: { \"revision\": -1 } }, \n"
-            + "                { $limit: 1 },\n"
-            + "                { $lookup: {\n"
-            + "                    from: \"t_rules\",\n"
-            + "                    let: { rule_ids: { $map: { input: \"$nodes\", in: { $toLong: \"$$this.ruleId\" } } } },\n"
-            + "                    pipeline: [\n"
-            + "                        { $match: { $expr: { $in: [ \"$_id\",  \"$$rule_ids\" ] } } },\n"
-            + "                        { $match: { \"enable\": { $eq: 1 } } },\n"
-            + "                        { $match: { \"delFlag\": { $eq: 0 } } },\n"
-            + "                        { $project: { \"_class\": 0, \"delFlag\": 0 } },\n"
-            + "                        { $lookup: {\n"
-            + "                            from: \"t_rule_scripts\",\n"
-            + "                            let: { rule_id: { $toLong: \"$_id\" } },\n"
-            + "                            pipeline: [\n"
-            + "                                { $match: { $expr: { $eq: [ \"$ruleId\",  \"$$rule_id\" ] } } },\n"
-            + "                                { $match: { \"enable\": { $eq: 1 } } },\n"
-            + "                                { $match: { \"delFlag\": { $eq: 0 } } },\n"
-            + "                                                                    { $project: { \"_class\": 0, \"delFlag\": 0 } },\n"
-            + "                                { $sort: { \"revision\": -1 } },  \n"
-            + "                                { $limit: 1 },\n"
-            + "                                { $lookup: {\n"
-            + "                                    from: \"t_uploads\",  \n"
-            + "                                    let: { upload_ids: { $map: { input: \"$uploadIds\", in: { $toLong: \"$$this\"} } } },\n"
-            + "                                    pipeline: [\n"
-            + "                                        { $match: { $expr: { $in: [ \"$_id\",  \"$$upload_ids\" ] } } }, \n"
-            + "                                        { $match: { \"enable\": { $eq: 1 } } },\n"
-            + "                                        { $match: { \"delFlag\": { $eq: 0 } } },\n"
-            + "                                        { $project: { \"_class\": 0, \"delFlag\": 0 } }\n"
-            + "                                    ],\n"
-            + "                                    as: \"uploads\"\n"
-            + "                                    }\n"
-            + "                                }\n"
-            + "                            ],\n"
-            + "                            as: \"scripts\"\n"
-            + "                            }\n"
-            + "                        }\n"
-            + "                    ],\n"
-            + "                    as: \"rules\"\n"
-            + "                    }\n"
-            + "                }\n"
-            + "            ],\n"
-            + "            as: \"graphs\"  \n"
-            + "            }\n"
-            + "        }\n"
-            + "    ],\n"
-            + "    as: \"workflows\"\n"
-            + "    }\n"
-            + "}");
-    // @formatter:on
 
 }

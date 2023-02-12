@@ -81,11 +81,15 @@
     <dependencies>
         <dependency>
             <groupId>com.wl4g</groupId>
+            <artifactId>rengine-client-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.wl4g</groupId>
             <artifactId>rengine-common</artifactId>
         </dependency>
         <dependency>
             <groupId>com.wl4g</groupId>
-            <artifactId>infra-context</artifactId>
+            <artifactId>infra-core</artifactId>
         </dependency>
         <!-- Spring -->
         <dependency>

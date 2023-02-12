@@ -56,7 +56,7 @@ import com.wl4g.infra.common.reflect.ObjectInstantiators;
 import com.wl4g.rengine.client.core.RengineClient;
 import com.wl4g.rengine.client.core.RengineClient.FailbackInfo;
 import com.wl4g.rengine.client.core.exception.ClientExecuteException;
-import com.wl4g.rengine.common.model.ExecuteResult;
+import com.wl4g.rengine.common.model.WorkflowExecuteResult;
 import com.wl4g.rengine.common.util.IdGenUtils;
 
 import lombok.CustomLog;
@@ -81,16 +81,16 @@ public class DefaultREvaluationHandler implements REvaluationHandler<REvaluation
         final long timeoutMs = annotation.timeout();
         final boolean bestEffort = annotation.bestEffort();
         final String paramsTemplate = annotation.paramsTemplate();
-        final Class<? extends Function<FailbackInfo, ExecuteResult>> failbackClazz = annotation.failback();
+        final Class<? extends Function<FailbackInfo, WorkflowExecuteResult>> failbackClazz = annotation.failback();
         hasText(scenesCode, "The evaluation parameter for scenesCode is missing.");
         isTrue(timeoutMs > 0, "The evaluation timeoutMs must > 0.");
         hasText(paramsTemplate, "The evaluation parameter for paramsTemplate is missing.");
 
         final String requestId = IdGenUtils.next();
-        final Function<FailbackInfo, ExecuteResult> failback = getFailback(failbackClazz);
+        final Function<FailbackInfo, WorkflowExecuteResult> failback = getFailback(failbackClazz);
         final Map<String, Object> args = buildEvaluateParams(jp, annotation, paramsTemplate);
 
-        final ExecuteResult result = rengineClient.execute(requestId, singletonList(scenesCode), timeoutMs, bestEffort, args,
+        final WorkflowExecuteResult result = rengineClient.execute(requestId, singletonList(scenesCode), timeoutMs, bestEffort, args,
                 failback);
         log.debug("Evaluated of result: {}, {} => {}", result, scenesCode, args);
 
@@ -104,16 +104,16 @@ public class DefaultREvaluationHandler implements REvaluationHandler<REvaluation
     }
 
     @SuppressWarnings("unchecked")
-    protected Function<FailbackInfo, ExecuteResult> getFailback(
-            Class<? extends Function<FailbackInfo, ExecuteResult>> failbackClazz) {
+    protected Function<FailbackInfo, WorkflowExecuteResult> getFailback(
+            Class<? extends Function<FailbackInfo, WorkflowExecuteResult>> failbackClazz) {
         if (isNull(failbackClazz)) {
             return null;
         }
-        Function<FailbackInfo, ExecuteResult> failback = (Function<FailbackInfo, ExecuteResult>) failbackCaching
+        Function<FailbackInfo, WorkflowExecuteResult> failback = (Function<FailbackInfo, WorkflowExecuteResult>) failbackCaching
                 .get(failbackClazz);
         if (isNull(failback)) {
             synchronized (this) {
-                failback = (Function<FailbackInfo, ExecuteResult>) failbackCaching.get(failbackClazz);
+                failback = (Function<FailbackInfo, WorkflowExecuteResult>) failbackCaching.get(failbackClazz);
                 if (isNull(failback)) {
                     failbackCaching.put(failbackClazz, failback = ObjectInstantiators.newInstance(failbackClazz));
                 }

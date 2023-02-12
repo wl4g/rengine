@@ -60,10 +60,11 @@ import com.wl4g.infra.common.task.GenericTaskRunner;
 import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
 import com.wl4g.rengine.common.entity.Rule.RuleEngine;
 import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
+import com.wl4g.rengine.common.entity.Workflow.WorkflowWrapper;
 import com.wl4g.rengine.common.exception.RengineException;
-import com.wl4g.rengine.common.model.ExecuteRequest;
-import com.wl4g.rengine.common.model.ExecuteResult;
-import com.wl4g.rengine.common.model.ExecuteResult.ResultDescription;
+import com.wl4g.rengine.common.model.WorkflowExecuteRequest;
+import com.wl4g.rengine.common.model.WorkflowExecuteResult;
+import com.wl4g.rengine.common.model.WorkflowExecuteResult.ResultDescription;
 import com.wl4g.rengine.executor.meter.RengineExecutorMeterService;
 import com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsTag;
 import com.wl4g.rengine.executor.service.impl.ReactiveEngineExecutionServiceImpl;
@@ -117,10 +118,10 @@ public class LifecycleExecutionService {
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public @NotNull ExecuteResult execute(
-            final @NotNull ExecuteRequest executeRequest,
+    public @NotNull WorkflowExecuteResult execute(
+            final @NotNull WorkflowExecuteRequest workflowExecuteRequest,
             @NotEmpty final List<ScenesWrapper> sceneses) throws Exception {
-        notNullOf(executeRequest, "executeRequest");
+        notNullOf(workflowExecuteRequest, "workflowExecuteRequest");
         notEmptyOf(sceneses, "sceneses");
 
         // Monitor task timeout interrupt.
@@ -129,7 +130,7 @@ public class LifecycleExecutionService {
         // Submit to execution workers.
         final Map<String, Future<ResultDescription>> futures = sceneses.stream()
                 .map(scenes -> new Tuple2(scenes.getScenesCode(),
-                        executionExecutor.submit(new ExecutionRunner(latch, executeRequest, scenes))))
+                        executionExecutor.submit(new ExecutionRunner(latch, workflowExecuteRequest, scenes))))
                 .collect(toMap(kv -> (String) kv.getItem1(), kv -> (Future) kv.getItem2()));
 
         final Map<String, ResultDescription> completed = new HashMap<>(futures.size());
@@ -137,8 +138,7 @@ public class LifecycleExecutionService {
 
         // Calculate the effective timeout time (ms), minus the network
         // transmission time-consuming deviation.
-        final long effectiveTimeoutMs = (long) ((long) executeRequest.getTimeout()
-                * (1 - config.executeTimeoutOffsetRate()));
+        final long effectiveTimeoutMs = (long) ((long) workflowExecuteRequest.getTimeout() * (1 - config.executeTimeoutOffsetRate()));
 
         final Iterator<Entry<String, Future<ResultDescription>>> it = futures.entrySet().iterator();
         if (!latch.await(effectiveTimeoutMs, MILLISECONDS)) { // Timeout(part-done)
@@ -179,8 +179,8 @@ public class LifecycleExecutionService {
 
         final List<ResultDescription> allResults = newArrayList(Iterables.concat(completed.values(), uncompleted));
         final long totalSuccess = safeList(allResults).stream().map(rd -> rd.validate()).filter(rd -> rd.getSuccess()).count();
-        return ExecuteResult.builder()
-                .requestId(executeRequest.getRequestId())
+        return WorkflowExecuteResult.builder()
+                .requestId(workflowExecuteRequest.getRequestId())
                 .results(allResults)
                 .description(totalSuccess == sceneses.size() ? "All executed successfully" : "There are failed executions")
                 .build();
@@ -189,7 +189,7 @@ public class LifecycleExecutionService {
     public WorkflowExecution getExecution(RuleEngine engine) {
         switch (engine) {
         default:
-            return getBean(DefaultWorkflowExecution.class);
+            return notNull(getBean(DefaultWorkflowExecution.class), "Could't obtain workflow execution of engine : %s", engine);
         }
     }
 
@@ -214,38 +214,44 @@ public class LifecycleExecutionService {
     @AllArgsConstructor
     class ExecutionRunner implements Callable<ResultDescription> {
         final @NotNull CountDownLatch latch;
-        final @NotNull ExecuteRequest executeRequest;
+        final @NotNull WorkflowExecuteRequest workflowExecuteRequest;
         final @NotNull ScenesWrapper scenes;
 
         @Override
         public ResultDescription call() {
-            // TODO multi workflows execution supports?
-            final RuleEngine engine = scenes.getEffectivePriorityWorkflow().getEngine();
+            final String scenesCode = scenes.getScenesCode();
+
+            // TODO multi workflows execution supports? Temporarily only need to
+            // support scenes to workflow as one-to-one.
+            final WorkflowWrapper workflow = scenes.getEffectivePriorityWorkflow();
+
+            final RuleEngine engine = workflow.getEngine();
             notNull(engine, "Please check if the configuration is correct, rule engine type of workflow is null.");
 
             try {
-                // Buried-point: total executeRequest.
+                // Buried-point: total workflowExecuteRequest.
                 meterService.counter(execution_total.getName(), execution_total.getHelp(), MetricsTag.ENGINE, engine.name())
                         .increment();
 
-                final WorkflowExecution execution = getExecution(engine);
-                notNull(execution, "Could not load execution rule engine via %s of '%s'", engine.name(),
-                        executeRequest.getClientId());
-                final ResultDescription result = execution.execute(executeRequest, scenes);
+                final WorkflowExecution execution = notNull(getExecution(engine),
+                        "Could not load execution rule engine via %s of '%s'", engine.name(), workflowExecuteRequest.getClientId());
 
-                // Buried-point: success executeRequest.
+                final ResultDescription result = execution.execute(workflowExecuteRequest, workflow);
+
+                // Buried-point: success workflowExecuteRequest.
                 meterService.counter(execution_success.getName(), execution_success.getHelp(), MetricsTag.ENGINE, engine.name())
                         .increment();
 
+                result.setScenesCode(scenesCode);
                 return result;
             } catch (Throwable e) {
                 final String errmsg = format(
-                        "Failed to execution %s engine of requestId: '%s', clientId: '%s', scenesCode: '%s'. reason: %s",
-                        engine.name(), executeRequest.getRequestId(), executeRequest.getClientId(), scenes.getScenesCode(),
+                        "Failed to execution %s engine of requestId: '%s', clientId: '%s', workflowId: '%s', scenesCode: '%s'. reason: %s",
+                        engine.name(), workflowExecuteRequest.getRequestId(), workflowExecuteRequest.getClientId(), workflow.getId(), scenesCode,
                         getRootCauseMessage(e));
                 log.error(errmsg, e);
 
-                // Buried-point: failed executeRequest.
+                // Buried-point: failed workflowExecuteRequest.
                 meterService.counter(execution_failure.getName(), execution_failure.getHelp(), MetricsTag.ENGINE, engine.name())
                         .increment();
 
@@ -255,7 +261,5 @@ public class LifecycleExecutionService {
             }
         }
     }
-
-    public static final long DEFAULT_EXECUTION_AWAIT = 20L;
 
 }

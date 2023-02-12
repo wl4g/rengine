@@ -12,8 +12,9 @@
 #
 ## see:com.wl4g.rengine.service.config.RengineServiceProperties
 services:
+  executor-endpoint: http://localhost:28002
   dict:
     dict-cached-prefix: rengine:services:dict:cache
     dict-cached-expire: 86400_000
-  schedule-job-log:
+  controller-log:
     base-dir: /tmp/__rengine_script_log

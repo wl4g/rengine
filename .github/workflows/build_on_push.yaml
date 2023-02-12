@@ -7,7 +7,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 ##
-## see:https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
+## see:https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-of-jobsjob_idsecrets
 ## see:https://github.com/apache/spark/blob/master/.github/workflows/build_main.yml
 
 name: "Build on Push"
@@ -17,7 +17,15 @@ on:
     branches:
       #- '**'
       - master
-      - 'releases/**'
+      - main
+      - feature*
+<<<<<<< Upstream, based on 51c9ee5be3e995035580864e519cbd67df875b1c
+      #- dev* # for testing
+=======
+      - dev*
+>>>>>>> cdd1aca ddddddddd
+      - hotfix*
+      #- 'releases/**'
 
 jobs:
   call-build-and-test:
@@ -25,5 +33,6 @@ jobs:
       packages: write
     name: Run
     uses: './.github/workflows/build_and_test.yaml' ## This the calling to workflow.
-    secrets: ## see:https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-of-jobsjob_idsecrets
-      personal-access-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+    if: github.repository == 'wl4g/rengine'
+    secrets:
+      PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}

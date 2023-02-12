@@ -4,7 +4,7 @@
 
 - [Development for Manager](./devel-manager.md)
 
-- [Development for Evaluator](./devel-evaluator.md)
+- [Development for Executor](./devel-evaluator.md)
 
 - [Development for Job](./devel-job.md)
 

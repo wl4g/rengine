@@ -51,7 +51,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "WorkflowAPI", description = "The workflow management API")
 @Slf4j
 @RestController
-@RequestMapping("/admin/workflow")
+@RequestMapping("/api/v1/workflow")
 public class WorkflowController {
 
     private @Autowired WorkflowService workflowService;

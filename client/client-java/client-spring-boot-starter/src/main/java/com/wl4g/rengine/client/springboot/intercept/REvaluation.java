@@ -24,8 +24,8 @@ import java.util.function.Function;
 
 import com.wl4g.rengine.client.core.RengineClient.DefaultFailback;
 import com.wl4g.rengine.client.core.RengineClient.FailbackInfo;
-import com.wl4g.rengine.common.model.ExecuteRequest;
-import com.wl4g.rengine.common.model.ExecuteResult;
+import com.wl4g.rengine.common.model.WorkflowExecuteRequest;
+import com.wl4g.rengine.common.model.WorkflowExecuteResult;
 
 /**
  * for example:
@@ -52,7 +52,7 @@ import com.wl4g.rengine.common.model.ExecuteResult;
 public @interface REvaluation {
 
     /**
-     * ExecuteRequest scenes code.
+     * WorkflowExecuteRequest scenes code.
      * 
      * @return
      */
@@ -63,9 +63,9 @@ public @interface REvaluation {
      * acceptable maximum execution time according to actual needs. Returns
      * immediately if evaluation/feature acquisition and computation times-out.
      * 
-     * @see {@link com.wl4g.rengine.common.model.ExecuteRequest#getTimeout()}
+     * @see {@link com.wl4g.rengine.common.model.WorkflowExecuteRequest#getTimeout()}
      */
-    long timeout() default ExecuteRequest.DEFAULT_TIMEOUT;
+    long timeout() default WorkflowExecuteRequest.DEFAULT_TIMEOUT;
 
     /**
      * This attribute is used to control the behavior when the calculation
@@ -76,12 +76,12 @@ public @interface REvaluation {
      * value of the evaluation result/feature will be given a default value, and
      * the corresponding error code will be set. </br>
      * 
-     * @see {@link com.wl4g.rengine.common.model.ExecuteRequest#getBestEffort()}
+     * @see {@link com.wl4g.rengine.common.model.WorkflowExecuteRequest#getBestEffort()}
      */
-    boolean bestEffort() default ExecuteRequest.DEFAULT_BESTEFFORT;
+    boolean bestEffort() default WorkflowExecuteRequest.DEFAULT_BESTEFFORT;
 
     /**
-     * ExecuteRequest to parameters template.
+     * WorkflowExecuteRequest to parameters template.
      * 
      * <p>
      * for example: {{ userId=#0.userId, goodId=#0.goodId, count=#1 }}
@@ -97,6 +97,6 @@ public @interface REvaluation {
      * 
      * @return
      */
-    Class<? extends Function<FailbackInfo, ExecuteResult>> failback() default DefaultFailback.class;
+    Class<? extends Function<FailbackInfo, WorkflowExecuteResult>> failback() default DefaultFailback.class;
 
 }

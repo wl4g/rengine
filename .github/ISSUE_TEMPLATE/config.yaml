@@ -1,0 +1,14 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Question
+    url: https://stackoverflow.com/questions/ask?tags=rengine
+    about: I have a question about how to use Rengine.
+  - name: Discussions
+    url: https://github.com/wl4g/rengine/discussions
+    about: Open Community discussions related to Rengine. 
+  - name: Rengine Dingtalk chat
+    url: https://qr.dingtalk.com/action/joingroup?code=v1,k1,0tSHdtPe4bTaPpynsi88zKoaPmEJCK+eb04bQzebp/E=&_dt_no_comment=1&origin=11
+    about: If you prefer live chat with the developers, we have a Zulip chat where we all hang out.
+  - name: Rengine Development mailing list 
+    url: https://groups.google.com/forum/#!forum/rengine-dev
+    about: You can also ask questions on our mailing list.

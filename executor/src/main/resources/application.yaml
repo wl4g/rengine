@@ -90,7 +90,7 @@ quarkus:
     file:
       enable: true
       format: '%d{yyyy-dd-mm HH:mm:ss} %-5p [%c{2.}] (%t) %s%e%n'
-      path: /mnt/disk1/log/${quarkus.application.name}/${quarkus.application.name}.log
+      path: /var/log/${quarkus.application.name}/${quarkus.application.name}.log
       async: false
         #queue-length: 128
         #overflow: block # block,discard
@@ -157,7 +157,7 @@ quarkus:
     enable: true
     path: /swagger-ui
     always-include: true
-    title: Rengine Evaluator APIs
+    title: Rengine Executor APIs
     #layout:
     theme: original # original, feeling-blue, flattop, material, monokai, muted, newspaper, outline
     supported-submit-methods: [PUT, POST]
@@ -173,9 +173,9 @@ quarkus:
     #oauth-additional-query-string-params:
   smallrye-openapi:
     path: /openapi
-    info-title: "Rengine Evaluator APIs"
+    info-title: "Rengine Executor APIs"
     info-version: 1.0.0
-    info-description: "Rengine Evaluator APIs Documention"
+    info-description: "Rengine Executor APIs Documention"
     info-terms-of-service: http://swagger.io/terms/
     info-contact-name: "James Wong"
     info-contact-email: "rengine@wl4g.com"

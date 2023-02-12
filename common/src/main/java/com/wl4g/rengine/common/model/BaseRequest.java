@@ -38,6 +38,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 public class BaseRequest {
+
     @NotBlank
     String requestId;
 

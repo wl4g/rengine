@@ -117,13 +117,13 @@ public class MinioManager {
     public ObjectResource loadObject(
             final @NotNull UploadType uploadType,
             final @NotBlank String objectPrefix,
-            final @NotBlank String scenesCode,
+            final @NotNull Long workflowId,
             final boolean binary,
             final @Min(-1) long objectCacheExpireMs)
             throws ErrorResponseException, InsufficientDataException, InternalException, InvalidKeyException,
             InvalidResponseException, IOException, NoSuchAlgorithmException, ServerException, XmlParserException, IOException {
 
-        final File localFile = determineLocalFile(uploadType, objectPrefix, scenesCode);
+        final File localFile = determineLocalFile(uploadType, objectPrefix, workflowId);
 
         // First get from local cached.
         if (objectCacheExpireMs > 0 && localFile.exists() && localFile.length() > 0) {
@@ -200,16 +200,16 @@ public class MinioManager {
         }
     }
 
-    static File determineLocalFile(@NotNull UploadType uploadType, @NotBlank String objectPrefix, @NotBlank String scenesCode)
+    static File determineLocalFile(@NotNull UploadType uploadType, @NotBlank String objectPrefix, @NotNull Long workflowId)
             throws IOException {
         notNullOf(uploadType, "uploadType");
         hasTextOf(objectPrefix, "objectPrefix");
-        hasTextOf(scenesCode, "scenesCode");
+        notNullOf(workflowId, "workflowId");
 
         final File localFile = new File(DEFAULT_EXECUTOR_SCRIPT_TMP_CACHE_DIR.concat("/")
                 .concat(uploadType.name())
                 .concat("/")
-                .concat(scenesCode)
+                .concat(workflowId + "")
                 .concat("/")
                 .concat(getFilename(objectPrefix)));
         FileIOUtils.forceMkdirParent(localFile);

@@ -54,11 +54,6 @@ public final class ExecutionGraphParameter implements Serializable {
     private @Default boolean trace = true;
 
     /**
-     * The execution scenes code.
-     */
-    private @NotBlank String scenesCode;
-
-    /**
      * The execution workflow ID.
      */
     private @NotBlank Long workflowId;

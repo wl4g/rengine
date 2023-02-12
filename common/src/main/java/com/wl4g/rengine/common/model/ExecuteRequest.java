@@ -17,18 +17,14 @@ package com.wl4g.rengine.common.model;
 
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
-import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import lombok.Builder.Default;
@@ -48,7 +44,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
-@ToString
+@ToString(callSuper = true)
 @NoArgsConstructor
 public class ExecuteRequest extends BaseRequest {
 
@@ -58,9 +54,11 @@ public class ExecuteRequest extends BaseRequest {
     @NotBlank
     String clientSecret;
 
-    @NotEmpty
+    /**
+     * The execution enable tracing mode.
+     */
     @Default
-    List<String> scenesCodes = new LinkedList<>();
+    boolean trace = DEFAULT_TRACE;
 
     /**
      * That is, the maximum execution time, and the user determines the
@@ -99,13 +97,13 @@ public class ExecuteRequest extends BaseRequest {
         super.validate();
         hasTextOf(clientId, "clientId");
         hasTextOf(clientSecret, "clientSecret");
-        notEmptyOf(scenesCodes, "scenesCodes");
         notNullOf(timeout, "timeout");
         isTrueOf(timeout > 0, "timeout > 0");
         notNullOf(bestEffort, "bestEffort");
         return this;
     }
 
+    public static final boolean DEFAULT_TRACE = true;
     public static final long DEFAULT_TIMEOUT = 10_000L;
     public static final boolean DEFAULT_BESTEFFORT = false;
 }
