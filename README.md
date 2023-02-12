@@ -12,7 +12,7 @@
 [![Zookeeper](https://img.shields.io/badge/Zookeeper-3.6.2%2B-green)](https://github.com/wl4g/rengine)
 [![Docker](https://img.shields.io/badge/Docker-20%2B-green)](https://github.com/wl4g/rengine)
 [![GithubStars](https://img.shields.io/github/stars/wl4g/rengine)](https://github.com/wl4g/rengine)
-[![Dingtalk](https://img.shields.io/badge/Dingtalk-Join%20Chat-greene)](https://qr.dingtalk.com/action/joingroup?code=v1,k1,0tSHdtPe4bTaPpynsi88zKoaPmEJCK+eb04bQzebp/E=&_dt_no_comment=1&origin=11)
+[![Dingtalk](https://img.shields.io/badge/Dingtalk%20Chat-22890022635-green)](https://qr.dingtalk.com/action/joingroup?code=v1,k1,0tSHdtPe4bTaPpynsi88zKoaPmEJCK+eb04bQzebp/E=&_dt_no_comment=1&origin=11)
 
 ## Architectures
 
