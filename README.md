@@ -1,8 +1,18 @@
 # Rengine
 
-Unified and flexible rules engine platform, naturally suitable for scenarios where rules change frequently, such as real-time or near-real-time financial risk control, e-commerce promotion rules, operation and maintenance monitoring, IoT device alarms, online data cleaning and filtering, etc.
+> Unified and flexible rules engine platform, naturally suitable for scenarios where rules change frequently, such as real-time or near-real-time financial risk control, e-commerce promotion rules, operation and maintenance monitoring, IoT device alarms, online data cleaning and filtering, etc.
 
-- [![Build](https://github.com/wl4g/rengine/actions/workflows/build_on_any.yaml/badge.svg)](https://github.com/wl4g/rengine/actions/workflows/build_on_any.yaml)
+[![Build](https://github.com/wl4g/rengine/actions/workflows/build_on_any.yaml/badge.svg)](https://github.com/wl4g/rengine/actions/workflows/build_on_any.yaml)
+[![License](https://img.shields.io/badge/license-Apache2.0+-green.svg)
+[![GraalVM](https://img.shields.io/badge/GraalVM-22.1-green)](https://github.com/wl4g/rengine)
+[![JVM](https://img.shields.io/badge/JVM-8%20and%2011%2B-green)](https://github.com/wl4g/rengine)
+[![Mongo](https://img.shields.io/badge/Mongo-4.4.6%2B-green)](https://github.com/wl4g/rengine)
+[![Redis](https://img.shields.io/badge/Redis%20Cluster-6%2B-green)](https://github.com/wl4g/rengine)
+[![Kafka](https://img.shields.io/badge/Kafka-2%2B-green)](https://github.com/wl4g/rengine)
+[![Zookeeper](https://img.shields.io/badge/Zookeeper-3.6.2%2B-green)](https://github.com/wl4g/rengine)
+[![Docker](https://img.shields.io/badge/Docker-20%2B-green)](https://github.com/wl4g/rengine)
+[![GithubStars](https://img.shields.io/github/stars/wl4g/rengine)](https://github.com/wl4g/rengine)
+[![Dingtalk](https://img.shields.io/badge/Dingtalk%20Chat-22890022635-green)](https://qr.dingtalk.com/action/joingroup?code=v1,k1,0tSHdtPe4bTaPpynsi88zKoaPmEJCK+eb04bQzebp/E=&_dt_no_comment=1&origin=11)
 
 ## Architectures
 

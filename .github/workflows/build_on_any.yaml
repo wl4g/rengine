@@ -10,12 +10,14 @@
 ## see:https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
 ## see:https://github.com/apache/spark/blob/master/.github/workflows/build_main.yml
 
-name: "Build on Any"
+name: "Build on Push"
 
 on:
   push:
     branches:
-      - '**'
+      #- '**'
+      - main
+      - 'releases/**'
 
 jobs:
   call-build-and-test:

@@ -29,7 +29,7 @@ on:
         description: Branch to run the build against
         required: false
         type: string
-        default: dev-1.0
+        default: master
       envs:
         description: Additional environment variables to set when running the tests. Should be in JSON format.
         required: false
