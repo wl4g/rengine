@@ -26,7 +26,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link RuleExecuteResult}
+ * {@link RuleScriptExecuteResult}
  * 
  * @author James Wong
  * @version 2022-09-21
@@ -37,13 +37,14 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
-public class RuleExecuteResult extends ResultDescription {
+public class RuleScriptExecuteResult extends ResultDescription {
 
     @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
     @JsonIgnore
     @Override
     public String getScenesCode() {
-        throw new UnsupportedOperationException();
+        // throw new UnsupportedOperationException();
+        return "NONE";
     }
 
     @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
@@ -53,7 +54,8 @@ public class RuleExecuteResult extends ResultDescription {
         throw new UnsupportedOperationException();
     }
 
-    public RuleExecuteResult validate() {
+    public RuleScriptExecuteResult validate() {
+        super.validate();
         return this;
     }
 

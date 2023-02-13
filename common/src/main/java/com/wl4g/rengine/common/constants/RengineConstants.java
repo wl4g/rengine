@@ -58,7 +58,7 @@ public abstract class RengineConstants extends EnvironmentUtil {
     // This API is only used to directly execute rule scripts for testing when
     // developing in the management console. The underlying implementation is
     // still the API for calling the workflow executor.
-    public static final String API_EXECUTOR_EXECUTE_INTERNAL_RULE = "/internal/rule";
+    public static final String API_EXECUTOR_EXECUTE_INTERNAL_RULESCRIPT = "/internal/rulescript";
 
     // Receive execution request internal from client SDK. For example, a
     // request from a business application JVM process via a depends client SDK.

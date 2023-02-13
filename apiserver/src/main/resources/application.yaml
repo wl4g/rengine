@@ -31,6 +31,8 @@ spring:
     core:
       logging:
         enabled: true
+      smart-proxies:
+        enabled: false
 
 ## co.elastic.logging:logback-ecs-encoder see: https://www.elastic.co/guide/en/ecs-logging/java/current/setup.html#setup
 ## com.github.loki4j:loki-logback-appender see: https://loki4j.github.io/loki-logback-appender/#quick-start

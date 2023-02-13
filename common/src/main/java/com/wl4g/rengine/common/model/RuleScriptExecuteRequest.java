@@ -21,11 +21,14 @@ import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wl4g.rengine.common.entity.Rule.RuleEngine;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,7 +37,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link RuleExecuteRequest}
+ * {@link RuleScriptExecuteRequest}
  * 
  * @author James Wong
  * @version 2022-09-18
@@ -45,7 +48,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class RuleExecuteRequest extends ExecuteRequest {
+public class RuleScriptExecuteRequest extends ExecuteRequest {
 
     @NotNull
     RuleEngine engine;
@@ -54,8 +57,23 @@ public class RuleExecuteRequest extends ExecuteRequest {
     @Default
     List<Long> ruleScriptIds = new LinkedList<>();
 
+    @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
+    @JsonIgnore
     @Override
-    public RuleExecuteRequest validate() {
+    public @Nullable Boolean getBestEffort() {
+        // throw new UnsupportedOperationException();
+        return false;
+    }
+
+    @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
+    @JsonIgnore
+    @Override
+    public void setBestEffort(@Nullable Boolean bestEffort) {
+        // throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public RuleScriptExecuteRequest validate() {
         super.validate();
         notNullOf(engine, "engine");
         notEmptyOf(ruleScriptIds, "ruleScriptIds");

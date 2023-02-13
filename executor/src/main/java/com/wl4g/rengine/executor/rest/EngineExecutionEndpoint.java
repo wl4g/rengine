@@ -28,7 +28,7 @@ import static com.wl4g.infra.common.serialize.JacksonUtils.parseMapObject;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_BASE;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_CUSTOM;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_INTERNAL_WORKFLOW;
-import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_INTERNAL_RULE;
+import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_INTERNAL_RULESCRIPT;
 import static com.wl4g.rengine.common.model.ExecuteRequest.DEFAULT_BESTEFFORT;
 import static com.wl4g.rengine.common.model.ExecuteRequest.DEFAULT_TIMEOUT;
 import static com.wl4g.rengine.executor.rest.EngineExecutionEndpoint.RequestSettings.PARAM_REQ_SETTINGS;
@@ -75,7 +75,7 @@ import com.wl4g.rengine.common.entity.Dict.DictType;
 import com.wl4g.rengine.common.exception.RengineException;
 import com.wl4g.rengine.common.model.WorkflowExecuteResult;
 import com.wl4g.rengine.common.model.WorkflowExecuteResult.ResultDescription;
-import com.wl4g.rengine.common.model.RuleExecuteRequest;
+import com.wl4g.rengine.common.model.RuleScriptExecuteRequest;
 import com.wl4g.rengine.common.model.WorkflowExecuteRequest;
 import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.executor.rest.intercept.CustomValid;
@@ -137,8 +137,9 @@ public class EngineExecutionEndpoint {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    @Path(API_EXECUTOR_EXECUTE_INTERNAL_RULE)
-    public Uni<RespBase<ResultDescription>> executeInternal(final @NotNull RuleExecuteRequest executeRequest) throws Exception {
+    @Path(API_EXECUTOR_EXECUTE_INTERNAL_RULESCRIPT)
+    public Uni<RespBase<ResultDescription>> executeInternal(final @NotNull RuleScriptExecuteRequest executeRequest)
+            throws Exception {
         log.debug("Executing for : {}", executeRequest);
         return engineExecutionService.execute(executeRequest);
     }
@@ -156,7 +157,8 @@ public class EngineExecutionEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path(API_EXECUTOR_EXECUTE_INTERNAL_WORKFLOW)
-    public Uni<RespBase<WorkflowExecuteResult>> executeInternal(final @NotNull WorkflowExecuteRequest executeRequest) throws Exception {
+    public Uni<RespBase<WorkflowExecuteResult>> executeInternal(final @NotNull WorkflowExecuteRequest executeRequest)
+            throws Exception {
         log.debug("Executing for : {}", executeRequest);
         return engineExecutionService.execute(executeRequest);
     }

@@ -39,8 +39,15 @@ import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.io.FileIOUtils;
 import com.wl4g.infra.common.io.FileIOUtils.ReadTailFrame;
+import com.wl4g.infra.common.reflect.ParameterizedTypeReference;
+import com.wl4g.infra.common.web.rest.RespBase;
+import com.wl4g.infra.common.web.rest.RespBase.RetCode;
+import com.wl4g.rengine.client.core.RengineClient;
+import com.wl4g.rengine.client.core.config.ClientConfig;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.WorkflowGraph;
+import com.wl4g.rengine.common.model.WorkflowExecuteRequest;
+import com.wl4g.rengine.common.model.WorkflowExecuteResult;
 import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.common.util.ScriptEngineUtil;
 import com.wl4g.rengine.service.WorkflowGraphService;
@@ -54,6 +61,8 @@ import com.wl4g.rengine.service.model.WorkflowGraphResultSave;
 import com.wl4g.rengine.service.model.WorkflowGraphSave;
 import com.wl4g.rengine.service.mongo.GlobalMongoSequenceService;
 
+import lombok.CustomLog;
+
 /**
  * {@link WorkflowGraphServiceImpl}
  * 
@@ -61,6 +70,7 @@ import com.wl4g.rengine.service.mongo.GlobalMongoSequenceService;
  * @version 2022-08-29
  * @since v1.0.0
  */
+@CustomLog
 @Service
 public class WorkflowGraphServiceImpl implements WorkflowGraphService {
 
@@ -177,7 +187,7 @@ public class WorkflowGraphServiceImpl implements WorkflowGraphService {
         //}
         //// @formatter:on
 
-        final String latestLogFile = ScriptEngineUtil.getLatestLogFile(config.getScheduleJobLog().getBaseDir(),
+        final String latestLogFile = ScriptEngineUtil.getLatestLogFile(config.getControllerLog().getBaseDir(),
                 model.getWorkflowId(), false);
         if (isBlank(latestLogFile)) {
             throw new IllegalArgumentException(format("Could't to load workflow log file for %s.", model.getWorkflowId()));
@@ -189,4 +199,36 @@ public class WorkflowGraphServiceImpl implements WorkflowGraphService {
         return WorkflowGraphLogfileResult.builder().frame(result).build();
     }
 
+    @Override
+    public RespBase<WorkflowExecuteResult> execute(@NotNull WorkflowExecuteRequest model) {
+        final RespBase<WorkflowExecuteResult> resp = RespBase.create();
+        notNullOf(model, "executeRequest");
+        model.validate();
+
+        log.info("Executing for {}, {}", config.getExecutorEndpoint(), model);
+        try {
+            final WorkflowExecuteResult result = RengineClient.builder()
+                    .config(ClientConfig.builder()
+                            .endpoint(config.getExecutorEndpoint())
+                            .clientId(model.getClientId())
+                            .clientSecret(model.getClientSecret())
+                            .defaultTimeout(model.getTimeout())
+                            .defaultBestEffort(model.getBestEffort())
+                            .build())
+                    .build()
+                    .execute(model);
+
+            log.info("Executed the result : {}", result);
+            resp.withCode(RetCode.OK).withData(result);
+
+        } catch (Throwable ex) {
+            log.error("Failed to execute rule script.", ex);
+            resp.withCode(RetCode.SYS_ERR).withMessage(ex.getMessage());
+        }
+
+        return resp;
+    }
+
+    static final ParameterizedTypeReference<RespBase<WorkflowExecuteResult>> WORKFLOW_EXECUTE_RESULT_TYPE = new ParameterizedTypeReference<>() {
+    };
 }
