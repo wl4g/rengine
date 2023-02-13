@@ -4,7 +4,7 @@ Unified and flexible rules engine platform, naturally suitable for scenarios whe
 
 [![Build on Push](https://github.com/wl4g/rengine/actions/workflows/build_on_push.yaml/badge.svg)](https://github.com/wl4g/rengine/actions/workflows/build_on_push.yaml)
 [![Build on Daily](https://github.com/wl4g/rengine/actions/workflows/build_on_daily.yaml/badge.svg)](https://github.com/wl4g/rengine/actions/workflows/build_on_daily.yaml)
-[![License](https://img.shields.io/badge/license-Apache2.0+-green.svg)
+[![License](https://img.shields.io/badge/license-Apache2.0+-green.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![GraalVM](https://img.shields.io/badge/GraalVM-22.1-green)](https://github.com/wl4g/rengine)
 [![JVM](https://img.shields.io/badge/JVM-8%20and%2011%2B-green)](https://github.com/wl4g/rengine)
 [![Mongo](https://img.shields.io/badge/Mongo-4.4.6%2B-green)](https://github.com/wl4g/rengine)
@@ -23,7 +23,7 @@ Unified and flexible rules engine platform, naturally suitable for scenarios whe
 
 - JDK 11.x +
 
-- GraalVM java11-22.3 + (Recommands)
+- GraalVM java11-22.1 + (Recommands)
 
 - Maven 3.6 +
 

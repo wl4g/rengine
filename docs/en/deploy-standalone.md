@@ -55,7 +55,7 @@ docker run -d \
 wl4g/rengine-manager
 ```
 
-- Deploy local Rengine Evaluator
+- Deploy local Rengine Executor
 
 ```bash
 docker run -d \
