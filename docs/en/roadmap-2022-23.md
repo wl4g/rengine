@@ -38,5 +38,5 @@ Please let us know if you have urgent needs which are not presented in the plan.
 
 - Add the rengine-operator module to make it auto management to the cloud-native environment?
 
-- Improve the Rengine Evaluator(quarkus native) runtime debugging toolchain and documentation, including memory snapshot dumps, real-time thread status dumps
+- Improve the Rengine Executor(quarkus native) runtime debugging toolchain and documentation, including memory snapshot dumps, real-time thread status dumps
 
