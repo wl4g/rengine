@@ -15,6 +15,8 @@
  */
 package com.wl4g.rengine.service.model;
 
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import com.wl4g.rengine.common.entity.UploadObject;
@@ -38,7 +40,7 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 @NoArgsConstructor
 public class UploadQuery extends BaseQuery<UploadObject> {
-    private @Nullable Long uploadId;
+    private @Nullable List<Long> uploadIds;
     private @Nullable UploadObject.UploadType uploadType;
     private @Nullable String extension;
 }

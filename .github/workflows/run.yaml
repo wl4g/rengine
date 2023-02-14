@@ -11,7 +11,7 @@
 ## see:https://github.com/apache/rengine/blob/master/.github/workflows/build_and_test.yml
 ## see:https://github.com/quarkusio/quarkus/blob/main/.github/workflows/release-build.yml
 
-name: Build and release images
+name: Build deploy and release images
 
 on:
   workflow_call: ## This the definition of the callee.
@@ -80,41 +80,15 @@ on:
         required: false
         type: boolean
         default: true
-        #default: |-
-        #  "{
-        #    \"build\": {
-        #      \"enable\": true,
-        #      \"mvn-opts\": \"\"
-        #    },
-        #    \"deploy\": {
-        #      \"enable\": true
-        #    },
-        #    \"build-image\": {
-        #      \"apiserver\": {
-        #          \"enable-tar\": true,
-        #          \"enable-springjar\": false
-        #      },
-        #      \"controller\": {
-        #          \"enable-tar\": true,
-        #          \"enable-springjar\": false
-        #      },
-        #      \"executor\": {
-        #          \"enable-tar\": true,
-        #          \"enable-native\": false
-        #      }
-        #    },
-        #    \"push-image\": {
-        #      \"docker-hub\": {
-        #          \"enable\": true
-        #      },
-        #      \"ghcr\": {
-        #          \"enable\": true
-        #      }
-        #    }
-        #  }"
     secrets: ## see:https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-of-onworkflow_callsecrets
       PERSONAL_ACCESS_TOKEN:
         description: 'A developer personal token from the caller workflow'
+        required: false
+      OSSRH_USERNAME:
+        description: 'A OSSRH username from the caller workflow'
+        required: false
+      OSSRH_TOKEN:
+        description: 'A OSSRH token from the caller workflow'
         required: false
       DOCKERHUB_USERNAME:
         description: 'A image registry username from the caller workflow'
@@ -159,10 +133,10 @@ jobs:
   build-push-image:
     needs: prepares
     if: github.repository == 'wl4g/rengine'
-    runs-on: ubuntu-20.04
+    runs-on: ${{ inputs.runs-on || 'ubuntu-latest' }}
     permissions:
       packages: write
-    timeout-minutes: 10
+    timeout-minutes: 30
     steps:
       ## Notice: Calling other workflows is not supported here. Different jobs will correspond 
       ## to different container spaces. For example, checkout project files cannot be shared.
@@ -171,17 +145,6 @@ jobs:
       #  if: github.repository == 'wl4g/rengine'
       #  with:
       #    PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-
-      - name: Debugging 1
-        run: |
-          echo "DEBUG: $(pwd)"
-          ls -al ./
-          echo 111
-          echo "==> ${{ fromJson(inputs.actions).build.enable == true }}"
-          echo 222
-          echo "==> ${{ fromJson(inputs.actions).build.enable }}"
-          echo 333
-          echo "==> ${{ inputs.actions }}"
 
       - name: Check out repository
         uses: actions/checkout@v3
@@ -228,6 +191,23 @@ jobs:
             -T 4C \
             clean install \
             ${{ inputs.build-mvn-opts }}
+
+      - name: Set up Maven Central Repository
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ inputs.java }}
+          distribution: 'adopt'
+          server-id: ossrh
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+
+      - name: Deploy to Maven
+        run: mvn --batch-mode deploy
+        if: >-
+          ${{ inputs.enable-build == true && inputs.enable-deploy == true }}
+        env:
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
 
       - name: Set up QEMU
         if: >-
@@ -365,12 +345,14 @@ jobs:
 
       - name: Push image for ApiServer (tar)
         if: ${{ inputs.enable-build == true && inputs.enable-build-image-apiserver-tar == true }}
+        continue-on-error: true
         run: |
           echo "DEBUG: Pushing image for ApiServer (tar) ..."
           docker push ghcr.io/${{ needs.prepares.outputs.repo_name }}/rengine-apiserver:${{ needs.prepares.outputs.image_tag }}
 
       - name: Push image for ApiServer (springjar)
         if: ${{ inputs.enable-build == true && inputs.enable-build-image-apiserver-springjar == true }}
+        continue-on-error: true
         run: |
           echo "DEBUG: Pushing image for ApiServer (tar) ..."
           docker push ghcr.io/${{ needs.prepares.outputs.repo_name }}/rengine-apiserver:${{ needs.prepares.outputs.image_tag }}

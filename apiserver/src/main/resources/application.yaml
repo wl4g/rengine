@@ -18,54 +18,5 @@ spring:
     include: base,arthas,arthas-override,telemetry,telemetry-override,swagger,mongo,redis,minio,security-static
     active: dev
 
-<<<<<<< Upstream, based on 51c9ee5be3e995035580864e519cbd67df875b1c
-## see:org.springframework.boot.autoconfigure.web.ServerProperties
-server:
-=======
-## co.elastic.logging:logback-ecs-encoder see: https://www.elastic.co/guide/en/ecs-logging/java/current/setup.html#setup
-## com.github.loki4j:loki-logback-appender see: https://loki4j.github.io/loki-logback-appender/#quick-start
-## see: https://docs.spring.io/spring-boot/docs/2.6.7/reference/htmlsingle/#features.logging.custom-log-configuration
-## see: com.wl4g.infra.core.logging.custom.logback.CustomLogbackConfigurer
-#logging:
-#  register-shutdown-hook: false
-#  charset.file: UTF-8
-#  ## Log levels belonging to this group will take effect synchronously.(TRACE|DEBUG|INFO|WARN|ERROR|FATAL|OFF)
-#  ## see:https://docs.spring.io/spring-boot/docs/2.6.7/reference/htmlsingle/#features.logging.log-groups
-#  group:
-#    config: "org.springframework.boot.context.config"
-#    tomcat: "org.apache.catalina,org.apache.coyote,org.apache.tomcat"
-#  file: ## see:org.springframework.boot.logging.LogFile#toString
-#    name: /var/log/${spring.application.name}/${spring.application.name}.log
-#  pattern:
-#    console: '%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} [%clr(${spring.application.name})] [%clr(%-12.12X{principal})] [%clr(%-32.32X{traceId})] [%clr(%-8.8X{spanId})] %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx'
-#    file: '%d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${PID:- } [${spring.application.name}] [%-12.12X{principal}] [%-32.32X{traceId}] [%-8.8X{spanId}] --- [%t] %-40.40logger{39} : %m%n%wEx'
-#    dateformat: yyyy-MM-dd HH:mm:ss.SSS
-#    level: '%5p'
-#  logback:
-#    rollingpolicy:
-#      file-name-pattern: ${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz
-#      clean-history-on-start: false ## Default by false
-#      max-file-size: 1GB ## Default by 200MB
-#      max-history: 30 ## Default by 7
-#      total-size-cap: 100GB ## Default by 10GB
-#  level:
-#    root: INFO
-#    tomcat: INFO
-#    config: INFO
-#    ## The built-in log groups:
-#    ## web(org.springframework.core.codec,org.springframework.http,org.springframework.web,org.springframework.boot.actuate.endpoint.web,org.springframework.boot.web.servlet.ServletContextInitializerBeans)
-#    ## sql(org.springframework.jdbc.core,org.hibernate.SQL,org.jooq.tools.LoggerListener)
-#    web: INFO
-#    sql: INFO
-#    reactor:
-#      netty.http.client: INFO
-#    org:
-#      springframework: INFO
-#      apache: INFO
-#    feign: DEBUG
-#    com:
-#      wl4g.rengine: DEBUG
-
 server: ## see:org.springframework.boot.autoconfigure.web.ServerProperties
->>>>>>> 3023cf7 fix: Dockerfile.springtar & config
   port: 28001

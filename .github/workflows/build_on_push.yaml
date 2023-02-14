@@ -19,20 +19,16 @@ on:
       - master
       - main
       - feature*
-<<<<<<< Upstream, based on 51c9ee5be3e995035580864e519cbd67df875b1c
       #- dev* # for testing
-=======
-      - dev*
->>>>>>> cdd1aca ddddddddd
       - hotfix*
       #- 'releases/**'
 
 jobs:
-  call-build-and-test:
+  build-and-test:
     permissions:
       packages: write
     name: Run
-    uses: './.github/workflows/build_and_test.yaml' ## This the calling to workflow.
+    uses: './.github/workflows/run.yaml' ## This the calling to workflow.
     if: github.repository == 'wl4g/rengine'
     secrets:
       PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}

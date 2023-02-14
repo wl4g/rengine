@@ -22,20 +22,15 @@ on:
       - 'releases/**'
 
 jobs:
-  #call-release-maven:
-  #  permissions:
-  #    packages: write
-  #  name: Release Maven
-  #  uses: './.github/workflows/release_maven.yaml'
-  #  if: github.repository == 'wl4g/rengine'
-  #  secrets:
-  #    PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-
-  call-release-images:
+  build-and-release:
     permissions:
       packages: write
-    name: Release Images
-    uses: './.github/workflows/release_image.yaml'
+    name: Build and release
+    uses: './.github/workflows/run.yaml'
     if: github.repository == 'wl4g/rengine'
     secrets:
       PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+      OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
