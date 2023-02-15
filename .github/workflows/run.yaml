@@ -194,6 +194,8 @@ jobs:
 
       - name: Set up Maven Central Repository
         uses: actions/setup-java@v3
+        if: >-
+          ${{ inputs.enable-build == true && inputs.enable-deploy == true }}
         with:
           java-version: ${{ inputs.java }}
           distribution: 'adopt'

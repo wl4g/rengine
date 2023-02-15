@@ -222,7 +222,7 @@ public class WorkflowGraphServiceImpl implements WorkflowGraphService {
             resp.withCode(RetCode.OK).withData(result);
 
         } catch (Throwable ex) {
-            log.error("Failed to execute rule script.", ex);
+            log.error("Failed to execute workflow graph.", ex);
             resp.withCode(RetCode.SYS_ERR).withMessage(ex.getMessage());
         }
 

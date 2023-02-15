@@ -61,6 +61,7 @@ import com.wl4g.rengine.common.entity.WorkflowGraph.BaseNode;
 import com.wl4g.rengine.common.entity.WorkflowGraph.BootNode;
 import com.wl4g.rengine.common.entity.WorkflowGraph.NodeConnection;
 import com.wl4g.rengine.common.entity.WorkflowGraph.ProcessNode;
+import com.wl4g.rengine.common.exception.RengineException;
 import com.wl4g.rengine.common.model.RuleScriptExecuteRequest;
 import com.wl4g.rengine.common.model.RuleScriptExecuteResult;
 import com.wl4g.rengine.common.model.WorkflowExecuteRequest;
@@ -117,11 +118,21 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
 
     @Override
     public Uni<RespBase<ResultDescription>> execute(@NotNull RuleScriptExecuteRequest executeRequest) {
-        executeRequest.validate();
-        return findRuleScripts(executeRequest.getRuleScriptIds()).map(rss -> {
+        final String notFoundErrmsg = format("Could't execute because not found rule script %s",
+                executeRequest.getRuleScriptId());
+        return findRuleScripts(singletonList(executeRequest.validate().getRuleScriptId())).map(rss -> {
             final RespBase<ResultDescription> resp = RespBase.create();
+            resp.setRequestId(executeRequest.getRequestId());
 
-            final RuleWrapper rule = RuleWrapper.builder().engine(executeRequest.getEngine()).scripts(rss).build();
+            // Check for not found.
+            if (CollectionUtils2.isEmpty(rss)) {
+                log.warn(notFoundErrmsg);
+                return resp.withCode(RetCode.NOT_FOUND_ERR)
+                        .withStatus(WorkflowExecuteResult.STATUS_FAILED)
+                        .withMessage(notFoundErrmsg);
+            }
+
+            final RuleWrapper rule = RuleWrapper.builder().engine(executeRequest.getEngine()).scripts(rss).build().validate();
             final Long ruleScriptId = rule.getEffectiveLatestScript().getId();
 
             // Notice: The purpose here is to execute a single Rule script (not
@@ -132,8 +143,8 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
             final Long virtualWorkflowId = ruleScriptId;
 
             final List<BaseNode<?>> virtualNodes = new LinkedList<>();
-            virtualNodes.add(new BootNode().withId("0").withName("The Boot"));
-            virtualNodes.add(new ProcessNode().withId("1").withName("For Execution Rule").withRuleId(rule.getId()));
+            virtualNodes.add(new BootNode().withId("0").withName("The virtual Boot node"));
+            virtualNodes.add(new ProcessNode().withId("1").withName("The virtual Process node").withRuleId(rule.getId()));
 
             final List<NodeConnection> virtualCollections = new LinkedList<>();
             virtualCollections.add(new NodeConnection("1", "0"));
@@ -148,63 +159,41 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
             final WorkflowWrapper virtualWorkflow = WorkflowWrapper.builder()
                     .id(virtualWorkflowId)
                     .engine(rule.getEngine())
-                    .graphs(singletonList(virtualGraph))
+                    .graphs(singletonList(virtualGraph.validate()))
                     .build();
 
             final ResultDescription result = lifecycleExecutionService.getExecution(rule.getEngine())
-                    .execute(executeRequest, virtualWorkflow);
+                    .execute(executeRequest, virtualWorkflow.validate());
+            log.debug("Executed virtual workflow result : {}", result);
 
-            return resp.withRequestId(executeRequest.getRequestId())
-                    .withCode(RetCode.OK)
+            return resp.withCode(RetCode.OK)
+                    .withStatus(WorkflowExecuteResult.STATUS_SUCCESS)
                     .withData(RuleScriptExecuteResult.builder()
                             .success(result.getSuccess())
                             .valueMap(result.getValueMap())
                             .reason(result.getReason())
                             .build());
-        });
+        })
+                .ifNoItem()
+                .after(Duration.ofMillis((long) (executeRequest.getTimeout() * DEFAULT_LOAD_TIMEOUT_MAX_RATE)))
+                .failWith(() -> new RengineException(notFoundErrmsg));
     }
 
     @Override
     public Uni<RespBase<WorkflowExecuteResult>> execute(@NotNull WorkflowExecuteRequest executeRequest) {
-        executeRequest.validate();
-
-        // @formatter:off
-        //return Uni.createFrom().item(() -> {
-        //    RespBase<WorkflowExecuteResult> resp = RespBase.create();
-        //    try {
-        //        // Query the sceneses of cascade by scenesCode.
-        //        final List<ScenesWrapper> sceneses = safeList(
-        //                findScenesWorkflowGraphRulesWithCaching(executeRequest, 1));
-        //
-        //        // Execution to workflow graphs.
-        //        final WorkflowExecuteResult result = lifecycleExecutionService.execute(executeRequest, sceneses);
-        //
-        //        // Check for success completes.
-        //        if (safeList(result.getResults()).stream().filter(res -> res.getSuccess()).count() == sceneses.size()) {
-        //            resp.setStatus(WorkflowExecuteResult.STATUS_ALL_SUCCESS);
-        //        } else {
-        //            resp.setStatus(WorkflowExecuteResult.STATUS_PART_SUCCESS);
-        //        }
-        //        resp.setData(result);
-        //    } catch (Throwable e) {
-        //        final String errmsg = format("Could not to execution evaluate of requestId: '%s', reason: %s",
-        //                executeRequest.getRequestId(), Exceptions.getRootCausesString(e, true));
-        //        log.error(errmsg, e);
-        //        resp.withCode(RetCode.SYS_ERR).withMessage(errmsg);
-        //    }
-        //    return resp.withRequestId(executeRequest.getRequestId());
-        //});
-        // @formatter:on
-
-        return findScenesWorkflowGraphRulesWithCached(executeRequest, 1).chain(sceneses -> {
+        return findScenesWorkflowGraphRulesWithCached(executeRequest.validate(), 1).chain(sceneses -> {
             final RespBase<WorkflowExecuteResult> resp = RespBase.create();
             resp.setRequestId(executeRequest.getRequestId());
             try {
                 if (CollectionUtils2.isEmpty(sceneses)) {
-                    return Uni.createFrom().item(() -> resp.withMessage("Invalid scenesCodes"));
+                    return Uni.createFrom()
+                            .item(() -> resp.withCode(RetCode.NOT_FOUND_ERR)
+                                    .withStatus(WorkflowExecuteResult.STATUS_FAILED)
+                                    .withMessage("Invalid scenesCodes"));
                 }
                 // Execution to workflow graphs.
                 final WorkflowExecuteResult result = lifecycleExecutionService.execute(executeRequest, sceneses);
+                log.debug("Executed workflow result : {}", result);
 
                 // Check for success completion.
                 if (sceneses.size() > 0 && result.errorCount() == sceneses.size()) {
@@ -227,7 +216,7 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
 
     @Override
     public Uni<List<RuleScriptWrapper>> findRuleScripts(@NotEmpty List<Long> ruleScriptIds) {
-        notEmptyOf(ruleScriptIds, "ruleScriptIds");
+        notEmptyOf(ruleScriptIds, "ruleScriptId");
 
         final List<Bson> aggregates = Lists.newArrayList();
         aggregates.add(Aggregates.match(Filters.in("_id", ruleScriptIds)));
@@ -481,11 +470,13 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
                 // not have enough time to allow early abandonment of
                 // execution.
                 .ifNoItem()
-                .after(Duration.ofMillis((long) (executeRequest.getTimeout() * 0.85)))
+                .after(Duration.ofMillis((long) (executeRequest.getTimeout() * DEFAULT_LOAD_TIMEOUT_MAX_RATE)))
                 .fail();
 
         // Uni.combine().all().unis(scenesesUni).combinedWith(_sceneses->_sceneses);
         return scenesesUni;
     }
+
+    public static final float DEFAULT_LOAD_TIMEOUT_MAX_RATE = 0.85f;
 
 }
