@@ -188,8 +188,8 @@ quarkus:
     add-runner-suffix: true
   ## see:https://quarkus.io/guides/writing-native-applications-tips#supporting-native-in-your-application
   native:
-    #builder-image: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image22.1-java11
-    builder-image: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image@sha256:addda81229f6894774eab0e5159448726952c5e2692f7cf18bda60f86a2a5f7e
+    builder-image: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image:22.1-java11
+    #builder-image: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image@sha256:addda81229f6894774eab0e5159448726952c5e2692f7cf18bda60f86a2a5f7e
     # The graal.js component is not installed. (quarkus-2.12.2)
     #builder-image: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image:22.3-java11
     # The graal.js component is installed. (quarkus-2.14.3)

@@ -51,7 +51,7 @@ public class ExecutorApplicationInitializer {
 
     void onStart(@Observes StartupEvent event, @ConfigProperty(name = "quarkus.application.name") String appName) {
         log.info("{} is starting ...", appName);
-        RespBase.ErrorPromptMessageBuilder.setPrompt(appName.substring(Math.max(appName.lastIndexOf("-") + 1, 0)));
+        RespBase.ErrorPromptMessageBuilder.setPromptDefault(appName);
         immdiatelyInitializeRedisDS();
     }
 

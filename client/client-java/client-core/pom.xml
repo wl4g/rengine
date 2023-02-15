@@ -54,11 +54,21 @@
         <artifactId>rengine-client-java</artifactId>
         <version>1.0.0</version>
     </parent>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.wl4g</groupId>
+                <artifactId>rengine-bom</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>com.wl4g</groupId>
             <artifactId>rengine-common</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
@@ -197,7 +207,7 @@
                 <dependency>
                     <groupId>com.wl4g</groupId>
                     <artifactId>rengine-eventbus-kafka</artifactId>
-                    <version>${project.version}</version>
+                    <version>${project.version}</version><!--$NO-MVN-MAN-VER$-->
                 </dependency>
             </dependencies>
         </profile>

@@ -77,7 +77,7 @@ public class Coding {
         if (isNull(hexStr)) {
             return null;
         }
-        return new String(Hex.decodeHex(hexStr), UTF_8);
+        return new String(Hex.decodeHex(hexStr.toCharArray()), UTF_8);
     }
 
     public @HostAccess.Export String toBase58FromHex(String hexStr) {
@@ -85,7 +85,7 @@ public class Coding {
             return null;
         }
         try {
-            return Base58.encodeBase58(Hex.decodeHex(hexStr));
+            return Base58.encodeBase58(Hex.decodeHex(hexStr.toCharArray()));
         } catch (DecoderException e) {
             throw new IllegalArgumentException(e);
         }
@@ -103,7 +103,7 @@ public class Coding {
             return null;
         }
         try {
-            return Base64.encodeBase64String(Hex.decodeHex(hexStr));
+            return Base64.encodeBase64String(Hex.decodeHex(hexStr.toCharArray()));
         } catch (DecoderException e) {
             throw new IllegalArgumentException(e);
         }

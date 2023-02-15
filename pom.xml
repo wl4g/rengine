@@ -108,8 +108,9 @@
         <!-- <java.version>1.8</java.version> -->
         <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <infra.version>3.1.0</infra.version>
+        <infra.version>3.1.1</infra.version>
         <spring-native.version>0.12.1</spring-native.version>
+        <spring-boot.version>2.7.3</spring-boot.version>
         <spring-cloud.version>2021.0.3</spring-cloud.version>
         <!-- Maven plugins -->
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
@@ -133,12 +134,6 @@
         <maven-springdoc-openapi.version>1.4</maven-springdoc-openapi.version>
         <maven-exec.version>3.1.0</maven-exec.version>
     </properties>
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.3</version>
-        <relativePath /> <!-- lookup parent from repository -->
-    </parent>
     <modules>
         <module>bom</module>
         <module>common</module>
