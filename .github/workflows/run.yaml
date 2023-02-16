@@ -85,10 +85,16 @@ on:
         description: 'A developer personal token from the caller workflow'
         required: false
       OSSRH_USERNAME:
-        description: 'A OSSRH username from the caller workflow'
+        description: 'A deploy to Maven central (OSSRH) username from the caller workflow'
         required: false
       OSSRH_TOKEN:
-        description: 'A OSSRH token from the caller workflow'
+        description: 'A deploy to Maven central (OSSRH) token(password) from the caller workflow'
+        required: false
+      MAVEN_GPG_PRIVATE_KEY:
+        description: 'A deploy to Maven central (OSSRH) GPG private key from the caller workflow'
+        required: false
+      MAVEN_GPG_PASSPHRASE:
+        description: 'A deploy to Maven central (OSSRH) GPG private key password from the caller workflow'
         required: false
       DOCKERHUB_USERNAME:
         description: 'A image registry username from the caller workflow'
@@ -221,36 +227,36 @@ jobs:
           key: build-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: build-maven-${{ needs.prepares.outputs.cache_suffix }}-
 
-      - name: Set up JDK ${{ inputs.java }}
-        if: ${{ inputs.enable-build == true }}
-        uses: actions/setup-java@v3
-        with:
-          distribution: temurin
-          java-version: ${{ inputs.java }}
-
-      - name: Build with Maven
-        if: ${{ inputs.enable-build == true }}
-        run: |
-          ./tools/build/run.sh build-maven
-
       - name: Set up Maven Central Repository
         uses: actions/setup-java@v3
         if: ${{ inputs.enable-build == true && inputs.enable-deploy == true }}
         with:
-          distribution: 'adopt'
           java-version: ${{ inputs.java }}
-          server-id: sonatype-nexus-staging # It is just a common name, as long as it corresponds to pom.xml
+          distribution: 'adopt'
+          server-id: sonatype-nexus-staging # It is just a common name, as long as it corresponds to pom.xml and settings.xml
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
-          #server-username: ${{ secrets.OSSRH_USERNAME }}
-          #server-password: ${{ secrets.OSSRH_TOKEN }}
+          #gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }} # Value of the GPG private key to import
+          #gpg-passphrase: MAVEN_GPG_PASSPHRASE # env variable for GPG private key passphrase
+
+      - name: Debugging 2
+        run: |
+          echo "---------- DEBUG OUTPUT. ----------"
+          echo "    disk usage: \n$(df -h)"
+          echo "  memory usage: \n$(free -h)"
+          echo "     cpu usage: \n$(top -n 1)"
+          echo "       gpg dir: \n$(ls -al ~/.gnupg/)"
+          echo "   gpg secrets: \n$(gpg --list-secret-keys)"
 
       - name: Deploy to Maven
-        run: ./mvnw --batch-mode deploy -Prelease
         if: ${{ inputs.enable-build == true && inputs.enable-deploy == true }}
+        run: |
+          ./tools/build/run.sh build-deploy
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+          MAVEN_GPG_PRIVATE_KEY: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
 
       - name: Set up QEMU
         if: >-
@@ -278,7 +284,7 @@ jobs:
           }}
         uses: docker/setup-buildx-action@v2
 
-      - name: Debugging 2
+      - name: Debugging 3
         run: |
           echo "---------- DEBUG OUTPUT. ----------"
           echo "    disk usage: \n$(df -h)"
@@ -320,7 +326,7 @@ jobs:
         run: |
           echo "Unsupported build image apiserver with springjar"; exit 1
 
-      - name: Debugging 3
+      - name: Debugging 4
         run: |
           echo "---------- DEBUG OUTPUT. ----------"
           echo "    disk usage: \n$(df -h)"
@@ -344,7 +350,7 @@ jobs:
         run: |
           echo "Unsupported build image controller with springjar"; exit 1
 
-      - name: Debugging 4
+      - name: Debugging 5
         run: |
           echo "---------- DEBUG OUTPUT. ----------"
           echo "    disk usage: \n$(df -h)"
@@ -360,7 +366,7 @@ jobs:
         run: |
           ./tools/build/run.sh build-image --executor
 
-      - name: Debugging 5
+      - name: Debugging 6
         run: |
           echo "---------- DEBUG OUTPUT. ----------"
           echo "    disk usage: \n$(df -h)"
@@ -375,7 +381,7 @@ jobs:
         run: |
           ./tools/build/run.sh build-image --executor-native
 
-      - name: Debugging 6
+      - name: Debugging 7
         run: |
           echo "---------- DEBUG OUTPUT. ----------"
           echo "    disk usage: \n$(df -h)"
@@ -458,7 +464,7 @@ jobs:
       #      fi
       #    fi
 
-      - name: Debugging 7
+      - name: Debugging 8
         run: |
           echo "---------- DEBUG OUTPUT. ----------"
           echo "    disk usage: \n$(df -h)"

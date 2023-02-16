@@ -13,21 +13,29 @@
 name: "Build on Push"
 
 on:
+  ## see:https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#example-including-branches-and-tags
   push:
     branches:
       #- '**'
+      #- 'releases/**' # eg: 'releases/**' will match the refs/heads/releases/10 Git ref.
       - master
       - main
-      - feature*
-      #- dev* # for testing
-      - hotfix*
-      #- 'releases/**'
+      - 'feature**'
+      - 'dev**'
+      - 'hotfix**'
+  pull_request:
+    branches:
+      - master
+      - main
+      - 'feature**'
+      - 'dev**'
+      - 'hotfix**'
 
 jobs:
   build-and-test:
     permissions:
       packages: write
-    name: Run
+    name: Build and test
     uses: './.github/workflows/run.yaml' ## This the calling to workflow.
     if: github.repository == 'wl4g/rengine'
     secrets:

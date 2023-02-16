@@ -12,7 +12,7 @@ set -e
 
 BASE_DIR="$(cd "`dirname $0`"/../..; pwd)"
 DEFAULT_MAVEN_OPTS=${MAVEN_OPTS:-"-Xss64m -Xms1g -Xmx12g -XX:ReservedCodeCacheSize=1g -Dorg.slf4j.simpleLogger.defaultLogLevel=WARN"}
-MAVEN_CLI_OPTS=${MAVEN_CLI_OPTS:-"--settings .github/mvn-settings.xml"} # --no-transfer-progress
+MAVEN_CLI_OPTS=${MAVEN_CLI_OPTS:-} # --no-transfer-progress
 MAVEN_USERNAME=${MAVEN_USERNAME:-}
 MAVEN_PASSWORD=${MAVEN_PASSWORD:-}
 DOCKERHUB_USERNAME=${DOCKERHUB_USERNAME:-}
@@ -49,8 +49,11 @@ function usages(){
 # for examples
 export JAVA_VERSION=11 # Optional
 export MAVEN_OPTS='-Xss64m -Xms1g -Xmx12g -XX:ReservedCodeCacheSize=1g -Dorg.slf4j.simpleLogger.defaultLogLevel=WARN' # Optional
+# Required (If needed)
 export MAVEN_USERNAME='myuser'
 export MAVEN_PASSWORD='abc'
+export MAVEN_GPG_PRIVATE_KEY='-----BEGIN PGP PRIVATE KEY BLOCK-----\n...'
+export MAVEN_GPG_PASSPHRASE='abc'
 export DOCKERHUB_USERNAME='myuser'
 export DOCKERHUB_TOKEN='abc'
 
@@ -75,7 +78,7 @@ Usage: ./$(basename $0) [OPTIONS] [arg1] [arg2] ...
 }
 
 function print_pom_version() {
-    ## see:https://cloud.tencent.com/developer/article/1476991
+    # see:https://cloud.tencent.com/developer/article/1476991
     MAVEN_OPTS="$DEFAULT_MAVEN_OPTS -Dorg.slf4j.simpleLogger.log.org.apache.maven.plugins.help=INFO"
     #./mvnw org.apache.maven.plugins:maven-help-plugin:3.3.0:evaluate -o -Dexpression=project.version | grep -v '[INFO]'
     POM_VERSION=$(./mvnw -Dexec.executable='echo' -Dexec.args='${project.version}' --non-recursive exec:exec -q)
@@ -87,13 +90,76 @@ function do_build_maven() {
     local build_opts=$1
     logDebug "Building for $build_opts ..."
     [ -z "$MAVEN_OPTS" ] && MAVEN_OPTS=$DEFAULT_MAVEN_OPTS
-    $BASE_DIR/mvnw $MAVEN_CLI_OPTS \
+    $BASE_DIR/mvnw \
+    $MAVEN_CLI_OPTS \
+    --settings .github/mvn-settings.xml
     -Dmaven.repo.local=$HOME/.m2/repository \
+    -Dmaven.test.skip=true \
     -DskipTests \
     -DskipITs \
     -Dgpg.skip \
     -B \
     $build_opts
+}
+
+function do_configure_gpg() {
+    log "INFO" "Configuring for GPG keys ..."
+
+    # Check for gpg keys.
+    if [[ -z "$MAVEN_GPG_PRIVATE_KEY" || -z "$MAVEN_GPG_PASSPHRASE" ]]; then
+      logErr "The environment variable MAVEN_GPG_PRIVATE_KEY or MAVEN_GPG_PASSPHRASE is missing."; exit 1
+    fi
+
+    # Check for supported gpg version.
+    gpg_version=$(gpg --version | head -1 | grep -iEo '(([0-9]+)\.([0-9]+)\.([0-9]+))') # eg: 2.2.19
+    gpg_version_major=$(echo $gpg_version | awk -F '.' '{print $1}')
+    gpg_version_minor=$(echo $gpg_version | awk -F '.' '{print $2}')
+    gpg_version_revision=$(echo $gpg_version | awk -F '.' '{print $3}')
+    if [[ ! ("$gpg_version_major" -ge 2 && "$gpg_version_minor" -ge 1) ]]; then
+      logErr "The GPG version must >= $gpg_version_major.$gpg_version_minor.x"; exit 1
+    fi
+
+    \rm -rf ~/.gnupg/; mkdir -p ~/.gnupg/private-keys-v1.d/; chmod -R 700 ~/.gnupg/
+    echo -n "$MAVEN_GPG_PRIVATE_KEY" > ~/tmp/private.key
+
+    #logDebug "----- Print GPG secret key (debug) -----"
+    #cat ~/tmp/private.key
+
+    # FIXED:https://github.com/keybase/keybase-issues/issues/2798#issue-205008630
+    #export GPG_TTY=$(tty) # Notice: github action the VM instance no tty.
+
+    # FIXED:https://bbs.archlinux.org/viewtopic.php?pid=1691978#p1691978
+    # FIXED:https://github.com/nodejs/docker-node/issues/922
+    # Note that since Version 2.0 this passphrase is only used if the option --batch has also
+    # been given. Since Version 2.1 the --pinentry-mode also needs to be set to loopback.
+    # see:https://www.gnupg.org/documentation/manuals/gnupg/GPG-Esoteric-Options.html#index-allow_002dsecret_002dkey_002dimport
+    gpg2 -v --pinentry-mode loopback --batch --secret-keyring ~/.gnupg/secring.gpg --import ~/tmp/private.key
+
+    logDebug "Cleanup to ~/tmp/private.key ..."
+    \rm -rf ~/tmp/private.key
+    ls -al ~/.gnupg/
+
+    logDebug "----- Imported list of GPG secret keys -----"
+    gpg2 --list-keys
+    gpg2 --list-secret-keys
+
+    # Notice: Test signing should be performed first to ensure that the gpg-agent service has been 
+    # pre-started (gpg-agent --homedir /root/.gnupg --use-standard-socket --daemon), otherwise
+    # an error may be reported : 'gpg: signing failed: Inappropriate ioctl for device'
+    logDebug "Preparing testing the GPG signing ..."
+    echo "test" | gpg2 -v --pinentry-mode loopback --passphrase $MAVEN_GPG_PASSPHRASE --clear-sign
+}
+
+function do_build_deploy() {
+    mkdir -p ~/.m2/; cp ./.github/settings-security.xml ~/.m2/
+
+    # see:https://blogs.wl4g.com/archives/56
+    # see:https://central.sonatype.org/publish/requirements/gpg/#distributing-your-public-key
+    # see:https://stackoverflow.com/questions/61096521/how-to-use-gpg-key-in-github-actions
+    # or using:https://github.com/actions/setup-java/tree/v1.4.3#publishing-using-apache-maven
+    do_configure_gpg
+
+    do_build_maven "-T 4C deploy -Prelease"
 }
 
 function do_push_image() {
@@ -114,13 +180,6 @@ function do_push_image() {
     docker push $image_registry/wl4g/$image_name:$image_tag
 }
 
-function check_maven_env() {
-    if [[ -z "$MAVEN_USERNAME" || -z "$MAVEN_PASSWORD" ]]; then
-      logWarn "The environment variable MAVEN_USERNAME or MAVEN_PASSWORD is missing."
-      exit 1
-    fi
-}
-
 # --- Main. ---
 case $1 in
   version)
@@ -130,8 +189,7 @@ case $1 in
     do_build_maven "-T 4C clean install"
     ;;
   build-deploy)
-    check_maven_env
-    do_build_maven "-T 4C deploy -Prelease"
+    do_build_deploy
     ;;
   build-image)
     case $2 in
@@ -188,6 +246,9 @@ case $1 in
     do_build_maven "package -f executor/pom.xml -Pbuild:tar:docker" &
     wait
     do_build_maven "package -f executor/pom.xml -Pnative -Dquarkus.native.container-build=true -Dquarkus.native.container-runtime=docker"
+
+    do_build_deploy
+
     POM_VERSION=${POM_VERSION:-$(print_pom_version)}
     do_push_image "rengine-apiserver" "$POM_VERSION"
     do_push_image "rengine-controller" "$POM_VERSION"

@@ -22,7 +22,7 @@ jobs:
   build-and-test:
     permissions:
       packages: write
-    name: Run
+    name: Build and test
     uses: './.github/workflows/run.yaml' ## This the calling to workflow.
     if: github.repository == 'wl4g/rengine'
     secrets: ## see:https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-of-jobsjob_idsecrets

@@ -15,11 +15,15 @@ name: "Release on Push"
 on:
   release:
     types: [ created ]
+  ## see:https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#example-including-branches-and-tags
   push:
     branches:
-      #- '**'
-      - 'dev*' # for testing
-      - 'releases/**'
+      - 'releases**'
+      - 'releases/**' # eg: 'releases/**' will match the refs/heads/releases/10 Git ref.
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v**'
+      - 'V**'
 
 jobs:
   build-and-release:
@@ -32,5 +36,7 @@ jobs:
       PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
       OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
       OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
+      MAVEN_GPG_PRIVATE_KEY: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
