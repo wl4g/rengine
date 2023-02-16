@@ -350,7 +350,7 @@ jobs:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
         run: |
-          ./tools/build/run.sh build-maven --controller
+          ./tools/build/run.sh build-image --controller
 
       - name: Build image for Controller (springjar)
         if: ${{ inputs.enable-build == true && inputs.enable-build-image-controller-springjar == true }}
