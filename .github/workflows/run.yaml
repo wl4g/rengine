@@ -43,7 +43,7 @@ on:
       enable-build:
         required: false
         type: boolean
-        default: true
+        default: true,7 /
       enable-deploy:
         required: false
         type: boolean
@@ -278,22 +278,6 @@ jobs:
           }}
         uses: docker/setup-buildx-action@v2
 
-      ## see:https://docs.docker.com/build/ci/github-actions/examples/
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        if: ${{ inputs.enable-build == true && inputs.enable-push-image-dockerhub == true }}
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        if: ${{ inputs.enable-build == true && inputs.enable-push-image-ghcr == true }}
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }} # github.repository_owner
-          password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Debugging 2
         run: |
           echo "---------- DEBUG OUTPUT. ----------"
@@ -399,15 +383,23 @@ jobs:
           echo "     cpu usage: \n$(top -n 1)"
           echo "        images: \n$(docker images)"
 
-      - name: Push images to Container Registry
-        if: ${{ inputs.enable-build == true && inputs.enable-build-image-apiserver-tar == true }}
+      ## see:https://docs.docker.com/build/ci/github-actions/examples/
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        if: ${{ inputs.enable-build == true && inputs.enable-push-image-dockerhub == true }}
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Push image to Docker Hub Registry
+        if: ${{ inputs.enable-build == true && inputs.enable-push-image-dockerhub == true }}
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
-          repo_owner="${{ needs.prepares.outputs.repo_owner }}"
-          pom_version="${{ needs.prepares.outputs.pom_version }}"
-          ref_img_tag="${{ needs.prepares.outputs.ref_img_tag }}"
+          #repo_owner="${{ needs.prepares.outputs.repo_owner }}"
+          #pom_version="${{ needs.prepares.outputs.pom_version }}"
+          #ref_img_tag="${{ needs.prepares.outputs.ref_img_tag }}"
 
           if [ "${{ inputs.enable-push-image-dockerhub }}" == "true" ]; then
             if [ "${{ inputs.enable-build-image-apiserver-tar }}" == "true" ]; then
@@ -429,6 +421,19 @@ jobs:
               ./tools/build/run.sh push-image --executor-native
             fi
           fi
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        if: ${{ inputs.enable-build == true && inputs.enable-push-image-ghcr == true }}
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }} # github.repository_owner
+          ## see:https://docs.github.com/en/actions/security-guides/automatic-token-authentication
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push image to Github Container Registry
+        if: ${{ inputs.enable-build == true && inputs.enable-push-image-ghcr == true }}
+        run: |
           if [ "${{ inputs.enable-push-image-ghcr }}" == "true" ]; then
             if [ "${{ inputs.enable-build-image-apiserver-tar }}" == "true" ]; then
               ./tools/build/run.sh push-image --apiserver https://ghcr.io
@@ -449,3 +454,11 @@ jobs:
               ./tools/build/run.sh push-image --executor-native https://ghcr.io
             fi
           fi
+
+      - name: Debugging 7
+        run: |
+          echo "---------- DEBUG OUTPUT. ----------"
+          echo "    disk usage: \n$(df -h)"
+          echo "  memory usage: \n$(free -h)"
+          echo "     cpu usage: \n$(top -n 1)"
+          echo "        images: \n$(docker images)"
