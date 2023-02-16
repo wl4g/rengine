@@ -76,10 +76,10 @@ on:
         required: false
         type: boolean
         default: true
-      enable-push-image-ghcr:
-        required: false
-        type: boolean
-        default: true
+      #enable-push-image-ghcr:
+      #  required: false
+      #  type: boolean
+      #  default: true
     secrets: ## see:https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-of-onworkflow_callsecrets
       PERSONAL_ACCESS_TOKEN:
         description: 'A developer personal token from the caller workflow'
@@ -239,7 +239,7 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: ${{ inputs.java }}
-          server-id: ossrh
+          server-id: sonatype-nexus-staging # It is just a common name, as long as it corresponds to pom.xml
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
           #server-username: ${{ secrets.OSSRH_USERNAME }}
@@ -391,7 +391,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Push image to Docker Hub Registry
+      - name: Push to Docker Hub Registry
         if: ${{ inputs.enable-build == true && inputs.enable-push-image-dockerhub == true }}
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -422,38 +422,41 @@ jobs:
             fi
           fi
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        if: ${{ inputs.enable-build == true && inputs.enable-push-image-ghcr == true }}
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }} # github.repository_owner
-          ## see:https://docs.github.com/en/actions/security-guides/automatic-token-authentication
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Push image to Github Container Registry
-        if: ${{ inputs.enable-build == true && inputs.enable-push-image-ghcr == true }}
-        run: |
-          if [ "${{ inputs.enable-push-image-ghcr }}" == "true" ]; then
-            if [ "${{ inputs.enable-build-image-apiserver-tar }}" == "true" ]; then
-              ./tools/build/run.sh push-image --apiserver https://ghcr.io
-            fi
-            if [ "${{ inputs.enable-build-image-apiserver-springjar }}" == "true" ]; then
-              echo "Unsupported push controller (springjar) to Github Container Registry."; exit 1
-            fi
-            if [ "${{ inputs.enable-build-image-controller-tar }}" == "true" ]; then
-              ./tools/build/run.sh push-image --controller https://ghcr.io
-            fi
-            if [ "${{ inputs.enable-build-image-controller-springjar }}" == "true" ]; then
-              echo "Unsupported push controller (springjar) to Github Container Registry."; exit 1
-            fi
-            if [ "${{ inputs.enable-build-image-executor-tar }}" == "true" ]; then
-              ./tools/build/run.sh push-image --executor https://ghcr.io
-            fi
-            if [ "${{ inputs.enable-build-image-executor-native }}" == "true" ]; then
-              ./tools/build/run.sh push-image --executor-native https://ghcr.io
-            fi
-          fi
+      #- name: Login to GitHub Container Registry
+      #  uses: docker/login-action@v2
+      #  if: ${{ inputs.enable-build == true && inputs.enable-push-image-ghcr == true }}
+      #  with:
+      #    registry: ghcr.io
+      #    username: ${{ github.actor }} # github.repository_owner
+      #    ## see:https://docs.github.com/en/actions/security-guides/automatic-token-authentication
+      #    password: ${{ secrets.GITHUB_TOKEN }}
+      #
+      #- name: Push to Github Container Registry
+      #  if: ${{ inputs.enable-build == true && inputs.enable-push-image-ghcr == true }}
+      #  env:
+      #    DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      #    DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      #  run: |
+      #    if [ "${{ inputs.enable-push-image-ghcr }}" == "true" ]; then
+      #      if [ "${{ inputs.enable-build-image-apiserver-tar }}" == "true" ]; then
+      #        ./tools/build/run.sh push-image --apiserver https://ghcr.io
+      #      fi
+      #      if [ "${{ inputs.enable-build-image-apiserver-springjar }}" == "true" ]; then
+      #        echo "Unsupported push controller (springjar) to Github Container Registry."; exit 1
+      #      fi
+      #      if [ "${{ inputs.enable-build-image-controller-tar }}" == "true" ]; then
+      #        ./tools/build/run.sh push-image --controller https://ghcr.io
+      #      fi
+      #      if [ "${{ inputs.enable-build-image-controller-springjar }}" == "true" ]; then
+      #        echo "Unsupported push controller (springjar) to Github Container Registry."; exit 1
+      #      fi
+      #      if [ "${{ inputs.enable-build-image-executor-tar }}" == "true" ]; then
+      #        ./tools/build/run.sh push-image --executor https://ghcr.io
+      #      fi
+      #      if [ "${{ inputs.enable-build-image-executor-native }}" == "true" ]; then
+      #        ./tools/build/run.sh push-image --executor-native https://ghcr.io
+      #      fi
+      #    fi
 
       - name: Debugging 7
         run: |
