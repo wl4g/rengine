@@ -138,7 +138,8 @@ public class LifecycleExecutionService {
 
         // Calculate the effective timeout time (ms), minus the network
         // transmission time-consuming deviation.
-        final long effectiveTimeoutMs = (long) ((long) workflowExecuteRequest.getTimeout() * (1 - config.executeTimeoutOffsetRate()));
+        final long effectiveTimeoutMs = (long) ((long) workflowExecuteRequest.getTimeout()
+                * (1 - config.executeTimeoutOffsetRate()));
 
         final Iterator<Entry<String, Future<ResultDescription>>> it = futures.entrySet().iterator();
         if (!latch.await(effectiveTimeoutMs, MILLISECONDS)) { // Timeout(part-done)
@@ -234,9 +235,10 @@ public class LifecycleExecutionService {
                         .increment();
 
                 final WorkflowExecution execution = notNull(getExecution(engine),
-                        "Could not load execution rule engine via %s of '%s'", engine.name(), workflowExecuteRequest.getClientId());
+                        "Could not load execution rule engine via %s of '%s'", engine.name(),
+                        workflowExecuteRequest.getClientId());
 
-                final ResultDescription result = execution.execute(workflowExecuteRequest, workflow);
+                final ResultDescription result = execution.execute(workflowExecuteRequest, workflow, true);
 
                 // Buried-point: success workflowExecuteRequest.
                 meterService.counter(execution_success.getName(), execution_success.getHelp(), MetricsTag.ENGINE, engine.name())
@@ -247,8 +249,8 @@ public class LifecycleExecutionService {
             } catch (Throwable e) {
                 final String errmsg = format(
                         "Failed to execution %s engine of requestId: '%s', clientId: '%s', workflowId: '%s', scenesCode: '%s'. reason: %s",
-                        engine.name(), workflowExecuteRequest.getRequestId(), workflowExecuteRequest.getClientId(), workflow.getId(), scenesCode,
-                        getRootCauseMessage(e));
+                        engine.name(), workflowExecuteRequest.getRequestId(), workflowExecuteRequest.getClientId(),
+                        workflow.getId(), scenesCode, getRootCauseMessage(e));
                 log.error(errmsg, e);
 
                 // Buried-point: failed workflowExecuteRequest.

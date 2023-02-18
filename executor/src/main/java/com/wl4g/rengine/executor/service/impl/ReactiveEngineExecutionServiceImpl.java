@@ -163,7 +163,7 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
                     .build();
 
             final ResultDescription result = lifecycleExecutionService.getExecution(rule.getEngine())
-                    .execute(executeRequest, virtualWorkflow.validate());
+                    .execute(executeRequest, virtualWorkflow.validate(), false);
             log.debug("Executed virtual workflow result : {}", result);
 
             return resp.withCode(RetCode.OK)

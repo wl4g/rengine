@@ -129,7 +129,10 @@ public abstract class AbstractScriptEngine implements IEngine {
     }
 
     @NotNull
-    protected List<ObjectResource> loadScriptResources(final @NotNull Long workflowId, final @NotNull RuleWrapper rule) {
+    protected List<ObjectResource> loadScriptResources(
+            final @NotNull Long workflowId,
+            final @NotNull RuleWrapper rule,
+            boolean usingCache) {
         notNullOf(workflowId, "workflowId");
         notNullOf(rule, "rule");
         log.debug("Loading script {} by workflowId: {}, ruleId: {}", workflowId, rule.getId());
@@ -138,7 +141,8 @@ public abstract class AbstractScriptEngine implements IEngine {
         return safeList(rule.getEffectiveLatestScript().getUploads()).stream().map(upload -> {
             try {
                 return minioManager.loadObject(UploadType.of(upload.getUploadType()), upload.getObjectPrefix(), workflowId,
-                        ExtensionType.of(upload.getExtension()).isBinary(), engineConfig.executorScriptCachedExpire());
+                        ExtensionType.of(upload.getExtension()).isBinary(),
+                        usingCache ? engineConfig.executorScriptCachedExpire() : -1);
             } catch (Exception e) {
                 log.error(format("Unable to load dependency script from MinIO: %s", upload.getObjectPrefix()), e);
                 throw new IllegalStateException(e); // fast-fail:Stay-Strongly-Consistent

@@ -29,5 +29,8 @@ import com.wl4g.rengine.common.model.WorkflowExecuteResult.ResultDescription;
  * @since v1.0.0
  */
 public interface WorkflowExecution {
-    ResultDescription execute(final @NotNull ExecuteRequest executeRequest, final @NotNull WorkflowWrapper workflow);
+    ResultDescription execute(
+            final @NotNull ExecuteRequest executeRequest,
+            final @NotNull WorkflowWrapper workflow,
+            final boolean usingCache);
 }

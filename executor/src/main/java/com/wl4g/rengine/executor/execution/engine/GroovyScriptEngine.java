@@ -76,7 +76,10 @@
 //
 //    @SuppressWarnings("unchecked")
 //    @Override
-//    public ScriptResult execute(final WorkflowExecuteRequest workflowExecuteRequest, final Scenes scenes) {
+//    public ScriptResult execute(
+//            final WorkflowExecuteRequest workflowExecuteRequest,
+//            final Scenes scenes,
+//            boolean usingCache) {
 //        log.debug("Execution Groovy script for scenesCode: {} ...", scenes.getScenesCode());
 //
 //        try {

@@ -29,6 +29,8 @@ import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
  * @since v1.0.0
  */
 public interface IEngine {
-
-    ScriptResult execute(@NotNull final ExecutionGraphContext graphContext, @NotNull final RuleWrapper rule);
+    ScriptResult execute(
+            @NotNull final ExecutionGraphContext graphContext,
+            @NotNull final RuleWrapper rule,
+            final boolean usingCache);
 }

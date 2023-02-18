@@ -120,10 +120,10 @@ function do_configure_gpg() {
     fi
 
     \rm -rf ~/.gnupg/; mkdir -p ~/.gnupg/private-keys-v1.d/; chmod -R 700 ~/.gnupg/
-    echo -n "$MAVEN_GPG_PRIVATE_KEY" > ~/tmp/private.key
+    echo -n "$MAVEN_GPG_PRIVATE_KEY" > /tmp/private.key
 
     #logDebug "----- Print GPG secret key (debug) -----"
-    #cat ~/tmp/private.key
+    #cat /tmp/private.key
 
     # FIXED:https://github.com/keybase/keybase-issues/issues/2798#issue-205008630
     #export GPG_TTY=$(tty) # Notice: github action the VM instance no tty.
@@ -133,10 +133,10 @@ function do_configure_gpg() {
     # Note that since Version 2.0 this passphrase is only used if the option --batch has also
     # been given. Since Version 2.1 the --pinentry-mode also needs to be set to loopback.
     # see:https://www.gnupg.org/documentation/manuals/gnupg/GPG-Esoteric-Options.html#index-allow_002dsecret_002dkey_002dimport
-    gpg2 -v --pinentry-mode loopback --batch --secret-keyring ~/.gnupg/secring.gpg --import ~/tmp/private.key
+    gpg2 -v --pinentry-mode loopback --batch --secret-keyring ~/.gnupg/secring.gpg --import /tmp/private.key
 
-    logDebug "Cleanup to ~/tmp/private.key ..."
-    \rm -rf ~/tmp/private.key
+    logDebug "Cleanup to /tmp/private.key ..."
+    \rm -rf /tmp/private.key
     ls -al ~/.gnupg/
 
     logDebug "----- Imported list of GPG secret keys -----"
