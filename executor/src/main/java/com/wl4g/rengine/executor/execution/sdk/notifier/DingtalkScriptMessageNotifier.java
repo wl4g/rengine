@@ -35,6 +35,8 @@ import javax.inject.Singleton;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import org.graalvm.polyglot.HostAccess;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.wl4g.infra.common.notification.MessageNotifier.NotifierKind;
 import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI;
@@ -74,12 +76,13 @@ public class DingtalkScriptMessageNotifier implements ScriptMessageNotifier {
     }
 
     @Override
-    public Object send(final @NotEmpty Map<String, Object> parameter) {
+    public @HostAccess.Export Object send(final @NotEmpty Map<String, Object> parameter) {
         notEmptyOf(parameter, "parameter");
         try {
             MeterUtil.counter(execution_sdk_notifier_total, kind(), METHOD_SEND);
             return MeterUtil.timer(execution_sdk_notifier_time, kind(), METHOD_SEND, () -> {
-                // final DingtalkConfig engineConfig = loadCurrentDingtalkConfig();
+                // final DingtalkConfig engineConfig =
+                // loadCurrentDingtalkConfig();
 
                 // Load the currently refreshed valid accessToken.
                 final String accessToken = getRequiredRefreshed().getAccessToken();
@@ -102,7 +105,8 @@ public class DingtalkScriptMessageNotifier implements ScriptMessageNotifier {
         try {
             MeterUtil.counter(execution_sdk_notifier_total, kind(), METHOD_CREATESCENEGROUPV2);
             return MeterUtil.timer(execution_sdk_notifier_time, kind(), METHOD_CREATESCENEGROUPV2, () -> {
-                // final DingtalkConfig engineConfig = loadCurrentDingtalkConfig();
+                // final DingtalkConfig engineConfig =
+                // loadCurrentDingtalkConfig();
 
                 // Load the currently refreshed valid accessToken.
                 final String accessToken = getRequiredRefreshed().getAccessToken();

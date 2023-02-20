@@ -48,6 +48,7 @@ import javax.validation.constraints.NotNull;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.bson.Document;
+import org.graalvm.polyglot.HostAccess;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
@@ -128,7 +129,7 @@ public class GlobalMessageNotifierManager {
         this.localRefreshedCache = new FastRefreshedLocalCache();
     }
 
-    public ScriptMessageNotifier obtain(final @NotNull NotifierKind notifierType) {
+    public @HostAccess.Export ScriptMessageNotifier obtain(final @NotNull NotifierKind notifierType) {
         try {
             MeterUtil.counter(execution_sdk_notifier_manager_total, notifierType, METHOD_OBTAIN);
             return MeterUtil.timer(execution_sdk_notifier_manager_time, notifierType, METHOD_OBTAIN, () -> {

@@ -34,6 +34,8 @@ import javax.inject.Singleton;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import org.graalvm.polyglot.HostAccess;
+
 import com.wl4g.infra.common.notification.MessageNotifier.NotifierKind;
 import com.wl4g.rengine.common.entity.Notification;
 import com.wl4g.rengine.common.entity.Notification.EmailConfig;
@@ -75,7 +77,7 @@ public class EmailScriptMessageNotifier implements ScriptMessageNotifier {
     }
 
     @Override
-    public Object send(final @NotEmpty Map<String, Object> parameter) {
+    public @HostAccess.Export Object send(final @NotEmpty Map<String, Object> parameter) {
         try {
             MeterUtil.counter(execution_sdk_notifier_total, kind(), METHOD_SEND);
             return MeterUtil.timer(execution_sdk_notifier_time, kind(), METHOD_SEND, () -> {

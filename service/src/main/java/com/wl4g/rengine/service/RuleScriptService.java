@@ -19,6 +19,7 @@ import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
+import com.wl4g.rengine.common.entity.Rule.RuleEngine;
 import com.wl4g.rengine.common.entity.RuleScript;
 import com.wl4g.rengine.common.model.RuleScriptExecuteRequest;
 import com.wl4g.rengine.common.model.RuleScriptExecuteResult;
@@ -27,6 +28,7 @@ import com.wl4g.rengine.service.model.RuleScriptDeleteResult;
 import com.wl4g.rengine.service.model.RuleScriptQuery;
 import com.wl4g.rengine.service.model.RuleScriptSave;
 import com.wl4g.rengine.service.model.RuleScriptSaveResult;
+import com.wl4g.rengine.service.util.RuleScriptParser.ScriptASTInfo;
 
 /**
  * {@link RuleScriptScriptService}
@@ -38,6 +40,8 @@ import com.wl4g.rengine.service.model.RuleScriptSaveResult;
 public interface RuleScriptService {
 
     PageHolder<RuleScript> query(@NotNull RuleScriptQuery model);
+
+    ScriptASTInfo parse(@NotNull RuleEngine engine, @NotNull Long scriptId);
 
     RuleScriptSaveResult save(@NotNull RuleScriptSave model);
 

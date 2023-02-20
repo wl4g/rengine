@@ -38,6 +38,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import org.graalvm.polyglot.HostAccess;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.wl4g.infra.common.jedis.JedisClient;
 import com.wl4g.infra.common.jedis.JedisClientBuilder;
@@ -99,7 +101,7 @@ public class RedisSourceFacade implements DataSourceFacade {
         }
     }
 
-    public JsonNode get(final @NotBlank String key) {
+    public @HostAccess.Export JsonNode get(final @NotBlank String key) {
         hasTextOf(key, "key");
         checkPermission(key, false);
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.REDIS, METHOD_GET);
@@ -115,7 +117,7 @@ public class RedisSourceFacade implements DataSourceFacade {
         }
     }
 
-    public String set(final @NotBlank String key, final Object value) {
+    public @HostAccess.Export String set(final @NotBlank String key, final Object value) {
         hasTextOf(key, "key");
         checkPermission(key, true);
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.REDIS, METHOD_SET);
@@ -135,7 +137,7 @@ public class RedisSourceFacade implements DataSourceFacade {
         }
     }
 
-    public String setex(final @NotBlank String key, final Object value, final @Min(-2) long seconds) {
+    public @HostAccess.Export String setex(final @NotBlank String key, final Object value, final @Min(-2) long seconds) {
         hasTextOf(key, "key");
         checkPermission(key, true);
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.REDIS, METHOD_SETEX);
@@ -155,12 +157,12 @@ public class RedisSourceFacade implements DataSourceFacade {
         }
     }
 
-    public Long setnx(final @NotBlank String key, final Object value) {
+    public @HostAccess.Export Long setnx(final @NotBlank String key, final Object value) {
         checkPermission(key, true);
         return setnxex(key, value, Long.MAX_VALUE);
     }
 
-    public Long setnxex(final @NotBlank String key, final Object value, final @Min(-2) long seconds) {
+    public @HostAccess.Export Long setnxex(final @NotBlank String key, final Object value, final @Min(-2) long seconds) {
         hasTextOf(key, "key");
         checkPermission(key, true);
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.REDIS, METHOD_SETNXEX);
@@ -187,7 +189,7 @@ public class RedisSourceFacade implements DataSourceFacade {
         }
     }
 
-    public Long del(final @NotBlank String key) {
+    public @HostAccess.Export Long del(final @NotBlank String key) {
         hasTextOf(key, "key");
         checkPermission(key, true);
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.REDIS, METHOD_DEL);
@@ -203,7 +205,7 @@ public class RedisSourceFacade implements DataSourceFacade {
         }
     }
 
-    public Long expire(final @NotBlank String key, final @Min(-2) long seconds) {
+    public @HostAccess.Export Long expire(final @NotBlank String key, final @Min(-2) long seconds) {
         hasTextOf(key, "key");
         checkPermission(key, true);
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.REDIS, METHOD_EXPIRE);
@@ -219,7 +221,7 @@ public class RedisSourceFacade implements DataSourceFacade {
         }
     }
 
-    public Map<String, JsonNode> hgetAll(final @NotBlank String key) {
+    public @HostAccess.Export Map<String, JsonNode> hgetAll(final @NotBlank String key) {
         hasTextOf(key, "key");
         checkPermission(key, false);
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.REDIS, METHOD_HGETALL);
@@ -238,7 +240,7 @@ public class RedisSourceFacade implements DataSourceFacade {
         }
     }
 
-    public JsonNode hget(final @NotBlank String key, final @NotBlank String field) {
+    public @HostAccess.Export JsonNode hget(final @NotBlank String key, final @NotBlank String field) {
         hasTextOf(key, "key");
         hasTextOf(field, "field");
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.REDIS, METHOD_HGET);
@@ -254,7 +256,7 @@ public class RedisSourceFacade implements DataSourceFacade {
         }
     }
 
-    public Long hset(final @NotBlank String key, final @NotBlank String field, final Object value) {
+    public @HostAccess.Export Long hset(final @NotBlank String key, final @NotBlank String field, final Object value) {
         hasTextOf(key, "key");
         hasTextOf(field, "field");
         checkPermission(key, false);
@@ -275,7 +277,7 @@ public class RedisSourceFacade implements DataSourceFacade {
         }
     }
 
-    public Long hsetnx(final @NotBlank String key, final @NotBlank String field, final Object value) {
+    public @HostAccess.Export Long hsetnx(final @NotBlank String key, final @NotBlank String field, final Object value) {
         hasTextOf(key, "key");
         hasTextOf(field, "field");
         checkPermission(key, true);
@@ -296,7 +298,7 @@ public class RedisSourceFacade implements DataSourceFacade {
         }
     }
 
-    public Object eval(final @NotBlank String script, int keyCount, String... params) {
+    public @HostAccess.Export Object eval(final @NotBlank String script, int keyCount, String... params) {
         hasTextOf(script, "script");
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.REDIS, METHOD_EVAL);
         try {

@@ -19,6 +19,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
+import javax.validation.constraints.NotNull;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
+import com.wl4g.rengine.common.entity.Rule.RuleEngine;
 import com.wl4g.rengine.common.entity.RuleScript;
 import com.wl4g.rengine.common.model.RuleScriptExecuteRequest;
 import com.wl4g.rengine.common.model.RuleScriptExecuteResult;
@@ -36,6 +39,7 @@ import com.wl4g.rengine.service.model.RuleScriptDeleteResult;
 import com.wl4g.rengine.service.model.RuleScriptQuery;
 import com.wl4g.rengine.service.model.RuleScriptSave;
 import com.wl4g.rengine.service.model.RuleScriptSaveResult;
+import com.wl4g.rengine.service.util.RuleScriptParser.ScriptASTInfo;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -68,6 +72,18 @@ public class RuleScriptController {
         log.debug("called: model={}", model);
         RespBase<PageHolder<RuleScript>> resp = RespBase.create();
         resp.setData(ruleScriptService.query(model));
+        return resp;
+    }
+
+    // @SecurityRequirement(name = "default_oauth")
+    @Operation(description = "Query rule scripts.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful",
+            content = { @Content(mediaType = "application/json") }) })
+    @RequestMapping(path = { "parse" }, method = { GET })
+    public RespBase<ScriptASTInfo> parse(@NotNull RuleEngine engine, @NotNull Long scriptId) {
+        log.debug("called: engine={}, scriptId={}", engine, scriptId);
+        RespBase<ScriptASTInfo> resp = RespBase.create();
+        resp.setData(ruleScriptService.parse(engine, scriptId));
         return resp;
     }
 

@@ -15,16 +15,25 @@
  */
 package com.wl4g.rengine.service.impl;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.infra.common.resource.ResourceUtils2.getResourceString;
+import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_BASE;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_INTERNAL_RULESCRIPT;
+import static com.wl4g.rengine.common.constants.ServiceRengineConstants.RULE_SCRIPT_LOOKUP_FILTER_WITH_UNIT_RUN;
 import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
+import org.bson.conversions.Bson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -34,10 +43,16 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.collect.Lists;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.model.Aggregates;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.collection.multimap.LinkedMultiValueMap;
 import com.wl4g.infra.common.collection.multimap.MultiValueMap;
+import com.wl4g.infra.common.io.ByteStreamUtils;
 import com.wl4g.infra.common.reflect.ParameterizedTypeReference;
 import com.wl4g.infra.common.remoting.HttpEntity;
 import com.wl4g.infra.common.remoting.HttpResponseEntity;
@@ -45,20 +60,31 @@ import com.wl4g.infra.common.remoting.RestClient;
 import com.wl4g.infra.common.remoting.uri.UriComponentsBuilder;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.common.web.rest.RespBase.RetCode;
+import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
+import com.wl4g.rengine.common.entity.Rule.RuleEngine;
 import com.wl4g.rengine.common.entity.RuleScript;
+import com.wl4g.rengine.common.entity.RuleScript.RuleScriptWrapper;
 import com.wl4g.rengine.common.model.RuleScriptExecuteRequest;
 import com.wl4g.rengine.common.model.RuleScriptExecuteResult;
+import com.wl4g.rengine.common.util.BsonEntitySerializers;
 import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.service.RuleScriptService;
 import com.wl4g.rengine.service.config.RengineServiceProperties;
+import com.wl4g.rengine.service.minio.MinioClientManager;
 import com.wl4g.rengine.service.model.RuleScriptDelete;
 import com.wl4g.rengine.service.model.RuleScriptDeleteResult;
 import com.wl4g.rengine.service.model.RuleScriptQuery;
 import com.wl4g.rengine.service.model.RuleScriptSave;
 import com.wl4g.rengine.service.model.RuleScriptSaveResult;
 import com.wl4g.rengine.service.mongo.GlobalMongoSequenceService;
+import com.wl4g.rengine.service.util.RuleScriptParser;
+import com.wl4g.rengine.service.util.RuleScriptParser.ScriptASTInfo;
+import com.wl4g.rengine.service.util.RuleScriptParser.ScriptInfo;
+import com.wl4g.rengine.service.util.RuleScriptParser.TypeInfo;
 
+import io.minio.GetObjectArgs;
+import io.minio.GetObjectResponse;
 import io.netty.handler.codec.http.HttpMethod;
 import lombok.CustomLog;
 
@@ -82,6 +108,9 @@ public class RuleScriptServiceImpl implements RuleScriptService {
     @Autowired
     GlobalMongoSequenceService mongoSequenceService;
 
+    @Autowired
+    MinioClientManager minioClientManager;
+
     @Override
     public PageHolder<RuleScript> query(RuleScriptQuery model) {
         final Query query = new Query(
@@ -98,6 +127,53 @@ public class RuleScriptServiceImpl implements RuleScriptService {
         return new PageHolder<RuleScript>(model.getPageNum(), model.getPageSize())
                 .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.T_RULE_SCRIPTS.getName()))
                 .withRecords(ruleScripts);
+    }
+
+    @Override
+    public ScriptASTInfo parse(final @NotNull RuleEngine engine, final @NotNull Long scriptId) {
+        final List<Bson> aggregates = Lists.newArrayList();
+        aggregates.add(Aggregates.match(Filters.in("_id", scriptId)));
+        RULE_SCRIPT_LOOKUP_FILTER_WITH_UNIT_RUN.stream().forEach(rs -> aggregates.add(rs.asDocument()));
+
+        final MongoCursor<RuleScriptWrapper> cursor = mongoTemplate.getDb()
+                .getCollection(MongoCollectionDefinition.T_RULE_SCRIPTS.getName())
+                .aggregate(aggregates)
+                .map(ruleScriptDoc -> RuleScriptWrapper
+                        .validate(BsonEntitySerializers.fromDocument(ruleScriptDoc, RuleScriptWrapper.class)))
+                .iterator();
+
+        if (!cursor.hasNext()) {
+            throw new IllegalArgumentException(format("Could't to load rule script for %s", scriptId));
+        }
+
+        final RuleScriptWrapper ruleScript = cursor.next();
+        // Load all depends content.
+        final List<ScriptInfo> depends = safeList(ruleScript.getUploads()).stream().map(upload -> {
+            try {
+                final GetObjectArgs args = GetObjectArgs.builder()
+                        .bucket(RengineConstants.DEFAULT_MINIO_BUCKET)
+                        .region(minioClientManager.getConfig().getRegion())
+                        .object(upload.getObjectPrefix())
+                        .build();
+                final GetObjectResponse response = minioClientManager.getMinioClient().getObject(args);
+                try {
+                    final byte[] buf = ByteStreamUtils.copyToByteArray(response);
+                    return new ScriptInfo(upload, buf);
+                } finally {
+                    response.close();
+                }
+            } catch (Throwable ex) {
+                throw new IllegalStateException(ex);
+            }
+        }).collect(toList());
+
+        // Dynamic to parse user depends scripts AST.
+        final ScriptASTInfo scriptAst = RuleScriptParser.parse(scriptId, ruleScript.getRevision(), engine, depends);
+
+        // Add system built JS SDK scripts AST.
+        scriptAst.getTypes().addAll(BUILT_JSSDK_TYPE_LIST);
+
+        return scriptAst;
     }
 
     @Override
@@ -158,7 +234,7 @@ public class RuleScriptServiceImpl implements RuleScriptService {
         final MultiValueMap<String, String> headers = new LinkedMultiValueMap<>(2);
         headers.add("Content-Type", "application/json");
 
-        RespBase<RuleScriptExecuteResult> resp = RespBase.create();
+        final RespBase<RuleScriptExecuteResult> resp = RespBase.create();
         try {
             final HttpResponseEntity<RespBase<RuleScriptExecuteResult>> result = restClient
                     .exchange(UriComponentsBuilder.fromUri(config.getExecutorEndpoint())
@@ -180,5 +256,9 @@ public class RuleScriptServiceImpl implements RuleScriptService {
 
     static final ParameterizedTypeReference<RespBase<RuleScriptExecuteResult>> RULE_EXECUTE_RESULT_TYPE = new ParameterizedTypeReference<>() {
     };
+
+    static final List<TypeInfo> BUILT_JSSDK_TYPE_LIST = parseJSON(getResourceString(null, "META-INF/executor-js-sdk-ast.json"),
+            new TypeReference<List<TypeInfo>>() {
+            });
 
 }

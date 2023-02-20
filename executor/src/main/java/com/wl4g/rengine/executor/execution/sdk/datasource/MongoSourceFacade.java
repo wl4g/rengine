@@ -44,6 +44,7 @@ import org.apache.commons.collections.IteratorUtils;
 import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.graalvm.polyglot.HostAccess;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.mongodb.ConnectionString;
@@ -109,7 +110,9 @@ public class MongoSourceFacade implements DataSourceFacade {
     }
 
     @SuppressWarnings("unchecked")
-    public List<JsonNode> findList(@NotBlank String tableName, @NotNull List<Map<String, Object>> bsonFilters) {
+    public @HostAccess.Export List<JsonNode> findList(
+            @NotBlank String tableName,
+            @NotNull List<Map<String, Object>> bsonFilters) {
         hasTextOf(tableName, "tableName");
         notNullOf(bsonFilters, "bsonFilters");
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.MONGO, METHOD_FIND_LIST);
@@ -141,7 +144,9 @@ public class MongoSourceFacade implements DataSourceFacade {
         }
     }
 
-    public Set<Integer> insertMany(@NotBlank String tableName, @NotNull List<Map<String, Object>> bsonEntitys) {
+    public @HostAccess.Export Set<Integer> insertMany(
+            @NotBlank String tableName,
+            @NotNull List<Map<String, Object>> bsonEntitys) {
         hasTextOf(tableName, "tableName");
         notNullOf(bsonEntitys, "bsonEntitys");
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.MONGO, METHOD_INSERT_MANY);
@@ -168,7 +173,7 @@ public class MongoSourceFacade implements DataSourceFacade {
         }
     }
 
-    public Long updateMany(
+    public @HostAccess.Export Long updateMany(
             @NotBlank String tableName,
             @NotNull Map<String, Object> bsonFilter,
             @NotNull List<Map<String, Object>> bsonEntitys) {
@@ -196,7 +201,7 @@ public class MongoSourceFacade implements DataSourceFacade {
         }
     }
 
-    public Long deleteMany(@NotBlank String tableName, @NotNull Map<String, Object> bsonFilter) {
+    public @HostAccess.Export Long deleteMany(@NotBlank String tableName, @NotNull Map<String, Object> bsonFilter) {
         hasTextOf(tableName, "tableName");
         notNullOf(bsonFilter, "bsonFilter");
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.MONGO, METHOD_DELETE_MANY);

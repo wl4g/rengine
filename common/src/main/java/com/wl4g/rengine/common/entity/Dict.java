@@ -61,6 +61,8 @@ public class Dict extends BaseBean {
 
         ENGINE_EXECUTION_CUSTOM_RESP_TPL,
 
+        ENGINE_SYS_LIB_SCRIPT,
+
         API_CONFIG_DEFINITION,
 
         OTHER_TYPE;

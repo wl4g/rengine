@@ -145,7 +145,7 @@ public abstract class QueryHolder {
 
     public static @Nullable Criteria inCriteria(final @NotBlank String fieldName, final @Nullable Object... fieldValues) {
         hasTextOf(fieldName, "fieldName");
-        if (nonNull(fieldValues)) {
+        if (nonNull(fieldValues) && fieldValues.length > 0) {
             return Criteria.where(fieldName).in(fieldValues);
         }
         return null;

@@ -40,6 +40,8 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 @NoArgsConstructor
 public class UploadQuery extends BaseQuery<UploadObject> {
+    // Notice: Although the front end of this default writing method can
+    // also be used like this: xx?uploadIds=11&uploadIds=22
     private @Nullable List<Long> uploadIds;
     private @Nullable UploadObject.UploadType uploadType;
     private @Nullable String extension;

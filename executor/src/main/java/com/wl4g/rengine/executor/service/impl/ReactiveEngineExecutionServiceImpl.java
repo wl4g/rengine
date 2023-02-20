@@ -25,6 +25,11 @@ import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_RULE_SCRIPTS;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_SCENESES;
+import static com.wl4g.rengine.common.constants.ServiceRengineConstants.DEFAULT_DELFLAT_FILTER;
+import static com.wl4g.rengine.common.constants.ServiceRengineConstants.DEFAULT_ENABLE_FILTER;
+import static com.wl4g.rengine.common.constants.ServiceRengineConstants.DEFAULT_PROJECT_FILTER;
+import static com.wl4g.rengine.common.constants.ServiceRengineConstants.RULE_SCRIPT_LOOKUP_FILTER_WITH_UNIT_RUN;
+import static com.wl4g.rengine.common.constants.ServiceRengineConstants.WORKFLOW_LOOKUP_FILTER;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.joining;
@@ -216,7 +221,7 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
 
     @Override
     public Uni<List<RuleScriptWrapper>> findRuleScripts(@NotEmpty List<Long> ruleScriptIds) {
-        notEmptyOf(ruleScriptIds, "ruleScriptId");
+        notEmptyOf(ruleScriptIds, "ruleScriptIds");
 
         final List<Bson> aggregates = Lists.newArrayList();
         aggregates.add(Aggregates.match(Filters.in("_id", ruleScriptIds)));

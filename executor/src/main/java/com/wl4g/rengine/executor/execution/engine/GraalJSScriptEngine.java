@@ -151,7 +151,7 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
                     graalContext.eval(Source.newBuilder("js", script.readToString(), scriptName).build());
                 } catch (PolyglotException e) {
                     throw new EvaluationException(traceId, clientId, workflowId,
-                            format("Unable to parse JS dependency of '%s', workflowId: %s", scriptName, workflowId), e);
+                            format("Unable to parse JS depends of '%s', workflowId: %s", scriptName, workflowId), e);
                 }
             }
 
