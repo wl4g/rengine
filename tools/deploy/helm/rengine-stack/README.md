@@ -77,22 +77,27 @@ kubectl -n rengine create secret docker-registry ccr-tencentcloud-secret \
 
 ```bash
 helm -n rengine upgrade --install --create-namespace rengine rengine-stack --set="\
-rengine-manager.image.baselineTag=1.0.0,\
-rengine-evaluator.image.baselineTag=1.0.0
+rengine-apiserver.image.baselineTag=1.0.0,\
+rengine-controller.image.baselineTag=1.0.0,\
+rengine-executor.image.baselineTag=1.0.0
 ```
 
 + Step 4: Upgrade deploying using canary mode. (weighted by traffic)
 
 ```bash
 helm -n rengine upgrade --install --create-namespace rengine rengine-stack --set="\
-rengine-manager.image.baselineTag=1.0.0,\
-rengine-manager.image.upgradeTag=1.0.1,\
-rengine-evaluator.image.baselineTag=1.0.0,\
-rengine-evaluator.image.upgradeTag=1.0.1,\
-rengine-manager.governance.istio.ingress.http.canary.baseline.weight=80,\
-rengine-manager.governance.istio.ingress.http.canary.upgrade.weight=20,\
-rengine-evaluator.governance.istio.ingress.http.canary.baseline.weight=80,\
-rengine-evaluator.governance.istio.ingress.http.canary.upgrade.weight=20,\
+rengine-apiserver.image.baselineTag=1.0.0,\
+rengine-apiserver.image.upgradeTag=1.0.1,\
+rengine-controller.image.baselineTag=1.0.0,\
+rengine-controller.image.upgradeTag=1.0.1,\
+rengine-executor.image.baselineTag=1.0.0,\
+rengine-executor.image.upgradeTag=1.0.1,\
+rengine-apiserver.governance.istio.ingress.http.canary.baseline.weight=80,\
+rengine-apiserver.governance.istio.ingress.http.canary.upgrade.weight=20,\
+rengine-controller.governance.istio.ingress.http.canary.baseline.weight=80,\
+rengine-controller.governance.istio.ingress.http.canary.upgrade.weight=20,\
+rengine-executor.governance.istio.ingress.http.canary.baseline.weight=80,\
+rengine-executor.governance.istio.ingress.http.canary.upgrade.weight=20,\
 global.components.jaeger.internal.enabled=true,\
 global.components.redis.internal.enabled=true,\
 global.components.zookeeper.internal.enabled=true,\
@@ -104,14 +109,18 @@ global.components.mysql.internal.enabled=true"
 
 ```bash
 helm -n rengine upgrade --install --create-namespace rengine rengine-stack --set="\
-rengine-manager.image.baselineTag=1.0.1,\
-rengine-manager.image.upgradeTag=,\
-rengine-evaluator.image.baselineTag=1.0.1,\
-rengine-evaluator.image.upgradeTag=,\
-rengine-manager.governance.istio.ingress.http.canary.baseline.weight=100,\
-rengine-manager.governance.istio.ingress.http.canary.upgrade.weight=0,\
-rengine-evaluator.governance.istio.ingress.http.canary.baseline.weight=100,\
-rengine-evaluator.governance.istio.ingress.http.canary.upgrade.weight=0,\
+rengine-apiserver.image.baselineTag=1.0.1,\
+rengine-apiserver.image.upgradeTag=,\
+rengine-controller.image.baselineTag=1.0.1,\
+rengine-controller.image.upgradeTag=,\
+rengine-executor.image.baselineTag=1.0.1,\
+rengine-executor.image.upgradeTag=,\
+rengine-apiserver.governance.istio.ingress.http.canary.baseline.weight=100,\
+rengine-apiserver.governance.istio.ingress.http.canary.upgrade.weight=0,\
+rengine-controller.governance.istio.ingress.http.canary.baseline.weight=100,\
+rengine-controller.governance.istio.ingress.http.canary.upgrade.weight=0,\
+rengine-executor.governance.istio.ingress.http.canary.baseline.weight=100,\
+rengine-executor.governance.istio.ingress.http.canary.upgrade.weight=0,\
 global.components.jaeger.internal.enabled=true,\
 global.components.redis.internal.enabled=true,\
 global.components.zookeeper.internal.enabled=true,\
@@ -131,16 +140,17 @@ helm dependency build
 helm dependency update
 
 helm dependency list
-NAME            VERSION     REPOSITORY                                  STATUS
-rengine-manager         ~0.1.0      file://charts/rengine-manager                       ok
-rengine-evaluator      ~0.1.0      file://charts/rengine-evaluator                    ok
-jaeger          ~0.57.1     https://jaegertracing.github.io/helm-charts ok    
-jaeger-operator ~2.33.0     https://jaegertracing.github.io/helm-charts ok    
-kafka           ~18.0.3     https://charts.bitnami.com/bitnami          ok    
-redis           ~17.0.x     https://charts.bitnami.com/bitnami          ok    
-mysql           ~9.2.x      https://charts.bitnami.com/bitnami          ok    
-mongodb         ~12.1.27    https://charts.bitnami.com/bitnami          ok    
-minio           ~11.7.13    https://charts.bitnami.com/bitnami          ok
+NAME               VERSION     REPOSITORY                                  STATUS
+rengine-apiserver  ~1.0.0      file://charts/rengine-apiserver             ok
+rengine-controller ~1.0.0      file://charts/rengine-apiserver             ok
+rengine-executor   ~1.0.0      file://charts/rengine-executor              ok
+jaeger             ~0.57.1     https://jaegertracing.github.io/helm-charts ok    
+jaeger-operator    ~2.33.0     https://jaegertracing.github.io/helm-charts ok    
+kafka              ~18.0.3     https://charts.bitnami.com/bitnami          ok    
+redis              ~17.0.x     https://charts.bitnami.com/bitnami          ok    
+mysql              ~9.2.x      https://charts.bitnami.com/bitnami          ok    
+mongodb            ~12.1.27    https://charts.bitnami.com/bitnami          ok    
+minio              ~11.7.13    https://charts.bitnami.com/bitnami          ok
 ...
 ```
 

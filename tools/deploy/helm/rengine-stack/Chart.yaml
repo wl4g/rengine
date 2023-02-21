@@ -26,11 +26,11 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.1.0
+version: 1.0.0
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application.
-appVersion: 3.0.0
+appVersion: 1.0.0
 
 # Onwer maintainers.
 maintainers:
@@ -43,17 +43,17 @@ maintainers:
 ## Global values see to: https://github.com/wl4g-k8s/helm-doc-zh-cn/blob/master/chart_template_guide/subcharts_and_globals-zh_cn.md#全局-chart-值
 ## Check version matching see to: https://github.com/Masterminds/semver#tilde-range-comparisons-patch
 dependencies:
-  - name: "rengine-manager"
-    condition: rengine-manager.enabled
-    repository: "file://charts/rengine-manager"
+  - name: "rengine-apiserver"
+    condition: rengine-apiserver.enabled
+    repository: "file://charts/rengine-apiserver"
     version: "~0.1.0"
-  - name: "rengine-evaluator"
-    condition: rengine-evaluator.enabled
-    repository: "file://charts/rengine-evaluator"
+  - name: "rengine-executor"
+    condition: rengine-executor.enabled
+    repository: "file://charts/rengine-executor"
     version: "~0.1.0"
-  - name: "rengine-collector"
-    condition: rengine-collector.enabled
-    repository: "file://charts/rengine-collector"
+  - name: "rengine-controller"
+    condition: rengine-controller.enabled
+    repository: "file://charts/rengine-controller"
     version: "~0.1.0"
   - name: "jaeger"
     condition: global.components.jaeger.internal.enabled

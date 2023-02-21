@@ -10,7 +10,7 @@
 
 ## This is the spec definition of application instance deployed in Kubernetes.
 image:
-  repository: wl4g/rengine-evaluator
+  repository: wl4g/rengine-executor
   baselineTag: 1.0.0
   upgradeTag: 
   pullPolicy: IfNotPresent
@@ -235,7 +235,7 @@ governance:
     ## see:https://istio.io/v1.14/docs/reference/config/networking/workload-entry/
     ## see:https://developer.aliyun.com/article/772279
     egress:
-    # - name: iam-data-example-wx-payment
+    # - name: example-wx-payment
     #   namespace:
     #   serviceAccount:
     #   labels:

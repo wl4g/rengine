@@ -1,12 +1,12 @@
 dependencies:
-- name: rengine-manager
-  repository: file://charts/rengine-manager
+- name: rengine-apiserver
+  repository: file://charts/rengine-apiserver
   version: 0.1.0
-- name: rengine-evaluator
-  repository: file://charts/rengine-evaluator
+- name: rengine-executor
+  repository: file://charts/rengine-executor
   version: 0.1.0
-- name: rengine-collector
-  repository: file://charts/rengine-collector
+- name: rengine-controller
+  repository: file://charts/rengine-controller
   version: 0.1.0
 - name: jaeger
   repository: https://jaegertracing.github.io/helm-charts
