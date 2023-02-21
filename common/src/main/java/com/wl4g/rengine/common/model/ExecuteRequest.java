@@ -27,6 +27,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -57,6 +58,7 @@ public class ExecuteRequest extends BaseRequest {
     /**
      * The execution enable tracing mode.
      */
+    @Schema(defaultValue = DEFAULT_TRACE + "")
     @Default
     boolean trace = DEFAULT_TRACE;
 
@@ -65,6 +67,7 @@ public class ExecuteRequest extends BaseRequest {
      * acceptable maximum execution time according to actual needs. Returns
      * immediately if evaluation/feature acquisition and computation times-out.
      */
+    @Schema(defaultValue = DEFAULT_TIMEOUT + "")
     @NotNull
     @Min(1)
     @Default
@@ -80,6 +83,7 @@ public class ExecuteRequest extends BaseRequest {
      * the corresponding error code will be set. </br>
      * refer to: https://mp.weixin.qq.com/s/UG4VJ3HuzcBhjLcmtVpLFw
      */
+    @Schema(defaultValue = DEFAULT_BESTEFFORT + "")
     @NotNull
     @Default
     Boolean bestEffort = DEFAULT_BESTEFFORT;

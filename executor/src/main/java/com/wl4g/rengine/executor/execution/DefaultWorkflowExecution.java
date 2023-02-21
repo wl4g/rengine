@@ -64,7 +64,10 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
     GraalJSScriptEngine graalJSScriptEngine;
 
     @Override
-    public ResultDescription execute(final @NotNull ExecuteRequest executeRequest, final @NotNull WorkflowWrapper workflow) {
+    public ResultDescription execute(
+            final @NotNull ExecuteRequest executeRequest,
+            final @NotNull WorkflowWrapper workflow,
+            final boolean usingCache) {
         workflow.validate();
         final WorkflowGraphWrapper workflowGraph = workflow.getEffectiveLatestGraph();
         final IEngine engine = getEngine(workflow.getEngine());
@@ -89,7 +92,7 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
                 final RuleWrapper rule = Assert2.notNull(ruleMap.get(ruleId),
                         "Rule '%s' is missing. please check workflow graph rules configuration.", ruleId);
 
-                final ScriptResult result = engine.execute(ctx, rule);
+                final ScriptResult result = engine.execute(ctx, rule, usingCache);
                 if (nonNull(result)) {
                     return new ExecutionGraphResult(ReturnState.of(result.getState()), result.getValueMap());
                 }

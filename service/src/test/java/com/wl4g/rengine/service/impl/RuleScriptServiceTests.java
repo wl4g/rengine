@@ -9,28 +9,36 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.executor.execution.engine;
+package com.wl4g.rengine.service.impl;
 
-import javax.validation.constraints.NotNull;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
-import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
-import com.wl4g.rengine.common.graph.ExecutionGraphContext;
-import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
+import com.wl4g.rengine.service.util.TestDefaultMongoSetup;
 
 /**
- * {@link IEngine}
+ * {@link RuleScriptParserTests}
  * 
  * @author James Wong
- * @version 2022-09-22
+ * @version 2023-02-14
  * @since v1.0.0
  */
-public interface IEngine {
-    ScriptResult execute(
-            @NotNull final ExecutionGraphContext graphContext,
-            @NotNull final RuleWrapper rule,
-            final boolean usingCache);
+public class RuleScriptServiceTests {
+
+    static RuleScriptServiceImpl ruleScriptService;
+
+    @BeforeClass
+    public static void init() {
+        ruleScriptService = new RuleScriptServiceImpl();
+        ruleScriptService.mongoTemplate = TestDefaultMongoSetup.createMongoTemplate();
+    }
+
+    @Test
+    public void testQuery() {
+    }
+
 }

@@ -106,9 +106,9 @@ public class UploadObject extends BaseBean {
     @AllArgsConstructor
     public static enum UploadType {
 
-        USER_LIBRARY_WITH_GROOVY("library/groovy", asList(ExtensionType.GROOVY, ExtensionType.JAR)),
-
         USER_LIBRARY_WITH_JS("library/js", asList(ExtensionType.JS, ExtensionType.TS, ExtensionType.MJS)),
+
+        USER_LIBRARY_WITH_GROOVY("library/groovy", asList(ExtensionType.GROOVY, ExtensionType.JAR)),
 
         TEST_DATASET("testset/csv", asList(ExtensionType.CSV)),
 

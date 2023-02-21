@@ -17,6 +17,7 @@ package com.wl4g.rengine.service.model;
 
 import javax.validation.constraints.NotNull;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,5 +40,6 @@ import lombok.experimental.SuperBuilder;
 public class WorkflowGraphLogfile {
     private @NotNull Long workflowId;
     private @NotNull @Default Long startPos = 0L;
+    @Schema(defaultValue = "1024")
     private @NotNull @Default Integer limit = 1024;
 }

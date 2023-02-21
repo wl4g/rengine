@@ -137,28 +137,28 @@ public class RengineClient {
     }
 
     public WorkflowExecuteResult execute(
-            @NotNull final WorkflowExecuteRequest workflowExecuteRequest,
+            @NotNull final WorkflowExecuteRequest executeRequest,
             @Nullable Function<FailbackInfo, WorkflowExecuteResult> failback) {
-        notNullOf(workflowExecuteRequest, "executeRequest");
-        hasTextOf(workflowExecuteRequest.getClientId(), "clientId");
-        hasTextOf(workflowExecuteRequest.getClientSecret(), "clientSecret");
-        notEmptyOf(workflowExecuteRequest.getScenesCodes(), "scenesCodes");
-        notNullOf(workflowExecuteRequest.getTimeout(), "timeout");
-        isTrueOf(workflowExecuteRequest.getTimeout() > 0, "timeout>0");
-        notNullOf(workflowExecuteRequest.getBestEffort(), "bestEffort");
-        if (isBlank(workflowExecuteRequest.getRequestId())) {
-            workflowExecuteRequest.setRequestId(IdGenUtils.next());
+        notNullOf(executeRequest, "executeRequest");
+        hasTextOf(executeRequest.getClientId(), "clientId");
+        hasTextOf(executeRequest.getClientSecret(), "clientSecret");
+        notEmptyOf(executeRequest.getScenesCodes(), "scenesCodes");
+        notNullOf(executeRequest.getTimeout(), "timeout");
+        isTrueOf(executeRequest.getTimeout() > 0, "timeout>0");
+        notNullOf(executeRequest.getBestEffort(), "bestEffort");
+        if (isBlank(executeRequest.getRequestId())) {
+            executeRequest.setRequestId(IdGenUtils.next());
         }
         failback = isNull(failback) ? defaultFailback : failback;
 
-        final String requestBody = toJSONString(workflowExecuteRequest);
+        final String requestBody = toJSONString(executeRequest);
         final Request request = new Request.Builder().url(UriComponentsBuilder.fromUri(config.getEndpoint())
                 .path(API_EXECUTOR_EXECUTE_BASE)
                 .path(API_EXECUTOR_EXECUTE_INTERNAL_WORKFLOW)
                 .build()
                 .toString()).post(FormBody.create(requestBody, MediaType.get("application/json"))).build();
         try (final Response response = httpClient.newBuilder()
-                .callTimeout(Duration.ofMillis(workflowExecuteRequest.getTimeout()))
+                .callTimeout(Duration.ofMillis(executeRequest.getTimeout()))
                 .build()
                 .newCall(request)
                 .execute();) {
@@ -167,16 +167,11 @@ public class RengineClient {
                         RESULT_TYPEREF);
                 if (RespBase.isSuccess(result)) {
                     return result.getData();
+                } else {
+                    return handleFailed(executeRequest, failback, result.getMessage());
                 }
             }
-            // Fast failback.
-            if (workflowExecuteRequest.getBestEffort()) {
-                return failback.apply(new FailbackInfo(workflowExecuteRequest, null));
-            }
-            throw new ClientExecuteException(workflowExecuteRequest.getRequestId(), workflowExecuteRequest.getScenesCodes(),
-                    workflowExecuteRequest.getTimeout(), workflowExecuteRequest.getBestEffort(),
-                    format("Engine execution failed, but you can set 'bestEffort=true' to force return a fallback result."));
-
+            return handleFailed(executeRequest, failback, response.message());
         } catch (Throwable ex) {
             final String errmsg = format("Could not to execution for '%s'", requestBody);
             if (log.isDebugEnabled()) {
@@ -184,12 +179,24 @@ public class RengineClient {
             } else {
                 log.error(format("%s. - reason: %s", errmsg, ex.getMessage()));
             }
-            if (workflowExecuteRequest.getBestEffort()) {
-                return failback.apply(new FailbackInfo(workflowExecuteRequest, ex));
+            if (executeRequest.getBestEffort()) {
+                return failback.apply(new FailbackInfo(executeRequest, ex));
             }
-            throw new ClientExecuteException(workflowExecuteRequest.getRequestId(), workflowExecuteRequest.getScenesCodes(),
-                    workflowExecuteRequest.getTimeout(), workflowExecuteRequest.getBestEffort(), ex);
+            throw new ClientExecuteException(executeRequest.getRequestId(), executeRequest.getScenesCodes(),
+                    executeRequest.getTimeout(), executeRequest.getBestEffort(), ex);
         }
+    }
+
+    private static WorkflowExecuteResult handleFailed(
+            @NotNull final WorkflowExecuteRequest executeRequest,
+            @Nullable final Function<FailbackInfo, WorkflowExecuteResult> failback,
+            @Nullable final String errmsg) {
+        if (executeRequest.getBestEffort()) { // Fast failback.
+            return failback.apply(new FailbackInfo(executeRequest, null));
+        }
+        throw new ClientExecuteException(executeRequest.getRequestId(), executeRequest.getScenesCodes(),
+                executeRequest.getTimeout(), executeRequest.getBestEffort(),
+                format("%s. but you can set 'bestEffort=true' to force return a fallback result.", errmsg));
     }
 
     public static class DefaultFailback implements Function<FailbackInfo, WorkflowExecuteResult> {

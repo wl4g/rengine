@@ -7,23 +7,36 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 ##
-## see:https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
+## see:https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-of-jobsjob_idsecrets
 ## see:https://github.com/apache/spark/blob/master/.github/workflows/build_main.yml
 
 name: "Build on Push"
 
 on:
+  ## see:https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#example-including-branches-and-tags
   push:
     branches:
       #- '**'
+      #- 'releases/**' # eg: 'releases/**' will match the refs/heads/releases/10 Git ref.
       - master
-      - 'releases/**'
+      - main
+      - 'feature**'
+      - 'dev**'
+      - 'hotfix**'
+  pull_request:
+    branches:
+      - master
+      - main
+      - 'feature**'
+      - 'dev**'
+      - 'hotfix**'
 
 jobs:
-  call-build-and-test:
+  build-and-test:
     permissions:
       packages: write
-    name: Run
-    uses: './.github/workflows/build_and_test.yaml' ## This the calling to workflow.
-    secrets: ## see:https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-of-jobsjob_idsecrets
-      personal-access-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+    name: Build and test
+    uses: './.github/workflows/run.yaml' ## This the calling to workflow.
+    if: github.repository == 'wl4g/rengine'
+    secrets:
+      PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}

@@ -116,7 +116,7 @@ curl -s -XPOST \
   "clientId": "JVqEpEwIaqkEkeD5",
   "clientSecret": "Uf6nJDyJQHKRP43ycl9vZ9zs7s1nyu77",
   "engine": "JS",
-  "ruleScriptIds": [6150869239922668],
+  "ruleScriptId": 6150869239922668,
   "timeout": 30000,
   "bestEffort": true,
   "args": {

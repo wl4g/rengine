@@ -40,15 +40,15 @@ import com.wl4g.rengine.service.util.TestDefaultRedisTemplateSetup;
  */
 public class ControllerLogServiceTests {
 
-    static ControllerLogServiceImpl scheduleJobLogService;
+    static ControllerLogServiceImpl controllerLogService;
     static MongoTemplate mongoTemplate;
 
     @BeforeClass
     public static void init() {
-        scheduleJobLogService = new ControllerLogServiceImpl();
-        scheduleJobLogService.mongoTemplate = (mongoTemplate = TestDefaultMongoSetup.createMongoTemplate());
-        scheduleJobLogService.redisTemplate = TestDefaultRedisTemplateSetup.createRedisTemplate();
-        scheduleJobLogService.init();
+        controllerLogService = new ControllerLogServiceImpl();
+        controllerLogService.mongoTemplate = (mongoTemplate = TestDefaultMongoSetup.createMongoTemplate());
+        controllerLogService.redisTemplate = TestDefaultRedisTemplateSetup.createRedisTemplate();
+        controllerLogService.init();
     }
 
     @Test
@@ -79,7 +79,7 @@ public class ControllerLogServiceTests {
         final long currentTime = buildDate("2023-02-19 01:00:00").getTime();
         final long retentionHours = 168; // 7 days
         final long purgeUpperTime = currentTime - Duration.ofHours(retentionHours).toMillis();
-        final var result = scheduleJobLogService
+        final var result = controllerLogService
                 .delete(ControllerLogDelete.builder().updateDateUpper(new Date(purgeUpperTime)).retentionCount(3L).build());
         System.out.println("Deleted count: " + result);
         assert result.getDeletedCount() == 6L;

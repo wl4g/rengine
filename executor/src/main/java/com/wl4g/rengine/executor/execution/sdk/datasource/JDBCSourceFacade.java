@@ -38,6 +38,7 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.dbutils.StatementConfiguration;
 import org.apache.commons.dbutils.handlers.MapHandler;
 import org.apache.commons.dbutils.handlers.MapListHandler;
+import org.graalvm.polyglot.HostAccess;
 
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourcePropertiesBase;
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
@@ -88,7 +89,8 @@ public class JDBCSourceFacade implements DataSourceFacade {
         }
     }
 
-    public List<Map<String, Object>> findList(final @NotBlank String sql, final Object... params) throws SQLException {
+    public @HostAccess.Export List<Map<String, Object>> findList(final @NotBlank String sql, final Object... params)
+            throws SQLException {
         hasTextOf(sql, "sql");
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.JDBC, METHOD_FIND_LIST);
 
@@ -105,7 +107,7 @@ public class JDBCSourceFacade implements DataSourceFacade {
         }
     }
 
-    public Map<String, Object> insert(final @NotBlank String sql, final Object... params) throws SQLException {
+    public @HostAccess.Export Map<String, Object> insert(final @NotBlank String sql, final Object... params) throws SQLException {
         hasTextOf(sql, "sql");
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.JDBC, METHOD_INSERT);
 
@@ -121,7 +123,7 @@ public class JDBCSourceFacade implements DataSourceFacade {
         }
     }
 
-    public int[] insertBatch(final @NotBlank String sql, final Object[][] params) throws SQLException {
+    public @HostAccess.Export int[] insertBatch(final @NotBlank String sql, final Object[][] params) throws SQLException {
         hasTextOf(sql, "sql");
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.JDBC, METHOD_INSERT_BATCH);
 
@@ -137,7 +139,7 @@ public class JDBCSourceFacade implements DataSourceFacade {
         }
     }
 
-    public int update(final @NotBlank String sql, Object... params) throws SQLException {
+    public @HostAccess.Export int update(final @NotBlank String sql, Object... params) throws SQLException {
         hasTextOf(sql, "sql");
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.JDBC, METHOD_UPDATE);
 
@@ -153,7 +155,7 @@ public class JDBCSourceFacade implements DataSourceFacade {
         }
     }
 
-    public int[] batch(final @NotBlank String sql, final Object[][] params) throws SQLException {
+    public @HostAccess.Export int[] batch(final @NotBlank String sql, final Object[][] params) throws SQLException {
         hasTextOf(sql, "sql");
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.JDBC, METHOD_BATCH);
 

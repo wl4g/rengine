@@ -82,6 +82,7 @@
         <elasticjob.version>3.0.1</elasticjob.version>
         <curator.version>5.1.0</curator.version>
         <logstash.version>7.2</logstash.version>
+        <okhttp.version>4.10.0</okhttp.version>
         <springdoc-openapi.version>1.6.11</springdoc-openapi.version>
         <!-- Notice: quarkus-2.12.2-netty-4.1.79.Final, quarkus-2.14.3-netty-4.1.82.Final -->
         <netty.version>4.1.82.Final</netty.version>
@@ -259,11 +260,11 @@
                 <artifactId>rengine-job-rabbitmq-hive</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
-            <!-- Spring Cloud -->
+            <!-- Spring Boot -->
             <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud.version}</version>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -343,7 +344,13 @@
                 <artifactId>logstash-logback-encoder</artifactId>
                 <version>${logstash.version}</version>
             </dependency>
-            <!-- GRPC -->
+            <!-- okhttp -->
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${okhttp.version}</version>
+            </dependency>
+            <!-- gRPC -->
             <dependency>
                 <groupId>io.grpc</groupId>
                 <artifactId>grpc-context</artifactId>

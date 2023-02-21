@@ -1400,10 +1400,10 @@
     {"name": "validate", "parameterTypes": []},
     {"name": "setBestEffort", "parameterTypes": ["java.lang.Boolean"]},
     {"name": "setEngine", "parameterTypes": ["com.wl4g.rengine.common.entity.Rule$RuleEngine"]},
-    {"name": "setRuleScriptIds", "parameterTypes": ["java.util.List"]},
+    {"name": "setRuleScriptId", "parameterTypes": ["java.lang.Long"]},
     {"name": "getBestEffort", "parameterTypes": []},
     {"name": "getEngine", "parameterTypes": []},
-    {"name": "getRuleScriptIds", "parameterTypes": []}
+    {"name": "getRuleScriptId", "parameterTypes": []}
   ]
 },
 {

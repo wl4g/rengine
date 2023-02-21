@@ -125,7 +125,10 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
     }
 
     @Override
-    public ScriptResult execute(@NotNull final ExecutionGraphContext graphContext, @NotNull final RuleWrapper rule) {
+    public ScriptResult execute(
+            final @NotNull ExecutionGraphContext graphContext,
+            final @NotNull RuleWrapper rule,
+            final boolean usingCache) {
         final String traceId = hasTextOf(graphContext.getParameter().getTraceId(), "traceId");
         final String clientId = hasTextOf(graphContext.getParameter().getClientId(), "clientId");
         final Long workflowId = notNullOf(graphContext.getParameter().getWorkflowId(), "workflowId");
@@ -137,7 +140,7 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
             final ScriptContext scriptContext = newScriptContext(graphContext);
 
             // Load all scripts dependencies.
-            final List<ObjectResource> scripts = safeList(loadScriptResources(workflowId, rule));
+            final List<ObjectResource> scripts = safeList(loadScriptResources(workflowId, rule, usingCache));
             for (ObjectResource script : scripts) {
                 isTrue(!script.isBinary(), "invalid js dependency lib type");
                 log.debug("Evaling js-dependencys: {}", script.getObjectPrefix());
@@ -148,7 +151,7 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
                     graalContext.eval(Source.newBuilder("js", script.readToString(), scriptName).build());
                 } catch (PolyglotException e) {
                     throw new EvaluationException(traceId, clientId, workflowId,
-                            format("Unable to parse JS dependency of '%s', workflowId: %s", scriptName, workflowId), e);
+                            format("Unable to parse JS depends of '%s', workflowId: %s", scriptName, workflowId), e);
                 }
             }
 

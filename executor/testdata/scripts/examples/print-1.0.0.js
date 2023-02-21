@@ -10,11 +10,10 @@ function process(context) {
     console.info(" context.getParameter().getClientId()    :", context.getParameter().getClientId());
     console.info(" context.getParameter().getTraceId()     :", context.getParameter().getTraceId());
     console.info(" context.getParameter().isTrace()        :", context.getParameter().isTrace());
-    console.info(" context.getParameter().getScenesCode()  :", context.getParameter().getScenesCode());
     console.info(" context.getParameter().getWorkflowId()  :", context.getParameter().getWorkflowId());
     console.info(" context.getParameter().getArgs()        :", JSON.stringify(context.getParameter().getArgs()));
 
     console.info(" context.getAttributes()                 :", JSON.stringify(context.getAttributes()));
 
-    return new ScriptResult(true);
+    return new ScriptResult(true).addValue("finishedTime", DateHolder.currentMillis());
 }

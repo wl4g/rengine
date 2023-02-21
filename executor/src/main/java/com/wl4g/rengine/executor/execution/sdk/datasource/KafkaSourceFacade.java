@@ -37,6 +37,7 @@ import javax.validation.constraints.NotNull;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.graalvm.polyglot.HostAccess;
 
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourcePropertiesBase;
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
@@ -82,11 +83,11 @@ public class KafkaSourceFacade implements DataSourceFacade {
         }
     }
 
-    public void publish(final @NotBlank String topic, final @NotEmpty Map<String, Object> record) {
+    public @HostAccess.Export void publish(final @NotBlank String topic, final @NotEmpty Map<String, Object> record) {
         publish(topic, singletonList(record));
     }
 
-    public void publish(final @NotBlank String topic, final @NotEmpty List<Map<String, Object>> records) {
+    public @HostAccess.Export void publish(final @NotBlank String topic, final @NotEmpty List<Map<String, Object>> records) {
         hasTextOf(topic, "topic");
         notEmptyOf(records, "records");
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.KAFKA, METHOD_PUBLISH);

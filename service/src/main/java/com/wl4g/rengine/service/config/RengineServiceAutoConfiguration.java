@@ -41,7 +41,7 @@ public class RengineServiceAutoConfiguration {
 
     @Bean
     @ConfigurationProperties(prefix = RengineConstants.CONF_PREFIX + ".services")
-    public RengineServiceProperties rengineServiceProperties() {
+    public RengineServiceProperties rengineServiceProperties(@Value("${spring.application.name}") String appName) {
         return new RengineServiceProperties();
     }
 

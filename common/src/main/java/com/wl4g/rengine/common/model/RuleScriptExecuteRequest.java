@@ -15,21 +15,15 @@
  */
 package com.wl4g.rengine.common.model;
 
-import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wl4g.rengine.common.entity.Rule.RuleEngine;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -53,9 +47,8 @@ public class RuleScriptExecuteRequest extends ExecuteRequest {
     @NotNull
     RuleEngine engine;
 
-    @NotEmpty
-    @Default
-    List<Long> ruleScriptIds = new LinkedList<>();
+    @NotNull
+    Long ruleScriptId;
 
     @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
     @JsonIgnore
@@ -76,7 +69,7 @@ public class RuleScriptExecuteRequest extends ExecuteRequest {
     public RuleScriptExecuteRequest validate() {
         super.validate();
         notNullOf(engine, "engine");
-        notEmptyOf(ruleScriptIds, "ruleScriptIds");
+        notNullOf(ruleScriptId, "ruleScriptId");
         return this;
     }
 

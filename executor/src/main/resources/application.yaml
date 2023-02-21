@@ -90,7 +90,7 @@ quarkus:
     file:
       enable: true
       format: '%d{yyyy-dd-mm HH:mm:ss} %-5p [%c{2.}] (%t) %s%e%n'
-      path: /mnt/disk1/log/${quarkus.application.name}/${quarkus.application.name}.log
+      path: /var/log/${quarkus.application.name}/${quarkus.application.name}.log
       async: false
         #queue-length: 128
         #overflow: block # block,discard
@@ -157,7 +157,7 @@ quarkus:
     enable: true
     path: /swagger-ui
     always-include: true
-    title: Rengine Evaluator APIs
+    title: Rengine Executor APIs
     #layout:
     theme: original # original, feeling-blue, flattop, material, monokai, muted, newspaper, outline
     supported-submit-methods: [PUT, POST]
@@ -173,9 +173,9 @@ quarkus:
     #oauth-additional-query-string-params:
   smallrye-openapi:
     path: /openapi
-    info-title: "Rengine Evaluator APIs"
+    info-title: "Rengine Executor APIs"
     info-version: 1.0.0
-    info-description: "Rengine Evaluator APIs Documention"
+    info-description: "Rengine Executor APIs Documention"
     info-terms-of-service: http://swagger.io/terms/
     info-contact-name: "James Wong"
     info-contact-email: "rengine@wl4g.com"
@@ -188,8 +188,8 @@ quarkus:
     add-runner-suffix: true
   ## see:https://quarkus.io/guides/writing-native-applications-tips#supporting-native-in-your-application
   native:
-    #builder-image: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image22.1-java11
-    builder-image: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image@sha256:addda81229f6894774eab0e5159448726952c5e2692f7cf18bda60f86a2a5f7e
+    builder-image: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image:22.1-java11
+    #builder-image: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image@sha256:addda81229f6894774eab0e5159448726952c5e2692f7cf18bda60f86a2a5f7e
     # The graal.js component is not installed. (quarkus-2.12.2)
     #builder-image: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image:22.3-java11
     # The graal.js component is installed. (quarkus-2.14.3)

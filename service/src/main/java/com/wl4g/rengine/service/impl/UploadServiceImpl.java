@@ -19,8 +19,8 @@ import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
+import static com.wl4g.rengine.service.mongo.QueryHolder.inIdsCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isCriteria;
-import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toList;
@@ -72,7 +72,7 @@ public class UploadServiceImpl implements UploadService {
 
     @Override
     public PageHolder<UploadObject> query(UploadQuery model) {
-        final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getUploadId()),
+        final Query query = new Query(andCriteria(baseCriteria(model), inIdsCriteria(safeList(model.getUploadIds()).toArray()),
                 isCriteria("uploadType", model.getUploadType())))
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
@@ -92,12 +92,12 @@ public class UploadServiceImpl implements UploadService {
         // SecurityContextHolder.getContext().getAuthentication();
         // System.out.println(authentication);
 
-        UploadType uploadType = UploadType.of(model.getUploadType());
+        final UploadType uploadType = UploadType.of(model.getUploadType());
         // The precise object prefixes to ensure the creation of STS policy
         // with precise authorized write permissions.
-        String objectPrefix = format("%s/%s/%s", RengineConstants.DEFAULT_MINIO_BUCKET, uploadType.getPrefix(),
+        final String objectPrefix = format("%s/%s/%s", RengineConstants.DEFAULT_MINIO_BUCKET, uploadType.getPrefix(),
                 model.getFilename());
-        UploadObject upload = UploadObject.builder()
+        final UploadObject upload = UploadObject.builder()
                 .uploadType(model.getUploadType())
                 .id(IdGenUtils.nextLong())
                 .objectPrefix(objectPrefix)
@@ -124,7 +124,7 @@ public class UploadServiceImpl implements UploadService {
 
         // New create temporary STS credentials.
         try {
-            Credentials credentials = minioManager.createSTSCredentials(objectPrefix);
+            final Credentials credentials = minioManager.createSTSCredentials(objectPrefix);
             final MinioClientProperties config = minioManager.getConfig();
             return UploadSaveResult.builder()
                     .id(upload.getId())

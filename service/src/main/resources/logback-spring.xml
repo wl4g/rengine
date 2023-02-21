@@ -21,7 +21,7 @@
 	<!-- see:com.wl4g.infra.core.logging.custom.logback.CustomLogbackConfigurer -->
 	<!-- see:org.springframework.boot.logging.logback.DefaultLogbackConfiguration.DefaultLogbackConfiguration -->
 	<appender name="fileout" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>/mnt/disk1/log/${appName}/${appName}.log</file>
+		<file>/var/log/${appName}/${appName}.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
 			<fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
 			<cleanHistoryOnStart>false</cleanHistoryOnStart>

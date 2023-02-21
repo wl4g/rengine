@@ -86,6 +86,10 @@ public abstract class QueryHolder {
         return null;
     }
 
+    public static @Nullable Criteria inIdsCriteria(final @Nullable Object... fieldValues) {
+        return inCriteria(DEFAULT_FIELD_ID, fieldValues);
+    }
+
     public static @Nullable Criteria gteUpdateDateCriteria(final @Nullable Object fieldValue) {
         if (nonNull(fieldValue)) {
             return Criteria.where(DEFAULT_FIELD_UPDATE_DATE).gte(fieldValue);
@@ -139,10 +143,10 @@ public abstract class QueryHolder {
         return null;
     }
 
-    public static @Nullable Criteria inCriteria(final @NotBlank String fieldName, final @Nullable Object fieldValue) {
+    public static @Nullable Criteria inCriteria(final @NotBlank String fieldName, final @Nullable Object... fieldValues) {
         hasTextOf(fieldName, "fieldName");
-        if (nonNull(fieldValue)) {
-            return Criteria.where(fieldName).in(fieldValue);
+        if (nonNull(fieldValues) && fieldValues.length > 0) {
+            return Criteria.where(fieldName).in(fieldValues);
         }
         return null;
     }

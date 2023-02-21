@@ -47,6 +47,7 @@ import javax.validation.constraints.NotNull;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.bson.Document;
+import org.graalvm.polyglot.HostAccess;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
@@ -143,7 +144,7 @@ public final class GlobalDataSourceManager {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends DataSourceFacade> T obtain(
+    public @HostAccess.Export <T extends DataSourceFacade> T obtain(
             final @NotNull DataSourceType dataSourceType,
             final @NotBlank String dataSourceName) {
         try {

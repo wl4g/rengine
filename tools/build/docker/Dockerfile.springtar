@@ -179,7 +179,8 @@
 ##      #export javaOpts=""
 ##      #export javaHeapOpts='-Xms4G -Xmx4G -XX:MaxDirectMemorySize=4G'
 ##      #export javaDumpOpts='-XX:+HeapDumpOnOutOfMemoryError -XX:-OmitStackTraceInFastThrow -XX:HeapDumpPath=${appLogDir}/jvm_dump.hprof'
-##      #export javaGcOpts='-XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:+DisableExplicitGC -Xloggc:${appLogDir}/${appName}-gc.log -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=10 -XX:GCLogFileSize=100M'
+##      ## see:https://github.com/apache/kafka/blob/3.3.1/bin/kafka-run-class.sh#L324
+##      #export javaGcOpts='-XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:+ExplicitGCInvokesConcurrent -XX:+DisableExplicitGC -Xlog:gc*:file=${appLogDir}/${appName}-gc.log:time,tags:filecount=10,filesize=102400'
 ##      docker run -d \
 ##        -e APP_NOHUP=y \
 ##        -e APP_DEBUG=y \
@@ -201,7 +202,9 @@
 
 ## see:https://docs.docker.com/develop/develop-images/multistage-build/
 ## see:https://blogs.wl4g.com/archives/2969
-FROM openjdk:8u212-jre-alpine3.9 AS wl4g_java_base
+## see:https://github.com/docker-library/openjdk/issues/440#issuecomment-733718821
+## see:
+FROM adoptopenjdk/openjdk11:jre-11.0.9_11.1-alpine AS wl4g_java_base
 LABEL maintainer="James Wong<jameswong1376@gmail.com>"
 
 #WORKDIR /tmp/build/base/
@@ -240,7 +243,8 @@ ENV APP_HOME_PARENT "/opt/apps/ecm/${APP_NAME}-package"
 ENV APP_HOME "${APP_HOME_PARENT}/${APP_BIN_NAME}"
 ENV APP_HOME_LINK "${APP_HOME_PARENT}/${APP_NAME}-current"
 ENV APP_DATA "${APP_HOME}/data"
-ENV APP_LOG "${APP_HOME}/log"
+#ENV APP_LOG "${APP_HOME}/log"
+ENV APP_LOG "/var/log/${APP_NAME}"
 
 ##
 ## Installation APP files.
@@ -277,7 +281,8 @@ export JAVA_HEAP_OPTS=\${JAVA_HEAP_OPTS:-\${DEFAULT_JAVA_HEAP_OPTS}}\n\
 export DEFAULT_JAVA_DUMP_OPTS=\"-XX:+HeapDumpOnOutOfMemoryError -XX:-OmitStackTraceInFastThrow -XX:HeapDumpPath=\${APP_LOG}/jvm_dump.hprof\" \n\
 export JAVA_DUMP_OPTS=\${JAVA_DUMP_OPTS:-\${DEFAULT_JAVA_DUMP_OPTS}}\n\
 \
-export DEFAULT_JAVA_GC_OPTS=\"-XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:+DisableExplicitGC -Xloggc:\${APP_LOG}/\${APP_NAME}-gc.log -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=10 -XX:GCLogFileSize=100M\" \n\
+## see:https://github.com/apache/kafka/blob/3.3.1/bin/kafka-run-class.sh#L324
+export DEFAULT_JAVA_GC_OPTS=\"-XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:+ExplicitGCInvokesConcurrent -XX:+DisableExplicitGC -Xlog:gc*:file=\${APP_LOG}/\${APP_NAME}-gc.log:time,tags:filecount=10,filesize=102400\" \n\
 export JAVA_GC_OPTS=\${JAVA_GC_OPTS:-\${DEFAULT_JAVA_GC_OPTS}}\n\
 \
 export JAVA_TOOL_OPTIONS=\${JAVA_TOOL_OPTIONS:-}\n\

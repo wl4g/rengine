@@ -35,23 +35,18 @@ on:
         required: false
         type: string
         default: '{}'
-      jobs:
-        description: >-
-          Jobs to run, and should be in JSON format. The values should be matched with the job's key defined
-          in this file, e.g., build. See precondition job below.
-        required: false
-        type: string
-        default: ''
     secrets: ## see:https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-of-onworkflow_callsecrets
-      personal-access-token:
-        description: 'A token passed from the caller workflow'
+      PERSONAL_ACCESS_TOKEN:
+        description: 'A developer personal token passed from the caller workflow'
         required: false
 
 jobs:
   build-and-test:
+    if: github.repository == 'wl4g/rengine'
+    runs-on: ubuntu-20.04
     permissions:
       packages: write
-    runs-on: ubuntu-20.04
+    timeout-minutes: 10
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -59,7 +54,7 @@ jobs:
           fetch-depth: 1
           repository: wl4g/rengine
           ref: ${{ inputs.branch }}
-          token: ${{ secrets.personal-access-token }}
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
       #- name: Sync the current branch with the latest in Rengine
       #  if: github.repository != 'wl4g/rengine'
