@@ -52,7 +52,6 @@ import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.collection.multimap.LinkedMultiValueMap;
 import com.wl4g.infra.common.collection.multimap.MultiValueMap;
-import com.wl4g.infra.common.io.ByteStreamUtils;
 import com.wl4g.infra.common.reflect.ParameterizedTypeReference;
 import com.wl4g.infra.common.remoting.HttpEntity;
 import com.wl4g.infra.common.remoting.HttpResponseEntity;
@@ -60,7 +59,6 @@ import com.wl4g.infra.common.remoting.RestClient;
 import com.wl4g.infra.common.remoting.uri.UriComponentsBuilder;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.common.web.rest.RespBase.RetCode;
-import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.Rule.RuleEngine;
 import com.wl4g.rengine.common.entity.RuleScript;
@@ -83,8 +81,6 @@ import com.wl4g.rengine.service.util.RuleScriptParser.ScriptASTInfo;
 import com.wl4g.rengine.service.util.RuleScriptParser.ScriptInfo;
 import com.wl4g.rengine.service.util.RuleScriptParser.TypeInfo;
 
-import io.minio.GetObjectArgs;
-import io.minio.GetObjectResponse;
 import io.netty.handler.codec.http.HttpMethod;
 import lombok.CustomLog;
 
@@ -108,8 +104,8 @@ public class RuleScriptServiceImpl implements RuleScriptService {
     @Autowired
     GlobalMongoSequenceService mongoSequenceService;
 
-    @Autowired
-    MinioClientManager minioClientManager;
+    @Autowired(required = false)
+    MinioClientManager minioManager;
 
     @Override
     public PageHolder<RuleScript> query(RuleScriptQuery model) {
@@ -150,15 +146,8 @@ public class RuleScriptServiceImpl implements RuleScriptService {
         // Load all depends content.
         final List<ScriptInfo> depends = safeList(ruleScript.getUploads()).stream().map(upload -> {
             try {
-                final GetObjectArgs args = GetObjectArgs.builder()
-                        .bucket(RengineConstants.DEFAULT_MINIO_BUCKET)
-                        .region(minioClientManager.getConfig().getRegion())
-                        .object(upload.getObjectPrefix())
-                        .build();
-                try (GetObjectResponse response = minioClientManager.getMinioClient().getObject(args);) {
-                    final byte[] buf = ByteStreamUtils.copyToByteArray(response);
-                    return new ScriptInfo(upload, buf);
-                }
+                final byte[] buf = minioManager.getObjectToByteArray(upload.getObjectPrefix());
+                return new ScriptInfo(upload, buf);
             } catch (Throwable ex) {
                 throw new IllegalStateException(ex);
             }

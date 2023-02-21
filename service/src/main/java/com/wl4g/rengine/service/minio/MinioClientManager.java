@@ -27,11 +27,15 @@ import java.security.NoSuchAlgorithmException;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 
+import com.wl4g.infra.common.io.ByteStreamUtils;
 import com.wl4g.infra.common.minio.S3Policy;
 import com.wl4g.infra.common.minio.S3Policy.EffectType;
 import com.wl4g.infra.common.minio.S3Policy.Statement;
+import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.service.minio.MinioClientProperties.UserUploadAssumeConfig;
 
+import io.minio.GetObjectArgs;
+import io.minio.GetObjectResponse;
 import io.minio.MinioClient;
 import io.minio.credentials.AssumeRoleProvider;
 import io.minio.credentials.Credentials;
@@ -56,6 +60,16 @@ public class MinioClientManager implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         // log.info("Initialization ...");
+    }
+
+    public byte[] getObjectToByteArray(final String objectPrefix) throws Exception {
+        try (GetObjectResponse response = getMinioClient().getObject(GetObjectArgs.builder()
+                .bucket(RengineConstants.DEFAULT_MINIO_BUCKET)
+                .region(getConfig().getRegion())
+                .object(objectPrefix)
+                .build());) {
+            return ByteStreamUtils.copyToByteArray(response);
+        }
     }
 
     public Credentials createSTSCredentials(String prefix) throws NoSuchAlgorithmException {
