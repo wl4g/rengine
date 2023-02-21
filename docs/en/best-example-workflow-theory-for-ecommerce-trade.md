@@ -1,12 +1,12 @@
-# Rengine best Aplicaciones Cases
+# Example of the underlying principles of complex workflow graph based on e-commerce recharge trade and send gift.
 
-## The rules workflow for e-commerce/telephone top-up gift giving
+> The following is a real e-commerce/telephone recharge gift case, and its recharge rules are complex and changeable.
 
-- Configuration for business workflow and execution graph are as follows:
+- The business flow as follows:
 
 - ![](../shots/case1.png)
 
-- Testing codes: [ExecutionGraphTests.java#testECommerceTradeWorkflow](../../common/src/test/java/com/wl4g/rengine/common/graph/ExecutionGraphTests.java)
+- The principle core codes for implementing the underlying execution graph is as follows (**pseudocode**):
 
 ```bash
     // ...
@@ -43,3 +43,5 @@
     out.println("-------------------------------------------------------");
     out.println("Executed tracing info : \n" + context.asTraceText(true));
 ```
+
+- see: [ExecutionGraphTests.java#testECommerceTradeWorkflow](../../common/src/test/java/com/wl4g/rengine/common/graph/ExecutionGraphTests.java)

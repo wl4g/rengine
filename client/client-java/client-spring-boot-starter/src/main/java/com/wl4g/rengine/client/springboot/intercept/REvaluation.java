@@ -32,11 +32,11 @@ import com.wl4g.rengine.common.model.WorkflowExecuteResult;
  * 
  * <pre>
  * &#64;Service
- * class MyOrderServiceImpl implements MyOrderService {
+ * public class MyOrderServiceImpl implements MyOrderService {
  * 
  *     &#64;REvaluation(scenesCode = "${scenes_configs.createOrder}", bestEffort = true, paramsTemplate = "{{userId=#0,goodId=#1}}")
  *     &#64;Override
- *     Map<String, String> create2(String userId, String goodId, String address, Integer count) {
+ *     Map<String, String> create(String userId, String goodId, String address, Integer count) {
  *         // Some logical ...
  *     }
  * }
@@ -90,7 +90,25 @@ public @interface REvaluation {
      * @see {@link DefaultREvaluationHandler#parseParamsTemplate(java.util.List, String)}
      * @return
      */
-    String paramsTemplate() default "";
+    String paramsTemplate();
+
+    /**
+     * The assertion expression of the execute result value map.
+     * 
+     * <p>
+     * for example: #{riskScore > 50}
+     * </p>
+     * 
+     * @return
+     */
+    String assertSpel();
+
+    /**
+     * When the result of the assertion fails, an error message is thrown.
+     * 
+     * @return
+     */
+    String assertErrmsg() default "The operation denied by the security manager";
 
     /**
      * When evaluation failure to callback handler.

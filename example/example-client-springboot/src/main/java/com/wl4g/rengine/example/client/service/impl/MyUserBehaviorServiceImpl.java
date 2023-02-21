@@ -47,7 +47,8 @@ public class MyUserBehaviorServiceImpl implements MyUserBehaviorService {
     private @Value("${scenes_configs.behaviorReport}") String behaviorReportScenesCode;
 
     @REvaluation(scenesCode = "${scenes_configs.behaviorReport}", bestEffort = true,
-            paramsTemplate = "{{userId=#0,operationType=#1,observedTime=#1}}", failback = MyFailback.class)
+            paramsTemplate = "{{userId=#0,operationType=#1,observedTime=#1}}", failback = MyFailback.class,
+            assertSpel = "#{validScore > 50}", assertErrmsg = "The report denied by the cleanup filter")
     @Override
     public Map<String, String> report(BehaviorReport report) {
         log.info("Reporting to behavior ...");

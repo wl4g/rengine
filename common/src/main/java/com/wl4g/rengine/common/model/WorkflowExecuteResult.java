@@ -59,7 +59,7 @@ public class WorkflowExecuteResult extends BaseRequest {
 
     @NotNull
     @Default
-    List<ResultDescription> results = new ArrayList<>();
+    List<ResultDescription> results = new ArrayList<>(2);
 
     @Nullable
     String description;

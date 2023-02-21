@@ -48,9 +48,14 @@ public class RengineRiskHandler {
         WorkflowExecuteResult result = rengineClient.execute(singletonList(scenesCode), true, args);
         log.info("Risk checked for result: {}, {} => {}", result, scenesCode, args);
 
-        // Assertion risk evaluation result.
-        if (result.errorCount() > 0) {
-            throw new RengineException(format("Unable to operation, detected risk in your environment."));
+        // Assertion result.
+        if (!result.getResults().isEmpty()) {
+            final Map<String, Object> valueMap = result.getResults().get(0).getValueMap();
+            if (((Number) valueMap.getOrDefault("riskScore", 0d)).doubleValue() > 50d) {
+                throw new RengineException(format("Denied to operation, detected risk in your environment."));
+            } else {
+                log.debug("Check passed.");
+            }
         }
     }
 

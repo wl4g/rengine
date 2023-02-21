@@ -16,6 +16,8 @@
 package com.wl4g.rengine.client.springboot.intercept;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.lang.Assert2.hasText;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.isTrue;
@@ -53,6 +55,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
 import com.wl4g.infra.common.reflect.ObjectInstantiators;
+import com.wl4g.infra.context.utils.expression.SpelExpressions;
 import com.wl4g.rengine.client.core.RengineClient;
 import com.wl4g.rengine.client.core.RengineClient.FailbackInfo;
 import com.wl4g.rengine.client.core.exception.ClientExecuteException;
@@ -71,7 +74,7 @@ import lombok.CustomLog;
 @CustomLog
 public class DefaultREvaluationHandler implements REvaluationHandler<REvaluation> {
 
-    private final Map<Class<?>, Object> failbackCaching = new ConcurrentHashMap<>(16);
+    private final Map<Class<?>, Function<FailbackInfo, WorkflowExecuteResult>> failbackCaching = new ConcurrentHashMap<>(16);
     private @Autowired Environment environment;
     private @Autowired RengineClient rengineClient;
 
@@ -81,39 +84,55 @@ public class DefaultREvaluationHandler implements REvaluationHandler<REvaluation
         final long timeoutMs = annotation.timeout();
         final boolean bestEffort = annotation.bestEffort();
         final String paramsTemplate = annotation.paramsTemplate();
+        final String assertSpel = annotation.assertSpel();
+        final String assertErrmsg = annotation.assertErrmsg();
         final Class<? extends Function<FailbackInfo, WorkflowExecuteResult>> failbackClazz = annotation.failback();
-        hasText(scenesCode, "The evaluation parameter for scenesCode is missing.");
+        hasText(scenesCode, "The evaluation parameter for scenesCode is required.");
         isTrue(timeoutMs > 0, "The evaluation timeoutMs must > 0.");
-        hasText(paramsTemplate, "The evaluation parameter for paramsTemplate is missing.");
+        hasText(paramsTemplate, "The evaluation parameter for paramsTemplate is required.");
+        hasText(assertSpel, "The evaluation result assertion for assertSpel is required.");
+        hasText(assertErrmsg, "The evaluation result assertion for assertErrmsg is required.");
 
         final String requestId = IdGenUtils.next();
         final Function<FailbackInfo, WorkflowExecuteResult> failback = getFailback(failbackClazz);
-        final Map<String, Object> args = buildEvaluateParams(jp, annotation, paramsTemplate);
+        final Map<String, Object> args = buildExecuteParams(jp, annotation, paramsTemplate);
 
-        final WorkflowExecuteResult result = rengineClient.execute(requestId, singletonList(scenesCode), timeoutMs, bestEffort, args,
-                failback);
+        final WorkflowExecuteResult result = rengineClient.execute(requestId, singletonList(scenesCode), timeoutMs, bestEffort,
+                args, failback);
         log.debug("Evaluated of result: {}, {} => {}", result, scenesCode, args);
 
-        // Assertion evaluation result.
-        if (nonNull(result) && result.errorCount() > 0) {
+        // If the execution is wrong, decide whether to throw an exception
+        // according to bestEffort.
+        if (!bestEffort && (isNull(result) || result.errorCount() > 0)) {
             throw new ClientExecuteException(requestId, singletonList(scenesCode), timeoutMs, bestEffort,
-                    format("Unable to operation, detected risk in your environment."));
+                    format("Failed to execute evaluation for %s", args));
+        }
+
+        // Assertion evaluation result.
+        if (nonNull(result) && !safeList(result.getResults()).isEmpty()) {
+            final Map<String, Object> resultMap = safeMap(result.getResults().get(0).getValueMap());
+            final Object asserted = DEFAULT_SPEL.resolve(assertSpel, resultMap);
+            if (asserted instanceof Boolean) {
+                if (!(Boolean) asserted) {
+                    throw new ClientExecuteException(requestId, singletonList(scenesCode), timeoutMs, bestEffort, assertErrmsg);
+                }
+            } else {
+                throw new IllegalStateException(format("Assertion result expression must output boolean. - '%s'", assertSpel));
+            }
         }
 
         return jp.proceed();
     }
 
-    @SuppressWarnings("unchecked")
     protected Function<FailbackInfo, WorkflowExecuteResult> getFailback(
             Class<? extends Function<FailbackInfo, WorkflowExecuteResult>> failbackClazz) {
         if (isNull(failbackClazz)) {
             return null;
         }
-        Function<FailbackInfo, WorkflowExecuteResult> failback = (Function<FailbackInfo, WorkflowExecuteResult>) failbackCaching
-                .get(failbackClazz);
+        Function<FailbackInfo, WorkflowExecuteResult> failback = failbackCaching.get(failbackClazz);
         if (isNull(failback)) {
             synchronized (this) {
-                failback = (Function<FailbackInfo, WorkflowExecuteResult>) failbackCaching.get(failbackClazz);
+                failback = failbackCaching.get(failbackClazz);
                 if (isNull(failback)) {
                     failbackCaching.put(failbackClazz, failback = ObjectInstantiators.newInstance(failbackClazz));
                 }
@@ -122,8 +141,8 @@ public class DefaultREvaluationHandler implements REvaluationHandler<REvaluation
         return failback;
     }
 
-    protected Map<String, Object> buildEvaluateParams(ProceedingJoinPoint jp, REvaluation annotation, String paramsTemplate) {
-        return parseParamsTemplate(safeArrayToList(jp.getArgs()), (MethodSignature) jp.getSignature(), paramsTemplate);
+    protected Map<String, Object> buildExecuteParams(ProceedingJoinPoint jp, REvaluation annotation, String paramsTemplate) {
+        return parseTemplateParams(safeArrayToList(jp.getArgs()), (MethodSignature) jp.getSignature(), paramsTemplate);
     }
 
     /**
@@ -152,10 +171,11 @@ public class DefaultREvaluationHandler implements REvaluationHandler<REvaluation
      * @param paramsTemplate
      * @return
      */
-    public static Map<String, Object> parseParamsTemplate(
+    public static Map<String, Object> parseTemplateParams(
             @NotNull List<Object> arguments,
             @NotNull MethodSignature signature,
             @NotBlank String paramsTemplate) {
+
         notNullOf(arguments, "arguments");
         notNullOf(signature, "signature");
         hasTextOf(paramsTemplate, "paramsTemplate");
@@ -222,4 +242,5 @@ public class DefaultREvaluationHandler implements REvaluationHandler<REvaluation
         return args;
     }
 
+    public static final SpelExpressions DEFAULT_SPEL = SpelExpressions.create();
 }

@@ -64,29 +64,29 @@ Unified and flexible rules engine platform, naturally suitable for scenarios whe
 
 ## Quick start
 
-- [Rengine Architecture](./docs/en/architecture.md)
+- [Architecture](./docs/en/architecture.md)
 
 - [Deploy for standalone](./docs/en/deploy-standalone.md)
 
 - [Deploy for production](./docs/en/deploy-production.md)
 
-- [Configuration for Clients](./docs/en/configuration-client.md)
+- [Configuration for client](./docs/en/configuration-client.md)
 
-- [Configuration for ApiServer](./docs/en/configuration-apiserver.md)
+- [Configuration for apiServer](./docs/en/configuration-apiserver.md)
 
-- [Configuration for Controller](./docs/en/configuration-controller.md)
+- [Configuration for controller](./docs/en/configuration-controller.md)
 
-- [Configuration for Executor](./docs/en/configuration-executor.md)
+- [Configuration for executor](./docs/en/configuration-executor.md)
 
-- [Configuration for Job](./docs/en/configuration-job.md)
+- [Configuration for job](./docs/en/configuration-job.md)
 
-- [Benchmark for Executor](./docs/en/benchmark-executor.md)
+- [Best examples](./docs/en/best-example.md)
 
-- [Best Cases examples](./docs/en/best-cases.md)
+- [Development quide](./docs/en/devel.md)
 
-- [Development Quide](./docs/en/devel.md)
+- [Operation quide](./docs/en/operation.md)
 
-- [Operation Quide](./docs/en/operation.md)
+- [Benchmark for executor](./docs/en/benchmark-executor.md)
 
 ## RoadMap
 
