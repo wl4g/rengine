@@ -176,7 +176,7 @@ jobs:
 
   build-push-image:
     needs: prepares
-    if: github.repository == 'wl4g/rengine'
+    if: github.repository == '${{ inputs.repository }}'
     runs-on: ${{ inputs.runs-on || 'ubuntu-latest' }}
     permissions:
       packages: write
@@ -200,7 +200,7 @@ jobs:
       ## to different container spaces. For example, checkout project files cannot be shared.
       #- name: Build and test
       #  uses: './.github/workflows/build_and_test.yaml'
-      #  if: github.repository == 'wl4g/rengine'
+      #  if: github.repository == '${{ inputs.repository }}'
       #  with:
       #    PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
@@ -213,7 +213,7 @@ jobs:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
       #- name: Sync the current branch with the latest in Rengine
-      #  if: github.repository != 'wl4g/rengine'
+      #  if: github.repository != '${{ inputs.repository }}'
       #  run: |
       #    git fetch https://github.com/$GITHUB_REPOSITORY.git ${GITHUB_REF#refs/heads/}
       #    git -c user.name='Rengine Test Account' -c user.email='renginetestacc@gmail.com' merge --no-commit --progress --squash FETCH_HEAD
@@ -226,6 +226,11 @@ jobs:
           path: ~/.m2/repository
           key: build-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: build-maven-${{ needs.prepares.outputs.cache_suffix }}-
+
+      - name: Build with Maven
+        if: ${{ inputs.enable-build == true }}
+        run: |
+          ./tools/build/run.sh build-maven
 
       - name: Set up Maven Central Repository
         uses: actions/setup-java@v3
@@ -406,26 +411,23 @@ jobs:
           #repo_owner="${{ needs.prepares.outputs.repo_owner }}"
           #pom_version="${{ needs.prepares.outputs.pom_version }}"
           #ref_img_tag="${{ needs.prepares.outputs.ref_img_tag }}"
-
-          if [ "${{ inputs.enable-push-image-dockerhub }}" == "true" ]; then
-            if [ "${{ inputs.enable-build-image-apiserver-tar }}" == "true" ]; then
-              ./tools/build/run.sh push-image --apiserver
-            fi
-            if [ "${{ inputs.enable-build-image-apiserver-springjar }}" == "true" ]; then
-              echo "Unsupported push apiserver (springjar) to Docker Hub."; exit 1
-            fi
-            if [ "${{ inputs.enable-build-image-controller-tar }}" == "true" ]; then
-              ./tools/build/run.sh push-image --controller
-            fi
-            if [ "${{ inputs.enable-build-image-controller-springjar }}" == "true" ]; then
-              echo "Unsupported push controller (springjar) to Docker Hub."; exit 1
-            fi
-            if [ "${{ inputs.enable-build-image-executor-tar }}" == "true" ]; then
-              ./tools/build/run.sh push-image --executor
-            fi
-            if [ "${{ inputs.enable-build-image-executor-native }}" == "true" ]; then
-              ./tools/build/run.sh push-image --executor-native
-            fi
+          if [ "${{ inputs.enable-build-image-apiserver-tar }}" == "true" ]; then
+            ./tools/build/run.sh push-image --apiserver
+          fi
+          if [ "${{ inputs.enable-build-image-apiserver-springjar }}" == "true" ]; then
+            echo "Unsupported push apiserver (springjar) to Docker Hub."; exit 1
+          fi
+          if [ "${{ inputs.enable-build-image-controller-tar }}" == "true" ]; then
+            ./tools/build/run.sh push-image --controller
+          fi
+          if [ "${{ inputs.enable-build-image-controller-springjar }}" == "true" ]; then
+            echo "Unsupported push controller (springjar) to Docker Hub."; exit 1
+          fi
+          if [ "${{ inputs.enable-build-image-executor-tar }}" == "true" ]; then
+            ./tools/build/run.sh push-image --executor
+          fi
+          if [ "${{ inputs.enable-build-image-executor-native }}" == "true" ]; then
+            ./tools/build/run.sh push-image --executor-native
           fi
 
       #- name: Login to GitHub Container Registry
@@ -443,25 +445,23 @@ jobs:
       #    DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       #    DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
       #  run: |
-      #    if [ "${{ inputs.enable-push-image-ghcr }}" == "true" ]; then
-      #      if [ "${{ inputs.enable-build-image-apiserver-tar }}" == "true" ]; then
-      #        ./tools/build/run.sh push-image --apiserver https://ghcr.io
-      #      fi
-      #      if [ "${{ inputs.enable-build-image-apiserver-springjar }}" == "true" ]; then
-      #        echo "Unsupported push controller (springjar) to Github Container Registry."; exit 1
-      #      fi
-      #      if [ "${{ inputs.enable-build-image-controller-tar }}" == "true" ]; then
-      #        ./tools/build/run.sh push-image --controller https://ghcr.io
-      #      fi
-      #      if [ "${{ inputs.enable-build-image-controller-springjar }}" == "true" ]; then
-      #        echo "Unsupported push controller (springjar) to Github Container Registry."; exit 1
-      #      fi
-      #      if [ "${{ inputs.enable-build-image-executor-tar }}" == "true" ]; then
-      #        ./tools/build/run.sh push-image --executor https://ghcr.io
-      #      fi
-      #      if [ "${{ inputs.enable-build-image-executor-native }}" == "true" ]; then
-      #        ./tools/build/run.sh push-image --executor-native https://ghcr.io
-      #      fi
+      #    if [ "${{ inputs.enable-build-image-apiserver-tar }}" == "true" ]; then
+      #      ./tools/build/run.sh push-image --apiserver https://ghcr.io
+      #    fi
+      #    if [ "${{ inputs.enable-build-image-apiserver-springjar }}" == "true" ]; then
+      #      echo "Unsupported push controller (springjar) to Github Container Registry."; exit 1
+      #    fi
+      #    if [ "${{ inputs.enable-build-image-controller-tar }}" == "true" ]; then
+      #      ./tools/build/run.sh push-image --controller https://ghcr.io
+      #    fi
+      #    if [ "${{ inputs.enable-build-image-controller-springjar }}" == "true" ]; then
+      #      echo "Unsupported push controller (springjar) to Github Container Registry."; exit 1
+      #    fi
+      #    if [ "${{ inputs.enable-build-image-executor-tar }}" == "true" ]; then
+      #      ./tools/build/run.sh push-image --executor https://ghcr.io
+      #    fi
+      #    if [ "${{ inputs.enable-build-image-executor-native }}" == "true" ]; then
+      #      ./tools/build/run.sh push-image --executor-native https://ghcr.io
       #    fi
 
       - name: Debugging 8
