@@ -49,7 +49,8 @@ public class MyOrderServiceImpl implements MyOrderService {
     private @Value("${scenes_configs.createOrder}") String createOrderScenesCode;
 
     @REvaluation(scenesCode = "${scenes_configs.createOrder}", bestEffort = true,
-            paramsTemplate = "{{userId=#0.userId,goodId=#0.goodId,count=#1}}", failback = MyFailback.class)
+            paramsTemplate = "{{userId=#0.userId,goodId=#0.goodId,count=#1}}", failback = MyFailback.class,
+            assertSpel = "#{riskScore > 50}", assertErrmsg = "Denied to operation, detected risk in your environment.")
     @Override
     public Map<String, String> create(CreateOrder order, Integer count) {
         log.info("Creating to order ...");

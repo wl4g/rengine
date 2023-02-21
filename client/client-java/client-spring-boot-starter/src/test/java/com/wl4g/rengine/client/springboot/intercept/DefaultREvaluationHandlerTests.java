@@ -46,8 +46,8 @@ public class DefaultREvaluationHandlerTests {
         arguments.add(dto);
         arguments.add(2);
 
-        String paramsTemplate = "{{userId=#0.userId, goodId=#0.goodId, count=#1}}";
-        Map<String, Object> args = DefaultREvaluationHandler.parseParamsTemplate(arguments, defaultMethodSignature,
+        String paramsTemplate = "{{userId=#0.userId, goodId=#0.goodId ,  count=#1}}";
+        Map<String, Object> args = DefaultREvaluationHandler.parseTemplateParams(arguments, defaultMethodSignature,
                 paramsTemplate);
         System.out.println(args);
         Assertions.assertEquals(args.get("goodId"), "G202202082139942");
@@ -62,16 +62,16 @@ public class DefaultREvaluationHandlerTests {
         arguments.add("G202202082139942");
         arguments.add("2");
         String paramsTemplate = "{{ userId=0, goodId=1 }}";
-        DefaultREvaluationHandler.parseParamsTemplate(arguments, defaultMethodSignature, paramsTemplate);
+        DefaultREvaluationHandler.parseTemplateParams(arguments, defaultMethodSignature, paramsTemplate);
 
         String paramsTemplate2 = "userId=1, goodId=0";
-        DefaultREvaluationHandler.parseParamsTemplate(arguments, defaultMethodSignature, paramsTemplate2);
+        DefaultREvaluationHandler.parseTemplateParams(arguments, defaultMethodSignature, paramsTemplate2);
 
         String paramsTemplate3 = "{{ userId=#0, goodId=#0 }}";
-        DefaultREvaluationHandler.parseParamsTemplate(arguments, defaultMethodSignature, paramsTemplate3);
+        DefaultREvaluationHandler.parseTemplateParams(arguments, defaultMethodSignature, paramsTemplate3);
 
         String paramsTemplate4 = "{{ userId=#0, userId=#1 }}";
-        DefaultREvaluationHandler.parseParamsTemplate(arguments, defaultMethodSignature, paramsTemplate4);
+        DefaultREvaluationHandler.parseTemplateParams(arguments, defaultMethodSignature, paramsTemplate4);
     }
 
     @Getter

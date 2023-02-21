@@ -74,10 +74,6 @@
         <!-- Rengine SDK -->
         <dependency>
             <groupId>com.wl4g</groupId>
-            <artifactId>rengine-client-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.wl4g</groupId>
             <artifactId>rengine-eventbus-kafka</artifactId>
         </dependency>
         <dependency>
