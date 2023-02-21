@@ -133,7 +133,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 1
-          repository: wl4g/rengine
+          repository: ${{ inputs.repository }}
           ref: ${{ inputs.branch || github.event.ref }}
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
@@ -208,7 +208,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 1
-          repository: wl4g/rengine
+          repository: ${{ inputs.repository }}
           ref: ${{ inputs.branch || github.event.ref }}
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
@@ -394,16 +394,34 @@ jobs:
           echo "     cpu usage: \n$(top -n 1)"
           echo "        images: \n$(docker images)"
 
-      ## see:https://docs.docker.com/build/ci/github-actions/examples/
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        if: ${{ inputs.enable-build == true && inputs.enable-push-image-dockerhub == true }}
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      ### see:https://docs.docker.com/build/ci/github-actions/examples/
+      #- name: Login to Docker Hub
+      #  uses: docker/login-action@v2
+      #  if: >-
+      #    ${{ inputs.enable-build == true && inputs.enable-push-image-dockerhub == true &&
+      #         (  inputs.enable-build-image-apiserver-tar == true
+      #         || inputs.enable-build-image-apiserver-springjar == true
+      #         || inputs.enable-build-image-controller-tar == true
+      #         || inputs.enable-build-image-controller-springjar == true
+      #         || inputs.enable-build-image-executor-tar == true
+      #         || inputs.enable-build-image-executor-native == true
+      #       )
+      #    }}
+      #  with:
+      #    username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #    password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Push to Docker Hub Registry
-        if: ${{ inputs.enable-build == true && inputs.enable-push-image-dockerhub == true }}
+        if: >-
+          ${{ inputs.enable-build == true && inputs.enable-push-image-dockerhub == true &&
+               (  inputs.enable-build-image-apiserver-tar == true
+               || inputs.enable-build-image-apiserver-springjar == true
+               || inputs.enable-build-image-controller-tar == true
+               || inputs.enable-build-image-controller-springjar == true
+               || inputs.enable-build-image-executor-tar == true
+               || inputs.enable-build-image-executor-native == true
+             )
+          }}
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
