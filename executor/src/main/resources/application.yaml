@@ -322,17 +322,18 @@ rengine:
         refreshed-cached-expire-offset-rate: 0.1f
       executor:
         per-executor-thread-pools: 2
-    minio:
-      endpoint: http://localhost:9000
-      region: us-east-1
-      bucket: rengine
-      tenant-access-key: rengine
-      tenant-secret-key: 12345678
-      http-client:
-        connect-timeout: 10s
-        write-timeout: 5m
-        read-timeout: 5m
-        proxy:
-          type: DIRECT
-          address: 127.0.0.1
-          port: 8118
+
+minio:
+  endpoint: http://localhost:9000
+  region: us-east-1
+  bucket: rengine
+  tenant-access-key: rengine
+  tenant-secret-key: 12345678
+  http-client:
+    connect-timeout: 10s
+    write-timeout: 5m
+    read-timeout: 5m
+    proxy:
+      type: DIRECT
+      address: 127.0.0.1
+      port: 8118

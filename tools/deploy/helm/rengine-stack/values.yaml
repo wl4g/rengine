@@ -13,10 +13,10 @@
 ## ---------------------------------- Rengine Values Configuration. ----------------------------------
 
 ## This is the spec definition of application instance deployed in Kubernetes.
-rengine-manager:
+rengine-apiserver:
   enabled: true
   image:
-    repository: wl4g/rengine-manager
+    repository: wl4g/rengine-apiserver
     baselineTag: 1.0.0
     upgradeTag: 1.0.1
 
@@ -30,13 +30,12 @@ rengine-manager:
     istio:
       ingress:
         ## see:https://istio.io/v1.14/docs/reference/config/networking/virtual-service/#HTTPRouteDestination
-        domain: wl4g.io ## Top level 1 domain.
+        domain: wl4g.com ## Top level 1 domain.
 
-rengine-evaluator:
+rengine-controller:
   enabled: true
   image:
-    #repository: wl4g/rengine-evaluator
-    repository: wl4g/rengine-evaluator-native # Recommands
+    repository: wl4g/rengine-controller
     baselineTag: 1.0.0
     upgradeTag: 1.0.1
 
@@ -46,11 +45,11 @@ rengine-evaluator:
 
   appConfigs: {}
 
-rengine-collector:
+rengine-executor:
   enabled: true
   image:
-    #repository: wl4g/rengine-collector
-    repository: wl4g/rengine-collector-native # Recommands
+    #repository: wl4g/rengine-executor
+    repository: wl4g/rengine-executor-native # Recommands
     baselineTag: 1.0.0
     upgradeTag: 1.0.1
 
@@ -73,13 +72,27 @@ global:
   ##
   preStartScript: |-
     #!/bin/sh
-    #export SPRING_SLEUTH_OTEL_EXPORTER_OTLP_ENDPOENT="http://otlp-collector.otlp.svc.cluster.local:4317"
-    #export SPRING_SLEUTH_OTEL_EXPORTER_JAEGER_ENDPOENT="http://jaeger-collector.jaeger.svc.cluster.local:14250"
-    #export SPRING_REDIS_CLUSTER_NODES="172.24.47.9:6379,172.24.47.9:6380,172.24.47.9:6381,172.24.47.10:6379,172.24.47.10:6380,172.24.47.10:6381"
-    #export SPRING_REDIS_CLUSTER_PASSWORD="123456"
-    #export SPRING_DATASOURCE_HIKARI_JDBCURL="jdbc:mysql://172.24.47.5:3306/iam?useunicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf-8&useSSL=false&allowMultiQueries=true&autoReconnect=true"
-    #export SPRING_DATASOURCE_HIKARI_USERNAME="demo"
-    #export SPRING_DATASOURCE_HIKARI_PASSWORD="${SPRING_DATASOURCE_HIKARI_USERNAME}"
+    ## see:./service/src/main/resources/application-telemetry.yaml
+    export SPRING_SLEUTH_OTEL_EXPORTER_OTLP_ENDPOENT="http://otlp-collector.otlp.svc.cluster.local:4317"
+    export SPRING_SLEUTH_OTEL_EXPORTER_JAEGER_ENDPOENT="http://jaeger-collector.jaeger.svc.cluster.local:14250"
+
+    ## see:./service/src/main/resources/application-mongo.yaml
+    export SPRING_DATA_MONGODB_URI='mongodb://10.0.0.163:27017/rengine'
+
+    ## see:./service/src/main/resources/application-redis.yaml
+    export SPRING_REDIS_CLUSTER_PASSWORD='zzx!@#$%'
+    #export SPRING_REDIS_CLUSTER_NODES="n0.redis.wl4g-cs.com:6379,n1.redis.wl4g-cs.com:6380,n2.redis.wl4g-cs.com:6381,n3.redis.wl4g-cs.com:7379,n4.redis.wl4g-cs.com:7380,n5.redis.wl4g-cs.com:7381"
+    export SPRING_REDIS_CLUSTER_NODES="redis-0.redis.svc.cluster.local:6379,redis-1.redis.svc.cluster.local:6379,redis-2.redis.svc.cluster.local:6379,redis-3.redis.svc.cluster.local:6379,redis-4.redis.svc.cluster.local:6379,redis-5.redis.svc.cluster.local:6379"
+
+    ## see:./executor/src/main/resources/application.yaml and ./service/src/main/resources/application-minio.yaml
+    export MINIO_ENDPOINT='http://10.0.0.163:9000'
+    export MINIO_TENANTACCESSKEY='rengine'
+    export MINIO_TENANTSECRETKEY='12345678'
+
+    ## see:./executor/src/main/resources/application.yaml
+    export QUARKUS_MONGODB_CONNECTION_STRING="${SPRING_DATA_MONGODB_URI}"
+    export QUARKUS_REDIS_PASSWORD="${SPRING_REDIS_CLUSTER_PASSWORD}"
+    export QUARKUS_REDIS_HOSTS="$(echo $SPRING_REDIS_CLUSTER_NODES | sed 's#,#,redis://#g')"
 
   envConfigs: {}
 
@@ -238,15 +251,24 @@ global:
         - protocol: TCP
           targetPort: 6381
         instanceAddresses:
-        - ip: 172.24.47.9
+        - ip: 172.24.47.1
           hosts:
-          - n1.redis.ecsafecloudcs.com
-        - ip: 172.24.47.10
+          - n0.redis.wl4g-cs.com
+        - ip: 172.24.47.2
           hosts:
-          - n2.redis.ecsafecloudcs.com
-        - ip: 172.24.47.11
+          - n1.redis.wl4g-cs.com
+        - ip: 172.24.47.3
           hosts:
-          - n3.redis.ecsafecloudcs.com
+          - n2.redis.wl4g-cs.com
+        - ip: 172.24.47.4
+          hosts:
+          - n3.redis.wl4g-cs.com
+        - ip: 172.24.47.5
+          hosts:
+          - n4.redis.wl4g-cs.com
+        - ip: 172.24.47.6
+          hosts:
+          - n5.redis.wl4g-cs.com
         location: MESH_EXTERNAL
         resolution: NONE
 

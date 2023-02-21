@@ -15,7 +15,6 @@
  */
 package com.wl4g.rengine.executor.minio;
 
-import static com.wl4g.rengine.common.constants.RengineConstants.CONF_PREFIX_EXECUTOR;
 import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_MINIO_BUCKET;
 import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_MINIO_ENDPOINT;
 import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_MINIO_REGION;
@@ -43,7 +42,7 @@ import io.smallrye.config.WithDefault;
  * @see https://quarkus.io/guides/properties-extending-support#custom-properties-source
  */
 @StaticInitSafe
-@ConfigMapping(prefix = CONF_PREFIX_EXECUTOR + ".minio", namingStrategy = NamingStrategy.KEBAB_CASE)
+@ConfigMapping(prefix = "minio", namingStrategy = NamingStrategy.KEBAB_CASE)
 public interface MinioConfig {
 
     @WithDefault(DEFAULT_MINIO_ENDPOINT)
