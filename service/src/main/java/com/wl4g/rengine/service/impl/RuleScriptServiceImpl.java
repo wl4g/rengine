@@ -155,12 +155,9 @@ public class RuleScriptServiceImpl implements RuleScriptService {
                         .region(minioClientManager.getConfig().getRegion())
                         .object(upload.getObjectPrefix())
                         .build();
-                final GetObjectResponse response = minioClientManager.getMinioClient().getObject(args);
-                try {
+                try (GetObjectResponse response = minioClientManager.getMinioClient().getObject(args);) {
                     final byte[] buf = ByteStreamUtils.copyToByteArray(response);
                     return new ScriptInfo(upload, buf);
-                } finally {
-                    response.close();
                 }
             } catch (Throwable ex) {
                 throw new IllegalStateException(ex);

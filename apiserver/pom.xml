@@ -503,9 +503,9 @@
                     </plugin>
                     <!-- Usages examples: -->
                     <!-- export DOCKER_HOST=tcp://localhost:2375 -->
-                    <!-- [build]: mvn -Pbuild:tar:docker -->
-                    <!-- [push]: mvn -Pbuild:tar:docker -->
-                    <!-- [push]: mvn -Pbuild:tar:docker dockerfile:build dockerfile:push -Ddockerfile.username=wl4g -Ddockerfile.password=xxx -->
+                    <!-- [build]: mvn -Pbuild:native:docker -->
+                    <!-- [push]: mvn -Pbuild:native:docker -->
+                    <!-- [push]: mvn -Pbuild:native:docker dockerfile:build dockerfile:push -Ddockerfile.username=wl4g -Ddockerfile.password=xxx -->
                     <plugin>
                         <groupId>com.spotify</groupId>
                         <artifactId>dockerfile-maven-plugin</artifactId>
