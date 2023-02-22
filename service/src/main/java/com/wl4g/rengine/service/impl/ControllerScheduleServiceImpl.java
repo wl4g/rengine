@@ -40,7 +40,6 @@ import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.ControllerSchedule;
-import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.service.ControllerScheduleService;
 import com.wl4g.rengine.service.model.ControllerScheduleDelete;
 import com.wl4g.rengine.service.model.ControllerScheduleDeleteResult;
@@ -95,7 +94,6 @@ public class ControllerScheduleServiceImpl implements ControllerScheduleService 
         notNullOf(trigger, "trigger");
 
         if (isNull(trigger.getId())) {
-            trigger.setId(IdGenUtils.nextLong());
             trigger.preInsert();
         } else {
             trigger.preUpdate();
@@ -108,7 +106,7 @@ public class ControllerScheduleServiceImpl implements ControllerScheduleService 
     @Override
     public ControllerScheduleDeleteResult delete(ControllerScheduleDelete model) {
         // 'id' is a keyword, it will be automatically converted to '_id'
-        DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
+        final DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
                 MongoCollectionDefinition.T_CONTROLLER_SCHEDULE.getName());
         return ControllerScheduleDeleteResult.builder().deletedCount(result.getDeletedCount()).build();
     }

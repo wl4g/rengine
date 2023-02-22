@@ -38,7 +38,6 @@ import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.DataSourceProperties;
 import com.wl4g.rengine.common.util.BeanSensitiveTransforms;
-import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.service.DataSourceService;
 import com.wl4g.rengine.service.model.DataSourceDelete;
 import com.wl4g.rengine.service.model.DataSourceDeleteResult;
@@ -94,7 +93,6 @@ public class DataSourceServiceImpl implements DataSourceService {
         notNullOf(dataSourceProperties, "datasource");
 
         if (isNull(dataSourceProperties.getId())) {
-            dataSourceProperties.setId(IdGenUtils.nextLong());
             dataSourceProperties.preInsert();
         } else {
             dataSourceProperties.preUpdate();

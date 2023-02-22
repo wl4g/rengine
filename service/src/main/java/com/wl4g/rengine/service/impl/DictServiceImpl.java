@@ -52,7 +52,6 @@ import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.collection.CollectionUtils2;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.Dict;
-import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.service.DictService;
 import com.wl4g.rengine.service.config.RengineServiceProperties;
 import com.wl4g.rengine.service.model.DictDelete;
@@ -176,7 +175,6 @@ public class DictServiceImpl implements DictService {
         notNullOf(dicts, "dicts");
 
         if (isNull(dicts.getId())) {
-            dicts.setId(IdGenUtils.nextLong());
             dicts.preInsert();
         } else {
             dicts.preUpdate();

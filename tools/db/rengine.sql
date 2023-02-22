@@ -11,7 +11,7 @@
  Target Server Version : 40406
  File Encoding         : 65001
 
- Date: 20/02/2023 14:36:43
+ Date: 22/02/2023 17:57:41
 */
 
 
@@ -265,6 +265,39 @@ db.getCollection("sys_notifications").insert([ {
 session.commitTransaction(); session.endSession();
 
 // ----------------------------
+// Collection structure for sys_users
+// ----------------------------
+db.getCollection("sys_users").drop();
+db.createCollection("sys_users");
+
+// ----------------------------
+// Documents of sys_users
+// ----------------------------
+session = db.getMongo().startSession();
+session.startTransaction();
+db = session.getDatabase("rengine");
+db.getCollection("sys_users").insert([ {
+    _id: NumberLong("61508655614689001"),
+    username: "root",
+    password: "$2y$13$omIlVnJQbPgVxt4cz9eXpeLpJ2so3SCaXqdJSVc.0p5AZmBxtABAy",
+    accountNonExpired: false,
+    accountNonLocked: false,
+    credentialsNonExpired: false,
+    enable: NumberInt("1"),
+    attributes: { },
+    orgCode: "top",
+    labels: [
+        "admin"
+    ],
+    remark: "超级管理员",
+    createDate: ISODate("2023-02-02T04:46:55.274Z"),
+    updateDate: ISODate("2023-02-02T04:46:55.274Z"),
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.User"
+} ]);
+session.commitTransaction(); session.endSession();
+
+// ----------------------------
 // Collection structure for t_aggregates
 // ----------------------------
 db.getCollection("t_aggregates").drop();
@@ -338,34 +371,6 @@ db = session.getDatabase("rengine");
 db.getCollection("t_controller_schedules").insert([ {
     _id: NumberLong("62208697108652456"),
     name: "vm_health_detecter",
-    monitorExecution: true,
-    failover: true,
-    misfire: true,
-    timeZone: "GMT+08:00",
-    maxTimeDiffSeconds: NumberInt("-1"),
-    reconcileIntervalMinutes: NumberInt("0"),
-    maxTimeoutMs: NumberLong("30000"),
-    runState: "SCHED",
-    properties: {
-        cron: "0/5 * * * * ?",
-        requests: [
-            {
-                scenesCodes: [
-                    "ecommerce_trade_gift"
-                ],
-                clientId: "JVqEpEwIaqkEkeD5",
-                clientSecret: "Uf6nJDyJQHKRP43ycl9vZ9zs7s1nyu77",
-                trace: true,
-                timeout: NumberLong("10000"),
-                bestEffort: false,
-                args: {
-                    foo1: "bar1"
-                }
-            }
-        ],
-        type: "GENERIC_EXECUTION_CONTROLLER",
-        _class: "com.wl4g.rengine.common.entity.ControllerSchedule$GenericExecutionScheduleConfig"
-    },
     enable: NumberInt("1"),
     labels: [
         "example",
@@ -373,42 +378,39 @@ db.getCollection("t_controller_schedules").insert([ {
         "health",
         "detecter"
     ],
+    monitorExecution: true,
+    failover: true,
+    misfire: true,
+    timeZone: "GMT+08:00",
+    maxTimeoutMs: 30000,
+    runState: null,
+    properties: {
+        type: "GENERIC_EXECUTION_CONTROLLER",
+        cron: "0/5 * * * * ?",
+        requests: [
+            {
+                clientId: "JVqEpEwIaqkEkeD5",
+                clientSecret: "Uf6nJDyJQHKRP43ycl9vZ9zs7s1nyu77",
+                scenesCodes: [
+                    "ecommerce_trade_gift"
+                ],
+                bestEffort: false,
+                timeout: 10000,
+                args: {
+                    foo1: "bar1"
+                }
+            }
+        ],
+        _class: "com.wl4g.rengine.common.entity.ControllerSchedule$ExecutionControllerConfig"
+    },
     remark: "Example monitoring for VM",
-    updateDate: ISODate("2023-02-13T03:07:56.404Z"),
+    updateDate: ISODate("2022-12-27T04:51:08.533Z"),
     delFlag: NumberInt("0"),
     _class: "com.wl4g.rengine.common.entity.ControllerSchedule"
 } ]);
 db.getCollection("t_controller_schedules").insert([ {
     _id: NumberLong("62208697108652457"),
     name: "db_records_yesterday_validator",
-    monitorExecution: true,
-    failover: true,
-    misfire: true,
-    timeZone: "GMT+08:00",
-    maxTimeDiffSeconds: NumberInt("-1"),
-    reconcileIntervalMinutes: NumberInt("0"),
-    maxTimeoutMs: NumberLong("30000"),
-    runState: "SCHED",
-    properties: {
-        cron: "0/5 * * * * ?",
-        requests: [
-            {
-                scenesCodes: [
-                    "ecommerce_trade_gift"
-                ],
-                clientId: "JVqEpEwIaqkEkeD5",
-                clientSecret: "Uf6nJDyJQHKRP43ycl9vZ9zs7s1nyu77",
-                trace: true,
-                timeout: NumberLong("10000"),
-                bestEffort: false,
-                args: {
-                    foo1: "bar1"
-                }
-            }
-        ],
-        type: "GENERIC_EXECUTION_CONTROLLER",
-        _class: "com.wl4g.rengine.common.entity.ControllerSchedule$GenericExecutionScheduleConfig"
-    },
     enable: NumberInt("1"),
     labels: [
         "example",
@@ -417,42 +419,39 @@ db.getCollection("t_controller_schedules").insert([ {
         "records",
         "validator"
     ],
+    monitorExecution: true,
+    failover: true,
+    misfire: true,
+    timeZone: "GMT+08:00",
+    maxTimeoutMs: 30000,
+    runState: null,
+    properties: {
+        type: "GENERIC_EXECUTION_CONTROLLER",
+        cron: "0/5 * * * * ?",
+        requests: [
+            {
+                clientId: "JVqEpEwIaqkEkeD5",
+                clientSecret: "Uf6nJDyJQHKRP43ycl9vZ9zs7s1nyu77",
+                scenesCodes: [
+                    "ecommerce_trade_gift"
+                ],
+                bestEffort: false,
+                timeout: 10000,
+                args: {
+                    foo1: "bar1"
+                }
+            }
+        ],
+        _class: "com.wl4g.rengine.common.entity.ControllerSchedule$ExecutionControllerConfig"
+    },
     remark: "Example monitoring for DB(mysql,pg,oracle)",
-    updateDate: ISODate("2023-02-13T03:07:56.805Z"),
+    updateDate: ISODate("2022-12-27T04:51:08.533Z"),
     delFlag: NumberInt("0"),
     _class: "com.wl4g.rengine.common.entity.ControllerSchedule"
 } ]);
 db.getCollection("t_controller_schedules").insert([ {
     _id: NumberLong("62208697108652459"),
     name: "emr_spark_history_stream_job_monitor",
-    monitorExecution: true,
-    failover: true,
-    misfire: true,
-    timeZone: "GMT+08:00",
-    maxTimeDiffSeconds: NumberInt("-1"),
-    reconcileIntervalMinutes: NumberInt("0"),
-    maxTimeoutMs: NumberLong("30000"),
-    runState: "SCHED",
-    properties: {
-        cron: "0/5 * * * * ?",
-        requests: [
-            {
-                scenesCodes: [
-                    "ecommerce_trade_gift"
-                ],
-                clientId: "JVqEpEwIaqkEkeD5",
-                clientSecret: "Uf6nJDyJQHKRP43ycl9vZ9zs7s1nyu77",
-                trace: true,
-                timeout: NumberLong("10000"),
-                bestEffort: false,
-                args: {
-                    foo1: "bar1"
-                }
-            }
-        ],
-        type: "GENERIC_EXECUTION_CONTROLLER",
-        _class: "com.wl4g.rengine.common.entity.ControllerSchedule$GenericExecutionScheduleConfig"
-    },
     enable: NumberInt("1"),
     labels: [
         "example",
@@ -461,78 +460,39 @@ db.getCollection("t_controller_schedules").insert([ {
         "history_stream_job",
         "monitor"
     ],
+    monitorExecution: true,
+    failover: true,
+    misfire: true,
+    timeZone: "GMT+08:00",
+    maxTimeoutMs: 30000,
+    runState: null,
+    properties: {
+        type: "GENERIC_EXECUTION_CONTROLLER",
+        cron: "0/5 * * * * ?",
+        requests: [
+            {
+                clientId: "JVqEpEwIaqkEkeD5",
+                clientSecret: "Uf6nJDyJQHKRP43ycl9vZ9zs7s1nyu77",
+                scenesCodes: [
+                    "ecommerce_trade_gift"
+                ],
+                bestEffort: false,
+                timeout: 10000,
+                args: {
+                    foo1: "bar1"
+                }
+            }
+        ],
+        _class: "com.wl4g.rengine.common.entity.ControllerSchedule$ExecutionControllerConfig"
+    },
     remark: "Generic monitoring for EMR spark",
-    updateDate: ISODate("2023-02-13T03:07:56.643Z"),
+    updateDate: ISODate("2022-12-27T04:51:08.533Z"),
     delFlag: NumberInt("0"),
     _class: "com.wl4g.rengine.common.entity.ControllerSchedule"
 } ]);
 db.getCollection("t_controller_schedules").insert([ {
     _id: NumberLong("62208697108652460"),
     name: "kafka_subscribe_notification_warning",
-    monitorExecution: true,
-    failover: true,
-    misfire: true,
-    timeZone: "GMT+08:00",
-    maxTimeDiffSeconds: NumberInt("-1"),
-    reconcileIntervalMinutes: NumberInt("0"),
-    maxTimeoutMs: NumberLong("30000"),
-    runState: "RUNNING",
-    properties: {
-        topics: [
-            "test_topic"
-        ],
-        concurrency: NumberInt("1"),
-        autoAcknowledgment: true,
-        request: {
-            scenesCodes: [
-                "ecommerce_trade_gift"
-            ],
-            clientId: "JVqEpEwIaqkEkeD5",
-            clientSecret: "Uf6nJDyJQHKRP43ycl9vZ9zs7s1nyu77",
-            trace: true,
-            timeout: NumberLong("10000"),
-            bestEffort: false,
-            args: {
-                foo1: "bar1"
-            }
-        },
-        consumerOptions: {
-            keySerializer: "org.apache.kafka.common.serialization.StringDeserializer",
-            valueSerializer: "org.apache.kafka.common.serialization.StringDeserializer",
-            bootstrapServers: "localhost:9092",
-            clientDnsLookup: "use_all_dns_ips",
-            metadataMaxAgeMs: NumberLong("300000"),
-            sendBufferBytes: NumberInt("131072"),
-            receiveBufferBytes: NumberInt("65536"),
-            clientRack: "",
-            reconnectBackoffMs: NumberLong("50"),
-            reconnectBackoffMaxMs: NumberLong("1000"),
-            retries: NumberInt("2147483647"),
-            retryBackoffMs: NumberLong("100"),
-            metricsSampleWindowMs: NumberLong("3000"),
-            metricsNumSamples: NumberInt("2"),
-            metricsRecordingLevel: "INFO",
-            metricsReporters: [ ],
-            securityProtocol: "PLAINTEXT",
-            socketConnectionSetupTimeoutMs: NumberLong("10000"),
-            socketConnectionSetupTimeoutMaxMs: NumberLong("30000"),
-            connectionsMaxIdleMs: NumberLong("540000"),
-            requestTimeoutMs: NumberInt("30000"),
-            groupId: "default-rengine-controller-subscriber",
-            maxPollIntervalMs: NumberInt("300000"),
-            sessionTimeoutMs: NumberInt("45000"),
-            heartbeatIntervalMs: NumberInt("3000"),
-            defaultApiTimeoutMs: NumberInt("60000"),
-            enableAutoCommit: false,
-            autoCommitIntervalMs: NumberInt("5000"),
-            autoOffsetReset: "latest",
-            fetchMinBytes: NumberInt("1"),
-            fetchMaxBytes: NumberInt("52428800"),
-            fetchMaxWaitMs: NumberInt("500")
-        },
-        type: "KAFKA_EXECUTION_CONTROLLER",
-        _class: "com.wl4g.rengine.common.entity.ControllerSchedule$KafkaExecutionScheduleConfig"
-    },
     enable: NumberInt("1"),
     labels: [
         "example",
@@ -540,8 +500,38 @@ db.getCollection("t_controller_schedules").insert([ {
         "subscribe",
         "notification"
     ],
+    monitorExecution: true,
+    failover: true,
+    misfire: true,
+    timeZone: "GMT+08:00",
+    maxTimeoutMs: 30000,
+    runState: null,
+    properties: {
+        type: "KAFKA_EXECUTION_CONTROLLER",
+        topics: [
+            "test_topic"
+        ],
+        concurrency: 1,
+        autoAcknowledgment: true,
+        request: {
+            clientId: "JVqEpEwIaqkEkeD5",
+            clientSecret: "Uf6nJDyJQHKRP43ycl9vZ9zs7s1nyu77",
+            scenesCodes: [
+                "ecommerce_trade_gift"
+            ],
+            bestEffort: false,
+            timeout: 10000,
+            args: {
+                foo1: "bar1"
+            }
+        },
+        consumerOptions: {
+            "group_id": "test_group"
+        },
+        _class: "com.wl4g.rengine.common.entity.ControllerSchedule$KafkaSubscribeScheduleConfig"
+    },
     remark: "Subscribe to notification for kafka",
-    updateDate: ISODate("2023-02-13T03:07:56.409Z"),
+    updateDate: ISODate("2022-12-27T04:51:08.533Z"),
     delFlag: NumberInt("0"),
     _class: "com.wl4g.rengine.common.entity.ControllerSchedule"
 } ]);
@@ -1098,7 +1088,7 @@ db.getCollection("t_uploads").insert([ {
     enable: NumberInt("1"),
     labels: [
         "generic",
-        "lang",
+        "print",
         "library"
     ],
     remark: "Generic print library.",
@@ -1204,118 +1194,6 @@ db.getCollection("t_uploads").insert([ {
     remark: "Example DB records yesterday validator js script.",
     updateDate: ISODate("2022-09-27T04:51:08.533Z"),
     delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.UploadObject"
-} ]);
-db.getCollection("t_uploads").insert([ {
-    _id: NumberLong("6357470874730496"),
-    uploadType: "USER_LIBRARY_WITH_JS",
-    objectPrefix: "rengine/library/js/print-1.0.0.js",
-    filename: "print-1.0.0.js",
-    extension: "string",
-    size: NumberLong("10000"),
-    orgCode: "string",
-    enable: NumberInt("1"),
-    labels: [
-        "string"
-    ],
-    remark: "string",
-    updateDate: ISODate("2023-02-20T03:36:42.851Z"),
-    _class: "com.wl4g.rengine.common.entity.UploadObject"
-} ]);
-db.getCollection("t_uploads").insert([ {
-    _id: NumberLong("6357471430590464"),
-    uploadType: "USER_LIBRARY_WITH_JS",
-    objectPrefix: "rengine/library/js/print-1.0.0.js",
-    filename: "print-1.0.0.js",
-    extension: "string",
-    size: NumberLong("10000"),
-    orgCode: "string",
-    enable: NumberInt("1"),
-    labels: [
-        "string"
-    ],
-    remark: "string",
-    updateDate: ISODate("2023-02-20T03:37:16.778Z"),
-    _class: "com.wl4g.rengine.common.entity.UploadObject"
-} ]);
-db.getCollection("t_uploads").insert([ {
-    _id: NumberLong("6357487867576320"),
-    uploadType: "USER_LIBRARY_WITH_JS",
-    objectPrefix: "rengine/library/js/print-1.0.0.js",
-    filename: "print-1.0.0.js",
-    extension: "string",
-    size: NumberLong("10000"),
-    orgCode: "string",
-    enable: NumberInt("1"),
-    labels: [
-        "string"
-    ],
-    remark: "string",
-    updateDate: ISODate("2023-02-20T03:54:00.012Z"),
-    _class: "com.wl4g.rengine.common.entity.UploadObject"
-} ]);
-db.getCollection("t_uploads").insert([ {
-    _id: NumberLong("6357496388370432"),
-    uploadType: "USER_LIBRARY_WITH_JS",
-    objectPrefix: "rengine/library/js/print-1.0.0.js",
-    filename: "print-1.0.0.js",
-    extension: "string",
-    size: NumberLong("10000"),
-    orgCode: "string",
-    enable: NumberInt("1"),
-    labels: [
-        "string"
-    ],
-    remark: "string",
-    updateDate: ISODate("2023-02-20T04:02:40.08Z"),
-    _class: "com.wl4g.rengine.common.entity.UploadObject"
-} ]);
-db.getCollection("t_uploads").insert([ {
-    _id: NumberLong("6357506167504896"),
-    uploadType: "USER_LIBRARY_WITH_JS",
-    objectPrefix: "rengine/library/js/print-1.0.0.js",
-    filename: "print-1.0.0.js",
-    extension: "string",
-    size: NumberLong("10000"),
-    orgCode: "string",
-    enable: NumberInt("1"),
-    labels: [
-        "string"
-    ],
-    remark: "string",
-    updateDate: ISODate("2023-02-20T04:12:36.951Z"),
-    _class: "com.wl4g.rengine.common.entity.UploadObject"
-} ]);
-db.getCollection("t_uploads").insert([ {
-    _id: NumberLong("6357507081191424"),
-    uploadType: "USER_LIBRARY_WITH_JS",
-    objectPrefix: "rengine/library/js/print-1.0.0.js",
-    filename: "print-1.0.0.js",
-    extension: "string",
-    size: NumberLong("10000"),
-    orgCode: "string",
-    enable: NumberInt("1"),
-    labels: [
-        "string"
-    ],
-    remark: "string",
-    updateDate: ISODate("2023-02-20T04:13:32.718Z"),
-    _class: "com.wl4g.rengine.common.entity.UploadObject"
-} ]);
-db.getCollection("t_uploads").insert([ {
-    _id: NumberLong("6357507864379392"),
-    uploadType: "USER_LIBRARY_WITH_JS",
-    objectPrefix: "rengine/library/js/print-1.0.0.js",
-    filename: "print-1.0.0.js",
-    extension: "string",
-    size: NumberLong("10000"),
-    orgCode: "string",
-    enable: NumberInt("1"),
-    labels: [
-        "string"
-    ],
-    remark: "string",
-    updateDate: ISODate("2023-02-20T04:14:20.52Z"),
     _class: "com.wl4g.rengine.common.entity.UploadObject"
 } ]);
 session.commitTransaction(); session.endSession();
@@ -1800,62 +1678,6 @@ db.getCollection("t_workflow_graphs").insert([ {
     remark: "string",
     createDate: ISODate("2022-09-27T04:50:22.304Z"),
     updateDate: ISODate("2022-09-27T04:50:22.304Z"),
-    delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.WorkflowGraph"
-} ]);
-db.getCollection("t_workflow_graphs").insert([ {
-    _id: NumberLong("6150868953411111"),
-    revision: NumberLong("1"),
-    workflowId: NumberLong("6150868953448438"),
-    nodes: [
-        {
-            "@type": "BOOT",
-            id: "0",
-            name: "The Boot",
-            attributes: {
-                top: "10px",
-                color: "#5f5f5f",
-                left: "10px"
-            }
-        },
-        {
-            "@type": "PROCESS",
-            id: "1",
-            name: "执行测试内置Script SDK示例",
-            attributes: {
-                top: "10px",
-                color: "#5f5f5f",
-                left: "10px"
-            },
-            ruleId: "6150869239922658"
-        }
-    ],
-    connections: [
-        {
-            name: "Unnamed Connection",
-            to: "1",
-            from: "0",
-            attributes: null
-        }
-    ],
-    attributes: {
-        foo: "bar",
-        openConversationId: "cidG+niQ3Ny/NwUc5KE7mANUQ==",
-        robotCode: "dingbhyrzjxx6qjhjcdr",
-        scenesGroupV2OwnerUserId: "6165471647114842627",
-        scenesGroupV2AdminUserIds: "6165471647114842627",
-        scenesGroupV2UserIds: "6165471647114842627"
-    },
-    orgCode: "top",
-    enable: NumberInt("1"),
-    labels: [
-        "example",
-        "vm",
-        "health"
-    ],
-    remark: "string",
-    createDate: ISODate("2022-09-27T04:50:22.304Z"),
-    updateDate: ISODate("2022-09-28T04:50:22.304Z"),
     delFlag: NumberInt("0"),
     _class: "com.wl4g.rengine.common.entity.WorkflowGraph"
 } ]);

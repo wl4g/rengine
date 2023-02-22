@@ -51,7 +51,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "DictAPI", description = "The Dict management API")
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/dict")
+@RequestMapping("/v1/dict")
 public class DictController {
 
     private @Autowired DictService dictService;

@@ -55,7 +55,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "WorkflowGraphAPI", description = "The workflow graph management API")
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/workflowgraph")
+@RequestMapping("/v1/workflowgraph")
 public class WorkflowGraphController {
 
     private @Autowired WorkflowGraphService workflowGraphService;

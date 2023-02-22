@@ -52,7 +52,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "DataSourceAPI", description = "The dataSource models management API")
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/dataSource")
+@RequestMapping("/v1/dataSource")
 public class DataSourceController {
 
     private @Autowired DataSourceService dataSourceService;

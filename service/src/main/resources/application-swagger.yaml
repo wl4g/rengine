@@ -53,9 +53,9 @@ springdoc:
     #tagsSorter:
     oauth2RedirectUrl: /swagger-ui/oauth2-redirect.html
     oauth:
-      clientId: ${RENGINE_IAM_CLIENT_ID:rengine}
-      clientSecret: ${RENGINE_IAM_CLIENT_SECRET:FvLNs0sbwF3sN4BbyjZ5GBwN819QFCmF}
-      realm: ${RENGINE_IAM_REALM:master}
+      clientId: ${IAM_CLIENT_ID:rengine}
+      clientSecret: ${IAM_CLIENT_SECRET:FvLNs0sbwF3sN4BbyjZ5GBwN819QFCmF}
+      realm: ${IAM_REALM:master}
       appName: ${spring.application.name}
       #additionalQueryStringParams:
       useBasicAuthenticationWithAccessCodeGrant: false ## Default by false
@@ -101,8 +101,8 @@ springdoc:
           #implicit: {}
           #clientCredentials: {}
           authorizationCode:
-            authorizationUrl: ${RENGINE_IAM_SERVER:http://localhost:8083}/realms/${RENGINE_IAM_REALM:master}/protocol/openid-connect/auth
-            tokenUrl: ${RENGINE_IAM_SERVER:http://localhost:8083}/realms/${RENGINE_IAM_REALM:master}/protocol/openid-connect/token
+            authorizationUrl: ${IAM_ENDPOINT:http://localhost:8083}/realms/${IAM_REALM:master}/protocol/openid-connect/auth
+            tokenUrl: ${IAM_ENDPOINT:http://localhost:8083}/realms/${IAM_REALM:master}/protocol/openid-connect/token
             #refreshUrl:
             #extensions: {}
             scopes:

@@ -66,7 +66,6 @@ import com.wl4g.rengine.common.entity.RuleScript.RuleScriptWrapper;
 import com.wl4g.rengine.common.model.RuleScriptExecuteRequest;
 import com.wl4g.rengine.common.model.RuleScriptExecuteResult;
 import com.wl4g.rengine.common.util.BsonEntitySerializers;
-import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.service.RuleScriptService;
 import com.wl4g.rengine.service.config.RengineServiceProperties;
 import com.wl4g.rengine.service.minio.MinioClientManager;
@@ -179,7 +178,6 @@ public class RuleScriptServiceImpl implements RuleScriptService {
         // }
         // @formatter:on
 
-        script.setId(IdGenUtils.nextLong()); // ignore frontend model 'id'
         script.preInsert();
 
         // Sets the current revision number, +1 according to the previous max

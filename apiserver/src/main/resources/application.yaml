@@ -15,8 +15,10 @@ spring:
   application.name: rengine-apiserver
   profiles:
     #include: base,arthas,arthas-override,telemetry,telemetry-override,swagger,mongo,redis,minio,security-oauth,security-static,devtool
-    include: base,arthas,arthas-override,telemetry,telemetry-override,swagger,mongo,redis,minio,security-static
+    include: base,arthas,arthas-override,telemetry,telemetry-override,swagger,mongo,redis,minio,security-oauth
     active: dev
 
 server: ## see:org.springframework.boot.autoconfigure.web.ServerProperties
   port: 28001
+  servlet:
+    contextPath: /api

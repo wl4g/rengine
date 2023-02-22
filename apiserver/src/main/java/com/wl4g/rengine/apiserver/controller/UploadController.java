@@ -53,7 +53,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "UploadAPI", description = "The user upload management API")
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/upload")
+@RequestMapping("/v1/upload")
 @CrossOrigin
 public class UploadController {
 

@@ -36,7 +36,6 @@ import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.Workflow;
-import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.service.WorkflowService;
 import com.wl4g.rengine.service.model.WorkflowDelete;
 import com.wl4g.rengine.service.model.WorkflowDeleteResult;
@@ -89,7 +88,6 @@ public class WorkflowServiceImpl implements WorkflowService {
         notNullOf(workflow.getScenesId(), "scenesId");
 
         if (isNull(workflow.getId())) {
-            workflow.setId(IdGenUtils.nextLong());
             workflow.preInsert();
         } else {
             workflow.preUpdate();

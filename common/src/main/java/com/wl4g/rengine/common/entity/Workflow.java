@@ -53,7 +53,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class Workflow extends BaseBean {
     private static final long serialVersionUID = -8038218208189261648L;
-    private @NotBlank Long scenesId;
+    private @NotNull Long scenesId;
     private @NotBlank String name;
     private @NotNull RuleEngine engine;
 

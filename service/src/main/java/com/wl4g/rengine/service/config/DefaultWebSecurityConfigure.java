@@ -15,13 +15,29 @@
  */
 package com.wl4g.rengine.service.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.ConditionalOnDefaultWebSecurity;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder.BCryptVersion;
 import org.springframework.security.web.SecurityFilterChain;
+
+import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
+
+import lombok.CustomLog;
 
 /**
  * {@link DefaultWebSecurityConfigure}
@@ -33,18 +49,78 @@ import org.springframework.security.web.SecurityFilterChain;
  */
 @Configuration
 @ConditionalOnDefaultWebSecurity
+// @EnableWebSecurity
 public class DefaultWebSecurityConfigure implements WebSecurityCustomizer {
 
     @Override
     public void customize(WebSecurity web) {
-        // "/swagger-ui/**"
-        web.ignoring().antMatchers("/hello/**", "/public/**", "/actuator/**");
+        web.ignoring().antMatchers("/hello/**", "/public/**", "/swagger-ui/**", "/actuator/**");
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable().cors().disable();
+    public SecurityFilterChain customSecurityFilterChain(
+            HttpSecurity http,
+            CustomAuthenticationProvider customAuthenticationProvider) throws Exception {
+        http.csrf()
+                .disable()
+                .cors()
+                .disable()
+                .authorizeRequests()
+                // .antMatchers("/", "/login**", "/callback/", "/oauth/**")
+                .antMatchers("/", "/login**")
+                .permitAll()
+                .and()
+                .formLogin()
+                .and()
+                .oauth2Login();
+        // If the custom start oauth2 redirect root path.
+        // .authorizationEndpoint()
+        // see:org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI
+        // .baseUri("/myroot/oauth2/authorization")
+        http.authenticationProvider(customAuthenticationProvider);
+        // http.getSharedObject(AuthenticationManagerBuilder.class).userDetailsService(null);
         return http.build();
+    }
+
+    @Bean
+    public CustomAuthenticationProvider customAuthenticationProvider(
+            @Autowired(required = false) AuthenticationManager authenticationManager,
+            MongoTemplate mongoTemplate) {
+        final var bCryptPasswordEncoder = new BCryptPasswordEncoder(BCryptVersion.$2Y, 13);
+        final var userDetailsService = new MongoUserDetailsManager(authenticationManager, mongoTemplate.getDb(),
+                MongoCollectionDefinition.SYS_USERS.getName());
+        return new CustomAuthenticationProvider(userDetailsService, bCryptPasswordEncoder);
+    }
+
+    @CustomLog
+    public static class CustomAuthenticationProvider implements AuthenticationProvider {
+        private UserDetailsService userDetailsService;
+        private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+        public CustomAuthenticationProvider(UserDetailsService userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+            this.userDetailsService = userDetailsService;
+            this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        }
+
+        @Override
+        public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+            final String username = authentication.getName();
+            final String password = (String) authentication.getCredentials();
+
+            final UserDetails user = userDetailsService.loadUserByUsername(username);
+
+            if (user == null || !bCryptPasswordEncoder.matches(password, user.getPassword())) {
+                throw new BadCredentialsException("Username or password is incorrect.");
+            }
+            log.info("Login success for : {}", user);
+
+            return new UsernamePasswordAuthenticationToken(user, password, user.getAuthorities());
+        }
+
+        @Override
+        public boolean supports(Class<?> aClass) {
+            return true;
+        }
     }
 
 }

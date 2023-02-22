@@ -51,7 +51,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "ControllerLogAPI", description = "The Controller Log management API")
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/controllerlog")
+@RequestMapping("/v1/controllerlog")
 public class ControllerLogController {
 
     private @Autowired ControllerLogService controllerLogService;

@@ -48,7 +48,6 @@ import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinit
 import com.wl4g.rengine.common.entity.WorkflowGraph;
 import com.wl4g.rengine.common.model.WorkflowExecuteRequest;
 import com.wl4g.rengine.common.model.WorkflowExecuteResult;
-import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.common.util.ScriptEngineUtil;
 import com.wl4g.rengine.service.WorkflowGraphService;
 import com.wl4g.rengine.service.config.RengineServiceProperties;
@@ -117,7 +116,6 @@ public class WorkflowGraphServiceImpl implements WorkflowGraphService {
         // }
         // @formatter:on
 
-        graph.setId(IdGenUtils.nextLong()); // ignore frontend model 'id'
         graph.preInsert();
 
         // Sets the current revision number, +1 according to the previous max

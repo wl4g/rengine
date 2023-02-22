@@ -49,7 +49,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "NotificationAPI", description = "The notification setting management API")
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/notification")
+@RequestMapping("/v1/notification")
 public class NotificationController {
 
     private @Autowired NotificationService notificationService;

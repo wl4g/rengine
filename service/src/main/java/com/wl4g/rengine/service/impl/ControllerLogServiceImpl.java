@@ -54,10 +54,9 @@ import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.jedis.BasicJedisClient;
 import com.wl4g.infra.common.locks.JedisLockManager;
 import com.wl4g.rengine.common.entity.ControllerLog;
-import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.service.ControllerLogService;
-import com.wl4g.rengine.service.model.ControllerLogDeleteResult;
 import com.wl4g.rengine.service.model.ControllerLogDelete;
+import com.wl4g.rengine.service.model.ControllerLogDeleteResult;
 import com.wl4g.rengine.service.model.ControllerLogQuery;
 import com.wl4g.rengine.service.model.ControllerLogSaveResult;
 
@@ -126,7 +125,6 @@ public class ControllerLogServiceImpl implements ControllerLogService {
         notNullOf(job, "job");
 
         if (isNull(job.getId())) {
-            job.setId(IdGenUtils.nextLong());
             job.preInsert();
         } else {
             job.preUpdate();

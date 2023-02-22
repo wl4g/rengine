@@ -101,6 +101,10 @@ public abstract class RengineConstants extends EnvironmentUtil {
 
         SYS_DICTS("sys_dicts", true),
 
+        SYS_USERS("sys_users", true),
+
+        SYS_ORGS("sys_orgs", true),
+
         SYS_IDENTITY_PROVIDERS("sys_identity_providers", true),
 
         SYS_NOTIFICATIONS("sys_notifications", true),

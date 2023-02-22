@@ -35,7 +35,6 @@ import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.Scenes;
-import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.service.ScenesService;
 import com.wl4g.rengine.service.model.ScenesDelete;
 import com.wl4g.rengine.service.model.ScenesDeleteResult;
@@ -101,7 +100,6 @@ public class ScenesServiceImpl implements ScenesService {
         notNullOf(scenes, "scenes");
 
         if (isNull(scenes.getId())) {
-            scenes.setId(IdGenUtils.nextLong());
             scenes.preInsert();
         } else {
             scenes.preUpdate();

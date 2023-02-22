@@ -76,10 +76,11 @@ spring:
 
 server: ## see:org.springframework.boot.autoconfigure.web.ServerProperties
   address: 0.0.0.0
+  #port: 8080
   servlet:
     #contextPath: /${spring.application.name}
     ## The spring-cloud-loadbalancer-2.2.6 not support metadata.contextPath
-    contextPath: /
+    #contextPath: /
     session:
       cookie:
         name: _R_SID

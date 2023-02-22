@@ -58,7 +58,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "RuleScriptAPI", description = "The rule script models management API")
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/rulescript")
+@RequestMapping("/v1/rulescript")
 public class RuleScriptController {
 
     private @Autowired RuleScriptService ruleScriptService;

@@ -37,7 +37,6 @@ import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.Rule;
-import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.service.RuleService;
 import com.wl4g.rengine.service.model.RuleDelete;
 import com.wl4g.rengine.service.model.RuleDeleteResult;
@@ -88,7 +87,6 @@ public class RuleServiceImpl implements RuleService {
         notNullOf(rule, "rule");
 
         if (isNull(rule.getId())) {
-            rule.setId(IdGenUtils.nextLong());
             rule.preInsert();
         } else {
             rule.preUpdate();

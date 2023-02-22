@@ -52,7 +52,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "RuleAPI", description = "The rule models management API")
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/rule")
+@RequestMapping("/v1/rule")
 public class RuleController {
 
     private @Autowired RuleService ruleService;
