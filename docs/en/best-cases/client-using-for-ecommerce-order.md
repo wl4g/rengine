@@ -45,14 +45,23 @@
         WorkflowExecuteResult result = rengineClient.execute(singletonList(scenesCode), true, args);
 
         // Assertion result.
-        if (!result.getResults().isEmpty()) {
-            final Map<String, Object> valueMap = result.getResults().get(0).getValueMap();
-            if (((Number) valueMap.getOrDefault("riskScore", 0d)).doubleValue() > 50d) {
-                throw new RengineException("Denied to operation, detected risk in your environment.");
-            } else {
-                log.debug("Check passed.");
-            }
+        if (((Number) result.firstValueMap().getOrDefault("riskScore", 0d)).doubleValue() > 50d) {
+            throw new RengineException(format("Denied to operation, detected risk in your environment."));
+        } else {
+            log.debug("Check passed.");
         }
     }
 }
+```
+
+- Mocks accessing
+
+```bash
+curl -v -XPOST \
+-H 'Content-Type: application/json' \
+-d '{
+ "userId": "u100102015",
+ "goodId": "g20230101291234885",
+ "address": "asgasdgasdg"
+}' localhost:28004/order/create?count=2
 ```

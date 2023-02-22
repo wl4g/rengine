@@ -16,8 +16,10 @@
 package com.wl4g.rengine.common.model;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static java.util.Collections.emptyMap;
 import static java.util.Objects.isNull;
 
 import java.util.ArrayList;
@@ -30,8 +32,8 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import lombok.Builder.Default;
 import lombok.AccessLevel;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -74,6 +76,11 @@ public class WorkflowExecuteResult extends BaseRequest {
             }
         }
         return _errorCount;
+    }
+
+    @JsonIgnore
+    public Map<String, Object> firstValueMap() {
+        return safeList(results).isEmpty() ? emptyMap() : safeMap(results.get(0).getValueMap());
     }
 
     @Getter

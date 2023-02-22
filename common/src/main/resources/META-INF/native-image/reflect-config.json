@@ -1353,6 +1353,7 @@
     {"name": "getDescription", "parameterTypes": []},
     {"name": "setDescription", "parameterTypes": ["java.lang.String"]},
     {"name": "errorCount", "parameterTypes": []},
+    {"name": "firstValueMap", "parameterTypes": []},
     {"name": "getResults", "parameterTypes": []},
     {"name": "setResults", "parameterTypes": ["java.util.List"]}
   ]

@@ -1,4 +1,4 @@
-# Example of the underlying principles of complex workflow graph based on e-commerce recharge trade and send gift.
+# A underlying principles of complex workflow graph based on e-commerce recharge trade and send gift.
 
 > The following is a real e-commerce/telephone recharge gift case, and its recharge rules are complex and changeable.
 

@@ -49,13 +49,10 @@ public class RengineRiskHandler {
         log.info("Risk checked for result: {}, {} => {}", result, scenesCode, args);
 
         // Assertion result.
-        if (!result.getResults().isEmpty()) {
-            final Map<String, Object> valueMap = result.getResults().get(0).getValueMap();
-            if (((Number) valueMap.getOrDefault("riskScore", 0d)).doubleValue() > 50d) {
-                throw new RengineException(format("Denied to operation, detected risk in your environment."));
-            } else {
-                log.debug("Check passed.");
-            }
+        if (((Number) result.firstValueMap().getOrDefault("riskScore", 0d)).doubleValue() > 50d) {
+            throw new RengineException(format("Denied to operation, detected risk in your environment."));
+        } else {
+            log.debug("Check passed.");
         }
     }
 

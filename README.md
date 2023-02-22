@@ -80,7 +80,7 @@ Unified and flexible rules engine platform, naturally suitable for scenarios whe
 
 - [Configuration for job](./docs/en/configuration-job.md)
 
-- [Best examples](./docs/en/best-example.md)
+- [Best examples](./docs/en/best-cases/best-cases.md)
 
 - [Development quide](./docs/en/devel.md)
 
