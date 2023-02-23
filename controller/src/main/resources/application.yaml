@@ -14,7 +14,7 @@
 spring:
   application.name: rengine-controller
   profiles:
-    include: base,arthas,arthas-override,telemetry,telemetry-override,mongo,redis,controller,security,devtool
+    include: base,arthas,arthas-override,telemetry,telemetry-override,mongo,redis,controller
     active: dev
 
 server: ## see:org.springframework.boot.autoconfigure.web.ServerProperties

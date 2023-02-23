@@ -43,10 +43,8 @@ public interface IdentityProviderService {
 
     default IdentityProvider getRegistrationId(@NotBlank String registrationId) {
         final var result = query(IdentityProviderQuery.builder()
-                .pageNum(1)
-                .pageSize(2)
                 .enable(true)
-                .kind(IdPKind.OIDC.name())
+                .type(IdPKind.OIDC.name())
                 .registrationId(hasTextOf(registrationId, "registrationId"))
                 .build());
         if (!CollectionUtils2.isEmpty(result.getRecords())) {

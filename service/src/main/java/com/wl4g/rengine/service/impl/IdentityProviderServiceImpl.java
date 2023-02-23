@@ -60,11 +60,11 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
     @Override
     public PageHolder<IdentityProvider> query(IdentityProviderQuery model) {
         final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getIdpId()),
-                isCriteria("kind", model.getKind()), isCriteria("registrationId", model.getRegistrationId())))
+                isCriteria("details.type", model.getType()), isCriteria("details.registrationId", model.getRegistrationId())))
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
         final List<IdentityProvider> idps = mongoTemplate.find(query, IdentityProvider.class,
-                MongoCollectionDefinition.T_SCENESES.getName());
+                MongoCollectionDefinition.SYS_IDENTITY_PROVIDERS.getName());
         // Collections.sort(idpConfigs, (o1, o2) ->
         // (o2.getUpdateDate().getTime()
         // - o1.getUpdateDate().getTime()) > 0 ? 1 : -1);

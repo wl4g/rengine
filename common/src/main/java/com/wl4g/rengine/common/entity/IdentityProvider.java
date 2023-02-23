@@ -24,16 +24,16 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.infra.common.lang.Assert2;
 import com.wl4g.infra.common.validation.EnumValue;
-import com.wl4g.rengine.common.entity.IdentityProvider.OidcConfig;
-import com.wl4g.rengine.common.entity.IdentityProvider.Saml2Config;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder.Default;
@@ -50,32 +50,46 @@ import lombok.experimental.SuperBuilder;
  * @version 2022-08-29
  * @since v1.0.0
  */
-// 1.多态参见:https://swagger.io/docs/specification/data-models/inheritance-and-polymorphism/
-// 2.对于swagger3注解,父类必须是抽象的，否则swagger3页面请求参数schemas展开后会以父类名重复展示3个.
-@Schema(oneOf = { OidcConfig.class, Saml2Config.class }, discriminatorProperty = "@kind")
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@kind", visible = true)
-@JsonSubTypes({ @Type(value = OidcConfig.class, name = "OIDC"), @Type(value = Saml2Config.class, name = "SAML2") })
 @Getter
 @Setter
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public abstract class IdentityProvider extends BaseBean {
+public class IdentityProvider extends BaseBean {
     private static final long serialVersionUID = 1L;
 
-    @Schema(name = "@kind", implementation = IdPKind.class)
-    @JsonProperty(value = "@kind")
-    private @NotBlank @EnumValue(enumCls = IdPKind.class) String kind;
+    private String name;
+
+    private ProviderDetailsBase details;
+
+    // 1.多态参见:https://swagger.io/docs/specification/data-models/inheritance-and-polymorphism/
+    // 2.对于swagger3注解,父类必须是抽象的，否则swagger3页面请求参数schemas展开后会以父类名重复展示3个.
+    @Schema(oneOf = { OidcConfig.class, Saml2Config.class }, discriminatorProperty = "type")
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", visible = true)
+    @JsonSubTypes({ @Type(value = OidcConfig.class, name = "OIDC"), @Type(value = Saml2Config.class, name = "SAML2") })
+    @Getter
+    @Setter
+    @SuperBuilder
+    @ToString(callSuper = true)
+    @NoArgsConstructor
+    public static abstract class ProviderDetailsBase implements Serializable {
+        private static final long serialVersionUID = 570;
+
+        @Schema(name = "type", implementation = IdPKind.class)
+        @JsonProperty(value = "type", access = Access.WRITE_ONLY)
+        @NotNull
+        private @NotBlank @EnumValue(enumCls = IdPKind.class) String type;
+    }
 
     /**
-     * @see {@link org.springframework.security.oauth2.client.registration.ClientRegistration}
+     * {@link org.springframework.security.oauth2.client.registration.ClientRegistration}
      */
     @Getter
     @Setter
     @SuperBuilder
     @ToString
     @NoArgsConstructor
-    public static class OidcConfig extends IdentityProvider {
+    public static class OidcConfig extends ProviderDetailsBase {
         private static final long serialVersionUID = 570;
         private String registrationId;
         private String clientId;
@@ -84,11 +98,16 @@ public abstract class IdentityProvider extends BaseBean {
         private AuthorizationGrantType authorizationGrantType;
         private String redirectUri;
         private @Default Set<String> scopes = Collections.emptySet();
-        private @Default ProviderDetails providerDetails = new ProviderDetails();
-        private String clientName;
+        // More details properties.
+        private String authorizationUri;
+        private String tokenUri;
+        private @Default UserInfoEndpoint userInfoEndpoint = new UserInfoEndpoint();
+        private String jwkSetUri;
+        private String issuerUri;
+        private @Default Map<String, Object> configurationMetadata = new HashMap<>(2);
 
         public ClientAuthenticationMethod getClientAuthenticationMethod() {
-            if (AuthorizationGrantType.AUTHORIZATION_CODE.equals(authorizationGrantType) && !!isBlank(clientSecret)) {
+            if (AuthorizationGrantType.authorization_code.equals(authorizationGrantType) && !!isBlank(clientSecret)) {
                 return ClientAuthenticationMethod.NONE;
             }
             return ClientAuthenticationMethod.CLIENT_SECRET_BASIC;
@@ -96,13 +115,13 @@ public abstract class IdentityProvider extends BaseBean {
 
         public OidcConfig validate() {
             Assert2.notNull(this.authorizationGrantType, "authorizationGrantType cannot be null");
-            if (AuthorizationGrantType.CLIENT_CREDENTIALS.equals(this.authorizationGrantType)) {
+            if (AuthorizationGrantType.client_credentials.equals(this.authorizationGrantType)) {
                 this.validateClientCredentialsGrantType();
-            } else if (AuthorizationGrantType.PASSWORD.equals(this.authorizationGrantType)) {
+            } else if (AuthorizationGrantType.password.equals(this.authorizationGrantType)) {
                 this.validatePasswordGrantType();
-            } else if (AuthorizationGrantType.IMPLICIT.equals(this.authorizationGrantType)) {
+            } else if (AuthorizationGrantType.implicit.equals(this.authorizationGrantType)) {
                 this.validateImplicitGrantType();
-            } else if (AuthorizationGrantType.AUTHORIZATION_CODE.equals(this.authorizationGrantType)) {
+            } else if (AuthorizationGrantType.authorization_code.equals(this.authorizationGrantType)) {
                 this.validateAuthorizationCodeGrantType();
             }
             this.validateScopes();
@@ -110,38 +129,38 @@ public abstract class IdentityProvider extends BaseBean {
         }
 
         private void validateAuthorizationCodeGrantType() {
-            Assert2.isTrue(AuthorizationGrantType.AUTHORIZATION_CODE.equals(this.authorizationGrantType),
-                    () -> "authorizationGrantType must be " + AuthorizationGrantType.AUTHORIZATION_CODE.name());
+            Assert2.isTrue(AuthorizationGrantType.authorization_code.equals(this.authorizationGrantType),
+                    () -> "authorizationGrantType must be " + AuthorizationGrantType.authorization_code.name());
             Assert2.hasText(registrationId, "registrationId cannot be empty");
             Assert2.hasText(clientId, "clientId cannot be empty");
             Assert2.hasText(redirectUri, "redirectUri cannot be empty");
-            Assert2.hasText(getProviderDetails().getAuthorizationUri(), "authorizationUri cannot be empty");
-            Assert2.hasText(getProviderDetails().getTokenUri(), "tokenUri cannot be empty");
+            Assert2.hasText(getAuthorizationUri(), "authorizationUri cannot be empty");
+            Assert2.hasText(getTokenUri(), "tokenUri cannot be empty");
         }
 
         private void validateImplicitGrantType() {
-            Assert2.isTrue(AuthorizationGrantType.IMPLICIT.equals(authorizationGrantType),
-                    () -> "authorizationGrantType must be " + AuthorizationGrantType.IMPLICIT.name());
+            Assert2.isTrue(AuthorizationGrantType.implicit.equals(authorizationGrantType),
+                    () -> "authorizationGrantType must be " + AuthorizationGrantType.implicit.name());
             Assert2.hasText(registrationId, "registrationId cannot be empty");
             Assert2.hasText(clientId, "clientId cannot be empty");
             Assert2.hasText(redirectUri, "redirectUri cannot be empty");
-            Assert2.hasText(getProviderDetails().getAuthorizationUri(), "authorizationUri cannot be empty");
+            Assert2.hasText(getAuthorizationUri(), "authorizationUri cannot be empty");
         }
 
         private void validateClientCredentialsGrantType() {
-            Assert2.isTrue(AuthorizationGrantType.CLIENT_CREDENTIALS.equals(authorizationGrantType),
-                    () -> "authorizationGrantType must be " + AuthorizationGrantType.CLIENT_CREDENTIALS.name());
+            Assert2.isTrue(AuthorizationGrantType.client_credentials.equals(authorizationGrantType),
+                    () -> "authorizationGrantType must be " + AuthorizationGrantType.client_credentials.name());
             Assert2.hasText(registrationId, "registrationId cannot be empty");
             Assert2.hasText(clientId, "clientId cannot be empty");
-            Assert2.hasText(getProviderDetails().getTokenUri(), "tokenUri cannot be empty");
+            Assert2.hasText(getTokenUri(), "tokenUri cannot be empty");
         }
 
         private void validatePasswordGrantType() {
-            Assert2.isTrue(AuthorizationGrantType.PASSWORD.equals(authorizationGrantType),
-                    () -> "authorizationGrantType must be " + AuthorizationGrantType.PASSWORD.name());
+            Assert2.isTrue(AuthorizationGrantType.password.equals(authorizationGrantType),
+                    () -> "authorizationGrantType must be " + AuthorizationGrantType.password.name());
             Assert2.hasText(registrationId, "registrationId cannot be empty");
             Assert2.hasText(clientId, "clientId cannot be empty");
-            Assert2.hasText(getProviderDetails().getTokenUri(), "tokenUri cannot be empty");
+            Assert2.hasText(getTokenUri(), "tokenUri cannot be empty");
         }
 
         private void validateScopes() {
@@ -168,45 +187,30 @@ public abstract class IdentityProvider extends BaseBean {
         @SuperBuilder
         @ToString
         @NoArgsConstructor
-        public static class ProviderDetails implements Serializable {
+        public static class UserInfoEndpoint implements Serializable {
             private static final long serialVersionUID = 570;
-            private String authorizationUri;
-            private String tokenUri;
-            private @Default UserInfoEndpoint userInfoEndpoint = new UserInfoEndpoint();
-            private String jwkSetUri;
-            private String issuerUri;
-            private @Default Map<String, Object> configurationMetadata = new HashMap<>(2);
-
-            @Getter
-            @Setter
-            @SuperBuilder
-            @ToString
-            @NoArgsConstructor
-            public static class UserInfoEndpoint implements Serializable {
-                private static final long serialVersionUID = 570;
-                private String uri;
-                private @Default AuthenticationMethod authenticationMethod = AuthenticationMethod.HEADER;
-                private String userNameAttributeName;
-            }
+            private String uri;
+            private @Default AuthenticationMethod authenticationMethod = AuthenticationMethod.header;
+            private String userNameAttributeName;
         }
 
         public static enum AuthorizationGrantType {
-            AUTHORIZATION_CODE,
+            authorization_code,
 
             @Deprecated
-            IMPLICIT,
+            implicit,
 
-            REFRESH_TOKEN,
+            refresh_token,
 
-            CLIENT_CREDENTIALS,
+            client_credentials,
 
-            PASSWORD,
+            password,
 
-            JWT_BEARER
+            jwt_bearer
         }
 
         public static enum AuthenticationMethod {
-            HEADER, FORM, QUERY
+            header, form, query
         }
 
         public static enum ClientAuthenticationMethod {
@@ -232,7 +236,7 @@ public abstract class IdentityProvider extends BaseBean {
     @SuperBuilder
     @ToString
     @NoArgsConstructor
-    public static class Saml2Config extends IdentityProvider {
+    public static class Saml2Config extends ProviderDetailsBase {
         private static final long serialVersionUID = 1L;
         private @NotBlank String spMetadataUrl;
     }

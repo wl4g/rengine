@@ -44,6 +44,6 @@ public abstract class BaseQuery<Q> {
     private @Nullable String orgCode;
     private @Nullable List<String> labels;
     private @Nullable Boolean enable;
-    private @Min(0) @Default Integer pageNum = 0;
+    private @Min(0) @Default Integer pageNum = 0; // zero-based,see:org.springframework.data.domain.PageRequest
     private @Min(1) @Default Integer pageSize = 10;
 }

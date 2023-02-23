@@ -48,7 +48,7 @@ public class IdentityProviderQuery extends BaseQuery<IdentityProvider> {
     @Schema(implementation = IdPKind.class)
     @Nullable
     @EnumValue(enumCls = IdPKind.class)
-    String kind;
+    String type;
 
     @Nullable
     String registrationId; // Notice: Applicable to OIDC only

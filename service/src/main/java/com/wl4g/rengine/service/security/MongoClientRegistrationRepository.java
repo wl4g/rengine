@@ -28,6 +28,7 @@ import org.springframework.security.oauth2.core.AuthenticationMethod;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 
+import com.wl4g.rengine.common.entity.IdentityProvider;
 import com.wl4g.rengine.common.entity.IdentityProvider.OidcConfig;
 import com.wl4g.rengine.service.IdentityProviderService;
 
@@ -57,11 +58,11 @@ public final class MongoClientRegistrationRepository implements ClientRegistrati
 
     @Override
     public ClientRegistration findByRegistrationId(String registrationId) {
-        final var oidcClientRegistration = (OidcConfig) identityProviderService.getRegistrationId(registrationId);
-        if (isNull(oidcClientRegistration)) {
-            throw new IllegalArgumentException(format("No found OIDC client registration for %s", registrationId));
+        final IdentityProvider identityProvider = identityProviderService.getRegistrationId(registrationId);
+        if (isNull(identityProvider)) {
+            throw new IllegalArgumentException(format("No found OIDC client registration configuration for %s", registrationId));
         }
-
+        final OidcConfig oidcClientRegistration = (OidcConfig) identityProvider.getDetails();
         return ClientRegistration.withRegistrationId(registrationId)
                 .clientId(oidcClientRegistration.getClientId())
                 .clientSecret(oidcClientRegistration.getClientSecret())
@@ -70,17 +71,16 @@ public final class MongoClientRegistrationRepository implements ClientRegistrati
                 .authorizationGrantType(new AuthorizationGrantType(oidcClientRegistration.getAuthorizationGrantType().name()))
                 .redirectUri(oidcClientRegistration.getRedirectUri())
                 .scope(oidcClientRegistration.getScopes())
-                .authorizationUri(oidcClientRegistration.getProviderDetails().getAuthorizationUri())
-                .tokenUri(oidcClientRegistration.getProviderDetails().getTokenUri())
-                .userInfoUri(oidcClientRegistration.getProviderDetails().getUserInfoEndpoint().getUri())
-                .userInfoAuthenticationMethod(new AuthenticationMethod(
-                        oidcClientRegistration.getProviderDetails().getUserInfoEndpoint().getAuthenticationMethod().name()))
-                .userNameAttributeName(
-                        oidcClientRegistration.getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName())
-                .jwkSetUri(oidcClientRegistration.getProviderDetails().getJwkSetUri())
-                .issuerUri(oidcClientRegistration.getProviderDetails().getIssuerUri())
-                .providerConfigurationMetadata(oidcClientRegistration.getProviderDetails().getConfigurationMetadata())
-                .clientName(oidcClientRegistration.getClientName())
+                .authorizationUri(oidcClientRegistration.getAuthorizationUri())
+                .tokenUri(oidcClientRegistration.getTokenUri())
+                .userInfoUri(oidcClientRegistration.getUserInfoEndpoint().getUri())
+                .userInfoAuthenticationMethod(
+                        new AuthenticationMethod(oidcClientRegistration.getUserInfoEndpoint().getAuthenticationMethod().name()))
+                .userNameAttributeName(oidcClientRegistration.getUserInfoEndpoint().getUserNameAttributeName())
+                .jwkSetUri(oidcClientRegistration.getJwkSetUri())
+                .issuerUri(oidcClientRegistration.getIssuerUri())
+                .providerConfigurationMetadata(oidcClientRegistration.getConfigurationMetadata())
+                .clientName(identityProvider.getName())
                 .build();
     }
 
