@@ -25,10 +25,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
+import com.wl4g.rengine.common.entity.IdentityProvider;
 import com.wl4g.rengine.service.IdentityProviderService;
 import com.wl4g.rengine.service.model.IdentityProviderQuery;
-import com.wl4g.rengine.service.model.IdentityProviderQueryResult;
 import com.wl4g.rengine.service.model.IdentityProviderSave;
 import com.wl4g.rengine.service.model.IdentityProviderSaveResult;
 
@@ -57,9 +58,9 @@ public class IdentityProviderController {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
     @ResponseBody
-    public RespBase<IdentityProviderQueryResult> query(@Validated IdentityProviderQuery model) {
+    public RespBase<PageHolder<IdentityProvider>> query(@Validated IdentityProviderQuery model) {
         log.debug("called: model={}", model);
-        RespBase<IdentityProviderQueryResult> resp = RespBase.create();
+        RespBase<PageHolder<IdentityProvider>> resp = RespBase.create();
         resp.setData(identityProviderService.query(model));
         return resp;
     }

@@ -115,6 +115,12 @@
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session-data-redis</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
         <!-- Docs -->
         <!-- see:https://springdoc.org/#demos -->
         <!-- see:https://github.com/springdoc/springdoc-openapi-demos -->

@@ -13,13 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.service.config;
+package com.wl4g.rengine.service.security;
+
+import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_SECURITY_OAUTH2_ENDPOINT_BASE_URI;
+import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_SECURITY_PASSWORD_ENDPOINT_URI;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.ConditionalOnDefaultWebSecurity;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -33,14 +37,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder.BCryptVersion;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
+import com.wl4g.rengine.service.IdentityProviderService;
 
 import lombok.CustomLog;
 
 /**
- * {@link DefaultWebSecurityConfigure}
+ * {@link RengineWebSecurityConfigure}
  * 
  * @author James Wong
  * @version 2022-08-29
@@ -50,7 +56,7 @@ import lombok.CustomLog;
 @Configuration
 @ConditionalOnDefaultWebSecurity
 // @EnableWebSecurity
-public class DefaultWebSecurityConfigure implements WebSecurityCustomizer {
+public class RengineWebSecurityConfigure implements WebSecurityCustomizer {
 
     @Override
     public void customize(WebSecurity web) {
@@ -66,20 +72,49 @@ public class DefaultWebSecurityConfigure implements WebSecurityCustomizer {
                 .cors()
                 .disable()
                 .authorizeRequests()
-                // .antMatchers("/", "/login**", "/callback/", "/oauth/**")
-                .antMatchers("/", "/login**")
+                // Login path without checking authentication.
+                .antMatchers("/login**")
                 .permitAll()
+                // Any other path requests are check for authentication.
+                .anyRequest()
+                .authenticated()
                 .and()
+                // Enable the form of static password login.
                 .formLogin()
+                .defaultSuccessUrl("/index", false) // TODO using getUserInfo??
+                .loginProcessingUrl(DEFAULT_SECURITY_PASSWORD_ENDPOINT_URI)
                 .and()
-                .oauth2Login();
-        // If the custom start oauth2 redirect root path.
-        // .authorizationEndpoint()
-        // see:org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI
-        // .baseUri("/myroot/oauth2/authorization")
+                // Enable the OAuth2 of authorization login.
+                .oauth2Login()
+                // Login to successful redirection uri.
+                // alwaysUse=false, It
+                // means that if the protected URL is accessed before the
+                // certification, it will be redirected to the URL
+                .defaultSuccessUrl("/index", false)
+                // If the custom start oauth2 redirect root path.
+                .authorizationEndpoint()
+                // The base URI of the start OAuth2 authenticating request.
+                // The default as: /oauth2/authorization
+                // see:org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI
+                .baseUri(DEFAULT_SECURITY_OAUTH2_ENDPOINT_BASE_URI);
+
         http.authenticationProvider(customAuthenticationProvider);
         // http.getSharedObject(AuthenticationManagerBuilder.class).userDetailsService(null);
         return http.build();
+    }
+
+    @Bean
+    public MongoClientRegistrationRepository mongoClientRegistrationRepository(
+            MongoTemplate mongoTemplate,
+            RedisTemplate<String, String> redisTemplate,
+            IdentityProviderService identityProviderService) {
+        return new MongoClientRegistrationRepository(mongoTemplate, redisTemplate, identityProviderService);
+    }
+
+    @Bean
+    public OAuth2AuthorizedClientService mongoOAuth2AuthorizedClientService(
+            MongoClientRegistrationRepository clientRegistrationRepository) {
+        return new MongoOAuth2AuthorizedClientService(clientRegistrationRepository);
     }
 
     @Bean

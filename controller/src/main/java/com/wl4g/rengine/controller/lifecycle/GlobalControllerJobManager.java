@@ -58,7 +58,7 @@ import com.wl4g.rengine.controller.config.RengineControllerProperties;
 import com.wl4g.rengine.controller.exception.RengineControllerException;
 import com.wl4g.rengine.controller.job.AbstractJobExecutor;
 import com.wl4g.rengine.controller.job.AbstractJobExecutor.ScheduleJobType;
-import com.wl4g.rengine.controller.job.GlobalEngineScheduleController;
+import com.wl4g.rengine.controller.job.GlobalEngineMasterController;
 import com.wl4g.rengine.controller.lifecycle.ElasticJobBootstrapBuilder.JobParameter;
 
 import lombok.CustomLog;
@@ -87,7 +87,7 @@ public class GlobalControllerJobManager implements ApplicationRunner, Closeable 
         this.tracingConfigurations = notNullOf(tracingConfigurations, "tracingConfigurations");
         this.regCenter = notNullOf(registryCenter, "registryCenter");
         final JobConfiguration jobConfig = config.getController()
-                .toJobConfiguration(GlobalEngineScheduleController.class.getSimpleName());
+                .toJobConfiguration(GlobalEngineMasterController.class.getSimpleName());
         this.controllerBootstrap = createJobBootstrap(jobConfig);
         this.bootstrapRegistry = new ConcurrentHashMap<>(16);
         this.scheduleMutexLocksRegistry = new ConcurrentHashMap<>(16);

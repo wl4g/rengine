@@ -7,7 +7,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-com.wl4g.rengine.controller.job.GlobalEngineScheduleController
+com.wl4g.rengine.controller.job.GlobalEngineMasterController
 com.wl4g.rengine.controller.job.EngineGenericExecutionController
 com.wl4g.rengine.controller.job.EngineKafkaExecutionController
 #com.wl4g.rengine.controller.job.EngineFlinkSubmitController

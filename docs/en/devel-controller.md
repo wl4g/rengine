@@ -6,42 +6,31 @@
 git clone git@github.com/wl4g/rengine.git
 cd rengine/
 export JAVA_HOME=/usr/local/jdk-11.0.10/
-./mvnw clean install -DskipTests -Dmaven.test.skip=true -Pwith:eventbus-kafka -U -T 4C
+./mvnw clean install -DskipTests -Dmaven.test.skip=true -U -T 4C
 ```
-
-- ***Notice:*** For the eventbus module, one of the following MQs is supported. build profiles are: `with:eventbus-kafka` (the default), `with:eventbus-pulsar`, `with:eventbus-rabbitmq`
 
 ## Directories
 
 ```bash
 + rengine/
-  + collector/
-    # The auto configuration entry of the collector.
-    + src/main/java/com/wl4g/rengine/collector/config/
-      + CollectorAutoConfiguration.java
+  + controller/
+    # The auto configuration entry of the controller.
+    + src/main/java/com/wl4g/rengine/controller/config/
+      + RengineControllerAutoConfiguration.java
 
-    + src/main/java/com/wl4g/rengine/collector/
+    + src/main/java/com/wl4g/rengine/job/
       # The cluster sharding job type of proactive collect tasks.
       + job/
-        + CollectJobExecutor.java # Collect job base.
+        + AbstractJobExecutor.java # Abstract job base.
 
-        # The support proactive fetch from prometheus exporters, convert them to general events,
-        # and then send them to MQ via eventbus.
-        + PrometheusCollectJobExecutor.java
+        # Global Master controller, responsible for scanning the schedule configuration 
+        # table, and allocating and starting different types of execution controllers.
+        + GlobalEngineMasterController.java
 
-        # In the same way, actively fetch event from remote http servers.
-        + SimpleHttpCollectJobExecutor.java
+        # The according to the configuration, parallel(distributed job) invoke workflow graph.
+        + EngineGenericExecutionController.java
 
-        # In the same way, actively fetch event from database(eg: MySQL).
-        + SimpleJdbcCollectJobExecutor.java
-
-        # In the same way, actively fetch event from redis(single, cluster).
-        + SimpleRedisCollectJobExecutor.java
-
-        # In the same way, actively fetch event from node via SSH script.
-        + SimpleSSHCollectJobExecutor.java
-
-        # In the same way, actively fetch event from node via send(base64)/receive TCP message packet.
-        + SimpleTcpCollectJobExecutor.java
+        # The consumpting data from Kafka in parallel(distributed job), and invoke workflow graph.
+        + EngineKafkaExecutionController.java
         + ...
 ```

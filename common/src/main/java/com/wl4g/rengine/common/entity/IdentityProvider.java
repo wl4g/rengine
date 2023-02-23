@@ -15,6 +15,14 @@
  */
 package com.wl4g.rengine.common.entity;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import javax.validation.constraints.NotBlank;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -22,11 +30,13 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.wl4g.infra.common.bean.BaseBean;
+import com.wl4g.infra.common.lang.Assert2;
 import com.wl4g.infra.common.validation.EnumValue;
 import com.wl4g.rengine.common.entity.IdentityProvider.OidcConfig;
 import com.wl4g.rengine.common.entity.IdentityProvider.Saml2Config;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -57,21 +67,164 @@ public abstract class IdentityProvider extends BaseBean {
     @JsonProperty(value = "@kind")
     private @NotBlank @EnumValue(enumCls = IdPKind.class) String kind;
 
+    /**
+     * @see {@link org.springframework.security.oauth2.client.registration.ClientRegistration}
+     */
     @Getter
     @Setter
     @SuperBuilder
     @ToString
     @NoArgsConstructor
     public static class OidcConfig extends IdentityProvider {
-        private static final long serialVersionUID = 1L;
-        private @NotBlank String authorizationUrl;
-        private @NotBlank String tokenUrl;
-        private @NotBlank String userinfoUrl;
-        private @NotBlank String clientId;
-        private @NotBlank String clientSecret;
-        private @NotBlank String userId;
-        private @NotBlank String userName;
-        private @NotBlank String scopes;
+        private static final long serialVersionUID = 570;
+        private String registrationId;
+        private String clientId;
+        private String clientSecret;
+        // private ClientAuthenticationMethod clientAuthenticationMethod;
+        private AuthorizationGrantType authorizationGrantType;
+        private String redirectUri;
+        private @Default Set<String> scopes = Collections.emptySet();
+        private @Default ProviderDetails providerDetails = new ProviderDetails();
+        private String clientName;
+
+        public ClientAuthenticationMethod getClientAuthenticationMethod() {
+            if (AuthorizationGrantType.AUTHORIZATION_CODE.equals(authorizationGrantType) && !!isBlank(clientSecret)) {
+                return ClientAuthenticationMethod.NONE;
+            }
+            return ClientAuthenticationMethod.CLIENT_SECRET_BASIC;
+        }
+
+        public OidcConfig validate() {
+            Assert2.notNull(this.authorizationGrantType, "authorizationGrantType cannot be null");
+            if (AuthorizationGrantType.CLIENT_CREDENTIALS.equals(this.authorizationGrantType)) {
+                this.validateClientCredentialsGrantType();
+            } else if (AuthorizationGrantType.PASSWORD.equals(this.authorizationGrantType)) {
+                this.validatePasswordGrantType();
+            } else if (AuthorizationGrantType.IMPLICIT.equals(this.authorizationGrantType)) {
+                this.validateImplicitGrantType();
+            } else if (AuthorizationGrantType.AUTHORIZATION_CODE.equals(this.authorizationGrantType)) {
+                this.validateAuthorizationCodeGrantType();
+            }
+            this.validateScopes();
+            return this;
+        }
+
+        private void validateAuthorizationCodeGrantType() {
+            Assert2.isTrue(AuthorizationGrantType.AUTHORIZATION_CODE.equals(this.authorizationGrantType),
+                    () -> "authorizationGrantType must be " + AuthorizationGrantType.AUTHORIZATION_CODE.name());
+            Assert2.hasText(registrationId, "registrationId cannot be empty");
+            Assert2.hasText(clientId, "clientId cannot be empty");
+            Assert2.hasText(redirectUri, "redirectUri cannot be empty");
+            Assert2.hasText(getProviderDetails().getAuthorizationUri(), "authorizationUri cannot be empty");
+            Assert2.hasText(getProviderDetails().getTokenUri(), "tokenUri cannot be empty");
+        }
+
+        private void validateImplicitGrantType() {
+            Assert2.isTrue(AuthorizationGrantType.IMPLICIT.equals(authorizationGrantType),
+                    () -> "authorizationGrantType must be " + AuthorizationGrantType.IMPLICIT.name());
+            Assert2.hasText(registrationId, "registrationId cannot be empty");
+            Assert2.hasText(clientId, "clientId cannot be empty");
+            Assert2.hasText(redirectUri, "redirectUri cannot be empty");
+            Assert2.hasText(getProviderDetails().getAuthorizationUri(), "authorizationUri cannot be empty");
+        }
+
+        private void validateClientCredentialsGrantType() {
+            Assert2.isTrue(AuthorizationGrantType.CLIENT_CREDENTIALS.equals(authorizationGrantType),
+                    () -> "authorizationGrantType must be " + AuthorizationGrantType.CLIENT_CREDENTIALS.name());
+            Assert2.hasText(registrationId, "registrationId cannot be empty");
+            Assert2.hasText(clientId, "clientId cannot be empty");
+            Assert2.hasText(getProviderDetails().getTokenUri(), "tokenUri cannot be empty");
+        }
+
+        private void validatePasswordGrantType() {
+            Assert2.isTrue(AuthorizationGrantType.PASSWORD.equals(authorizationGrantType),
+                    () -> "authorizationGrantType must be " + AuthorizationGrantType.PASSWORD.name());
+            Assert2.hasText(registrationId, "registrationId cannot be empty");
+            Assert2.hasText(clientId, "clientId cannot be empty");
+            Assert2.hasText(getProviderDetails().getTokenUri(), "tokenUri cannot be empty");
+        }
+
+        private void validateScopes() {
+            if (scopes == null) {
+                return;
+            }
+            for (String scope : scopes) {
+                Assert2.isTrue(validateScope(scope), "scope \"" + scope + "\" contains invalid characters");
+            }
+        }
+
+        private static boolean validateScope(String scope) {
+            return scope == null || scope.chars()
+                    .allMatch((c) -> withinTheRangeOf(c, 0x21, 0x21) || withinTheRangeOf(c, 0x23, 0x5B)
+                            || withinTheRangeOf(c, 0x5D, 0x7E));
+        }
+
+        private static boolean withinTheRangeOf(int c, int min, int max) {
+            return c >= min && c <= max;
+        }
+
+        @Getter
+        @Setter
+        @SuperBuilder
+        @ToString
+        @NoArgsConstructor
+        public static class ProviderDetails implements Serializable {
+            private static final long serialVersionUID = 570;
+            private String authorizationUri;
+            private String tokenUri;
+            private @Default UserInfoEndpoint userInfoEndpoint = new UserInfoEndpoint();
+            private String jwkSetUri;
+            private String issuerUri;
+            private @Default Map<String, Object> configurationMetadata = new HashMap<>(2);
+
+            @Getter
+            @Setter
+            @SuperBuilder
+            @ToString
+            @NoArgsConstructor
+            public static class UserInfoEndpoint implements Serializable {
+                private static final long serialVersionUID = 570;
+                private String uri;
+                private @Default AuthenticationMethod authenticationMethod = AuthenticationMethod.HEADER;
+                private String userNameAttributeName;
+            }
+        }
+
+        public static enum AuthorizationGrantType {
+            AUTHORIZATION_CODE,
+
+            @Deprecated
+            IMPLICIT,
+
+            REFRESH_TOKEN,
+
+            CLIENT_CREDENTIALS,
+
+            PASSWORD,
+
+            JWT_BEARER
+        }
+
+        public static enum AuthenticationMethod {
+            HEADER, FORM, QUERY
+        }
+
+        public static enum ClientAuthenticationMethod {
+            @Deprecated
+            BASIC,
+
+            CLIENT_SECRET_BASIC,
+
+            POST,
+
+            CLIENT_SECRET_POST,
+
+            CLIENT_SECRET_JWT,
+
+            PRIVATE_KEY_JWT,
+
+            NONE
+        }
     }
 
     @Getter

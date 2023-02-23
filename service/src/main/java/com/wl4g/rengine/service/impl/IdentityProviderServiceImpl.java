@@ -15,25 +15,33 @@
  */
 package com.wl4g.rengine.service.impl;
 
+import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
+import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
+import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
+import static com.wl4g.rengine.service.mongo.QueryHolder.isCriteria;
+import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
 import static java.util.Objects.isNull;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import com.mongodb.client.result.DeleteResult;
+import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.IdentityProvider;
 import com.wl4g.rengine.common.util.BeanSensitiveTransforms;
 import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.service.IdentityProviderService;
+import com.wl4g.rengine.service.model.IdentityProviderDelete;
+import com.wl4g.rengine.service.model.IdentityProviderDeleteResult;
 import com.wl4g.rengine.service.model.IdentityProviderQuery;
-import com.wl4g.rengine.service.model.IdentityProviderQueryResult;
 import com.wl4g.rengine.service.model.IdentityProviderSave;
 import com.wl4g.rengine.service.model.IdentityProviderSaveResult;
 
@@ -50,26 +58,25 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
     private @Autowired MongoTemplate mongoTemplate;
 
     @Override
-    public IdentityProviderQueryResult query(IdentityProviderQuery model) {
-        List<IdentityProvider> idpConfigs = null;
-        if (!isBlank(model.getKind())) {
-            final Criteria criteria = new Criteria().orOperator(Criteria.where("kind").is(model.getKind()));
-            idpConfigs = mongoTemplate.find(new Query(criteria), IdentityProvider.class,
-                    MongoCollectionDefinition.SYS_IDENTITY_PROVIDERS.getName());
-        } else {
-            idpConfigs = mongoTemplate.findAll(IdentityProvider.class,
-                    MongoCollectionDefinition.SYS_IDENTITY_PROVIDERS.getName());
-        }
+    public PageHolder<IdentityProvider> query(IdentityProviderQuery model) {
+        final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getIdpId()),
+                isCriteria("kind", model.getKind()), isCriteria("registrationId", model.getRegistrationId())))
+                        .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
+
+        final List<IdentityProvider> idps = mongoTemplate.find(query, IdentityProvider.class,
+                MongoCollectionDefinition.T_SCENESES.getName());
         // Collections.sort(idpConfigs, (o1, o2) ->
         // (o2.getUpdateDate().getTime()
         // - o1.getUpdateDate().getTime()) > 0 ? 1 : -1);
 
         // Mask sensitive information.
-        for (IdentityProvider idp : idpConfigs) {
+        for (IdentityProvider idp : idps) {
             BeanSensitiveTransforms.transform(idp);
         }
 
-        return IdentityProviderQueryResult.builder().providers(idpConfigs).build();
+        return new PageHolder<IdentityProvider>(model.getPageNum(), model.getPageSize())
+                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.SYS_IDENTITY_PROVIDERS.getName()))
+                .withRecords(idps);
     }
 
     @Override
@@ -84,6 +91,14 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
         provider.setUpdateDate(new Date());
         IdentityProvider saved = mongoTemplate.save(provider, MongoCollectionDefinition.SYS_IDENTITY_PROVIDERS.getName());
         return IdentityProviderSaveResult.builder().id(saved.getId()).build();
+    }
+
+    @Override
+    public IdentityProviderDeleteResult delete(IdentityProviderDelete model) {
+        // 'id' is a keyword, it will be automatically converted to '_id'
+        DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
+                MongoCollectionDefinition.SYS_IDENTITY_PROVIDERS.getName());
+        return IdentityProviderDeleteResult.builder().deletedCount(result.getDeletedCount()).build();
     }
 
 }

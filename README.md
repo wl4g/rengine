@@ -24,7 +24,7 @@ Unified and flexible rules engine platform, naturally suitable for scenarios whe
 
 - JDK 11.x +
 
-- GraalVM java11-22.1 + (Recommands)
+- GraalVM java11-22.1 + (If the needs build executor native image)
 
 - Maven 3.6 +
 
@@ -34,33 +34,37 @@ Unified and flexible rules engine platform, naturally suitable for scenarios whe
 
 - Redis Cluster 6 +
 
-- MongoDB 4.4.6 +
+- Mongo 4.4.6 +
 
 - MinIO 2021.x +
 
 - Docker 20.x +
 
-- Kubernetes 1.21 + (Recommands)
+- Kubernetes 1.21 + (If the needs deploy to kubernetes)
 
-- Flink 1.14.4 + (Recommands)
+- Flink 1.14.4 + (If the need to run the Flink CEP job to process massive events)
 
-- HBase 2.2.x + (Optional)
+- HBase 2.2.x + (Optional, If the needs to store raw events so that can trace back.)
 
 ## Features
 
-- Supports large-scale MMP parallel near real-time aggregation computing based on Flink/CEP.
+- Support [ApiServer](docs/en/devel-apiserver.md) static password login and standard OAuth2/OIDC authentication (the configure multiple), such as [keycloak](https://www.keycloak.org/), [github](https://github.com/), etc.
 
-- Supports multi-language scripting engine for [Groovy](http://groovy-lang.org/differences.html#_default_imports), [JS(graal.js)](https://www.graalvm.org/22.2/reference-manual/js/FAQ/#what-is-the-difference-between-running-graalvms-javascript-in-native-image-compared-to-the-jvm).
+- Support online coding development rules models, and upload the custom dependency script libraries.
 
-- Supports highly flexible dynamic writing rule templates based on WebIDE.
+- Support [Controller](docs/en/devel-controller.md) actively scheduling invoke workflow graph.
 
-- Supports WebIDE uploading of custom class libraries and automatically completes code prompts.
+- Support [Job](docs/en/devel-job.md) large-scale MMP parallel real-time state recognition based on Flink CEP.
 
-- Supports automatic analysis of hit rate reports.
+- Support [Controller](docs/en/devel-controller.md), [ApiServer](docs/en/devel-apiserver.md) register connecting to [arthas tunnel](https://arthas.aliyun.com/en/doc/tunnel.html) for easy operator JVM troubleshooting (**Only in JVM run mode**).
 
-- Support [graalvm native mode](https://www.graalvm.org/22.1/docs/getting-started/#native-image) operation (currently supported services: manager/evaluator/collector, future plans to support: flink jobs).
+- Support [Executor](docs/en/devel-executor.md) run by native mode running. see: [native-image](https://www.graalvm.org/22.1/docs/getting-started/#native-image)
 
-- Supports connecting to [arthas tunnel](https://arthas.aliyun.com/en/doc/tunnel.html) for easy administrator JVM troubleshooting (**Only in JVM run mode**).
+- Support [Executor](docs/en/devel-executor.md) built-in multi SDKs(eg: **tools/common/datasource/notifier**), such as datasource sdk, which can be connected to multiple data-source instances by configuration.
+
+- Support [Executor](docs/en/devel-executor.md) multi-languages scripting engine for [JS (Graal.js)](https://www.graalvm.org/22.2/reference-manual/js/FAQ/#what-is-the-difference-between-running-graalvms-javascript-in-native-image-compared-to-the-jvm) (**default**), [Groovy](http://groovy-lang.org/differences.html#_default_imports) (**plan**).
+
+- Support automatic analysis of hit rate reports (**progressing**).
 
 ## Quick start
 

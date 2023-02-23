@@ -15,12 +15,6 @@
  */
 package com.wl4g.rengine.service.model;
 
-import java.util.List;
-
-import javax.annotation.Nullable;
-
-import com.wl4g.rengine.common.entity.IdentityProvider;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,7 +22,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link IdentityProviderQueryResult}
+ * {@link IdentityProviderDelete}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -39,6 +33,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class IdentityProviderQueryResult {
-    private @Nullable List<IdentityProvider> providers;
+public class IdentityProviderDelete extends BaseDelete {
 }

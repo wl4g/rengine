@@ -55,6 +55,6 @@ rengine:
     client:
       concurrency: 10
       acceptQueue: 2
-    flink:
-      concurrency: 5
-      acceptQueue: 1
+    #flink:
+    #  concurrency: 5
+    #  acceptQueue: 1

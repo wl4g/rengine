@@ -33,23 +33,32 @@ import lombok.Getter;
  */
 public abstract class RengineConstants extends EnvironmentUtil {
 
-    // ----- for Basic definitions. -----
+    // ----- Common definitions. -----
 
     public static final String CONF_PREFIX = "rengine";
 
-    // ----- for ApiServer definitions. -----
-
-    public static final String CONF_PREFIX_APISERVER = CONF_PREFIX + ".apiserver";
     public static final String DEFAULT_MONGODB_DATABASE = getStringProperty("mongodb.database", "rengine");
     public static final String DEFAULT_MINIO_ENDPOINT = "http://localhost:9000";
     public static final String DEFAULT_MINIO_REGION = "us-east-1";
     public static final String DEFAULT_MINIO_BUCKET = "rengine";
 
-    // ----- for Controller definitions. -----
+    // ----- ApiServer definitions. -----
+
+    public static final String CONF_PREFIX_APISERVER = CONF_PREFIX + ".apiserver";
+
+    // The URI of form submit username and password processing login endpoint.
+    // The default as: /login
+    public static final String DEFAULT_SECURITY_PASSWORD_ENDPOINT_URI = "/login/password";
+    // The base URI of the start OAuth2 authenticating request.
+    // The default as: /oauth2/authorization
+    // see:org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI
+    public static final String DEFAULT_SECURITY_OAUTH2_ENDPOINT_BASE_URI = "/login/oauth2";
+
+    // ----- Controller definitions. -----
 
     public static final String CONF_PREFIX_CONTROLLER = CONF_PREFIX + ".controller";
 
-    // ----- for Executor definitions. -----
+    // ----- Executor definitions. -----
 
     public static final String CONF_PREFIX_EXECUTOR = CONF_PREFIX + ".executor";
 
@@ -80,15 +89,15 @@ public abstract class RengineConstants extends EnvironmentUtil {
     public static final int DEFAULT_EXECUTOR_S3_OBJECT_MAX_LIMIT = getIntProperty("EXECUTOR_S3_OBJECT_MAX_LIMIT",
             10 * 1024 * 1024);
 
-    // ----- for Client definitions. -----
+    // ----- Client definitions. -----
 
     public static final String CONF_PREFIX_CLIENT = CONF_PREFIX + ".client";
 
-    // ----- for Job definitions. -----
+    // ----- Job definitions. -----
 
     public static final String DEFAULT_EVENTBUS_TOPIC = "rengine_event";
 
-    // ----- for Eventbus definitions. -----
+    // ----- Eventbus definitions. -----
 
     public static final String CONF_PREFIX_EVENTBUS = CONF_PREFIX + ".eventbus";
     public static final String CONF_PREFIX_EVENTBUS_KAFKA = CONF_PREFIX_EVENTBUS + ".kafka";

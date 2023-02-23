@@ -1,0 +1,87 @@
+/*
+ * Copyright 2002-2018 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.wl4g.rengine.service.security;
+
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static java.lang.String.format;
+import static java.util.Objects.isNull;
+
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.core.AuthenticationMethod;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+
+import com.wl4g.rengine.common.entity.IdentityProvider.OidcConfig;
+import com.wl4g.rengine.service.IdentityProviderService;
+
+import lombok.Getter;
+
+/**
+ * {@link MongoClientRegistrationRepository}
+ * 
+ * @author James Wong
+ * @version 2023-02-23
+ * @since v1.0.0
+ * @see {@link org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository}
+ */
+@Getter
+public final class MongoClientRegistrationRepository implements ClientRegistrationRepository {
+
+    private final MongoTemplate mongoTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
+    private final IdentityProviderService identityProviderService;
+
+    public MongoClientRegistrationRepository(MongoTemplate mongoTemplate, RedisTemplate<String, String> redisTemplate,
+            IdentityProviderService identityProviderService) {
+        this.mongoTemplate = notNullOf(mongoTemplate, "mongoTemplate");
+        this.redisTemplate = notNullOf(redisTemplate, "redisTemplate");
+        this.identityProviderService = notNullOf(identityProviderService, "identityProviderService");
+    }
+
+    @Override
+    public ClientRegistration findByRegistrationId(String registrationId) {
+        final var oidcClientRegistration = (OidcConfig) identityProviderService.getRegistrationId(registrationId);
+        if (isNull(oidcClientRegistration)) {
+            throw new IllegalArgumentException(format("No found OIDC client registration for %s", registrationId));
+        }
+
+        return ClientRegistration.withRegistrationId(registrationId)
+                .clientId(oidcClientRegistration.getClientId())
+                .clientSecret(oidcClientRegistration.getClientSecret())
+                .clientAuthenticationMethod(
+                        new ClientAuthenticationMethod(oidcClientRegistration.getClientAuthenticationMethod().name()))
+                .authorizationGrantType(new AuthorizationGrantType(oidcClientRegistration.getAuthorizationGrantType().name()))
+                .redirectUri(oidcClientRegistration.getRedirectUri())
+                .scope(oidcClientRegistration.getScopes())
+                .authorizationUri(oidcClientRegistration.getProviderDetails().getAuthorizationUri())
+                .tokenUri(oidcClientRegistration.getProviderDetails().getTokenUri())
+                .userInfoUri(oidcClientRegistration.getProviderDetails().getUserInfoEndpoint().getUri())
+                .userInfoAuthenticationMethod(new AuthenticationMethod(
+                        oidcClientRegistration.getProviderDetails().getUserInfoEndpoint().getAuthenticationMethod().name()))
+                .userNameAttributeName(
+                        oidcClientRegistration.getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName())
+                .jwkSetUri(oidcClientRegistration.getProviderDetails().getJwkSetUri())
+                .issuerUri(oidcClientRegistration.getProviderDetails().getIssuerUri())
+                .providerConfigurationMetadata(oidcClientRegistration.getProviderDetails().getConfigurationMetadata())
+                .clientName(oidcClientRegistration.getClientName())
+                .build();
+    }
+
+}

@@ -1,4 +1,4 @@
-package com.wl4g.rengine.service.config;
+package com.wl4g.rengine.service.security;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
@@ -32,6 +32,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.wl4g.infra.common.bean.BaseBean;
+import com.wl4g.rengine.common.exception.RengineException;
 import com.wl4g.rengine.common.util.BsonEntitySerializers;
 
 import lombok.CustomLog;
@@ -68,7 +69,11 @@ public final class MongoUserDetailsManager implements UserDetailsManager, UserDe
 
         Document document = BsonEntitySerializers.toDocument(toEntityUser(user));
 
-        // TODO Check for already?
+        // Check for already
+        if (userExists(user.getUsername())) {
+            throw new RengineException(format("Already the user '%s'", user.getUsername()));
+        }
+
         userCollection.insertOne(document);
     }
 

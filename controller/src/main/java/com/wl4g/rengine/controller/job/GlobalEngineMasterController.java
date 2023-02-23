@@ -60,7 +60,7 @@ import lombok.CustomLog;
 import lombok.Getter;
 
 /**
- * {@link GlobalEngineScheduleController}
+ * {@link GlobalEngineMasterController}
  * 
  * @author James Wong
  * @version 2022-10-20
@@ -69,7 +69,7 @@ import lombok.Getter;
  */
 @Getter
 @CustomLog
-public class GlobalEngineScheduleController extends AbstractJobExecutor {
+public class GlobalEngineMasterController extends AbstractJobExecutor {
 
     private static final String METHOD_EXECUTE = "execute";
 

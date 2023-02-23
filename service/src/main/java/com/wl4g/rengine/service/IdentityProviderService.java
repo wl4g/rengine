@@ -15,10 +15,20 @@
  */
 package com.wl4g.rengine.service;
 
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static java.lang.String.format;
+
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.wl4g.infra.common.bean.page.PageHolder;
+import com.wl4g.infra.common.collection.CollectionUtils2;
+import com.wl4g.rengine.common.entity.IdentityProvider;
+import com.wl4g.rengine.common.entity.IdentityProvider.IdPKind;
+import com.wl4g.rengine.common.exception.RengineException;
+import com.wl4g.rengine.service.model.IdentityProviderDelete;
+import com.wl4g.rengine.service.model.IdentityProviderDeleteResult;
 import com.wl4g.rengine.service.model.IdentityProviderQuery;
-import com.wl4g.rengine.service.model.IdentityProviderQueryResult;
 import com.wl4g.rengine.service.model.IdentityProviderSave;
 import com.wl4g.rengine.service.model.IdentityProviderSaveResult;
 
@@ -31,8 +41,29 @@ import com.wl4g.rengine.service.model.IdentityProviderSaveResult;
  */
 public interface IdentityProviderService {
 
-    IdentityProviderQueryResult query(@NotNull IdentityProviderQuery model);
+    default IdentityProvider getRegistrationId(@NotBlank String registrationId) {
+        final var result = query(IdentityProviderQuery.builder()
+                .pageNum(1)
+                .pageSize(2)
+                .enable(true)
+                .kind(IdPKind.OIDC.name())
+                .registrationId(hasTextOf(registrationId, "registrationId"))
+                .build());
+        if (!CollectionUtils2.isEmpty(result.getRecords())) {
+            if (result.getRecords().size() > 1) {
+                throw new RengineException(format(
+                        "More many IDP configurations found. Please make sure the backend mgmt configuration is correct. %s",
+                        result.getRecords()));
+            }
+            return result.getRecords().get(0);
+        }
+        return null;
+    }
+
+    PageHolder<IdentityProvider> query(@NotNull IdentityProviderQuery model);
 
     IdentityProviderSaveResult save(@NotNull IdentityProviderSave model);
+
+    IdentityProviderDeleteResult delete(IdentityProviderDelete model);
 
 }

@@ -41,12 +41,12 @@ import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.User;
 import com.wl4g.rengine.service.UserService;
-import com.wl4g.rengine.service.config.MongoUserDetailsManager;
 import com.wl4g.rengine.service.model.UserDelete;
 import com.wl4g.rengine.service.model.UserDeleteResult;
 import com.wl4g.rengine.service.model.UserQuery;
 import com.wl4g.rengine.service.model.UserSave;
 import com.wl4g.rengine.service.model.UserSaveResult;
+import com.wl4g.rengine.service.security.MongoUserDetailsManager;
 
 import lombok.CustomLog;
 
