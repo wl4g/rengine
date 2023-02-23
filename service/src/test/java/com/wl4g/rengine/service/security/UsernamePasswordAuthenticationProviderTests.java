@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.service.config;
+package com.wl4g.rengine.service.security;
 
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
@@ -23,13 +23,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder.BCryptVersion;
 
 /**
- * {@link DefaultWebSecurityConfigureTests}
+ * {@link UsernamePasswordAuthenticationProviderTests}
  * 
  * @author James Wong
  * @version 2023-02-22
  * @since v1.0.0
  */
-public class DefaultWebSecurityConfigureTests {
+public class UsernamePasswordAuthenticationProviderTests {
 
     @Test
     public void testBCryptEncode() {

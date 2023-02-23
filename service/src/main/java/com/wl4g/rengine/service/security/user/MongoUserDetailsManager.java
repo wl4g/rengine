@@ -1,4 +1,4 @@
-package com.wl4g.rengine.service.security;
+package com.wl4g.rengine.service.security.user;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
@@ -51,6 +51,7 @@ import lombok.Setter;
 @Setter
 @CustomLog
 public final class MongoUserDetailsManager implements UserDetailsManager, UserDetailsPasswordService {
+
     private final AuthenticationManager authenticationManager;
     private final MongoCollection<Document> userCollection;
 

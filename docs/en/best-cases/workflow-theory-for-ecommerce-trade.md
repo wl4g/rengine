@@ -4,7 +4,7 @@
 
 - The business flow as follows:
 
-- ![](../shots/case1.png)
+- ![workflow-theory-for-ecommerce-trade](../../shots/best-cases/workflow-theory-for-ecommerce-trade.png)
 
 - The principle core codes for implementing the underlying execution graph is as follows (**pseudocode**):
 

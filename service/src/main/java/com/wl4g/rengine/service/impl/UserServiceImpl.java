@@ -46,7 +46,9 @@ import com.wl4g.rengine.service.model.UserDeleteResult;
 import com.wl4g.rengine.service.model.UserQuery;
 import com.wl4g.rengine.service.model.UserSave;
 import com.wl4g.rengine.service.model.UserSaveResult;
-import com.wl4g.rengine.service.security.MongoUserDetailsManager;
+import com.wl4g.rengine.service.security.AuthenticationUtils;
+import com.wl4g.rengine.service.security.AuthenticationUtils.UserAuthenticationInfo;
+import com.wl4g.rengine.service.security.user.MongoUserDetailsManager;
 
 import lombok.CustomLog;
 
@@ -110,6 +112,496 @@ public class UserServiceImpl implements UserService {
             return false;
         }
         return true;
+    }
+
+    /**
+     * for example (full spring security authentication information):
+     * 
+     * <pre>
+     *   {
+     *       "code": 200,
+     *       "status": "Normal",
+     *       "requestId": null,
+     *       "timestamp": 1677174410315,
+     *       "message": "Ok",
+     *       "data": {
+     *           "authorities": [
+     *               {
+     *                   "authority": "ROLE_USER",
+     *                   "attributes": {
+     *                       "at_hash": "BobM6LsCeuMwygl60hqmvA",
+     *                       "sub": "4255db57-6cd2-421a-b8dd-32c0c9f6a99a",
+     *                       "email_verified": false,
+     *                       "iss": "https://iam.wl4g.com/realms/master",
+     *                       "typ": "ID",
+     *                       "preferred_username": "rengine1",
+     *                       "given_name": "",
+     *                       "nonce": "zDQphkFiVlGqS-HXy6qXBFT_NLAB40tONKF75oiddFk",
+     *                       "sid": "fb3fc07c-13d9-4665-9628-ec7772dafe3c",
+     *                       "aud": [
+     *                           "rengine"
+     *                       ],
+     *                       "acr": "1",
+     *                       "azp": "rengine",
+     *                       "auth_time": "2023-02-23T17:43:49Z",
+     *                       "exp": "2023-02-23T17:44:50Z",
+     *                       "session_state": "fb3fc07c-13d9-4665-9628-ec7772dafe3c",
+     *                       "family_name": "",
+     *                       "iat": "2023-02-23T17:43:50Z",
+     *                       "jti": "9e9e3400-571a-48fb-ac67-6f6015180913"
+     *                   },
+     *                   "idToken": {
+     *                       "tokenValue": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJOMVlUSmlxcE1HSUI5eEg5OERZUTlJZlJmR2RsYWRKUjNmZE95TjRzeks4In0.eyJleHAiOjE2NzcxNzQyOTAsImlhdCI6MTY3NzE3NDIzMCwiYXV0aF90aW1lIjoxNjc3MTc0MjI5LCJqdGkiOiI5ZTllMzQwMC01NzFhLTQ4ZmItYWM2Ny02ZjYwMTUxODA5MTMiLCJpc3MiOiJodHRwczovL2lhbS53bDRnLmNvbS9yZWFsbXMvbWFzdGVyIiwiYXVkIjoicmVuZ2luZSIsInN1YiI6IjQyNTVkYjU3LTZjZDItNDIxYS1iOGRkLTMyYzBjOWY2YTk5YSIsInR5cCI6IklEIiwiYXpwIjoicmVuZ2luZSIsIm5vbmNlIjoiekRRcGhrRmlWbEdxUy1IWHk2cVhCRlRfTkxBQjQwdE9OS0Y3NW9pZGRGayIsInNlc3Npb25fc3RhdGUiOiJmYjNmYzA3Yy0xM2Q5LTQ2NjUtOTYyOC1lYzc3NzJkYWZlM2MiLCJhdF9oYXNoIjoiQm9iTTZMc0NldU13eWdsNjBocW12QSIsImFjciI6IjEiLCJzaWQiOiJmYjNmYzA3Yy0xM2Q5LTQ2NjUtOTYyOC1lYzc3NzJkYWZlM2MiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsInByZWZlcnJlZF91c2VybmFtZSI6InJlbmdpbmUxIiwiZ2l2ZW5fbmFtZSI6IiIsImZhbWlseV9uYW1lIjoiIn0.wXW6fNPMilbOWlKRTtF70GqbcUN6U9h-NqlSrcgnm1lxhD2iGWcNPD3vQZPIBvEg5JShSUSIaiKLvO5b8mKa6w4EtGYd0R4AUlHZRvwcKktuW6rrr3Nwowrq2wslDRxI6uDTqpLu85iRXnQ2LPFzQ6jDxskj1_OYjnZGE3hNVvivX3vRZnPfPLTGvQvZIrbYccDg3GGntBGEOOU3iCRu71ifc4-JWncxeVYvsAlo88eDxT8lYDz3NaH0w2-XRNnSl9ByTIxrz35qIWPJrOCO0EGlr-u1I9myW5iVmSlFOWYcRDgFcFqPeDtMT7yIgyjtL0AB2zr6HS8XOor25MCnyw",
+     *                       "issuedAt": "2023-02-23T17:43:50Z",
+     *                       "expiresAt": "2023-02-23T17:44:50Z",
+     *                       "claims": {
+     *                           "at_hash": "BobM6LsCeuMwygl60hqmvA",
+     *                           "sub": "4255db57-6cd2-421a-b8dd-32c0c9f6a99a",
+     *                           "email_verified": false,
+     *                           "iss": "https://iam.wl4g.com/realms/master",
+     *                           "typ": "ID",
+     *                           "preferred_username": "rengine1",
+     *                           "given_name": "",
+     *                           "nonce": "zDQphkFiVlGqS-HXy6qXBFT_NLAB40tONKF75oiddFk",
+     *                           "sid": "fb3fc07c-13d9-4665-9628-ec7772dafe3c",
+     *                           "aud": [
+     *                               "rengine"
+     *                           ],
+     *                           "acr": "1",
+     *                           "azp": "rengine",
+     *                           "auth_time": "2023-02-23T17:43:49Z",
+     *                           "exp": "2023-02-23T17:44:50Z",
+     *                           "session_state": "fb3fc07c-13d9-4665-9628-ec7772dafe3c",
+     *                           "iat": "2023-02-23T17:43:50Z",
+     *                           "family_name": "",
+     *                           "jti": "9e9e3400-571a-48fb-ac67-6f6015180913"
+     *                       },
+     *                       "subject": "4255db57-6cd2-421a-b8dd-32c0c9f6a99a",
+     *                       "audience": [
+     *                           "rengine"
+     *                       ],
+     *                       "authenticatedAt": "2023-02-23T17:43:49Z",
+     *                       "authenticationContextClass": "1",
+     *                       "authenticationMethods": null,
+     *                       "authorizedParty": "rengine",
+     *                       "accessTokenHash": "BobM6LsCeuMwygl60hqmvA",
+     *                       "authorizationCodeHash": null,
+     *                       "nonce": "zDQphkFiVlGqS-HXy6qXBFT_NLAB40tONKF75oiddFk",
+     *                       "issuer": "https://iam.wl4g.com/realms/master",
+     *                       "address": {
+     *                           "formatted": null,
+     *                           "streetAddress": null,
+     *                           "locality": null,
+     *                           "region": null,
+     *                           "postalCode": null,
+     *                           "country": null
+     *                       },
+     *                       "locale": null,
+     *                       "fullName": null,
+     *                       "zoneInfo": null,
+     *                       "email": null,
+     *                       "profile": null,
+     *                       "familyName": "",
+     *                       "middleName": null,
+     *                       "nickName": null,
+     *                       "preferredUsername": "rengine1",
+     *                       "picture": null,
+     *                       "website": null,
+     *                       "emailVerified": false,
+     *                       "gender": null,
+     *                       "birthdate": null,
+     *                       "phoneNumber": null,
+     *                       "phoneNumberVerified": null,
+     *                       "updatedAt": null,
+     *                       "givenName": ""
+     *                   },
+     *                   "userInfo": {
+     *                       "claims": {
+     *                           "sub": "4255db57-6cd2-421a-b8dd-32c0c9f6a99a",
+     *                           "email_verified": false,
+     *                           "preferred_username": "rengine1",
+     *                           "given_name": "",
+     *                           "family_name": ""
+     *                       },
+     *                       "address": {
+     *                           "formatted": null,
+     *                           "streetAddress": null,
+     *                           "locality": null,
+     *                           "region": null,
+     *                           "postalCode": null,
+     *                           "country": null
+     *                       },
+     *                       "locale": null,
+     *                       "fullName": null,
+     *                       "zoneInfo": null,
+     *                       "email": null,
+     *                       "profile": null,
+     *                       "subject": "4255db57-6cd2-421a-b8dd-32c0c9f6a99a",
+     *                       "familyName": "",
+     *                       "middleName": null,
+     *                       "nickName": null,
+     *                       "preferredUsername": "rengine1",
+     *                       "picture": null,
+     *                       "website": null,
+     *                       "emailVerified": false,
+     *                       "gender": null,
+     *                       "birthdate": null,
+     *                       "phoneNumber": null,
+     *                       "phoneNumberVerified": null,
+     *                       "updatedAt": null,
+     *                       "givenName": ""
+     *                   }
+     *               },
+     *               {
+     *                   "authority": "SCOPE_email"
+     *               },
+     *               {
+     *                   "authority": "SCOPE_openid"
+     *               },
+     *               {
+     *                   "authority": "SCOPE_profile"
+     *               }
+     *           ],
+     *           "details": {
+     *               "remoteAddress": "127.0.0.1",
+     *               "sessionId": "4c70b110-a59a-41e5-9ef9-66ac6ab92891"
+     *           },
+     *           "authenticated": true,
+     *           "principal": {
+     *               "authorities": [
+     *                   {
+     *                       "authority": "ROLE_USER",
+     *                       "attributes": {
+     *                           "at_hash": "BobM6LsCeuMwygl60hqmvA",
+     *                           "sub": "4255db57-6cd2-421a-b8dd-32c0c9f6a99a",
+     *                           "email_verified": false,
+     *                           "iss": "https://iam.wl4g.com/realms/master",
+     *                           "typ": "ID",
+     *                           "preferred_username": "rengine1",
+     *                           "given_name": "",
+     *                           "nonce": "zDQphkFiVlGqS-HXy6qXBFT_NLAB40tONKF75oiddFk",
+     *                           "sid": "fb3fc07c-13d9-4665-9628-ec7772dafe3c",
+     *                           "aud": [
+     *                               "rengine"
+     *                           ],
+     *                           "acr": "1",
+     *                           "azp": "rengine",
+     *                           "auth_time": "2023-02-23T17:43:49Z",
+     *                           "exp": "2023-02-23T17:44:50Z",
+     *                           "session_state": "fb3fc07c-13d9-4665-9628-ec7772dafe3c",
+     *                           "family_name": "",
+     *                           "iat": "2023-02-23T17:43:50Z",
+     *                           "jti": "9e9e3400-571a-48fb-ac67-6f6015180913"
+     *                       },
+     *                       "idToken": {
+     *                           "tokenValue": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJOMVlUSmlxcE1HSUI5eEg5OERZUTlJZlJmR2RsYWRKUjNmZE95TjRzeks4In0.eyJleHAiOjE2NzcxNzQyOTAsImlhdCI6MTY3NzE3NDIzMCwiYXV0aF90aW1lIjoxNjc3MTc0MjI5LCJqdGkiOiI5ZTllMzQwMC01NzFhLTQ4ZmItYWM2Ny02ZjYwMTUxODA5MTMiLCJpc3MiOiJodHRwczovL2lhbS53bDRnLmNvbS9yZWFsbXMvbWFzdGVyIiwiYXVkIjoicmVuZ2luZSIsInN1YiI6IjQyNTVkYjU3LTZjZDItNDIxYS1iOGRkLTMyYzBjOWY2YTk5YSIsInR5cCI6IklEIiwiYXpwIjoicmVuZ2luZSIsIm5vbmNlIjoiekRRcGhrRmlWbEdxUy1IWHk2cVhCRlRfTkxBQjQwdE9OS0Y3NW9pZGRGayIsInNlc3Npb25fc3RhdGUiOiJmYjNmYzA3Yy0xM2Q5LTQ2NjUtOTYyOC1lYzc3NzJkYWZlM2MiLCJhdF9oYXNoIjoiQm9iTTZMc0NldU13eWdsNjBocW12QSIsImFjciI6IjEiLCJzaWQiOiJmYjNmYzA3Yy0xM2Q5LTQ2NjUtOTYyOC1lYzc3NzJkYWZlM2MiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsInByZWZlcnJlZF91c2VybmFtZSI6InJlbmdpbmUxIiwiZ2l2ZW5fbmFtZSI6IiIsImZhbWlseV9uYW1lIjoiIn0.wXW6fNPMilbOWlKRTtF70GqbcUN6U9h-NqlSrcgnm1lxhD2iGWcNPD3vQZPIBvEg5JShSUSIaiKLvO5b8mKa6w4EtGYd0R4AUlHZRvwcKktuW6rrr3Nwowrq2wslDRxI6uDTqpLu85iRXnQ2LPFzQ6jDxskj1_OYjnZGE3hNVvivX3vRZnPfPLTGvQvZIrbYccDg3GGntBGEOOU3iCRu71ifc4-JWncxeVYvsAlo88eDxT8lYDz3NaH0w2-XRNnSl9ByTIxrz35qIWPJrOCO0EGlr-u1I9myW5iVmSlFOWYcRDgFcFqPeDtMT7yIgyjtL0AB2zr6HS8XOor25MCnyw",
+     *                           "issuedAt": "2023-02-23T17:43:50Z",
+     *                           "expiresAt": "2023-02-23T17:44:50Z",
+     *                           "claims": {
+     *                               "at_hash": "BobM6LsCeuMwygl60hqmvA",
+     *                               "sub": "4255db57-6cd2-421a-b8dd-32c0c9f6a99a",
+     *                               "email_verified": false,
+     *                               "iss": "https://iam.wl4g.com/realms/master",
+     *                               "typ": "ID",
+     *                               "preferred_username": "rengine1",
+     *                               "given_name": "",
+     *                               "nonce": "zDQphkFiVlGqS-HXy6qXBFT_NLAB40tONKF75oiddFk",
+     *                               "sid": "fb3fc07c-13d9-4665-9628-ec7772dafe3c",
+     *                               "aud": [
+     *                                   "rengine"
+     *                               ],
+     *                               "acr": "1",
+     *                               "azp": "rengine",
+     *                               "auth_time": "2023-02-23T17:43:49Z",
+     *                               "exp": "2023-02-23T17:44:50Z",
+     *                               "session_state": "fb3fc07c-13d9-4665-9628-ec7772dafe3c",
+     *                               "iat": "2023-02-23T17:43:50Z",
+     *                               "family_name": "",
+     *                               "jti": "9e9e3400-571a-48fb-ac67-6f6015180913"
+     *                           },
+     *                           "subject": "4255db57-6cd2-421a-b8dd-32c0c9f6a99a",
+     *                           "audience": [
+     *                               "rengine"
+     *                           ],
+     *                           "authenticatedAt": "2023-02-23T17:43:49Z",
+     *                           "authenticationContextClass": "1",
+     *                           "authenticationMethods": null,
+     *                           "authorizedParty": "rengine",
+     *                           "accessTokenHash": "BobM6LsCeuMwygl60hqmvA",
+     *                           "authorizationCodeHash": null,
+     *                           "nonce": "zDQphkFiVlGqS-HXy6qXBFT_NLAB40tONKF75oiddFk",
+     *                           "issuer": "https://iam.wl4g.com/realms/master",
+     *                           "address": {
+     *                               "formatted": null,
+     *                               "streetAddress": null,
+     *                               "locality": null,
+     *                               "region": null,
+     *                               "postalCode": null,
+     *                               "country": null
+     *                           },
+     *                           "locale": null,
+     *                           "fullName": null,
+     *                           "zoneInfo": null,
+     *                           "email": null,
+     *                           "profile": null,
+     *                           "familyName": "",
+     *                           "middleName": null,
+     *                           "nickName": null,
+     *                           "preferredUsername": "rengine1",
+     *                           "picture": null,
+     *                           "website": null,
+     *                           "emailVerified": false,
+     *                           "gender": null,
+     *                           "birthdate": null,
+     *                           "phoneNumber": null,
+     *                           "phoneNumberVerified": null,
+     *                           "updatedAt": null,
+     *                           "givenName": ""
+     *                       },
+     *                       "userInfo": {
+     *                           "claims": {
+     *                               "sub": "4255db57-6cd2-421a-b8dd-32c0c9f6a99a",
+     *                               "email_verified": false,
+     *                               "preferred_username": "rengine1",
+     *                               "given_name": "",
+     *                               "family_name": ""
+     *                           },
+     *                           "address": {
+     *                               "formatted": null,
+     *                               "streetAddress": null,
+     *                               "locality": null,
+     *                               "region": null,
+     *                               "postalCode": null,
+     *                               "country": null
+     *                           },
+     *                           "locale": null,
+     *                           "fullName": null,
+     *                           "zoneInfo": null,
+     *                           "email": null,
+     *                           "profile": null,
+     *                           "subject": "4255db57-6cd2-421a-b8dd-32c0c9f6a99a",
+     *                           "familyName": "",
+     *                           "middleName": null,
+     *                           "nickName": null,
+     *                           "preferredUsername": "rengine1",
+     *                           "picture": null,
+     *                           "website": null,
+     *                           "emailVerified": false,
+     *                           "gender": null,
+     *                           "birthdate": null,
+     *                           "phoneNumber": null,
+     *                           "phoneNumberVerified": null,
+     *                           "updatedAt": null,
+     *                           "givenName": ""
+     *                       }
+     *                   },
+     *                   {
+     *                       "authority": "SCOPE_email"
+     *                   },
+     *                   {
+     *                       "authority": "SCOPE_openid"
+     *                   },
+     *                   {
+     *                       "authority": "SCOPE_profile"
+     *                   }
+     *               ],
+     *               "attributes": {
+     *                   "at_hash": "BobM6LsCeuMwygl60hqmvA",
+     *                   "sub": "4255db57-6cd2-421a-b8dd-32c0c9f6a99a",
+     *                   "email_verified": false,
+     *                   "iss": "https://iam.wl4g.com/realms/master",
+     *                   "typ": "ID",
+     *                   "preferred_username": "rengine1",
+     *                   "given_name": "",
+     *                   "nonce": "zDQphkFiVlGqS-HXy6qXBFT_NLAB40tONKF75oiddFk",
+     *                   "sid": "fb3fc07c-13d9-4665-9628-ec7772dafe3c",
+     *                   "aud": [
+     *                       "rengine"
+     *                   ],
+     *                   "acr": "1",
+     *                   "azp": "rengine",
+     *                   "auth_time": "2023-02-23T17:43:49Z",
+     *                   "exp": "2023-02-23T17:44:50Z",
+     *                   "session_state": "fb3fc07c-13d9-4665-9628-ec7772dafe3c",
+     *                   "family_name": "",
+     *                   "iat": "2023-02-23T17:43:50Z",
+     *                   "jti": "9e9e3400-571a-48fb-ac67-6f6015180913"
+     *               },
+     *               "idToken": {
+     *                   "tokenValue": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJOMVlUSmlxcE1HSUI5eEg5OERZUTlJZlJmR2RsYWRKUjNmZE95TjRzeks4In0.eyJleHAiOjE2NzcxNzQyOTAsImlhdCI6MTY3NzE3NDIzMCwiYXV0aF90aW1lIjoxNjc3MTc0MjI5LCJqdGkiOiI5ZTllMzQwMC01NzFhLTQ4ZmItYWM2Ny02ZjYwMTUxODA5MTMiLCJpc3MiOiJodHRwczovL2lhbS53bDRnLmNvbS9yZWFsbXMvbWFzdGVyIiwiYXVkIjoicmVuZ2luZSIsInN1YiI6IjQyNTVkYjU3LTZjZDItNDIxYS1iOGRkLTMyYzBjOWY2YTk5YSIsInR5cCI6IklEIiwiYXpwIjoicmVuZ2luZSIsIm5vbmNlIjoiekRRcGhrRmlWbEdxUy1IWHk2cVhCRlRfTkxBQjQwdE9OS0Y3NW9pZGRGayIsInNlc3Npb25fc3RhdGUiOiJmYjNmYzA3Yy0xM2Q5LTQ2NjUtOTYyOC1lYzc3NzJkYWZlM2MiLCJhdF9oYXNoIjoiQm9iTTZMc0NldU13eWdsNjBocW12QSIsImFjciI6IjEiLCJzaWQiOiJmYjNmYzA3Yy0xM2Q5LTQ2NjUtOTYyOC1lYzc3NzJkYWZlM2MiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsInByZWZlcnJlZF91c2VybmFtZSI6InJlbmdpbmUxIiwiZ2l2ZW5fbmFtZSI6IiIsImZhbWlseV9uYW1lIjoiIn0.wXW6fNPMilbOWlKRTtF70GqbcUN6U9h-NqlSrcgnm1lxhD2iGWcNPD3vQZPIBvEg5JShSUSIaiKLvO5b8mKa6w4EtGYd0R4AUlHZRvwcKktuW6rrr3Nwowrq2wslDRxI6uDTqpLu85iRXnQ2LPFzQ6jDxskj1_OYjnZGE3hNVvivX3vRZnPfPLTGvQvZIrbYccDg3GGntBGEOOU3iCRu71ifc4-JWncxeVYvsAlo88eDxT8lYDz3NaH0w2-XRNnSl9ByTIxrz35qIWPJrOCO0EGlr-u1I9myW5iVmSlFOWYcRDgFcFqPeDtMT7yIgyjtL0AB2zr6HS8XOor25MCnyw",
+     *                   "issuedAt": "2023-02-23T17:43:50Z",
+     *                   "expiresAt": "2023-02-23T17:44:50Z",
+     *                   "claims": {
+     *                       "at_hash": "BobM6LsCeuMwygl60hqmvA",
+     *                       "sub": "4255db57-6cd2-421a-b8dd-32c0c9f6a99a",
+     *                       "email_verified": false,
+     *                       "iss": "https://iam.wl4g.com/realms/master",
+     *                       "typ": "ID",
+     *                       "preferred_username": "rengine1",
+     *                       "given_name": "",
+     *                       "nonce": "zDQphkFiVlGqS-HXy6qXBFT_NLAB40tONKF75oiddFk",
+     *                       "sid": "fb3fc07c-13d9-4665-9628-ec7772dafe3c",
+     *                       "aud": [
+     *                           "rengine"
+     *                       ],
+     *                       "acr": "1",
+     *                       "azp": "rengine",
+     *                       "auth_time": "2023-02-23T17:43:49Z",
+     *                       "exp": "2023-02-23T17:44:50Z",
+     *                       "session_state": "fb3fc07c-13d9-4665-9628-ec7772dafe3c",
+     *                       "iat": "2023-02-23T17:43:50Z",
+     *                       "family_name": "",
+     *                       "jti": "9e9e3400-571a-48fb-ac67-6f6015180913"
+     *                   },
+     *                   "subject": "4255db57-6cd2-421a-b8dd-32c0c9f6a99a",
+     *                   "audience": [
+     *                       "rengine"
+     *                   ],
+     *                   "authenticatedAt": "2023-02-23T17:43:49Z",
+     *                   "authenticationContextClass": "1",
+     *                   "authenticationMethods": null,
+     *                   "authorizedParty": "rengine",
+     *                   "accessTokenHash": "BobM6LsCeuMwygl60hqmvA",
+     *                   "authorizationCodeHash": null,
+     *                   "nonce": "zDQphkFiVlGqS-HXy6qXBFT_NLAB40tONKF75oiddFk",
+     *                   "issuer": "https://iam.wl4g.com/realms/master",
+     *                   "address": {
+     *                       "formatted": null,
+     *                       "streetAddress": null,
+     *                       "locality": null,
+     *                       "region": null,
+     *                       "postalCode": null,
+     *                       "country": null
+     *                   },
+     *                   "locale": null,
+     *                   "fullName": null,
+     *                   "zoneInfo": null,
+     *                   "email": null,
+     *                   "profile": null,
+     *                   "familyName": "",
+     *                   "middleName": null,
+     *                   "nickName": null,
+     *                   "preferredUsername": "rengine1",
+     *                   "picture": null,
+     *                   "website": null,
+     *                   "emailVerified": false,
+     *                   "gender": null,
+     *                   "birthdate": null,
+     *                   "phoneNumber": null,
+     *                   "phoneNumberVerified": null,
+     *                   "updatedAt": null,
+     *                   "givenName": ""
+     *               },
+     *               "userInfo": {
+     *                   "claims": {
+     *                       "sub": "4255db57-6cd2-421a-b8dd-32c0c9f6a99a",
+     *                       "email_verified": false,
+     *                       "preferred_username": "rengine1",
+     *                       "given_name": "",
+     *                       "family_name": ""
+     *                   },
+     *                   "address": {
+     *                       "formatted": null,
+     *                       "streetAddress": null,
+     *                       "locality": null,
+     *                       "region": null,
+     *                       "postalCode": null,
+     *                       "country": null
+     *                   },
+     *                   "locale": null,
+     *                   "fullName": null,
+     *                   "zoneInfo": null,
+     *                   "email": null,
+     *                   "profile": null,
+     *                   "subject": "4255db57-6cd2-421a-b8dd-32c0c9f6a99a",
+     *                   "familyName": "",
+     *                   "middleName": null,
+     *                   "nickName": null,
+     *                   "preferredUsername": "rengine1",
+     *                   "picture": null,
+     *                   "website": null,
+     *                   "emailVerified": false,
+     *                   "gender": null,
+     *                   "birthdate": null,
+     *                   "phoneNumber": null,
+     *                   "phoneNumberVerified": null,
+     *                   "updatedAt": null,
+     *                   "givenName": ""
+     *               },
+     *               "claims": {
+     *                   "at_hash": "BobM6LsCeuMwygl60hqmvA",
+     *                   "sub": "4255db57-6cd2-421a-b8dd-32c0c9f6a99a",
+     *                   "email_verified": false,
+     *                   "iss": "https://iam.wl4g.com/realms/master",
+     *                   "typ": "ID",
+     *                   "preferred_username": "rengine1",
+     *                   "given_name": "",
+     *                   "nonce": "zDQphkFiVlGqS-HXy6qXBFT_NLAB40tONKF75oiddFk",
+     *                   "sid": "fb3fc07c-13d9-4665-9628-ec7772dafe3c",
+     *                   "aud": [
+     *                       "rengine"
+     *                   ],
+     *                   "acr": "1",
+     *                   "azp": "rengine",
+     *                   "auth_time": "2023-02-23T17:43:49Z",
+     *                   "exp": "2023-02-23T17:44:50Z",
+     *                   "session_state": "fb3fc07c-13d9-4665-9628-ec7772dafe3c",
+     *                   "family_name": "",
+     *                   "iat": "2023-02-23T17:43:50Z",
+     *                   "jti": "9e9e3400-571a-48fb-ac67-6f6015180913"
+     *               },
+     *               "name": "rengine1",
+     *               "subject": "4255db57-6cd2-421a-b8dd-32c0c9f6a99a",
+     *               "issuedAt": "2023-02-23T17:43:50Z",
+     *               "expiresAt": "2023-02-23T17:44:50Z",
+     *               "audience": [
+     *                   "rengine"
+     *               ],
+     *               "authenticatedAt": "2023-02-23T17:43:49Z",
+     *               "authenticationContextClass": "1",
+     *               "authenticationMethods": null,
+     *               "authorizedParty": "rengine",
+     *               "accessTokenHash": "BobM6LsCeuMwygl60hqmvA",
+     *               "authorizationCodeHash": null,
+     *               "nonce": "zDQphkFiVlGqS-HXy6qXBFT_NLAB40tONKF75oiddFk",
+     *               "issuer": "https://iam.wl4g.com/realms/master",
+     *               "address": {
+     *                   "formatted": null,
+     *                   "streetAddress": null,
+     *                   "locality": null,
+     *                   "region": null,
+     *                   "postalCode": null,
+     *                   "country": null
+     *               },
+     *               "locale": null,
+     *               "fullName": null,
+     *               "zoneInfo": null,
+     *               "email": null,
+     *               "profile": null,
+     *               "familyName": "",
+     *               "middleName": null,
+     *               "nickName": null,
+     *               "preferredUsername": "rengine1",
+     *               "picture": null,
+     *               "website": null,
+     *               "emailVerified": false,
+     *               "gender": null,
+     *               "birthdate": null,
+     *               "phoneNumber": null,
+     *               "phoneNumberVerified": null,
+     *               "updatedAt": null,
+     *               "givenName": ""
+     *           },
+     *           "authorizedClientRegistrationId": "default_oidc",
+     *           "credentials": "",
+     *           "name": "rengine1"
+     *       }
+     *   }
+     * </pre>
+     */
+    @Override
+    public UserAuthenticationInfo loadUserInfo() {
+        return AuthenticationUtils.currentUserInfo();
     }
 
 }

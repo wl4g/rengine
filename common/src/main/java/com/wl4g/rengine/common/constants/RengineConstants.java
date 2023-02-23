@@ -49,10 +49,17 @@ public abstract class RengineConstants extends EnvironmentUtil {
     // The URI of form submit username and password processing login endpoint.
     // The default as: /login
     public static final String DEFAULT_SECURITY_PASSWORD_ENDPOINT_URI = "/login/password";
+
     // The base URI of the start OAuth2 authenticating request.
     // The default as: /oauth2/authorization
     // see:org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI
     public static final String DEFAULT_SECURITY_OAUTH2_ENDPOINT_BASE_URI = "/login/oauth2";
+
+    // The URI of form callback oauth2 processing login base uri.
+    // The default as: /login/oauth2/code/*
+    // see:org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter#DEFAULT_FILTER_PROCESSES_URI
+    // see:org.springframework.security.config.annotation.web.configurers.oauth2.client.OAuth2LoginConfigurer#loginProcessingUrl()
+    public static final String DEFAULT_SECURITY_OAUTH2_CALLBACK_BASE_URI = "/login/oauth2/callback/*";
 
     // ----- Controller definitions. -----
 

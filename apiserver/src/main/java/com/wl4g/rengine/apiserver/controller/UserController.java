@@ -19,6 +19,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotBlank;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,7 @@ import com.wl4g.rengine.service.model.UserDeleteResult;
 import com.wl4g.rengine.service.model.UserQuery;
 import com.wl4g.rengine.service.model.UserSave;
 import com.wl4g.rengine.service.model.UserSaveResult;
+import com.wl4g.rengine.service.security.AuthenticationUtils.UserAuthenticationInfo;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -54,7 +56,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "UserAPI", description = "The User management API")
 @Slf4j
 @RestController
-@RequestMapping("/v1/user")
+@RequestMapping(UserService.DEFAULT_USER_BASE_URI_V1)
 public class UserController {
 
     private @Autowired UserService userService;
@@ -102,6 +104,15 @@ public class UserController {
         RespBase<Boolean> resp = RespBase.create();
         resp.setData(userService.changePassword(oldPassword, newPassword));
         return resp;
+    }
+
+    // @SecurityRequirement(name = "default_oauth")
+    @Operation(description = "Load current authentication user info.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
+    @RequestMapping(path = { UserService.DEFAULT_LOAD_USERINFO_URI }, produces = "application/json", method = { GET })
+    public RespBase<UserAuthenticationInfo> loadUserInfo(HttpServletRequest request) {
+        RespBase<UserAuthenticationInfo> resp = RespBase.create();
+        return resp.withData(userService.loadUserInfo());
     }
 
 }

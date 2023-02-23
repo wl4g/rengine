@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.wl4g.rengine.service.security;
+package com.wl4g.rengine.service.security.oauth2;
 
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
@@ -22,13 +22,15 @@ import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-import java.security.Principal;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+
+import com.wl4g.rengine.service.security.RengineWebSecurityProperties;
 
 /**
  * 
@@ -48,63 +50,53 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
  */
 public class MongoOAuth2AuthorizedClientService implements OAuth2AuthorizedClientService {
 
+    private final RengineWebSecurityProperties config;
     private final MongoClientRegistrationRepository clientRegistrationRepository;
 
-    public MongoOAuth2AuthorizedClientService(ClientRegistrationRepository clientRegistrationRepository) {
+    public MongoOAuth2AuthorizedClientService(RengineWebSecurityProperties config,
+            ClientRegistrationRepository clientRegistrationRepository) {
+        this.config = notNullOf(config, "config");
         this.clientRegistrationRepository = notNullOf(clientRegistrationRepository, "clientRegistrationRepository");
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T extends OAuth2AuthorizedClient> T loadAuthorizedClient(String clientRegistrationId, String principalName) {
-        //// @formatter:off
-        //ClientRegistration clientRegistration = this.clientRegistrationRepository.findByRegistrationId(clientRegistrationId);
-        //if (clientRegistration == null) {
-        //    throw new IllegalArgumentException("Invalid Client Registration Id: " + clientRegistrationId);
-        //}
-        //return (T) new OAuth2AuthorizedClient(clientRegistration, principalName, null);
-        //// @formatter:on
-
         return (T) parseJSON(clientRegistrationRepository.getRedisTemplate()
                 .opsForValue()
-                // TODO using config prefix
-                .get(buildOAuth2ClientCacheKey(null, clientRegistrationId, principalName)), OAuth2AuthorizedClient.class);
+                .get(buildOAuth2ClientCacheKey(config.getOidc().getSaveOAuth2ClientPrefix(), clientRegistrationId,
+                        principalName)),
+                OAuth2AuthorizedClient.class);
     }
 
     @Override
     public void saveAuthorizedClient(OAuth2AuthorizedClient authorizedClient, Authentication principal) {
-        // clientRegistrationRepository.getMongoTemplate().save(authorizedClient);
-
-        final var registrationId = authorizedClient.getClientRegistration().getRegistrationId();
-        final var _principal = (Principal) principal.getPrincipal();
+        final String registrationId = authorizedClient.getClientRegistration().getRegistrationId();
+        final AuthenticatedPrincipal _principal = (AuthenticatedPrincipal) principal.getPrincipal(); // DefaultOidcUser,DefaultOAuth2User
 
         clientRegistrationRepository.getRedisTemplate()
                 .opsForValue()
-                // TODO using config prefix and expires
-                .set(buildOAuth2ClientCacheKey(null, registrationId, _principal.getName()), toJSONString(authorizedClient), 1800,
-                        TimeUnit.SECONDS);
-
+                .set(buildOAuth2ClientCacheKey(config.getOidc().getSaveOAuth2ClientPrefix(), registrationId,
+                        _principal.getName()), toJSONString(authorizedClient),
+                        config.getOidc().getSaveOAuth2ClientExpireSeconds(), TimeUnit.SECONDS);
     }
 
     @Override
     public void removeAuthorizedClient(String clientRegistrationId, String principalName) {
-        //// @formatter:off
-        //clientRegistrationRepository.getMongoTemplate()
-        //        .remove(Query.query(
-        //                Criteria.where("clientRegistrationId").is(clientRegistrationId).and("principalName").is(principalName)),
-        //                OAuth2AuthorizedClient.class);
-        //// @formatter:on
-
         clientRegistrationRepository.getRedisTemplate()
-                // TODO using config prefix
-                .delete(buildOAuth2ClientCacheKey(null, clientRegistrationId, principalName));
+                .delete(buildOAuth2ClientCacheKey(config.getOidc().getSaveOAuth2ClientPrefix(), clientRegistrationId,
+                        principalName));
     }
 
     public static String buildOAuth2ClientCacheKey(String prefix, String clientRegistrationId, String principalName) {
         hasTextOf(clientRegistrationId, "clientRegistrationId");
         hasTextOf(principalName, "principalName");
-        prefix = isBlank(prefix) ? "" : prefix;
-        return prefix.concat(":").concat(clientRegistrationId).concat(":").concat(principalName);
+        prefix = isBlank(prefix) ? "" : prefix.concat(":");
+        return prefix.concat(OAuth2AuthorizedClient.class.getSimpleName())
+                .concat(":")
+                .concat(clientRegistrationId)
+                .concat(":")
+                .concat(principalName);
     }
 
 }

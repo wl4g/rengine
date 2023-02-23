@@ -30,7 +30,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * {@link RengineServiceProperties}
+ * {@link RengineWebSecurityProperties}
  * 
  * @author James Wong
  * @version 2022-08-28

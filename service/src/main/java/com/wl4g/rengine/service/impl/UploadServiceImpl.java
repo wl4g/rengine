@@ -88,10 +88,6 @@ public class UploadServiceImpl implements UploadService {
     }
 
     public UploadSaveResult apply(UploadSave model) {
-        // Authentication authentication =
-        // SecurityContextHolder.getContext().getAuthentication();
-        // System.out.println(authentication);
-
         final UploadType uploadType = UploadType.of(model.getUploadType());
         // The precise object prefixes to ensure the creation of STS policy
         // with precise authorized write permissions.

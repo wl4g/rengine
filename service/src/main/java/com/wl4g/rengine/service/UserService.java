@@ -25,6 +25,7 @@ import com.wl4g.rengine.service.model.UserDeleteResult;
 import com.wl4g.rengine.service.model.UserQuery;
 import com.wl4g.rengine.service.model.UserSave;
 import com.wl4g.rengine.service.model.UserSaveResult;
+import com.wl4g.rengine.service.security.AuthenticationUtils.UserAuthenticationInfo;
 
 /**
  * {@link UserService}
@@ -42,5 +43,10 @@ public interface UserService {
     UserDeleteResult delete(@NotNull UserDelete model);
 
     boolean changePassword(@NotBlank String oldPassword, @NotBlank String newPassword);
+
+    UserAuthenticationInfo loadUserInfo();
+
+    public static final String DEFAULT_USER_BASE_URI_V1 = "/v1/user";
+    public static final String DEFAULT_LOAD_USERINFO_URI = "/loaduserinfo";
 
 }

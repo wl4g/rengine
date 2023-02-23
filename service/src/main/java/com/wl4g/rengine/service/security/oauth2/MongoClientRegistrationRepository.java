@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package com.wl4g.rengine.service.security;
+package com.wl4g.rengine.service.security.oauth2;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_SECURITY_OAUTH2_CALLBACK_BASE_URI;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -28,8 +31,12 @@ import org.springframework.security.oauth2.core.AuthenticationMethod;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 
+import com.wl4g.infra.common.remoting.uri.UriComponentsBuilder;
+import com.wl4g.infra.common.web.WebUtils2;
+import com.wl4g.infra.context.utils.web.WebUtils3;
 import com.wl4g.rengine.common.entity.IdentityProvider;
 import com.wl4g.rengine.common.entity.IdentityProvider.OidcConfig;
+import com.wl4g.rengine.common.entity.IdentityProvider.OidcConfig.UserInfoEndpoint;
 import com.wl4g.rengine.service.IdentityProviderService;
 
 import lombok.Getter;
@@ -62,26 +69,50 @@ public final class MongoClientRegistrationRepository implements ClientRegistrati
         if (isNull(identityProvider)) {
             throw new IllegalArgumentException(format("No found OIDC client registration configuration for %s", registrationId));
         }
+
+        final String defaultOAuth2RedirectUri = buildDefaultOAuth2RedirectUri(registrationId);
+
         final OidcConfig oidcClientRegistration = (OidcConfig) identityProvider.getDetails();
+        final UserInfoEndpoint userInfoEndpoint = oidcClientRegistration.getUserInfoEndpoint();
         return ClientRegistration.withRegistrationId(registrationId)
                 .clientId(oidcClientRegistration.getClientId())
                 .clientSecret(oidcClientRegistration.getClientSecret())
                 .clientAuthenticationMethod(
                         new ClientAuthenticationMethod(oidcClientRegistration.getClientAuthenticationMethod().name()))
                 .authorizationGrantType(new AuthorizationGrantType(oidcClientRegistration.getAuthorizationGrantType().name()))
-                .redirectUri(oidcClientRegistration.getRedirectUri())
                 .scope(oidcClientRegistration.getScopes())
                 .authorizationUri(oidcClientRegistration.getAuthorizationUri())
                 .tokenUri(oidcClientRegistration.getTokenUri())
                 .userInfoUri(oidcClientRegistration.getUserInfoEndpoint().getUri())
-                .userInfoAuthenticationMethod(
-                        new AuthenticationMethod(oidcClientRegistration.getUserInfoEndpoint().getAuthenticationMethod().name()))
-                .userNameAttributeName(oidcClientRegistration.getUserInfoEndpoint().getUserNameAttributeName())
+                .userInfoAuthenticationMethod(new AuthenticationMethod(userInfoEndpoint.getAuthenticationMethod().name()))
+                // Automatically downgrade to use the default value, thought to
+                // pass the configuration check.
+                .redirectUri(isBlank(oidcClientRegistration.getRedirectUri()) ? defaultOAuth2RedirectUri
+                        : oidcClientRegistration.getRedirectUri())
+                .userNameAttributeName(isBlank(userInfoEndpoint.getUserNameAttributeName()) ? DEFAULT_USER_NAME_ATTRIBUTE
+                        : userInfoEndpoint.getUserNameAttributeName())
                 .jwkSetUri(oidcClientRegistration.getJwkSetUri())
                 .issuerUri(oidcClientRegistration.getIssuerUri())
                 .providerConfigurationMetadata(oidcClientRegistration.getConfigurationMetadata())
                 .clientName(identityProvider.getName())
                 .build();
     }
+
+    // for example:
+    // http://rengine.xxx.io/api/login/oauth2/callback/default_oidc
+    public static String buildDefaultOAuth2RedirectUri(String registrationId) {
+        final var currentRequest = WebUtils3.currentServletRequest();
+        if (nonNull(currentRequest)) {
+            return UriComponentsBuilder.fromUriString(WebUtils2.getRFCBaseURI(currentRequest, true))
+                    .path(DEFAULT_SECURITY_OAUTH2_CALLBACK_BASE_URI.substring(0,
+                            DEFAULT_SECURITY_OAUTH2_CALLBACK_BASE_URI.indexOf("*")))
+                    .path(registrationId)
+                    .build()
+                    .toUriString();
+        }
+        return null;
+    }
+
+    public static final String DEFAULT_USER_NAME_ATTRIBUTE = "preferred_username"; // such-as:keycloack
 
 }

@@ -13,20 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.service.model;
+package com.wl4g.rengine.service.security;
 
-import javax.annotation.Nullable;
-
-import com.wl4g.rengine.common.entity.User;
+import javax.validation.constraints.NotNull;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.experimental.SuperBuilder;
 
 /**
- * {@link UserQuery}
+ * {@link RengineWebSecurityProperties}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -34,10 +31,19 @@ import lombok.experimental.SuperBuilder;
  */
 @Getter
 @Setter
-@SuperBuilder
-@ToString(callSuper = true)
-@NoArgsConstructor
-public class UserQuery extends BaseQuery<User> {
-    private @Nullable Long userId;
-    private @Nullable String email;
+@ToString
+public class RengineWebSecurityProperties {
+
+    @NotNull
+    OAuth2OidcProperties oidc = new OAuth2OidcProperties();
+
+    @Getter
+    @Setter
+    @ToString
+    @NoArgsConstructor
+    public static class OAuth2OidcProperties {
+        private String saveOAuth2ClientPrefix = "";
+        private Long saveOAuth2ClientExpireSeconds = 1800L;
+    }
+
 }

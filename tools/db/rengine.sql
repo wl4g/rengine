@@ -11,7 +11,7 @@
  Target Server Version : 40406
  File Encoding         : 65001
 
- Date: 22/02/2023 17:57:41
+ Date: 24/02/2023 11:22:58
 */
 
 
@@ -171,6 +171,56 @@ db.getCollection("sys_global_sequences").insert([ {
 session.commitTransaction(); session.endSession();
 
 // ----------------------------
+// Collection structure for sys_identity_providers
+// ----------------------------
+db.getCollection("sys_identity_providers").drop();
+db.createCollection("sys_identity_providers");
+
+// ----------------------------
+// Documents of sys_identity_providers
+// ----------------------------
+session = db.getMongo().startSession();
+session.startTransaction();
+db = session.getDatabase("rengine");
+db.getCollection("sys_identity_providers").insert([ {
+    _id: NumberLong("6150865561468928"),
+    name: "default OIDC client",
+    details: {
+        type: "OIDC",
+        registrationId: "default_oidc",
+        clientId: "rengine",
+        clientSecret: "FvLNs0sbwF3sN4BbyjZ5GBwN819QFCmF",
+        authorizationGrantType: "authorization_code",
+        redirectUri: "http://rengine.wl4g.io/api/login/oauth2/callback/default_oidc",
+        scopes: [
+            "openid",
+            "email",
+            "profile",
+            "roles"
+        ],
+        authorizationUri: "https://iam.wl4g.com/realms/master/protocol/openid-connect/auth",
+        tokenUri: "https://iam.wl4g.com/realms/master/protocol/openid-connect/token",
+        userInfoEndpoint: {
+            uri: "https://iam.wl4g.com/realms/master/protocol/openid-connect/userinfo",
+            authenticationMethod: "header",
+            userNameAttributeName: "preferred_username"
+        },
+        jwkSetUri: "https://iam.wl4g.com/realms/master/protocol/openid-connect/certs",
+        issuerUri: "https://iam.wl4g.com/realms/master",
+        configurationMetadata: { }
+    },
+    orgCode: "top",
+    enable: NumberInt("1"),
+    labels: [ ],
+    remark: "see:https://iam.wl4g.com/realms/master/.well-known/openid-configuration",
+    createDate: ISODate("2023-02-02T04:46:55.274Z"),
+    updateDate: ISODate("2023-02-02T04:46:55.274Z"),
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.IdentityProvider"
+} ]);
+session.commitTransaction(); session.endSession();
+
+// ----------------------------
 // Collection structure for sys_notifications
 // ----------------------------
 db.getCollection("sys_notifications").drop();
@@ -238,7 +288,7 @@ db.getCollection("sys_notifications").insert([ {
     createDate: ISODate("2023-01-07T11:22:48.314Z"),
     updateDate: ISODate("2023-01-07T11:22:48.314Z"),
     delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.Notification$DingtalkConfig"
+    _class: "com.wl4g.rengine.common.entity.Notification"
 } ]);
 db.getCollection("sys_notifications").insert([ {
     _id: NumberLong("6295643646476289"),
@@ -260,7 +310,7 @@ db.getCollection("sys_notifications").insert([ {
     createDate: ISODate("2023-01-07T11:22:48.314Z"),
     updateDate: ISODate("2023-01-07T11:22:48.314Z"),
     delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.Notification$DingtalkConfig"
+    _class: "com.wl4g.rengine.common.entity.Notification"
 } ]);
 session.commitTransaction(); session.endSession();
 
@@ -563,7 +613,8 @@ db.getCollection("t_datasources").insert([ {
     },
     remark: "test",
     updateDate: ISODate("2022-12-27T04:51:08.533Z"),
-    delFlag: NumberInt("0")
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.DataSourceProperties"
 } ]);
 db.getCollection("t_datasources").insert([ {
     _id: NumberLong("6220869710864223"),
@@ -583,7 +634,8 @@ db.getCollection("t_datasources").insert([ {
     },
     remark: "test",
     updateDate: ISODate("2022-12-27T04:51:08.533Z"),
-    delFlag: NumberInt("0")
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.DataSourceProperties"
 } ]);
 db.getCollection("t_datasources").insert([ {
     _id: NumberLong("6220869710864228"),
@@ -603,7 +655,8 @@ db.getCollection("t_datasources").insert([ {
     },
     remark: "test",
     updateDate: ISODate("2022-12-27T04:51:08.533Z"),
-    delFlag: NumberInt("0")
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.DataSourceProperties"
 } ]);
 db.getCollection("t_datasources").insert([ {
     _id: NumberLong("6220869710864224"),
@@ -633,7 +686,8 @@ db.getCollection("t_datasources").insert([ {
     },
     remark: "test",
     updateDate: ISODate("2022-12-27T04:51:08.533Z"),
-    delFlag: NumberInt("0")
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.DataSourceProperties"
 } ]);
 db.getCollection("t_datasources").insert([ {
     _id: NumberLong("6220869710864227"),
@@ -663,7 +717,8 @@ db.getCollection("t_datasources").insert([ {
     },
     remark: "test",
     updateDate: ISODate("2022-12-27T04:51:08.533Z"),
-    delFlag: NumberInt("0")
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.DataSourceProperties"
 } ]);
 db.getCollection("t_datasources").insert([ {
     _id: NumberLong("6220869710864225"),
@@ -679,7 +734,8 @@ db.getCollection("t_datasources").insert([ {
     },
     remark: "test",
     updateDate: ISODate("2022-12-27T04:51:08.533Z"),
-    delFlag: NumberInt("0")
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.DataSourceProperties"
 } ]);
 session.commitTransaction(); session.endSession();
 
@@ -1276,142 +1332,155 @@ db.getCollection("t_workflow_graphs").insert([ {
             id: "0",
             name: "The Boot",
             attributes: {
-                top: "10px",
+                top: "35px",
                 color: "#5f5f5f",
-                left: "10px"
-            }
+                left: "310px"
+            },
+            color: "#5f5f5f"
         },
         {
             "@type": "PROCESS",
             id: "11",
             name: "预处理(如篡改当前时间以用于测试目的)",
             attributes: {
-                top: "10px",
+                top: "130px",
                 color: "#5f5f5f",
-                left: "10px"
+                left: "300px"
             },
-            ruleId: "6150869239922100"
+            ruleId: 6.1508692399221e+15,
+            color: "#5f5f5f"
         },
         {
             "@type": "RELATION",
             id: "21",
             name: "当前时间是否满足(10.1~10.8)",
             attributes: {
-                top: "10px",
+                top: "220px",
                 color: "#5f5f5f",
-                left: "10px"
+                left: "305px"
             },
-            ruleId: "6150869239922100"
+            ruleId: 6.1508692399221e+15,
+            color: "#5f5f5f"
         },
         {
             "@type": "LOGICAL",
             id: "31",
             name: "ALL_AND逻辑运算",
             attributes: {
-                top: "10px",
+                top: "330px",
                 color: "#5f5f5f",
-                left: "10px"
+                left: "290px"
             },
-            logical: "ALL_AND"
+            logical: "ALL_AND",
+            color: "#5f5f5f"
         },
         {
             "@type": "LOGICAL",
             id: "41",
             name: "AND逻辑运算",
             attributes: {
-                top: "10px",
+                top: "355px",
                 color: "#5f5f5f",
-                left: "10px"
+                left: "505px"
             },
-            logical: "AND"
+            logical: "AND",
+            color: "#5f5f5f"
         },
         {
             "@type": "LOGICAL",
             id: "42",
             name: "AND逻辑运算",
             attributes: {
-                top: "10px",
+                top: "375px",
                 color: "#5f5f5f",
-                left: "10px"
+                left: "120px"
             },
-            logical: "AND"
+            logical: "AND",
+            color: "#5f5f5f"
         },
         {
             "@type": "RELATION",
             id: "51",
             name: "充值是否>=120元",
             attributes: {
-                top: "10px",
+                top: "480px",
                 color: "#5f5f5f",
-                left: "10px"
+                left: "595px"
             },
-            ruleId: "6150869239922100"
+            ruleId: 6.1508692399221e+15,
+            color: "#5f5f5f"
         },
         {
             "@type": "LOGICAL",
             id: "52",
             name: "AND逻辑运算",
             attributes: {
-                top: "10px",
+                top: "460px",
                 color: "#5f5f5f",
-                left: "10px"
+                left: "420px"
             },
-            logical: "AND"
+            logical: "AND",
+            color: "#5f5f5f"
         },
         {
             "@type": "RELATION",
             id: "53",
             name: "当前时间是否满足(10.5~10.8)",
             attributes: {
-                top: "10px",
+                top: "510px",
                 color: "#5f5f5f",
-                left: "10px"
+                left: "35px"
             },
-            ruleId: "6150869239922100"
+            ruleId: 6.1508692399221e+15,
+            color: "#5f5f5f"
         },
         {
             "@type": "RELATION",
             id: "54",
             name: "充值是否>=50元",
             attributes: {
-                top: "10px",
+                top: "535px",
                 color: "#5f5f5f",
-                left: "10px"
+                left: "170px"
             },
-            ruleId: "6150869239922100"
+            ruleId: 6.1508692399221e+15,
+            color: "#5f5f5f"
         },
         {
             "@type": "FAILBACK",
             id: "62",
             name: "如果赠送余额失败则执行回退规则",
             attributes: {
-                top: "10px",
+                top: "560px",
                 color: "#5f5f5f",
-                left: "10px"
+                left: "450px"
             },
-            ruleId: "6150869239922100"
+            ruleId: 6.1508692399221e+15,
+            color: "#5f5f5f"
         },
         {
             "@type": "RUN",
             id: "63",
             name: "赠送20积分",
             attributes: {
-                top: "10px",
+                top: "640px",
                 color: "#5f5f5f",
-                left: "10px"
+                left: "130px"
             },
-            ruleId: "6150869239922100"
+            ruleId: 6.1508692399221e+15,
+            color: "#5f5f5f"
         },
         {
             "@type": "RUN",
             id: "71",
             name: "赠送10元余额",
             attributes: {
-                top: "10px",
+                top: "615px",
                 color: "#5f5f5f",
-                left: "10px"
+                left: "325px"
             },
-            ruleId: "6150869239922100"
+            ruleId: 6.1508692399221e+15,
+            color: "#5f5f5f"
         }
     ],
     connections: [
