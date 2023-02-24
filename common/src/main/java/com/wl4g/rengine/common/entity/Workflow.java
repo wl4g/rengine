@@ -98,14 +98,13 @@ public class Workflow extends BaseBean {
         private static final long serialVersionUID = 1L;
         private @Nullable List<RuleWrapper> rules = new ArrayList<>(4);
 
-        public WorkflowGraphWrapper validate() {
+        public WorkflowGraphWrapper validateForBasic() {
             return validate(this);
         }
 
         public static WorkflowGraphWrapper validate(WorkflowGraphWrapper graph) {
             notNullOf(graph, "graph");
-            notEmpty(graph.getNodes(), "graph.nodes");
-            notEmpty(graph.getConnections(), "graph.connections");
+            graph.validateForBasic();
             notEmpty(graph.getRules(), "graph.rules");
 
             // Check for graph rules number.

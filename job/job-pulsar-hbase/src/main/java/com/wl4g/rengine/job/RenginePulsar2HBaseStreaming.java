@@ -18,7 +18,7 @@ package com.wl4g.rengine.job;
 import org.apache.flink.api.connector.source.Source;
 import org.apache.flink.api.connector.source.SourceSplit;
 
-import com.wl4g.rengine.job.hbase.RengineHBaseStreamingSupport;
+import com.wl4g.rengine.job.hbase.HBaseFlinkStreamingSupport;
 
 /**
  * {@link RenginePulsar2HBaseStreaming}
@@ -27,7 +27,7 @@ import com.wl4g.rengine.job.hbase.RengineHBaseStreamingSupport;
  * @version 2022-06-02 v3.0.0
  * @since v1.0.0
  */
-public class RenginePulsar2HBaseStreaming extends RengineHBaseStreamingSupport {
+public class RenginePulsar2HBaseStreaming extends HBaseFlinkStreamingSupport {
 
     public static void main(String[] args) throws Exception {
         new RenginePulsar2HBaseStreaming().parse(args).run();

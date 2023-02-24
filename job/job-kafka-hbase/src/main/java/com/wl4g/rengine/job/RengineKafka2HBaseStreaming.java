@@ -22,13 +22,13 @@ import org.apache.flink.api.connector.source.Source;
 import org.apache.flink.api.connector.source.SourceSplit;
 import org.apache.flink.connector.kafka.source.KafkaSourceOptions;
 
-import com.wl4g.rengine.job.hbase.RengineHBaseStreamingSupport;
+import com.wl4g.rengine.job.hbase.HBaseFlinkStreamingSupport;
 import com.wl4g.rengine.job.kafka.RengineKafkaUtil;
 
 import lombok.Getter;
 
 /**
- * {@link RengineKafka2HBaseStreaming}
+ * {@link GenericFlinkCepKafkaStreaming}
  * 
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2022-05-31 v3.0.0
@@ -36,12 +36,12 @@ import lombok.Getter;
  * @see https://stackoverflow.com/questions/69765972/migrating-from-flinkkafkaconsumer-to-kafkasource-no-windows-executed
  */
 @Getter
-public class RengineKafka2HBaseStreaming extends RengineHBaseStreamingSupport {
+public class RengineKafka2HBaseStreaming extends HBaseFlinkStreamingSupport {
 
     private String partitionDiscoveryIntervalMs;
 
     public static void main(String[] args) throws Exception {
-        new RengineKafka2HBaseStreaming().parse(args).run();
+        new GenericFlinkCepKafkaStreaming().parse(args).run();
     }
 
     public RengineKafka2HBaseStreaming() {
@@ -50,7 +50,7 @@ public class RengineKafka2HBaseStreaming extends RengineHBaseStreamingSupport {
     }
 
     @Override
-    protected RengineFlinkStreamingBase parse(String[] args) throws ParseException {
+    protected AbstractFlinkStreamingBase parse(String[] args) throws ParseException {
         super.parse(args);
         this.partitionDiscoveryIntervalMs = line.get("partitionDiscoveryIntervalMs");
         return this;

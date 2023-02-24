@@ -164,7 +164,7 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
             final WorkflowWrapper virtualWorkflow = WorkflowWrapper.builder()
                     .id(virtualWorkflowId)
                     .engine(rule.getEngine())
-                    .graphs(singletonList(virtualGraph.validate()))
+                    .graphs(singletonList(virtualGraph.validateForBasic()))
                     .build();
 
             final ResultDescription result = lifecycleExecutionService.getExecution(rule.getEngine())

@@ -22,16 +22,16 @@ import javax.validation.constraints.NotNull;
 import com.wl4g.rengine.common.event.RengineEvent;
 
 /**
- * {@link RengineEventAnalytical}
+ * {@link RengineEventWrapper}
  * 
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2022-06-08
  * @since v1.0.0
  */
-public class RengineEventAnalytical extends RengineEvent {
+public class RengineEventWrapper extends RengineEvent {
     private static final long serialVersionUID = 7396808707170188284L;
 
-    public RengineEventAnalytical(@NotNull RengineEvent event) {
+    public RengineEventWrapper(@NotNull RengineEvent event) {
         super(((RengineEvent) notNullOf(event, "event")).getType(), event.getObservedTime(), (EventSource) event.getSource(),
                 event.getBody(), event.getAttributes());
     }
@@ -40,7 +40,7 @@ public class RengineEventAnalytical extends RengineEvent {
     // * Sorted field list.
     // */
     // public static final List<Field> ORDERED_FIELDS = unmodifiableList(
-    // findAllDeclaredFields(RengineEventAnalytical.class,
+    // findAllDeclaredFields(RengineEventWrapper.class,
     // true).stream().filter(f -> {
     // // Check if it is a valid field that needs to be persisted.
     // int m = f.getModifiers();

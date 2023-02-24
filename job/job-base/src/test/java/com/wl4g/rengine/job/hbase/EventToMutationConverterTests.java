@@ -24,7 +24,7 @@ import org.junit.Test;
 import com.wl4g.rengine.common.event.RengineEvent;
 import com.wl4g.rengine.common.event.RengineEvent.EventSource;
 import com.wl4g.rengine.common.event.RengineEvent.EventLocation;
-import com.wl4g.rengine.job.model.RengineEventAnalytical;
+import com.wl4g.rengine.job.model.RengineEventWrapper;
 
 /**
  * {@link EventToMutationConverterTests}
@@ -37,7 +37,7 @@ public class EventToMutationConverterTests {
 
     @Test
     public void testEventToMutationConverter() {
-        RengineEventAnalytical model = new RengineEventAnalytical(new RengineEvent("device_temp_warning",
+        RengineEventWrapper model = new RengineEventWrapper(new RengineEvent("device_temp_warning",
                 EventSource.builder()
                         .time(currentTimeMillis())
                         .principals(singletonList("admin"))
@@ -48,9 +48,9 @@ public class EventToMutationConverterTests {
                                 .zipcode("20500")
                                 .build())
                         .build(),
-                // BsonEntitySerializers serious alarm occurs when the device temperature is greater
-                // than 52℃
-                "52"));
+                // BsonEntitySerializers serious alarm occurs when the device
+                // temperature is greater than 52℃
+                singletonList("52")));
 
         EventToMutationConverter converter = new EventToMutationConverter();
         converter.open();

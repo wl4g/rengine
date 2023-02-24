@@ -21,8 +21,8 @@ import org.apache.flink.api.connector.source.Source;
 import org.apache.flink.api.connector.source.SourceSplit;
 import org.apache.flink.connector.pulsar.source.PulsarSource;
 
-import com.wl4g.rengine.job.RengineFlinkStreamingBase;
-import com.wl4g.rengine.job.model.RengineEventAnalytical;
+import com.wl4g.rengine.job.AbstractFlinkStreamingBase;
+import com.wl4g.rengine.job.model.RengineEventWrapper;
 
 /**
  * {@link RenginePulsarUtil}
@@ -40,9 +40,9 @@ public abstract class RenginePulsarUtil {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public static <T, S extends SourceSplit, E> Source<T, S, E> createPulsarSource(RengineFlinkStreamingBase program) {
+    public static <T, S extends SourceSplit, E> Source<T, S, E> createPulsarSource(AbstractFlinkStreamingBase program) {
         // TODO
-        PulsarSource<RengineEventAnalytical> source = PulsarSource.<RengineEventAnalytical> builder()
+        PulsarSource<RengineEventWrapper> source = PulsarSource.<RengineEventWrapper> builder()
                 .setServiceUrl(program.getBrokers())
                 // .setGroupId(program.getGroupId())
                 .setTopicPattern(Pattern.compile(program.getTopicPattern()))

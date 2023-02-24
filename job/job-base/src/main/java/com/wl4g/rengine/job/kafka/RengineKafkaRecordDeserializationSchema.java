@@ -30,7 +30,7 @@ import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
 import com.wl4g.rengine.common.event.RengineEvent;
-import com.wl4g.rengine.job.model.RengineEventAnalytical;
+import com.wl4g.rengine.job.model.RengineEventWrapper;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -44,13 +44,13 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Getter
-public class RengineKafkaRecordDeserializationSchema implements KafkaRecordDeserializationSchema<RengineEventAnalytical> {
+public class RengineKafkaRecordDeserializationSchema implements KafkaRecordDeserializationSchema<RengineEventWrapper> {
     private static final long serialVersionUID = -3765473065594331694L;
 
     private transient Deserializer<String> deserializer = new StringDeserializer();
 
     @Override
-    public void deserialize(ConsumerRecord<byte[], byte[]> record, Collector<RengineEventAnalytical> collector)
+    public void deserialize(ConsumerRecord<byte[], byte[]> record, Collector<RengineEventWrapper> collector)
             throws IOException {
         if (isNull(deserializer)) {
             this.deserializer = new StringDeserializer();
@@ -58,7 +58,7 @@ public class RengineKafkaRecordDeserializationSchema implements KafkaRecordDeser
         if (nonNull(record.value())) {
             String json = deserializer.deserialize(record.topic(), record.value());
             try {
-                collector.collect(new RengineEventAnalytical(parseJSON(json, RengineEvent.class).validate()));
+                collector.collect(new RengineEventWrapper(parseJSON(json, RengineEvent.class).validate()));
             } catch (Exception e) {
                 log.warn(format("Unable to parse event json. - %s", json), e);
             }
@@ -66,8 +66,8 @@ public class RengineKafkaRecordDeserializationSchema implements KafkaRecordDeser
     }
 
     @Override
-    public TypeInformation<RengineEventAnalytical> getProducedType() {
-        return TypeInformation.of(RengineEventAnalytical.class);
+    public TypeInformation<RengineEventWrapper> getProducedType() {
+        return TypeInformation.of(RengineEventWrapper.class);
     }
 
 }

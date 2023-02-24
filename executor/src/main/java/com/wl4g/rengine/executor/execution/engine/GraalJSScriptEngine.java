@@ -15,10 +15,12 @@
  */
 package com.wl4g.rengine.executor.execution.engine;
 
+import static com.google.common.base.Charsets.UTF_8;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.infra.common.lang.Exceptions.getStackTraceAsString;
 import static com.wl4g.infra.common.lang.FastTimeClock.currentTimeMillis;
 import static com.wl4g.infra.common.lang.StringUtils2.getFilename;
 import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_MAIN_FUNCTION;
@@ -26,13 +28,22 @@ import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTO
 import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsName.execution_time;
 import static java.lang.String.format;
 import static java.util.Collections.singletonMap;
+import static java.util.Objects.nonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.lang3.StringUtils.join;
+import static org.apache.commons.lang3.StringUtils.trimToEmpty;
+import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -47,6 +58,7 @@ import org.graalvm.polyglot.Value;
 import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager;
 import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager.ContextWrapper;
 import com.wl4g.infra.common.graalvm.polyglot.JdkLoggingOutputStream;
+import com.wl4g.infra.common.io.FileIOUtils;
 import com.wl4g.infra.common.lang.StringUtils2;
 import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
 import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
@@ -103,14 +115,24 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
              * {@link com.wl4g.rengine.service.impl.ScheduleJobLogServiceImpl#logfile}
              */
             this.graalPolyglotManager = GraalPolyglotManager.newDefaultGraalJS(DEFAULT_EXECUTOR_SCRIPT_TMP_CACHE_DIR,
-                    metadata -> new JdkLoggingOutputStream(buildScriptLogFilePattern(scriptLogConfig.baseDir(), metadata, false),
-                            Level.INFO, scriptLogConfig.fileMaxSize(), scriptLogConfig.fileMaxCount(),
-                            scriptLogConfig.enableConsole(), false),
-                    metadata -> new JdkLoggingOutputStream(buildScriptLogFilePattern(scriptLogConfig.baseDir(), metadata, true),
-                            Level.WARNING, scriptLogConfig.fileMaxSize(), scriptLogConfig.fileMaxCount(),
-                            scriptLogConfig.enableConsole(), true));
-        } catch (Exception e) {
-            throw new ExecutionScriptException("Failed to init graal JS Script engine.", e);
+                    metadata -> {
+                        String filePattern = buildScriptLogFilePattern(scriptLogConfig.baseDir(), metadata, false);
+                        // Make sure to generate a log file during
+                        // initialization to solve the problem that there is no
+                        // output but an error is thrown when the script is
+                        // executed. At this time, the logtail loading log
+                        // interface will report an error that does not exist.
+                        FileIOUtils.ensureFile(new File(filePattern));
+                        return new JdkLoggingOutputStream(filePattern, Level.INFO, scriptLogConfig.fileMaxSize(),
+                                scriptLogConfig.fileMaxCount(), scriptLogConfig.enableConsole(), false);
+                    }, metadata -> {
+                        String filePattern = buildScriptLogFilePattern(scriptLogConfig.baseDir(), metadata, true);
+                        FileIOUtils.ensureFile(new File(filePattern));
+                        return new JdkLoggingOutputStream(filePattern, Level.WARNING, scriptLogConfig.fileMaxSize(),
+                                scriptLogConfig.fileMaxCount(), scriptLogConfig.enableConsole(), true);
+                    });
+        } catch (Throwable ex) {
+            throw new ExecutionScriptException("Failed to init graal JS Script engine.", ex);
         }
     }
 
@@ -135,8 +157,9 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
         log.debug("Executing JS script for workflowId: {} ...", workflowId);
 
         // see:https://github.com/oracle/graaljs/blob/vm-ee-22.1.0/graal-js/src/com.oracle.truffle.js.test.threading/src/com/oracle/truffle/js/test/threading/AsyncTaskTests.java#L283
-        try (ContextWrapper graalContext = graalPolyglotManager.getContext(singletonMap(KEY_WORKFLOW_ID, workflowId));) {
-            // New construct script context.
+        final ContextWrapper graalContext = graalPolyglotManager.getContext(singletonMap(KEY_WORKFLOW_ID, workflowId));
+        try {
+            // Build script context.
             final ScriptContext scriptContext = newScriptContext(graphContext);
 
             // Load all scripts dependencies.
@@ -174,8 +197,16 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
 
             log.debug("Executed for workflowId: {}, cost: {}ms, result: {}", workflowId, costTime, result);
             return result.as(ScriptResult.class);
-        } catch (Throwable e) {
-            throw new EvaluationException(traceId, clientId, workflowId, "Failed to execution js script", e);
+        } catch (Throwable ex) {
+            // Gets current graal context stderr.
+            logScriptErrorMessage(ex, (JdkLoggingOutputStream) graalContext.getStderr());
+            throw new EvaluationException(traceId, clientId, workflowId, "Failed to execute script", ex);
+        } finally {
+            try {
+                graalContext.close();
+            } catch (Throwable ex) {
+                throw new IllegalStateException(format("Failed to closing context wrapper for %s", workflowId), ex);
+            }
         }
     }
 
@@ -193,11 +224,62 @@ public class GraalJSScriptEngine extends AbstractScriptEngine {
         });
     }
 
+    private void logScriptErrorMessage(Throwable ex, JdkLoggingOutputStream graalCtxStderr) {
+        if (nonNull(graalCtxStderr)) {
+            try {
+                String scriptErrmsg = getStackTraceAsString(ex);
+                if (engineConfig.log().extractStackCausesAsLog()) {
+                    scriptErrmsg = extractStackCausesAsLog(scriptErrmsg);
+                }
+                graalCtxStderr.write(trimToEmpty(scriptErrmsg).getBytes(UTF_8));
+                graalCtxStderr.flush();
+            } catch (IOException ex2) {
+                log.error("Unable to write script execute error log.", ex2);
+            }
+        }
+    }
+
+    public static String extractStackCausesAsLog(String scriptStacktrace) {
+        final List<String> errStacks = new ArrayList<>(4);
+        final Matcher matcher = Pattern.compile(DEFAULT_SCRIPT_ERRMSG_REGEX).matcher(scriptStacktrace);
+        while (matcher.find()) {
+            errStacks.add(matcher.group());
+        }
+        return trimToEmpty(join(errStacks.toArray(), LINE_SEPARATOR));
+    }
+
     @Override
     protected ScriptExecutor createScriptExecutor(
             final @NotNull ExecutionGraphParameter parameter,
             final @NotNull SafeScheduledTaskPoolExecutor executor) {
         return new ScriptExecutor(parameter.getWorkflowId(), executor, graalPolyglotManager);
     }
+
+    /**
+     * for example:
+     * 
+     * <pre>
+     *   2023-24-45 19:45:12 WARN co.wl.re.ex.ex.DefaultWorkflowExecution (ReactiveEngineExecutionServiceImpl-1) Failed to execution workflow graph for workflowId: 6150868953448440[39m[38;5;203m: com.wl4g.rengine.common.exception.ExecutionGraphException: com.wl4g.rengine.common.exception.EvaluationException: Failed to execute script
+     *   at com.wl4g.rengine.common.graph.ExecutionGraph$BaseOperator.doExecute(ExecutionGraph.java:300)
+     *   ... 10 more
+     *   Caused by: com.wl4g.rengine.common.exception.EvaluationException: Failed to execute script
+     *   at com.wl4g.rengine.executor.execution.engine.GraalJSScriptEngine.execute(GraalJSScriptEngine.java:207)
+     *   at com.wl4g.rengine.executor.execution.engine.GraalJSScriptEngine_Subclass.execute$$superforward1(Unknown Source)
+     *   at com.wl4g.rengine.executor.execution.engine.GraalJSScriptEngine_Subclass$$function$$6.apply(Unknown Source)
+     *   at io.quarkus.arc.impl.AroundInvokeInvocationContext.proceed(AroundInvokeInvocationContext.java:53)
+     *   ... 28 more
+     *   Caused by: org.graalvm.polyglot.PolyglotException: [AF] - vmHost is required
+     *   at com.wl4g.infra.common.lang.Assert2.hasText(Assert2.java:608)
+     *   at com.wl4g.infra.common.lang.Assert2.hasTextOf(Assert2.java:772)
+     *   at com.wl4g.rengine.executor.execution.sdk.tools.Assert.hasTextOf(Assert.java:80)
+     *   at &lt;js&gt;.process(vm-health-detecter-1.0.0.js@6150868953448440:4)
+     *   at &lt;js&gt; process(vm-health-detecter-1.0.0.js@6150868953448440:4)
+     *   at org.graalvm.polyglot.Value.execute(Value.java:841)
+     *   at com.wl4g.rengine.executor.execution.engine.GraalJSScriptEngine.execute(GraalJSScriptEngine.java:198)
+     *   at com.wl4g.rengine.executor.execution.engine.GraalJSScriptEngine_Subclass.execute$$superforward1(Unknown Source)
+     *   ... 5 more
+     * </pre>
+     */
+    public static final String DEFAULT_SCRIPT_ERRMSG_REGEX = "Caused by:(.+)|at <js>(\\s|\\.)([a-zA-Z0-9]+)\\((.+)\\)";
 
 }

@@ -38,7 +38,7 @@ import io.smallrye.config.WithDefault;
  * @see https://quarkus.io/guides/properties-extending-support#custom-properties-source
  */
 @StaticInitSafe
-@ConfigMapping(prefix = CONF_PREFIX_EXECUTOR + ".execution", namingStrategy = NamingStrategy.KEBAB_CASE)
+@ConfigMapping(prefix = CONF_PREFIX_EXECUTOR + ".engine", namingStrategy = NamingStrategy.KEBAB_CASE)
 public interface EngineConfig {
 
     @WithDefault(DEFAULT_SCENES_RULES_CACHED_PREFIX)
@@ -104,14 +104,21 @@ public interface EngineConfig {
         @Min(1)
         Integer fileMaxCount();
 
-        @WithDefault(DEFAULT_SCRIPT_LOG_UPLOADER_CRON)
-        @NotBlank
-        String uploaderCron();
+        @WithDefault(DEFAULT_SCRIPT_EXTRACT_STACK_CAUSES_AS_LOG + "")
+        @NotNull
+        Boolean extractStackCausesAsLog();
+
+        // @WithDefault(DEFAULT_SCRIPT_LOG_UPLOADER_CRON)
+        // @NotBlank
+        // String uploaderCron();
 
         public static final boolean DEFAULT_SCRIPT_LOG_ENABLE_CONSOLE = true;
+        public static final boolean DEFAULT_SCRIPT_EXTRACT_STACK_CAUSES_AS_LOG = true;
         public static final int DEFAULT_SCRIPT_LOG_FILE_MAX_SIZE = 512 * 1024 * 1024;
         public static final int DEFAULT_SCRIPT_LOG_FILE_MAX_COUNT = 10;
-        public static final String DEFAULT_SCRIPT_LOG_UPLOADER_CRON = "0 1 * * * * ?";
+        // @formatter:off
+        // public static final String DEFAULT_SCRIPT_LOG_UPLOADER_CRON = "0 1 * * * * ?";
+        // @formatter:on
     }
 
     public static interface SdkDataSourceConfig {
@@ -158,7 +165,7 @@ public interface EngineConfig {
 
     public static final String DEFAULT_SCENES_RULES_CACHED_PREFIX = "rengine:executor:engine:scenes:rules:";
     public static final long DEFAULT_SCENES_RULES_CACHED_EXPIRE = 10 * 60 * 1000; // 10m
-    public static final long DEFAULT_SCRIPT_CACHED_EXPIRE = 10 * 60 * 1000; // 10m
+    public static final long DEFAULT_SCRIPT_CACHED_EXPIRE = 1 * 60 * 1000; // 1m
     public static final int DEFAULT_EXECUTOR_THREAD_POOLS = 10;
     public static final int DEFAULT_EXECUTOR_ACCEPT_QUEUE = 10;
     public static final float DEFAULT_TIMEOUT_OFFSET_RATE = 0.1f;

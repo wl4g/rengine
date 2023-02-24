@@ -102,8 +102,8 @@ public class WorkflowGraphServiceImpl implements WorkflowGraphService {
     @Override
     public WorkflowGraphResultSave save(WorkflowGraphSave model) {
         WorkflowGraph graph = model;
-        notNullOf(graph, "graph");
-        notNullOf(graph.getWorkflowId(), "workflowId");
+        notNullOf(graph, "workflowGraph");
+        graph.validateForBasic();
 
         // The workflow graph only increments the revision and does not allow
         // modification.
@@ -134,7 +134,7 @@ public class WorkflowGraphServiceImpl implements WorkflowGraphService {
 
         graph.setRevision(mongoSequenceService.getNextSequence(GlobalMongoSequenceService.GRAPHS_REVISION_SEQ));
 
-        WorkflowGraph saved = mongoTemplate.save(graph, MongoCollectionDefinition.T_WORKFLOW_GRAPHS.getName());
+        final WorkflowGraph saved = mongoTemplate.save(graph, MongoCollectionDefinition.T_WORKFLOW_GRAPHS.getName());
         return WorkflowGraphResultSave.builder().id(saved.getId()).build();
     }
 

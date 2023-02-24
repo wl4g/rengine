@@ -305,7 +305,7 @@ rengine:
     engine:
       scenes-rules-cached-prefix: 'rengine:executor:engine:scenes:rules:'
       scenes-rules-cached-expire: 600000 # Default by 10m
-      executor-script-cached-expire: 6000000 # Default by 10m
+      executor-script-cached-expire: 60000 # Default by 1m
       executor-thread-pools: 20
       executor-accept-queue: 10
       execute-timeout-offset-rate: 0.1f
@@ -314,6 +314,7 @@ rengine:
         enable-console: true
         file-max-size: 536870912 # Default by 512MB
         file-max-count: 10
+        extract-stack-causes-as-log: true # Default by true
       datasource:
         total-limited-max: 10
       notifier:

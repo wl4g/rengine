@@ -40,19 +40,19 @@ import org.apache.flink.streaming.api.functions.sink.PrintSinkFunction;
 
 import com.wl4g.infra.common.cli.CommandLineTool;
 import com.wl4g.infra.common.cli.CommandLineTool.CommandLineFacade;
-import com.wl4g.rengine.job.model.RengineEventAnalytical;
+import com.wl4g.rengine.job.model.RengineEventWrapper;
 
 import lombok.Getter;
 
 /**
- * {@link RengineFlinkStreamingBase}
+ * {@link AbstractFlinkStreamingBase}
  * 
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2022-06-07 v3.0.0
  * @since v1.0.0
  */
 @Getter
-public abstract class RengineFlinkStreamingBase implements Runnable {
+public abstract class AbstractFlinkStreamingBase implements Runnable {
 
     // Flink MQ(kafka/pulsar/rabbitmq/...) options.
     private String brokers;
@@ -94,7 +94,7 @@ public abstract class RengineFlinkStreamingBase implements Runnable {
     protected transient CommandLineFacade line;
     protected transient Properties props;
 
-    protected RengineFlinkStreamingBase() {
+    protected AbstractFlinkStreamingBase() {
         this.builder = CommandLineTool.builder()
                 // MQ(Kafka/Pulsar/Rabbitmq/...) options.
                 .option("b", "brokers", "localhost:9092", "Connect MQ brokers addresses. default is local kafka brokers")
@@ -143,13 +143,17 @@ public abstract class RengineFlinkStreamingBase implements Runnable {
      * @return
      * @throws ParseException
      */
-    protected RengineFlinkStreamingBase parse(String[] args) throws ParseException {
+    protected AbstractFlinkStreamingBase parse(String[] args) throws ParseException {
         this.line = builder.helpIfEmpty(args).build(args);
         // KAFKA options.
         this.brokers = line.get("brokers");
         this.topicPattern = line.get("topicPattern");
         this.groupId = line.get("groupId");
         this.fromOffsetTime = line.getLong("fromOffsetTime");
+        // FLINK basic options.
+        this.runtimeMode = line.getEnum("runtimeMode", RuntimeExecutionMode.class);
+        this.restartAttempts = line.getInteger("restartAttempts");
+        this.restartDelaySeconds = line.getInteger("restartDelaySeconds");
         // Checkpoint options.
         this.checkpointDir = line.get("checkpointDir");
         this.checkpointMode = line.getEnum("checkpointMode", CheckpointingMode.class);
@@ -192,7 +196,7 @@ public abstract class RengineFlinkStreamingBase implements Runnable {
      * 
      * @return
      */
-    protected abstract RengineFlinkStreamingBase customStream(DataStreamSource<RengineEventAnalytical> dataStream);
+    protected abstract AbstractFlinkStreamingBase customStream(DataStreamSource<RengineEventWrapper> dataStreamSource);
 
     /**
      * Handling job execution result.
@@ -244,7 +248,7 @@ public abstract class RengineFlinkStreamingBase implements Runnable {
             env.getCheckpointConfig().setExternalizedCheckpointCleanup(externalizedCheckpointCleanup);
         }
 
-        DataStreamSource<RengineEventAnalytical> dataStream = env.fromSource(createSource(),
+        final DataStreamSource<RengineEventWrapper> dataStream = env.fromSource(createSource(),
                 RengineEventWatermarks.newWatermarkStrategy(ofMillis(outOfOrdernessMillis), ofMillis(idleTimeoutMillis)),
                 jobName.concat("Source"));
         if (parallelism > 0) {
@@ -265,8 +269,8 @@ public abstract class RengineFlinkStreamingBase implements Runnable {
 
         try {
             handleJobExecutionResult(env.execute(jobName));
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
+        } catch (Throwable ex) {
+            throw new IllegalStateException(ex);
         }
     }
 

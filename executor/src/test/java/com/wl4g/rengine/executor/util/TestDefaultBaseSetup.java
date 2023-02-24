@@ -195,9 +195,14 @@ public abstract class TestDefaultBaseSetup {
                     }
 
                     @Override
-                    public @NotBlank String uploaderCron() {
-                        return ScriptLogConfig.DEFAULT_SCRIPT_LOG_UPLOADER_CRON;
+                    public @NotNull Boolean extractStackCausesAsLog() {
+                        return ScriptLogConfig.DEFAULT_SCRIPT_EXTRACT_STACK_CAUSES_AS_LOG;
                     }
+
+                    // @Override
+                    // public @NotBlank String uploaderCron() {
+                    // return ScriptLogConfig.DEFAULT_SCRIPT_LOG_UPLOADER_CRON;
+                    // }
                 };
             }
 

@@ -42,7 +42,7 @@ import org.apache.hadoop.hbase.client.Put;
 
 import com.wl4g.rengine.common.event.RengineEvent.EventLocation;
 import com.wl4g.rengine.common.event.RengineEvent.EventSource;
-import com.wl4g.rengine.job.model.RengineEventAnalytical;
+import com.wl4g.rengine.job.model.RengineEventWrapper;
 
 /**
  * {@link EventToMutationConverter}
@@ -51,7 +51,7 @@ import com.wl4g.rengine.job.model.RengineEventAnalytical;
  * @version 2022-06-06 v3.0.0
  * @since v1.0.0
  */
-public class EventToMutationConverter implements HBaseMutationConverter<RengineEventAnalytical> {
+public class EventToMutationConverter implements HBaseMutationConverter<RengineEventWrapper> {
     private static final long serialVersionUID = 1L;
 
     private final byte[] nullStringBytes;
@@ -69,14 +69,14 @@ public class EventToMutationConverter implements HBaseMutationConverter<RengineE
     }
 
     @Override
-    public Mutation convertToMutation(@NotNull RengineEventAnalytical model) {
+    public Mutation convertToMutation(@NotNull RengineEventWrapper model) {
         notNullOf(model, "model");
         model.validate();
 
         final Put put = new Put(generateRowkey(model));
 
         // Automatic mapped.
-        // for (Field f : RengineEventAnalytical.ORDERED_FIELDS) {
+        // for (Field f : RengineEventWrapper.ORDERED_FIELDS) {
         // byte[] value = nullStringBytes;
         // Object v = getField(f, model, true);
         // if (nonNull(v)) {
@@ -87,8 +87,8 @@ public class EventToMutationConverter implements HBaseMutationConverter<RengineE
 
         // observedTime
         addPutColumn(put, "observedTime", DateFormatUtils.format(model.getObservedTime(), "yyMMddHHmmss"));
-        // body
-        addPutColumn(put, "body", model.getBody());
+        // body TODO
+        addPutColumn(put, "body", join(model.getBody().toArray(), ","));
         // attributes
         addPutColumn(put, "attributes", toJSONString(model.getAttributes()));
         // source
@@ -125,7 +125,7 @@ public class EventToMutationConverter implements HBaseMutationConverter<RengineE
     /**
      * @see {@link https://github.com/apache/hbase/blob/rel/2.1.2/hbase-common/src/main/java/org/apache/hadoop/hbase/HConstants.java#L599}
      */
-    protected byte[] generateRowkey(@NotNull RengineEventAnalytical model) {
+    protected byte[] generateRowkey(@NotNull RengineEventWrapper model) {
         EventSource source = (EventSource) model.getSource();
 
         // Use reversed time strings to avoid data hotspots.

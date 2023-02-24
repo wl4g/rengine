@@ -13,34 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.job.elasticsearch7;
+package com.wl4g.rengine.job.hive;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 
-import com.wl4g.rengine.job.RengineFlinkStreamingBase;
-import com.wl4g.rengine.job.model.RengineEventAnalytical;
+import com.wl4g.rengine.job.AbstractFlinkStreamingBase;
+import com.wl4g.rengine.job.elasticsearch7.ES7FlinkStreamingSupport;
+import com.wl4g.rengine.job.model.RengineEventWrapper;
 
 import lombok.Getter;
 
 /**
- * {@link RengineES7StreamingSupport}
+ * {@link ES7FlinkStreamingSupport}
  * 
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2022-06-07 v3.0.0
  * @since v1.0.0
  */
 @Getter
-public abstract class RengineES7StreamingSupport extends RengineFlinkStreamingBase {
+public abstract class HiveFlinkStreamingSupport extends AbstractFlinkStreamingBase {
 
-    protected RengineES7StreamingSupport() {
+    protected HiveFlinkStreamingSupport() {
         super();
         // Sink options.
         // TODO
     }
 
     @Override
-    protected RengineFlinkStreamingBase parse(String[] args) throws ParseException {
+    protected AbstractFlinkStreamingBase parse(String[] args) throws ParseException {
         super.parse(args);
         // Sink options.
         // TODO Auto-generated method stub
@@ -48,7 +49,7 @@ public abstract class RengineES7StreamingSupport extends RengineFlinkStreamingBa
     }
 
     @Override
-    protected RengineFlinkStreamingBase customStream(DataStreamSource<RengineEventAnalytical> dataStream) {
+    protected AbstractFlinkStreamingBase customStream(DataStreamSource<RengineEventWrapper> dataStreamSource) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException();
     }

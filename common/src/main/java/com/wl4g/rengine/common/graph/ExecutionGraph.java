@@ -32,10 +32,10 @@ import static com.wl4g.rengine.common.entity.WorkflowGraph.NodeType.RUN;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -47,6 +47,7 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.wl4g.infra.common.lang.Assert2;
 import com.wl4g.rengine.common.entity.WorkflowGraph;
 import com.wl4g.rengine.common.entity.WorkflowGraph.BaseNode;
 import com.wl4g.rengine.common.entity.WorkflowGraph.BootNode;
@@ -81,79 +82,34 @@ import lombok.ToString;
 @ToString(callSuper = true, exclude = { "prev" })
 public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
         implements Function<ExecutionGraphContext, ExecutionGraphResult> {
-    private String id;
-    private String name;
+    private @NotBlank String id;
+    private @NotBlank String name;
+    private Integer priority;
     private String prevId;
     private ExecutionGraph<?> prev;
 
-    public ExecutionGraph(@NotNull final BaseNode<?> node) {
+    public ExecutionGraph(@NotNull BaseNode<?> node) {
         notNullOf(node, "node");
         this.id = hasTextOf(node.getId(), "id");
         this.name = hasTextOf(node.getName(), "name");
-    }
-
-    public static List<BaseNode<?>> validateEffective(List<BaseNode<?>> nodes) {
-        notNullOf(nodes, "nodes");
-
-        // Check for duplicate node ID.
-        nodes.stream()
-                .map(n -> n.validate())
-                .collect(groupingBy(n -> n.getId()))
-                .entrySet()
-                .stream()
-                .filter(e -> safeList(e.getValue()).size() > 1)
-                .findAny()
-                .ifPresent(e -> {
-                    throw new InvalidNodeRelationException(format("Duplicate node id of : %s", e.getKey()));
-                });
-
-        // @formatter:off
-        //// Check for start node.
-        //List<ExecutionGraph<?>> startNodes = nodes.stream().filter(n -> n instanceof BootOperator).collect(toList());
-        //if (safeList(startNodes).size() != 1) {
-        //    throw new InvalidNodeRelationException(format("There must be one and only one start node of : %s", startNodes));
-        //}
-        //if (!isBlank(safeList(startNodes).get(0).getPrevId())) {
-        //    throw new InvalidNodeRelationException("The prevId value of start node must be empty.");
-        //}
-        //
-        //// Check for end node.
-        //List<ExecutionGraph<?>> endNodes = nodes.stream().filter(n -> n instanceof EndOperator).collect(toList());
-        //if (safeList(endNodes).size() != 1) {
-        //    throw new InvalidNodeRelationException(format("There must be one and only one end node of : %s", endNodes));
-        //}
-        //
-        //// Check for start-to-end reachable continuity.
-        //Map<String, ExecutionGraph<?>> nodeMap = nodes.stream().collect(toMap(n -> n.getId(), n -> n));
-        //for (Entry<String, ExecutionGraph<?>> ent : nodeMap.entrySet()) {
-        //    ExecutionGraph<?> n = ent.getValue();
-        //    if (!(n instanceof BootOperator) && isNull(nodeMap.get(n.getPrevId()))) {
-        //        throw new InvalidNodeRelationException(format("Invalid node unreachable orphaned of : %s", n));
-        //    }
-        //}
-        // @formatter:on
-
-        return nodes;
+        // If the current node is a child of a logical node, priority is must
+        // required.
+        this.priority = node.getPriority();
     }
 
     /**
      * The parse to tree {@link ExecutionGraph} from {@link BaseNode<?>} flat
      * list.
      * 
-     * @param workflow
+     * @param graph
      * @return
      * @see https://www.java-success.com/00-%E2%99%A6-creating-tree-list-flattening-back-list-java/
      */
-    public static ExecutionGraph<?> from(final WorkflowGraph workflow) {
-        if (isNull(workflow)) {
-            return null;
-        }
-        notNullOf(workflow.getNodes(), "workflow");
+    public static ExecutionGraph<?> from(@NotNull WorkflowGraph graph) {
+        notNullOf(graph, "workflowGraph");
+        graph.validateForBasic();
 
-        // Validate for effective.
-        validateEffective(workflow.getNodes());
-
-        List<BaseOperator<?>> flatNodes = safeList(workflow.getNodes()).stream().map(n -> {
+        final List<BaseOperator<?>> flatNodes = safeList(graph.getNodes()).stream().map(n -> {
             switch (NodeType.of(n.getType())) {
             case BOOT:
                 return new BootOperator((BootNode) n);
@@ -184,51 +140,64 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
             }
         }).collect(toList());
 
+        // TODO for validate?
         // Map<String, ExecutionGraph<?>> flatNodeMap =
         // safeList(flatNodes).stream().collect(toMap(n -> n.getId(), l -> l));
 
-        Map<String, String> toConnectionMap = new LinkedHashMap<>();
-        for (NodeConnection link : safeList(workflow.getConnections())) {
-            String from = toConnectionMap.get(link.getTo());
+        // Coonvert to node connections.
+        final Map<String, String> toConnectionMap = new LinkedHashMap<>();
+        for (NodeConnection link : safeList(graph.getConnections())) {
+            final String from = toConnectionMap.get(link.getTo());
             if (isBlank(from)) {
                 toConnectionMap.put(link.getTo(), link.getFrom());
             } else { // The end operator
-                // TODO 只校验就完了?
-                // @formatter:off
-//                ExecutionGraph<?> end = flatNodeMap.get(link.getTo());
-//                if (!(end instanceof EndOperator)) {
-//                    throw new InvalidNodeRelationException(format(
-//                            "Invalid node connection relationship, only end nodes support multiple inputs. - ", end.getId()));
-//                }
-                // @formatter:on
+                // TODO validate?
+                //// @formatter:off
+                //  ExecutionGraph<?> end = flatNodeMap.get(link.getTo());
+                //  if (!(end instanceof EndOperator)) {
+                //      throw new InvalidNodeRelationException(format(
+                //              "Invalid node connection relationship, only end nodes support multiple inputs. - ", end.getId()));
+                //  }
+                //// @formatter:on
             }
         }
 
-        // Save all nodes to a map. (without end operator)
-        Map<String, ExecutionGraph<?>> treeNodes = new HashMap<>();
+        // Transform to childrens tree. (without end operator)
+        final Map<String, BaseOperator<?>> treeNodes = new HashMap<>();
         for (BaseOperator<?> current : flatNodes) {
             current.setPrevId(toConnectionMap.get(current.getId()));
             treeNodes.put(current.getId(), current);
         }
 
-        // loop and assign parent/child relationships
+        // Check the connection is valid.
+        final List<String> invalidConnections = toConnectionMap.entrySet()
+                .stream()
+                .filter(e -> !treeNodes.containsKey(e.getKey()) || !treeNodes.containsKey(e.getValue()))
+                .map(e -> format("(to %s from %s)", e.getValue(), e.getKey()))
+                .collect(toList());
+        if (!invalidConnections.isEmpty()) {
+            throw new InvalidNodeRelationException(format("Invalid the node connection for : %s", invalidConnections));
+        }
+
+        // Set Up the tree children's parent.
         for (BaseOperator<?> current : flatNodes) {
             String prevId = current.getPrevId();
             if (!isBlank(prevId)) {
-                ExecutionGraph<?> prev = treeNodes.get(prevId);
+                final BaseOperator<?> prev = treeNodes.get(prevId);
                 if (nonNull(prev)) {
                     current.setPrev(prev);
                     if (prev instanceof LogicalOperator) {
                         ((LogicalOperator<?>) prev).getNexts().add(current);
                     }
                     if (prev instanceof SingleNextOperator) {
-                        // @formatter:off
-//                        if (nonNull(prev.getNext())) {
-//                            throw new InvalidNodeRelationException(format(
-//                                    "The next node of a non-relationship node is not allowed to have more than one of prev.id : %s",
-//                                    prev.getId()));
-//                        }
-                        // @formatter:on
+                        // TODO validate?
+                        //// @formatter:off
+                        //  if (nonNull(prev.getNext())) {
+                        //      throw new InvalidNodeRelationException(format(
+                        //              "The next node of a non-relationship node is not allowed to have more than one of prev.id : %s",
+                        //              prev.getId()));
+                        //  }
+                        //// @formatter:on
                         ((SingleNextOperator<?>) prev).setNext(current);
                     }
                     treeNodes.put(prevId, prev);
@@ -237,7 +206,7 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
             }
         }
 
-        // find the root. (start/boot node)
+        // Find the root node (start/boot).
         ExecutionGraph<?> root = null;
         for (ExecutionGraph<?> node : treeNodes.values()) {
             if (node instanceof SingleNextOperator) {
@@ -245,6 +214,21 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
                     root = node;
                     break;
                 }
+            }
+        }
+
+        // Notice: Each level of the node tree needs to be sorted separately to
+        // ensure correctness when performing logical operations. For example:
+        // the nodes that perform logical operations, the consequences of 'if (A
+        // && B)' and 'if (B && A)' are completely different.
+        for (BaseOperator<?> current : flatNodes) {
+            if (current instanceof LogicalOperator) {
+                final List<BaseOperator<?>> nexts = safeList(((LogicalOperator<?>) current).getNexts());
+                Collections.sort(nexts, (o1, o2) -> {
+                    Assert2.notNull(o1.getPriority(), format("priority is missing of (%s, %s)", o1.getId(), o1.getName()));
+                    Assert2.notNull(o2.getPriority(), format("priority is missing of (%s, %s)", o1.getId(), o2.getName()));
+                    return o1.getPriority() - o2.getPriority();
+                });
             }
         }
 

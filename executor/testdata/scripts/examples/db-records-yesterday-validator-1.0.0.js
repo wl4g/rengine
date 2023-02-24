@@ -1,13 +1,14 @@
 // Execute sql to validating the number of yesterday's records in the target mysql table.
 // (For example, it can be used to check the calculation results of business offline jobs).
 function process(context) {
-    const dsName = Assert.hasTextOf(context.getArgs()['dsName'], "dsName");
-    const tableName = Assert.hasTextOf(context.getArgs()['tableName'], "tableName");
-    const sqlWhereBaseConditions = Assert.hasTextOf(context.getArgs()['sqlWhereBaseConditions'], "sqlWhereBaseConditions");
-    const updateDateFieldName = Assert.hasTextOf(context.getArgs()['updateDateFieldName'], "updateDateFieldName");
-    const updateDateFieldPattern = Assert.hasTextOf(context.getArgs()['updateDateFieldPattern'], "updateDateFieldPattern");
-    const assertCountMin = Assert.hasTextOf(context.getArgs()['assertCountMin'], "assertCountMin");
-    const assertCountMax = Assert.hasTextOf(context.getArgs()['assertCountMax'], "assertCountMax");
+    const args = context.getParameter().getArgs();
+    const dsName = Assert.hasTextOf(args['dsName'], "dsName");
+    const tableName = Assert.hasTextOf(args['tableName'], "tableName");
+    const sqlWhereBaseConditions = Assert.hasTextOf(args['sqlWhereBaseConditions'], "sqlWhereBaseConditions");
+    const updateDateFieldName = Assert.hasTextOf(args['updateDateFieldName'], "updateDateFieldName");
+    const updateDateFieldPattern = Assert.hasTextOf(args['updateDateFieldPattern'], "updateDateFieldPattern");
+    const assertCountMin = Assert.hasTextOf(args['assertCountMin'], "assertCountMin");
+    const assertCountMax = Assert.hasTextOf(args['assertCountMax'], "assertCountMax");
 
     console.info("Validating DB table of :", dsName, tableName, sqlWhereBaseConditions, updateDateFieldName, updateDateFieldPattern, assertCountMin, assertCountMax);
     try {

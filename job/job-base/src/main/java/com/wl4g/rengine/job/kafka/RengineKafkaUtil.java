@@ -23,8 +23,8 @@ import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.kafka.clients.consumer.OffsetResetStrategy;
 
-import com.wl4g.rengine.job.RengineFlinkStreamingBase;
-import com.wl4g.rengine.job.model.RengineEventAnalytical;
+import com.wl4g.rengine.job.AbstractFlinkStreamingBase;
+import com.wl4g.rengine.job.model.RengineEventWrapper;
 
 /**
  * {@link RenginePulsarUtil}
@@ -42,7 +42,7 @@ public abstract class RengineKafkaUtil {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public static <T, S extends SourceSplit, E> Source<T, S, E> createKafkaSource(RengineFlinkStreamingBase streaming) {
+    public static <T, S extends SourceSplit, E> Source<T, S, E> createKafkaSource(AbstractFlinkStreamingBase streaming) {
         // see:https://github.com/apache/flink/blob/release-1.14.4/docs/content/docs/connectors/datastream/kafka.md#starting-offset
         // Start from committed offset, also use EARLIEST as reset strategy if
         // committed offset doesn't exist
@@ -52,7 +52,7 @@ public abstract class RengineKafkaUtil {
             // or equals a timestamp.
             offsets = OffsetsInitializer.timestamp(streaming.getFromOffsetTime());
         }
-        KafkaSource<RengineEventAnalytical> source = KafkaSource.<RengineEventAnalytical> builder()
+        KafkaSource<RengineEventWrapper> source = KafkaSource.<RengineEventWrapper> builder()
                 .setBootstrapServers(streaming.getBrokers())
                 .setGroupId(streaming.getGroupId())
                 .setTopicPattern(Pattern.compile(streaming.getTopicPattern()))

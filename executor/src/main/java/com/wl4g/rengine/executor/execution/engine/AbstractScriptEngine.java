@@ -24,6 +24,7 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toList;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -138,16 +139,24 @@ public abstract class AbstractScriptEngine implements IEngine {
         log.debug("Loading script {} by workflowId: {}, ruleId: {}", workflowId, rule.getId());
 
         // Add upload object script dependencies all by scenes.workflow.rules
-        return safeList(rule.getEffectiveLatestScript().getUploads()).stream().map(upload -> {
+        final var ruleScript = rule.getEffectiveLatestScript();
+        final var scriptObjects = safeList(ruleScript.getUploads()).stream().map(upload -> {
             try {
-                return minioManager.loadObject(UploadType.of(upload.getUploadType()), upload.getObjectPrefix(), workflowId,
-                        ExtensionType.of(upload.getExtension()).isBinary(),
+                return minioManager.loadObject(upload.getId(), UploadType.of(upload.getUploadType()), upload.getObjectPrefix(),
+                        workflowId, ExtensionType.of(upload.getExtension()).isBinary(),
                         usingCache ? engineConfig.executorScriptCachedExpire() : -1);
             } catch (Exception e) {
                 log.error(format("Unable to load dependency script from MinIO: %s", upload.getObjectPrefix()), e);
                 throw new IllegalStateException(e); // fast-fail:Stay-Strongly-Consistent
             }
         }).collect(toList());
+
+        // Notice: According to the graal context eval mechanism, if there is a
+        // function with the same name, the latter will overwrite the previous
+        // eval function, so make sure that the main script is the last one.
+        Collections.sort(scriptObjects, (o1, o2) -> o1.getUploadId() == ruleScript.getEntrypointUploadId() ? 1 : -1);
+
+        return scriptObjects;
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })

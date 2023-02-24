@@ -23,7 +23,7 @@ import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.eventtime.WatermarksWithIdleness;
 
 import com.wl4g.rengine.common.event.RengineEvent.EventSource;
-import com.wl4g.rengine.job.model.RengineEventAnalytical;
+import com.wl4g.rengine.job.model.RengineEventWrapper;
 
 /**
  * {@link RengineEventWatermarks}
@@ -32,14 +32,14 @@ import com.wl4g.rengine.job.model.RengineEventAnalytical;
  * @version 2022-05-31 v3.0.0
  * @since v1.0.0
  */
-public class RengineEventWatermarks extends BoundedOutOfOrdernessWatermarks<RengineEventAnalytical> {
+public class RengineEventWatermarks extends BoundedOutOfOrdernessWatermarks<RengineEventWrapper> {
 
     public RengineEventWatermarks(Duration outOfOrderness) {
         super(outOfOrderness);
     }
 
     @Override
-    public void onEvent(RengineEventAnalytical model, long eventTimestamp, WatermarkOutput output) {
+    public void onEvent(RengineEventWrapper model, long eventTimestamp, WatermarkOutput output) {
         super.onEvent(model, ((EventSource) model.getSource()).getTime(), output);
     }
 
@@ -48,7 +48,7 @@ public class RengineEventWatermarks extends BoundedOutOfOrdernessWatermarks<Reng
      * {@link RengineEventWatermarks} at all. This may be useful in scenarios
      * that do pure processing-time based stream processing.
      */
-    public static WatermarkStrategy<RengineEventAnalytical> newWatermarkStrategy(Duration outOfOrderness, Duration idleTimeout) {
+    public static WatermarkStrategy<RengineEventWrapper> newWatermarkStrategy(Duration outOfOrderness, Duration idleTimeout) {
         // see:https://github.com/apache/flink/blob/release-1.14.4/docs/content/docs/connectors/datastream/kafka.md#idleness
         return ctx -> new WatermarksWithIdleness<>(new RengineEventWatermarks(outOfOrderness), idleTimeout);
     }

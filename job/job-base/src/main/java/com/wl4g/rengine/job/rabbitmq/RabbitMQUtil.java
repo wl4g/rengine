@@ -32,10 +32,10 @@ public abstract class RabbitMQUtil {
     // */
     // @SuppressWarnings("unchecked")
     // public static <T, S extends SourceSplit, E> Source<T, S, E>
-    // createRabbitMQSource(RengineFlinkStreamingBase program) {
+    // createRabbitMQSource(AbstractFlinkStreamingBase program) {
     // // TODO
-    // RabbitMQSource<RengineEventAnalytical> source =
-    // RabbitMQSource.<RengineEventAnalytical> builder()
+    // RabbitMQSource<RengineEventWrapper> source =
+    // RabbitMQSource.<RengineEventWrapper> builder()
     // .setServiceUrl(program.getBrokers())
     // // .setGroupId(program.getGroupId())
     // .setTopicPattern(Pattern.compile(program.getTopicPattern()))

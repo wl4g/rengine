@@ -16,17 +16,17 @@
 package com.wl4g.rengine.job.model;
 
 /**
- * {@link RengineEventAnalyticalTests}
+ * {@link RengineEventWrapperTests}
  * 
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2022-06-08 v3.0.0
  * @since v1.0.0
  */
-public class RengineEventAnalyticalTests {
+public class RengineEventWrapperTests {
 
     // @Test
     // public void testOrderedFields() {
-    // System.out.println(RengineEventAnalytical.ORDERED_FIELDS);
+    // System.out.println(RengineEventWrapper.ORDERED_FIELDS);
     // }
 
 }

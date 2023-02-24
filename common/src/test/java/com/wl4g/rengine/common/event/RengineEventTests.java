@@ -45,15 +45,16 @@ public class RengineEventTests {
                         .principals(singletonList("jameswong1234@gmail.com"))
                         .location(EventLocation.builder().ipAddress("1.1.1.1").zipcode("20500").build())
                         .build(),
-                // BsonEntitySerializers serious alarm occurs when the device temperature is greater
+                // BsonEntitySerializers serious alarm occurs when the device
+                // temperature is greater
                 // than 52℃
-                "52");
+                singletonList("52"));
         System.out.println(toJSONString(event));
     }
 
     @Test
     public void testEventFromJson() {
-        String json = "{\"source\":{\"time\":1665849312303,\"principals\":[\"jameswong1234@gmail.com\"],\"location\":{\"ipAddress\":\"1.1.1.1\",\"ipv6\":null,\"isp\":null,\"domain\":null,\"country\":null,\"region\":null,\"city\":null,\"latitude\":null,\"longitude\":null,\"timezone\":null,\"zipcode\":\"20500\",\"elevation\":null}},\"type\":\"iotice_temp_warning\",\"observedTime\":1665849312304,\"body\":\"52\",\"attributes\":{}}";
+        String json = "{\"source\":{\"time\":1677255692660,\"principals\":[\"jameswong1234@gmail.com\"],\"location\":{\"ipAddress\":\"1.1.1.1\",\"ipv6\":null,\"isp\":null,\"domain\":null,\"elevation\":null,\"latitude\":null,\"longitude\":null,\"timezone\":null,\"zipcode\":\"20500\",\"city\":null,\"region\":null,\"country\":null}},\"id\":\"iot_temp_warn1:1677255692662:jameswong1234@gmail.com\",\"type\":\"iot_temp_warn1\",\"observedTime\":1677255692662,\"body\":[\"52\"],\"attributes\":{}}";
         RengineEvent event = parseJSON(json, RengineEvent.class);
         System.out.println("         EventType: " + event.getType());
         System.out.println("      ObservedTime: " + event.getObservedTime());

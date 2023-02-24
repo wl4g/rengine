@@ -32,13 +32,12 @@ import org.junit.Test;
 import com.wl4g.rengine.common.entity.WorkflowGraph;
 import com.wl4g.rengine.common.entity.WorkflowGraph.BaseNode;
 import com.wl4g.rengine.common.entity.WorkflowGraph.BootNode;
-import com.wl4g.rengine.common.entity.WorkflowGraph.FailbackNode;
 import com.wl4g.rengine.common.entity.WorkflowGraph.LogicalNode;
 import com.wl4g.rengine.common.entity.WorkflowGraph.LogicalType;
 import com.wl4g.rengine.common.entity.WorkflowGraph.NodeConnection;
 import com.wl4g.rengine.common.entity.WorkflowGraph.ProcessNode;
 import com.wl4g.rengine.common.entity.WorkflowGraph.RelationNode;
-import com.wl4g.rengine.common.entity.WorkflowGraph.RunNode;
+import com.wl4g.rengine.common.entity.WorkflowGraphTests;
 import com.wl4g.rengine.common.graph.ExecutionGraph.BaseOperator;
 import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
 
@@ -51,71 +50,104 @@ import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
  */
 public class ExecutionGraphTests {
 
+    @Test(expected = Throwable.class)
+    public void testInvalidNodeConnection() {
+        try {
+            List<BaseNode<?>> nodes = new LinkedList<>();
+            nodes.add(new BootNode().withId("0").withName("The Boot"));
+            nodes.add(new ProcessNode().withId("11").withName("预处理(如篡改当前时间以用于测试目的)").withRuleId(10100101L));
+            nodes.add(new RelationNode().withId("21").withName("当前时间是否满足(10.1~10.8)").withRuleId(10100102L));
+            nodes.add(new LogicalNode().withId("31").withName("ALL_AND逻辑运算").withLogical(LogicalType.ALL_AND));
+            nodes.add(new LogicalNode().withId("41").withPriority(1).withName("AND逻辑运算").withLogical(LogicalType.AND));
+            nodes.add(new LogicalNode().withId("42")./* withPriority(2). */withName("AND逻辑运算").withLogical(LogicalType.AND));
+
+            List<NodeConnection> collections = new LinkedList<>();
+            collections.add(new NodeConnection("11", "0"));
+            collections.add(new NodeConnection("21", "11"));
+            collections.add(new NodeConnection("31", "21"));
+            collections.add(new NodeConnection("41", "31"));
+            // collections.add(new NodeConnection("42", "31"));
+            collections.add(new NodeConnection("42", "999"));
+
+            WorkflowGraph workflowGraph = new WorkflowGraph(10101010L, nodes, collections);
+            out.println("Workflow Nodes Json : " + toJSONString(workflowGraph));
+            ExecutionGraph.from(workflowGraph);
+        } catch (Throwable ex) {
+            // ex.printStackTrace();
+            throw ex;
+        }
+    }
+
+    @Test(expected = Throwable.class)
+    public void testInvalidNodeMustPriority() {
+        try {
+            List<BaseNode<?>> nodes = new LinkedList<>();
+            nodes.add(new BootNode().withId("0").withName("The Boot"));
+            nodes.add(new ProcessNode().withId("11").withName("预处理(如篡改当前时间以用于测试目的)").withRuleId(10100101L));
+            nodes.add(new RelationNode().withId("21").withName("当前时间是否满足(10.1~10.8)").withRuleId(10100102L));
+            nodes.add(new LogicalNode().withId("31").withName("ALL_AND逻辑运算").withLogical(LogicalType.ALL_AND));
+            nodes.add(new LogicalNode().withId("41").withPriority(1).withName("AND逻辑运算").withLogical(LogicalType.AND));
+            nodes.add(new LogicalNode().withId("42")./* withPriority(2). */withName("AND逻辑运算").withLogical(LogicalType.AND));
+
+            List<NodeConnection> collections = new LinkedList<>();
+            collections.add(new NodeConnection("11", "0"));
+            collections.add(new NodeConnection("21", "11"));
+            collections.add(new NodeConnection("31", "21"));
+            collections.add(new NodeConnection("41", "31"));
+            collections.add(new NodeConnection("42", "31"));
+
+            WorkflowGraph workflowGraph = new WorkflowGraph(10101010L, nodes, collections);
+            out.println("Workflow Nodes Json : " + toJSONString(workflowGraph));
+            ExecutionGraph.from(workflowGraph);
+        } catch (Throwable ex) {
+            // ex.printStackTrace();
+            throw ex;
+        }
+    }
+
     @Test
     public void testECommerceTradeWorkflow() {
-        List<BaseNode<?>> nodes = new LinkedList<>();
-        nodes.add(new BootNode().withId("0").withName("The Boot"));
-        nodes.add(new ProcessNode().withId("11").withName("预处理(如篡改当前时间以用于测试目的)").withRuleId(10100101L));
-        nodes.add(new RelationNode().withId("21").withName("当前时间是否满足(10.1~10.8)").withRuleId(10100102L));
-        nodes.add(new LogicalNode().withId("31").withName("ALL_AND逻辑运算").withLogical(LogicalType.ALL_AND));
-        nodes.add(new LogicalNode().withId("41").withName("AND逻辑运算").withLogical(LogicalType.AND));
-        nodes.add(new LogicalNode().withId("42").withName("AND逻辑运算").withLogical(LogicalType.AND));
-        nodes.add(new RelationNode().withId("51").withName("充值是否>=120元").withRuleId(10100103L));
-        nodes.add(new LogicalNode().withId("52").withName("AND逻辑运算").withLogical(LogicalType.AND));
-        nodes.add(new RelationNode().withId("53").withName("当前时间是否满足(10.5~10.8)").withRuleId(10100104L));
-        nodes.add(new RelationNode().withId("54").withName("充值是否>=50元").withRuleId(10100105L));
-        nodes.add(new RelationNode().withId("61").withName("赠送库存是否<=100").withRuleId(10100105L));
-        nodes.add(new FailbackNode().withId("62").withName("如果赠送余额失败则执行回退规则").withRuleId(10100106L));
-        nodes.add(new RunNode().withId("63").withName("赠送20积分").withRuleId(10100108L));
-        nodes.add(new RunNode().withId("71").withName("赠送10元余额").withRuleId(10100107L));
+        try {
 
-        List<NodeConnection> collections = new LinkedList<>();
-        collections.add(new NodeConnection("11", "0"));
-        collections.add(new NodeConnection("21", "11"));
-        collections.add(new NodeConnection("31", "21"));
-        collections.add(new NodeConnection("41", "31"));
-        collections.add(new NodeConnection("42", "31"));
-        collections.add(new NodeConnection("51", "41"));
-        collections.add(new NodeConnection("52", "41"));
-        collections.add(new NodeConnection("53", "42"));
-        collections.add(new NodeConnection("54", "42"));
-        collections.add(new NodeConnection("61", "51"));
-        collections.add(new NodeConnection("62", "52"));
-        collections.add(new NodeConnection("63", "54"));
-        collections.add(new NodeConnection("71", "62"));
+            final WorkflowGraph workflowGraph = WorkflowGraphTests.buildDefaultWorkflowGraph();
+            out.println("Workflow Nodes Json : " + toJSONString(workflowGraph));
 
-        WorkflowGraph workflow = new WorkflowGraph(nodes, collections);
-        out.println("Workflow Nodes Json : " + toJSONString(workflow));
+            ExecutionGraphParameter parameter = ExecutionGraphParameter.builder()
+                    .requestTime(currentTimeMillis())
+                    .traceId(UUID.randomUUID().toString())
+                    .trace(true)
+                    .workflowId(100100101L)
+                    .args(singletonMap("deviceId", "12345678"))
+                    .build();
 
-        ExecutionGraphParameter parameter = ExecutionGraphParameter.builder()
-                .requestTime(currentTimeMillis())
-                .traceId(UUID.randomUUID().toString())
-                .trace(true)
-                .workflowId(100100101L)
-                .args(singletonMap("deviceId", "12345678"))
-                .build();
+            ExecutionGraphContext context = new ExecutionGraphContext(parameter, ctx -> { // 模拟(PROCESS/RELATION/RUN)类型的node执行script,也只有这几种类型才需要执行script
+                final String nodeId = ctx.getCurrentNode().getId(); // 当前执行script的节点ID
+                final String nodeType = ((BaseOperator<?>) ctx.getCurrentNode()).getType(); // 当前执行script的节点Type
 
-        ExecutionGraphContext context = new ExecutionGraphContext(parameter, ctx -> { // 模拟(PROCESS/RELATION/RUN)类型的node执行script,也只有这几种类型才需要执行script
-            final String nodeId = ctx.getCurrentNode().getId(); // 当前执行script的节点ID
-            final String nodeType = ((BaseOperator<?>) ctx.getCurrentNode()).getType(); // 当前执行script的节点Type
+                out.println(
+                        format("current nodeId: %s@%s, lastResult : %s", nodeId, nodeType, toJSONString(ctx.getLastResult())));
 
-            out.println(format("current nodeId: %s@%s, lastResult : %s", nodeId, nodeType, toJSONString(ctx.getLastResult())));
+                // 1. 在之后支持执行script的节点的规则代码中, 可使用 ctx.getLastResult()
+                // 获取前一个节点的返回值.
+                // 2. 当前节点返回值会覆盖上一个节点的返回值.
+                return new ExecutionGraphResult(ReturnState.TRUE, singletonMap("foo" + nodeId, "bar" + nodeId));
+            });
 
-            // 1. 在之后支持执行script的节点的规则代码中, 可使用 ctx.getLastResult() 获取前一个节点的返回值.
-            // 2. 当前节点返回值会覆盖上一个节点的返回值.
-            return new ExecutionGraphResult(ReturnState.TRUE, singletonMap("foo" + nodeId, "bar" + nodeId));
-        });
+            ExecutionGraph<?> graph = ExecutionGraph.from(workflowGraph);
+            ExecutionGraphResult result = graph.apply(context);
 
-        ExecutionGraph<?> graph = ExecutionGraph.from(workflow);
-        ExecutionGraphResult result = graph.apply(context);
+            out.println("-------------------------------------------------------");
+            out.println("                           Final result : " + toJSONString(result));
+            out.println("-------------------------------------------------------");
+            out.println("Executed tracing info : \n" + context.asTraceText(true));
 
-        out.println("-------------------------------------------------------");
-        out.println("                           Final result : " + toJSONString(result));
-        out.println("-------------------------------------------------------");
-        out.println("Executed tracing info : \n" + context.asTraceText(true));
+            assert nonNull(result);
+            assert valueOf(result.getValueMap().get("foo63")).equals("bar63");
 
-        assert nonNull(result);
-        assert valueOf(result.getValueMap().get("foo63")).equals("bar63");
+        } catch (Throwable ex) {
+            ex.printStackTrace();
+            throw ex;
+        }
     }
 
 }

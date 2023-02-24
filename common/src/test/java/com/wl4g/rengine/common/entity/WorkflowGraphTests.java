@@ -46,8 +46,8 @@ public class WorkflowGraphTests {
 
     @Test
     public void testWorkflowGraphSerialze() {
-        final WorkflowGraph workflow = buildDefaultWorkflowGraph();
-        System.out.println("Workflow Nodes Json : " + toJSONString(workflow, false));
+        final WorkflowGraph workflowGraph = buildDefaultWorkflowGraph();
+        System.out.println("Workflow Nodes Json : " + toJSONString(workflowGraph, false));
     }
 
     @Test
@@ -68,12 +68,12 @@ public class WorkflowGraphTests {
         nodes.add(new ProcessNode().withId("11").withName("预处理(如篡改当前时间以用于测试目的)").withRuleId(10100101L));
         nodes.add(new RelationNode().withId("21").withName("当前时间是否满足(10.1~10.8)").withRuleId(10100102L));
         nodes.add(new LogicalNode().withId("31").withName("ALL_AND逻辑运算").withLogical(LogicalType.ALL_AND));
-        nodes.add(new LogicalNode().withId("41").withName("AND逻辑运算").withLogical(LogicalType.AND));
-        nodes.add(new LogicalNode().withId("42").withName("AND逻辑运算").withLogical(LogicalType.AND));
-        nodes.add(new RelationNode().withId("51").withName("充值是否>=120元").withRuleId(10100103L));
-        nodes.add(new LogicalNode().withId("52").withName("AND逻辑运算").withLogical(LogicalType.AND));
-        nodes.add(new RelationNode().withId("53").withName("当前时间是否满足(10.5~10.8)").withRuleId(10100104L));
-        nodes.add(new RelationNode().withId("54").withName("充值是否>=50元").withRuleId(10100105L));
+        nodes.add(new LogicalNode().withId("41").withPriority(1).withName("AND逻辑运算").withLogical(LogicalType.AND));
+        nodes.add(new LogicalNode().withId("42").withPriority(2).withName("AND逻辑运算").withLogical(LogicalType.AND));
+        nodes.add(new RelationNode().withId("51").withPriority(1).withName("充值是否>=120元").withRuleId(10100103L));
+        nodes.add(new LogicalNode().withId("52").withPriority(2).withName("AND逻辑运算").withLogical(LogicalType.AND));
+        nodes.add(new RelationNode().withId("53").withPriority(1).withName("当前时间是否满足(10.5~10.8)").withRuleId(10100104L));
+        nodes.add(new RelationNode().withId("54").withPriority(2).withName("充值是否>=50元").withRuleId(10100105L));
         nodes.add(new RelationNode().withId("61").withName("赠送库存是否<=100").withRuleId(10100105L));
         nodes.add(new FailbackNode().withId("62").withName("如果赠送余额失败则执行回退规则").withRuleId(10100106L));
         nodes.add(new RunNode().withId("63").withName("赠送20积分").withRuleId(10100108L));
@@ -94,7 +94,7 @@ public class WorkflowGraphTests {
         collections.add(new NodeConnection("63", "54"));
         collections.add(new NodeConnection("71", "62"));
 
-        final WorkflowGraph graph = new WorkflowGraph(nodes, collections);
+        final WorkflowGraph graph = new WorkflowGraph(10100101L, nodes, collections);
         graph.setId(100100101L);
         graph.setEnable(1);
         graph.setLabels(singletonList("foo"));

@@ -15,9 +15,15 @@
  */
 package com.wl4g.rengine.common.entity;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
 import static com.wl4g.infra.common.lang.Assert2.notEmpty;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.lang.String.format;
+import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -36,9 +42,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
-import com.wl4g.infra.common.bean.BaseBean;
-import com.wl4g.rengine.common.validation.ValidForEntityMarker;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.wl4g.infra.common.bean.BaseBean;
+import com.wl4g.rengine.common.exception.InvalidNodeRelationException;
+import com.wl4g.rengine.common.validation.ValidForEntityMarker;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
@@ -82,9 +89,70 @@ public class WorkflowGraph extends BaseBean {
      */
     private @Nullable Map<String, Object> attributes = new HashMap<>();
 
-    public WorkflowGraph(final @NotEmpty List<BaseNode<?>> nodes, final @NotEmpty List<NodeConnection> connections) {
-        this.nodes = notEmpty(nodes, "nodes");
-        this.connections = notEmpty(connections, "connections");
+    public WorkflowGraph(@NotNull @Min(0) Long workflowId, @NotEmpty List<BaseNode<?>> nodes,
+            @NotEmpty List<NodeConnection> connections) {
+        this.workflowId = workflowId;
+        this.nodes = nodes;
+        this.connections = connections;
+        validateForBasic();
+    }
+
+    public WorkflowGraph validateForBasic() {
+        isTrueOf(nonNull(workflowId) && workflowId >= 0, "workflowId >= 0");
+        notEmpty(getNodes(), "graph.nodes");
+        notEmpty(getConnections(), "graph.connections");
+
+        // Check the node property (sush as:
+        // type,id,name,priority,logical,ruleId etc) is missing.
+        safeList(nodes).stream().forEach(n -> {
+            try {
+                n.validate();
+            } catch (Throwable ex) {
+                throw new IllegalArgumentException(format("Missing node property values for : %s", n));
+            }
+        });
+
+        // Check the duplicate node ID.
+        nodes.stream()
+                .collect(groupingBy(n -> n.getId()))
+                .entrySet()
+                .stream()
+                .filter(e -> safeList(e.getValue()).size() > 1)
+                .findAny()
+                .ifPresent(e -> {
+                    throw new InvalidNodeRelationException(format("Duplicate node id of : %s", e.getKey()));
+                });
+
+        // Check the boot(start) node.
+        final List<BootNode> bootNodes = nodes.stream()
+                .filter(n -> n instanceof BootNode)
+                .map(n -> (BootNode) n)
+                .collect(toList());
+        if (safeList(bootNodes).size() != 1) {
+            throw new InvalidNodeRelationException(format("There must be one and only one boot(start) node of : %s", bootNodes));
+        }
+
+        //// @formatter:off
+        //if (!isBlank(safeList(bootNodes).get(0).getPrevId())) {
+        //    throw new InvalidNodeRelationException("The prevId value of start node must be empty.");
+        //}
+        //// Check the end node.
+        //List<ExecutionGraph<?>> endNodes = nodes.stream().filter(n -> n instanceof EndOperator).collect(toList());
+        //if (safeList(endNodes).size() != 1) {
+        //    throw new InvalidNodeRelationException(format("There must be one and only one end node of : %s", endNodes));
+        //}
+        //
+        //// Check the start-to-end reachable continuity.
+        //Map<String, ExecutionGraph<?>> nodeMap = nodes.stream().collect(toMap(n -> n.getId(), n -> n));
+        //for (Entry<String, ExecutionGraph<?>> ent : nodeMap.entrySet()) {
+        //    ExecutionGraph<?> n = ent.getValue();
+        //    if (!(n instanceof BootOperator) && isNull(nodeMap.get(n.getPrevId()))) {
+        //        throw new InvalidNodeRelationException(format("Invalid node unreachable orphaned of : %s", n));
+        //    }
+        //}
+        // @formatter:on
+
+        return this;
     }
 
     /**
@@ -113,6 +181,9 @@ public class WorkflowGraph extends BaseBean {
         @JsonProperty(value = "@type", access = Access.WRITE_ONLY)
         private @NotBlank String type;
         private @NotBlank String id;
+        // If the current node is a child of a logical node, priority is must
+        // required.
+        private Integer priority;
         private @NotBlank String name = DEFAULT_NODE_NAME;
         private @Nullable Map<String, Object> attributes = new HashMap<String, Object>() {
             private static final long serialVersionUID = 1L;
@@ -133,6 +204,11 @@ public class WorkflowGraph extends BaseBean {
             return (E) this;
         }
 
+        public E withPriority(Integer priority) {
+            this.priority = priority;
+            return (E) this;
+        }
+
         public E withAttributes(Map<String, Object> attributes) {
             this.attributes = attributes;
             return (E) this;
@@ -142,6 +218,7 @@ public class WorkflowGraph extends BaseBean {
             hasTextOf(type, "type");
             hasTextOf(id, "id");
             hasTextOf(name, "name");
+            // notNullOf(priority, "priority");
             return this;
         }
     }
@@ -196,7 +273,7 @@ public class WorkflowGraph extends BaseBean {
     public static class LogicalNode extends BaseNode<LogicalNode> {
         private static final long serialVersionUID = 4222652655435899065L;
 
-        private LogicalType logical;
+        private @NotNull LogicalType logical;
 
         public LogicalNode() {
             setType(NodeType.LOGICAL.name());
@@ -205,6 +282,12 @@ public class WorkflowGraph extends BaseBean {
         public LogicalNode withLogical(LogicalType logical) {
             setLogical(logical);
             return this;
+        }
+
+        @Override
+        public BaseNode<LogicalNode> validate() {
+            notNullOf(logical, "logical");
+            return super.validate();
         }
     }
 
@@ -227,6 +310,12 @@ public class WorkflowGraph extends BaseBean {
             setRuleId(ruleId);
             return this;
         }
+
+        @Override
+        public BaseNode<RunNode> validate() {
+            notNullOf(ruleId, "ruleId");
+            return super.validate();
+        }
     }
 
     // Notice: It is recommended to disable the toString method, otherwise
@@ -237,15 +326,15 @@ public class WorkflowGraph extends BaseBean {
     @AllArgsConstructor
     public static enum LogicalType {
 
-        AND("Short-circuit and operator, equivalent to: '&&'"),
+        AND("Short-circuit and operator, like the: '&&'"),
 
-        OR("Short-circuit and operator, equivalent to: '||'"),
+        OR("Short-circuit and operator, like the: '||'"),
 
-        ALL_AND("Non short-circuit and operator, equivalent to: '&'"),
+        ALL_AND("Non short-circuit and operator, like the: '&'"),
 
-        ALL_OR("Non short-circuit or operator, equivalent to: '|'"),
+        ALL_OR("Non short-circuit or operator, like the: '|'"),
 
-        NOT("Non operator, equivalent to: '!'");
+        NOT("Non operator, like the: '!'");
 
         private final String description;
 
@@ -260,10 +349,6 @@ public class WorkflowGraph extends BaseBean {
         }
     }
 
-    // Notice: It is recommended to disable the toString method, otherwise
-    // swagger will generate the name of the example long enumeration type by
-    // default.
-    // @ToString
     @Getter
     @AllArgsConstructor
     public static enum NodeType {

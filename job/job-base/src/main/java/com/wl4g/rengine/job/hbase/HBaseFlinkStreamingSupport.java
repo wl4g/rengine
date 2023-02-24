@@ -36,14 +36,14 @@ import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.hadoop.hbase.client.TableDescriptor;
 import org.apache.hadoop.hbase.client.TableDescriptorBuilder;
 
-import com.wl4g.rengine.job.RengineFlinkStreamingBase;
-import com.wl4g.rengine.job.model.RengineEventAnalytical;
+import com.wl4g.rengine.job.AbstractFlinkStreamingBase;
+import com.wl4g.rengine.job.model.RengineEventWrapper;
 
 import lombok.CustomLog;
 import lombok.Getter;
 
 /**
- * {@link RengineHBaseStreamingSupport}
+ * {@link HBaseFlinkStreamingSupport}
  * 
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2022-06-07 v3.0.0
@@ -51,8 +51,7 @@ import lombok.Getter;
  */
 @Getter
 @CustomLog
-public abstract class RengineHBaseStreamingSupport extends RengineFlinkStreamingBase {
-
+public abstract class HBaseFlinkStreamingSupport extends AbstractFlinkStreamingBase {
     private String hbaseZkAddrs;
     private String hTableNamespace;
     private String hTableName;
@@ -60,7 +59,7 @@ public abstract class RengineHBaseStreamingSupport extends RengineFlinkStreaming
     private Long bufferFlushMaxRows;
     private Long bufferFlushIntervalMillis;
 
-    protected RengineHBaseStreamingSupport() {
+    protected HBaseFlinkStreamingSupport() {
         super();
         // Sink options.
         builder.longOption("hbaseZkAddrs", "localhost:2181", "HBase zookeeper quorum addresses.")
@@ -75,7 +74,7 @@ public abstract class RengineHBaseStreamingSupport extends RengineFlinkStreaming
     }
 
     @Override
-    protected RengineFlinkStreamingBase parse(String[] args) throws ParseException {
+    protected AbstractFlinkStreamingBase parse(String[] args) throws ParseException {
         super.parse(args);
         // Sink options.
         this.hbaseZkAddrs = line.get("hbaseZkAddrs");
@@ -88,7 +87,7 @@ public abstract class RengineHBaseStreamingSupport extends RengineFlinkStreaming
     }
 
     @Override
-    protected RengineFlinkStreamingBase customStream(DataStreamSource<RengineEventAnalytical> dataStream) {
+    protected AbstractFlinkStreamingBase customStream(DataStreamSource<RengineEventWrapper> dataStreamSource) {
         Configuration conf = HBaseConfiguration.create();
         // Clients prefer to use this configuration.
         conf.set(HConstants.CLIENT_ZOOKEEPER_QUORUM, hbaseZkAddrs, getClass().getSimpleName());
@@ -104,8 +103,8 @@ public abstract class RengineHBaseStreamingSupport extends RengineFlinkStreaming
         // reported: RetriesExhaustedWithDetailsException: Failed 1 action: 1
         // time, servers with issues: null
         String fullTableName = hTableNamespace.concat(":").concat(hTableName);
-        dataStream.addSink(new HBaseSinkFunction<>(fullTableName, conf, converter, bufferFlushMaxSizeInBytes, bufferFlushMaxRows,
-                bufferFlushIntervalMillis));
+        dataStreamSource.addSink(new HBaseSinkFunction<>(fullTableName, conf, converter, bufferFlushMaxSizeInBytes,
+                bufferFlushMaxRows, bufferFlushIntervalMillis));
         return this;
     }
 

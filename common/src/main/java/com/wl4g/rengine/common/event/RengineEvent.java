@@ -26,6 +26,7 @@ import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.emptyMap;
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.Serializable;
@@ -90,7 +91,7 @@ public class RengineEvent extends EventObject {
     /**
      * Event body.
      */
-    private @Nullable String body;
+    private @Nullable List<String> body;
 
     /**
      * Event extension attributes.
@@ -101,12 +102,12 @@ public class RengineEvent extends EventObject {
         this(type, currentTimeMillis(), source, null, new HashMap<>());
     }
 
-    public RengineEvent(@NotBlank String type, @NotNull EventSource source, @Nullable String body) {
+    public RengineEvent(@NotBlank String type, @NotNull EventSource source, @Nullable List<String> body) {
         this(type, currentTimeMillis(), source, body, emptyMap());
     }
 
-    public RengineEvent(@NotBlank String type, @Min(0) Long observedTime, @NotNull EventSource source, @Nullable String body,
-            @Nullable Map<String, String> attributes) {
+    public RengineEvent(@NotBlank String type, @Min(0) Long observedTime, @NotNull EventSource source,
+            @Nullable List<String> body, @Nullable Map<String, String> attributes) {
         super(notNullOf(source, "eventSource"));
         isTrueOf(observedTime > 0, format("observedTime > 0, but is: %s", observedTime));
         this.type = hasTextOf(type, "eventType");
@@ -129,17 +130,26 @@ public class RengineEvent extends EventObject {
     public static RengineEvent fromJson(JsonNode node) {
         notNullOf(node, "node");
 
-        // Event base
-        String type = node.at("/type").asText();
-        Long observedTime = node.at("/observedTime").asLong();
+        // Event base.
+        final String type = node.at("/type").asText();
+        final Long observedTime = node.at("/observedTime").asLong();
 
-        String body = node.at("/body").asText();
-        Map<String, String> attributes = parseJSON(node.at("/attributes").asText(), HASHMAP_TYPEREF);
+        final List<String> body = new ArrayList<>(4);
+        final JsonNode bodyArr = node.at("/body");
+        if (nonNull(bodyArr)) {
+            for (int i = 0; i < bodyArr.size(); i++) {
+                body.add(bodyArr.get(i).asText());
+            }
+        }
 
-        // Event source
-        Long sourceTime = node.at("/source/time").asLong();
-        List principals = parseFromNode(node, "/source/principals", List.class);
-        EventLocation location = parseFromNode(node, "/source/location", EventLocation.class);
+        final JsonNode attributesNode = node.at("/attributes");
+        final Map<String, String> attributes = (nonNull(attributesNode) && !attributesNode.isMissingNode()
+                && !isBlank(attributesNode.asText())) ? parseJSON(attributesNode.asText(), HASHMAP_TYPEREF) : null;
+
+        // Event source.
+        final Long sourceTime = node.at("/source/time").asLong();
+        final List principals = parseFromNode(node, "/source/principals", List.class);
+        final EventLocation location = parseFromNode(node, "/source/location", EventLocation.class);
 
         return new RengineEvent(type, observedTime,
                 EventSource.builder().time(sourceTime).principals(principals).location(location).build(), body, attributes);

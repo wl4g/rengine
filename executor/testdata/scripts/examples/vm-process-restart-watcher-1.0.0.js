@@ -1,11 +1,12 @@
 // Detect whether the APP process of the VM is healthy, otherwise and restart.
 function process(context) {
-    const vmHost = Assert.hasTextOf(context.getArgs()['vmHost'], "vmHost");
-    const vmPort = Assert.hasTextOf(context.getArgs()['vmPort'], "vmPort");
-    const vmUser = Assert.hasTextOf(context.getArgs()['vmUser'], "vmUser");
-    const vmPassword = Assert.hasTextOf(context.getArgs()['vmPassword'], "vmPassword");
-    const processFilter = Assert.hasTextOf(context.getArgs()['processFilter'], "processFilter");
-    const restartCmd = Assert.hasTextOf(context.getArgs()['restartCmd'], "restartCmd");
+    const args = context.getParameter().getArgs();
+    const vmHost = Assert.hasTextOf(args['vmHost'], "vmHost");
+    const vmPort = Assert.hasTextOf(args['vmPort'], "vmPort");
+    const vmUser = Assert.hasTextOf(args['vmUser'], "vmUser");
+    const vmPassword = Assert.hasTextOf(args['vmPassword'], "vmPassword");
+    const processFilter = Assert.hasTextOf(args['processFilter'], "processFilter");
+    const restartCmd = Assert.hasTextOf(args['restartCmd'], "restartCmd");
 
     const logConnString = "ssh " + vmUser + " -p " + vmPort + "@" + vmHost
     console.info("Detecting VM process of ", logConnString, "processFilter:", processFilter, "restartCmd:", restartCmd);

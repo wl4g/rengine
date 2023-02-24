@@ -18,6 +18,7 @@ package com.wl4g.rengine.executor.minio;
 import static com.google.common.base.Charsets.UTF_8;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.isTrue;
+import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.StringUtils2.getFilename;
 import static com.wl4g.infra.common.lang.TypeConverts.safeLongToInt;
@@ -25,6 +26,7 @@ import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTO
 import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_S3_OBJECT_READ_BUFFER;
 import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_SCRIPT_TMP_CACHE_DIR;
 import static java.lang.System.currentTimeMillis;
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.BufferedOutputStream;
@@ -115,13 +117,19 @@ public class MinioManager {
     }
 
     public ObjectResource loadObject(
+            final @NotNull Long uploadId,
             final @NotNull UploadType uploadType,
             final @NotBlank String objectPrefix,
             final @NotNull Long workflowId,
             final boolean binary,
-            final @Min(-1) long objectCacheExpireMs)
+            final @Min(-1) Long objectCacheExpireMs)
             throws ErrorResponseException, InsufficientDataException, InternalException, InvalidKeyException,
             InvalidResponseException, IOException, NoSuchAlgorithmException, ServerException, XmlParserException, IOException {
+        notNullOf(uploadId, "uploadId");
+        notNullOf(uploadType, "uploadType");
+        hasTextOf(objectPrefix, "objectPrefix");
+        notNullOf(workflowId, "workflowId");
+        isTrueOf(nonNull(objectCacheExpireMs) && objectCacheExpireMs >= -1, "objectCacheExpireMs >= -1");
 
         final File localFile = determineLocalFile(uploadType, objectPrefix, workflowId);
 
@@ -129,7 +137,7 @@ public class MinioManager {
         if (objectCacheExpireMs > 0 && localFile.exists() && localFile.length() > 0) {
             // Check for expiration is valid.
             if ((currentTimeMillis() - localFile.lastModified()) < objectCacheExpireMs) {
-                return new ObjectResource(objectPrefix, binary, localFile, safeLongToInt(localFile.length()));
+                return new ObjectResource(uploadId, objectPrefix, binary, localFile, safeLongToInt(localFile.length()));
             }
             // Expired and clearup
             if (!localFile.delete()) {
@@ -154,7 +162,7 @@ public class MinioManager {
                 // result.transferTo(out);
                 // out.toByteArray();
                 result.transferTo(bout);
-                return new ObjectResource(objectPrefix, binary, localFile, available);
+                return new ObjectResource(uploadId, objectPrefix, binary, localFile, available);
             }
         }
     }
@@ -220,10 +228,11 @@ public class MinioManager {
     @ToString
     @AllArgsConstructor
     public static class ObjectResource {
+        private @NotNull Long uploadId;
         private @NotBlank String objectPrefix;
-        private @NotNull boolean binary;
+        private boolean binary;
         private @NotNull File localFile;
-        private @NotNull int available;
+        private int available;
 
         public byte[] readToBytes() throws IOException {
             isTrue(available <= DEFAULT_EXECUTOR_S3_OBJECT_MAX_LIMIT, "Maximum file object readable limit exceeded: %s",
