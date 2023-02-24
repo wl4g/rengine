@@ -23,8 +23,10 @@ import static com.wl4g.rengine.service.UserService.DEFAULT_LOAD_USERINFO_URI;
 import static com.wl4g.rengine.service.UserService.DEFAULT_USER_BASE_URI_V1;
 import static com.wl4g.rengine.service.security.AuthenticationUtils.currentUserInfo;
 import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.IOException;
+import java.net.URI;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -59,17 +61,19 @@ public class SmartRedirectStrategy extends DefaultRedirectStrategy {
 
     @Override
     public void sendRedirect(HttpServletRequest request, HttpServletResponse response, String url) throws IOException {
-        final String redirectUrl = UriComponentsBuilder.fromUriString(WebUtils2.getRFCBaseURI(request, true))
-                .path(url)
-                .encode()
-                .build()
-                .toUriString();
+        String redirectUrl = url;
+        if (isBlank(URI.create(url).getScheme())) {
+            redirectUrl = UriComponentsBuilder.fromUriString(WebUtils2.getRFCBaseURI(request, true))
+                    .path(url)
+                    .encode()
+                    .build()
+                    .toUriString();
+        }
         if (isJSONResponse(request)) {
-            if (nonNull(failureRedirectStrategy)) { // Authentication failure
+            if (failureRedirectStrategy) { // Authentication failure
                 // see:org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler#saveException()
                 final AuthenticationException authException = (AuthenticationException) request
                         .getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
-
                 WebUtils2.writeJson(response, toJSONString(RespBase.create()
                         .withStatus(DEFAULT_UNAUTHENTICATED_STATUS)
                         .withMessage(nonNull(authException) ? authException.getMessage() : "Unknown authentication failed")

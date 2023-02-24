@@ -31,12 +31,12 @@ springdoc:
   use-management-port: false ## Default by false
   group-configs:
     - group: apiserver-docs
-      pathsToMatch: /api/**
+      pathsToMatch: /v1/**
       packagesToScan: com.wl4g.rengine.apiserver
   swagger-ui:
     enabled: true ## Default by true
     path: /swagger-ui.html
-    #configUrl: /v3/api-docs/swagger-config
+    #configUrl: ${springdoc.api-docs.path}/swagger-config ## Default by '/v3/api-docs/swagger-config'
     #layout: BaseLayout
     displayRequestDuration: true ## Default by false
     disableSwaggerDefaultUrl: true ## Default by false
