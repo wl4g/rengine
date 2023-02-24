@@ -3,7 +3,7 @@
 Unified and flexible rules engine platform, naturally suitable for scenarios where rules change frequently, such as real-time or near-real-time financial risk control, e-commerce promotion rules, operation and maintenance monitoring, IoT device alarms, online data cleaning and filtering, etc.
 
 [![Build on Push](https://github.com/wl4g/rengine/actions/workflows/build_on_push.yaml/badge.svg)](https://github.com/wl4g/rengine/actions/workflows/build_on_push.yaml)
-[![Build on Daily](https://github.com/wl4g/rengine/actions/workflows/build_on_daily.yaml/badge.svg)](https://github.com/wl4g/rengine/actions/workflows/build_on_daily.yaml)
+[![Build on Timing](https://github.com/wl4g/rengine/actions/workflows/build_on_timing.yaml/badge.svg)](https://github.com/wl4g/rengine/actions/workflows/build_on_timing.yaml)
 [![Release on Push](https://github.com/wl4g/rengine/actions/workflows/release_on_push.yaml/badge.svg)](https://github.com/wl4g/rengine/actions/workflows/release_on_push.yaml)
 [![License](https://img.shields.io/badge/license-Apache2.0+-green.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![GraalVM](https://img.shields.io/badge/GraalVM-22.1-green)](https://github.com/wl4g/rengine)
