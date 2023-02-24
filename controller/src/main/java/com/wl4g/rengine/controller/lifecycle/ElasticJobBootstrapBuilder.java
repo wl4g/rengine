@@ -139,15 +139,15 @@ public class ElasticJobBootstrapBuilder {
     public static JobConfiguration newDefaultJobConfig(
             @NotNull ScheduleJobType jobType,
             @NotBlank String jobName,
-            @NotNull ControllerSchedule trigger,
+            @NotNull ControllerSchedule schedule,
             @NotNull JobParameter jobParameter) {
         hasTextOf(jobName, "jobName");
-        notNullOf(trigger, "trigger");
+        notNullOf(schedule, "trigger");
         notNullOf(jobParameter, "jobParameter");
 
         String cron = null; // OneOffJobBootstrap
-        if (trigger.getProperties() instanceof GenericExecutionScheduleConfig) { // ScheduleJobBootstrap
-            cron = ((GenericExecutionScheduleConfig) trigger.getProperties()).getCron();
+        if (schedule.getProperties() instanceof GenericExecutionScheduleConfig) { // ScheduleJobBootstrap
+            cron = ((GenericExecutionScheduleConfig) schedule.getProperties()).getCron();
         }
         return JobConfiguration.builder()
                 .jobType(jobType)
@@ -155,10 +155,10 @@ public class ElasticJobBootstrapBuilder {
                 .cron(cron)
                 .disabled(DEFAULT_DISABLED)
                 .overwrite(DEFAULT_OVERWRITE)
-                .monitorExecution(trigger.getMonitorExecution())
-                .failover(trigger.getFailover())
-                .misfire(trigger.getMisfire())
-                .timeZone(trigger.getTimeZone())
+                .monitorExecution(schedule.getMonitorExecution())
+                .failover(schedule.getFailover())
+                .misfire(schedule.getMisfire())
+                .timeZone(schedule.getTimeZone())
                 // When setup true, the shardingTotalCount will be ignored,
                 // and the will be automatically allocated according to the
                 // number of cluster nodes priority.
@@ -166,8 +166,8 @@ public class ElasticJobBootstrapBuilder {
                 .shardingTotalCount(DEFAULT_SHARDING_TOTAL_COUNT)
                 .shardingItemParameters(DEFAULT_SHARDING_ITEM_PARAMETERS)
                 .jobParameter(toJSONString(jobParameter))
-                .maxTimeDiffSeconds(trigger.getMaxTimeDiffSeconds())
-                .reconcileIntervalMinutes(trigger.getReconcileIntervalMinutes())
+                .maxTimeDiffSeconds(schedule.getMaxTimeDiffSeconds())
+                .reconcileIntervalMinutes(schedule.getReconcileIntervalMinutes())
                 .jobShardingStrategyType(DEFAULT_JOB_SHARDING_STRATEGY_TYPE)
                 .jobExecutorServiceHandlerType(DEFAULT_JOB_EXECUTOR_SERVICE_HANDLER_TYPE)
                 .jobErrorHandlerType(DEFAULT_JOB_ERROR_HANDLER_TYPE)

@@ -19,5 +19,3 @@ spring:
 
 server: ## see:org.springframework.boot.autoconfigure.web.ServerProperties
   port: 28003
-  servlet:
-    contextPath: /controller

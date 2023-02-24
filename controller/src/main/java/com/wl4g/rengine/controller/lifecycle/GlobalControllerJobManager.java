@@ -44,6 +44,7 @@ import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
 import org.apache.shardingsphere.elasticjob.executor.ElasticJobExecutor;
 import org.apache.shardingsphere.elasticjob.executor.item.JobItemExecutor;
 import org.apache.shardingsphere.elasticjob.lite.api.bootstrap.JobBootstrap;
+import org.apache.shardingsphere.elasticjob.lite.api.bootstrap.impl.OneOffJobBootstrap;
 import org.apache.shardingsphere.elasticjob.lite.api.bootstrap.impl.ScheduleJobBootstrap;
 import org.apache.shardingsphere.elasticjob.lite.internal.schedule.JobScheduler;
 import org.apache.shardingsphere.elasticjob.reg.base.CoordinatorRegistryCenter;
@@ -97,18 +98,7 @@ public class GlobalControllerJobManager implements ApplicationRunner, Closeable 
     public void close() throws IOException {
         safeMap(bootstrapRegistry).entrySet().forEach(e -> {
             try {
-                final Field jobSchedulerField = findField(e.getValue().getClass(), "jobScheduler");
-                final JobScheduler jobScheduler = getField(jobSchedulerField, e.getValue(), true);
-
-                final Field jobExecutorField = findField(JobScheduler.class, "jobExecutor");
-                final ElasticJobExecutor jobExecutor = getField(jobExecutorField, jobScheduler, true);
-
-                final Field jobItemExecutorField = findField(ElasticJobExecutor.class, "jobItemExecutor");
-                final JobItemExecutor<ElasticJob> jobItemExecutor = getField(jobItemExecutorField, jobExecutor, true);
-
-                if (jobItemExecutor instanceof AbstractJobExecutor) {
-                    ((AbstractJobExecutor) jobItemExecutor).close();
-                }
+                closeJobExecutor(e.getValue());
             } catch (IOException ex) {
                 log.warn(format("Unable to closing job item executor for scheduleId: %s", e.getKey()), ex);
             }
@@ -139,20 +129,20 @@ public class GlobalControllerJobManager implements ApplicationRunner, Closeable 
             @NotNull InterProcessSemaphoreMutex lock,
             @NotNull ScheduleJobType jobType,
             @NotBlank String jobName,
-            @NotNull ControllerSchedule trigger,
+            @NotNull ControllerSchedule schedule,
             @NotNull JobParameter jobParameter) throws Exception {
         notNullOf(lock, "lock");
         notNullOf(jobType, "jobType");
         hasTextOf(jobName, "jobName");
-        notNullOf(trigger, "trigger");
+        notNullOf(schedule, "schedule");
         notNullOf(jobParameter, "jobParameter");
-        trigger.validate();
+        schedule.validate();
 
-        final JobConfiguration jobConfig = newDefaultJobConfig(jobType, jobName, trigger, jobParameter);
+        final JobConfiguration jobConfig = newDefaultJobConfig(jobType, jobName, schedule, jobParameter);
         final JobBootstrap bootstrap = createJobBootstrap(jobConfig);
-        final JobBootstrap existing = bootstrapRegistry.putIfAbsent(trigger.getId(), bootstrap);
+        final JobBootstrap existing = bootstrapRegistry.putIfAbsent(schedule.getId(), bootstrap);
         if (nonNull(existing)) {
-            throw new RengineControllerException(format("Already trigger '%s' scheduling for : %s", trigger.getId(), existing));
+            throw new RengineControllerException(format("Already trigger '%s' scheduling for : %s", schedule.getId(), existing));
         }
         return (T) bootstrap;
     }
@@ -178,15 +168,16 @@ public class GlobalControllerJobManager implements ApplicationRunner, Closeable 
                 .filter(e -> _scheduleIds.isEmpty() || (!_scheduleIds.isEmpty() && _scheduleIds.contains(e.getKey())))
                 .map(e -> {
                     try {
-                        if (nonNull(e.getValue()) && e.getValue() instanceof ScheduleJobBootstrap) {
-                            ((ScheduleJobBootstrap) e.getValue()).schedule();
-                            // } else if (e.getValue() instanceof
-                            // OneOffJobBootstrap) {
-                            // ((OneOffJobBootstrap) e.getValue()).execute();
+                        if (nonNull(e.getValue())) {
+                            if (e.getValue() instanceof ScheduleJobBootstrap) {
+                                ((ScheduleJobBootstrap) e.getValue()).schedule();
+                            } else if (e.getValue() instanceof OneOffJobBootstrap) {
+                                ((OneOffJobBootstrap) e.getValue()).execute();
+                            }
                         }
                         log.info("Scheduled job bootstrap : {}", e.getKey());
-                    } catch (Exception e1) {
-                        log.error("Failed to scheduled job bootstrap : {}", e.getKey());
+                    } catch (Throwable ex) {
+                        log.error("Failed to scheduled job bootstrap : {}", e.getKey(), ex);
                         return null;
                     }
                     return e.getKey();
@@ -202,11 +193,24 @@ public class GlobalControllerJobManager implements ApplicationRunner, Closeable 
                 .stream()
                 .filter(e -> _scheduleIds.isEmpty() || (!_scheduleIds.isEmpty() && _scheduleIds.contains(e.getKey())))
                 .map(e -> {
+                    boolean error = false;
                     try {
-                        ((ScheduleJobBootstrap) e.getValue()).shutdown();
+                        log.debug("Closing job executor : {}", e.getKey());
+                        closeJobExecutor(e.getValue());
+                        log.info("Closed job executor : {}", e.getKey());
+                    } catch (Throwable ex) {
+                        log.error("Failed to closing job executor : {}", e.getKey(), ex);
+                        error = true;
+                    }
+                    try {
+                        log.debug("Shutdowning job bootstrap : {}", e.getKey());
+                        e.getValue().shutdown();
                         log.info("Shutdown job bootstrap : {}", e.getKey());
-                    } catch (Exception e1) {
-                        log.error("Failed to Shutdown job bootstrap : {}", e.getKey());
+                    } catch (Throwable ex) {
+                        log.error("Failed to Shutdown job bootstrap : {}", e.getKey(), ex);
+                        error = true;
+                    }
+                    if (error) {
                         return null;
                     }
                     return e.getKey();
@@ -245,6 +249,22 @@ public class GlobalControllerJobManager implements ApplicationRunner, Closeable 
         } catch (Throwable e) {
             log.error("Failed to build job bootstrap.", e);
             throw e;
+        }
+    }
+
+    public static void closeJobExecutor(@NotNull JobBootstrap bootstrap) throws IOException {
+        notNullOf(bootstrap, "bootstrap");
+        final Field jobSchedulerField = findField(bootstrap.getClass(), "jobScheduler");
+        final JobScheduler jobScheduler = getField(jobSchedulerField, bootstrap, true);
+
+        final Field jobExecutorField = findField(JobScheduler.class, "jobExecutor");
+        final ElasticJobExecutor jobExecutor = getField(jobExecutorField, jobScheduler, true);
+
+        final Field jobItemExecutorField = findField(ElasticJobExecutor.class, "jobItemExecutor");
+        final JobItemExecutor<ElasticJob> jobItemExecutor = getField(jobItemExecutorField, jobExecutor, true);
+
+        if (jobItemExecutor instanceof AbstractJobExecutor) {
+            ((AbstractJobExecutor) jobItemExecutor).close();
         }
     }
 

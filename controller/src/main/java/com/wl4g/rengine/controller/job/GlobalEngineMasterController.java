@@ -119,17 +119,14 @@ public class GlobalEngineMasterController extends AbstractJobExecutor {
                             // The status of the schedule is disabled, you need
                             // to shtudown the scheduling job.
                             if (schedule.getEnable() == BaseBean.DISABLED) {
-                                log.info("Disabling schedule scheduling for : {}", schedule.getId());
+                                log.info("Disabling scheduling : {}", schedule.getId());
                                 if (getGlobalScheduleJobManager().exists(schedule.getId())) {
                                     getGlobalScheduleJobManager().shutdown(schedule.getId());
                                     getGlobalScheduleJobManager().remove(schedule.getId());
                                     // When the schedule is disabled(cancelled),
-                                    // the
-                                    // mutex should be released, to allow
-                                    // binding
-                                    // (scheduling) by other nodes after
-                                    // schedule
-                                    // re-enabling.
+                                    // the mutex should be released, to allow
+                                    // binding (scheduling) by other nodes after
+                                    // schedule e-enabling.
                                     try {
                                         mutexLock.release(); // [#MARK1]
                                     } catch (IllegalStateException e) {
@@ -149,7 +146,7 @@ public class GlobalEngineMasterController extends AbstractJobExecutor {
                             //
                             // 3). Because the current node (shard) binding
                             //
-                            // schedule scheduling is stateful, once the lock is
+                            // scheduling is stateful, once the lock is
                             // acquired, there is no need to actively release
                             // it, unless the schedule is actively
                             // disabled(cancelled), or the current JVM exits
@@ -174,7 +171,7 @@ public class GlobalEngineMasterController extends AbstractJobExecutor {
 
                                 updateTriggerRunState(schedule.getId(), RunState.SCHED);
                             } else {
-                                log.debug("Trigger {} is already bound to the this JVM or other nodes.", schedule.getId());
+                                log.debug("Schedule {} is already bound to the this JVM or other nodes.", schedule.getId());
                             }
 
                         } catch (Throwable e) {
@@ -238,7 +235,7 @@ public class GlobalEngineMasterController extends AbstractJobExecutor {
 
         public void start() {
             if (currentTimeMillis() - lastPurgeTime.get() > DEFAULT_PURGE_INTERNAL_MS) {
-                log.debug("Started for purge controller.");
+                log.debug("No need to start purge controller.");
                 return;
             }
             this.lastPurgeTime.set(currentTimeMillis());
@@ -246,7 +243,7 @@ public class GlobalEngineMasterController extends AbstractJobExecutor {
                 this.executor = new Thread(() -> {
                     try {
                         if (purgerMutexLock.acquire(1, TimeUnit.MILLISECONDS)) {
-                            log.info("Purging schedule schedule job logs for : {}", config.getPurger());
+                            log.info("Purging schedule job logs for : {}", config.getPurger());
 
                             // Purge past logs according to configuration,
                             // keeping only the most recent period of time.

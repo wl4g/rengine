@@ -77,7 +77,6 @@ public class ControllerScheduleServiceImpl implements ControllerScheduleService 
             final @NotNull ControllerScheduleQuery model,
             final @NotNull Integer divisor,
             final @NotNull Integer remainder) {
-
         final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getScheduleId()),
                 modIdCriteria(divisor, remainder), isCriteria("properties.type", model.getType()))).with(defaultSort());
 

@@ -27,7 +27,7 @@ quarkus:
     port: 28002
     ssl-port: 28012
     test-ssl-port: 28022
-    root-path: /executor
+    root-path: /
     insecure-requests: enabled ## enabled|redirect|disabled
     cors: false
   tls:

@@ -67,8 +67,8 @@ APP_USER_HOME="/home/${APP_USER}"
 
 # Logs,lib and data directory define.
 LIB_DIR_NAME="lib"
-DATA_DIR="/mnt/disk1/${APP_NAME}"
-LOG_DIR="/mnt/disk1/log/${APP_NAME}"
+DATA_DIR="/var/${APP_NAME}"
+LOG_DIR="/var/log/${APP_NAME}"
 
 # Standard out and err logfile.
 #STDOUT_FILE="/dev/null"
