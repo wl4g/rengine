@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.job.cep;
+package com.wl4g.rengine.job.cep.pattern;
 
 import static org.junit.Assert.assertEquals;
 

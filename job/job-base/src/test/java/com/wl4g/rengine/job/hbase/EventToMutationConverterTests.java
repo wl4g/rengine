@@ -22,9 +22,8 @@ import org.apache.hadoop.hbase.client.Mutation;
 import org.junit.Test;
 
 import com.wl4g.rengine.common.event.RengineEvent;
-import com.wl4g.rengine.common.event.RengineEvent.EventSource;
 import com.wl4g.rengine.common.event.RengineEvent.EventLocation;
-import com.wl4g.rengine.job.model.RengineEventWrapper;
+import com.wl4g.rengine.common.event.RengineEvent.EventSource;
 
 /**
  * {@link EventToMutationConverterTests}
@@ -37,7 +36,7 @@ public class EventToMutationConverterTests {
 
     @Test
     public void testEventToMutationConverter() {
-        RengineEventWrapper model = new RengineEventWrapper(new RengineEvent("device_temp_warning",
+        RengineEvent model = new RengineEvent("device_temp_warning",
                 EventSource.builder()
                         .time(currentTimeMillis())
                         .principals(singletonList("admin"))
@@ -50,7 +49,7 @@ public class EventToMutationConverterTests {
                         .build(),
                 // BsonEntitySerializers serious alarm occurs when the device
                 // temperature is greater than 52℃
-                singletonList("52")));
+                singletonList("52"));
 
         EventToMutationConverter converter = new EventToMutationConverter();
         converter.open();

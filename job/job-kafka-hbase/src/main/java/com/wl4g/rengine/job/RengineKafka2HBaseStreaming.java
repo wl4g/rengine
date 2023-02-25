@@ -28,7 +28,7 @@ import com.wl4g.rengine.job.kafka.RengineKafkaUtil;
 import lombok.Getter;
 
 /**
- * {@link GenericFlinkCepKafkaStreaming}
+ * {@link AbstractFlinkCepStreamingBase}
  * 
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2022-05-31 v3.0.0
@@ -41,7 +41,7 @@ public class RengineKafka2HBaseStreaming extends HBaseFlinkStreamingSupport {
     private String partitionDiscoveryIntervalMs;
 
     public static void main(String[] args) throws Exception {
-        new GenericFlinkCepKafkaStreaming().parse(args).run();
+        new RengineKafka2HBaseStreaming().parse(args).run();
     }
 
     public RengineKafka2HBaseStreaming() {

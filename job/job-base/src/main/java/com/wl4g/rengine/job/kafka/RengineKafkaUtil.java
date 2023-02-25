@@ -24,7 +24,7 @@ import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsIni
 import org.apache.kafka.clients.consumer.OffsetResetStrategy;
 
 import com.wl4g.rengine.job.AbstractFlinkStreamingBase;
-import com.wl4g.rengine.job.model.RengineEventWrapper;
+import com.wl4g.rengine.common.event.RengineEvent;
 
 /**
  * {@link RenginePulsarUtil}
@@ -41,18 +41,30 @@ public abstract class RengineKafkaUtil {
      * @param streaming
      * @return
      */
-    @SuppressWarnings("unchecked")
     public static <T, S extends SourceSplit, E> Source<T, S, E> createKafkaSource(AbstractFlinkStreamingBase streaming) {
+        return createKafkaSource(OffsetResetStrategy.LATEST, streaming);
+    }
+
+    /**
+     * Create KAFKA FLINK stream source
+     * 
+     * @param streaming
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public static <T, S extends SourceSplit, E> Source<T, S, E> createKafkaSource(
+            OffsetResetStrategy defaultOffsetResetStrategy,
+            AbstractFlinkStreamingBase streaming) {
         // see:https://github.com/apache/flink/blob/release-1.14.4/docs/content/docs/connectors/datastream/kafka.md#starting-offset
         // Start from committed offset, also use EARLIEST as reset strategy if
         // committed offset doesn't exist
-        OffsetsInitializer offsets = OffsetsInitializer.committedOffsets(OffsetResetStrategy.EARLIEST);
+        OffsetsInitializer offsets = OffsetsInitializer.committedOffsets(defaultOffsetResetStrategy);
         if (streaming.getFromOffsetTime() > 0) { // By-default
             // Start from the first record whose timestamp is greater than
             // or equals a timestamp.
             offsets = OffsetsInitializer.timestamp(streaming.getFromOffsetTime());
         }
-        KafkaSource<RengineEventWrapper> source = KafkaSource.<RengineEventWrapper> builder()
+        KafkaSource<RengineEvent> source = KafkaSource.<RengineEvent> builder()
                 .setBootstrapServers(streaming.getBrokers())
                 .setGroupId(streaming.getGroupId())
                 .setTopicPattern(Pattern.compile(streaming.getTopicPattern()))

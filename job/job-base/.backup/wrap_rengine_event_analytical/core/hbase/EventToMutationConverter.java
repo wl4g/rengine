@@ -33,7 +33,7 @@ import org.apache.hadoop.hbase.client.Put;
 
 import com.wl4g.rengine.common.event.RengineEvent;
 import com.wl4g.rengine.common.event.RengineEvent.EventSource;
-import com.wl4g.rengine.job.model.RengineEventAnalytical;
+import com.wl4g.rengine.common.event.RengineEventAnalytical;
 
 /**
  * {@link EventToMutationConverter}

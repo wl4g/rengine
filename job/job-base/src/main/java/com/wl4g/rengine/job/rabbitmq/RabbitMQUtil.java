@@ -34,8 +34,8 @@ public abstract class RabbitMQUtil {
     // public static <T, S extends SourceSplit, E> Source<T, S, E>
     // createRabbitMQSource(AbstractFlinkStreamingBase program) {
     // // TODO
-    // RabbitMQSource<RengineEventWrapper> source =
-    // RabbitMQSource.<RengineEventWrapper> builder()
+    // RabbitMQSource<RengineEvent> source =
+    // RabbitMQSource.<RengineEvent> builder()
     // .setServiceUrl(program.getBrokers())
     // // .setGroupId(program.getGroupId())
     // .setTopicPattern(Pattern.compile(program.getTopicPattern()))

@@ -16,10 +16,11 @@
 package com.wl4g.rengine.job.elasticsearch7;
 
 import org.apache.commons.cli.ParseException;
+import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 
+import com.wl4g.rengine.common.event.RengineEvent;
 import com.wl4g.rengine.job.AbstractFlinkStreamingBase;
-import com.wl4g.rengine.job.model.RengineEventWrapper;
 
 import lombok.Getter;
 
@@ -48,7 +49,7 @@ public abstract class ES7FlinkStreamingSupport extends AbstractFlinkStreamingBas
     }
 
     @Override
-    protected AbstractFlinkStreamingBase customStream(DataStreamSource<RengineEventWrapper> dataStreamSource) {
+    protected DataStream<?> customStream(DataStreamSource<RengineEvent> dataStreamSource) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException();
     }

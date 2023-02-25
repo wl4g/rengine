@@ -23,7 +23,7 @@ import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.eventtime.WatermarksWithIdleness;
 
 import com.wl4g.rengine.common.event.RengineEvent.EventSource;
-import com.wl4g.rengine.job.model.RengineEventAnalytical;
+import com.wl4g.rengine.common.event.RengineEventAnalytical;
 
 /**
  * {@link RengineEventWatermarks}

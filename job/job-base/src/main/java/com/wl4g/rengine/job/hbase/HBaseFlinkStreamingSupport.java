@@ -22,6 +22,7 @@ import java.util.Arrays;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.flink.connector.hbase.sink.HBaseSinkFunction;
+import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
@@ -36,8 +37,8 @@ import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.hadoop.hbase.client.TableDescriptor;
 import org.apache.hadoop.hbase.client.TableDescriptorBuilder;
 
+import com.wl4g.rengine.common.event.RengineEvent;
 import com.wl4g.rengine.job.AbstractFlinkStreamingBase;
-import com.wl4g.rengine.job.model.RengineEventWrapper;
 
 import lombok.CustomLog;
 import lombok.Getter;
@@ -87,7 +88,7 @@ public abstract class HBaseFlinkStreamingSupport extends AbstractFlinkStreamingB
     }
 
     @Override
-    protected AbstractFlinkStreamingBase customStream(DataStreamSource<RengineEventWrapper> dataStreamSource) {
+    protected DataStream<?> customStream(DataStreamSource<RengineEvent> dataStreamSource) {
         Configuration conf = HBaseConfiguration.create();
         // Clients prefer to use this configuration.
         conf.set(HConstants.CLIENT_ZOOKEEPER_QUORUM, hbaseZkAddrs, getClass().getSimpleName());
@@ -105,7 +106,8 @@ public abstract class HBaseFlinkStreamingSupport extends AbstractFlinkStreamingB
         String fullTableName = hTableNamespace.concat(":").concat(hTableName);
         dataStreamSource.addSink(new HBaseSinkFunction<>(fullTableName, conf, converter, bufferFlushMaxSizeInBytes,
                 bufferFlushMaxRows, bufferFlushIntervalMillis));
-        return this;
+
+        return dataStreamSource;
     }
 
     /**

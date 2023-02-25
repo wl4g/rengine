@@ -24,7 +24,7 @@ import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsIni
 import org.apache.kafka.clients.consumer.OffsetResetStrategy;
 
 import com.wl4g.rengine.job.RengineFlinkStreamingBase;
-import com.wl4g.rengine.job.model.RengineEventAnalytical;
+import com.wl4g.rengine.common.event.RengineEventAnalytical;
 
 /**
  * {@link RenginePulsarUtil}

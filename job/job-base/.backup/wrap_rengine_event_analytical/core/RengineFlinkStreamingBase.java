@@ -31,7 +31,7 @@ import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.sink.PrintSinkFunction;
 
-import com.wl4g.rengine.job.model.RengineEventAnalytical;
+import com.wl4g.rengine.common.event.RengineEventAnalytical;
 import com.wl4g.infra.common.cli.CommandLineTool;
 import com.wl4g.infra.common.cli.CommandLineTool.CommandLineFacade;
 

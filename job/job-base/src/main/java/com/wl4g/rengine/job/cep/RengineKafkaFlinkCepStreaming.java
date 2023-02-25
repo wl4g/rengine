@@ -13,20 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.job.model;
+package com.wl4g.rengine.job.cep;
+
+import org.apache.flink.api.connector.source.Source;
+import org.apache.flink.api.connector.source.SourceSplit;
+
+import com.wl4g.rengine.job.kafka.RengineKafkaUtil;
+
+import lombok.Getter;
 
 /**
- * {@link RengineEventWrapperTests}
+ * {@link RengineKafkaFlinkCepStreaming}
  * 
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
- * @version 2022-06-08 v3.0.0
+ * @version 2022-05-31 v3.0.0
  * @since v1.0.0
  */
-public class RengineEventWrapperTests {
+@Getter
+public class RengineKafkaFlinkCepStreaming extends AbstractFlinkCepStreamingBase {
 
-    // @Test
-    // public void testOrderedFields() {
-    // System.out.println(RengineEventWrapper.ORDERED_FIELDS);
-    // }
+    public static void main(String[] args) throws Exception {
+        new RengineKafkaFlinkCepStreaming().parse(args).run();
+    }
+
+    @Override
+    protected <T, S extends SourceSplit, E> Source<T, S, E> createSource() {
+        return RengineKafkaUtil.createKafkaSource(this);
+    }
 
 }

@@ -37,7 +37,7 @@ import org.apache.hadoop.hbase.client.TableDescriptor;
 import org.apache.hadoop.hbase.client.TableDescriptorBuilder;
 
 import com.wl4g.rengine.job.RengineFlinkStreamingBase;
-import com.wl4g.rengine.job.model.RengineEventAnalytical;
+import com.wl4g.rengine.common.event.RengineEventAnalytical;
 
 import lombok.CustomLog;
 import lombok.Getter;

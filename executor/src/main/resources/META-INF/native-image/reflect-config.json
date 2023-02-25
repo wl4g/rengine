@@ -52,9 +52,10 @@
   "queryAllDeclaredMethods": true,
   "queryAllDeclaredConstructors": true,
   "methods": [
-    {"name": "<init>","parameterTypes": ["java.lang.String","boolean","java.io.File","int"]},
+    {"name": "<init>","parameterTypes": ["java.lang.Long","java.lang.String","boolean","java.io.File","int"]},
     {"name": "readToBytes","parameterTypes": []},
     {"name": "readToString","parameterTypes": []},
+    {"name": "getUploadId","parameterTypes": []},
     {"name": "getObjectPrefix","parameterTypes": []},
     {"name": "isBinary","parameterTypes": []},
     {"name": "getLocalFile","parameterTypes": []},

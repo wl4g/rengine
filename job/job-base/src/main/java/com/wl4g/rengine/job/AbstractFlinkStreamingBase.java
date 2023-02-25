@@ -33,14 +33,16 @@ import org.apache.flink.api.connector.source.Source;
 import org.apache.flink.api.connector.source.SourceSplit;
 import org.apache.flink.runtime.state.hashmap.HashMapStateBackend;
 import org.apache.flink.streaming.api.CheckpointingMode;
+import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
+import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.CheckpointConfig.ExternalizedCheckpointCleanup;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.sink.PrintSinkFunction;
 
 import com.wl4g.infra.common.cli.CommandLineTool;
 import com.wl4g.infra.common.cli.CommandLineTool.CommandLineFacade;
-import com.wl4g.rengine.job.model.RengineEventWrapper;
+import static com.wl4g.infra.common.runtime.JvmRuntimeTool.*;
+import com.wl4g.rengine.common.event.RengineEvent;
 
 import lombok.Getter;
 
@@ -76,7 +78,7 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
     private Integer checkpointMaxConcurrent;
     private ExternalizedCheckpointCleanup externalizedCheckpointCleanup;
 
-    // Performance options.
+    // FLINK Performance options.
     private Integer parallelism;
     private Integer maxParallelism;
     private Long bufferTimeoutMillis;
@@ -97,19 +99,19 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
     protected AbstractFlinkStreamingBase() {
         this.builder = CommandLineTool.builder()
                 // MQ(Kafka/Pulsar/Rabbitmq/...) options.
-                .option("b", "brokers", "localhost:9092", "Connect MQ brokers addresses. default is local kafka brokers")
-                .option("t", "topicPattern", "rengine_event", "MQ topic regex pattern.")
-                .mustOption("g", "groupId", "Flink source consumer group id.")
-                .longOption("fromOffsetTime", "-1",
+                .option("B", "brokers", "localhost:9092", "Connect MQ brokers addresses. default is local kafka brokers")
+                .option("T", "topicPattern", "rengine_event", "MQ topic regex pattern.")
+                .mustOption("G", "groupId", "Flink source consumer group id.")
+                .option("O", "fromOffsetTime", "-1",
                         "Start consumption from the first record with a timestamp greater than or equal to a certain timestamp. if <=0, it will not be setup and keep the default behavior.")
                 // FLINK basic options.
-                .longOption("runtimeMode", RuntimeExecutionMode.STREAMING.name(),
+                .option("R", "runtimeMode", RuntimeExecutionMode.STREAMING.name(),
                         "Set the job execution mode. default is: STREAMING")
                 .longOption("restartAttempts", "3", "Set the maximum number of failed restart attempts. default is: 3")
                 .longOption("restartDelaySeconds", "15",
                         "Set the maximum number of failed interval between each restart. default is: 15")
                 // FLINK Checkpoint options.
-                .longOption("checkpointDir", "hdfs:///tmp/flink-checkpoint",
+                .longOption("checkpointDir", (isJvmInDebugging ? "file" : "hdfs") + ":///tmp/flink-checkpoint",
                         "Checkpoint execution interval millis, only valid when checkpointMode is sets.")
                 .longOption("checkpointMode", CheckpointingMode.AT_LEAST_ONCE.name(),
                         "Sets the checkpoint mode, the default is null means not enabled. options: "
@@ -122,7 +124,7 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
                 .longOption("checkpointMaxConcurrent", null, "")
                 .longOption("externalizedCheckpointCleanup", null, "The program is closed, an extra checkpoint is triggered.")
                 // FLINK Performance options.
-                .longOption("parallelism", "-1",
+                .option("p", "parallelism", "-1",
                         "The parallelism for operator. if <=0, it will not be setup and keep the default behavior.")
                 .longOption("maxParallelism", "-1",
                         "The maximum parallelism for operator. if <=0, it will not be setup and keep the default behavior.")
@@ -133,7 +135,7 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
                 // FLINK Sink options.
                 .option("F", "forceUsePrintSink", "false", "Force override set to stdout print sink function.")
                 // ControllerLog options.
-                .option("J", "jobName", "RengineAggregateFlinkJob", "Flink connect MQ source streaming job name.");
+                .option("J", "jobName", getClass().getSimpleName().concat("Job"), "Flink connect MQ source streaming job name.");
     }
 
     /**
@@ -150,11 +152,11 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
         this.topicPattern = line.get("topicPattern");
         this.groupId = line.get("groupId");
         this.fromOffsetTime = line.getLong("fromOffsetTime");
-        // FLINK basic options.
+        // FLINK Basic options.
         this.runtimeMode = line.getEnum("runtimeMode", RuntimeExecutionMode.class);
         this.restartAttempts = line.getInteger("restartAttempts");
         this.restartDelaySeconds = line.getInteger("restartDelaySeconds");
-        // Checkpoint options.
+        // FLINK Checkpoint options.
         this.checkpointDir = line.get("checkpointDir");
         this.checkpointMode = line.getEnum("checkpointMode", CheckpointingMode.class);
         this.checkpointIntervalMs = line.getLong("checkpointIntervalMs");
@@ -163,15 +165,15 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
         this.checkpointMinPauseBetween = line.getLong("checkpointMinPauseBetween");
         this.checkpointMaxConcurrent = line.getInteger("checkpointMaxConcurrent");
         this.externalizedCheckpointCleanup = line.getEnum("externalizedCheckpointCleanup", ExternalizedCheckpointCleanup.class);
-        // Performance options.
+        // FLINK Performance options.
         this.parallelism = line.getInteger("parallelism");
         this.maxParallelism = line.getInteger("maxParallelism");
         this.bufferTimeoutMillis = line.getLong("bufferTimeoutMillis");
         this.outOfOrdernessMillis = line.getLong("outOfOrdernessMillis");
         this.idleTimeoutMillis = line.getLong("idleTimeoutMillis");
-        // Sink options.
+        // FLINK Sink options.
         this.forceUsePrintSink = line.getBoolean("forceUsePrintSink");
-        // ControllerLog options.
+        // FLINK ControllerLog options.
         this.jobName = line.get("jobName");
         return this;
     }
@@ -196,7 +198,7 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
      * 
      * @return
      */
-    protected abstract AbstractFlinkStreamingBase customStream(DataStreamSource<RengineEventWrapper> dataStreamSource);
+    protected abstract DataStream<?> customStream(DataStreamSource<RengineEvent> dataStreamSource);
 
     /**
      * Handling job execution result.
@@ -211,46 +213,55 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
         notNull(line, errmsg -> new IllegalStateException(errmsg),
                 "Parse arguments are not initialized, must call #parse() before");
 
-        this.props = (Properties) System.getProperties().clone();
-
         // Custom properties.
-        customProps(props);
+        customProps(props = (Properties) System.getProperties().clone());
 
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setRuntimeMode(runtimeMode);
         env.setRestartStrategy(fixedDelayRestart(restartAttempts, Time.of(restartDelaySeconds, TimeUnit.SECONDS)));
+        final CheckpointConfig checkpointConfig = env.getCheckpointConfig();
         if (!isBlank(checkpointDir)) {
             //@formatter:off
             //env.setStateBackend(new FsStateBackend(new Path(checkpointDir).toUri(), flinkCheckpointSizeThreshold));
             //@formatter:on
             env.setStateBackend(new HashMapStateBackend());
-            env.getCheckpointConfig().setCheckpointStorage(checkpointDir);
+            checkpointConfig.setCheckpointStorage(checkpointDir);
         }
         // see:https://github.com/apache/flink/blob/release-1.14.4/docs/content/docs/connectors/datastream/kafka.md#consumer-offset-committing
         if (nonNull(checkpointMode)) {
-            env.getCheckpointConfig().setCheckpointingMode(checkpointMode);
+            checkpointConfig.setCheckpointingMode(checkpointMode);
         }
         if (nonNull(checkpointIntervalMs)) {
             env.enableCheckpointing(checkpointIntervalMs);
         }
         if (nonNull(checkpointMinPauseBetween)) {
             // Sets the minimum time interval between two checkpoints.
-            env.getCheckpointConfig().setMinPauseBetweenCheckpoints(checkpointMinPauseBetween);
+            checkpointConfig.setMinPauseBetweenCheckpoints(checkpointMinPauseBetween);
         }
         if (nonNull(checkpointTimeout)) {
-            env.getCheckpointConfig().setCheckpointTimeout(checkpointTimeout);
+            checkpointConfig.setCheckpointTimeout(checkpointTimeout);
         }
         if (nonNull(checkpointMaxConcurrent)) {
-            env.getCheckpointConfig().setMaxConcurrentCheckpoints(checkpointMaxConcurrent);
+            checkpointConfig.setMaxConcurrentCheckpoints(checkpointMaxConcurrent);
         }
         // When the program is closed, an extra checkpoint is triggered.
         if (nonNull(externalizedCheckpointCleanup)) {
-            env.getCheckpointConfig().setExternalizedCheckpointCleanup(externalizedCheckpointCleanup);
+            checkpointConfig.setExternalizedCheckpointCleanup(externalizedCheckpointCleanup);
         }
 
-        final DataStreamSource<RengineEventWrapper> dataStream = env.fromSource(createSource(),
+        final DataStreamSource<RengineEvent> dataStream = env.fromSource(createSource(),
                 RengineEventWatermarks.newWatermarkStrategy(ofMillis(outOfOrdernessMillis), ofMillis(idleTimeoutMillis)),
                 jobName.concat("Source"));
+
+        //// @formatter:off
+        //dataStream.assignTimestampsAndWatermarks(new BoundedOutOfOrdernessTimestampExtractor<RengineEvent>(Time.seconds(5)) {
+        //    @Override
+        //    public long extractTimestamp(RengineEvent event) {
+        //        return event.getObservedTime(); // event-time
+        //    }
+        //})
+        //// @formatter:on
+
         if (parallelism > 0) {
             dataStream.setParallelism(parallelism);
         }
@@ -261,10 +272,10 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
             dataStream.setBufferTimeout(bufferTimeoutMillis);
         }
 
+        final DataStream<?> customDataStream = customStream(dataStream);
+
         if (nonNull(forceUsePrintSink) && forceUsePrintSink) {
-            dataStream.addSink(new PrintSinkFunction<>());
-        } else {
-            customStream(dataStream);
+            customDataStream.print();
         }
 
         try {

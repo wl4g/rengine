@@ -22,7 +22,7 @@ import org.apache.flink.api.connector.source.SourceSplit;
 import org.apache.flink.connector.pulsar.source.PulsarSource;
 
 import com.wl4g.rengine.job.RengineFlinkStreamingBase;
-import com.wl4g.rengine.job.model.RengineEventAnalytical;
+import com.wl4g.rengine.common.event.RengineEventAnalytical;
 
 /**
  * {@link RenginePulsarUtil}

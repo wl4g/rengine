@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.wl4g.rengine.job.cep;
+package com.wl4g.rengine.job.cep.pattern;
 
 import org.apache.flink.api.common.ExecutionConfig;
 import org.apache.flink.api.common.typeinfo.TypeInformation;

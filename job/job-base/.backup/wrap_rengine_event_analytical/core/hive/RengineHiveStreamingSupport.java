@@ -20,7 +20,7 @@ import org.apache.flink.streaming.api.datastream.DataStreamSource;
 
 import com.wl4g.rengine.job.RengineFlinkStreamingBase;
 import com.wl4g.rengine.job.elasticsearch7.RengineES7StreamingSupport;
-import com.wl4g.rengine.job.model.RengineEventAnalytical;
+import com.wl4g.rengine.common.event.RengineEventAnalytical;
 
 import lombok.Getter;
 

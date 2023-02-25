@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.wl4g.rengine.job.cep;
+package com.wl4g.rengine.job.cep.pattern;
 
 /** BsonEntitySerializers subclass of {@link Event} for usage in tests. */
 public class SubEvent extends Event {
