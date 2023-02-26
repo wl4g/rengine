@@ -162,13 +162,12 @@ public class RengineEvent extends EventObject {
         isTrueOf(event.getObservedTime() > 0, "Must observedTime > 0");
 
         // Source validate.
-        EventSource source = (EventSource) event.getSource();
-        notNullOf(source.getTime(), "sourceTime");
-        isTrueOf(source.getTime() > 0, "Must sourceTime > 0");
+        final EventSource source = (EventSource) event.getSource();
+        isTrueOf(nonNull(source.getTime()) && source.getTime() > 0, "sourceTime > 0");
         notEmptyOf(source.getPrincipals(), "principals");
 
         // Location validate.
-        EventLocation location = source.getLocation();
+        final EventLocation location = source.getLocation();
         if (!isBlank(location.getCountry())) {
             isTrue(Pattern.matches(EVENT_LOCATION_COUNTRY_REGEX, location.getCountry()),
                     "Invalid event location country '%s' does not satisfy the regex: %s", location.getCountry(),

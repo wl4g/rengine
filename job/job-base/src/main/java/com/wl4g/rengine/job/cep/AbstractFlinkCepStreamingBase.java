@@ -36,9 +36,11 @@ import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.util.Collector;
 
 import com.wl4g.rengine.common.event.RengineEvent;
+import com.wl4g.rengine.common.event.RengineEvent.EventSource;
 import com.wl4g.rengine.job.AbstractFlinkStreamingBase;
 
 import lombok.AllArgsConstructor;
+import lombok.CustomLog;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -153,6 +155,7 @@ import lombok.experimental.SuperBuilder;
  * @see https://github1s.com/RealtimeCompute/ververica-cep-demo/blob/master/src/main/java/com/alibaba/ververica/cep/demo/CepDemo.java
  */
 @Getter
+@CustomLog
 public abstract class AbstractFlinkCepStreamingBase extends AbstractFlinkStreamingBase {
 
     private String patternJsonBase64;
@@ -193,23 +196,20 @@ public abstract class AbstractFlinkCepStreamingBase extends AbstractFlinkStreami
                 .keyBy(new KeySelector<RengineEvent, String>() {
                     @Override
                     public String getKey(RengineEvent event) throws Exception {
-                        // TODO The grouping default by eventType.
-                        return event.getType();
+                        // TODO The grouping default by principal 0.
+                        return ((EventSource) event.getSource()).getPrincipals().get(0);
                     }
                 });
 
-        Pattern<RengineEvent, RengineEvent> cepPattern = null;
-        try {
-            cepPattern = (Pattern<RengineEvent, RengineEvent>) CepJsonUtils
-                    .convertJSONStringToPattern(decodeBase64String(patternJsonBase64));
-        } catch (Exception ex) {
-            throw new IllegalArgumentException("Could't parse to cep pattern from json.", ex);
-        }
+        final Pattern<RengineEvent, RengineEvent> cepPattern = (Pattern<RengineEvent, RengineEvent>) CepJsonUtils
+                .toPattern(decodeBase64String(patternJsonBase64));
+        log.info("Using cep pattern : {}", cepPattern);
+
         final PatternStream<RengineEvent> patternStream = CEP.pattern(keyedStreamSource, cepPattern);
 
-        final SingleOutputStreamOperator<WarningEvent> output = patternStream.flatSelect(new GenericEventMatcher());
+        final SingleOutputStreamOperator<WarningEvent> selectStream = patternStream.flatSelect(new GenericEventMatcher());
 
-        return output;
+        return selectStream;
     }
 
     public static class GenericEventMatcher

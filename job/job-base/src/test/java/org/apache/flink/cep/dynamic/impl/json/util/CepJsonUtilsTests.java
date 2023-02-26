@@ -46,7 +46,7 @@ public class CepJsonUtilsTests {
                 .where(new MiddleCondition())
                 .followedByAny("end")
                 .where(new EndCondition());
-        final String patternJson1 = CepJsonUtils.convertPatternToJSONString(pattern1);
+        final String patternJson1 = CepJsonUtils.toJson(pattern1);
         out.println("patternJson1 : " + patternJson1);
 
         // show how to print test pattern in json format
@@ -57,7 +57,7 @@ public class CepJsonUtilsTests {
                 .followedBy("end")
                 .where(new EndCondition());
 
-        final String patternJson2 = CepJsonUtils.convertPatternToJSONString(pattern2);
+        final String patternJson2 = CepJsonUtils.toJson(pattern2);
         out.println("patternJson2 : " + patternJson2);
     }
 
@@ -200,7 +200,7 @@ public class CepJsonUtilsTests {
 
         Throwable error = null;
         try {
-            final Pattern<?, ?> pattern1 = CepJsonUtils.convertJSONStringToPattern(patternJson1);
+            final Pattern<?, ?> pattern1 = CepJsonUtils.toPattern(patternJson1);
             out.println("pattern1 : " + pattern1);
             assert nonNull(pattern1);
         } catch (Throwable ex) {
@@ -209,7 +209,7 @@ public class CepJsonUtilsTests {
         }
 
         try {
-            final Pattern<?, ?> pattern2 = CepJsonUtils.convertJSONStringToPattern(patternJson2);
+            final Pattern<?, ?> pattern2 = CepJsonUtils.toPattern(patternJson2);
             out.println("pattern2 : " + pattern2);
             assert nonNull(pattern2);
         } catch (Throwable ex) {

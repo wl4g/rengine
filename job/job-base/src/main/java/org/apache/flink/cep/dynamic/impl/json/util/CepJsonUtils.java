@@ -25,48 +25,67 @@ import org.apache.flink.cep.dynamic.impl.json.spec.ConditionSpec;
 import org.apache.flink.cep.dynamic.impl.json.spec.GraphSpec;
 import org.apache.flink.cep.dynamic.impl.json.spec.NodeSpec;
 import org.apache.flink.cep.pattern.Pattern;
-import org.apache.flink.streaming.api.windowing.time.Time;
-
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.module.SimpleModule;
+import org.apache.flink.streaming.api.windowing.time.Time;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.CustomLog;
 
-/** Utils for translating a Pattern to JSON string and vice versa. */
+/**
+ * {@link CepJsonUtils}
+ * 
+ * @author James Wong
+ * @version 2023-02-22
+ * @since v1.0.0
+ */
+@CustomLog
 public class CepJsonUtils {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CepJsonUtils.class);
     private static final ObjectMapper objectMapper = new ObjectMapper()
             .registerModule(new SimpleModule().addDeserializer(ConditionSpec.class, ConditionSpecStdDeserializer.INSTANCE)
                     .addDeserializer(Time.class, TimeStdDeserializer.INSTANCE)
                     .addDeserializer(NodeSpec.class, NodeSpecStdDeserializer.INSTANCE));
 
-    public static String convertPatternToJSONString(Pattern<?, ?> pattern) throws JsonProcessingException {
-        GraphSpec graphSpec = GraphSpec.fromPattern(pattern);
-        return objectMapper.writeValueAsString(graphSpec);
+    public static Pattern<?, ?> toPattern(String jsonString) {
+        return toPattern(jsonString, Thread.currentThread().getContextClassLoader());
     }
 
-    public static Pattern<?, ?> convertJSONStringToPattern(String jsonString) throws Exception {
-        return convertJSONStringToPattern(jsonString, Thread.currentThread().getContextClassLoader());
-    }
-
-    public static Pattern<?, ?> convertJSONStringToPattern(String jsonString, ClassLoader userCodeClassLoader) throws Exception {
-        if (userCodeClassLoader == null) {
-            LOG.warn("The given userCodeClassLoader is null. Will try to use ContextClassLoader of current thread.");
-            return convertJSONStringToPattern(jsonString);
+    public static Pattern<?, ?> toPattern(String jsonString, ClassLoader userCodeClassLoader) {
+        try {
+            if (userCodeClassLoader == null) {
+                log.warn("The given userCodeClassLoader is null. Will try to use ContextClassLoader of current thread.");
+                return toPattern(jsonString);
+            }
+            GraphSpec deserializedGraphSpec = objectMapper.readValue(jsonString, GraphSpec.class);
+            return deserializedGraphSpec.toPattern(userCodeClassLoader);
+        } catch (Throwable ex) {
+            throw new IllegalArgumentException(ex);
         }
-        GraphSpec deserializedGraphSpec = objectMapper.readValue(jsonString, GraphSpec.class);
-        return deserializedGraphSpec.toPattern(userCodeClassLoader);
     }
 
-    public static GraphSpec convertJSONStringToGraphSpec(String jsonString) throws Exception {
-        return objectMapper.readValue(jsonString, GraphSpec.class);
+    public static GraphSpec toGraphSpec(String jsonString) {
+        try {
+            return objectMapper.readValue(jsonString, GraphSpec.class);
+        } catch (Throwable ex) {
+            throw new IllegalArgumentException(ex);
+        }
     }
 
-    public static String convertGraphSpecToJSONString(GraphSpec graphSpec) throws Exception {
-        return objectMapper.writeValueAsString(graphSpec);
+    public static String toJson(GraphSpec graphSpec) {
+        try {
+            return objectMapper.writeValueAsString(graphSpec);
+        } catch (Throwable ex) {
+            throw new IllegalArgumentException(ex);
+        }
+    }
+
+    public static String toJson(Pattern<?, ?> pattern) {
+        GraphSpec graphSpec = GraphSpec.fromPattern(pattern);
+        try {
+            return objectMapper.writeValueAsString(graphSpec);
+        } catch (Throwable ex) {
+            throw new IllegalArgumentException(ex);
+        }
     }
 
 }
