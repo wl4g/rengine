@@ -43,6 +43,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.equalsAnyIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.replaceIgnoreCase;
@@ -277,7 +278,15 @@ public class EngineExecutionEndpoint {
         Object value = queryParams.get(key);
         // 2. Get parameter by headers (second priority).
         if (StringUtils2.isEmpty(value)) {
-            value = headers.get(key);
+            // Notice: It may be converted to lowercase by services such as
+            // front-end load balancing and gateways.
+            // value = headers.get(key);
+            value = headers.entries()
+                    .stream()
+                    .filter(e -> equalsAnyIgnoreCase(e.getKey(), key, "x-".concat(key)))
+                    .map(e -> e.getValue())
+                    .findFirst()
+                    .orElse(null);
         }
         // 3. Get parameter by body (third priority).
         if (StringUtils2.isEmpty(value)) {
@@ -297,7 +306,6 @@ public class EngineExecutionEndpoint {
         if (defaultValue instanceof Collection && value instanceof String) {
             value = asList(split((String) value, ","));
         }
-
         return (T) value;
     }
 

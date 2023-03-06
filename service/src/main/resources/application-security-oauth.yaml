@@ -13,9 +13,12 @@
 
 rengine:
   security:
+    auth:
+      secret-cache-prefix: "${spring.application.name:}:login:cache:secret:"
+      secret-cache-expire-seconds: 60
     oidc:
-      save-oauth2--client-prefix: ${spring.application.name:}
-      save-oauth2--client-expire-seconds: 1800
+      oauth2-client-cache-prefix: "${spring.application.name:}:login:cache:oidc:"
+      oauth2-client-cache-expire-seconds: 1800
 
 #
 # @Deprecated The implemented with custom repository. see:com.wl4g.rengine.service.security.MongoClientRegistrationRepository

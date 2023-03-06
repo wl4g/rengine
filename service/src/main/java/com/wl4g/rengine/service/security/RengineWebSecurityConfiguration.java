@@ -35,10 +35,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder.BCryptVe
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 
 import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.service.IdentityProviderService;
+import com.wl4g.rengine.service.UserService;
 import com.wl4g.rengine.service.security.authentication.SmartRedirectStrategy;
 import com.wl4g.rengine.service.security.oauth2.MongoClientRegistrationRepository;
 import com.wl4g.rengine.service.security.oauth2.MongoOAuth2AuthorizedClientService;
@@ -61,7 +63,11 @@ public class RengineWebSecurityConfiguration implements WebSecurityCustomizer {
     @Override
     public void customize(WebSecurity web) {
         web.ignoring()
-                .antMatchers("/hello/**", "/public/**", /* "/swagger-ui/**", */ "/actuator/**");
+                .antMatchers("/public/**")
+                .antMatchers("/hello/**")
+                .antMatchers(UserService.DEFAULT_USER_BASE_URI_V1 + UserService.DEFAULT_APPLY_SECRET_URI)
+                // .antMatchers("/swagger-ui/**")
+                .antMatchers("/actuator/**");
     }
 
     @Bean
@@ -99,6 +105,11 @@ public class RengineWebSecurityConfiguration implements WebSecurityCustomizer {
                             .defaultSuccessUrl(SmartRedirectStrategy.DEFAULT_SUCCESS_URI);
                     // Setup to success and failure smart redirect strategy.
                     SmartRedirectStrategy.configurer(customizer);
+                })
+                .logout(customizer -> {
+                    final var logoutSuccessHandler = new SimpleUrlLogoutSuccessHandler();
+                    logoutSuccessHandler.setRedirectStrategy(new SmartRedirectStrategy(false));
+                    customizer.logoutSuccessHandler(logoutSuccessHandler);
                 })
                 // @formatter:on
                 // Enable the OAuth2 of authorization login.
@@ -150,12 +161,14 @@ public class RengineWebSecurityConfiguration implements WebSecurityCustomizer {
 
     @Bean
     public UsernamePasswordAuthenticationProvider usernamePasswordAuthenticationProvider(
+            RengineWebSecurityProperties config,
+            RedisTemplate<String, byte[]> redisTemplate,
             @Autowired(required = false) AuthenticationManager authenticationManager,
             MongoTemplate mongoTemplate) {
         final var bCryptPasswordEncoder = new BCryptPasswordEncoder(BCryptVersion.$2Y, 13);
         final var userDetailsService = new MongoUserDetailsManager(authenticationManager, mongoTemplate.getDb(),
                 MongoCollectionDefinition.SYS_USERS.getName());
-        return new UsernamePasswordAuthenticationProvider(userDetailsService, bCryptPasswordEncoder);
+        return new UsernamePasswordAuthenticationProvider(config, redisTemplate, userDetailsService, bCryptPasswordEncoder);
     }
 
 }

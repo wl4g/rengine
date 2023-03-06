@@ -17,6 +17,8 @@ package com.wl4g.rengine.service.security;
 
 import javax.validation.constraints.NotNull;
 
+import com.wl4g.rengine.common.constants.RengineConstants;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -35,15 +37,27 @@ import lombok.ToString;
 public class RengineWebSecurityProperties {
 
     @NotNull
+    AuthenticationProperties auth = new AuthenticationProperties();
+
+    @NotNull
     OAuth2OidcProperties oidc = new OAuth2OidcProperties();
 
     @Getter
     @Setter
     @ToString
     @NoArgsConstructor
+    public static class AuthenticationProperties {
+        private String secretCachePrefix = RengineConstants.DEFAULT_LOGIN_CACHE_SECRET_PREFIX;
+        private Long secretCacheExpireSeconds = 60L;
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    @NoArgsConstructor
     public static class OAuth2OidcProperties {
-        private String saveOAuth2ClientPrefix = "";
-        private Long saveOAuth2ClientExpireSeconds = 1800L;
+        private String oauth2ClientCachePrefix = RengineConstants.DEFAULT_LOGIN_CACHE_OIDC_PREFIX;
+        private Long oauth2ClientCacheExpireSeconds = 1800L;
     }
 
 }

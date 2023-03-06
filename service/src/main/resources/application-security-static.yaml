@@ -13,6 +13,12 @@
 
 spring:
   security:
+    auth:
+      secret-cache-prefix: "${spring.application.name:}:login:cache:secret:"
+      secret-cache-expire-seconds: 60
+    oidc:
+      oauth2-client-cache-prefix: "${spring.application.name:}:login:cache:oidc:"
+      oauth2-client-cache-expire-seconds: 1800
     ## Notice: Production environment should be closed.
     user:
       name: user

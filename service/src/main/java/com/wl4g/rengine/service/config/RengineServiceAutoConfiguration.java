@@ -20,6 +20,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.service.meter.RengineMeterService;
@@ -51,6 +53,13 @@ public class RengineServiceAutoConfiguration {
             @Value("${spring.application.name}") String serviceId,
             @Value("${server.port}") int port) {
         return new RengineMeterService(meterRegistry, serviceId, port);
+    }
+
+    @Bean
+    public RedisTemplate<String, byte[]> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, byte[]> template = new RedisTemplate<>();
+        template.setConnectionFactory(redisConnectionFactory);
+        return template;
     }
 
 }

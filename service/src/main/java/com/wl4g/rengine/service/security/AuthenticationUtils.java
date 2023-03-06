@@ -15,6 +15,8 @@
  */
 package com.wl4g.rengine.service.security;
 
+import static java.util.Objects.nonNull;
+
 import java.time.Instant;
 import java.util.Map;
 
@@ -45,62 +47,64 @@ import lombok.experimental.SuperBuilder;
 public abstract class AuthenticationUtils {
 
     public static UserAuthenticationInfo currentUserInfo() {
+        final UserAuthenticationInfo info = new UserAuthenticationInfo();
+
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         log.debug("Load auth user info : {}", authentication);
 
-        final UserAuthenticationInfo info = new UserAuthenticationInfo();
-        info.setName(authentication.getName());
-        info.setAuthenticated(authentication.isAuthenticated());
+        if (nonNull(authentication)) {
+            info.setName(authentication.getName());
+            info.setAuthenticated(authentication.isAuthenticated());
 
-        if (authentication.getDetails() instanceof WebAuthenticationDetails) {
-            info.setSessionId(((WebAuthenticationDetails) authentication.getDetails()).getSessionId());
-            info.setRemoteAddress(((WebAuthenticationDetails) authentication.getDetails()).getRemoteAddress());
-        }
-
-        final Object principal = authentication.getPrincipal();
-        if (principal instanceof OAuth2AuthenticatedPrincipal) {
-            info.setAttributes(((OAuth2AuthenticatedPrincipal) principal).getAttributes());
-            if (principal instanceof OidcUser) {
-                final OidcUser oidcUser = ((OidcUser) principal);
-                info.setAuthenticatedAt(oidcUser.getAuthenticatedAt());
-                info.setExpiresAt(oidcUser.getExpiresAt());
-                final OidcUserInfo oidcUserInfo = oidcUser.getUserInfo();
-                info.setUserinfo(UserInfo.builder()
-                        .locale(oidcUserInfo.getLocale())
-                        .fullName(oidcUserInfo.getFullName())
-                        .zoneInfo(oidcUserInfo.getZoneInfo())
-                        .email(oidcUserInfo.getEmail())
-                        .profile(oidcUserInfo.getProfile())
-                        .subject(oidcUserInfo.getSubject())
-                        .familyName(oidcUserInfo.getFamilyName())
-                        .middleName(oidcUserInfo.getMiddleName())
-                        .nickName(oidcUserInfo.getNickName())
-                        .preferredUsername(oidcUserInfo.getPreferredUsername())
-                        .picture(oidcUserInfo.getPicture())
-                        .website(oidcUserInfo.getWebsite())
-                        .emailVerified(oidcUserInfo.getEmailVerified())
-                        .gender(oidcUserInfo.getGender())
-                        .birthdate(oidcUserInfo.getBirthdate())
-                        .phoneNumber(oidcUserInfo.getPhoneNumber())
-                        .phoneNumberVerified(oidcUserInfo.getPhoneNumberVerified())
-                        .updatedAt(oidcUserInfo.getUpdatedAt())
-                        .givenName(oidcUserInfo.getGivenName())
-                        .build());
-                final AddressStandardClaim oidcAddress = oidcUserInfo.getAddress();
-                info.setAddress(AddressInfo.builder()
-                        .formatted(oidcAddress.getFormatted())
-                        .streetAddress(oidcAddress.getStreetAddress())
-                        .region(oidcAddress.getRegion())
-                        .postalCode(oidcAddress.getPostalCode())
-                        .locality(oidcAddress.getLocality())
-                        .country(oidcAddress.getCountry())
-                        .build());
+            if (authentication.getDetails() instanceof WebAuthenticationDetails) {
+                info.setSessionId(((WebAuthenticationDetails) authentication.getDetails()).getSessionId());
+                info.setRemoteAddress(((WebAuthenticationDetails) authentication.getDetails()).getRemoteAddress());
             }
-        }
 
-        if (principal instanceof UserDetails) {
-            // final UserDetails userDetails = (UserDetails) principal;
-            // userDetails.getAuthorities();
+            final Object principal = authentication.getPrincipal();
+            if (principal instanceof OAuth2AuthenticatedPrincipal) {
+                info.setAttributes(((OAuth2AuthenticatedPrincipal) principal).getAttributes());
+                if (principal instanceof OidcUser) {
+                    final OidcUser oidcUser = ((OidcUser) principal);
+                    info.setAuthenticatedAt(oidcUser.getAuthenticatedAt());
+                    info.setExpiresAt(oidcUser.getExpiresAt());
+                    final OidcUserInfo oidcUserInfo = oidcUser.getUserInfo();
+                    info.setUserinfo(UserInfo.builder()
+                            .locale(oidcUserInfo.getLocale())
+                            .fullName(oidcUserInfo.getFullName())
+                            .zoneInfo(oidcUserInfo.getZoneInfo())
+                            .email(oidcUserInfo.getEmail())
+                            .profile(oidcUserInfo.getProfile())
+                            .subject(oidcUserInfo.getSubject())
+                            .familyName(oidcUserInfo.getFamilyName())
+                            .middleName(oidcUserInfo.getMiddleName())
+                            .nickName(oidcUserInfo.getNickName())
+                            .preferredUsername(oidcUserInfo.getPreferredUsername())
+                            .picture(oidcUserInfo.getPicture())
+                            .website(oidcUserInfo.getWebsite())
+                            .emailVerified(oidcUserInfo.getEmailVerified())
+                            .gender(oidcUserInfo.getGender())
+                            .birthdate(oidcUserInfo.getBirthdate())
+                            .phoneNumber(oidcUserInfo.getPhoneNumber())
+                            .phoneNumberVerified(oidcUserInfo.getPhoneNumberVerified())
+                            .updatedAt(oidcUserInfo.getUpdatedAt())
+                            .givenName(oidcUserInfo.getGivenName())
+                            .build());
+                    final AddressStandardClaim oidcAddress = oidcUserInfo.getAddress();
+                    info.setAddress(AddressInfo.builder()
+                            .formatted(oidcAddress.getFormatted())
+                            .streetAddress(oidcAddress.getStreetAddress())
+                            .region(oidcAddress.getRegion())
+                            .postalCode(oidcAddress.getPostalCode())
+                            .locality(oidcAddress.getLocality())
+                            .country(oidcAddress.getCountry())
+                            .build());
+                }
+            }
+            if (principal instanceof UserDetails) {
+                // final UserDetails userDetails = (UserDetails) principal;
+                // userDetails.getAuthorities();
+            }
         }
 
         return info;

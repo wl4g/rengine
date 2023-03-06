@@ -17,9 +17,8 @@ package com.wl4g.rengine.service.security.authentication;
 
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.findField;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.getField;
-import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static com.wl4g.infra.common.web.WebUtils2.ResponseType.isRespJSON;
-import static com.wl4g.rengine.service.UserService.DEFAULT_LOAD_USERINFO_URI;
+import static com.wl4g.rengine.service.UserService.DEFAULT_USERINFO_URI;
 import static com.wl4g.rengine.service.UserService.DEFAULT_USER_BASE_URI_V1;
 import static com.wl4g.rengine.service.security.AuthenticationUtils.currentUserInfo;
 import static java.util.Objects.nonNull;
@@ -42,6 +41,7 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
 import com.wl4g.infra.common.remoting.uri.UriComponentsBuilder;
 import com.wl4g.infra.common.web.WebUtils2;
 import com.wl4g.infra.common.web.rest.RespBase;
+import com.wl4g.infra.common.web.rest.RespBase.RetCode;
 
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
@@ -57,7 +57,7 @@ import lombok.CustomLog;
 @AllArgsConstructor
 public class SmartRedirectStrategy extends DefaultRedirectStrategy {
 
-    private final boolean failureRedirectStrategy;
+    private final boolean failureRedirect;
 
     @Override
     public void sendRedirect(HttpServletRequest request, HttpServletResponse response, String url) throws IOException {
@@ -70,23 +70,30 @@ public class SmartRedirectStrategy extends DefaultRedirectStrategy {
                     .toUriString();
         }
         if (isJSONResponse(request)) {
-            if (failureRedirectStrategy) { // Authentication failure
+            if (failureRedirect) { // Authentication failure
                 // see:org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler#saveException()
-                final AuthenticationException authException = (AuthenticationException) request
+                final AuthenticationException authEx = (AuthenticationException) request
                         .getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
-                WebUtils2.writeJson(response, toJSONString(RespBase.create()
-                        .withStatus(DEFAULT_UNAUTHENTICATED_STATUS)
-                        .withMessage(nonNull(authException) ? authException.getMessage() : "Unknown authentication failed")
-                        .forMap()
-                        .andPut(DEFAULT_REDIRECT_URI_KEY, redirectUrl)));
-            } else { // Authentication success
                 WebUtils2.writeJson(response,
-                        toJSONString(RespBase.create()
+                        RespBase.create()
+                                .withCode(RetCode.OK)
+                                .withStatus(DEFAULT_UNAUTHENTICATED_STATUS)
+                                .withMessage(nonNull(authEx) ? authEx.getMessage() : "Unknown authentication failed")
+                                .forMap()
+                                .andPut(DEFAULT_REDIRECT_URI_KEY, redirectUrl)
+                                .withParent()
+                                .asJson());
+            } else { // Authentication success,logout etc.
+                WebUtils2.writeJson(response,
+                        RespBase.create()
+                                .withCode(RetCode.OK)
                                 .withStatus(DEFAULT_AUTHENTICATED_STATUS)
                                 .withMessage("Login successful")
                                 .forMap()
                                 .andPut(DEFAULT_REDIRECT_URI_KEY, redirectUrl)
-                                .andPut(DEFAULT_USERINFO_KEY, currentUserInfo())));
+                                .andPut(DEFAULT_USERINFO_KEY, currentUserInfo())
+                                .withParent()
+                                .asJson());
             }
         } else {
             response.sendRedirect(redirectUrl);
@@ -133,10 +140,10 @@ public class SmartRedirectStrategy extends DefaultRedirectStrategy {
         configurer.failureHandler(failureHandler);
     }
 
-    public static final String DEFAULT_UNAUTHENTICATED_STATUS = "unauthenticated";
-    public static final String DEFAULT_AUTHENTICATED_STATUS = "authenticated";
+    public static final String DEFAULT_UNAUTHENTICATED_STATUS = "Unauthenticated";
+    public static final String DEFAULT_AUTHENTICATED_STATUS = "Authenticated";
     public static final String DEFAULT_REDIRECT_URI_KEY = "redirect_uri";
     public static final String DEFAULT_USERINFO_KEY = "userinfo";
 
-    public static final String DEFAULT_SUCCESS_URI = DEFAULT_USER_BASE_URI_V1.concat(DEFAULT_LOAD_USERINFO_URI);
+    public static final String DEFAULT_SUCCESS_URI = DEFAULT_USER_BASE_URI_V1.concat(DEFAULT_USERINFO_URI);
 }

@@ -19,6 +19,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
+import com.wl4g.infra.common.crypto.asymmetric.RSACryptor;
 import com.wl4g.rengine.common.entity.User;
 import com.wl4g.rengine.service.model.UserDelete;
 import com.wl4g.rengine.service.model.UserDeleteResult;
@@ -26,6 +27,7 @@ import com.wl4g.rengine.service.model.UserQuery;
 import com.wl4g.rengine.service.model.UserSave;
 import com.wl4g.rengine.service.model.UserSaveResult;
 import com.wl4g.rengine.service.security.AuthenticationUtils.UserAuthenticationInfo;
+import com.wl4g.rengine.service.security.RengineWebSecurityProperties;
 
 /**
  * {@link UserService}
@@ -44,9 +46,17 @@ public interface UserService {
 
     boolean changePassword(@NotBlank String oldPassword, @NotBlank String newPassword);
 
-    UserAuthenticationInfo loadUserInfo();
+    String applySecret(@NotBlank String username);
 
+    UserAuthenticationInfo userInfo();
+
+    public static String buildSecretCacheKey(RengineWebSecurityProperties config, String username) {
+        return config.getAuth().getSecretCachePrefix().concat(username);
+    }
+
+    public static final RSACryptor DEFAULT_RSA_CRYPTOR = new RSACryptor();
     public static final String DEFAULT_USER_BASE_URI_V1 = "/v1/user";
-    public static final String DEFAULT_LOAD_USERINFO_URI = "/loaduserinfo";
+    public static final String DEFAULT_APPLY_SECRET_URI = "/applysecret";
+    public static final String DEFAULT_USERINFO_URI = "/userinfo";
 
 }

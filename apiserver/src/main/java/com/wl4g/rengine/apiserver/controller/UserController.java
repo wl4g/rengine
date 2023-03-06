@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
+import com.wl4g.infra.common.web.rest.RespBase.RetCode;
 import com.wl4g.rengine.common.entity.User;
 import com.wl4g.rengine.service.UserService;
 import com.wl4g.rengine.service.model.UserDelete;
@@ -39,6 +40,7 @@ import com.wl4g.rengine.service.model.UserQuery;
 import com.wl4g.rengine.service.model.UserSave;
 import com.wl4g.rengine.service.model.UserSaveResult;
 import com.wl4g.rengine.service.security.AuthenticationUtils.UserAuthenticationInfo;
+import com.wl4g.rengine.service.security.authentication.SmartRedirectStrategy;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -107,12 +109,22 @@ public class UserController {
     }
 
     // @SecurityRequirement(name = "default_oauth")
+    @Operation(description = "Apply secret")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
+    @RequestMapping(path = { UserService.DEFAULT_APPLY_SECRET_URI }, produces = "application/json", method = { GET })
+    public RespBase<String> applySecret(@NotBlank @RequestParam("username") String username) {
+        return RespBase.<String> create().withCode(RetCode.OK).withData(userService.applySecret(username));
+    }
+
+    // @SecurityRequirement(name = "default_oauth")
     @Operation(description = "Load current authentication user info.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
-    @RequestMapping(path = { UserService.DEFAULT_LOAD_USERINFO_URI }, produces = "application/json", method = { GET })
-    public RespBase<UserAuthenticationInfo> loadUserInfo(HttpServletRequest request) {
-        RespBase<UserAuthenticationInfo> resp = RespBase.create();
-        return resp.withData(userService.loadUserInfo());
+    @RequestMapping(path = { UserService.DEFAULT_USERINFO_URI }, produces = "application/json", method = { GET })
+    public RespBase<UserAuthenticationInfo> userInfo(HttpServletRequest request) {
+        return RespBase.<UserAuthenticationInfo> create()
+                .withCode(RetCode.OK)
+                .withStatus(SmartRedirectStrategy.DEFAULT_AUTHENTICATED_STATUS)
+                .withData(userService.userInfo());
     }
 
 }

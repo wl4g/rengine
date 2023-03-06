@@ -64,7 +64,7 @@ public class MongoOAuth2AuthorizedClientService implements OAuth2AuthorizedClien
     public <T extends OAuth2AuthorizedClient> T loadAuthorizedClient(String clientRegistrationId, String principalName) {
         return (T) parseJSON(clientRegistrationRepository.getRedisTemplate()
                 .opsForValue()
-                .get(buildOAuth2ClientCacheKey(config.getOidc().getSaveOAuth2ClientPrefix(), clientRegistrationId,
+                .get(buildOAuth2ClientCacheKey(config.getOidc().getOauth2ClientCachePrefix(), clientRegistrationId,
                         principalName)),
                 OAuth2AuthorizedClient.class);
     }
@@ -76,15 +76,15 @@ public class MongoOAuth2AuthorizedClientService implements OAuth2AuthorizedClien
 
         clientRegistrationRepository.getRedisTemplate()
                 .opsForValue()
-                .set(buildOAuth2ClientCacheKey(config.getOidc().getSaveOAuth2ClientPrefix(), registrationId,
+                .set(buildOAuth2ClientCacheKey(config.getOidc().getOauth2ClientCachePrefix(), registrationId,
                         _principal.getName()), toJSONString(authorizedClient),
-                        config.getOidc().getSaveOAuth2ClientExpireSeconds(), TimeUnit.SECONDS);
+                        config.getOidc().getOauth2ClientCacheExpireSeconds(), TimeUnit.SECONDS);
     }
 
     @Override
     public void removeAuthorizedClient(String clientRegistrationId, String principalName) {
         clientRegistrationRepository.getRedisTemplate()
-                .delete(buildOAuth2ClientCacheKey(config.getOidc().getSaveOAuth2ClientPrefix(), clientRegistrationId,
+                .delete(buildOAuth2ClientCacheKey(config.getOidc().getOauth2ClientCachePrefix(), clientRegistrationId,
                         principalName));
     }
 

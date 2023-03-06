@@ -46,6 +46,10 @@ public abstract class RengineConstants extends EnvironmentUtil {
 
     public static final String CONF_PREFIX_APISERVER = CONF_PREFIX + ".apiserver";
 
+    public static final String DEFAULT_LOGIN_CACHE_OIDC_PREFIX = "login:cache:oidc:";
+
+    public static final String DEFAULT_LOGIN_CACHE_SECRET_PREFIX = "login:cache:secret:";
+
     // The URI of form submit username and password processing login endpoint.
     // The default as: /login
     public static final String DEFAULT_SECURITY_PASSWORD_ENDPOINT_URI = "/login/password";

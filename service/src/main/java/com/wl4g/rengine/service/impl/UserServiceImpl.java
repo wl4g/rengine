@@ -23,7 +23,9 @@ import static com.wl4g.rengine.service.mongo.QueryHolder.isCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
+import java.time.Duration;
 import java.util.List;
 
 import javax.validation.constraints.NotBlank;
@@ -33,11 +35,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
+import com.wl4g.infra.common.crypto.asymmetric.spec.RSAKeyPairSpec;
+import com.wl4g.infra.common.serialize.ProtostuffUtils;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.User;
 import com.wl4g.rengine.service.UserService;
@@ -47,6 +52,7 @@ import com.wl4g.rengine.service.model.UserQuery;
 import com.wl4g.rengine.service.model.UserSave;
 import com.wl4g.rengine.service.model.UserSaveResult;
 import com.wl4g.rengine.service.security.AuthenticationUtils;
+import com.wl4g.rengine.service.security.RengineWebSecurityProperties;
 import com.wl4g.rengine.service.security.AuthenticationUtils.UserAuthenticationInfo;
 import com.wl4g.rengine.service.security.user.MongoUserDetailsManager;
 
@@ -63,7 +69,9 @@ import lombok.CustomLog;
 @Service
 public class UserServiceImpl implements UserService {
 
+    private @Autowired RengineWebSecurityProperties config;
     private @Autowired MongoTemplate mongoTemplate;
+    private @Autowired RedisTemplate<String, byte[]> redisTemplate;
     private @Autowired(required = false) MongoUserDetailsManager userDetailsManager;
 
     @Override
@@ -112,6 +120,24 @@ public class UserServiceImpl implements UserService {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public String applySecret(@NotBlank String username) {
+        final var secretCacheKey = UserService.buildSecretCacheKey(config, username);
+
+        final var existingSecret = ProtostuffUtils.deserialize(redisTemplate.opsForValue().get(secretCacheKey),
+                RSAKeyPairSpec.class);
+        if (nonNull(existingSecret)) {
+            return existingSecret.getPubHexString();
+        }
+
+        final var secret = DEFAULT_RSA_CRYPTOR.generateKeyPair();
+        redisTemplate.opsForValue()
+                .set(secretCacheKey, ProtostuffUtils.serialize(secret),
+                        Duration.ofSeconds(config.getAuth().getSecretCacheExpireSeconds()));
+
+        return secret.getPubHexString();
     }
 
     /**
@@ -600,7 +626,7 @@ public class UserServiceImpl implements UserService {
      * </pre>
      */
     @Override
-    public UserAuthenticationInfo loadUserInfo() {
+    public UserAuthenticationInfo userInfo() {
         return AuthenticationUtils.currentUserInfo();
     }
 

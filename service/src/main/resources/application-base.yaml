@@ -83,7 +83,7 @@ server: ## see:org.springframework.boot.autoconfigure.web.ServerProperties
     #contextPath: /
     session:
       cookie:
-        name: _R_SID
+        name: __r_sid
   tomcat: # see: org.springframework.boot.autoconfigure.web.ServerProperties.Tomcat
     basedir: /tmp/${spring.application.name}
     accesslog:
