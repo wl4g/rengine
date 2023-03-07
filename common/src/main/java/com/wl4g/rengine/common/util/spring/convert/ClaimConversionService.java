@@ -16,7 +16,7 @@
 
 package com.wl4g.rengine.common.util.spring.convert;
 
-import com.wl4g.rengine.common.entity.User.ClaimAccessor;
+import com.wl4g.rengine.common.entity.sys.User.ClaimAccessor;
 
 /**
  * A {@link ConversionService} configured with converters that provide type conversion for

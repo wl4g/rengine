@@ -30,7 +30,6 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.infra.common.validation.EnumValue;
 import com.wl4g.rengine.common.entity.ControllerSchedule.ScheduleType;
 import com.wl4g.rengine.common.model.WorkflowExecuteResult.ResultDescription;
@@ -55,7 +54,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class ControllerLog extends BaseBean {
+public class ControllerLog extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     private @NotNull Long scheduleId;
@@ -69,7 +68,7 @@ public class ControllerLog extends BaseBean {
     }
 
     @NotNull
-    LogDetailBase<?> detail;
+    LogDetailBase<?> details;
 
     @Schema(oneOf = { ExecutionControllerLog.class, KafkaSubscribeControllerLog.class }, discriminatorProperty = "type")
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", visible = true)

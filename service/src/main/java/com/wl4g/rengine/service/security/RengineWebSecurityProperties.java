@@ -36,7 +36,7 @@ import lombok.ToString;
 @ToString
 public class RengineWebSecurityProperties {
 
-    Boolean ignoreSwaggerAuth = false;
+    Boolean ignoreSwaggerAuth = true;
 
     @NotNull
     UserAuthenticationProperties user = new UserAuthenticationProperties();

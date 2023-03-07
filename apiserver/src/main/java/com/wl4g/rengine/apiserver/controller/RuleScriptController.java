@@ -22,6 +22,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -68,6 +69,7 @@ public class RuleScriptController {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful",
             content = { @Content(mediaType = "application/json") }) })
     @RequestMapping(path = { "query" }, method = { GET })
+    @PreAuthorize("hasAuthority('arn:rengine:rulescript:query:v1')")
     public RespBase<PageHolder<RuleScript>> query(@Validated RuleScriptQuery model) {
         log.debug("called: model={}", model);
         RespBase<PageHolder<RuleScript>> resp = RespBase.create();
@@ -80,6 +82,7 @@ public class RuleScriptController {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful",
             content = { @Content(mediaType = "application/json") }) })
     @RequestMapping(path = { "parse" }, method = { GET })
+    @PreAuthorize("hasAuthority('arn:rengine:rulescript:parse:v1')")
     public RespBase<ScriptASTInfo> parse(@NotNull RuleEngine engine, @NotNull Long scriptId) {
         log.debug("called: engine={}, scriptId={}", engine, scriptId);
         RespBase<ScriptASTInfo> resp = RespBase.create();
@@ -91,6 +94,7 @@ public class RuleScriptController {
     @Operation(description = "Save rule script.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
+    @PreAuthorize("hasAuthority('arn:rengine:rulescript:save:v1')")
     public RespBase<RuleScriptSaveResult> save(@Validated @RequestBody RuleScriptSave model) {
         log.debug("called: model={}", model);
         RespBase<RuleScriptSaveResult> resp = RespBase.create();
@@ -102,6 +106,7 @@ public class RuleScriptController {
     @Operation(description = "Delete rule script.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
+    @PreAuthorize("hasAuthority('arn:rengine:rulescript:delete:v1')")
     public RespBase<RuleScriptDeleteResult> delete(@Validated @RequestBody RuleScriptDelete model) {
         log.debug("called: model={}", model);
         RespBase<RuleScriptDeleteResult> resp = RespBase.create();
@@ -113,6 +118,7 @@ public class RuleScriptController {
     @Operation(description = "Execute rule script for testing.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "execute" }, consumes = "application/json", produces = "application/json", method = { POST })
+    @PreAuthorize("hasAuthority('arn:rengine:rulescript:execute:v1')")
     public RespBase<RuleScriptExecuteResult> execute(@RequestBody RuleScriptExecuteRequest model) {
         log.debug("called: model={}", model);
         return ruleScriptService.execute(model);

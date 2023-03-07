@@ -19,6 +19,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,12 +27,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.service.NotificationService;
-import com.wl4g.rengine.service.model.NotificationDingtalkUserIdExchage;
-import com.wl4g.rengine.service.model.NotificationDingtalkUserIdExchageResult;
-import com.wl4g.rengine.service.model.NotificationQuery;
-import com.wl4g.rengine.service.model.NotificationQueryResult;
-import com.wl4g.rengine.service.model.NotificationSave;
-import com.wl4g.rengine.service.model.NotificationSaveResult;
+import com.wl4g.rengine.service.model.sys.NotificationDingtalkUserIdExchage;
+import com.wl4g.rengine.service.model.sys.NotificationDingtalkUserIdExchageResult;
+import com.wl4g.rengine.service.model.sys.NotificationQuery;
+import com.wl4g.rengine.service.model.sys.NotificationQueryResult;
+import com.wl4g.rengine.service.model.sys.NotificationSave;
+import com.wl4g.rengine.service.model.sys.NotificationSaveResult;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -58,6 +59,7 @@ public class NotificationController {
     @Operation(description = "Query notification settings.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
+    @PreAuthorize("hasAuthority('arn:rengine:notification:query:v1')")
     public RespBase<NotificationQueryResult> query(@Validated NotificationQuery model) {
         log.debug("called: model={}", model);
         RespBase<NotificationQueryResult> resp = RespBase.create();
@@ -69,6 +71,7 @@ public class NotificationController {
     @Operation(description = "Save notification settings.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
+    @PreAuthorize("hasAuthority('arn:rengine:notification:save:v1')")
     public RespBase<NotificationSaveResult> save(@Validated @RequestBody NotificationSave model) {
         log.debug("called: model={}", model);
         RespBase<NotificationSaveResult> resp = RespBase.create();
@@ -81,6 +84,7 @@ public class NotificationController {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "exchageDingtalkUserId" }, consumes = "application/json", produces = "application/json",
             method = { POST })
+    @PreAuthorize("hasAuthority('arn:rengine:notification:exchageDingtalkUserId:v1')")
     public RespBase<NotificationDingtalkUserIdExchageResult> exchageDingtalkUserId(
             @RequestBody @Validated NotificationDingtalkUserIdExchage model) {
         log.debug("called: model={}", model);
@@ -88,4 +92,5 @@ public class NotificationController {
         resp.setData(notificationService.exchageDingtalkUserId(model));
         return resp;
     }
+
 }

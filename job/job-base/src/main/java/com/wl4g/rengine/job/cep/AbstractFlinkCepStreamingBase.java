@@ -58,7 +58,7 @@ import lombok.experimental.SuperBuilder;
  *      "name": "end",
  *      "quantifier": {
  *          "consumingStrategy": "SKIP_TILL_NEXT",
- *          "properties": [
+ *          "details": [
  *              "SINGLE"
  *          ],
  *          "times": null,
@@ -70,7 +70,7 @@ import lombok.experimental.SuperBuilder;
  *              "name": "end",
  *              "quantifier": {
  *                  "consumingStrategy": "SKIP_TILL_NEXT",
- *                  "properties": [
+ *                  "details": [
  *                      "SINGLE"
  *                  ],
  *                  "times": null,
@@ -86,7 +86,7 @@ import lombok.experimental.SuperBuilder;
  *              "name": "middle",
  *              "quantifier": {
  *                  "consumingStrategy": "SKIP_TILL_NEXT",
- *                  "properties": [
+ *                  "details": [
  *                      "SINGLE"
  *                  ],
  *                  "times": null,
@@ -113,7 +113,7 @@ import lombok.experimental.SuperBuilder;
  *              "name": "start",
  *              "quantifier": {
  *                  "consumingStrategy": "SKIP_TILL_NEXT",
- *                  "properties": [
+ *                  "details": [
  *                      "SINGLE"
  *                  ],
  *                  "times": null,

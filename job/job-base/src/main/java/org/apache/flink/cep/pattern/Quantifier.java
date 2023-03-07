@@ -142,7 +142,7 @@ public class Quantifier {
 
     @Override
     public String toString() {
-        return "Quantifier{" + "properties=" + properties + ", consumingStrategy=" + consumingStrategy
+        return "Quantifier{" + "details=" + properties + ", consumingStrategy=" + consumingStrategy
                 + ", innerConsumingStrategy=" + innerConsumingStrategy + '}';
     }
 

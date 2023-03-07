@@ -17,9 +17,10 @@ package com.wl4g.rengine.service.security;
 
 import static com.wl4g.rengine.common.constants.RengineConstants.API_LOGIN_OAUTH2_CALLBACK_ENDPOINT_BASE;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_LOGIN_OAUTH2_ENDPOINT_BASE;
+import static com.wl4g.rengine.common.constants.RengineConstants.API_LOGIN_PAGE_PATH;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_LOGIN_PASSWORD_ENDPOINT;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_V1_USER_BASE_URI;
-import static com.wl4g.rengine.common.constants.RengineConstants.API_V1_USER_PREPARE_URI;
+import static com.wl4g.rengine.common.constants.RengineConstants.API_V1_USER_SECURE_URI;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,6 +48,7 @@ import com.wl4g.rengine.service.IdentityProviderService;
 import com.wl4g.rengine.service.security.authentication.SmartRedirectStrategy;
 import com.wl4g.rengine.service.security.oauth2.MongoClientRegistrationRepository;
 import com.wl4g.rengine.service.security.oauth2.MongoOAuth2AuthorizedClientService;
+import com.wl4g.rengine.service.security.user.AuthenticationService;
 import com.wl4g.rengine.service.security.user.MongoUserDetailsManager;
 import com.wl4g.rengine.service.security.user.UsernamePasswordAuthenticationProvider;
 
@@ -72,7 +74,7 @@ public class RengineWebSecurityConfiguration implements WebSecurityCustomizer {
                 .antMatchers("/hello/**")
                 .antMatchers("/public/**")
                 .antMatchers("/actuator/**")
-                .antMatchers(API_V1_USER_BASE_URI + API_V1_USER_PREPARE_URI);
+                .antMatchers(API_V1_USER_BASE_URI + API_V1_USER_SECURE_URI);
 
         final var config = SpringContextHolder.getBean(RengineWebSecurityProperties.class);
         if (config.getIgnoreSwaggerAuth()) {
@@ -92,17 +94,22 @@ public class RengineWebSecurityConfiguration implements WebSecurityCustomizer {
     @Bean
     public SecurityFilterChain customSecurityFilterChain(
             HttpSecurity http,
-            UsernamePasswordAuthenticationProvider authenticationProvider) throws Exception {
+            UsernamePasswordAuthenticationProvider userAuthcProvider) throws Exception {
         // http.getSharedObject(AuthenticationManagerBuilder.class).userDetailsService(null);
         return http.csrf()
                 .disable()
                 .cors()
                 .disable()
-                .authenticationProvider(authenticationProvider)
+                .authenticationProvider(userAuthcProvider)
                 .authorizeRequests()
                 // Login path without checking authentication.
-                .antMatchers("/login**")
-                .permitAll()
+                //
+                // Notice: The frontand and backend are deploy separately, this
+                // setup will be meaningless. In fact, the jump to the login
+                // page is controlled by the custom authenticationEntryPoint.
+                //
+                // .antMatchers("/login**")
+                // .permitAll()
                 // Any other path requests are check for authentication.
                 .anyRequest()
                 .authenticated()
@@ -124,12 +131,12 @@ public class RengineWebSecurityConfiguration implements WebSecurityCustomizer {
                 // see:org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter
                 // see:org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint
                 .authenticationEntryPoint((request, response, authEx) -> {
-                    SmartRedirectStrategy.DEFAULT.doSendRedirect(request, response, "/login", authEx);
+                    SmartRedirectStrategy.defaultInstanceOfUnauthc.doSendRedirect(request, response, API_LOGIN_PAGE_PATH, false, authEx);
                 })
                 .and()
                 .logout(customizer -> {
                     final var logoutSuccessHandler = new SimpleUrlLogoutSuccessHandler();
-                    logoutSuccessHandler.setRedirectStrategy(new SmartRedirectStrategy(false));
+                    logoutSuccessHandler.setRedirectStrategy(SmartRedirectStrategy.defaultInstanceOfAuthed);
                     customizer.logoutSuccessHandler(logoutSuccessHandler);
                 })
                 // @formatter:off
@@ -181,15 +188,34 @@ public class RengineWebSecurityConfiguration implements WebSecurityCustomizer {
     }
 
     @Bean
-    public UsernamePasswordAuthenticationProvider usernamePasswordAuthenticationProvider(
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder(BCryptVersion.$2Y, 13);
+    }
+
+    @Bean
+    public AuthenticationService authenticationService(
             RengineWebSecurityProperties config,
-            RedisTemplate<String, byte[]> redisTemplate,
-            @Autowired(required = false) AuthenticationManager authenticationManager,
-            MongoTemplate mongoTemplate) {
-        final var bCryptPasswordEncoder = new BCryptPasswordEncoder(BCryptVersion.$2Y, 13);
-        final var userDetailsService = new MongoUserDetailsManager(authenticationManager, mongoTemplate.getDb(),
-                MongoCollectionDefinition.SYS_USERS.getName());
-        return new UsernamePasswordAuthenticationProvider(config, redisTemplate, userDetailsService, bCryptPasswordEncoder);
+            RedisTemplate<String, byte[]> redisTemplate) {
+        return new AuthenticationService(config, redisTemplate);
+    }
+
+    @Bean
+    public MongoUserDetailsManager mongoUserDetailsManager(
+            RengineWebSecurityProperties config,
+            BCryptPasswordEncoder passwordEncoder,
+            MongoTemplate mongoTemplate,
+            AuthenticationService authenticationService,
+            @Autowired(required = false) AuthenticationManager authenticationManager) {
+        return new MongoUserDetailsManager(config, passwordEncoder,
+                mongoTemplate.getDb().getCollection(MongoCollectionDefinition.SYS_USERS.getName()), authenticationService,
+                authenticationManager);
+    }
+
+    @Bean
+    public UsernamePasswordAuthenticationProvider usernamePasswordAuthenticationProvider(
+            MongoUserDetailsManager mongoUserDetailsManager,
+            AuthenticationService authenticationService) {
+        return new UsernamePasswordAuthenticationProvider(mongoUserDetailsManager, authenticationService);
     }
 
 }

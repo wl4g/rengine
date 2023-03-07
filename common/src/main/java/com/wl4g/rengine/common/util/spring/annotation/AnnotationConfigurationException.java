@@ -33,7 +33,7 @@ public class AnnotationConfigurationException extends RuntimeException {
      * supplied message.
      * 
      * @param message
-     *            the detail message
+     *            the details message
      */
     public AnnotationConfigurationException(String message) {
         super(message);
@@ -44,7 +44,7 @@ public class AnnotationConfigurationException extends RuntimeException {
      * supplied message and cause.
      * 
      * @param message
-     *            the detail message
+     *            the details message
      * @param cause
      *            the root cause
      */

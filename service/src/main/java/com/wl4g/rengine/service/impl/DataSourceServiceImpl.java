@@ -60,7 +60,7 @@ public class DataSourceServiceImpl implements DataSourceService {
     @Override
     public PageHolder<DataSourceProperties> query(DataSourceQuery model) {
         final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getDataSourceId()),
-                isCriteria("properties.type", nonNull(model.getType()) ? model.getType().name() : null)))
+                isCriteria("details.type", nonNull(model.getType()) ? model.getType().name() : null)))
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
         final List<DataSourceProperties> dataSourceProperties = mongoTemplate.find(query, DataSourceProperties.class,
@@ -68,7 +68,7 @@ public class DataSourceServiceImpl implements DataSourceService {
 
         // Mask sensitive information.
         for (DataSourceProperties ds : dataSourceProperties) {
-            BeanSensitiveTransforms.transform(ds.getProperties());
+            BeanSensitiveTransforms.transform(ds.getDetails());
         }
 
         return new PageHolder<DataSourceProperties>(model.getPageNum(), model.getPageSize())

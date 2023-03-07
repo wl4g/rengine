@@ -15,7 +15,7 @@ public class QuantifierSpec {
     private final ConditionSpec untilCondition;
 
     public QuantifierSpec(@JsonProperty("consumingStrategy") Quantifier.ConsumingStrategy consumingStrategy,
-            @JsonProperty("properties") EnumSet<Quantifier.QuantifierProperty> properties,
+            @JsonProperty("details") EnumSet<Quantifier.QuantifierProperty> properties,
             @Nullable @JsonProperty("times") Quantifier.Times times,
             @Nullable @JsonProperty("untilCondition") ConditionSpec untilCondition) {
         this.consumingStrategy = consumingStrategy;

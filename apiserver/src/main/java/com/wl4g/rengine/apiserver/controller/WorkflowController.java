@@ -20,6 +20,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,6 +61,7 @@ public class WorkflowController {
     @Operation(description = "Query workflows.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
+    @PreAuthorize("hasAuthority('arn:rengine:workflow:query:v1')")
     public RespBase<PageHolder<Workflow>> query(@Validated WorkflowQuery model) {
         log.debug("called: model={}", model);
         RespBase<PageHolder<Workflow>> resp = RespBase.create();
@@ -71,6 +73,7 @@ public class WorkflowController {
     @Operation(description = "Save workflow.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
+    @PreAuthorize("hasAuthority('arn:rengine:workflow:save:v1')")
     public RespBase<WorkflowSaveResult> save(@Validated @RequestBody WorkflowSave model) {
         log.debug("called: model={}", model);
         RespBase<WorkflowSaveResult> resp = RespBase.create();
@@ -82,6 +85,7 @@ public class WorkflowController {
     @Operation(description = "Delete workflow.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
+    @PreAuthorize("hasAuthority('arn:rengine:workflow:delete:v1')")
     public RespBase<WorkflowDeleteResult> delete(@Validated @RequestBody WorkflowDelete model) {
         log.debug("called: model={}", model);
         RespBase<WorkflowDeleteResult> resp = RespBase.create();

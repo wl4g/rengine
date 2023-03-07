@@ -115,7 +115,7 @@ public class EngineGenericExecutionController extends AbstractJobExecutor {
         final ControllerLog controllerLog = upsertSchedulingLog(scheduleId, null, true, false, null, null);
 
         final ControllerSchedule schedule = notNullOf(getControllerScheduleService().get(scheduleId), "trigger");
-        final GenericExecutionScheduleConfig gesc = ((GenericExecutionScheduleConfig) notNullOf(schedule.getProperties(),
+        final GenericExecutionScheduleConfig gesc = ((GenericExecutionScheduleConfig) notNullOf(schedule.getDetails(),
                 "genericExecutionScheduleConfig")).validate();
 
         try {
@@ -133,7 +133,7 @@ public class EngineGenericExecutionController extends AbstractJobExecutor {
                 final Set<ResultInformation> results = (Set<ResultInformation>) resultAndJobLog.getItem1();
                 results.stream().forEach(rd -> rd.validate());
                 final ControllerLog _jobLog = (ControllerLog) resultAndJobLog.getItem2();
-                ((ExecutionControllerLog) _jobLog.getDetail()).setResults(results);
+                ((ExecutionControllerLog) _jobLog.getDetails()).setResults(results);
             });
 
         } catch (Throwable ex) {
@@ -197,7 +197,7 @@ public class EngineGenericExecutionController extends AbstractJobExecutor {
     protected ControllerLog newDefaultScheduleJobLog(final Long scheduleId) {
         return ControllerLog.builder()
                 .scheduleId(scheduleId)
-                .detail(ExecutionControllerLog.builder().type(ScheduleType.GENERIC_EXECUTION_CONTROLLER.name()).build())
+                .details(ExecutionControllerLog.builder().type(ScheduleType.GENERIC_EXECUTION_CONTROLLER.name()).build())
                 .build();
     }
 

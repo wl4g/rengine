@@ -72,7 +72,7 @@ import com.wl4g.infra.common.lang.Assert2;
 import com.wl4g.infra.common.lang.StringUtils2;
 import com.wl4g.infra.common.serialize.JaxbUtils;
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.common.entity.Dict.DictType;
+import com.wl4g.rengine.common.entity.sys.Dict.DictType;
 import com.wl4g.rengine.common.exception.RengineException;
 import com.wl4g.rengine.common.model.WorkflowExecuteResult;
 import com.wl4g.rengine.common.model.WorkflowExecuteResult.ResultDescription;
@@ -244,7 +244,7 @@ public class EngineExecutionEndpoint {
             // Load the response template from the dictionary service
             // according to the request template key, and then render the
             // response string.
-            return dictService.findDicts(DictType.ENGINE_EXECUTION_CUSTOM_RESP_TPL, respSettings.getTemplateKey()).map(dicts -> {
+            return dictService.findDicts(DictType.EXECUTOR_CUSTOM_RESP_TPL, respSettings.getTemplateKey()).map(dicts -> {
                 try {
                     Assert2.notEmpty(dicts, "Not found response template dictionary by %s", respSettings.getTemplateKey());
                     final String respTemplate = dicts.get(0).getValue();

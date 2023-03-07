@@ -24,7 +24,6 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.rengine.common.entity.Workflow.WorkflowWrapper;
 
 import lombok.Getter;
@@ -45,7 +44,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class Scenes extends BaseBean {
+public class Scenes extends BaseEntity {
     private static final long serialVersionUID = -5069149346132378733L;
     private @NotBlank String scenesCode;
     private @NotBlank String name;

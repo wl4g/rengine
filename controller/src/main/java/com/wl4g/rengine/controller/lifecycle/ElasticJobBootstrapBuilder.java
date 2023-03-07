@@ -69,7 +69,7 @@ public class ElasticJobBootstrapBuilder {
 
     public ElasticJobBootstrapBuilder(@NotNull RengineControllerProperties config,
             @NotNull CoordinatorRegistryCenter registryCenter, List<TracingConfiguration<?>> tracingConfigurations) {
-        this.config = notNullOf(config, "properties");
+        this.config = notNullOf(config, "details");
         this.registryCenter = notNullOf(registryCenter, "registryCenter");
         this.tracingConfigurations = tracingConfigurations;
     }
@@ -146,8 +146,8 @@ public class ElasticJobBootstrapBuilder {
         notNullOf(jobParameter, "jobParameter");
 
         String cron = null; // OneOffJobBootstrap
-        if (schedule.getProperties() instanceof GenericExecutionScheduleConfig) { // ScheduleJobBootstrap
-            cron = ((GenericExecutionScheduleConfig) schedule.getProperties()).getCron();
+        if (schedule.getDetails() instanceof GenericExecutionScheduleConfig) { // ScheduleJobBootstrap
+            cron = ((GenericExecutionScheduleConfig) schedule.getDetails()).getCron();
         }
         return JobConfiguration.builder()
                 .jobType(jobType)

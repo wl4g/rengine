@@ -57,7 +57,7 @@ import com.wl4g.infra.common.lang.tuples.Tuple2;
 import com.wl4g.infra.common.locks.JedisLockManager;
 import com.wl4g.infra.common.notification.MessageNotifier.NotifierKind;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
-import com.wl4g.rengine.common.entity.Notification;
+import com.wl4g.rengine.common.entity.sys.Notification;
 import com.wl4g.rengine.common.exception.ConfigRengineException;
 import com.wl4g.rengine.common.exception.RengineException;
 import com.wl4g.rengine.common.util.BsonEntitySerializers;
@@ -269,7 +269,7 @@ public class GlobalMessageNotifierManager {
 
         final MongoCollection<Document> collection = mongoRepository.getCollection(MongoCollectionDefinition.SYS_NOTIFICATIONS);
 
-        try (final MongoCursor<Notification> cursor = collection.find(Filters.and(Filters.in("properties.type", notifierTypes)))
+        try (final MongoCursor<Notification> cursor = collection.find(Filters.and(Filters.in("details.type", notifierTypes)))
                 .batchSize(2)
                 .limit(2)
                 .map(doc -> BsonEntitySerializers.fromDocument(doc, Notification.class))

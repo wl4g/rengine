@@ -251,7 +251,7 @@ public class MongoSourceFacade implements DataSourceFacade {
 
             final String connectionString = ((MongoDataSourceProperties) dataSourceProperties).getConnectionString();
             if (isBlank(connectionString)) {
-                throw new ConfigRengineException(format("No found mongo dataSource properties : %s", dataSourceProperties));
+                throw new ConfigRengineException(format("No found mongo dataSource details : %s", dataSourceProperties));
             }
 
             final MongoClient mongoClient = new MongoClientImpl(

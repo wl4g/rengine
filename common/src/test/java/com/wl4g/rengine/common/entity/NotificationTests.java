@@ -23,9 +23,10 @@ import java.util.Date;
 
 import org.junit.Test;
 
-import com.wl4g.rengine.common.entity.Notification.DingtalkConfig;
-import com.wl4g.rengine.common.entity.Notification.DingtalkConfig.DingtalkScenesGroupInfo;
-import com.wl4g.rengine.common.entity.Notification.DingtalkConfig.DingtalkUserInfo;
+import com.wl4g.rengine.common.entity.sys.Notification;
+import com.wl4g.rengine.common.entity.sys.Notification.DingtalkConfig;
+import com.wl4g.rengine.common.entity.sys.Notification.DingtalkConfig.DingtalkScenesGroupInfo;
+import com.wl4g.rengine.common.entity.sys.Notification.DingtalkConfig.DingtalkUserInfo;
 
 /**
  * {@link NotificationTests}
@@ -41,7 +42,7 @@ public class NotificationTests {
         final Notification notification = Notification.builder()
                 .id(10101001L)
                 .enable(1)
-                .properties(DingtalkConfig.builder()
+                .details(DingtalkConfig.builder()
                         .appKey("abcd323423")
                         .appSecret("abcdef")
                         .corpId("abcdef222")
@@ -63,7 +64,7 @@ public class NotificationTests {
         Notification notification2 = parseJSON(json, Notification.class);
         System.out.println(notification2);
 
-        assert notification2.getProperties() instanceof DingtalkConfig;
+        assert notification2.getDetails() instanceof DingtalkConfig;
     }
 
 }

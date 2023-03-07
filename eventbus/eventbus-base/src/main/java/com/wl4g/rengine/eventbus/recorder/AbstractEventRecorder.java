@@ -52,7 +52,7 @@ public abstract class AbstractEventRecorder implements Closeable, EventRecorder 
     protected final ExecutorService executor;
 
     public AbstractEventRecorder(ClientEventBusConfig config) {
-        this.config = notNullOf(config, "properties");
+        this.config = notNullOf(config, "details");
         final int threadPools = config.getRecorder().getCompaction().getThreadPools();
         final AtomicInteger counter = new AtomicInteger(0);
         this.executor = Executors.newFixedThreadPool((threadPools <= 1) ? 1 : threadPools,

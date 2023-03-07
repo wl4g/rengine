@@ -43,7 +43,6 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.rengine.common.exception.InvalidNodeRelationException;
 import com.wl4g.rengine.common.validation.ValidForEntityMarker;
 
@@ -68,7 +67,7 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @ToString(callSuper = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class WorkflowGraph extends BaseBean {
+public class WorkflowGraph extends BaseEntity {
     private static final long serialVersionUID = 1917204508937266181L;
 
     private @NotNull(groups = ValidForEntityMarker.class) @Min(value = 0, groups = ValidForEntityMarker.class) Long revision;
@@ -97,7 +96,8 @@ public class WorkflowGraph extends BaseBean {
         validateForBasic();
     }
 
-    public WorkflowGraph validateForBasic() {
+    @SuppressWarnings("unchecked")
+    public <T extends WorkflowGraph> T validateForBasic() {
         isTrueOf(nonNull(workflowId) && workflowId >= 0, "workflowId >= 0");
         notEmpty(getNodes(), "graph.nodes");
         notEmpty(getConnections(), "graph.connections");
@@ -152,7 +152,7 @@ public class WorkflowGraph extends BaseBean {
         //}
         // @formatter:on
 
-        return this;
+        return (T) this;
     }
 
     /**

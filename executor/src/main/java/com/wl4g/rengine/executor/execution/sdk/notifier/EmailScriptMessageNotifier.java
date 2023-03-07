@@ -37,8 +37,8 @@ import javax.validation.constraints.NotNull;
 import org.graalvm.polyglot.HostAccess;
 
 import com.wl4g.infra.common.notification.MessageNotifier.NotifierKind;
-import com.wl4g.rengine.common.entity.Notification;
-import com.wl4g.rengine.common.entity.Notification.EmailConfig;
+import com.wl4g.rengine.common.entity.sys.Notification;
+import com.wl4g.rengine.common.entity.sys.Notification.EmailConfig;
 import com.wl4g.rengine.executor.meter.MeterUtil;
 import com.wl4g.rengine.executor.util.VertxMailerFactory;
 
@@ -114,7 +114,7 @@ public class EmailScriptMessageNotifier implements ScriptMessageNotifier {
         try {
             MeterUtil.counter(execution_sdk_notifier_total, kind(), METHOD_REFRESH);
             return MeterUtil.timer(execution_sdk_notifier_time, kind(), METHOD_REFRESH, () -> {
-                final EmailConfig config = (EmailConfig) notification.getProperties();
+                final EmailConfig config = (EmailConfig) notification.getDetails();
 
                 MeterUtil.counter(execution_sdk_notifier_success, kind(), METHOD_REFRESH);
                 return RefreshedInfo.builder()
@@ -138,7 +138,7 @@ public class EmailScriptMessageNotifier implements ScriptMessageNotifier {
             MeterUtil.timer(execution_sdk_notifier_time, kind(), METHOD_UPDATE, () -> {
                 ScriptMessageNotifier.super.update(refreshed, vertx);
 
-                // Initialze for engineConfig properties.
+                // Initialze for engineConfig details.
                 final EmailConfig config = parseJSON((String) refreshed.getAttributes().get(KEY_MAIL_CONFIG), EmailConfig.class);
                 notNull(config,
                         "Internal error! Please check the redis cache configuration data, email engineConfig json is required. refreshed: %s",

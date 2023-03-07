@@ -19,6 +19,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,11 +28,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.common.entity.IdentityProvider;
+import com.wl4g.rengine.common.entity.sys.IdentityProvider;
 import com.wl4g.rengine.service.IdentityProviderService;
-import com.wl4g.rengine.service.model.IdentityProviderQuery;
-import com.wl4g.rengine.service.model.IdentityProviderSave;
-import com.wl4g.rengine.service.model.IdentityProviderSaveResult;
+import com.wl4g.rengine.service.model.sys.IdentityProviderQuery;
+import com.wl4g.rengine.service.model.sys.IdentityProviderSave;
+import com.wl4g.rengine.service.model.sys.IdentityProviderSaveResult;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -58,6 +59,7 @@ public class IdentityProviderController {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
     @ResponseBody
+    @PreAuthorize("hasAuthority('arn:rengine:idp:query:v1')")
     public RespBase<PageHolder<IdentityProvider>> query(@Validated IdentityProviderQuery model) {
         log.debug("called: model={}", model);
         RespBase<PageHolder<IdentityProvider>> resp = RespBase.create();
@@ -69,6 +71,7 @@ public class IdentityProviderController {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
     @ResponseBody
+    @PreAuthorize("hasAuthority('arn:rengine:idp:save:v1')")
     public RespBase<IdentityProviderSaveResult> save(@Validated @RequestBody IdentityProviderSave model) {
         log.debug("called: model={}", model);
         RespBase<IdentityProviderSaveResult> resp = RespBase.create();

@@ -18,9 +18,10 @@ package com.wl4g.rengine.service.security.authentication;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.findField;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.getField;
 import static com.wl4g.infra.common.web.WebUtils2.ResponseType.isRespJSON;
+import static com.wl4g.rengine.common.constants.RengineConstants.API_LOGIN_PAGE_PATH;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_V1_USER_BASE_URI;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_V1_USER_USERINFO_URI;
-import static com.wl4g.rengine.service.security.AuthenticationUtils.currentUserInfo;
+import static com.wl4g.rengine.service.security.user.AuthenticationService.currentUserInfo;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -60,56 +61,58 @@ import lombok.CustomLog;
 @AllArgsConstructor
 public class SmartRedirectStrategy extends DefaultRedirectStrategy {
 
-    private final boolean failureRedirect;
+    private final boolean isFailure;
+    private final RetCode retCode;
 
     @Override
     public void sendRedirect(HttpServletRequest request, HttpServletResponse response, String url) throws IOException {
         // see:org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler#saveException()
         final AuthenticationException authEx = (AuthenticationException) request
                 .getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
-        doSendRedirect(request, response, url, authEx);
+        doSendRedirect(request, response, url, true, authEx);
     }
 
     public void doSendRedirect(
             @NotNull HttpServletRequest request,
             @NotNull HttpServletResponse response,
-            @NotBlank String url,
+            @NotBlank String uri,
+            boolean contextPath,
             @Nullable AuthenticationException authEx) throws IOException {
 
-        String redirectUrl = url;
-        if (isBlank(URI.create(url).getScheme())) {
-            redirectUrl = UriComponentsBuilder.fromUriString(WebUtils2.getRFCBaseURI(request, true))
-                    .path(url)
-                    .encode()
+        String redirectUri = uri;
+        if (isBlank(URI.create(uri).getScheme())) {
+            redirectUri = UriComponentsBuilder.fromUriString(WebUtils2.getRFCBaseURI(request, contextPath))
+                    .path(uri)
+                    // .encode()
                     .build()
                     .toUriString();
         }
 
         if (isJsonResponse(request)) {
-            if (failureRedirect) { // Authentication failure
+            if (isFailure) { // Authentication failure
                 WebUtils2.writeJson(response,
                         RespBase.create()
-                                .withCode(RetCode.OK)
+                                .withCode(retCode)
                                 .withStatus(DEFAULT_UNAUTHORIZED_STATUS)
                                 .withMessage(nonNull(authEx) ? authEx.getMessage() : "Authentication failed")
                                 .forMap()
-                                .andPut(DEFAULT_REDIRECT_URI_KEY, redirectUrl)
+                                .andPut(DEFAULT_REDIRECT_URI_KEY, redirectUri)
                                 .withParent()
                                 .asJson());
             } else { // Authentication success,logout etc.
                 WebUtils2.writeJson(response,
                         RespBase.create()
-                                .withCode(RetCode.OK)
+                                .withCode(retCode)
                                 .withStatus(DEFAULT_AUTHORIZED_STATUS)
                                 .withMessage("Login successful")
                                 .forMap()
-                                .andPut(DEFAULT_REDIRECT_URI_KEY, redirectUrl)
+                                .andPut(DEFAULT_REDIRECT_URI_KEY, redirectUri)
                                 .andPut(DEFAULT_USERINFO_KEY, currentUserInfo())
                                 .withParent()
                                 .asJson());
             }
         } else {
-            response.sendRedirect(redirectUrl);
+            response.sendRedirect(redirectUri);
         }
     }
 
@@ -133,7 +136,7 @@ public class SmartRedirectStrategy extends DefaultRedirectStrategy {
                 findField(configurer.getClass(), "successHandler", AuthenticationSuccessHandler.class), configurer, true);
         successHandler.setDefaultTargetUrl(DEFAULT_LOGIN_SUCCESS_URI);
         successHandler.setAlwaysUseDefaultTargetUrl(false);
-        successHandler.setRedirectStrategy(new SmartRedirectStrategy(false));
+        successHandler.setRedirectStrategy(defaultInstanceOfAuthed);
 
         //// @formatter:off
         // Init failure handler with default.
@@ -148,12 +151,15 @@ public class SmartRedirectStrategy extends DefaultRedirectStrategy {
         //// @formatter:on
 
         // see:org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer#updateAuthenticationDefaults()
-        final var failureHandler = new SimpleUrlAuthenticationFailureHandler("/login?error");
-        failureHandler.setRedirectStrategy(new SmartRedirectStrategy(true));
+        final var failureHandler = new SimpleUrlAuthenticationFailureHandler(API_LOGIN_PAGE_PATH+"?error");
+        failureHandler.setRedirectStrategy(defaultInstanceOfUnauthc);
         configurer.failureHandler(failureHandler);
     }
 
-    public static final SmartRedirectStrategy DEFAULT = new SmartRedirectStrategy(true);
+    public static final SmartRedirectStrategy defaultInstanceOfAuthed = new SmartRedirectStrategy(false, RetCode.OK);
+    public static final SmartRedirectStrategy defaultInstanceOfUnauthc = new SmartRedirectStrategy(true, RetCode.UNAUTHC);
+    public static final SmartRedirectStrategy defaultInstanceOfUnauthz = new SmartRedirectStrategy(true, RetCode.UNAUTHZ);
+
     public static final String DEFAULT_UNAUTHORIZED_STATUS = "UNAUTHORIZED";
     public static final String DEFAULT_AUTHORIZED_STATUS = "AUTHORIZED";
     public static final String DEFAULT_REDIRECT_URI_KEY = "redirect_uri";

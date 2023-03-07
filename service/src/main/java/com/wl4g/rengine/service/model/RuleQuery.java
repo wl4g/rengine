@@ -26,7 +26,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link RuleQuery}
+ * {@link RoleQuery}
  * 
  * @author James Wong
  * @version 2022-08-28

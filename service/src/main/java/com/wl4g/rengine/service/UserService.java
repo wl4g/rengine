@@ -19,15 +19,13 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
-import com.wl4g.infra.common.crypto.asymmetric.RSACryptor;
-import com.wl4g.rengine.common.entity.User;
-import com.wl4g.rengine.service.model.UserDelete;
-import com.wl4g.rengine.service.model.UserDeleteResult;
-import com.wl4g.rengine.service.model.UserQuery;
-import com.wl4g.rengine.service.model.UserSave;
-import com.wl4g.rengine.service.model.UserSaveResult;
-import com.wl4g.rengine.service.security.AuthenticationUtils.UserAuthenticationInfo;
-import com.wl4g.rengine.service.security.RengineWebSecurityProperties;
+import com.wl4g.rengine.common.entity.sys.User;
+import com.wl4g.rengine.service.model.sys.UserDelete;
+import com.wl4g.rengine.service.model.sys.UserDeleteResult;
+import com.wl4g.rengine.service.model.sys.UserQuery;
+import com.wl4g.rengine.service.model.sys.UserSave;
+import com.wl4g.rengine.service.model.sys.UserSaveResult;
+import com.wl4g.rengine.service.security.user.AuthenticationService.UserAuthInfo;
 
 /**
  * {@link UserService}
@@ -40,20 +38,12 @@ public interface UserService {
 
     PageHolder<User> query(@NotNull UserQuery model);
 
+    User loadUserByUsername(@NotBlank String username);
+
     UserSaveResult save(@NotNull UserSave model);
 
     UserDeleteResult delete(@NotNull UserDelete model);
 
-    boolean changePassword(@NotBlank String oldPassword, @NotBlank String newPassword);
-
-    String applySecret(@NotBlank String username);
-
-    UserAuthenticationInfo userInfo();
-
-    public static String buildSecretCacheKey(RengineWebSecurityProperties config, String username) {
-        return config.getUser().getSecretCachePrefix().concat(username);
-    }
-
-    public static final RSACryptor DEFAULT_RSA_CRYPTOR = new RSACryptor();
+    UserAuthInfo userInfo();
 
 }

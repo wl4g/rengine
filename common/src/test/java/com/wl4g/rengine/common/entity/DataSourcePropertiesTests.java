@@ -44,7 +44,7 @@ public class DataSourcePropertiesTests {
         final DataSourceProperties datasource = new DataSourceProperties();
         datasource.setId(10101001L);
         datasource.setName("default");
-        datasource.setProperties(MongoDataSourceProperties.builder()
+        datasource.setDetails(MongoDataSourceProperties.builder()
                 // .type(DataSourceType.MONGO)
                 .connectionString("mongodb://localhost:27017")
                 .build());
@@ -55,7 +55,7 @@ public class DataSourcePropertiesTests {
         DataSourceProperties datasource2 = parseJSON(json, DataSourceProperties.class);
         System.out.println(datasource2);
 
-        assert datasource2.getProperties() instanceof MongoDataSourceProperties;
+        assert datasource2.getDetails() instanceof MongoDataSourceProperties;
     }
 
     @Test
@@ -63,7 +63,7 @@ public class DataSourcePropertiesTests {
         final DataSourceProperties datasource = new DataSourceProperties();
         datasource.setId(10101001L);
         datasource.setName("default");
-        datasource.setProperties(JDBCDataSourceProperties.builder()
+        datasource.setDetails(JDBCDataSourceProperties.builder()
                 // .type(DataSourceType.JDBC)
                 .fetchSize(1024)
                 .jdbcUrl(
@@ -78,7 +78,7 @@ public class DataSourcePropertiesTests {
         DataSourceProperties datasource2 = parseJSON(json, DataSourceProperties.class);
         System.out.println(datasource2);
 
-        assert datasource2.getProperties() instanceof JDBCDataSourceProperties;
+        assert datasource2.getDetails() instanceof JDBCDataSourceProperties;
     }
 
     @Test
@@ -86,7 +86,7 @@ public class DataSourcePropertiesTests {
         final DataSourceProperties datasource = new DataSourceProperties();
         datasource.setId(10101001L);
         datasource.setName("default");
-        datasource.setProperties(RedisDataSourceProperties.builder()
+        datasource.setDetails(RedisDataSourceProperties.builder()
                 // .type(DataSourceType.REDIS)
                 .nodes(asList("localhost:6379,localhost:6380,localhost:6381,localhost:7379,localhost:7380,localhost:7381"))
                 .connTimeout(3000)
@@ -100,7 +100,7 @@ public class DataSourcePropertiesTests {
         DataSourceProperties datasource2 = parseJSON(json, DataSourceProperties.class);
         System.out.println(datasource2);
 
-        assert datasource2.getProperties() instanceof RedisDataSourceProperties;
+        assert datasource2.getDetails() instanceof RedisDataSourceProperties;
     }
 
     @Test
@@ -108,7 +108,7 @@ public class DataSourcePropertiesTests {
         final DataSourceProperties datasource1 = new DataSourceProperties();
         datasource1.setId(10101001L);
         datasource1.setName("default");
-        datasource1.setProperties(KafkaDataSourceProperties.builder()
+        datasource1.setDetails(KafkaDataSourceProperties.builder()
                 // .type(DataSourceType.KAFKA)
                 .bootstrapServers("localhost:9092")
                 .acks("all")
@@ -121,10 +121,10 @@ public class DataSourcePropertiesTests {
         final DataSourceProperties datasource2 = parseJSON(json1, DataSourceProperties.class);
         System.out.println("datasource2: " + datasource2);
 
-        assert datasource2.getProperties() instanceof KafkaDataSourceProperties;
+        assert datasource2.getDetails() instanceof KafkaDataSourceProperties;
 
         // Assertion for kafka producer configure.
-        final Map<String, Object> producerConfigProps = ((KafkaDataSourceProperties) datasource2.getProperties())
+        final Map<String, Object> producerConfigProps = ((KafkaDataSourceProperties) datasource2.getDetails())
                 .toProducerConfigProperties();
         System.out.println("producerConfigProps: " + producerConfigProps);
 

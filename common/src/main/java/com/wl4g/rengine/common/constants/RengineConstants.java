@@ -54,8 +54,10 @@ public abstract class RengineConstants extends EnvironmentUtil {
     public static final String CACHE_LOGIN_OIDC_PREFIX = "login:oidc:";
 
     public static final String API_V1_USER_BASE_URI = "/v1/user";
-    public static final String API_V1_USER_PREPARE_URI = "/prepare";
+    public static final String API_V1_USER_SECURE_URI = "/secure";
     public static final String API_V1_USER_USERINFO_URI = "/userinfo";
+
+    public static final String API_LOGIN_PAGE_PATH = "/#/login";
 
     // The URI of form submit username and password processing login endpoint.
     // The default as: /login
@@ -140,7 +142,11 @@ public abstract class RengineConstants extends EnvironmentUtil {
 
         SYS_USERS("sys_users", true),
 
-        SYS_ORGS("sys_orgs", true),
+        SYS_ROLES("sys_roles", true),
+
+        SYS_MENUS("sys_menus", true),
+
+        SYS_ORANIZATIONS("sys_organizations", true),
 
         SYS_IDENTITY_PROVIDERS("sys_identity_providers", true),
 

@@ -15,6 +15,8 @@
  */
 package com.wl4g.rengine.service.model;
 
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import com.wl4g.infra.common.validation.EnumValue;
@@ -43,6 +45,6 @@ import lombok.experimental.SuperBuilder;
 public class ControllerLogQuery extends BaseQuery<ControllerLog> {
     @Schema(implementation = ScheduleType.class)
     private @Nullable @EnumValue(enumCls = ScheduleType.class) String type;
-    private @Nullable Long scheduleId;
-    private @Nullable Long controllerLogId;
+    private @Nullable List<Long> scheduleIds;
+    private @Nullable List<Long> controllerLogIds;
 }

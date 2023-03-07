@@ -46,8 +46,8 @@ import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.CreateSc
 import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.CreateSceneGroupV2Result;
 import com.wl4g.infra.common.notification.dingtalk.internal.DingtalkAPI.RobotGroupMessagesSend;
 import com.wl4g.infra.common.serialize.JacksonUtils;
-import com.wl4g.rengine.common.entity.Notification;
-import com.wl4g.rengine.common.entity.Notification.DingtalkConfig;
+import com.wl4g.rengine.common.entity.sys.Notification;
+import com.wl4g.rengine.common.entity.sys.Notification.DingtalkConfig;
 import com.wl4g.rengine.executor.meter.MeterUtil;
 
 import io.vertx.core.Vertx;
@@ -159,12 +159,12 @@ public class DingtalkScriptMessageNotifier implements ScriptMessageNotifier {
         try {
             MeterUtil.counter(execution_sdk_notifier_total, kind(), METHOD_REFRESH);
             return MeterUtil.timer(execution_sdk_notifier_time, kind(), METHOD_REFRESH, () -> {
-                final DingtalkConfig config = (DingtalkConfig) notification.getProperties();
+                final DingtalkConfig config = (DingtalkConfig) notification.getDetails();
                 final AccessTokenResult result = DingtalkAPI.getInstance()
                         .getAccessToken(
                                 AccessToken.builder().appKey(config.getAppKey()).appSecret(config.getAppSecret()).build());
 
-                // Sets default configuration properties.
+                // Sets default configuration details.
                 final Map<String, Object> attributes = new HashMap<>();
                 attributes.put(KEY_DINGTALK_CONFIG, toJSONString(config));
 

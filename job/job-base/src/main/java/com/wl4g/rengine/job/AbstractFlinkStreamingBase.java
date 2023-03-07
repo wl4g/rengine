@@ -179,7 +179,7 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
     }
 
     /**
-     * Configuring custom FLINK environment properties.
+     * Configuring custom FLINK environment details.
      * 
      * @return
      */
@@ -213,7 +213,7 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
         notNull(line, errmsg -> new IllegalStateException(errmsg),
                 "Parse arguments are not initialized, must call #parse() before");
 
-        // Custom properties.
+        // Custom details.
         customProps(props = (Properties) System.getProperties().clone());
 
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();

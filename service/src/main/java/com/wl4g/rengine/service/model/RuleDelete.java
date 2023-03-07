@@ -22,7 +22,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link RuleDelete}
+ * {@link RoleDelete}
  * 
  * @author James Wong
  * @version 2022-08-28

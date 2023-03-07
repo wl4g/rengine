@@ -20,6 +20,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,6 +61,7 @@ public class ControllerScheduleController {
     @Operation(description = "Query schedule triggers.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
+    @PreAuthorize("hasAuthority('arn:rengine:controllerschedule:query:v1')")
     public RespBase<PageHolder<ControllerSchedule>> query(@Validated ControllerScheduleQuery model) {
         log.debug("called: model={}", model);
         RespBase<PageHolder<ControllerSchedule>> resp = RespBase.create();
@@ -71,6 +73,7 @@ public class ControllerScheduleController {
     @Operation(description = "Save schedule trigger.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
+    @PreAuthorize("hasAuthority('arn:rengine:controllerschedule:save:v1')")
     public RespBase<ControllerScheduleSaveResult> save(@Validated @RequestBody ControllerScheduleSave model) {
         log.debug("called: model={}", model);
         RespBase<ControllerScheduleSaveResult> resp = RespBase.create();
@@ -82,6 +85,7 @@ public class ControllerScheduleController {
     @Operation(description = "Delete schedule trigger.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
+    @PreAuthorize("hasAuthority('arn:rengine:controllerschedule:delete:v1')")
     public RespBase<ControllerScheduleDeleteResult> delete(@Validated @RequestBody ControllerScheduleDelete model) {
         log.debug("called: model={}", model);
         RespBase<ControllerScheduleDeleteResult> resp = RespBase.create();

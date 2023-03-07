@@ -23,14 +23,14 @@ import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.collection.CollectionUtils2;
-import com.wl4g.rengine.common.entity.IdentityProvider;
-import com.wl4g.rengine.common.entity.IdentityProvider.IdPKind;
+import com.wl4g.rengine.common.entity.sys.IdentityProvider;
+import com.wl4g.rengine.common.entity.sys.IdentityProvider.IdPKind;
 import com.wl4g.rengine.common.exception.RengineException;
-import com.wl4g.rengine.service.model.IdentityProviderDelete;
-import com.wl4g.rengine.service.model.IdentityProviderDeleteResult;
-import com.wl4g.rengine.service.model.IdentityProviderQuery;
-import com.wl4g.rengine.service.model.IdentityProviderSave;
-import com.wl4g.rengine.service.model.IdentityProviderSaveResult;
+import com.wl4g.rengine.service.model.sys.IdentityProviderDelete;
+import com.wl4g.rengine.service.model.sys.IdentityProviderDeleteResult;
+import com.wl4g.rengine.service.model.sys.IdentityProviderQuery;
+import com.wl4g.rengine.service.model.sys.IdentityProviderSave;
+import com.wl4g.rengine.service.model.sys.IdentityProviderSaveResult;
 
 /**
  * {@link IdentityProviderService}

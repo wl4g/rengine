@@ -18,21 +18,12 @@ package com.wl4g.rengine.service.security.user;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.util.Objects.isNull;
 
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import com.wl4g.infra.common.codec.CodecSource;
-import com.wl4g.infra.common.crypto.asymmetric.spec.RSAKeyPairSpec;
-import com.wl4g.infra.common.serialize.ProtostuffUtils;
-import com.wl4g.rengine.service.UserService;
-import com.wl4g.rengine.service.security.RengineWebSecurityProperties;
 
 import lombok.CustomLog;
 
@@ -45,47 +36,32 @@ import lombok.CustomLog;
  */
 @CustomLog
 public class UsernamePasswordAuthenticationProvider implements AuthenticationProvider {
-    private final RengineWebSecurityProperties config;
-    private final RedisTemplate<String, byte[]> redisTemplate;
-    private final UserDetailsService userDetailsService;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UsernamePasswordAuthenticationProvider(RengineWebSecurityProperties config,
-            RedisTemplate<String, byte[]> redisTemplate, UserDetailsService userDetailsService,
-            BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.config = notNullOf(config, "config");
-        this.redisTemplate = notNullOf(redisTemplate, "redisTemplate");
-        this.userDetailsService = notNullOf(userDetailsService, "userDetailsService");
-        this.bCryptPasswordEncoder = notNullOf(bCryptPasswordEncoder, "bCryptPasswordEncoder");
+    private final MongoUserDetailsManager userDetailsManager;
+    private final AuthenticationService authenticationService;
+
+    public UsernamePasswordAuthenticationProvider(MongoUserDetailsManager userDetailsManager,
+            AuthenticationService authenticationService) {
+        this.userDetailsManager = notNullOf(userDetailsManager, "userDetailsManager");
+        this.authenticationService = notNullOf(authenticationService, "authenticationService");
     }
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         final String username = authentication.getName();
+        // final String secureCode = authentication.getName(); // TODO
         final String cipherPassword = (String) authentication.getCredentials();
 
-        // Resolve cipher password to plain.
-        final var secretCacheKey = UserService.buildSecretCacheKey(config, username);
+        final var plainPassword = authenticationService.resolveCipher(username, cipherPassword, true);
 
-        // Load pre-login applyed secret.
-        final var secret = ProtostuffUtils.deserialize(redisTemplate.opsForValue().get(secretCacheKey), RSAKeyPairSpec.class);
+        final UserDetails user = userDetailsManager.loadUserByUsername(username);
 
-        // Check for pre-login settings.
-        if (isNull(secret)) {
-            throw new BadCredentialsException("The login process timed out, please refresh the page and log in again.");
-        }
-
-        final var plainPasswordSource = UserService.DEFAULT_RSA_CRYPTOR.decrypt(secret.getKeySpec(),
-                CodecSource.fromHex(cipherPassword));
-
-        final UserDetails user = userDetailsService.loadUserByUsername(username);
-
-        if (user == null || !bCryptPasswordEncoder.matches(plainPasswordSource.toString(), user.getPassword())) {
+        if (isNull(user) || !userDetailsManager.getPasswordEncoder().matches(plainPassword.toString(), user.getPassword())) {
             throw new BadCredentialsException("Username or password is incorrect.");
         }
-        log.info("Login success for : {}", user);
+        log.info("Login successful for : {}", user);
 
-        return new UsernamePasswordAuthenticationToken(user, plainPasswordSource, user.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(user, plainPassword, user.getAuthorities());
     }
 
     // see:org.springframework.security.authentication.ProviderManager#authenticate()

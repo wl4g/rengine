@@ -23,7 +23,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.rengine.common.entity.RuleScript.RuleScriptWrapper;
 
 import lombok.Getter;
@@ -44,7 +43,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class Rule extends BaseBean {
+public class Rule extends BaseEntity {
     private static final long serialVersionUID = -7441054887057231030L;
     private @NotBlank String name;
     private @NotNull RuleEngine engine;

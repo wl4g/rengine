@@ -29,8 +29,8 @@ import java.util.function.Function;
 import org.junit.Test;
 import org.junit.jupiter.api.RepeatedTest;
 
-import com.wl4g.rengine.common.entity.Dict;
-import com.wl4g.rengine.common.entity.Dict.DictType;
+import com.wl4g.rengine.common.entity.sys.Dict;
+import com.wl4g.rengine.common.entity.sys.Dict.DictType;
 import com.wl4g.rengine.executor.util.TestDefaultBaseSetup;
 import com.wl4g.rengine.executor.util.TestDefaultRedisSetup;
 
@@ -89,7 +89,7 @@ public class ReactiveDictServiceTests {
 
         final var dict1 = Dict.builder()
                 .id(6305460145405952L)
-                .type(DictType.ENGINE_EXECUTION_CUSTOM_RESP_TPL)
+                .type(DictType.EXECUTOR_CUSTOM_RESP_TPL)
                 .key("dingtalk")
                 .value("{\"msg_signature\":\"%s\",\"timeStamp\":\"%s\",\"nonce\":\"%s\",\"encrypt\":\"%s\"}")
                 .sort(1)
@@ -105,7 +105,7 @@ public class ReactiveDictServiceTests {
         setup();
 
         try {
-            Uni<List<Dict>> dictsUni = dictService.findDicts(DictType.ENGINE_EXECUTION_CUSTOM_RESP_TPL,
+            Uni<List<Dict>> dictsUni = dictService.findDicts(DictType.EXECUTOR_CUSTOM_RESP_TPL,
                     "dingtalk" /* null */);
 
             System.out.println("Await for " + dictsUni + " ...");
@@ -121,7 +121,7 @@ public class ReactiveDictServiceTests {
         }
     }
 
-    final static String mockDict1Json = "{\"id\":6305460145405952,\"orgCode\":null,\"enable\":null,\"labels\":null,\"remark\":null,\"createBy\":1,\"createDate\":\"2023-01-14 23:07:15\",\"updateBy\":null,\"updateDate\":null,\"delFlag\":null,\"humanCreateDate\":null,\"humanUpdateDate\":null,\"type\":\"ENGINE_EXECUTION_CUSTOM_RESP_TPL\",\"key\":\"dingtalk\",\"value\":\"{\\\"msg_signature\\\":\\\"%s\\\",\\\"timeStamp\\\":\\\"%s\\\",\\\"nonce\\\":\\\"%s\\\",\\\"encrypt\\\":\\\"%s\\\"}\",\"sort\":1}";
+    final static String mockDict1Json = "{\"id\":6305460145405952,\"orgCode\":null,\"enable\":null,\"labels\":null,\"remark\":null,\"createBy\":1,\"createDate\":\"2023-01-14 23:07:15\",\"updateBy\":null,\"updateDate\":null,\"delFlag\":null,\"humanCreateDate\":null,\"humanUpdateDate\":null,\"type\":\"EXECUTOR_CUSTOM_RESP_TPL\",\"key\":\"dingtalk\",\"value\":\"{\\\"msg_signature\\\":\\\"%s\\\",\\\"timeStamp\\\":\\\"%s\\\",\\\"nonce\\\":\\\"%s\\\",\\\"encrypt\\\":\\\"%s\\\"}\",\"sort\":1}";
     final static ReactiveRedisDataSource mockReactiveRedisDataSource = new ReactiveRedisDataSource() {
 
         @Override
@@ -227,7 +227,7 @@ public class ReactiveDictServiceTests {
                 public Uni<Map<F, V>> hgetall(K key) {
                     return Uni.createFrom().item(() -> {
                         Map<F, V> mockDicts = new HashMap<>();
-                        String hashKey = DictType.ENGINE_EXECUTION_CUSTOM_RESP_TPL.name() + ":" + "dingtalk";
+                        String hashKey = DictType.EXECUTOR_CUSTOM_RESP_TPL.name() + ":" + "dingtalk";
                         mockDicts.put((F) hashKey, (V) mockDict1Json);
                         return mockDicts;
                     });

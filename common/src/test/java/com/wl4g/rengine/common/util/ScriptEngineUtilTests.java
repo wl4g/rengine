@@ -34,7 +34,7 @@ import com.wl4g.infra.common.io.FileIOUtils.ReadTailFrame;
  */
 public class ScriptEngineUtilTests {
 
-    static String logBaseDir = "/tmp/__rengine_script_log/";
+    static String logBaseDir = "/tmp/__rengine_script_log";
     static Long workflowId = 101000101L;
 
     @BeforeClass
@@ -45,7 +45,11 @@ public class ScriptEngineUtilTests {
         FileIOUtils.touch(new File(logFilePattern + ".0.2"));
         FileIOUtils.touch(new File(logFilePattern + ".1.1"));
         final File file = new File(logFilePattern + ".1.2");
-        FileIOUtils.forceDelete(file);
+        // try {
+        // FileIOUtils.forceDelete(file);
+        // } catch (Exception e) {
+        // e.printStackTrace();
+        // }
         FileIOUtils.touch(file);
         for (int i = 0; i < 100; i++) {
             FileIOUtils.writeALineFile(file, "The data xxxx of " + i);

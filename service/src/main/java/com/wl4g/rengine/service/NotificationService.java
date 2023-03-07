@@ -17,12 +17,12 @@ package com.wl4g.rengine.service;
 
 import javax.validation.constraints.NotNull;
 
-import com.wl4g.rengine.service.model.NotificationDingtalkUserIdExchage;
-import com.wl4g.rengine.service.model.NotificationDingtalkUserIdExchageResult;
-import com.wl4g.rengine.service.model.NotificationQuery;
-import com.wl4g.rengine.service.model.NotificationQueryResult;
-import com.wl4g.rengine.service.model.NotificationSave;
-import com.wl4g.rengine.service.model.NotificationSaveResult;
+import com.wl4g.rengine.service.model.sys.NotificationDingtalkUserIdExchage;
+import com.wl4g.rengine.service.model.sys.NotificationDingtalkUserIdExchageResult;
+import com.wl4g.rengine.service.model.sys.NotificationQuery;
+import com.wl4g.rengine.service.model.sys.NotificationQueryResult;
+import com.wl4g.rengine.service.model.sys.NotificationSave;
+import com.wl4g.rengine.service.model.sys.NotificationSaveResult;
 
 /**
  * {@link NotificationService}

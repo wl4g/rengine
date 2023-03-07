@@ -93,7 +93,7 @@ public class NodeSpec {
             }
         }
 
-        // Process quantifier's properties
+        // Process quantifier's details
         for (QuantifierProperty property : this.getQuantifier().getProperties()) {
             if (property.equals(QuantifierProperty.OPTIONAL)) {
                 pattern.optional();

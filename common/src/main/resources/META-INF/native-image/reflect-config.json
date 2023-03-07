@@ -1,31 +1,5 @@
 [{
-  "name": "com.wl4g.rengine.common.entity.WorkflowGraph$NodeType",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "values", "parameterTypes": []},
-    {"name": "valueOf", "parameterTypes": ["java.lang.String"]},
-    {"name": "of", "parameterTypes": ["java.lang.String"]},
-    {"name": "getClazz", "parameterTypes": []}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.Dict$DictType",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "values", "parameterTypes": []},
-    {"name": "valueOf", "parameterTypes": ["java.lang.String"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.Workflow",
+  "name": "com.wl4g.rengine.common.entity.sys.IdentityProvider$OidcConfig$UserInfoEndpoint",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
@@ -34,587 +8,16 @@
   "methods": [
     {"name": "<init>", "parameterTypes": []},
     {"name": "toString", "parameterTypes": []},
-    {"name": "getName", "parameterTypes": []},
-    {"name": "setName", "parameterTypes": ["java.lang.String"]},
-    {"name": "getEngine", "parameterTypes": []},
-    {"name": "setEngine", "parameterTypes": ["com.wl4g.rengine.common.entity.Rule$RuleEngine"]},
-    {"name": "getScenesId", "parameterTypes": []},
-    {"name": "setScenesId", "parameterTypes": ["java.lang.Long"]}
+    {"name": "getUri", "parameterTypes": []},
+    {"name": "getAuthenticationMethod", "parameterTypes": []},
+    {"name": "getUserNameAttributeName", "parameterTypes": []},
+    {"name": "setUri", "parameterTypes": ["java.lang.String"]},
+    {"name": "setAuthenticationMethod", "parameterTypes": ["com.wl4g.rengine.common.entity.sys.IdentityProvider$OidcConfig$AuthenticationMethod"]},
+    {"name": "setUserNameAttributeName", "parameterTypes": ["java.lang.String"]}
   ]
 },
 {
-  "name": "com.wl4g.rengine.common.entity.Workflow$WorkflowGraphWrapper",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": ["com.wl4g.rengine.common.entity.Workflow$WorkflowGraphWrapper"]},
-    {"name": "getRules", "parameterTypes": []},
-    {"name": "setRules", "parameterTypes": ["java.util.List"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.UploadObject",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "setSize", "parameterTypes": ["java.lang.Long"]},
-    {"name": "getExtension", "parameterTypes": []},
-    {"name": "setExtension", "parameterTypes": ["java.lang.String"]},
-    {"name": "setOwner", "parameterTypes": ["java.lang.String"]},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "getSize", "parameterTypes": []},
-    {"name": "getOwner", "parameterTypes": []},
-    {"name": "getObjectPrefix", "parameterTypes": []},
-    {"name": "getFilename", "parameterTypes": []},
-    {"name": "getGroup", "parameterTypes": []},
-    {"name": "getAccessMode", "parameterTypes": []},
-    {"name": "getMd5", "parameterTypes": []},
-    {"name": "getSha1", "parameterTypes": []},
-    {"name": "setUploadType", "parameterTypes": ["java.lang.String"]},
-    {"name": "setObjectPrefix", "parameterTypes": ["java.lang.String"]},
-    {"name": "setFilename", "parameterTypes": ["java.lang.String"]},
-    {"name": "setGroup", "parameterTypes": ["java.lang.String"]},
-    {"name": "setAccessMode", "parameterTypes": ["java.lang.String"]},
-    {"name": "setMd5", "parameterTypes": ["java.lang.String"]},
-    {"name": "setSha1", "parameterTypes": ["java.lang.String"]},
-    {"name": "getUploadType", "parameterTypes": []}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.ControllerSchedule$KafkaExecutionScheduleConfig",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": []},
-    {"name": "getTopics", "parameterTypes": []},
-    {"name": "getConcurrency", "parameterTypes": []},
-    {"name": "getAutoAcknowledgment", "parameterTypes": []},
-    {"name": "getRequest", "parameterTypes": []},
-    {"name": "getConsumerOptions", "parameterTypes": []},
-    {"name": "setTopics", "parameterTypes": ["java.util.List"]},
-    {"name": "setConcurrency", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setAutoAcknowledgment", "parameterTypes": ["java.lang.Boolean"]},
-    {"name": "setRequest", "parameterTypes": ["com.wl4g.rengine.common.model.WorkflowExecuteRequest"]},
-    {"name": "setConsumerOptions", "parameterTypes": ["com.wl4g.rengine.common.entity.ControllerSchedule$KafkaExecutionScheduleConfig$KafkaConsumerOptions"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.Scenes$ScenesWrapper",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": ["com.wl4g.rengine.common.entity.Scenes$ScenesWrapper"]},
-    {"name": "validate", "parameterTypes": []},
-    {"name": "setWorkflows", "parameterTypes": ["java.util.List"]},
-    {"name": "getWorkflows", "parameterTypes": []},
-    {"name": "getEffectivePriorityWorkflow", "parameterTypes": []}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.Notification$NotifierConfigPropertiesBase",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "getType", "parameterTypes": []},
-    {"name": "setType", "parameterTypes": ["java.lang.String"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.IdentityProvider$Saml2Config",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "getSpMetadataUrl", "parameterTypes": []},
-    {"name": "setSpMetadataUrl", "parameterTypes": ["java.lang.String"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.ControllerSchedule",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "getTimeZone", "parameterTypes": []},
-    {"name": "setTimeZone", "parameterTypes": ["java.lang.String"]},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "getName", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": []},
-    {"name": "getProperties", "parameterTypes": []},
-    {"name": "setProperties", "parameterTypes": ["com.wl4g.rengine.common.entity.ControllerSchedule$ScheduleDetailBase"]},
-    {"name": "setName", "parameterTypes": ["java.lang.String"]},
-    {"name": "getFailover", "parameterTypes": []},
-    {"name": "getMisfire", "parameterTypes": []},
-    {"name": "getMaxTimeDiffSeconds", "parameterTypes": []},
-    {"name": "getReconcileIntervalMinutes", "parameterTypes": []},
-    {"name": "getMaxTimeoutMs", "parameterTypes": []},
-    {"name": "getRunState", "parameterTypes": []},
-    {"name": "setMonitorExecution", "parameterTypes": ["java.lang.Boolean"]},
-    {"name": "setFailover", "parameterTypes": ["java.lang.Boolean"]},
-    {"name": "setMisfire", "parameterTypes": ["java.lang.Boolean"]},
-    {"name": "setMaxTimeDiffSeconds", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setReconcileIntervalMinutes", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setMaxTimeoutMs", "parameterTypes": ["java.lang.Long"]},
-    {"name": "setRunState", "parameterTypes": ["com.wl4g.rengine.common.entity.ControllerSchedule$RunState"]},
-    {"name": "getMonitorExecution", "parameterTypes": []}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.UploadObject$UploadType",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "getExtensions", "parameterTypes": []},
-    {"name": "values", "parameterTypes": []},
-    {"name": "valueOf", "parameterTypes": ["java.lang.String"]},
-    {"name": "of", "parameterTypes": ["java.lang.String"]},
-    {"name": "getPrefix", "parameterTypes": []}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.Rule$RuleEngine",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "values", "parameterTypes": []},
-    {"name": "valueOf", "parameterTypes": ["java.lang.String"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.DataSourceProperties$MongoDataSourceProperties",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": []},
-    {"name": "getConnectionString", "parameterTypes": []},
-    {"name": "setConnectionString", "parameterTypes": ["java.lang.String"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.ControllerSchedule$ScheduleType",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "values", "parameterTypes": []},
-    {"name": "valueOf", "parameterTypes": ["java.lang.String"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.WorkflowGraph$RunNode",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "withRuleId", "parameterTypes": ["java.lang.Long"]},
-    {"name": "setRuleId", "parameterTypes": ["java.lang.Long"]},
-    {"name": "getRuleId", "parameterTypes": []}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.WorkflowGraph$BaseNode",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "getName", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": []},
-    {"name": "setName", "parameterTypes": ["java.lang.String"]},
-    {"name": "getId", "parameterTypes": []},
-    {"name": "getType", "parameterTypes": []},
-    {"name": "getAttributes", "parameterTypes": []},
-    {"name": "setType", "parameterTypes": ["java.lang.String"]},
-    {"name": "withId", "parameterTypes": ["java.lang.String"]},
-    {"name": "setId", "parameterTypes": ["java.lang.String"]},
-    {"name": "setAttributes", "parameterTypes": ["java.util.Map"]},
-    {"name": "withName", "parameterTypes": ["java.lang.String"]},
-    {"name": "withAttributes", "parameterTypes": ["java.util.Map"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.User",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "getType", "parameterTypes": []},
-    {"name": "getAttributes", "parameterTypes": []},
-    {"name": "setType", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setAttributes", "parameterTypes": ["java.lang.String"]},
-    {"name": "getUsername", "parameterTypes": []},
-    {"name": "getPassword", "parameterTypes": []},
-    {"name": "getEmail", "parameterTypes": []},
-    {"name": "setUsername", "parameterTypes": ["java.lang.String"]},
-    {"name": "setPassword", "parameterTypes": ["java.lang.String"]},
-    {"name": "setEmail", "parameterTypes": ["java.lang.String"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.DataSourceProperties$RedisDataSourceProperties",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": []},
-    {"name": "getNodes", "parameterTypes": []},
-    {"name": "setNodes", "parameterTypes": ["java.util.List"]},
-    {"name": "getUsername", "parameterTypes": []},
-    {"name": "getPassword", "parameterTypes": []},
-    {"name": "setUsername", "parameterTypes": ["java.lang.String"]},
-    {"name": "setPassword", "parameterTypes": ["java.lang.String"]},
-    {"name": "getClientName", "parameterTypes": []},
-    {"name": "getConnTimeout", "parameterTypes": []},
-    {"name": "getSoTimeout", "parameterTypes": []},
-    {"name": "getMaxAttempts", "parameterTypes": []},
-    {"name": "getDatabase", "parameterTypes": []},
-    {"name": "isSafeMode", "parameterTypes": []},
-    {"name": "getPoolConfig", "parameterTypes": []},
-    {"name": "setClientName", "parameterTypes": ["java.lang.String"]},
-    {"name": "setConnTimeout", "parameterTypes": ["int"]},
-    {"name": "setSoTimeout", "parameterTypes": ["int"]},
-    {"name": "setMaxAttempts", "parameterTypes": ["int"]},
-    {"name": "setDatabase", "parameterTypes": ["int"]},
-    {"name": "setSafeMode", "parameterTypes": ["boolean"]},
-    {"name": "setPoolConfig", "parameterTypes": ["com.wl4g.rengine.common.entity.DataSourceProperties$RedisDataSourceProperties$JedisPoolConfig"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.ControllerLog$ExecutionControllerLog",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "<init>", "parameterTypes": ["java.util.Collection"]},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "getResults", "parameterTypes": []},
-    {"name": "setResults", "parameterTypes": ["java.util.Collection"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.RuleScript$RuleScriptWrapper",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": ["com.wl4g.rengine.common.entity.RuleScript$RuleScriptWrapper"]},
-    {"name": "getUploads", "parameterTypes": []},
-    {"name": "setUploads", "parameterTypes": ["java.util.List"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.ControllerSchedule$GenericExecutionScheduleConfig",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": []},
-    {"name": "getRequests", "parameterTypes": []},
-    {"name": "setCron", "parameterTypes": ["java.lang.String"]},
-    {"name": "setRequests", "parameterTypes": ["java.util.List"]},
-    {"name": "getCron", "parameterTypes": []}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.WorkflowGraph$BootNode",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.WorkflowGraph$RelationNode",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.Workflow$WorkflowWrapper",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": ["com.wl4g.rengine.common.entity.Workflow$WorkflowWrapper"]},
-    {"name": "getGraphs", "parameterTypes": []},
-    {"name": "getEffectiveLatestGraph", "parameterTypes": []},
-    {"name": "setGraphs", "parameterTypes": ["java.util.List"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.Notification$WeChatMpConfig",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "getAppSecret", "parameterTypes": []},
-    {"name": "setAppSecret", "parameterTypes": ["java.lang.String"]},
-    {"name": "getAppId", "parameterTypes": []},
-    {"name": "setAppId", "parameterTypes": ["java.lang.String"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.WorkflowGraph$LogicalType",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "values", "parameterTypes": []},
-    {"name": "valueOf", "parameterTypes": ["java.lang.String"]},
-    {"name": "of", "parameterTypes": ["java.lang.String"]},
-    {"name": "getDescription", "parameterTypes": []}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.Scenes",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "getName", "parameterTypes": []},
-    {"name": "setName", "parameterTypes": ["java.lang.String"]},
-    {"name": "getScenesCode", "parameterTypes": []},
-    {"name": "setScenesCode", "parameterTypes": ["java.lang.String"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.UploadObject$ExtensionType",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "values", "parameterTypes": []},
-    {"name": "valueOf", "parameterTypes": ["java.lang.String"]},
-    {"name": "of", "parameterTypes": ["java.lang.String"]},
-    {"name": "getSuffix", "parameterTypes": []},
-    {"name": "isBinary", "parameterTypes": []}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.Dict",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "getSort", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "getValue", "parameterTypes": []},
-    {"name": "getKey", "parameterTypes": []},
-    {"name": "setValue", "parameterTypes": ["java.lang.String"]},
-    {"name": "getType", "parameterTypes": []},
-    {"name": "setType", "parameterTypes": ["com.wl4g.rengine.common.entity.Dict$DictType"]},
-    {"name": "setKey", "parameterTypes": ["java.lang.String"]},
-    {"name": "setSort", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "buildCacheHashKey", "parameterTypes": ["java.lang.String","java.lang.String"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.DataSourceProperties$JDBCDataSourceProperties",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "setMaximumPoolSize", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "getMaximumPoolSize", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": []},
-    {"name": "getDriverClassName", "parameterTypes": []},
-    {"name": "getJdbcUrl", "parameterTypes": []},
-    {"name": "getUsername", "parameterTypes": []},
-    {"name": "getPassword", "parameterTypes": []},
-    {"name": "setUsername", "parameterTypes": ["java.lang.String"]},
-    {"name": "setPassword", "parameterTypes": ["java.lang.String"]},
-    {"name": "getFetchDirection", "parameterTypes": []},
-    {"name": "getFetchSize", "parameterTypes": []},
-    {"name": "getMaxFieldSize", "parameterTypes": []},
-    {"name": "getMaxRows", "parameterTypes": []},
-    {"name": "getQueryTimeoutMs", "parameterTypes": []},
-    {"name": "getConnectionTimeout", "parameterTypes": []},
-    {"name": "getValidationTimeout", "parameterTypes": []},
-    {"name": "getValidationTestSql", "parameterTypes": []},
-    {"name": "getIdleTimeout", "parameterTypes": []},
-    {"name": "getSoftMinIdleTimeout", "parameterTypes": []},
-    {"name": "getMaxConnLifeTime", "parameterTypes": []},
-    {"name": "getEvictionRunsBetweenTime", "parameterTypes": []},
-    {"name": "getInitPoolSize", "parameterTypes": []},
-    {"name": "getMinimumIdle", "parameterTypes": []},
-    {"name": "getAutoCommit", "parameterTypes": []},
-    {"name": "getCacheState", "parameterTypes": []},
-    {"name": "getTestOnBorrow", "parameterTypes": []},
-    {"name": "getTestOnCreate", "parameterTypes": []},
-    {"name": "getTestOnReturn", "parameterTypes": []},
-    {"name": "getTestWhileIdle", "parameterTypes": []},
-    {"name": "setFetchDirection", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setFetchSize", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setMaxFieldSize", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setMaxRows", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setQueryTimeoutMs", "parameterTypes": ["java.lang.Long"]},
-    {"name": "setDriverClassName", "parameterTypes": ["java.lang.String"]},
-    {"name": "setJdbcUrl", "parameterTypes": ["java.lang.String"]},
-    {"name": "setConnectionTimeout", "parameterTypes": ["java.lang.Long"]},
-    {"name": "setValidationTimeout", "parameterTypes": ["java.lang.Long"]},
-    {"name": "setValidationTestSql", "parameterTypes": ["java.lang.String"]},
-    {"name": "setIdleTimeout", "parameterTypes": ["java.lang.Long"]},
-    {"name": "setSoftMinIdleTimeout", "parameterTypes": ["java.lang.Long"]},
-    {"name": "setMaxConnLifeTime", "parameterTypes": ["java.lang.Long"]},
-    {"name": "setEvictionRunsBetweenTime", "parameterTypes": ["java.lang.Long"]},
-    {"name": "setInitPoolSize", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setMinimumIdle", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setAutoCommit", "parameterTypes": ["java.lang.Boolean"]},
-    {"name": "setCacheState", "parameterTypes": ["java.lang.Boolean"]},
-    {"name": "setTestOnBorrow", "parameterTypes": ["java.lang.Boolean"]},
-    {"name": "setTestOnCreate", "parameterTypes": ["java.lang.Boolean"]},
-    {"name": "setTestOnReturn", "parameterTypes": ["java.lang.Boolean"]},
-    {"name": "setTestWhileIdle", "parameterTypes": ["java.lang.Boolean"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.ControllerLog$ResultInformation",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": ["java.lang.String","java.util.List"]},
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": []},
-    {"name": "getResults", "parameterTypes": []},
-    {"name": "setResults", "parameterTypes": ["java.util.List"]},
-    {"name": "getRequestId", "parameterTypes": []},
-    {"name": "setRequestId", "parameterTypes": ["java.lang.String"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.WorkflowGraph",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": ["java.util.List","java.util.List"]},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "getAttributes", "parameterTypes": []},
-    {"name": "setAttributes", "parameterTypes": ["java.util.Map"]},
-    {"name": "getRevision", "parameterTypes": []},
-    {"name": "setRevision", "parameterTypes": ["java.lang.Long"]},
-    {"name": "getWorkflowId", "parameterTypes": []},
-    {"name": "getNodes", "parameterTypes": []},
-    {"name": "getConnections", "parameterTypes": []},
-    {"name": "setWorkflowId", "parameterTypes": ["java.lang.Long"]},
-    {"name": "setNodes", "parameterTypes": ["java.util.List"]},
-    {"name": "setConnections", "parameterTypes": ["java.util.List"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.Notification$DingtalkConfig",
+  "name": "com.wl4g.rengine.common.entity.sys.Notification$DingtalkConfig",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
@@ -641,97 +44,19 @@
   ]
 },
 {
-  "name": "com.wl4g.rengine.common.entity.Notification$DingtalkConfig$DingtalkScenesGroupInfo",
+  "name": "com.wl4g.rengine.common.entity.Rule$RuleEngine",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
   "queryAllDeclaredMethods": true,
   "queryAllDeclaredConstructors": true,
   "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "<init>", "parameterTypes": ["java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.util.List","java.util.List","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String"]},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": []},
-    {"name": "getTitle", "parameterTypes": []},
-    {"name": "getTemplateId", "parameterTypes": []},
-    {"name": "getChatId", "parameterTypes": []},
-    {"name": "getOpenConversationId", "parameterTypes": []},
-    {"name": "getOwnerUserId", "parameterTypes": []},
-    {"name": "getAdminUserIds", "parameterTypes": []},
-    {"name": "getUserIds", "parameterTypes": []},
-    {"name": "getUuid", "parameterTypes": []},
-    {"name": "getIcon", "parameterTypes": []},
-    {"name": "getMentionAllAuthority", "parameterTypes": []},
-    {"name": "getShowHistoryType", "parameterTypes": []},
-    {"name": "getValidationType", "parameterTypes": []},
-    {"name": "getSearchable", "parameterTypes": []},
-    {"name": "getChatVannedType", "parameterTypes": []},
-    {"name": "getManagementType", "parameterTypes": []},
-    {"name": "getOnlyAdminCanDing", "parameterTypes": []},
-    {"name": "getAllMembersCanCreateMcsConf", "parameterTypes": []},
-    {"name": "getAllMembersCanCreateCalendar", "parameterTypes": []},
-    {"name": "getGroupEmailDisabled", "parameterTypes": []},
-    {"name": "getOnlyAdminCanSetMsgTop", "parameterTypes": []},
-    {"name": "getAddFriendForbidden", "parameterTypes": []},
-    {"name": "getGroupLiveSwitch", "parameterTypes": []},
-    {"name": "getMembersToAdminChat", "parameterTypes": []},
-    {"name": "setTitle", "parameterTypes": ["java.lang.String"]},
-    {"name": "setTemplateId", "parameterTypes": ["java.lang.String"]},
-    {"name": "setChatId", "parameterTypes": ["java.lang.String"]},
-    {"name": "setOpenConversationId", "parameterTypes": ["java.lang.String"]},
-    {"name": "setOwnerUserId", "parameterTypes": ["java.lang.String"]},
-    {"name": "setAdminUserIds", "parameterTypes": ["java.util.List"]},
-    {"name": "setUserIds", "parameterTypes": ["java.util.List"]},
-    {"name": "setUuid", "parameterTypes": ["java.lang.String"]},
-    {"name": "setIcon", "parameterTypes": ["java.lang.String"]},
-    {"name": "setMentionAllAuthority", "parameterTypes": ["java.lang.String"]},
-    {"name": "setShowHistoryType", "parameterTypes": ["java.lang.String"]},
-    {"name": "setValidationType", "parameterTypes": ["java.lang.String"]},
-    {"name": "setSearchable", "parameterTypes": ["java.lang.String"]},
-    {"name": "setChatVannedType", "parameterTypes": ["java.lang.String"]},
-    {"name": "setManagementType", "parameterTypes": ["java.lang.String"]},
-    {"name": "setOnlyAdminCanDing", "parameterTypes": ["java.lang.String"]},
-    {"name": "setAllMembersCanCreateMcsConf", "parameterTypes": ["java.lang.String"]},
-    {"name": "setAllMembersCanCreateCalendar", "parameterTypes": ["java.lang.String"]},
-    {"name": "setGroupEmailDisabled", "parameterTypes": ["java.lang.String"]},
-    {"name": "setOnlyAdminCanSetMsgTop", "parameterTypes": ["java.lang.String"]},
-    {"name": "setAddFriendForbidden", "parameterTypes": ["java.lang.String"]},
-    {"name": "setGroupLiveSwitch", "parameterTypes": ["java.lang.String"]},
-    {"name": "setMembersToAdminChat", "parameterTypes": ["java.lang.String"]}
+    {"name": "values", "parameterTypes": []},
+    {"name": "valueOf", "parameterTypes": ["java.lang.String"]}
   ]
 },
 {
-  "name": "com.wl4g.rengine.common.entity.WorkflowGraph$FailbackNode",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.Notification$DingtalkConfig$DingtalkUserInfo",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "<init>", "parameterTypes": ["java.lang.String","java.lang.String"]},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": ["boolean"]},
-    {"name": "getMobile", "parameterTypes": []},
-    {"name": "getUserId", "parameterTypes": []},
-    {"name": "setMobile", "parameterTypes": ["java.lang.String"]},
-    {"name": "setUserId", "parameterTypes": ["java.lang.String"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.DataSourceProperties$DataSourcePropertiesBase",
+  "name": "com.wl4g.rengine.common.entity.sys.Notification$AliyunVmsConfig",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
@@ -740,9 +65,67 @@
   "methods": [
     {"name": "<init>", "parameterTypes": []},
     {"name": "toString", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": []},
+    {"name": "getAccessKey", "parameterTypes": []},
+    {"name": "getAccessSecret", "parameterTypes": []},
+    {"name": "getRegionId", "parameterTypes": []},
+    {"name": "getCalledShowNumber", "parameterTypes": []},
+    {"name": "setAccessKey", "parameterTypes": ["java.lang.String"]},
+    {"name": "setAccessSecret", "parameterTypes": ["java.lang.String"]},
+    {"name": "setRegionId", "parameterTypes": ["java.lang.String"]},
+    {"name": "setCalledShowNumber", "parameterTypes": ["java.lang.String"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.Organization",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "equals", "parameterTypes": ["java.lang.Object"]},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "hashCode", "parameterTypes": []},
     {"name": "getType", "parameterTypes": []},
-    {"name": "setType", "parameterTypes": ["com.wl4g.rengine.common.entity.DataSourceProperties$DataSourceType"]}
+    {"name": "setType", "parameterTypes": ["java.lang.String"]},
+    {"name": "getNameEn", "parameterTypes": []},
+    {"name": "getNameZh", "parameterTypes": []},
+    {"name": "setNameEn", "parameterTypes": ["java.lang.String"]},
+    {"name": "setNameZh", "parameterTypes": ["java.lang.String"]},
+    {"name": "getParentId", "parameterTypes": []},
+    {"name": "getChildrens", "parameterTypes": []},
+    {"name": "setParentId", "parameterTypes": ["java.lang.Long"]},
+    {"name": "setChildrens", "parameterTypes": ["java.util.List"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.Workflow$WorkflowGraphWrapper",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "getRules", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": ["com.wl4g.rengine.common.entity.Workflow$WorkflowGraphWrapper"]},
+    {"name": "setRules", "parameterTypes": ["java.util.List"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.DataSourceProperties$DataSourceType",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "values", "parameterTypes": []},
+    {"name": "valueOf", "parameterTypes": ["java.lang.String"]},
+    {"name": "of", "parameterTypes": ["java.lang.String"]},
+    {"name": "getPropertiesClass", "parameterTypes": []}
   ]
 },
 {
@@ -763,37 +146,7 @@
   ]
 },
 {
-  "name": "com.wl4g.rengine.common.entity.ControllerSchedule$ScheduleDetailBase",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "getType", "parameterTypes": []},
-    {"name": "setType", "parameterTypes": ["java.lang.String"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.Rule",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "getName", "parameterTypes": []},
-    {"name": "setName", "parameterTypes": ["java.lang.String"]},
-    {"name": "getEngine", "parameterTypes": []},
-    {"name": "setEngine", "parameterTypes": ["com.wl4g.rengine.common.entity.Rule$RuleEngine"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.ControllerLog",
+  "name": "com.wl4g.rengine.common.entity.ControllerSchedule$GenericExecutionScheduleConfig",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
@@ -803,81 +156,14 @@
     {"name": "<init>", "parameterTypes": []},
     {"name": "toString", "parameterTypes": []},
     {"name": "validate", "parameterTypes": []},
-    {"name": "getScheduleId", "parameterTypes": []},
-    {"name": "getJobName", "parameterTypes": []},
-    {"name": "getStartupTime", "parameterTypes": []},
-    {"name": "getFinishedTime", "parameterTypes": []},
-    {"name": "getSuccess", "parameterTypes": []},
-    {"name": "getDetail", "parameterTypes": []},
-    {"name": "setScheduleId", "parameterTypes": ["java.lang.Long"]},
-    {"name": "setJobName", "parameterTypes": ["java.lang.String"]},
-    {"name": "setStartupTime", "parameterTypes": ["java.util.Date"]},
-    {"name": "setFinishedTime", "parameterTypes": ["java.util.Date"]},
-    {"name": "setSuccess", "parameterTypes": ["java.lang.Boolean"]},
-    {"name": "setDetail", "parameterTypes": ["com.wl4g.rengine.common.entity.ControllerLog$LogDetailBase"]}
+    {"name": "getCron", "parameterTypes": []},
+    {"name": "getRequests", "parameterTypes": []},
+    {"name": "setCron", "parameterTypes": ["java.lang.String"]},
+    {"name": "setRequests", "parameterTypes": ["java.util.List"]}
   ]
 },
 {
-  "name": "com.wl4g.rengine.common.entity.DataSourceProperties$RedisDataSourceProperties$JedisPoolConfig",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": []},
-    {"name": "getTestOnBorrow", "parameterTypes": []},
-    {"name": "getTestOnCreate", "parameterTypes": []},
-    {"name": "getTestOnReturn", "parameterTypes": []},
-    {"name": "getTestWhileIdle", "parameterTypes": []},
-    {"name": "setTestOnBorrow", "parameterTypes": ["java.lang.Boolean"]},
-    {"name": "setTestOnCreate", "parameterTypes": ["java.lang.Boolean"]},
-    {"name": "setTestOnReturn", "parameterTypes": ["java.lang.Boolean"]},
-    {"name": "setTestWhileIdle", "parameterTypes": ["java.lang.Boolean"]},
-    {"name": "getMaxTotal", "parameterTypes": []},
-    {"name": "getMaxIdle", "parameterTypes": []},
-    {"name": "getMinIdle", "parameterTypes": []},
-    {"name": "getLifo", "parameterTypes": []},
-    {"name": "getFairness", "parameterTypes": []},
-    {"name": "getMaxWait", "parameterTypes": []},
-    {"name": "getMinEvictableIdleMs", "parameterTypes": []},
-    {"name": "getEvictorShutdownTimeoutMs", "parameterTypes": []},
-    {"name": "getSoftMinEvictableIdleMs", "parameterTypes": []},
-    {"name": "getNumTestsPerEvictionRun", "parameterTypes": []},
-    {"name": "getDurationBetweenEvictionRunsMs", "parameterTypes": []},
-    {"name": "getBlockWhenExhausted", "parameterTypes": []},
-    {"name": "setMaxTotal", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setMaxIdle", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setMinIdle", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setLifo", "parameterTypes": ["java.lang.Boolean"]},
-    {"name": "setFairness", "parameterTypes": ["java.lang.Boolean"]},
-    {"name": "setMaxWait", "parameterTypes": ["java.lang.Long"]},
-    {"name": "setMinEvictableIdleMs", "parameterTypes": ["java.lang.Long"]},
-    {"name": "setEvictorShutdownTimeoutMs", "parameterTypes": ["java.lang.Long"]},
-    {"name": "setSoftMinEvictableIdleMs", "parameterTypes": ["java.lang.Long"]},
-    {"name": "setNumTestsPerEvictionRun", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setDurationBetweenEvictionRunsMs", "parameterTypes": ["java.lang.Long"]},
-    {"name": "setBlockWhenExhausted", "parameterTypes": ["java.lang.Boolean"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.Notification",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "getProperties", "parameterTypes": []},
-    {"name": "setProperties", "parameterTypes": ["com.wl4g.rengine.common.entity.Notification$NotifierConfigPropertiesBase"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.Notification$EmailConfig",
+  "name": "com.wl4g.rengine.common.entity.sys.Notification$EmailConfig",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
@@ -901,7 +187,7 @@
   ]
 },
 {
-  "name": "com.wl4g.rengine.common.entity.RuleScript",
+  "name": "com.wl4g.rengine.common.entity.ControllerSchedule$ScheduleDetailBase",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
@@ -910,38 +196,21 @@
   "methods": [
     {"name": "<init>", "parameterTypes": []},
     {"name": "toString", "parameterTypes": []},
-    {"name": "setRuleId", "parameterTypes": ["java.lang.Long"]},
-    {"name": "getRuleId", "parameterTypes": []},
-    {"name": "getRevision", "parameterTypes": []},
-    {"name": "getUploadIds", "parameterTypes": []},
-    {"name": "setRevision", "parameterTypes": ["java.lang.Long"]},
-    {"name": "setUploadIds", "parameterTypes": ["java.util.List"]}
+    {"name": "getType", "parameterTypes": []},
+    {"name": "setType", "parameterTypes": ["java.lang.String"]}
   ]
 },
 {
-  "name": "com.wl4g.rengine.common.entity.WorkflowGraph$NodeConnection",
+  "name": "com.wl4g.rengine.common.entity.sys.User$IdTokenClaimNames",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
   "queryAllDeclaredMethods": true,
   "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "<init>", "parameterTypes": ["java.lang.String","java.lang.String"]},
-    {"name": "<init>", "parameterTypes": ["java.lang.String","java.lang.String","java.lang.String"]},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "getName", "parameterTypes": []},
-    {"name": "setName", "parameterTypes": ["java.lang.String"]},
-    {"name": "getAttributes", "parameterTypes": []},
-    {"name": "setAttributes", "parameterTypes": ["java.util.Map"]},
-    {"name": "setTo", "parameterTypes": ["java.lang.String"]},
-    {"name": "getFrom", "parameterTypes": []},
-    {"name": "setFrom", "parameterTypes": ["java.lang.String"]},
-    {"name": "getTo", "parameterTypes": []}
-  ]
+  "methods": []
 },
 {
-  "name": "com.wl4g.rengine.common.entity.DataSourceProperties$DataSourceType",
+  "name": "com.wl4g.rengine.common.entity.UploadObject$UploadType",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
@@ -951,138 +220,12 @@
     {"name": "values", "parameterTypes": []},
     {"name": "valueOf", "parameterTypes": ["java.lang.String"]},
     {"name": "of", "parameterTypes": ["java.lang.String"]},
-    {"name": "getPropertiesClass", "parameterTypes": []}
+    {"name": "getExtensions", "parameterTypes": []},
+    {"name": "getPrefix", "parameterTypes": []}
   ]
 },
 {
-  "name": "com.wl4g.rengine.common.entity.ControllerSchedule$KafkaExecutionScheduleConfig$KafkaConsumerOptions",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": []},
-    {"name": "getKeySerializer", "parameterTypes": []},
-    {"name": "getValueSerializer", "parameterTypes": []},
-    {"name": "getBootstrapServers", "parameterTypes": []},
-    {"name": "getClientDnsLookup", "parameterTypes": []},
-    {"name": "getMetadataMaxAgeMs", "parameterTypes": []},
-    {"name": "getSendBufferBytes", "parameterTypes": []},
-    {"name": "getReceiveBufferBytes", "parameterTypes": []},
-    {"name": "getClientId", "parameterTypes": []},
-    {"name": "getClientRack", "parameterTypes": []},
-    {"name": "getReconnectBackoffMs", "parameterTypes": []},
-    {"name": "getReconnectBackoffMaxMs", "parameterTypes": []},
-    {"name": "getRetries", "parameterTypes": []},
-    {"name": "getRetryBackoffMs", "parameterTypes": []},
-    {"name": "getMetricsSampleWindowMs", "parameterTypes": []},
-    {"name": "getMetricsNumSamples", "parameterTypes": []},
-    {"name": "getMetricsRecordingLevel", "parameterTypes": []},
-    {"name": "getMetricsReporters", "parameterTypes": []},
-    {"name": "getSecurityProtocol", "parameterTypes": []},
-    {"name": "getSocketConnectionSetupTimeoutMs", "parameterTypes": []},
-    {"name": "getSocketConnectionSetupTimeoutMaxMs", "parameterTypes": []},
-    {"name": "getConnectionsMaxIdleMs", "parameterTypes": []},
-    {"name": "getRequestTimeoutMs", "parameterTypes": []},
-    {"name": "getGroupId", "parameterTypes": []},
-    {"name": "getGroupInstanceId", "parameterTypes": []},
-    {"name": "getMaxPollIntervalMs", "parameterTypes": []},
-    {"name": "getRebalanceTimeoutMs", "parameterTypes": []},
-    {"name": "getSessionTimeoutMs", "parameterTypes": []},
-    {"name": "getHeartbeatIntervalMs", "parameterTypes": []},
-    {"name": "getDefaultApiTimeoutMs", "parameterTypes": []},
-    {"name": "setKeySerializer", "parameterTypes": ["java.lang.String"]},
-    {"name": "setValueSerializer", "parameterTypes": ["java.lang.String"]},
-    {"name": "setBootstrapServers", "parameterTypes": ["java.lang.String"]},
-    {"name": "setClientDnsLookup", "parameterTypes": ["java.lang.String"]},
-    {"name": "setMetadataMaxAgeMs", "parameterTypes": ["java.lang.Long"]},
-    {"name": "setSendBufferBytes", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setReceiveBufferBytes", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setClientId", "parameterTypes": ["java.lang.String"]},
-    {"name": "setClientRack", "parameterTypes": ["java.lang.String"]},
-    {"name": "setReconnectBackoffMs", "parameterTypes": ["java.lang.Long"]},
-    {"name": "setReconnectBackoffMaxMs", "parameterTypes": ["java.lang.Long"]},
-    {"name": "setRetries", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setRetryBackoffMs", "parameterTypes": ["java.lang.Long"]},
-    {"name": "setMetricsSampleWindowMs", "parameterTypes": ["java.lang.Long"]},
-    {"name": "setMetricsNumSamples", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setMetricsRecordingLevel", "parameterTypes": ["java.lang.String"]},
-    {"name": "setMetricsReporters", "parameterTypes": ["java.util.List"]},
-    {"name": "setSecurityProtocol", "parameterTypes": ["java.lang.String"]},
-    {"name": "setSocketConnectionSetupTimeoutMs", "parameterTypes": ["java.lang.Long"]},
-    {"name": "setSocketConnectionSetupTimeoutMaxMs", "parameterTypes": ["java.lang.Long"]},
-    {"name": "setConnectionsMaxIdleMs", "parameterTypes": ["java.lang.Long"]},
-    {"name": "setRequestTimeoutMs", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setGroupId", "parameterTypes": ["java.lang.String"]},
-    {"name": "setGroupInstanceId", "parameterTypes": ["java.lang.String"]},
-    {"name": "setMaxPollIntervalMs", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setRebalanceTimeoutMs", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setSessionTimeoutMs", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "toConsumerConfigProperties", "parameterTypes": []},
-    {"name": "getEnableAutoCommit", "parameterTypes": []},
-    {"name": "getAutoCommitIntervalMs", "parameterTypes": []},
-    {"name": "getAutoOffsetReset", "parameterTypes": []},
-    {"name": "getFetchMinBytes", "parameterTypes": []},
-    {"name": "getFetchMaxBytes", "parameterTypes": []},
-    {"name": "getFetchMaxWaitMs", "parameterTypes": []},
-    {"name": "setEnableAutoCommit", "parameterTypes": ["java.lang.Boolean"]},
-    {"name": "setAutoCommitIntervalMs", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setAutoOffsetReset", "parameterTypes": ["java.lang.String"]},
-    {"name": "setFetchMinBytes", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setFetchMaxBytes", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setFetchMaxWaitMs", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setHeartbeatIntervalMs", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setDefaultApiTimeoutMs", "parameterTypes": ["java.lang.Integer"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.ControllerSchedule$RunState",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "toString", "parameterTypes": []},
-    {"name": "values", "parameterTypes": []},
-    {"name": "valueOf", "parameterTypes": ["java.lang.String"]},
-    {"name": "isSuccess", "parameterTypes": []}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.IdentityProvider",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "getKind", "parameterTypes": []},
-    {"name": "setKind", "parameterTypes": ["java.lang.String"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.ControllerLog$KafkaSubscribeControllerLog",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": ["com.wl4g.rengine.common.entity.ControllerLog$ResultInformation"]},
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "setResult", "parameterTypes": ["com.wl4g.rengine.common.entity.ControllerLog$ResultInformation"]},
-    {"name": "getResult", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.entity.IdentityProvider$IdPKind",
+  "name": "com.wl4g.rengine.common.entity.sys.IdentityProvider$OidcConfig$AuthenticationMethod",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
@@ -1106,7 +249,7 @@
   ]
 },
 {
-  "name": "com.wl4g.rengine.common.entity.Notification$AliyunSmsConfig",
+  "name": "com.wl4g.rengine.common.entity.Rule",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
@@ -1115,52 +258,68 @@
   "methods": [
     {"name": "<init>", "parameterTypes": []},
     {"name": "toString", "parameterTypes": []},
-    {"name": "getAccessKey", "parameterTypes": []},
-    {"name": "getAccessSecret", "parameterTypes": []},
-    {"name": "getRegionId", "parameterTypes": []},
-    {"name": "getSignName", "parameterTypes": []},
-    {"name": "setAccessKey", "parameterTypes": ["java.lang.String"]},
-    {"name": "setAccessSecret", "parameterTypes": ["java.lang.String"]},
-    {"name": "setRegionId", "parameterTypes": ["java.lang.String"]},
-    {"name": "setSignName", "parameterTypes": ["java.lang.String"]}
+    {"name": "getName", "parameterTypes": []},
+    {"name": "setName", "parameterTypes": ["java.lang.String"]},
+    {"name": "getEngine", "parameterTypes": []},
+    {"name": "setEngine", "parameterTypes": ["com.wl4g.rengine.common.entity.Rule$RuleEngine"]}
   ]
 },
 {
-  "name": "com.wl4g.rengine.common.entity.IdentityProvider$OAuth2Config",
+  "name": "com.wl4g.rengine.common.entity.ControllerLog$ResultInformation",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
   "queryAllDeclaredMethods": true,
   "queryAllDeclaredConstructors": true,
   "methods": [
+    {"name": "<init>", "parameterTypes": ["java.lang.String","java.util.List"]},
     {"name": "<init>", "parameterTypes": []},
     {"name": "toString", "parameterTypes": []},
-    {"name": "getClientId", "parameterTypes": []},
-    {"name": "setClientId", "parameterTypes": ["java.lang.String"]},
-    {"name": "getUserId", "parameterTypes": []},
-    {"name": "setUserId", "parameterTypes": ["java.lang.String"]},
-    {"name": "getTokenUrl", "parameterTypes": []},
-    {"name": "getAuthorizationUrl", "parameterTypes": []},
-    {"name": "getUserinfoUrl", "parameterTypes": []},
-    {"name": "getClientSecret", "parameterTypes": []},
-    {"name": "getUserName", "parameterTypes": []},
-    {"name": "getScopes", "parameterTypes": []},
-    {"name": "setAuthorizationUrl", "parameterTypes": ["java.lang.String"]},
-    {"name": "setTokenUrl", "parameterTypes": ["java.lang.String"]},
-    {"name": "setUserinfoUrl", "parameterTypes": ["java.lang.String"]},
-    {"name": "setClientSecret", "parameterTypes": ["java.lang.String"]},
-    {"name": "setUserName", "parameterTypes": ["java.lang.String"]},
-    {"name": "setScopes", "parameterTypes": ["java.lang.String"]}
+    {"name": "validate", "parameterTypes": []},
+    {"name": "getResults", "parameterTypes": []},
+    {"name": "setResults", "parameterTypes": ["java.util.List"]},
+    {"name": "getRequestId", "parameterTypes": []},
+    {"name": "setRequestId", "parameterTypes": ["java.lang.String"]}
   ]
 },
 {
-  "name": "com.wl4g.rengine.common.entity.WorkflowGraph$BaseNode$1",
+  "name": "com.wl4g.rengine.common.entity.sys.IdentityProvider$IdPKind",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
   "queryAllDeclaredMethods": true,
   "queryAllDeclaredConstructors": true,
-  "methods": []
+  "methods": [
+    {"name": "values", "parameterTypes": []},
+    {"name": "valueOf", "parameterTypes": ["java.lang.String"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.UploadObject$ExtensionType",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "values", "parameterTypes": []},
+    {"name": "valueOf", "parameterTypes": ["java.lang.String"]},
+    {"name": "of", "parameterTypes": ["java.lang.String"]},
+    {"name": "getSuffix", "parameterTypes": []},
+    {"name": "isBinary", "parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.ControllerSchedule$ScheduleType",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "values", "parameterTypes": []},
+    {"name": "valueOf", "parameterTypes": ["java.lang.String"]}
+  ]
 },
 {
   "name": "com.wl4g.rengine.common.entity.DataSourceProperties$KafkaDataSourceProperties",
@@ -1243,9 +402,9 @@
     {"name": "setMaxPollIntervalMs", "parameterTypes": ["java.lang.Integer"]},
     {"name": "setRebalanceTimeoutMs", "parameterTypes": ["java.lang.Integer"]},
     {"name": "setSessionTimeoutMs", "parameterTypes": ["java.lang.Integer"]},
-    {"name": "setBufferMemory", "parameterTypes": ["java.lang.Long"]},
     {"name": "setHeartbeatIntervalMs", "parameterTypes": ["java.lang.Integer"]},
     {"name": "setDefaultApiTimeoutMs", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setBufferMemory", "parameterTypes": ["java.lang.Long"]},
     {"name": "setAcks", "parameterTypes": ["java.lang.String"]},
     {"name": "setCompressionType", "parameterTypes": ["java.lang.String"]},
     {"name": "setBatchSize", "parameterTypes": ["java.lang.Integer"]},
@@ -1258,6 +417,479 @@
     {"name": "setMetadataMaxAge", "parameterTypes": ["java.lang.Long"]},
     {"name": "setMaxInFlightRequestsPerConnection", "parameterTypes": ["java.lang.Integer"]},
     {"name": "setTransactionTimeout", "parameterTypes": ["java.lang.Integer"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.User",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "getAttributes", "parameterTypes": []},
+    {"name": "setAttributes", "parameterTypes": ["java.util.Map"]},
+    {"name": "getOrgCode", "parameterTypes": []},
+    {"name": "setOrgCode", "parameterTypes": ["java.lang.String"]},
+    {"name": "getUsername", "parameterTypes": []},
+    {"name": "getPassword", "parameterTypes": []},
+    {"name": "setUsername", "parameterTypes": ["java.lang.String"]},
+    {"name": "setPassword", "parameterTypes": ["java.lang.String"]},
+    {"name": "isAccountNonLocked", "parameterTypes": []},
+    {"name": "isAccountNonExpired", "parameterTypes": []},
+    {"name": "isCredentialsNonExpired", "parameterTypes": []},
+    {"name": "getAuthorities", "parameterTypes": []},
+    {"name": "getRoles", "parameterTypes": []},
+    {"name": "setAccountNonExpired", "parameterTypes": ["boolean"]},
+    {"name": "setAccountNonLocked", "parameterTypes": ["boolean"]},
+    {"name": "setCredentialsNonExpired", "parameterTypes": ["boolean"]},
+    {"name": "setAuthorities", "parameterTypes": ["java.util.Set"]},
+    {"name": "setRoles", "parameterTypes": ["java.util.List"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.RuleScript",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "setRuleId", "parameterTypes": ["java.lang.Long"]},
+    {"name": "getRuleId", "parameterTypes": []},
+    {"name": "getRevision", "parameterTypes": []},
+    {"name": "getEntrypointUploadId", "parameterTypes": []},
+    {"name": "getUploadIds", "parameterTypes": []},
+    {"name": "setRevision", "parameterTypes": ["java.lang.Long"]},
+    {"name": "setEntrypointUploadId", "parameterTypes": ["java.lang.Long"]},
+    {"name": "setUploadIds", "parameterTypes": ["java.util.List"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.ControllerLog$KafkaSubscribeControllerLog",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": ["com.wl4g.rengine.common.entity.ControllerLog$ResultInformation"]},
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "setResult", "parameterTypes": ["com.wl4g.rengine.common.entity.ControllerLog$ResultInformation"]},
+    {"name": "getResult", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.DataSourceProperties$RedisDataSourceProperties",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": []},
+    {"name": "getNodes", "parameterTypes": []},
+    {"name": "setNodes", "parameterTypes": ["java.util.List"]},
+    {"name": "getUsername", "parameterTypes": []},
+    {"name": "getPassword", "parameterTypes": []},
+    {"name": "setUsername", "parameterTypes": ["java.lang.String"]},
+    {"name": "setPassword", "parameterTypes": ["java.lang.String"]},
+    {"name": "getClientName", "parameterTypes": []},
+    {"name": "getConnTimeout", "parameterTypes": []},
+    {"name": "getSoTimeout", "parameterTypes": []},
+    {"name": "getMaxAttempts", "parameterTypes": []},
+    {"name": "getDatabase", "parameterTypes": []},
+    {"name": "isSafeMode", "parameterTypes": []},
+    {"name": "getPoolConfig", "parameterTypes": []},
+    {"name": "setClientName", "parameterTypes": ["java.lang.String"]},
+    {"name": "setConnTimeout", "parameterTypes": ["int"]},
+    {"name": "setSoTimeout", "parameterTypes": ["int"]},
+    {"name": "setMaxAttempts", "parameterTypes": ["int"]},
+    {"name": "setDatabase", "parameterTypes": ["int"]},
+    {"name": "setSafeMode", "parameterTypes": ["boolean"]},
+    {"name": "setPoolConfig", "parameterTypes": ["com.wl4g.rengine.common.entity.DataSourceProperties$RedisDataSourceProperties$JedisPoolConfig"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.User$IdTokenClaimAccessor",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "getSubject", "parameterTypes": []},
+    {"name": "getIssuedAt", "parameterTypes": []},
+    {"name": "getExpiresAt", "parameterTypes": []},
+    {"name": "getIssuer", "parameterTypes": []},
+    {"name": "getAuthorizationCodeHash", "parameterTypes": []},
+    {"name": "getAudience", "parameterTypes": []},
+    {"name": "getAuthenticatedAt", "parameterTypes": []},
+    {"name": "getNonce", "parameterTypes": []},
+    {"name": "getAuthenticationContextClass", "parameterTypes": []},
+    {"name": "getAuthenticationMethods", "parameterTypes": []},
+    {"name": "getAuthorizedParty", "parameterTypes": []},
+    {"name": "getAccessTokenHash", "parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.WorkflowGraph$FailbackNode",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.Workflow$WorkflowWrapper",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": ["com.wl4g.rengine.common.entity.Workflow$WorkflowWrapper"]},
+    {"name": "getGraphs", "parameterTypes": []},
+    {"name": "getEffectiveLatestGraph", "parameterTypes": []},
+    {"name": "setGraphs", "parameterTypes": ["java.util.List"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.Role",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "equals", "parameterTypes": ["java.lang.Object"]},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "hashCode", "parameterTypes": []},
+    {"name": "getType", "parameterTypes": []},
+    {"name": "setType", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "getUsers", "parameterTypes": []},
+    {"name": "setUsers", "parameterTypes": ["java.util.List"]},
+    {"name": "getRoleCode", "parameterTypes": []},
+    {"name": "getNameEn", "parameterTypes": []},
+    {"name": "getNameZh", "parameterTypes": []},
+    {"name": "getOrg", "parameterTypes": []},
+    {"name": "getMenus", "parameterTypes": []},
+    {"name": "setRoleCode", "parameterTypes": ["java.lang.String"]},
+    {"name": "setNameEn", "parameterTypes": ["java.lang.String"]},
+    {"name": "setNameZh", "parameterTypes": ["java.lang.String"]},
+    {"name": "setOrg", "parameterTypes": ["com.wl4g.rengine.common.entity.sys.Organization"]},
+    {"name": "setMenus", "parameterTypes": ["java.util.List"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.WorkflowGraph$NodeConnection",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "<init>", "parameterTypes": ["java.lang.String","java.lang.String"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.String","java.lang.String","java.lang.String"]},
+    {"name": "setTo", "parameterTypes": ["java.lang.String"]},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "getName", "parameterTypes": []},
+    {"name": "setName", "parameterTypes": ["java.lang.String"]},
+    {"name": "getAttributes", "parameterTypes": []},
+    {"name": "setAttributes", "parameterTypes": ["java.util.Map"]},
+    {"name": "getFrom", "parameterTypes": []},
+    {"name": "setFrom", "parameterTypes": ["java.lang.String"]},
+    {"name": "getTo", "parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.WorkflowGraph$RelationNode",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.WorkflowGraph$BaseNode",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "getName", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": []},
+    {"name": "setPriority", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "getPriority", "parameterTypes": []},
+    {"name": "setName", "parameterTypes": ["java.lang.String"]},
+    {"name": "getId", "parameterTypes": []},
+    {"name": "getType", "parameterTypes": []},
+    {"name": "getAttributes", "parameterTypes": []},
+    {"name": "setType", "parameterTypes": ["java.lang.String"]},
+    {"name": "withAttributes", "parameterTypes": ["java.util.Map"]},
+    {"name": "withName", "parameterTypes": ["java.lang.String"]},
+    {"name": "withId", "parameterTypes": ["java.lang.String"]},
+    {"name": "withPriority", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setId", "parameterTypes": ["java.lang.String"]},
+    {"name": "setAttributes", "parameterTypes": ["java.util.Map"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.User$OidcIdToken",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": ["java.lang.String","java.time.Instant","java.time.Instant","java.util.Map"]},
+    {"name": "getClaims", "parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.ControllerSchedule$RunState",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "toString", "parameterTypes": []},
+    {"name": "values", "parameterTypes": []},
+    {"name": "valueOf", "parameterTypes": ["java.lang.String"]},
+    {"name": "isSuccess", "parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.User$GrantedAuthority",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "getAuthority", "parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.ControllerLog$ExecutionControllerLog",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "<init>", "parameterTypes": ["java.util.Collection"]},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "getResults", "parameterTypes": []},
+    {"name": "setResults", "parameterTypes": ["java.util.Collection"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.ControllerSchedule$KafkaExecutionScheduleConfig",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": []},
+    {"name": "getTopics", "parameterTypes": []},
+    {"name": "getConcurrency", "parameterTypes": []},
+    {"name": "getAutoAcknowledgment", "parameterTypes": []},
+    {"name": "getRequest", "parameterTypes": []},
+    {"name": "getConsumerOptions", "parameterTypes": []},
+    {"name": "setTopics", "parameterTypes": ["java.util.List"]},
+    {"name": "setConcurrency", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setAutoAcknowledgment", "parameterTypes": ["java.lang.Boolean"]},
+    {"name": "setRequest", "parameterTypes": ["com.wl4g.rengine.common.model.WorkflowExecuteRequest"]},
+    {"name": "setConsumerOptions", "parameterTypes": ["com.wl4g.rengine.common.entity.ControllerSchedule$KafkaExecutionScheduleConfig$KafkaConsumerOptions"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.User$ClaimAccessor",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "getClaimAsString", "parameterTypes": ["java.lang.String"]},
+    {"name": "getClaimAsBoolean", "parameterTypes": ["java.lang.String"]},
+    {"name": "getClaimAsMap", "parameterTypes": ["java.lang.String"]},
+    {"name": "getClaimAsInstant", "parameterTypes": ["java.lang.String"]},
+    {"name": "getClaims", "parameterTypes": []},
+    {"name": "getClaim", "parameterTypes": ["java.lang.String"]},
+    {"name": "hasClaim", "parameterTypes": ["java.lang.String"]},
+    {"name": "containsClaim", "parameterTypes": ["java.lang.String"]},
+    {"name": "getClaimAsURL", "parameterTypes": ["java.lang.String"]},
+    {"name": "getClaimAsStringList", "parameterTypes": ["java.lang.String"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.WorkflowGraph$LogicalNode",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": []},
+    {"name": "withLogical", "parameterTypes": ["com.wl4g.rengine.common.entity.WorkflowGraph$LogicalType"]},
+    {"name": "setLogical", "parameterTypes": ["com.wl4g.rengine.common.entity.WorkflowGraph$LogicalType"]},
+    {"name": "getLogical", "parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.WorkflowGraph$LogicalType",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "values", "parameterTypes": []},
+    {"name": "valueOf", "parameterTypes": ["java.lang.String"]},
+    {"name": "of", "parameterTypes": ["java.lang.String"]},
+    {"name": "getDescription", "parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.Menu",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "getSort", "parameterTypes": []},
+    {"name": "setPermissions", "parameterTypes": ["java.util.List"]},
+    {"name": "equals", "parameterTypes": ["java.lang.Object"]},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "hashCode", "parameterTypes": []},
+    {"name": "getPermissions", "parameterTypes": []},
+    {"name": "getType", "parameterTypes": []},
+    {"name": "setType", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "getLevel", "parameterTypes": []},
+    {"name": "getOrgCode", "parameterTypes": []},
+    {"name": "setOrgCode", "parameterTypes": ["java.lang.String"]},
+    {"name": "getIcon", "parameterTypes": []},
+    {"name": "setIcon", "parameterTypes": ["java.lang.String"]},
+    {"name": "getNameEn", "parameterTypes": []},
+    {"name": "getNameZh", "parameterTypes": []},
+    {"name": "setNameEn", "parameterTypes": ["java.lang.String"]},
+    {"name": "setNameZh", "parameterTypes": ["java.lang.String"]},
+    {"name": "getParentId", "parameterTypes": []},
+    {"name": "getPageLocation", "parameterTypes": []},
+    {"name": "getRoutePath", "parameterTypes": []},
+    {"name": "getRouteNamespace", "parameterTypes": []},
+    {"name": "getRenderTarget", "parameterTypes": []},
+    {"name": "getParentRoutePath", "parameterTypes": []},
+    {"name": "getClassify", "parameterTypes": []},
+    {"name": "setLevel", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setPageLocation", "parameterTypes": ["java.lang.String"]},
+    {"name": "setRoutePath", "parameterTypes": ["java.lang.String"]},
+    {"name": "setRouteNamespace", "parameterTypes": ["java.lang.String"]},
+    {"name": "setRenderTarget", "parameterTypes": ["java.lang.String"]},
+    {"name": "setParentRoutePath", "parameterTypes": ["java.lang.String"]},
+    {"name": "getChildrens", "parameterTypes": []},
+    {"name": "setParentId", "parameterTypes": ["java.lang.Long"]},
+    {"name": "setChildrens", "parameterTypes": ["java.util.List"]},
+    {"name": "setSort", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setClassify", "parameterTypes": ["java.lang.String"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.IdentityProvider",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "getName", "parameterTypes": []},
+    {"name": "setName", "parameterTypes": ["java.lang.String"]},
+    {"name": "getOrgCode", "parameterTypes": []},
+    {"name": "setOrgCode", "parameterTypes": ["java.lang.String"]},
+    {"name": "getDetails", "parameterTypes": []},
+    {"name": "setDetails", "parameterTypes": ["com.wl4g.rengine.common.entity.sys.IdentityProvider$ProviderDetailsBase"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.Notification$WeChatMpConfig",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "getAppSecret", "parameterTypes": []},
+    {"name": "setAppSecret", "parameterTypes": ["java.lang.String"]},
+    {"name": "getAppId", "parameterTypes": []},
+    {"name": "setAppId", "parameterTypes": ["java.lang.String"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.RuleScript$RuleScriptWrapper",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": ["com.wl4g.rengine.common.entity.RuleScript$RuleScriptWrapper"]},
+    {"name": "getUploads", "parameterTypes": []},
+    {"name": "setUploads", "parameterTypes": ["java.util.List"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.IdentityProvider$Saml2Config",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "getSpMetadataUrl", "parameterTypes": []},
+    {"name": "setSpMetadataUrl", "parameterTypes": ["java.lang.String"]}
   ]
 },
 {
@@ -1275,7 +907,7 @@
   ]
 },
 {
-  "name": "com.wl4g.rengine.common.entity.WorkflowGraph$LogicalNode",
+  "name": "com.wl4g.rengine.common.entity.Scenes",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
@@ -1284,13 +916,371 @@
   "methods": [
     {"name": "<init>", "parameterTypes": []},
     {"name": "toString", "parameterTypes": []},
-    {"name": "withLogical", "parameterTypes": ["com.wl4g.rengine.common.entity.WorkflowGraph$LogicalType"]},
-    {"name": "setLogical", "parameterTypes": ["com.wl4g.rengine.common.entity.WorkflowGraph$LogicalType"]},
-    {"name": "getLogical", "parameterTypes": []}
+    {"name": "getName", "parameterTypes": []},
+    {"name": "setName", "parameterTypes": ["java.lang.String"]},
+    {"name": "getScenesCode", "parameterTypes": []},
+    {"name": "setScenesCode", "parameterTypes": ["java.lang.String"]}
   ]
 },
 {
-  "name": "com.wl4g.rengine.common.entity.Notification$AliyunVmsConfig",
+  "name": "com.wl4g.rengine.common.entity.WorkflowGraph",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": ["java.lang.Long","java.util.List","java.util.List"]},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "getAttributes", "parameterTypes": []},
+    {"name": "setAttributes", "parameterTypes": ["java.util.Map"]},
+    {"name": "getRevision", "parameterTypes": []},
+    {"name": "setRevision", "parameterTypes": ["java.lang.Long"]},
+    {"name": "validateForBasic", "parameterTypes": []},
+    {"name": "getNodes", "parameterTypes": []},
+    {"name": "getConnections", "parameterTypes": []},
+    {"name": "getWorkflowId", "parameterTypes": []},
+    {"name": "setWorkflowId", "parameterTypes": ["java.lang.Long"]},
+    {"name": "setNodes", "parameterTypes": ["java.util.List"]},
+    {"name": "setConnections", "parameterTypes": ["java.util.List"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.User$AddressStandardClaim",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "getCountry", "parameterTypes": []},
+    {"name": "getRegion", "parameterTypes": []},
+    {"name": "getFormatted", "parameterTypes": []},
+    {"name": "getStreetAddress", "parameterTypes": []},
+    {"name": "getLocality", "parameterTypes": []},
+    {"name": "getPostalCode", "parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.ControllerSchedule",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "setTimeZone", "parameterTypes": ["java.lang.String"]},
+    {"name": "getTimeZone", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "getName", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": []},
+    {"name": "getProperties", "parameterTypes": []},
+    {"name": "setProperties", "parameterTypes": ["com.wl4g.rengine.common.entity.ControllerSchedule$ScheduleDetailBase"]},
+    {"name": "setName", "parameterTypes": ["java.lang.String"]},
+    {"name": "getMonitorExecution", "parameterTypes": []},
+    {"name": "getFailover", "parameterTypes": []},
+    {"name": "getMisfire", "parameterTypes": []},
+    {"name": "getMaxTimeDiffSeconds", "parameterTypes": []},
+    {"name": "getReconcileIntervalMinutes", "parameterTypes": []},
+    {"name": "getMaxTimeoutMs", "parameterTypes": []},
+    {"name": "getRunState", "parameterTypes": []},
+    {"name": "setMonitorExecution", "parameterTypes": ["java.lang.Boolean"]},
+    {"name": "setFailover", "parameterTypes": ["java.lang.Boolean"]},
+    {"name": "setMisfire", "parameterTypes": ["java.lang.Boolean"]},
+    {"name": "setMaxTimeDiffSeconds", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setReconcileIntervalMinutes", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setMaxTimeoutMs", "parameterTypes": ["java.lang.Long"]},
+    {"name": "setRunState", "parameterTypes": ["com.wl4g.rengine.common.entity.ControllerSchedule$RunState"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.DataSourceProperties$JDBCDataSourceProperties",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "setMaximumPoolSize", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "getMaximumPoolSize", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": []},
+    {"name": "getDriverClassName", "parameterTypes": []},
+    {"name": "getJdbcUrl", "parameterTypes": []},
+    {"name": "getUsername", "parameterTypes": []},
+    {"name": "getPassword", "parameterTypes": []},
+    {"name": "getFetchDirection", "parameterTypes": []},
+    {"name": "getFetchSize", "parameterTypes": []},
+    {"name": "getMaxFieldSize", "parameterTypes": []},
+    {"name": "getMaxRows", "parameterTypes": []},
+    {"name": "getQueryTimeoutMs", "parameterTypes": []},
+    {"name": "getConnectionTimeout", "parameterTypes": []},
+    {"name": "getValidationTimeout", "parameterTypes": []},
+    {"name": "getValidationTestSql", "parameterTypes": []},
+    {"name": "getIdleTimeout", "parameterTypes": []},
+    {"name": "getSoftMinIdleTimeout", "parameterTypes": []},
+    {"name": "getMaxConnLifeTime", "parameterTypes": []},
+    {"name": "getEvictionRunsBetweenTime", "parameterTypes": []},
+    {"name": "getInitPoolSize", "parameterTypes": []},
+    {"name": "getMinimumIdle", "parameterTypes": []},
+    {"name": "getAutoCommit", "parameterTypes": []},
+    {"name": "getCacheState", "parameterTypes": []},
+    {"name": "getTestOnBorrow", "parameterTypes": []},
+    {"name": "getTestOnCreate", "parameterTypes": []},
+    {"name": "getTestOnReturn", "parameterTypes": []},
+    {"name": "getTestWhileIdle", "parameterTypes": []},
+    {"name": "setFetchDirection", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setFetchSize", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setMaxFieldSize", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setMaxRows", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setQueryTimeoutMs", "parameterTypes": ["java.lang.Long"]},
+    {"name": "setDriverClassName", "parameterTypes": ["java.lang.String"]},
+    {"name": "setJdbcUrl", "parameterTypes": ["java.lang.String"]},
+    {"name": "setUsername", "parameterTypes": ["java.lang.String"]},
+    {"name": "setPassword", "parameterTypes": ["java.lang.String"]},
+    {"name": "setConnectionTimeout", "parameterTypes": ["java.lang.Long"]},
+    {"name": "setValidationTimeout", "parameterTypes": ["java.lang.Long"]},
+    {"name": "setValidationTestSql", "parameterTypes": ["java.lang.String"]},
+    {"name": "setIdleTimeout", "parameterTypes": ["java.lang.Long"]},
+    {"name": "setSoftMinIdleTimeout", "parameterTypes": ["java.lang.Long"]},
+    {"name": "setMaxConnLifeTime", "parameterTypes": ["java.lang.Long"]},
+    {"name": "setEvictionRunsBetweenTime", "parameterTypes": ["java.lang.Long"]},
+    {"name": "setInitPoolSize", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setMinimumIdle", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setAutoCommit", "parameterTypes": ["java.lang.Boolean"]},
+    {"name": "setCacheState", "parameterTypes": ["java.lang.Boolean"]},
+    {"name": "setTestOnBorrow", "parameterTypes": ["java.lang.Boolean"]},
+    {"name": "setTestOnCreate", "parameterTypes": ["java.lang.Boolean"]},
+    {"name": "setTestOnReturn", "parameterTypes": ["java.lang.Boolean"]},
+    {"name": "setTestWhileIdle", "parameterTypes": ["java.lang.Boolean"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.IdentityProvider$OidcConfig$AuthorizationGrantType",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "values", "parameterTypes": []},
+    {"name": "valueOf", "parameterTypes": ["java.lang.String"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.WorkflowGraph$BootNode",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.ControllerSchedule$KafkaExecutionScheduleConfig$KafkaConsumerOptions",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": []},
+    {"name": "getKeySerializer", "parameterTypes": []},
+    {"name": "getValueSerializer", "parameterTypes": []},
+    {"name": "getBootstrapServers", "parameterTypes": []},
+    {"name": "getClientDnsLookup", "parameterTypes": []},
+    {"name": "getMetadataMaxAgeMs", "parameterTypes": []},
+    {"name": "getSendBufferBytes", "parameterTypes": []},
+    {"name": "getReceiveBufferBytes", "parameterTypes": []},
+    {"name": "getClientId", "parameterTypes": []},
+    {"name": "getClientRack", "parameterTypes": []},
+    {"name": "getReconnectBackoffMs", "parameterTypes": []},
+    {"name": "getReconnectBackoffMaxMs", "parameterTypes": []},
+    {"name": "getRetries", "parameterTypes": []},
+    {"name": "getRetryBackoffMs", "parameterTypes": []},
+    {"name": "getMetricsSampleWindowMs", "parameterTypes": []},
+    {"name": "getMetricsNumSamples", "parameterTypes": []},
+    {"name": "getMetricsRecordingLevel", "parameterTypes": []},
+    {"name": "getMetricsReporters", "parameterTypes": []},
+    {"name": "getSecurityProtocol", "parameterTypes": []},
+    {"name": "getSocketConnectionSetupTimeoutMs", "parameterTypes": []},
+    {"name": "getSocketConnectionSetupTimeoutMaxMs", "parameterTypes": []},
+    {"name": "getConnectionsMaxIdleMs", "parameterTypes": []},
+    {"name": "getRequestTimeoutMs", "parameterTypes": []},
+    {"name": "getGroupId", "parameterTypes": []},
+    {"name": "getGroupInstanceId", "parameterTypes": []},
+    {"name": "getMaxPollIntervalMs", "parameterTypes": []},
+    {"name": "getRebalanceTimeoutMs", "parameterTypes": []},
+    {"name": "getSessionTimeoutMs", "parameterTypes": []},
+    {"name": "getHeartbeatIntervalMs", "parameterTypes": []},
+    {"name": "getDefaultApiTimeoutMs", "parameterTypes": []},
+    {"name": "setKeySerializer", "parameterTypes": ["java.lang.String"]},
+    {"name": "setValueSerializer", "parameterTypes": ["java.lang.String"]},
+    {"name": "setBootstrapServers", "parameterTypes": ["java.lang.String"]},
+    {"name": "setClientDnsLookup", "parameterTypes": ["java.lang.String"]},
+    {"name": "setMetadataMaxAgeMs", "parameterTypes": ["java.lang.Long"]},
+    {"name": "setSendBufferBytes", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setReceiveBufferBytes", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setClientId", "parameterTypes": ["java.lang.String"]},
+    {"name": "setClientRack", "parameterTypes": ["java.lang.String"]},
+    {"name": "setReconnectBackoffMs", "parameterTypes": ["java.lang.Long"]},
+    {"name": "setReconnectBackoffMaxMs", "parameterTypes": ["java.lang.Long"]},
+    {"name": "setRetries", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setRetryBackoffMs", "parameterTypes": ["java.lang.Long"]},
+    {"name": "setMetricsSampleWindowMs", "parameterTypes": ["java.lang.Long"]},
+    {"name": "setMetricsNumSamples", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setMetricsRecordingLevel", "parameterTypes": ["java.lang.String"]},
+    {"name": "setMetricsReporters", "parameterTypes": ["java.util.List"]},
+    {"name": "setSecurityProtocol", "parameterTypes": ["java.lang.String"]},
+    {"name": "setSocketConnectionSetupTimeoutMs", "parameterTypes": ["java.lang.Long"]},
+    {"name": "setSocketConnectionSetupTimeoutMaxMs", "parameterTypes": ["java.lang.Long"]},
+    {"name": "setConnectionsMaxIdleMs", "parameterTypes": ["java.lang.Long"]},
+    {"name": "setRequestTimeoutMs", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setGroupId", "parameterTypes": ["java.lang.String"]},
+    {"name": "setGroupInstanceId", "parameterTypes": ["java.lang.String"]},
+    {"name": "setMaxPollIntervalMs", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setRebalanceTimeoutMs", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setSessionTimeoutMs", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setHeartbeatIntervalMs", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setDefaultApiTimeoutMs", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "toConsumerConfigProperties", "parameterTypes": []},
+    {"name": "getEnableAutoCommit", "parameterTypes": []},
+    {"name": "getAutoCommitIntervalMs", "parameterTypes": []},
+    {"name": "getAutoOffsetReset", "parameterTypes": []},
+    {"name": "getFetchMinBytes", "parameterTypes": []},
+    {"name": "getFetchMaxBytes", "parameterTypes": []},
+    {"name": "getFetchMaxWaitMs", "parameterTypes": []},
+    {"name": "setEnableAutoCommit", "parameterTypes": ["java.lang.Boolean"]},
+    {"name": "setAutoCommitIntervalMs", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setAutoOffsetReset", "parameterTypes": ["java.lang.String"]},
+    {"name": "setFetchMinBytes", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setFetchMaxBytes", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setFetchMaxWaitMs", "parameterTypes": ["java.lang.Integer"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.User$OAuth2Token",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "getTokenValue", "parameterTypes": []},
+    {"name": "getIssuedAt", "parameterTypes": []},
+    {"name": "getExpiresAt", "parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.Notification",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "getOrgCode", "parameterTypes": []},
+    {"name": "setOrgCode", "parameterTypes": ["java.lang.String"]},
+    {"name": "getDetails", "parameterTypes": []},
+    {"name": "setDetails", "parameterTypes": ["com.wl4g.rengine.common.entity.sys.Notification$NotifierDetailsBase"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.WorkflowGraph$NodeType",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "values", "parameterTypes": []},
+    {"name": "valueOf", "parameterTypes": ["java.lang.String"]},
+    {"name": "of", "parameterTypes": ["java.lang.String"]},
+    {"name": "getClazz", "parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.IdentityProvider$ProviderDetailsBase",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "getType", "parameterTypes": []},
+    {"name": "setType", "parameterTypes": ["java.lang.String"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.IdentityProvider$OidcConfig$ClientAuthenticationMethod",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "values", "parameterTypes": []},
+    {"name": "valueOf", "parameterTypes": ["java.lang.String"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.User$StandardClaimAccessor",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "getFullName", "parameterTypes": []},
+    {"name": "getAddress", "parameterTypes": []},
+    {"name": "getSubject", "parameterTypes": []},
+    {"name": "getGivenName", "parameterTypes": []},
+    {"name": "getFamilyName", "parameterTypes": []},
+    {"name": "getMiddleName", "parameterTypes": []},
+    {"name": "getNickName", "parameterTypes": []},
+    {"name": "getPreferredUsername", "parameterTypes": []},
+    {"name": "getProfile", "parameterTypes": []},
+    {"name": "getPicture", "parameterTypes": []},
+    {"name": "getWebsite", "parameterTypes": []},
+    {"name": "getEmail", "parameterTypes": []},
+    {"name": "getEmailVerified", "parameterTypes": []},
+    {"name": "getGender", "parameterTypes": []},
+    {"name": "getBirthdate", "parameterTypes": []},
+    {"name": "getZoneInfo", "parameterTypes": []},
+    {"name": "getLocale", "parameterTypes": []},
+    {"name": "getPhoneNumber", "parameterTypes": []},
+    {"name": "getPhoneNumberVerified", "parameterTypes": []},
+    {"name": "getUpdatedAt", "parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.User$AbstractOAuth2Token",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "equals", "parameterTypes": ["java.lang.Object"]},
+    {"name": "hashCode", "parameterTypes": []},
+    {"name": "getTokenValue", "parameterTypes": []},
+    {"name": "getIssuedAt", "parameterTypes": []},
+    {"name": "getExpiresAt", "parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.Notification$AliyunSmsConfig",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
@@ -1305,8 +1295,190 @@
     {"name": "setAccessKey", "parameterTypes": ["java.lang.String"]},
     {"name": "setAccessSecret", "parameterTypes": ["java.lang.String"]},
     {"name": "setRegionId", "parameterTypes": ["java.lang.String"]},
-    {"name": "getCalledShowNumber", "parameterTypes": []},
-    {"name": "setCalledShowNumber", "parameterTypes": ["java.lang.String"]}
+    {"name": "getSignName", "parameterTypes": []},
+    {"name": "setSignName", "parameterTypes": ["java.lang.String"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.IdentityProvider$OidcConfig",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": []},
+    {"name": "getClientId", "parameterTypes": []},
+    {"name": "setClientId", "parameterTypes": ["java.lang.String"]},
+    {"name": "getClientAuthenticationMethod", "parameterTypes": []},
+    {"name": "getAuthorizationUri", "parameterTypes": []},
+    {"name": "getTokenUri", "parameterTypes": []},
+    {"name": "getRegistrationId", "parameterTypes": []},
+    {"name": "getClientSecret", "parameterTypes": []},
+    {"name": "getAuthorizationGrantType", "parameterTypes": []},
+    {"name": "getRedirectUri", "parameterTypes": []},
+    {"name": "getScopes", "parameterTypes": []},
+    {"name": "getUserInfoEndpoint", "parameterTypes": []},
+    {"name": "getJwkSetUri", "parameterTypes": []},
+    {"name": "getIssuerUri", "parameterTypes": []},
+    {"name": "getConfigurationMetadata", "parameterTypes": []},
+    {"name": "setRegistrationId", "parameterTypes": ["java.lang.String"]},
+    {"name": "setClientSecret", "parameterTypes": ["java.lang.String"]},
+    {"name": "setAuthorizationGrantType", "parameterTypes": ["com.wl4g.rengine.common.entity.sys.IdentityProvider$OidcConfig$AuthorizationGrantType"]},
+    {"name": "setRedirectUri", "parameterTypes": ["java.lang.String"]},
+    {"name": "setScopes", "parameterTypes": ["java.util.Set"]},
+    {"name": "setAuthorizationUri", "parameterTypes": ["java.lang.String"]},
+    {"name": "setTokenUri", "parameterTypes": ["java.lang.String"]},
+    {"name": "setUserInfoEndpoint", "parameterTypes": ["com.wl4g.rengine.common.entity.sys.IdentityProvider$OidcConfig$UserInfoEndpoint"]},
+    {"name": "setJwkSetUri", "parameterTypes": ["java.lang.String"]},
+    {"name": "setIssuerUri", "parameterTypes": ["java.lang.String"]},
+    {"name": "setConfigurationMetadata", "parameterTypes": ["java.util.Map"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.User$DefaultAddressStandardClaim",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "<init>", "parameterTypes": ["java.util.Map"]},
+    {"name": "equals", "parameterTypes": ["java.lang.Object"]},
+    {"name": "hashCode", "parameterTypes": []},
+    {"name": "getCountry", "parameterTypes": []},
+    {"name": "getRegion", "parameterTypes": []},
+    {"name": "setRegion", "parameterTypes": ["java.lang.String"]},
+    {"name": "getFormatted", "parameterTypes": []},
+    {"name": "getStreetAddress", "parameterTypes": []},
+    {"name": "getLocality", "parameterTypes": []},
+    {"name": "getPostalCode", "parameterTypes": []},
+    {"name": "setFormatted", "parameterTypes": ["java.lang.String"]},
+    {"name": "setStreetAddress", "parameterTypes": ["java.lang.String"]},
+    {"name": "setLocality", "parameterTypes": ["java.lang.String"]},
+    {"name": "setPostalCode", "parameterTypes": ["java.lang.String"]},
+    {"name": "setCountry", "parameterTypes": ["java.lang.String"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.Scenes$ScenesWrapper",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": ["com.wl4g.rengine.common.entity.Scenes$ScenesWrapper"]},
+    {"name": "validate", "parameterTypes": []},
+    {"name": "getWorkflows", "parameterTypes": []},
+    {"name": "getEffectivePriorityWorkflow", "parameterTypes": []},
+    {"name": "setWorkflows", "parameterTypes": ["java.util.List"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.ControllerLog",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": []},
+    {"name": "getScheduleId", "parameterTypes": []},
+    {"name": "getJobName", "parameterTypes": []},
+    {"name": "getStartupTime", "parameterTypes": []},
+    {"name": "getFinishedTime", "parameterTypes": []},
+    {"name": "getSuccess", "parameterTypes": []},
+    {"name": "getDetail", "parameterTypes": []},
+    {"name": "setScheduleId", "parameterTypes": ["java.lang.Long"]},
+    {"name": "setJobName", "parameterTypes": ["java.lang.String"]},
+    {"name": "setStartupTime", "parameterTypes": ["java.util.Date"]},
+    {"name": "setFinishedTime", "parameterTypes": ["java.util.Date"]},
+    {"name": "setSuccess", "parameterTypes": ["java.lang.Boolean"]},
+    {"name": "setDetail", "parameterTypes": ["com.wl4g.rengine.common.entity.ControllerLog$LogDetailBase"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.User$OidcUserInfo",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": ["java.util.Map"]},
+    {"name": "equals", "parameterTypes": ["java.lang.Object"]},
+    {"name": "hashCode", "parameterTypes": []},
+    {"name": "getClaims", "parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.Notification$DingtalkConfig$DingtalkScenesGroupInfo",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "<init>", "parameterTypes": ["java.lang.String","java.lang.String","java.lang.String","java.util.List","java.lang.String","java.lang.String","java.util.List","java.util.List","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String","java.lang.String"]},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": []},
+    {"name": "getOwnerUserId", "parameterTypes": []},
+    {"name": "getUserIds", "parameterTypes": []},
+    {"name": "getAdminUserIds", "parameterTypes": []},
+    {"name": "getUuid", "parameterTypes": []},
+    {"name": "getIcon", "parameterTypes": []},
+    {"name": "getMentionAllAuthority", "parameterTypes": []},
+    {"name": "getShowHistoryType", "parameterTypes": []},
+    {"name": "getValidationType", "parameterTypes": []},
+    {"name": "getSearchable", "parameterTypes": []},
+    {"name": "getChatVannedType", "parameterTypes": []},
+    {"name": "getManagementType", "parameterTypes": []},
+    {"name": "getOnlyAdminCanDing", "parameterTypes": []},
+    {"name": "getAllMembersCanCreateMcsConf", "parameterTypes": []},
+    {"name": "getAllMembersCanCreateCalendar", "parameterTypes": []},
+    {"name": "getGroupEmailDisabled", "parameterTypes": []},
+    {"name": "getOnlyAdminCanSetMsgTop", "parameterTypes": []},
+    {"name": "getAddFriendForbidden", "parameterTypes": []},
+    {"name": "getGroupLiveSwitch", "parameterTypes": []},
+    {"name": "getMembersToAdminChat", "parameterTypes": []},
+    {"name": "setTitle", "parameterTypes": ["java.lang.String"]},
+    {"name": "setTemplateId", "parameterTypes": ["java.lang.String"]},
+    {"name": "setChatId", "parameterTypes": ["java.lang.String"]},
+    {"name": "setRobotCodes", "parameterTypes": ["java.util.List"]},
+    {"name": "setOpenConversationId", "parameterTypes": ["java.lang.String"]},
+    {"name": "setOwnerUserId", "parameterTypes": ["java.lang.String"]},
+    {"name": "setUserIds", "parameterTypes": ["java.util.List"]},
+    {"name": "setAdminUserIds", "parameterTypes": ["java.util.List"]},
+    {"name": "setUuid", "parameterTypes": ["java.lang.String"]},
+    {"name": "setIcon", "parameterTypes": ["java.lang.String"]},
+    {"name": "setMentionAllAuthority", "parameterTypes": ["java.lang.String"]},
+    {"name": "setShowHistoryType", "parameterTypes": ["java.lang.String"]},
+    {"name": "setValidationType", "parameterTypes": ["java.lang.String"]},
+    {"name": "setSearchable", "parameterTypes": ["java.lang.String"]},
+    {"name": "setChatVannedType", "parameterTypes": ["java.lang.String"]},
+    {"name": "setManagementType", "parameterTypes": ["java.lang.String"]},
+    {"name": "setOnlyAdminCanDing", "parameterTypes": ["java.lang.String"]},
+    {"name": "setAllMembersCanCreateMcsConf", "parameterTypes": ["java.lang.String"]},
+    {"name": "setAllMembersCanCreateCalendar", "parameterTypes": ["java.lang.String"]},
+    {"name": "setGroupEmailDisabled", "parameterTypes": ["java.lang.String"]},
+    {"name": "setOnlyAdminCanSetMsgTop", "parameterTypes": ["java.lang.String"]},
+    {"name": "setAddFriendForbidden", "parameterTypes": ["java.lang.String"]},
+    {"name": "setGroupLiveSwitch", "parameterTypes": ["java.lang.String"]},
+    {"name": "setMembersToAdminChat", "parameterTypes": ["java.lang.String"]},
+    {"name": "getTitle", "parameterTypes": []},
+    {"name": "getTemplateId", "parameterTypes": []},
+    {"name": "getChatId", "parameterTypes": []},
+    {"name": "getRobotCodes", "parameterTypes": []},
+    {"name": "getOpenConversationId", "parameterTypes": []}
   ]
 },
 {
@@ -1326,7 +1498,24 @@
   ]
 },
 {
-  "name": "com.wl4g.rengine.common.model.WorkflowExecuteRequest",
+  "name": "com.wl4g.rengine.common.entity.sys.User$OAuth2UserAuthority",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": ["java.util.Map"]},
+    {"name": "<init>", "parameterTypes": ["java.lang.String","java.util.Map"]},
+    {"name": "equals", "parameterTypes": ["java.lang.Object"]},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "hashCode", "parameterTypes": []},
+    {"name": "getAuthority", "parameterTypes": []},
+    {"name": "getAttributes", "parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.DataSourceProperties$MongoDataSourceProperties",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
@@ -1336,12 +1525,12 @@
     {"name": "<init>", "parameterTypes": []},
     {"name": "toString", "parameterTypes": []},
     {"name": "validate", "parameterTypes": []},
-    {"name": "getScenesCodes", "parameterTypes": []},
-    {"name": "setScenesCodes", "parameterTypes": ["java.util.List"]}
+    {"name": "getConnectionString", "parameterTypes": []},
+    {"name": "setConnectionString", "parameterTypes": ["java.lang.String"]}
   ]
 },
 {
-  "name": "com.wl4g.rengine.common.model.WorkflowExecuteResult",
+  "name": "com.wl4g.rengine.common.entity.sys.Notification$NotifierDetailsBase",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
@@ -1350,12 +1539,249 @@
   "methods": [
     {"name": "<init>", "parameterTypes": []},
     {"name": "toString", "parameterTypes": []},
-    {"name": "getDescription", "parameterTypes": []},
-    {"name": "setDescription", "parameterTypes": ["java.lang.String"]},
-    {"name": "errorCount", "parameterTypes": []},
-    {"name": "firstValueMap", "parameterTypes": []},
-    {"name": "getResults", "parameterTypes": []},
-    {"name": "setResults", "parameterTypes": ["java.util.List"]}
+    {"name": "getType", "parameterTypes": []},
+    {"name": "setType", "parameterTypes": ["java.lang.String"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.User$OidcUserAuthority",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": ["java.lang.String","com.wl4g.rengine.common.entity.sys.User$OidcIdToken","com.wl4g.rengine.common.entity.sys.User$OidcUserInfo"]},
+    {"name": "<init>", "parameterTypes": ["com.wl4g.rengine.common.entity.sys.User$OidcIdToken","com.wl4g.rengine.common.entity.sys.User$OidcUserInfo"]},
+    {"name": "<init>", "parameterTypes": ["com.wl4g.rengine.common.entity.sys.User$OidcIdToken"]},
+    {"name": "equals", "parameterTypes": ["java.lang.Object"]},
+    {"name": "hashCode", "parameterTypes": []},
+    {"name": "getUserInfo", "parameterTypes": []},
+    {"name": "getIdToken", "parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.Notification$DingtalkConfig$DingtalkUserInfo",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "<init>", "parameterTypes": ["java.lang.String","java.lang.String"]},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": ["boolean"]},
+    {"name": "getMobile", "parameterTypes": []},
+    {"name": "getUserId", "parameterTypes": []},
+    {"name": "setMobile", "parameterTypes": ["java.lang.String"]},
+    {"name": "setUserId", "parameterTypes": ["java.lang.String"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.WorkflowGraph$BaseNode$1",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": []
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.Dict$DictType",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "values", "parameterTypes": []},
+    {"name": "valueOf", "parameterTypes": ["java.lang.String"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.BaseEntity",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.DataSourceProperties$DataSourcePropertiesBase",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": []},
+    {"name": "getType", "parameterTypes": []},
+    {"name": "setType", "parameterTypes": ["com.wl4g.rengine.common.entity.DataSourceProperties$DataSourceType"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.User$StandardClaimNames",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": []
+},
+{
+  "name": "com.wl4g.rengine.common.entity.Workflow",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "getName", "parameterTypes": []},
+    {"name": "setName", "parameterTypes": ["java.lang.String"]},
+    {"name": "getEngine", "parameterTypes": []},
+    {"name": "setEngine", "parameterTypes": ["com.wl4g.rengine.common.entity.Rule$RuleEngine"]},
+    {"name": "setScenesId", "parameterTypes": ["java.lang.Long"]},
+    {"name": "getScenesId", "parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.DataSourceProperties$RedisDataSourceProperties$JedisPoolConfig",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": []},
+    {"name": "getTestOnBorrow", "parameterTypes": []},
+    {"name": "getTestOnCreate", "parameterTypes": []},
+    {"name": "getTestOnReturn", "parameterTypes": []},
+    {"name": "getTestWhileIdle", "parameterTypes": []},
+    {"name": "setTestOnBorrow", "parameterTypes": ["java.lang.Boolean"]},
+    {"name": "setTestOnCreate", "parameterTypes": ["java.lang.Boolean"]},
+    {"name": "setTestOnReturn", "parameterTypes": ["java.lang.Boolean"]},
+    {"name": "setTestWhileIdle", "parameterTypes": ["java.lang.Boolean"]},
+    {"name": "getMaxTotal", "parameterTypes": []},
+    {"name": "getMaxIdle", "parameterTypes": []},
+    {"name": "getMinIdle", "parameterTypes": []},
+    {"name": "getLifo", "parameterTypes": []},
+    {"name": "getFairness", "parameterTypes": []},
+    {"name": "getMaxWait", "parameterTypes": []},
+    {"name": "getMinEvictableIdleMs", "parameterTypes": []},
+    {"name": "getEvictorShutdownTimeoutMs", "parameterTypes": []},
+    {"name": "getSoftMinEvictableIdleMs", "parameterTypes": []},
+    {"name": "getNumTestsPerEvictionRun", "parameterTypes": []},
+    {"name": "getDurationBetweenEvictionRunsMs", "parameterTypes": []},
+    {"name": "getBlockWhenExhausted", "parameterTypes": []},
+    {"name": "setMaxTotal", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setMaxIdle", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setMinIdle", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setLifo", "parameterTypes": ["java.lang.Boolean"]},
+    {"name": "setFairness", "parameterTypes": ["java.lang.Boolean"]},
+    {"name": "setMaxWait", "parameterTypes": ["java.lang.Long"]},
+    {"name": "setMinEvictableIdleMs", "parameterTypes": ["java.lang.Long"]},
+    {"name": "setEvictorShutdownTimeoutMs", "parameterTypes": ["java.lang.Long"]},
+    {"name": "setSoftMinEvictableIdleMs", "parameterTypes": ["java.lang.Long"]},
+    {"name": "setNumTestsPerEvictionRun", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "setDurationBetweenEvictionRunsMs", "parameterTypes": ["java.lang.Long"]},
+    {"name": "setBlockWhenExhausted", "parameterTypes": ["java.lang.Boolean"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.WorkflowGraph$RunNode",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": []},
+    {"name": "withRuleId", "parameterTypes": ["java.lang.Long"]},
+    {"name": "setRuleId", "parameterTypes": ["java.lang.Long"]},
+    {"name": "getRuleId", "parameterTypes": []}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.Dict",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "getSort", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "getValue", "parameterTypes": []},
+    {"name": "getKey", "parameterTypes": []},
+    {"name": "setValue", "parameterTypes": ["java.lang.String"]},
+    {"name": "getType", "parameterTypes": []},
+    {"name": "setType", "parameterTypes": ["com.wl4g.rengine.common.entity.sys.Dict$DictType"]},
+    {"name": "getOrgCode", "parameterTypes": []},
+    {"name": "setOrgCode", "parameterTypes": ["java.lang.String"]},
+    {"name": "setSort", "parameterTypes": ["java.lang.Integer"]},
+    {"name": "buildCacheHashKey", "parameterTypes": ["java.lang.String","java.lang.String"]},
+    {"name": "setKey", "parameterTypes": ["java.lang.String"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.UploadObject",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "setOwner", "parameterTypes": ["java.lang.String"]},
+    {"name": "setSize", "parameterTypes": ["java.lang.Long"]},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "getSize", "parameterTypes": []},
+    {"name": "getOwner", "parameterTypes": []},
+    {"name": "getExtension", "parameterTypes": []},
+    {"name": "setExtension", "parameterTypes": ["java.lang.String"]},
+    {"name": "getUploadType", "parameterTypes": []},
+    {"name": "getObjectPrefix", "parameterTypes": []},
+    {"name": "getFilename", "parameterTypes": []},
+    {"name": "getGroup", "parameterTypes": []},
+    {"name": "getAccessMode", "parameterTypes": []},
+    {"name": "getMd5", "parameterTypes": []},
+    {"name": "getSha1", "parameterTypes": []},
+    {"name": "setUploadType", "parameterTypes": ["java.lang.String"]},
+    {"name": "setObjectPrefix", "parameterTypes": ["java.lang.String"]},
+    {"name": "setFilename", "parameterTypes": ["java.lang.String"]},
+    {"name": "setGroup", "parameterTypes": ["java.lang.String"]},
+    {"name": "setAccessMode", "parameterTypes": ["java.lang.String"]},
+    {"name": "setMd5", "parameterTypes": ["java.lang.String"]},
+    {"name": "setSha1", "parameterTypes": ["java.lang.String"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.entity.sys.User$SimpleGrantedAuthority",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": ["java.lang.String"]},
+    {"name": "equals", "parameterTypes": ["java.lang.Object"]},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "hashCode", "parameterTypes": []},
+    {"name": "getAuthority", "parameterTypes": []}
   ]
 },
 {
@@ -1371,40 +1797,6 @@
     {"name": "validate", "parameterTypes": []},
     {"name": "getRequestId", "parameterTypes": []},
     {"name": "setRequestId", "parameterTypes": ["java.lang.String"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.model.RuleScriptExecuteResult",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": []},
-    {"name": "getScenesCode", "parameterTypes": []},
-    {"name": "setScenesCode", "parameterTypes": ["java.lang.String"]}
-  ]
-},
-{
-  "name": "com.wl4g.rengine.common.model.RuleScriptExecuteRequest",
-  "allDeclaredFields": true,
-  "allDeclaredMethods": true,
-  "allDeclaredConstructors": true,
-  "queryAllDeclaredMethods": true,
-  "queryAllDeclaredConstructors": true,
-  "methods": [
-    {"name": "<init>", "parameterTypes": []},
-    {"name": "toString", "parameterTypes": []},
-    {"name": "validate", "parameterTypes": []},
-    {"name": "setBestEffort", "parameterTypes": ["java.lang.Boolean"]},
-    {"name": "setEngine", "parameterTypes": ["com.wl4g.rengine.common.entity.Rule$RuleEngine"]},
-    {"name": "setRuleScriptId", "parameterTypes": ["java.lang.Long"]},
-    {"name": "getBestEffort", "parameterTypes": []},
-    {"name": "getEngine", "parameterTypes": []},
-    {"name": "getRuleScriptId", "parameterTypes": []}
   ]
 },
 {
@@ -1433,7 +1825,7 @@
   ]
 },
 {
-  "name": "com.wl4g.rengine.common.model.WorkflowExecuteResult$ResultDescription",
+  "name": "com.wl4g.rengine.common.model.RuleScriptExecuteResult",
   "allDeclaredFields": true,
   "allDeclaredMethods": true,
   "allDeclaredConstructors": true,
@@ -1443,7 +1835,40 @@
     {"name": "<init>", "parameterTypes": []},
     {"name": "toString", "parameterTypes": []},
     {"name": "validate", "parameterTypes": []},
+    {"name": "getScenesCode", "parameterTypes": []},
+    {"name": "setScenesCode", "parameterTypes": ["java.lang.String"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.model.WorkflowExecuteResult",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "getDescription", "parameterTypes": []},
+    {"name": "setDescription", "parameterTypes": ["java.lang.String"]},
+    {"name": "errorCount", "parameterTypes": []},
+    {"name": "firstValueMap", "parameterTypes": []},
+    {"name": "getResults", "parameterTypes": []},
+    {"name": "setResults", "parameterTypes": ["java.util.List"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.model.WorkflowExecuteResult$ResultDescription",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
     {"name": "getReason", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": []},
     {"name": "getScenesCode", "parameterTypes": []},
     {"name": "getSuccess", "parameterTypes": []},
     {"name": "getValueMap", "parameterTypes": []},
@@ -1451,5 +1876,39 @@
     {"name": "setSuccess", "parameterTypes": ["java.lang.Boolean"]},
     {"name": "setValueMap", "parameterTypes": ["java.util.Map"]},
     {"name": "setReason", "parameterTypes": ["java.lang.String"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.model.WorkflowExecuteRequest",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": []},
+    {"name": "getScenesCodes", "parameterTypes": []},
+    {"name": "setScenesCodes", "parameterTypes": ["java.util.List"]}
+  ]
+},
+{
+  "name": "com.wl4g.rengine.common.model.RuleScriptExecuteRequest",
+  "allDeclaredFields": true,
+  "allDeclaredMethods": true,
+  "allDeclaredConstructors": true,
+  "queryAllDeclaredMethods": true,
+  "queryAllDeclaredConstructors": true,
+  "methods": [
+    {"name": "<init>", "parameterTypes": []},
+    {"name": "toString", "parameterTypes": []},
+    {"name": "validate", "parameterTypes": []},
+    {"name": "getRuleScriptId", "parameterTypes": []},
+    {"name": "setEngine", "parameterTypes": ["com.wl4g.rengine.common.entity.Rule$RuleEngine"]},
+    {"name": "setRuleScriptId", "parameterTypes": ["java.lang.Long"]},
+    {"name": "getEngine", "parameterTypes": []},
+    {"name": "getBestEffort", "parameterTypes": []},
+    {"name": "setBestEffort", "parameterTypes": ["java.lang.Boolean"]}
   ]
 }]

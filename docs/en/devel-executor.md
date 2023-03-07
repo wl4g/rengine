@@ -195,7 +195,7 @@ curl -v -XPOST -H 'Content-Type: application/json' 'http://localhost:28002/hello
 - Tail logs
 
 ```bash
-tail -f /tmp/rengine/executor.log | jq -r '.message'
+tail -f /var/log/executor/executor.log | jq -r '.message'
 ```
 
 ### Mock testing dynamic `js` script execution?
@@ -226,7 +226,7 @@ curl -v -XPOST -H 'Content-Type: application/json' 'http://localhost:28002/hello
 - Tail logs
 
 ```bash
-tail -f /tmp/rengine/executor.log | jq -r '.message'
+tail -f /var/log/executor/executor.log | jq -r '.message'
 ```
 
 ### Use the Groovy execution engine support native executable mode ?

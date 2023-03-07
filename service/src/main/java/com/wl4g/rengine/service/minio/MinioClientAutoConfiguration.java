@@ -67,16 +67,16 @@ public class MinioClientAutoConfiguration {
 
     // @Bean
     // public MinioAdminClient minioAdminClient(
-    // MinioClientProperties properties,
+    // MinioClientProperties details,
     // @Qualifier(BEAN_MINIO_OKHTTPCLIENT) OkHttpClient httpClient) {
     // MinioAdminClient.Builder builder = MinioAdminClient.builder()
-    // .endpoint(properties.getEndpoint())
+    // .endpoint(details.getEndpoint())
     // //.credentialsProvider(provider)
-    // .credentials(properties.getTenantAccessKey(),
-    // properties.getTenantSecretKey())
+    // .credentials(details.getTenantAccessKey(),
+    // details.getTenantSecretKey())
     // .httpClient(httpClient);
-    // if (isBlank(properties.getRegion())) {
-    // builder.region(properties.getRegion());
+    // if (isBlank(details.getRegion())) {
+    // builder.region(details.getRegion());
     // }
     // return builder.build();
     // }

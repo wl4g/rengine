@@ -48,7 +48,6 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.rengine.common.exception.ConfigRengineException;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -72,14 +71,14 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class DataSourceProperties extends BaseBean {
+public class DataSourceProperties extends BaseEntity {
     static final long serialVersionUID = -7441054887057231030L;
 
     @NotBlank
     String name;
 
     @NotNull
-    DataSourcePropertiesBase properties;
+    DataSourcePropertiesBase details;
 
     // Notice: It is recommended to disable the toString method, otherwise
     // swagger will generate the name of the example long enumeration type by
@@ -301,7 +300,7 @@ public class DataSourceProperties extends BaseBean {
             notEmptyOf(getNodes(), "nodes");
             if (isEmpty(getNodes())) {
                 throw new ConfigRengineException(format(
-                        "The number of redis single or cluster connection nodes must be >=1, but actual properties nodes : %s",
+                        "The number of redis single or cluster connection nodes must be >=1, but actual details nodes : %s",
                         getNodes()));
             }
             // hasTextOf(getUsername(), "username");
@@ -309,7 +308,7 @@ public class DataSourceProperties extends BaseBean {
             // @formatter:off
             // Check redis nodes size with cluster.
             //if (getNodes().size() < 6) {
-            //    throw new ConfigRengineException(format("The number of redis cluster connection nodes must be >=6, but actual properties nodes : %s", getNodes()));
+            //    throw new ConfigRengineException(format("The number of redis cluster connection nodes must be >=6, but actual details nodes : %s", getNodes()));
             //}
             // @formatter:on
             poolConfig.validate();
@@ -370,9 +369,9 @@ public class DataSourceProperties extends BaseBean {
     }
 
     /**
-     * Here is the properties configuration of kafka producer see
+     * Here is the details configuration of kafka producer see
      * {@link org.apache.kafka.clients.producer.ProducerConfig#CONFIG}, and the
-     * properties configuration of kafka consumer see
+     * details configuration of kafka consumer see
      * {@link com.wl4g.rengine.common.entity.ControllerSchedule.KafkaExecutionScheduleConfig}
      */
     @Getter

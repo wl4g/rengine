@@ -42,7 +42,6 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.infra.common.validation.EnumValue;
 import com.wl4g.rengine.common.model.WorkflowExecuteRequest;
 
@@ -76,7 +75,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class ControllerSchedule extends BaseBean {
+public class ControllerSchedule extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     private @NotBlank String name;
@@ -105,7 +104,7 @@ public class ControllerSchedule extends BaseBean {
     }
 
     @NotNull
-    ScheduleDetailBase<?> properties;
+    ScheduleDetailBase<?> details;
 
     public static enum ScheduleType {
         GENERIC_EXECUTION_CONTROLLER,
@@ -208,9 +207,9 @@ public class ControllerSchedule extends BaseBean {
         }
 
         /**
-         * Here is the properties configuration of kafka consumer see
+         * Here is the details configuration of kafka consumer see
          * {@link org.apache.kafka.clients.consumer.ConsumerConfig#CONFIG}, and
-         * the properties configuration of kafka consumer see
+         * the details configuration of kafka consumer see
          * {@link com.wl4g.rengine.common.entity.DataSourceProperties.KafkaDataSourceProperties}
          */
         @Getter

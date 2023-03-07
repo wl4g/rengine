@@ -121,7 +121,7 @@ public final class ExecutionGraphContext implements Serializable {
         setEndTime(endTime);
 
         // Clean up the local thread cache of the current node and transfer to
-        // normal properties to prevent memory leaks.
+        // normal details to prevent memory leaks.
         this.currentNode = currentNodeLocal.get();
         currentNodeLocal.remove();
 

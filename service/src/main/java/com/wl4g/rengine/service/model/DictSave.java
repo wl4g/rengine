@@ -15,7 +15,7 @@
  */
 package com.wl4g.rengine.service.model;
 
-import com.wl4g.rengine.common.entity.Dict;
+import com.wl4g.rengine.common.entity.sys.Dict;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -34,9 +34,9 @@ import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import com.wl4g.infra.common.remoting.uri.UriComponentsBuilder;
 import com.wl4g.infra.common.web.WebUtils2;
 import com.wl4g.infra.context.utils.web.WebUtils3;
-import com.wl4g.rengine.common.entity.IdentityProvider;
-import com.wl4g.rengine.common.entity.IdentityProvider.OidcConfig;
-import com.wl4g.rengine.common.entity.IdentityProvider.OidcConfig.UserInfoEndpoint;
+import com.wl4g.rengine.common.entity.sys.IdentityProvider;
+import com.wl4g.rengine.common.entity.sys.IdentityProvider.OidcConfig;
+import com.wl4g.rengine.common.entity.sys.IdentityProvider.OidcConfig.UserInfoEndpoint;
 import com.wl4g.rengine.service.IdentityProviderService;
 
 import lombok.Getter;

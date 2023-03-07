@@ -13,7 +13,7 @@
 
 rengine:
   security:
-    ignore-swagger-auth: false ## Default by false
+    ignore-swagger-auth: true ## Default by true
     user:
       secret-cache-prefix: "${spring.application.name:}:login:secret:"
       secret-cache-expire-seconds: 60

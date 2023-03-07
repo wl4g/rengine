@@ -48,7 +48,7 @@ public abstract class AbstractEventBusService<R> implements RengineEventBusServi
     protected final SafeScheduledTaskPoolExecutor compactExecutor;
 
     public AbstractEventBusService(ClientEventBusConfig config, EventRecorder recorder) {
-        this.config = notNullOf(config, "properties");
+        this.config = notNullOf(config, "details");
         this.recorder = notNullOf(recorder, "recorder");
         this.compactExecutor = GenericTaskRunner.newDefaultScheduledExecutor(AbstractEventBusService.class.getSimpleName(), 1, 4);
         // Timing scheduling execution.

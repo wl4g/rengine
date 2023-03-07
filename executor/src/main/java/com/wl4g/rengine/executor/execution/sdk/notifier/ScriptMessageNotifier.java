@@ -39,7 +39,7 @@ import org.graalvm.polyglot.HostAccess;
 import com.wl4g.infra.common.lang.Assert2;
 import com.wl4g.infra.common.notification.MessageNotifier;
 import com.wl4g.infra.common.notification.MessageNotifier.NotifierKind;
-import com.wl4g.rengine.common.entity.Notification;
+import com.wl4g.rengine.common.entity.sys.Notification;
 
 import io.vertx.core.Vertx;
 import lombok.Builder.Default;

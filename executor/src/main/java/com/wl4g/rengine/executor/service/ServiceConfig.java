@@ -34,8 +34,8 @@ import io.smallrye.config.WithDefault;
  * @author James Wong
  * @version 2022-09-18
  * @since v1.0.0
- * @see https://quarkus.io/guides/properties-mappings
- * @see https://quarkus.io/guides/properties-extending-support#custom-properties-source
+ * @see https://quarkus.io/guides/details-mappings
+ * @see https://quarkus.io/guides/details-extending-support#custom-details-source
  * @see {@link com.wl4g.rengine.service.config.RengineServiceProperties.ServiceProperties}
  */
 @StaticInitSafe

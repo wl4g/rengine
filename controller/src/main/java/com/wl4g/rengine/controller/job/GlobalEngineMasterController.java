@@ -157,7 +157,7 @@ public class GlobalEngineMasterController extends AbstractJobExecutor {
 
                                 log.info("Scheduling schedule for {} : {}", jobName, schedule);
                                 final JobBootstrap bootstrap = getGlobalScheduleJobManager().add(mutexLock,
-                                        ScheduleJobType.get(ScheduleType.valueOf(schedule.getProperties().getType())), jobName,
+                                        ScheduleJobType.get(ScheduleType.valueOf(schedule.getDetails().getType())), jobName,
                                         schedule, new JobParameter(schedule.getId()));
 
                                 if (bootstrap instanceof ScheduleJobBootstrap) {

@@ -19,8 +19,8 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import com.wl4g.rengine.common.entity.Dict;
-import com.wl4g.rengine.common.entity.Dict.DictType;
+import com.wl4g.rengine.common.entity.sys.Dict;
+import com.wl4g.rengine.common.entity.sys.Dict.DictType;
 
 import io.smallrye.mutiny.Uni;
 

@@ -19,8 +19,8 @@ import javax.annotation.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wl4g.infra.common.validation.EnumValue;
-import com.wl4g.rengine.common.entity.Dict;
-import com.wl4g.rengine.common.entity.Dict.DictType;
+import com.wl4g.rengine.common.entity.sys.Dict;
+import com.wl4g.rengine.common.entity.sys.Dict.DictType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -61,7 +61,25 @@ public class DictQuery extends BaseQuery<Dict> {
     // @Default
     // Boolean isSimple = false;
 
-    // Dictionaries table has no name field.
+    // Ignore organization getter/setter.
+    @JsonIgnore
+    @Override
+    public String getOrgCode() {
+        return null;
+    }
+
+    @JsonIgnore
+    @Override
+    public void setOrgCode(String orgCode) {
+    }
+
+    // Ignore organization getter/setter.
+    @JsonIgnore
+    @Override
+    public String getName() {
+        return null;
+    }
+
     @JsonIgnore
     public void setName(String name) {
         super.setName(name);

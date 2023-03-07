@@ -43,7 +43,7 @@ public class CustomMongoConfigureTests {
                 .id(111101001L)
                 .enable(1)
                 .labels(singletonList("foo"))
-                .properties(MongoDataSourceProperties.builder().connectionString("mongodb://localhost:27010").build())
+                .details(MongoDataSourceProperties.builder().connectionString("mongodb://localhost:27010").build())
                 .createBy(11L)
                 .createDate(new Date())
                 .updateBy(11L)
@@ -58,7 +58,7 @@ public class CustomMongoConfigureTests {
 
     @Test
     public void testDeSerializeIgnoreAndTransformProperties() {
-        final String json = "{\"_id\":111101001,\"orgCode\":null,\"enable\":1,\"labels\":[\"foo\"],\"remark\":null,\"createBy\":11,\"createDate\":\"2022-12-28 23:27:19\",\"updateBy\":11,\"updateDate\":\"2022-12-28 23:27:19\",\"delFlag\":0,\"name\":null,\"properties\":{\"type\":\"MONGO\",\"connectionString\":\"mongodb://localhost:27010\"}}";
+        final String json = "{\"_id\":111101001,\"orgCode\":null,\"enable\":1,\"labels\":[\"foo\"],\"remark\":null,\"createBy\":11,\"createDate\":\"2022-12-28 23:27:19\",\"updateBy\":11,\"updateDate\":\"2022-12-28 23:27:19\",\"delFlag\":0,\"name\":null,\"details\":{\"type\":\"MONGO\",\"connectionString\":\"mongodb://localhost:27010\"}}";
         final DataSourceProperties source = parseJSON(BsonEntitySerializers.DEFAULT_MODIFIER_MAPPER, json,
                 DataSourceProperties.class, BsonEntitySerializers.ID_DESERIALIZE_TRANSFORMER,
                 BsonEntitySerializers.BASE_EXCLUDER);

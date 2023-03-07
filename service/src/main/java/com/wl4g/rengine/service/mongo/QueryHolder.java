@@ -16,6 +16,7 @@
 package com.wl4g.rengine.service.mongo;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
@@ -86,6 +87,10 @@ public abstract class QueryHolder {
         return null;
     }
 
+    public static @Nullable <T> Criteria inIdsCriteria(final @Nullable List<T> fieldValues) {
+        return inIdsCriteria(safeList(fieldValues).toArray());
+    }
+
     public static @Nullable Criteria inIdsCriteria(final @Nullable Object... fieldValues) {
         return inCriteria(DEFAULT_FIELD_ID, fieldValues);
     }
@@ -143,10 +148,16 @@ public abstract class QueryHolder {
         return null;
     }
 
+    public static @Nullable <T> Criteria inCriteria(final @NotBlank String fieldName, final @Nullable List<T> fieldValues) {
+        return inCriteria(fieldName, safeList(fieldValues).toArray());
+    }
+
     public static @Nullable Criteria inCriteria(final @NotBlank String fieldName, final @Nullable Object... fieldValues) {
         hasTextOf(fieldName, "fieldName");
-        if (nonNull(fieldValues) && fieldValues.length > 0) {
-            return Criteria.where(fieldName).in(fieldValues);
+        // filter for null elements.
+        final Object[] values = safeArrayToList(fieldValues).stream().filter(v -> nonNull(v)).toArray();
+        if (values.length > 0) {
+            return Criteria.where(fieldName).in(values);
         }
         return null;
     }

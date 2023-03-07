@@ -22,7 +22,8 @@ import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
 import static com.wl4g.rengine.service.mongo.QueryHolder.gteUpdateDateCriteria;
-import static com.wl4g.rengine.service.mongo.QueryHolder.isCriteria;
+import static com.wl4g.rengine.service.mongo.QueryHolder.inCriteria;
+import static com.wl4g.rengine.service.mongo.QueryHolder.inIdsCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.lteUpdateDateCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.orCriteria;
@@ -108,8 +109,8 @@ public class ControllerLogServiceImpl implements ControllerLogService {
 
     @Override
     public PageHolder<ControllerLog> query(ControllerLogQuery model) {
-        final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getControllerLogId()),
-                isCriteria("scheduleId", model.getScheduleId())))
+        final Query query = new Query(andCriteria(baseCriteria(model), inIdsCriteria(model.getControllerLogIds()),
+                inCriteria("scheduleId", model.getScheduleIds())))
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
         final List<ControllerLog> jobs = mongoTemplate.find(query, ControllerLog.class, T_CONTROLLER_LOG.getName());

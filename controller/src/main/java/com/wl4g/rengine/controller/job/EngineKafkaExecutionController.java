@@ -123,7 +123,7 @@ public class EngineKafkaExecutionController extends EngineGenericExecutionContro
             }
 
             // Register to subscriber registry.
-            final KafkaExecutionScheduleConfig kssc = ((KafkaExecutionScheduleConfig) schedule.getProperties()).validate();
+            final KafkaExecutionScheduleConfig kssc = ((KafkaExecutionScheduleConfig) schedule.getDetails()).validate();
             final ConcurrentMessageListenerContainer<String, String> subscriber = new KafkaSubscribeBuilder(
                     kssc.getConsumerOptions().toConsumerConfigProperties()).buildSubscriber(kssc.getTopics(),
                             generateGroupId(schedule), kssc.getConcurrency(), (records, acknowledgment) -> {
@@ -142,7 +142,7 @@ public class EngineKafkaExecutionController extends EngineGenericExecutionContro
                                             if (!results.isEmpty()) {
                                                 final ResultInformation result = results.iterator().next();
                                                 final ControllerLog _jobLog = (ControllerLog) resultAndJobLog.getItem2();
-                                                ((KafkaSubscribeControllerLog) _jobLog.getDetail()).setResult(result);
+                                                ((KafkaSubscribeControllerLog) _jobLog.getDetails()).setResult(result);
                                             }
                                         });
 
@@ -192,7 +192,7 @@ public class EngineKafkaExecutionController extends EngineGenericExecutionContro
     protected ControllerLog newDefaultScheduleJobLog(final Long scheduleId) {
         return ControllerLog.builder()
                 .scheduleId(scheduleId)
-                .detail(KafkaSubscribeControllerLog.builder().type(ScheduleType.KAFKA_EXECUTION_CONTROLLER.name()).build())
+                .details(KafkaSubscribeControllerLog.builder().type(ScheduleType.KAFKA_EXECUTION_CONTROLLER.name()).build())
                 .build();
     }
 

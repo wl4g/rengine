@@ -28,7 +28,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.rengine.common.entity.Rule.RuleEngine;
 import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
 
@@ -51,7 +50,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class Workflow extends BaseBean {
+public class Workflow extends BaseEntity {
     private static final long serialVersionUID = -8038218208189261648L;
     private @NotNull Long scenesId;
     private @NotBlank String name;
@@ -97,10 +96,6 @@ public class Workflow extends BaseBean {
     public static class WorkflowGraphWrapper extends WorkflowGraph {
         private static final long serialVersionUID = 1L;
         private @Nullable List<RuleWrapper> rules = new ArrayList<>(4);
-
-        public WorkflowGraphWrapper validateForBasic() {
-            return validate(this);
-        }
 
         public static WorkflowGraphWrapper validate(WorkflowGraphWrapper graph) {
             notNullOf(graph, "graph");

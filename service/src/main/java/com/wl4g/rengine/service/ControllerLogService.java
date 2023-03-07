@@ -16,6 +16,7 @@
 package com.wl4g.rengine.service;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static java.util.Arrays.asList;
 
 import javax.validation.constraints.NotNull;
 
@@ -36,7 +37,7 @@ import com.wl4g.rengine.service.model.ControllerLogSaveResult;
 public interface ControllerLogService {
 
     default ControllerLog get(@NotNull Long id) {
-        final PageHolder<ControllerLog> result = query(ControllerLogQuery.builder().controllerLogId(id).build());
+        final PageHolder<ControllerLog> result = query(ControllerLogQuery.builder().controllerLogIds(asList(id)).build());
         return safeList(result.getRecords()).isEmpty() ? null : result.getRecords().get(0);
     }
 

@@ -49,16 +49,16 @@ public abstract class Parameters {
     }
 
     /**
-     * The group by properties key prefix and convert to nested map.
+     * The group by details key prefix and convert to nested map.
      * 
      * for example: </br>
      * 
      * <pre>
      * 
-     * Original properties:
+     * Original details:
      *   {web-1.http.uri=http://192.168.8.1:9100/metrics, web-1.http.headers=Content-Type=text/html,X-Foo=Bar, web-2.http.uri=http://10.0.0.114:9100/metrics}
      * 
-     * Sharding properties:
+     * Sharding details:
      *   web-1 => {http.headers=Content-Type=text/html,X-Foo=Bar, http.url=http://192.168.8.1:9100/metrics}
      *   web-2 => {http.url=http://192.168.8.2:9100/metrics}
      * </pre>

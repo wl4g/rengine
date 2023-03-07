@@ -24,7 +24,6 @@ import java.util.List;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.rengine.common.validation.ValidForEntityMarker;
 
 import lombok.Builder.Default;
@@ -46,7 +45,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class RuleScript extends BaseBean {
+public class RuleScript extends BaseEntity {
     private static final long serialVersionUID = -4525858823849417654L;
     private @NotNull(groups = ValidForEntityMarker.class) Long revision;
     private @NotNull Long ruleId;

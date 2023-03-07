@@ -20,6 +20,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,6 +61,7 @@ public class ScenesController {
     @Operation(description = "Query sceneses.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
+    @PreAuthorize("hasAuthority('arn:rengine:scenes:query:v1')")
     public RespBase<PageHolder<Scenes>> query(@Validated ScenesQuery model) {
         log.debug("called: model={}", model);
         RespBase<PageHolder<Scenes>> resp = RespBase.create();
@@ -71,6 +73,7 @@ public class ScenesController {
     @Operation(description = "Save scenes.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
+    @PreAuthorize("hasAuthority('arn:rengine:scenes:save:v1')")
     public RespBase<ScenesSaveResult> save(@Validated @RequestBody ScenesSave model) {
         log.debug("called: model={}", model);
         RespBase<ScenesSaveResult> resp = RespBase.create();
@@ -82,6 +85,7 @@ public class ScenesController {
     @Operation(description = "Delete scenes.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
+    @PreAuthorize("hasAuthority('arn:rengine:scenes:delete:v1')")
     public RespBase<ScenesDeleteResult> delete(@Validated @RequestBody ScenesDelete model) {
         log.debug("called: model={}", model);
         RespBase<ScenesDeleteResult> resp = RespBase.create();

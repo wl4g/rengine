@@ -20,6 +20,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -63,6 +64,7 @@ public class UploadController {
     @Operation(description = "Query upload files.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
+    @PreAuthorize("hasAuthority('arn:rengine:upload:query:v1')")
     public RespBase<PageHolder<UploadObject>> query(@Validated UploadQuery model) {
         log.debug("called: model={}", model);
         RespBase<PageHolder<UploadObject>> resp = RespBase.create();
@@ -75,6 +77,7 @@ public class UploadController {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful",
             content = { @Content(mediaType = "application/json") }) })
     @RequestMapping(path = { "apply" }, method = { POST })
+    @PreAuthorize("hasAuthority('arn:rengine:upload:apply:v1')")
     public RespBase<UploadSaveResult> apply(@Validated @RequestBody UploadSave model) {
         log.debug("called: model={}", model);
         RespBase<UploadSaveResult> resp = RespBase.create();
@@ -86,6 +89,7 @@ public class UploadController {
     @Operation(description = "Delete upload.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
+    @PreAuthorize("hasAuthority('arn:rengine:upload:delete:v1')")
     public RespBase<UploadDeleteResult> delete(@Validated @RequestBody DeleteUpload model) {
         log.debug("called: model={}", model);
         RespBase<UploadDeleteResult> resp = RespBase.create();

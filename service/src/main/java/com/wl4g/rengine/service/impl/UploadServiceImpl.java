@@ -126,7 +126,7 @@ public class UploadServiceImpl implements UploadService {
                     .id(upload.getId())
                     .endpoint(config.getEndpoint())
                     .region(minioManager.getConfig().getRegion())
-                    // .bucket(properties.getBucket())
+                    // .bucket(details.getBucket())
                     .bucket(RengineConstants.DEFAULT_MINIO_BUCKET)
                     .accessKey(credentials.accessKey())
                     .secretKey(credentials.secretKey())

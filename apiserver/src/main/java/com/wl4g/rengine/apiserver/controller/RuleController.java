@@ -20,6 +20,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,6 +63,7 @@ public class RuleController {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful",
             content = { @Content(mediaType = "application/json") }) })
     @RequestMapping(path = { "query" }, method = { GET })
+    @PreAuthorize("hasAuthority('arn:rengine:rule:query:v1')")
     public RespBase<PageHolder<Rule>> query(@Validated RuleQuery model) {
         log.debug("called: model={}", model);
         RespBase<PageHolder<Rule>> resp = RespBase.create();
@@ -73,6 +75,7 @@ public class RuleController {
     @Operation(description = "Save rule.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
+    @PreAuthorize("hasAuthority('arn:rengine:rule:save:v1')")
     public RespBase<RuleSaveResult> save(@Validated @RequestBody RuleSave model) {
         log.debug("called: model={}", model);
         RespBase<RuleSaveResult> resp = RespBase.create();
@@ -84,6 +87,7 @@ public class RuleController {
     @Operation(description = "Delete rule.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
+    @PreAuthorize("hasAuthority('arn:rengine:rule:delete:v1')")
     public RespBase<RuleDeleteResult> delete(@Validated @RequestBody RuleDelete model) {
         log.debug("called: model={}", model);
         RespBase<RuleDeleteResult> resp = RespBase.create();

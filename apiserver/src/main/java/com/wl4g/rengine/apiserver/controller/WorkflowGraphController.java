@@ -20,6 +20,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -64,6 +65,7 @@ public class WorkflowGraphController {
     @Operation(description = "Query workflow graphs.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
+    @PreAuthorize("hasAuthority('arn:rengine:workflowgraph:query:v1')")
     public RespBase<PageHolder<WorkflowGraph>> query(@Validated WorkflowGraphQuery model) {
         log.debug("called: model={}", model);
         RespBase<PageHolder<WorkflowGraph>> resp = RespBase.create();
@@ -75,6 +77,7 @@ public class WorkflowGraphController {
     @Operation(description = "Save workflow graph.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
+    @PreAuthorize("hasAuthority('arn:rengine:workflowgraph:save:v1')")
     public RespBase<WorkflowGraphResultSave> save(@Validated @RequestBody WorkflowGraphSave model) {
         log.debug("called: model={}", model);
         RespBase<WorkflowGraphResultSave> resp = RespBase.create();
@@ -86,6 +89,7 @@ public class WorkflowGraphController {
     @Operation(description = "Delete workflow graph.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
+    @PreAuthorize("hasAuthority('arn:rengine:workflowgraph:delete:v1')")
     public RespBase<WorkflowGraphDeleteResult> delete(@Validated @RequestBody WorkflowDeleteGraph model) {
         log.debug("called: model={}", model);
         RespBase<WorkflowGraphDeleteResult> resp = RespBase.create();
@@ -97,6 +101,7 @@ public class WorkflowGraphController {
     @Operation(description = "Tail load for workflow graph log file.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "logtail" }, produces = "application/json", method = { GET })
+    @PreAuthorize("hasAuthority('arn:rengine:workflowgraph:logtail:v1')")
     public RespBase<WorkflowGraphLogfileResult> logtail(@Validated WorkflowGraphLogfile model) {
         log.debug("called: model={}", model);
         RespBase<WorkflowGraphLogfileResult> resp = RespBase.create();
@@ -108,6 +113,7 @@ public class WorkflowGraphController {
     @Operation(description = "Execute workflow for testing.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "execute" }, consumes = "application/json", produces = "application/json", method = { POST })
+    @PreAuthorize("hasAuthority('arn:rengine:workflowgraph:execute:v1')")
     public RespBase<WorkflowExecuteResult> execute(@RequestBody WorkflowExecuteRequest model) {
         log.debug("called: model={}", model);
         return workflowGraphService.execute(model);

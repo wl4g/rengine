@@ -22,6 +22,7 @@ import static java.lang.String.valueOf;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.endsWithIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.equalsAnyIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.replace;
 import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
@@ -97,9 +98,10 @@ public abstract class ScriptEngineUtil {
         final String prefix = isStdErr ? DEFAULT_STDERR_PREFIX : DEFAULT_STDOUT_PREFIX;
 
         final List<String> sortedLogFiles = getAllLogFilenames(logBaseDir, workflowId, isStdErr).stream()
+                .filter(f -> !equalsAnyIgnoreCase(f, DEFAULT_STDOUT_PREFIX, DEFAULT_STDERR_PREFIX))
                 .collect(toMap(f -> f, f -> {
-                    final String noPrefix = f.substring(f.lastIndexOf(prefix) + 1 + prefix.length());
-                    return Integer.parseInt(replace(noPrefix, ".", ""));
+                    final String withoutPrefix = f.substring(f.lastIndexOf(prefix) + 1 + prefix.length());
+                    return Integer.parseInt(replace(withoutPrefix, ".", ""));
                 }))
                 .entrySet()
                 .stream()

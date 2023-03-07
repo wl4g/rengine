@@ -61,7 +61,7 @@ public class ControllerScheduleServiceImpl implements ControllerScheduleService 
     @Override
     public PageHolder<ControllerSchedule> query(ControllerScheduleQuery model) {
         final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getScheduleId()),
-                isCriteria("properties.type", model.getType())))
+                isCriteria("details.type", model.getType())))
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
         final List<ControllerSchedule> triggeres = mongoTemplate.find(query, ControllerSchedule.class,
@@ -78,7 +78,7 @@ public class ControllerScheduleServiceImpl implements ControllerScheduleService 
             final @NotNull Integer divisor,
             final @NotNull Integer remainder) {
         final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getScheduleId()),
-                modIdCriteria(divisor, remainder), isCriteria("properties.type", model.getType()))).with(defaultSort());
+                modIdCriteria(divisor, remainder), isCriteria("details.type", model.getType()))).with(defaultSort());
 
         final List<ControllerSchedule> schedules = mongoTemplate.find(query, ControllerSchedule.class,
                 MongoCollectionDefinition.T_CONTROLLER_SCHEDULE.getName());

@@ -205,7 +205,7 @@ public final class GlobalDataSourceManager {
         final MongoCollection<Document> collection = mongoRepository.getCollection(MongoCollectionDefinition.T_DATASOURCES);
 
         try (final MongoCursor<DataSourceProperties> cursor = collection
-                .find(Filters.and(Filters.eq("properties.type", dataSourceType), Filters.eq("name", dataSourceName)))
+                .find(Filters.and(Filters.eq("details.type", dataSourceType), Filters.eq("name", dataSourceName)))
                 .batchSize(2)
                 .limit(2)
                 .map(doc -> BsonEntitySerializers.fromDocument(doc, DataSourceProperties.class))
@@ -221,10 +221,10 @@ public final class GlobalDataSourceManager {
                         format("The multiple data sources of the same type and name were found of %s, %s", dataSourceType,
                                 dataSourceName));
             }
-            final DataSourcePropertiesBase properties = dss.get(0).getProperties();
+            final DataSourcePropertiesBase properties = dss.get(0).getDetails();
             if (isNull(properties)) {
                 throw new ConfigRengineException(
-                        format("The data source configuration properties is missing. %s, %s", dataSourceType, dataSourceName));
+                        format("The data source configuration details is missing. %s, %s", dataSourceType, dataSourceName));
             }
 
             return properties.validate();
