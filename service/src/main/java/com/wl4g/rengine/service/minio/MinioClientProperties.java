@@ -131,7 +131,7 @@ public class MinioClientProperties implements InitializingBean {
          * @see https://github.com/minio/minio-js/blob/7.0.32/src/main/object-uploader.js#L75
          * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/router.go#L95
          * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/object-handler.go#L345
-         * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/auth-handler.go#L391
+         * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/user-handler.go#L391
          * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1754
          * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1680
          * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1723
@@ -151,7 +151,7 @@ public class MinioClientProperties implements InitializingBean {
          * @see https://github.com/minio/minio-js/blob/7.0.32/src/main/object-uploader.js#L75
          * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/router.go#L95
          * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/object-handler.go#L345
-         * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/auth-handler.go#L391
+         * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/user-handler.go#L391
          * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1754
          * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1680
          * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1723

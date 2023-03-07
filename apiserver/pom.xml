@@ -65,7 +65,7 @@
         <repackage.classifier />
         <elastic-logback.version>1.5.0</elastic-logback.version>
         <bootstrap-classname>com.wl4g.RengineApiServer</bootstrap-classname>
-        <final.name>rengine-apiserver</final.name>
+        <final.name>apiserver</final.name>
     </properties>
     <parent>
         <groupId>com.wl4g</groupId>

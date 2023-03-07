@@ -15,6 +15,9 @@
  */
 package com.wl4g.rengine.apiserver.controller;
 
+import static com.wl4g.rengine.common.constants.RengineConstants.API_V1_USER_PREPARE_URI;
+import static com.wl4g.rengine.common.constants.RengineConstants.API_V1_USER_BASE_URI;
+import static com.wl4g.rengine.common.constants.RengineConstants.API_V1_USER_USERINFO_URI;
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -58,7 +61,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "UserAPI", description = "The User management API")
 @Slf4j
 @RestController
-@RequestMapping(UserService.DEFAULT_USER_BASE_URI_V1)
+@RequestMapping(API_V1_USER_BASE_URI)
 public class UserController {
 
     private @Autowired UserService userService;
@@ -111,7 +114,7 @@ public class UserController {
     // @SecurityRequirement(name = "default_oauth")
     @Operation(description = "Apply secret")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
-    @RequestMapping(path = { UserService.DEFAULT_APPLY_SECRET_URI }, produces = "application/json", method = { GET })
+    @RequestMapping(path = { API_V1_USER_PREPARE_URI }, produces = "application/json", method = { GET })
     public RespBase<String> applySecret(@NotBlank @RequestParam("username") String username) {
         return RespBase.<String> create().withCode(RetCode.OK).withData(userService.applySecret(username));
     }
@@ -119,11 +122,11 @@ public class UserController {
     // @SecurityRequirement(name = "default_oauth")
     @Operation(description = "Load current authentication user info.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
-    @RequestMapping(path = { UserService.DEFAULT_USERINFO_URI }, produces = "application/json", method = { GET })
+    @RequestMapping(path = { API_V1_USER_USERINFO_URI }, produces = "application/json", method = { GET })
     public RespBase<UserAuthenticationInfo> userInfo(HttpServletRequest request) {
         return RespBase.<UserAuthenticationInfo> create()
                 .withCode(RetCode.OK)
-                .withStatus(SmartRedirectStrategy.DEFAULT_AUTHENTICATED_STATUS)
+                .withStatus(SmartRedirectStrategy.DEFAULT_AUTHORIZED_STATUS)
                 .withData(userService.userInfo());
     }
 

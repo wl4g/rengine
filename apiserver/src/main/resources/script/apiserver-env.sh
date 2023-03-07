@@ -38,7 +38,7 @@ BASE_DIR="$(cd "`dirname "$0"`"/..; pwd)"
 #
 
 # Note that the application name must be the same as the boot jar file name. (Short name is recommended)
-APP_NAME="${APP_NAME:-rengine-apiserver}"
+APP_NAME="${APP_NAME:-apiserver}"
 APP_VERSION="${APP_VERSION:-1.0.0}"
 APP_PROFILE="${APP_PROFILE:-pro}"
 MAIN_CLASS="${MAIN_CLASS:-com.wl4g.RengineApiServer}"

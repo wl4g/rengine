@@ -80,14 +80,14 @@ public class IdentityProviderController {
     // Using Spring Security built-in oauth2 endpoint.
     // see:org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter
     // e.g: localhost:28001/oauth2/authorization/iam ->
-    // https://iam.xx.com/realms/master/protocol/openid-connect/auth?response_type=code&client_id=rengine&scope=email%20profile%20roles&state=PDZJDK3n6oGtUhq_rISUCrtiPJx4U90LXc96e5x1sIs%3D&redirect_uri=http://localhost:28001/login/oauth2/code/iam
+    // https://iam.xx.com/realms/master/protocol/openid-connect/user?response_type=code&client_id=rengine&scope=email%20profile%20roles&state=PDZJDK3n6oGtUhq_rISUCrtiPJx4U90LXc96e5x1sIs%3D&redirect_uri=http://localhost:28001/login/oauth2/code/iam
     // see:org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter
 
     // @formatter:off
     // @Operation(description = "The authenticating")
     // @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
-    // @RequestMapping(path = { "auth/{provider}" }, method = { GET })
-    // public String auth(HttpServletRequest request, @NotBlank @PathVariable String provider) {
+    // @RequestMapping(path = { "user/{provider}" }, method = { GET })
+    // public String user(HttpServletRequest request, @NotBlank @PathVariable String provider) {
     //     switch (IdPKind.valueOf(provider.toUpperCase())) {
     //     case OIDC:
     //         return buildRedirectForOidc(request);
@@ -104,7 +104,7 @@ public class IdentityProviderController {
     //     redisTemplate.opsForValue().set(state, currentTimeMillis() + "", 600L, TimeUnit.SECONDS);
     // 
     //     return "redirect:"
-    //             .concat(UriComponentsBuilder.fromUriString("https://iam.wl4g.com/realms/master/protocol/openid-connect/auth")
+    //             .concat(UriComponentsBuilder.fromUriString("https://iam.wl4g.com/realms/master/protocol/openid-connect/user")
     //                     .queryParam("client_id", "rengine-wl4g")
     //                     .queryParam("redirect_uri",
     //                             urlEncode(baseUri.concat("/oauth2/authorization/").concat(DEFAULT_OAUTH2_REGISTRATION_ID)))

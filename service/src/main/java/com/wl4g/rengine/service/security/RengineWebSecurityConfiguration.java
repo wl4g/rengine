@@ -15,11 +15,14 @@
  */
 package com.wl4g.rengine.service.security;
 
-import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_SECURITY_OAUTH2_CALLBACK_BASE_URI;
-import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_SECURITY_OAUTH2_ENDPOINT_BASE_URI;
-import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_SECURITY_PASSWORD_ENDPOINT_URI;
+import static com.wl4g.rengine.common.constants.RengineConstants.API_LOGIN_OAUTH2_CALLBACK_ENDPOINT_BASE;
+import static com.wl4g.rengine.common.constants.RengineConstants.API_LOGIN_OAUTH2_ENDPOINT_BASE;
+import static com.wl4g.rengine.common.constants.RengineConstants.API_LOGIN_PASSWORD_ENDPOINT;
+import static com.wl4g.rengine.common.constants.RengineConstants.API_V1_USER_BASE_URI;
+import static com.wl4g.rengine.common.constants.RengineConstants.API_V1_USER_PREPARE_URI;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.ConditionalOnDefaultWebSecurity;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -37,10 +40,10 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 
+import com.wl4g.infra.context.utils.SpringContextHolder;
 import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.service.IdentityProviderService;
-import com.wl4g.rengine.service.UserService;
 import com.wl4g.rengine.service.security.authentication.SmartRedirectStrategy;
 import com.wl4g.rengine.service.security.oauth2.MongoClientRegistrationRepository;
 import com.wl4g.rengine.service.security.oauth2.MongoOAuth2AuthorizedClientService;
@@ -60,14 +63,24 @@ import com.wl4g.rengine.service.security.user.UsernamePasswordAuthenticationProv
 // @EnableWebSecurity
 public class RengineWebSecurityConfiguration implements WebSecurityCustomizer {
 
+    @Value("${springdoc.api-docs.path:/v3/api-docs}")
+    String springdocApiDocsPath;
+
     @Override
     public void customize(WebSecurity web) {
         web.ignoring()
-                .antMatchers("/public/**")
                 .antMatchers("/hello/**")
-                .antMatchers(UserService.DEFAULT_USER_BASE_URI_V1 + UserService.DEFAULT_APPLY_SECRET_URI)
-                // .antMatchers("/swagger-ui/**")
-                .antMatchers("/actuator/**");
+                .antMatchers("/public/**")
+                .antMatchers("/actuator/**")
+                .antMatchers(API_V1_USER_BASE_URI + API_V1_USER_PREPARE_URI);
+
+        final var config = SpringContextHolder.getBean(RengineWebSecurityProperties.class);
+        if (config.getIgnoreSwaggerAuth()) {
+            web.ignoring()
+                    .antMatchers(springdocApiDocsPath)
+                    .antMatchers(springdocApiDocsPath.concat("/**"))
+                    .antMatchers("/swagger-ui/**");
+        }
     }
 
     @Bean
@@ -95,52 +108,60 @@ public class RengineWebSecurityConfiguration implements WebSecurityCustomizer {
                 .authenticated()
                 .and()
                 // Enable the form of static password login.
-                .formLogin()
-                // .loginProcessingUrl(DEFAULT_SECURITY_PASSWORD_ENDPOINT_URI)
-                // .defaultSuccessUrl(SmartRedirectStrategy.DEFAULT_SUCCESS_URI)
-                .and()
                 // @formatter:off
+                // .formLogin()
+                // .loginProcessingUrl(API_LOGIN_PASSWORD_ENDPOINT)
+                // .defaultSuccessUrl(SmartRedirectStrategy.DEFAULT_SUCCESS_URI)
+                // .and()
+                // @formatter:on
                 .formLogin(customizer -> {
-                    customizer.loginProcessingUrl(DEFAULT_SECURITY_PASSWORD_ENDPOINT_URI)
-                            .defaultSuccessUrl(SmartRedirectStrategy.DEFAULT_SUCCESS_URI);
+                    customizer.loginProcessingUrl(API_LOGIN_PASSWORD_ENDPOINT)
+                            .defaultSuccessUrl(SmartRedirectStrategy.DEFAULT_LOGIN_SUCCESS_URI);
                     // Setup to success and failure smart redirect strategy.
-                    SmartRedirectStrategy.configurer(customizer);
+                    SmartRedirectStrategy.configure(customizer);
                 })
+                .exceptionHandling()
+                // see:org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter
+                // see:org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint
+                .authenticationEntryPoint((request, response, authEx) -> {
+                    SmartRedirectStrategy.DEFAULT.doSendRedirect(request, response, "/login", authEx);
+                })
+                .and()
                 .logout(customizer -> {
                     final var logoutSuccessHandler = new SimpleUrlLogoutSuccessHandler();
                     logoutSuccessHandler.setRedirectStrategy(new SmartRedirectStrategy(false));
                     customizer.logoutSuccessHandler(logoutSuccessHandler);
                 })
-                // @formatter:on
+                // @formatter:off
                 // Enable the OAuth2 of authorization login.
                 // .oauth2Login()
                 // .authorizationEndpoint()
-                // .baseUri(DEFAULT_SECURITY_OAUTH2_ENDPOINT_BASE_URI)
+                // .baseUri(API_LOGIN_OAUTH2_ENDPOINT_BASE)
                 // .and()
-                // .loginProcessingUrl(DEFAULT_SECURITY_OAUTH2_CALLBACK_BASE_URI)
+                // .loginProcessingUrl(API_LOGIN_OAUTH2_CALLBACK_ENDPOINT_BASE)
                 // .defaultSuccessUrl(SmartRedirectStrategy.DEFAULT_SUCCESS_URI,
                 // false)
                 // .and()
-                // @formatter:off
+                // @formatter:on
                 .oauth2Login(customizer -> {
                     // If the custom start oauth2 redirect root path.
                     customizer.authorizationEndpoint()
                             // The base URI of the start OAuth2 authenticating
                             // request. The default as: /oauth2/authorization
                             // see:org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI
-                            .baseUri(DEFAULT_SECURITY_OAUTH2_ENDPOINT_BASE_URI)
+                            .baseUri(API_LOGIN_OAUTH2_ENDPOINT_BASE)
                             .and()
                             // see:org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter#attemptAuthentication()
-                            .loginProcessingUrl(DEFAULT_SECURITY_OAUTH2_CALLBACK_BASE_URI)
+                            .loginProcessingUrl(API_LOGIN_OAUTH2_CALLBACK_ENDPOINT_BASE)
                             // Login to successful redirection uri.
                             // alwaysUse=false, It means that if the protected
                             // URL is accessed before the certification, it will
                             // be redirected to the URL.
-                            .defaultSuccessUrl(SmartRedirectStrategy.DEFAULT_SUCCESS_URI, false);
+                            .defaultSuccessUrl(SmartRedirectStrategy.DEFAULT_LOGIN_SUCCESS_URI, false);
                     // Setup to success and failure smart redirect strategy.
-                    SmartRedirectStrategy.configurer(customizer);
+                    SmartRedirectStrategy.configure(customizer);
                 })
-        // @formatter:on
+                // @formatter:on
                 .build();
     }
 

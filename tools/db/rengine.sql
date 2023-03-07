@@ -11,7 +11,7 @@
  Target Server Version : 40406
  File Encoding         : 65001
 
- Date: 24/02/2023 15:51:50
+ Date: 07/03/2023 10:42:28
 */
 
 
@@ -187,11 +187,11 @@ db.getCollection("sys_identity_providers").insert([ {
     name: "default OIDC client",
     details: {
         type: "OIDC",
-        registrationId: "default_oidc",
+        registrationId: "oidc0",
         clientId: "rengine",
         clientSecret: "FvLNs0sbwF3sN4BbyjZ5GBwN819QFCmF",
         authorizationGrantType: "authorization_code",
-        redirectUri: "http://rengine.wl4g.io/api/login/oauth2/callback/default_oidc",
+        redirectUri: "http://rengine.wl4g.io/api/login/oauth2/callback/oidc0",
         scopes: [
             "openid",
             "email",
@@ -390,19 +390,136 @@ session = db.getMongo().startSession();
 session.startTransaction();
 db = session.getDatabase("rengine");
 db.getCollection("t_controller_logs").insert([ {
-    _id: NumberLong("1001010119"),
-    updateDate: ISODate("2023-02-18T16:00:00.000Z"),
-    _class: "com.wl4g.rengine.common.entity.ControllerLog"
+    _id: NumberLong("6363610652180480"),
+    orgCode: null,
+    enable: NumberInt("1"),
+    labels: null,
+    remark: null,
+    createBy: NumberInt("-1"),
+    createDate: "2023-02-24 19:42:25",
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-02-24 19:42:31",
+    delFlag: NumberInt("0"),
+    scheduleId: NumberLong("62208697108652456"),
+    jobName: null,
+    startupTime: NumberLong("1677238945178"),
+    finishedTime: NumberLong("1677238951075"),
+    success: false,
+    detail: {
+        type: "GENERIC_EXECUTION_CONTROLLER",
+        results: [
+            {
+                requestId: "510c46e0-6957-4f8a-872a-9a06e91cbc3d",
+                results: [
+                    {
+                        scenesCode: "vm_health_detect",
+                        success: false,
+                        valueMap: null,
+                        reason: "Failed to execution workflow graph of reason: com.wl4g.rengine.common.exception.EvaluationException: Failed to execute script"
+                    }
+                ]
+            }
+        ]
+    }
 } ]);
 db.getCollection("t_controller_logs").insert([ {
-    _id: NumberLong("1001010118"),
-    updateDate: ISODate("2023-02-17T16:00:00.000Z"),
-    _class: "com.wl4g.rengine.common.entity.ControllerLog"
+    _id: NumberLong("6363610815283200"),
+    orgCode: null,
+    enable: NumberInt("1"),
+    labels: null,
+    remark: null,
+    createBy: NumberInt("-1"),
+    createDate: "2023-02-24 19:42:35",
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-02-24 19:42:35",
+    delFlag: NumberInt("0"),
+    scheduleId: NumberLong("62208697108652456"),
+    jobName: null,
+    startupTime: NumberLong("1677238955088"),
+    finishedTime: NumberLong("1677238955244"),
+    success: false,
+    detail: {
+        type: "GENERIC_EXECUTION_CONTROLLER",
+        results: [
+            {
+                requestId: "c37125b8-c574-46ad-a13a-45bfd9ed3723",
+                results: [
+                    {
+                        scenesCode: "vm_health_detect",
+                        success: false,
+                        valueMap: null,
+                        reason: "Failed to execution workflow graph of reason: com.wl4g.rengine.common.exception.EvaluationException: Failed to execute script"
+                    }
+                ]
+            }
+        ]
+    }
 } ]);
 db.getCollection("t_controller_logs").insert([ {
-    _id: NumberLong("1001010117"),
-    updateDate: ISODate("2023-02-16T16:00:00.000Z"),
-    _class: "com.wl4g.rengine.common.entity.ControllerLog"
+    _id: NumberLong("6363610819018752"),
+    orgCode: null,
+    enable: NumberInt("1"),
+    labels: null,
+    remark: null,
+    createBy: NumberInt("-1"),
+    createDate: "2023-02-24 19:42:35",
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-02-24 19:42:35",
+    delFlag: NumberInt("0"),
+    scheduleId: NumberLong("62208697108652456"),
+    jobName: null,
+    startupTime: NumberLong("1677238955316"),
+    finishedTime: NumberLong("1677238955429"),
+    success: false,
+    detail: {
+        type: "GENERIC_EXECUTION_CONTROLLER",
+        results: [
+            {
+                requestId: "e3e3e895-a128-419a-8703-40ca46b9d39e",
+                results: [
+                    {
+                        scenesCode: "vm_health_detect",
+                        success: false,
+                        valueMap: null,
+                        reason: "Failed to execution workflow graph of reason: com.wl4g.rengine.common.exception.EvaluationException: Failed to execute script"
+                    }
+                ]
+            }
+        ]
+    }
+} ]);
+db.getCollection("t_controller_logs").insert([ {
+    _id: NumberLong("6363610896891904"),
+    orgCode: null,
+    enable: NumberInt("1"),
+    labels: null,
+    remark: null,
+    createBy: NumberInt("-1"),
+    createDate: "2023-02-24 19:42:40",
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-02-24 19:42:40",
+    delFlag: NumberInt("0"),
+    scheduleId: NumberLong("62208697108652456"),
+    jobName: null,
+    startupTime: NumberLong("1677238960070"),
+    finishedTime: NumberLong("1677238960166"),
+    success: false,
+    detail: {
+        type: "GENERIC_EXECUTION_CONTROLLER",
+        results: [
+            {
+                requestId: "5ac9d43f-fe63-45cb-96b0-672c73d7fb9d",
+                results: [
+                    {
+                        scenesCode: "vm_health_detect",
+                        success: false,
+                        valueMap: null,
+                        reason: "Failed to execution workflow graph of reason: com.wl4g.rengine.common.exception.EvaluationException: Failed to execute script"
+                    }
+                ]
+            }
+        ]
+    }
 } ]);
 session.commitTransaction(); session.endSession();
 
@@ -419,8 +536,53 @@ session = db.getMongo().startSession();
 session.startTransaction();
 db = session.getDatabase("rengine");
 db.getCollection("t_controller_schedules").insert([ {
+    _id: NumberLong("62208697108652455"),
+    orgCode: null,
+    enable: NumberInt("0"),
+    labels: [
+        "example",
+        "test",
+        "print"
+    ],
+    remark: "Example for built SDK testing",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-02-24 17:27:40",
+    delFlag: NumberInt("0"),
+    name: "test_script_sdk_example",
+    monitorExecution: true,
+    failover: true,
+    misfire: true,
+    timeZone: "GMT+08:00",
+    maxTimeDiffSeconds: NumberInt("-1"),
+    reconcileIntervalMinutes: NumberInt("0"),
+    maxTimeoutMs: NumberInt("30000"),
+    runState: "FAILED",
+    properties: {
+        type: "GENERIC_EXECUTION_CONTROLLER",
+        cron: "0/5 * * * * ?",
+        requests: [
+            {
+                requestId: null,
+                clientId: "JVqEpEwIaqkEkeD5",
+                clientSecret: "Uf6nJDyJQHKRP43ycl9vZ9zs7s1nyu77",
+                trace: true,
+                timeout: NumberInt("10000"),
+                bestEffort: false,
+                args: {
+                    foo1: "bar1"
+                },
+                scenesCodes: [
+                    "test_script_sdk_example"
+                ]
+            }
+        ]
+    }
+} ]);
+db.getCollection("t_controller_schedules").insert([ {
     _id: NumberLong("62208697108652456"),
-    name: "vm_health_detecter",
+    orgCode: null,
     enable: NumberInt("1"),
     labels: [
         "example",
@@ -428,40 +590,46 @@ db.getCollection("t_controller_schedules").insert([ {
         "health",
         "detecter"
     ],
+    remark: "Example monitoring for VM",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-02-24 19:42:40",
+    delFlag: NumberInt("0"),
+    name: "vm_health_detecter",
     monitorExecution: true,
     failover: true,
     misfire: true,
     timeZone: "GMT+08:00",
-    maxTimeoutMs: 30000,
-    runState: null,
+    maxTimeDiffSeconds: NumberInt("-1"),
+    reconcileIntervalMinutes: NumberInt("0"),
+    maxTimeoutMs: NumberInt("30000"),
+    runState: "FAILED",
     properties: {
         type: "GENERIC_EXECUTION_CONTROLLER",
         cron: "0/5 * * * * ?",
         requests: [
             {
+                requestId: null,
                 clientId: "JVqEpEwIaqkEkeD5",
                 clientSecret: "Uf6nJDyJQHKRP43ycl9vZ9zs7s1nyu77",
-                scenesCodes: [
-                    "ecommerce_trade_gift"
-                ],
+                trace: true,
+                timeout: NumberInt("10000"),
                 bestEffort: false,
-                timeout: 10000,
                 args: {
                     foo1: "bar1"
-                }
+                },
+                scenesCodes: [
+                    "vm_health_detect"
+                ]
             }
-        ],
-        _class: "com.wl4g.rengine.common.entity.ControllerSchedule$ExecutionControllerConfig"
-    },
-    remark: "Example monitoring for VM",
-    updateDate: ISODate("2022-12-27T04:51:08.533Z"),
-    delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.ControllerSchedule"
+        ]
+    }
 } ]);
 db.getCollection("t_controller_schedules").insert([ {
     _id: NumberLong("62208697108652457"),
     name: "db_records_yesterday_validator",
-    enable: NumberInt("1"),
+    enable: NumberInt("0"),
     labels: [
         "example",
         "db",
@@ -483,7 +651,7 @@ db.getCollection("t_controller_schedules").insert([ {
                 clientId: "JVqEpEwIaqkEkeD5",
                 clientSecret: "Uf6nJDyJQHKRP43ycl9vZ9zs7s1nyu77",
                 scenesCodes: [
-                    "ecommerce_trade_gift"
+                    "vm_process_watch_restart"
                 ],
                 bestEffort: false,
                 timeout: 10000,
@@ -502,7 +670,7 @@ db.getCollection("t_controller_schedules").insert([ {
 db.getCollection("t_controller_schedules").insert([ {
     _id: NumberLong("62208697108652459"),
     name: "emr_spark_history_stream_job_monitor",
-    enable: NumberInt("1"),
+    enable: NumberInt("0"),
     labels: [
         "example",
         "emr",
@@ -524,7 +692,7 @@ db.getCollection("t_controller_schedules").insert([ {
                 clientId: "JVqEpEwIaqkEkeD5",
                 clientSecret: "Uf6nJDyJQHKRP43ycl9vZ9zs7s1nyu77",
                 scenesCodes: [
-                    "ecommerce_trade_gift"
+                    "test_script_sdk_example"
                 ],
                 bestEffort: false,
                 timeout: 10000,
@@ -542,48 +710,88 @@ db.getCollection("t_controller_schedules").insert([ {
 } ]);
 db.getCollection("t_controller_schedules").insert([ {
     _id: NumberLong("62208697108652460"),
-    name: "kafka_subscribe_notification_warning",
-    enable: NumberInt("1"),
+    orgCode: null,
+    enable: NumberInt("0"),
     labels: [
         "example",
         "kafka",
         "subscribe",
         "notification"
     ],
+    remark: "Subscribe to notification for kafka",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-02-24 17:19:56",
+    delFlag: NumberInt("0"),
+    name: "kafka_subscribe_notification_warning",
     monitorExecution: true,
     failover: true,
     misfire: true,
     timeZone: "GMT+08:00",
-    maxTimeoutMs: 30000,
-    runState: null,
+    maxTimeDiffSeconds: NumberInt("-1"),
+    reconcileIntervalMinutes: NumberInt("0"),
+    maxTimeoutMs: NumberInt("30000"),
+    runState: "RUNNING",
     properties: {
         type: "KAFKA_EXECUTION_CONTROLLER",
         topics: [
             "test_topic"
         ],
-        concurrency: 1,
+        concurrency: NumberInt("1"),
         autoAcknowledgment: true,
         request: {
+            requestId: null,
             clientId: "JVqEpEwIaqkEkeD5",
             clientSecret: "Uf6nJDyJQHKRP43ycl9vZ9zs7s1nyu77",
-            scenesCodes: [
-                "ecommerce_trade_gift"
-            ],
+            trace: true,
+            timeout: NumberInt("10000"),
             bestEffort: false,
-            timeout: 10000,
             args: {
                 foo1: "bar1"
-            }
+            },
+            scenesCodes: [
+                "test_script_sdk_example"
+            ]
         },
         consumerOptions: {
-            "group_id": "test_group"
-        },
-        _class: "com.wl4g.rengine.common.entity.ControllerSchedule$KafkaSubscribeScheduleConfig"
-    },
-    remark: "Subscribe to notification for kafka",
-    updateDate: ISODate("2022-12-27T04:51:08.533Z"),
-    delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.ControllerSchedule"
+            "key_deserializer": "org.apache.kafka.common.serialization.StringDeserializer",
+            "value_deserializer": "org.apache.kafka.common.serialization.StringDeserializer",
+            "bootstrap_servers": "localhost:9092",
+            "client_dns_lookup": "use_all_dns_ips",
+            "metadata_max_age_ms": NumberInt("300000"),
+            "send_buffer_bytes": NumberInt("131072"),
+            "receive_buffer_bytes": NumberInt("65536"),
+            "client_id": null,
+            "client_rack": "",
+            "reconnect_backoff_ms": NumberInt("50"),
+            "reconnect_backoff_max_ms": NumberInt("1000"),
+            retries: NumberInt("2147483647"),
+            "retry_backoff_ms": NumberInt("100"),
+            "metrics_sample_window_ms": NumberInt("3000"),
+            "metrics_num_samples": NumberInt("2"),
+            "metrics_recording_level": "INFO",
+            "metric_reporters": [ ],
+            "security_protocol": "PLAINTEXT",
+            "socket_connection_setup_timeout_ms": NumberInt("10000"),
+            "socket_connection_setup_timeout_max_ms": NumberInt("30000"),
+            "connections_max_idle_ms": NumberInt("540000"),
+            "request_timeout_ms": NumberInt("30000"),
+            "group_id": "test_group",
+            "group_instance_id": null,
+            "max_poll_interval_ms": NumberInt("300000"),
+            "rebalance_timeout_ms": null,
+            "session_timeout_ms": NumberInt("45000"),
+            "heartbeat_interval_ms": NumberInt("3000"),
+            "default_api_timeout_ms": NumberInt("60000"),
+            "enable_auto_commit": false,
+            "auto_commit_interval_ms": NumberInt("5000"),
+            "auto_offset_reset": "latest",
+            "fetch_min_bytes": NumberInt("1"),
+            "fetch_max_bytes": NumberInt("52428800"),
+            "fetch_max_wait_ms": NumberInt("500")
+        }
+    }
 } ]);
 session.commitTransaction(); session.endSession();
 

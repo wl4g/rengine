@@ -38,7 +38,7 @@ BASE_DIR="$(cd "`dirname "$0"`"/..; pwd)"
 #
 
 # Note that the application name must be the same as the boot jar file name. (Short name is recommended)
-APP_NAME="${APP_NAME:-rengine-executor}"
+APP_NAME="${APP_NAME:-executor}"
 APP_VERSION="${APP_VERSION:-1.0.0}"
 APP_PROFILE="${APP_PROFILE:-pro}"
 MAIN_CLASS="${MAIN_CLASS:-com.wl4g.RengineExecutor}"

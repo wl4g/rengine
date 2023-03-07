@@ -13,11 +13,12 @@
 
 rengine:
   security:
-    auth:
-      secret-cache-prefix: "${spring.application.name:}:login:cache:secret:"
+    ignore-swagger-auth: false ## Default by false
+    user:
+      secret-cache-prefix: "${spring.application.name:}:login:secret:"
       secret-cache-expire-seconds: 60
     oidc:
-      oauth2-client-cache-prefix: "${spring.application.name:}:login:cache:oidc:"
+      oauth2-client-cache-prefix: "${spring.application.name:}:login:oidc:"
       oauth2-client-cache-expire-seconds: 1800
 
 #
@@ -25,8 +26,8 @@ rengine:
 #
 # Using Spring Security built-in oauth2 endpoint.
 # see:org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter
-# e.g: localhost:28001/oauth2/authorization/default_oidc ->
-# https://iam.xx.com/realms/master/protocol/openid-connect/auth?response_type=code&client_id=rengine&scope=email%20profile%20roles&state=PDZJDK3n6oGtUhq_rISUCrtiPJx4U90LXc96e5x1sIs%3D&redirect_uri=http://localhost:28001/login/oauth2/code/default_oidc
+# e.g: localhost:28001/oauth2/authorization/oidc0 ->
+# https://iam.xx.com/realms/master/protocol/openid-connect/auth?response_type=code&client_id=rengine&scope=email%20profile%20roles&state=PDZJDK3n6oGtUhq_rISUCrtiPJx4U90LXc96e5x1sIs%3D&redirect_uri=http://localhost:28001/login/oauth2/code/oidc0
 # see:org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter
 #spring:
 #  security:
@@ -41,14 +42,14 @@ rengine:
 #          jwk-set-uri: ${IAM_ENDPOINT:https://iam.wl4g.com}/realms/${IAM_REALMS:master}/protocol/openid-connect/certs
 #      client:
 #        provider:
-#          default_keycloak:
+#          keycloak0:
 #            ## see:https://iam.xx.com/realms/master/.well-known/openid-configuration
 #            issuer-uri: ${IAM_ENDPOINT:https://iam.wl4g.com}/realms/${IAM_REALMS:master}
 #        ## see:org.springframework.security.config.oauth2.client.ClientRegistrationsBeanDefinitionParser
 #        ## see:org.springframework.security.oauth2.client.registration.ClientRegistration
 #        registration:
-#          default_oidc:
-#            provider: default_keycloak
+#          oidc0:
+#            provider: keycloak0
 #            client-id: ${IAM_CLIENT_ID:rengine}
 #            client-secret: ${IAM_CLIENT_SECRET:FvLNs0sbwF3sN4BbyjZ5GBwN819QFCmF}
 #            client-name: default OIDC client

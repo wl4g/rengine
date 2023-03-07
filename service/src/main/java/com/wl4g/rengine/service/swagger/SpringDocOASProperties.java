@@ -60,7 +60,7 @@ public class SpringDocOASProperties {
                 SecurityScheme defaultScheme = new CustomSecurityScheme().type(SecurityScheme.Type.OAUTH2)
                         .in(SecurityScheme.In.HEADER)
                         .flows(new OAuthFlows().authorizationCode(new OAuthFlow()
-                                .authorizationUrl("http://localhost:8080/realms/master/protocol/openid-connect/auth")
+                                .authorizationUrl("http://localhost:8080/realms/master/protocol/openid-connect/user")
                                 .tokenUrl("http://localhost:8080/realms/master/protocol/openid-connect/token")
                                 .refreshUrl("http://localhost:8080/realms/master/protocol/openid-connect/refresh")
                                 .scopes(new Scopes() {

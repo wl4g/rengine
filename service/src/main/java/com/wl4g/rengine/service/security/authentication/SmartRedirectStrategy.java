@@ -18,8 +18,8 @@ package com.wl4g.rengine.service.security.authentication;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.findField;
 import static com.wl4g.infra.common.reflect.ReflectionUtils2.getField;
 import static com.wl4g.infra.common.web.WebUtils2.ResponseType.isRespJSON;
-import static com.wl4g.rengine.service.UserService.DEFAULT_USERINFO_URI;
-import static com.wl4g.rengine.service.UserService.DEFAULT_USER_BASE_URI_V1;
+import static com.wl4g.rengine.common.constants.RengineConstants.API_V1_USER_BASE_URI;
+import static com.wl4g.rengine.common.constants.RengineConstants.API_V1_USER_USERINFO_URI;
 import static com.wl4g.rengine.service.security.AuthenticationUtils.currentUserInfo;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -27,8 +27,11 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import java.io.IOException;
 import java.net.URI;
 
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.security.core.AuthenticationException;
@@ -61,6 +64,18 @@ public class SmartRedirectStrategy extends DefaultRedirectStrategy {
 
     @Override
     public void sendRedirect(HttpServletRequest request, HttpServletResponse response, String url) throws IOException {
+        // see:org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler#saveException()
+        final AuthenticationException authEx = (AuthenticationException) request
+                .getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
+        doSendRedirect(request, response, url, authEx);
+    }
+
+    public void doSendRedirect(
+            @NotNull HttpServletRequest request,
+            @NotNull HttpServletResponse response,
+            @NotBlank String url,
+            @Nullable AuthenticationException authEx) throws IOException {
+
         String redirectUrl = url;
         if (isBlank(URI.create(url).getScheme())) {
             redirectUrl = UriComponentsBuilder.fromUriString(WebUtils2.getRFCBaseURI(request, true))
@@ -69,16 +84,14 @@ public class SmartRedirectStrategy extends DefaultRedirectStrategy {
                     .build()
                     .toUriString();
         }
-        if (isJSONResponse(request)) {
+
+        if (isJsonResponse(request)) {
             if (failureRedirect) { // Authentication failure
-                // see:org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler#saveException()
-                final AuthenticationException authEx = (AuthenticationException) request
-                        .getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
                 WebUtils2.writeJson(response,
                         RespBase.create()
                                 .withCode(RetCode.OK)
-                                .withStatus(DEFAULT_UNAUTHENTICATED_STATUS)
-                                .withMessage(nonNull(authEx) ? authEx.getMessage() : "Unknown authentication failed")
+                                .withStatus(DEFAULT_UNAUTHORIZED_STATUS)
+                                .withMessage(nonNull(authEx) ? authEx.getMessage() : "Authentication failed")
                                 .forMap()
                                 .andPut(DEFAULT_REDIRECT_URI_KEY, redirectUrl)
                                 .withParent()
@@ -87,7 +100,7 @@ public class SmartRedirectStrategy extends DefaultRedirectStrategy {
                 WebUtils2.writeJson(response,
                         RespBase.create()
                                 .withCode(RetCode.OK)
-                                .withStatus(DEFAULT_AUTHENTICATED_STATUS)
+                                .withStatus(DEFAULT_AUTHORIZED_STATUS)
                                 .withMessage("Login successful")
                                 .forMap()
                                 .andPut(DEFAULT_REDIRECT_URI_KEY, redirectUrl)
@@ -107,18 +120,18 @@ public class SmartRedirectStrategy extends DefaultRedirectStrategy {
      * @param request
      * @return
      */
-    protected boolean isJSONResponse(HttpServletRequest request) {
+    protected boolean isJsonResponse(HttpServletRequest request) {
         final boolean isRespJson = isRespJSON(request);
         log.debug("Using response json : {}", isRespJson);
         return isRespJson;
     }
 
     @SuppressWarnings("rawtypes")
-    public static void configurer(AbstractAuthenticationFilterConfigurer configurer) {
+    public static void configure(AbstractAuthenticationFilterConfigurer configurer) {
         // Setup to success smart redirect strategy.
         final var successHandler = (SavedRequestAwareAuthenticationSuccessHandler) getField(
                 findField(configurer.getClass(), "successHandler", AuthenticationSuccessHandler.class), configurer, true);
-        successHandler.setDefaultTargetUrl(DEFAULT_SUCCESS_URI);
+        successHandler.setDefaultTargetUrl(DEFAULT_LOGIN_SUCCESS_URI);
         successHandler.setAlwaysUseDefaultTargetUrl(false);
         successHandler.setRedirectStrategy(new SmartRedirectStrategy(false));
 
@@ -140,10 +153,10 @@ public class SmartRedirectStrategy extends DefaultRedirectStrategy {
         configurer.failureHandler(failureHandler);
     }
 
-    public static final String DEFAULT_UNAUTHENTICATED_STATUS = "Unauthenticated";
-    public static final String DEFAULT_AUTHENTICATED_STATUS = "Authenticated";
+    public static final SmartRedirectStrategy DEFAULT = new SmartRedirectStrategy(true);
+    public static final String DEFAULT_UNAUTHORIZED_STATUS = "UNAUTHORIZED";
+    public static final String DEFAULT_AUTHORIZED_STATUS = "AUTHORIZED";
     public static final String DEFAULT_REDIRECT_URI_KEY = "redirect_uri";
     public static final String DEFAULT_USERINFO_KEY = "userinfo";
-
-    public static final String DEFAULT_SUCCESS_URI = DEFAULT_USER_BASE_URI_V1.concat(DEFAULT_USERINFO_URI);
+    public static final String DEFAULT_LOGIN_SUCCESS_URI = API_V1_USER_BASE_URI.concat(API_V1_USER_USERINFO_URI);
 }

@@ -33,7 +33,9 @@ import lombok.Getter;
  */
 public abstract class RengineConstants extends EnvironmentUtil {
 
-    // ----- Common definitions. -----
+    // ----------------------------------------------------------------------------
+    // ----- Common constants. -----
+    // ----------------------------------------------------------------------------
 
     public static final String CONF_PREFIX = "rengine";
 
@@ -42,34 +44,43 @@ public abstract class RengineConstants extends EnvironmentUtil {
     public static final String DEFAULT_MINIO_REGION = "us-east-1";
     public static final String DEFAULT_MINIO_BUCKET = "rengine";
 
-    // ----- ApiServer definitions. -----
+    // ----------------------------------------------------------------------------
+    // ----- ApiServer constants. -----
+    // ----------------------------------------------------------------------------
 
     public static final String CONF_PREFIX_APISERVER = CONF_PREFIX + ".apiserver";
 
-    public static final String DEFAULT_LOGIN_CACHE_OIDC_PREFIX = "login:cache:oidc:";
+    public static final String CACHE_LOGIN_SECRET_PREFIX = "login:secret:";
+    public static final String CACHE_LOGIN_OIDC_PREFIX = "login:oidc:";
 
-    public static final String DEFAULT_LOGIN_CACHE_SECRET_PREFIX = "login:cache:secret:";
+    public static final String API_V1_USER_BASE_URI = "/v1/user";
+    public static final String API_V1_USER_PREPARE_URI = "/prepare";
+    public static final String API_V1_USER_USERINFO_URI = "/userinfo";
 
     // The URI of form submit username and password processing login endpoint.
     // The default as: /login
-    public static final String DEFAULT_SECURITY_PASSWORD_ENDPOINT_URI = "/login/password";
+    public static final String API_LOGIN_PASSWORD_ENDPOINT = "/login/password";
 
     // The base URI of the start OAuth2 authenticating request.
     // The default as: /oauth2/authorization
     // see:org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI
-    public static final String DEFAULT_SECURITY_OAUTH2_ENDPOINT_BASE_URI = "/login/oauth2";
+    public static final String API_LOGIN_OAUTH2_ENDPOINT_BASE = "/login/oauth2";
 
     // The URI of form callback oauth2 processing login base uri.
     // The default as: /login/oauth2/code/*
     // see:org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter#DEFAULT_FILTER_PROCESSES_URI
     // see:org.springframework.security.config.annotation.web.configurers.oauth2.client.OAuth2LoginConfigurer#loginProcessingUrl()
-    public static final String DEFAULT_SECURITY_OAUTH2_CALLBACK_BASE_URI = "/login/oauth2/callback/*";
+    public static final String API_LOGIN_OAUTH2_CALLBACK_ENDPOINT_BASE = "/login/oauth2/callback/*";
 
-    // ----- Controller definitions. -----
+    // ----------------------------------------------------------------------------
+    // ----- Controller constants. -----
+    // ----------------------------------------------------------------------------
 
     public static final String CONF_PREFIX_CONTROLLER = CONF_PREFIX + ".controller";
 
-    // ----- Executor definitions. -----
+    //
+    // ----- Executor constants. -----
+    //
 
     public static final String CONF_PREFIX_EXECUTOR = CONF_PREFIX + ".executor";
 
@@ -100,20 +111,26 @@ public abstract class RengineConstants extends EnvironmentUtil {
     public static final int DEFAULT_EXECUTOR_S3_OBJECT_MAX_LIMIT = getIntProperty("EXECUTOR_S3_OBJECT_MAX_LIMIT",
             10 * 1024 * 1024);
 
-    // ----- Client definitions. -----
-
-    public static final String CONF_PREFIX_CLIENT = CONF_PREFIX + ".client";
-
-    // ----- Job definitions. -----
+    // ----------------------------------------------------------------------------
+    // ----- Job constants. -----
+    // ----------------------------------------------------------------------------
 
     public static final String DEFAULT_EVENTBUS_TOPIC = "rengine_event";
 
-    // ----- Eventbus definitions. -----
+    // ----------------------------------------------------------------------------
+    // ----- Eventbus constants. -----
+    // ----------------------------------------------------------------------------
 
     public static final String CONF_PREFIX_EVENTBUS = CONF_PREFIX + ".eventbus";
     public static final String CONF_PREFIX_EVENTBUS_KAFKA = CONF_PREFIX_EVENTBUS + ".kafka";
     public static final String CONF_PREFIX_EVENTBUS_PULSAR = CONF_PREFIX_EVENTBUS + ".pulsar";
     public static final String CONF_PREFIX_EVENTBUS_ROCKETMQ = CONF_PREFIX_EVENTBUS + ".rabbitmq";
+
+    // ----------------------------------------------------------------------------
+    // ----- Client constants. -----
+    // ----------------------------------------------------------------------------
+
+    public static final String CONF_PREFIX_CLIENT = CONF_PREFIX + ".client";
 
     @Getter
     @AllArgsConstructor

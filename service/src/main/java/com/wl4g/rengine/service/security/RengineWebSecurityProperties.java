@@ -36,8 +36,10 @@ import lombok.ToString;
 @ToString
 public class RengineWebSecurityProperties {
 
+    Boolean ignoreSwaggerAuth = false;
+
     @NotNull
-    AuthenticationProperties auth = new AuthenticationProperties();
+    UserAuthenticationProperties user = new UserAuthenticationProperties();
 
     @NotNull
     OAuth2OidcProperties oidc = new OAuth2OidcProperties();
@@ -46,8 +48,8 @@ public class RengineWebSecurityProperties {
     @Setter
     @ToString
     @NoArgsConstructor
-    public static class AuthenticationProperties {
-        private String secretCachePrefix = RengineConstants.DEFAULT_LOGIN_CACHE_SECRET_PREFIX;
+    public static class UserAuthenticationProperties {
+        private String secretCachePrefix = RengineConstants.CACHE_LOGIN_SECRET_PREFIX;
         private Long secretCacheExpireSeconds = 60L;
     }
 
@@ -56,7 +58,7 @@ public class RengineWebSecurityProperties {
     @ToString
     @NoArgsConstructor
     public static class OAuth2OidcProperties {
-        private String oauth2ClientCachePrefix = RengineConstants.DEFAULT_LOGIN_CACHE_OIDC_PREFIX;
+        private String oauth2ClientCachePrefix = RengineConstants.CACHE_LOGIN_OIDC_PREFIX;
         private Long oauth2ClientCacheExpireSeconds = 1800L;
     }
 

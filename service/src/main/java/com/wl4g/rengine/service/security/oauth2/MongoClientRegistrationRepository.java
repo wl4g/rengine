@@ -17,7 +17,7 @@
 package com.wl4g.rengine.service.security.oauth2;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_SECURITY_OAUTH2_CALLBACK_BASE_URI;
+import static com.wl4g.rengine.common.constants.RengineConstants.API_LOGIN_OAUTH2_CALLBACK_ENDPOINT_BASE;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -104,8 +104,8 @@ public final class MongoClientRegistrationRepository implements ClientRegistrati
         final var currentRequest = WebUtils3.currentServletRequest();
         if (nonNull(currentRequest)) {
             return UriComponentsBuilder.fromUriString(WebUtils2.getRFCBaseURI(currentRequest, true))
-                    .path(DEFAULT_SECURITY_OAUTH2_CALLBACK_BASE_URI.substring(0,
-                            DEFAULT_SECURITY_OAUTH2_CALLBACK_BASE_URI.indexOf("*")))
+                    .path(API_LOGIN_OAUTH2_CALLBACK_ENDPOINT_BASE.substring(0,
+                            API_LOGIN_OAUTH2_CALLBACK_ENDPOINT_BASE.indexOf("*")))
                     .path(registrationId)
                     .build()
                     .toUriString();

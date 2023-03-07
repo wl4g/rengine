@@ -135,7 +135,7 @@ public class UserServiceImpl implements UserService {
         final var secret = DEFAULT_RSA_CRYPTOR.generateKeyPair();
         redisTemplate.opsForValue()
                 .set(secretCacheKey, ProtostuffUtils.serialize(secret),
-                        Duration.ofSeconds(config.getAuth().getSecretCacheExpireSeconds()));
+                        Duration.ofSeconds(config.getUser().getSecretCacheExpireSeconds()));
 
         return secret.getPubHexString();
     }

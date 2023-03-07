@@ -50,7 +50,7 @@ public abstract class AuthenticationUtils {
         final UserAuthenticationInfo info = new UserAuthenticationInfo();
 
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        log.debug("Load auth user info : {}", authentication);
+        log.debug("Load user user info : {}", authentication);
 
         if (nonNull(authentication)) {
             info.setName(authentication.getName());

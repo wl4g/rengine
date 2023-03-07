@@ -97,13 +97,13 @@ public final class MongoUserDetailsManager implements UserDetailsManager, UserDe
 
     @Override
     public void changePassword(String oldPassword, String newPassword) {
-        Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
+        final Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
         if (currentUser == null) {
             // This would indicate bad coding somewhere
             throw new AccessDeniedException(
                     "Can't change password as no Authentication object found in context " + "for current user.");
         }
-        String username = currentUser.getName();
+        final String username = currentUser.getName();
         log.debug(format("Changing password for user '%s'", username));
 
         // If an authentication manager has been set, re-authenticate the user
@@ -114,7 +114,7 @@ public final class MongoUserDetailsManager implements UserDetailsManager, UserDe
         } else {
             log.debug("No authentication manager set. Password won't be re-checked.");
         }
-        User user = (User) loadUserByUsername(username);
+        final User user = (User) loadUserByUsername(username);
         Assert.state(user != null, "Current user doesn't exist in database.");
         updatePassword(user, newPassword);
     }
@@ -176,20 +176,21 @@ public final class MongoUserDetailsManager implements UserDetailsManager, UserDe
     public static UserDetails fromEntityUser(com.wl4g.rengine.common.entity.User user) {
         return new User(user.getUsername(), user.getPassword(), (user.getEnable() == BaseBean.ENABLED ? true : false),
                 user.isAccountNonExpired(), user.isAccountNonExpired(), user.isCredentialsNonExpired(),
-                safeList(user.getAuthorities()).stream().map(auth -> {
-                    if (auth instanceof com.wl4g.rengine.common.entity.User.SimpleGrantedAuthority) {
-                        return new SimpleGrantedAuthority(auth.getAuthority());
-                    } else if (auth instanceof com.wl4g.rengine.common.entity.User.OAuth2UserAuthority) {
-                        return new OAuth2UserAuthority(auth.getAuthority(), ((OAuth2UserAuthority) auth).getAttributes());
-                    } else if (auth instanceof com.wl4g.rengine.common.entity.User.OidcUserAuthority) {
-                        final var oidcAuth = ((com.wl4g.rengine.common.entity.User.OidcUserAuthority) auth);
+                safeList(user.getAuthorities()).stream().map(grantAuth -> {
+                    if (grantAuth instanceof com.wl4g.rengine.common.entity.User.SimpleGrantedAuthority) {
+                        return new SimpleGrantedAuthority(grantAuth.getAuthority());
+                    } else if (grantAuth instanceof com.wl4g.rengine.common.entity.User.OAuth2UserAuthority) {
+                        return new OAuth2UserAuthority(grantAuth.getAuthority(),
+                                ((OAuth2UserAuthority) grantAuth).getAttributes());
+                    } else if (grantAuth instanceof com.wl4g.rengine.common.entity.User.OidcUserAuthority) {
+                        final var oidcAuth = ((com.wl4g.rengine.common.entity.User.OidcUserAuthority) grantAuth);
                         final var oidcIdToken = oidcAuth.getIdToken();
                         final var newIdToken = new OidcIdToken(oidcIdToken.getTokenValue(), oidcIdToken.getIssuedAt(),
                                 oidcIdToken.getExpiresAt(), oidcIdToken.getClaims());
                         final var newUserInfo = new OidcUserInfo(oidcAuth.getUserInfo().getClaims());
-                        return new OidcUserAuthority(auth.getAuthority(), newIdToken, newUserInfo);
+                        return new OidcUserAuthority(grantAuth.getAuthority(), newIdToken, newUserInfo);
                     }
-                    throw new UnsupportedOperationException(format("No supported granted authority for %s", auth));
+                    throw new UnsupportedOperationException(format("No supported granted authority for %s", grantAuth));
                 }).collect(toSet()));
     }
 

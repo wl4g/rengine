@@ -51,12 +51,9 @@ public interface UserService {
     UserAuthenticationInfo userInfo();
 
     public static String buildSecretCacheKey(RengineWebSecurityProperties config, String username) {
-        return config.getAuth().getSecretCachePrefix().concat(username);
+        return config.getUser().getSecretCachePrefix().concat(username);
     }
 
     public static final RSACryptor DEFAULT_RSA_CRYPTOR = new RSACryptor();
-    public static final String DEFAULT_USER_BASE_URI_V1 = "/v1/user";
-    public static final String DEFAULT_APPLY_SECRET_URI = "/applysecret";
-    public static final String DEFAULT_USERINFO_URI = "/userinfo";
 
 }
