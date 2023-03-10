@@ -76,7 +76,7 @@ public class UserController {
     @Operation(description = "Query useres.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
-    @PreAuthorize("hasAuthority('arn:rengine:sys:user:query:v1')")
+    @PreAuthorize("hasAuthority('arn:sys:user:query:v1')")
     public RespBase<PageHolder<User>> query(@Validated UserQuery model) {
         log.debug("called: model={}", model);
         RespBase<PageHolder<User>> resp = RespBase.create();
@@ -88,7 +88,7 @@ public class UserController {
     @Operation(description = "Save user.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    @PreAuthorize("hasAuthority('arn:rengine:sys:user:save:v1')")
+    @PreAuthorize("hasAuthority('arn:sys:user:save:v1')")
     public RespBase<UserSaveResult> save(@Validated @RequestBody UserSave model) {
         log.debug("called: model={}", model);
         RespBase<UserSaveResult> resp = RespBase.create();
@@ -100,7 +100,7 @@ public class UserController {
     @Operation(description = "Delete user.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
-    @PreAuthorize("hasAuthority('arn:rengine:sys:user:delete:v1')")
+    @PreAuthorize("hasAuthority('arn:sys:user:delete:v1')")
     public RespBase<UserDeleteResult> delete(@Validated @RequestBody UserDelete model) {
         log.debug("called: model={}", model);
         RespBase<UserDeleteResult> resp = RespBase.create();
@@ -120,7 +120,7 @@ public class UserController {
     @Operation(description = "Change password.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "changePassword" }, produces = "application/json", method = { POST })
-    @PreAuthorize("hasAuthority('arn:rengine:sys:user:changePassword:v1')")
+    @PreAuthorize("hasAuthority('arn:sys:user:changePassword:v1')")
     public RespBase<Boolean> changePassword(
             @NotBlank @RequestParam("oldPassword") String oldPassword,
             @NotBlank @RequestParam("newPassword") String newPassword) {
@@ -132,7 +132,7 @@ public class UserController {
     @Operation(description = "Load current authentication user info.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { API_V1_USER_USERINFO_URI }, produces = "application/json", method = { GET })
-    @PreAuthorize("hasAuthority('arn:rengine:sys:user:userinfo:v1')")
+    @PreAuthorize("hasAuthority('arn:sys:user:userinfo:v1')")
     public RespBase<UserAuthInfo> userInfo(HttpServletRequest request) {
         return RespBase.<UserAuthInfo> create()
                 .withCode(RetCode.OK)

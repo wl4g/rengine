@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.apiserver.controller;
+package com.wl4g.rengine.apiserver.controller.sys;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -59,7 +59,7 @@ public class IdentityProviderController {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
     @ResponseBody
-    @PreAuthorize("hasAuthority('arn:rengine:idp:query:v1')")
+    @PreAuthorize("hasAuthority('arn:sys:idp:query:v1')")
     public RespBase<PageHolder<IdentityProvider>> query(@Validated IdentityProviderQuery model) {
         log.debug("called: model={}", model);
         RespBase<PageHolder<IdentityProvider>> resp = RespBase.create();
@@ -71,7 +71,7 @@ public class IdentityProviderController {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
     @ResponseBody
-    @PreAuthorize("hasAuthority('arn:rengine:idp:save:v1')")
+    @PreAuthorize("hasAuthority('arn:sys:idp:save:v1')")
     public RespBase<IdentityProviderSaveResult> save(@Validated @RequestBody IdentityProviderSave model) {
         log.debug("called: model={}", model);
         RespBase<IdentityProviderSaveResult> resp = RespBase.create();

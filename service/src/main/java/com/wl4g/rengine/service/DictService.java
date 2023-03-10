@@ -58,12 +58,12 @@ public interface DictService {
         for (Dict dict : dicts) {
             DictType type = dict.getType();
             // To dictionaries list
-            List<Dict> list = dictList.getOrDefault(type, new ArrayList<>());
+            List<Dict> list = dictList.getOrDefault(type.name(), new ArrayList<>());
             list.add(dict);
             dictList.put(type.name(), list);
 
             // To dictionaries map
-            Map<String, Dict> map = dictMap.getOrDefault(type, new HashMap<>());
+            Map<String, Dict> map = dictMap.getOrDefault(type.name(), new HashMap<>());
             map.put(dict.getValue(), dict);
             dictMap.put(type.name(), map);
         }

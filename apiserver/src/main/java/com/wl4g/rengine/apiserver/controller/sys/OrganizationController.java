@@ -61,7 +61,7 @@ public class OrganizationController {
     @Operation(description = "Query organizationes.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
-    @PreAuthorize("hasAuthority('arn:rengine:sys:org:query:v1')")
+    @PreAuthorize("hasAuthority('arn:sys:org:query:v1')")
     public RespBase<PageHolder<Organization>> query(@Validated OrganizationQuery model) {
         log.debug("called: model={}", model);
         RespBase<PageHolder<Organization>> resp = RespBase.create();
@@ -73,7 +73,7 @@ public class OrganizationController {
     @Operation(description = "Save organization.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    @PreAuthorize("hasAuthority('arn:rengine:sys:org:save:v1')")
+    @PreAuthorize("hasAuthority('arn:sys:org:save:v1')")
     public RespBase<OrganizationSaveResult> save(@Validated @RequestBody OrganizationSave model) {
         log.debug("called: model={}", model);
         RespBase<OrganizationSaveResult> resp = RespBase.create();
@@ -85,7 +85,7 @@ public class OrganizationController {
     @Operation(description = "Delete organization.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
-    @PreAuthorize("hasAuthority('arn:rengine:sys:org:delete:v1')")
+    @PreAuthorize("hasAuthority('arn:sys:org:delete:v1')")
     public RespBase<OrganizationDeleteResult> delete(@Validated @RequestBody OrganizationDelete model) {
         log.debug("called: model={}", model);
         RespBase<OrganizationDeleteResult> resp = RespBase.create();
