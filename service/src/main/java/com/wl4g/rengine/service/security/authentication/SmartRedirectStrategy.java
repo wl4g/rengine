@@ -81,7 +81,7 @@ public class SmartRedirectStrategy extends DefaultRedirectStrategy {
             @Nullable RuntimeException authEx) throws IOException {
 
         String redirectUri = uri;
-        if (isBlank(uri) && isBlank(URI.create(uri).getScheme())) {
+        if (!isBlank(uri) && isBlank(URI.create(uri).getScheme())) {
             redirectUri = UriComponentsBuilder.fromUriString(WebUtils2.getRFCBaseURI(request, contextPath))
                     .path(uri)
                     // .encode()

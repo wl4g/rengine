@@ -15,7 +15,12 @@
  */
 package com.wl4g.rengine.service.security.access;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static com.wl4g.rengine.service.security.user.AuthenticationService.DEFAULT_EXTRA_AUTHORITY_ATTRIBUTE;
+import static com.wl4g.rengine.service.security.user.AuthenticationService.isDefaultSuperAdministrator;
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.split;
 
 import java.io.Serializable;
 
@@ -24,6 +29,7 @@ import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 
 /**
  * Although it is easy to implement the evaluate of data permissions this type,
@@ -37,22 +43,36 @@ public class SimplePermissionEvaluator implements PermissionEvaluator {
 
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
+        // The root user has the highest super authority.
+        // TODO using strategy config.
+        if (isDefaultSuperAdministrator(authentication.getName())) {
+            return true;
+        }
         final var principal = authentication.getPrincipal();
+        final var permissionStr = (permission instanceof String) ? (String) permission : null;
 
+        if (principal instanceof OAuth2AuthenticatedPrincipal) {
+            // Matchs for OIDC standard authorities.
+            final var oauth2Principal = (OAuth2AuthenticatedPrincipal) principal;
+            for (GrantedAuthority authority : safeList(oauth2Principal.getAuthorities())) {
+                if (StringUtils.equals(authority.getAuthority(), permissionStr)) {
+                    return true;
+                }
+            }
+            // Matchs for extra OIDC attributes authorities.
+            final var extraAuthorities = oauth2Principal.getAttribute(DEFAULT_EXTRA_AUTHORITY_ATTRIBUTE);
+            if (nonNull(extraAuthorities) && (extraAuthorities instanceof String)) {
+                for (String authority : safeArrayToList(split(extraAuthorities.toString(), ","))) {
+                    if (StringUtils.equals(authority, permissionStr)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        // Matchs for default login authorities.
         if (principal instanceof UserDetails) {
             final var user = (UserDetails) principal;
-
-            // The root user has the highest super authority.
-            // TODO using strategy config.
-            if (StringUtils.equals(user.getUsername(), "root")) {
-                return true;
-            }
-
-            String permissionStr = null;
-            if (permission instanceof String) {
-                permissionStr = (String) permission;
-            }
-
             for (GrantedAuthority authority : safeList(user.getAuthorities())) {
                 if (StringUtils.equals(authority.getAuthority(), permissionStr)) {
                     return true;

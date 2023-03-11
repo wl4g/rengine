@@ -15,6 +15,7 @@
  */
 package com.wl4g.rengine.service.security.user;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.util.Objects.isNull;
@@ -24,14 +25,21 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.validation.constraints.NotBlank;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
@@ -45,8 +53,10 @@ import com.wl4g.infra.common.crypto.asymmetric.RSACryptor;
 import com.wl4g.infra.common.crypto.asymmetric.spec.KeyPairSpec;
 import com.wl4g.infra.common.serialize.ProtostuffUtils;
 import com.wl4g.rengine.service.security.RengineWebSecurityProperties;
+import com.wl4g.rengine.service.security.access.SimplePermissionGrantedAuthority;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder.Default;
 import lombok.CustomLog;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -144,7 +154,8 @@ public class AuthenticationService {
 
             final Object principal = authentication.getPrincipal();
             if (principal instanceof OAuth2AuthenticatedPrincipal) {
-                info.setAttributes(((OAuth2AuthenticatedPrincipal) principal).getAttributes());
+                final var oauth2Principal = (OAuth2AuthenticatedPrincipal) principal;
+                info.setAttributes(oauth2Principal.getAttributes());
                 if (principal instanceof OidcUser) {
                     final OidcUser oidcUser = ((OidcUser) principal);
                     info.setAuthenticatedAt(oidcUser.getAuthenticatedAt());
@@ -181,14 +192,38 @@ public class AuthenticationService {
                             .country(oidcAddress.getCountry())
                             .build());
                 }
+                setupAuthorities(authentication, info, oauth2Principal.getAuthorities());
             }
             if (principal instanceof UserDetails) {
-                // final UserDetails userDetails = (UserDetails) principal;
-                // userDetails.getAuthorities();
+                final UserDetails userDetails = (UserDetails) principal;
+                setupAuthorities(authentication, info, userDetails.getAuthorities());
             }
         }
 
         return info;
+    }
+
+    private static void setupAuthorities(
+            Authentication authentication,
+            UserAuthInfo info,
+            Collection<? extends GrantedAuthority> authorities) {
+
+        if (isDefaultSuperAdministrator(authentication.getName())) {
+            info.getAuthorities().setIsSuperAdministrator(true);
+        }
+
+        for (GrantedAuthority auth : safeList(authorities)) {
+            if (auth instanceof SimpleGrantedAuthority) {
+                info.getAuthorities().getRoles().add(auth.getAuthority());
+            }
+            if (auth instanceof SimplePermissionGrantedAuthority) {
+                info.getAuthorities().getPermissions().add(auth.getAuthority());
+            }
+        }
+    }
+
+    public static boolean isDefaultSuperAdministrator(String username) {
+        return StringUtils.equals(username, "root");
     }
 
     @Getter
@@ -203,9 +238,21 @@ public class AuthenticationService {
         private Instant authenticatedAt;
         private Instant expiresAt;
         private String remoteAddress;
-        private UserInfo userinfo;
-        private AddressInfo address;
-        private Map<String, Object> attributes;
+        private @Default UserAuthorityInfo authorities = UserAuthorityInfo.builder().build();
+        private @Default UserInfo userinfo = UserInfo.builder().build();
+        private @Default AddressInfo address = AddressInfo.builder().build();
+        private @Default Map<String, Object> attributes = new HashMap<>();
+    }
+
+    @Getter
+    @Setter
+    @SuperBuilder
+    @ToString(callSuper = true)
+    @NoArgsConstructor
+    public static class UserAuthorityInfo {
+        private @Default Boolean isSuperAdministrator = false;
+        private @Default List<String> roles = new ArrayList<>();
+        private @Default List<String> permissions = new ArrayList<>();
     }
 
     @Getter
@@ -270,5 +317,7 @@ public class AuthenticationService {
         private String sc; // random secure store code (key).
         private String st; // pubilc key hex.
     }
+
+    public static final String DEFAULT_EXTRA_AUTHORITY_ATTRIBUTE = "extra_authorities";
 
 }
