@@ -13,35 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.common.entity.sys;
+package com.wl4g.rengine.common.util;
 
-import java.io.Serializable;
-import java.util.List;
+import java.util.UUID;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.SuperBuilder;
+import com.wl4g.infra.common.id.SnowflakeIdGenerator;
 
 /**
- * {@link UserRole}
+ * {@link IdGenUtils}
  * 
  * @author James Wong
- * @version 2022-09-13
+ * @version 2022-09-16
  * @since v1.0.0
- * @see {@link com.wl4g.rengine.common.entity.sys.springframework.security.core.userdetails.User}
  */
-@Getter
-@Setter
-@SuperBuilder
-@ToString(callSuper = true)
-@NoArgsConstructor
-public class UserRole implements Serializable {
-    private static final long serialVersionUID = -5762348176963349685L;
-    private Long userId;
-    private Long roleId;
+public abstract class IdGenUtils {
 
-    // The temporary wrap fields.
-    private List<Role> roles;
+    public static String next() {
+        return UUID.randomUUID().toString();
+    }
+
+    public static long nextLong() {
+        return SnowflakeIdGenerator.getDefault().nextId();
+    }
+
 }

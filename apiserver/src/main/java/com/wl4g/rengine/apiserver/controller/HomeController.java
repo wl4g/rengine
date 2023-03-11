@@ -61,7 +61,7 @@ public class HomeController {
     @Operation(description = "Query home information.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
-    @PreAuthorize("hasAuthority('arn:rengine:home:query:v1')")
+    @PreAuthorize("isAuthenticated()")
     public RespBase<HomeQueryResult> query(@Validated HomeQuery model) {
         log.debug("called: model={}", model);
         RespBase<HomeQueryResult> resp = RespBase.create();

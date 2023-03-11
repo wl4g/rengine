@@ -22,6 +22,7 @@ import static com.wl4g.rengine.common.constants.RengineConstants.API_LOGIN_PAGE_
 import static com.wl4g.rengine.common.constants.RengineConstants.API_V1_USER_BASE_URI;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_V1_USER_USERINFO_URI;
 import static com.wl4g.rengine.service.security.user.AuthenticationService.currentUserInfo;
+import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -77,10 +78,10 @@ public class SmartRedirectStrategy extends DefaultRedirectStrategy {
             @NotNull HttpServletResponse response,
             @NotBlank String uri,
             boolean contextPath,
-            @Nullable AuthenticationException authEx) throws IOException {
+            @Nullable RuntimeException authEx) throws IOException {
 
         String redirectUri = uri;
-        if (isBlank(URI.create(uri).getScheme())) {
+        if (isBlank(uri) && isBlank(URI.create(uri).getScheme())) {
             redirectUri = UriComponentsBuilder.fromUriString(WebUtils2.getRFCBaseURI(request, contextPath))
                     .path(uri)
                     // .encode()
@@ -89,29 +90,32 @@ public class SmartRedirectStrategy extends DefaultRedirectStrategy {
         }
 
         if (isJsonResponse(request)) {
-            if (isFailure) { // Authentication failure
-                WebUtils2.writeJson(response,
-                        RespBase.create()
-                                .withCode(retCode)
-                                .withStatus(DEFAULT_UNAUTHORIZED_STATUS)
-                                .withMessage(nonNull(authEx) ? authEx.getMessage() : "Authentication failed")
-                                .forMap()
-                                .andPut(DEFAULT_REDIRECT_URI_KEY, redirectUri)
-                                .withParent()
-                                .asJson());
-            } else { // Authentication success,logout etc.
-                WebUtils2.writeJson(response,
-                        RespBase.create()
-                                .withCode(retCode)
-                                .withStatus(DEFAULT_AUTHORIZED_STATUS)
-                                .withMessage("Login successful")
-                                .forMap()
-                                .andPut(DEFAULT_REDIRECT_URI_KEY, redirectUri)
-                                .andPut(DEFAULT_USERINFO_KEY, currentUserInfo())
-                                .withParent()
-                                .asJson());
+            if (isFailure) { // Authentication failure, accessDenied or logout.
+                final var respBody = RespBase.create()
+                        .withCode(retCode)
+                        .withStatus(DEFAULT_UNAUTHORIZED_STATUS)
+                        .withMessage(nonNull(authEx) ? authEx.getMessage() : "Authentication failed")
+                        .forMap();
+                if (!isBlank(redirectUri)) {
+                    respBody.put(DEFAULT_REDIRECT_URI_KEY, redirectUri);
+                }
+                WebUtils2.writeJson(response, respBody.withParent().asJson());
+            } else { // Authentication success etc.
+                final var respBody = RespBase.create()
+                        .withCode(retCode)
+                        .withStatus(DEFAULT_AUTHORIZED_STATUS)
+                        .withMessage("Authentication successful")
+                        .forMap()
+                        .andPut(DEFAULT_USERINFO_KEY, currentUserInfo());
+                if (!isBlank(redirectUri)) {
+                    respBody.put(DEFAULT_REDIRECT_URI_KEY, redirectUri);
+                }
+                WebUtils2.writeJson(response, respBody.withParent().asJson());
             }
         } else {
+            if (isBlank(redirectUri)) {
+                throw new IllegalStateException(format("The redirect uri is required."));
+            }
             response.sendRedirect(redirectUri);
         }
     }
@@ -123,7 +127,7 @@ public class SmartRedirectStrategy extends DefaultRedirectStrategy {
      * @param request
      * @return
      */
-    protected boolean isJsonResponse(HttpServletRequest request) {
+    public static boolean isJsonResponse(HttpServletRequest request) {
         final boolean isRespJson = isRespJSON(request);
         log.debug("Using response json : {}", isRespJson);
         return isRespJson;
@@ -151,14 +155,14 @@ public class SmartRedirectStrategy extends DefaultRedirectStrategy {
         //// @formatter:on
 
         // see:org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer#updateAuthenticationDefaults()
-        final var failureHandler = new SimpleUrlAuthenticationFailureHandler(API_LOGIN_PAGE_PATH+"?error");
-        failureHandler.setRedirectStrategy(defaultInstanceOfUnauthc);
+        final var failureHandler = new SimpleUrlAuthenticationFailureHandler(API_LOGIN_PAGE_PATH + "?error");
+        failureHandler.setRedirectStrategy(defaultInstanceOfUnauth);
         configurer.failureHandler(failureHandler);
     }
 
     public static final SmartRedirectStrategy defaultInstanceOfAuthed = new SmartRedirectStrategy(false, RetCode.OK);
-    public static final SmartRedirectStrategy defaultInstanceOfUnauthc = new SmartRedirectStrategy(true, RetCode.UNAUTHC);
-    public static final SmartRedirectStrategy defaultInstanceOfUnauthz = new SmartRedirectStrategy(true, RetCode.UNAUTHZ);
+    public static final SmartRedirectStrategy defaultInstanceOfUnauth = new SmartRedirectStrategy(true, RetCode.UNAUTHC);
+    public static final SmartRedirectStrategy defaultInstanceOfAccessDenied = new SmartRedirectStrategy(true, RetCode.UNAUTHZ);
 
     public static final String DEFAULT_UNAUTHORIZED_STATUS = "UNAUTHORIZED";
     public static final String DEFAULT_AUTHORIZED_STATUS = "AUTHORIZED";

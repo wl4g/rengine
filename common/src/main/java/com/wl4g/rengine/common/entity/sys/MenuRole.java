@@ -41,5 +41,7 @@ public class MenuRole implements Serializable {
     private static final long serialVersionUID = -5762348176963349685L;
     private Long menuId;
     private Long roleId;
+
+    // The temporary wrap fields.
     private List<Menu> menus;
 }

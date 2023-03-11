@@ -61,7 +61,7 @@ public class ControllerLogController {
     @Operation(description = "Query schedule jobs.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
-    @PreAuthorize("hasAuthority('arn:rengine:controllerlog:query:v1')")
+    @PreAuthorize("hasPermission(#model,'arn:rengine:controllerlog:read:v1')")
     public RespBase<PageHolder<ControllerLog>> query(@Validated ControllerLogQuery model) {
         log.debug("called: model={}", model);
         RespBase<PageHolder<ControllerLog>> resp = RespBase.create();
@@ -73,7 +73,7 @@ public class ControllerLogController {
     @Operation(description = "Save schedule job.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    @PreAuthorize("hasAuthority('arn:rengine:controllerlog:save:v1')")
+    @PreAuthorize("hasPermission(#model,'arn:rengine:controllerlog:write:v1')")
     public RespBase<ControllerLogSaveResult> save(@Validated @RequestBody ControllerLogSave model) {
         log.debug("called: model={}", model);
         RespBase<ControllerLogSaveResult> resp = RespBase.create();
@@ -85,7 +85,7 @@ public class ControllerLogController {
     @Operation(description = "Delete schedule job.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
-    @PreAuthorize("hasAuthority('arn:rengine:controllerlog:delete:v1')")
+    @PreAuthorize("hasPermission(#model,'arn:rengine:controllerlog:delete:v1')")
     public RespBase<ControllerLogDeleteResult> delete(@Validated @RequestBody ControllerLogDelete model) {
         log.debug("called: model={}", model);
         RespBase<ControllerLogDeleteResult> resp = RespBase.create();

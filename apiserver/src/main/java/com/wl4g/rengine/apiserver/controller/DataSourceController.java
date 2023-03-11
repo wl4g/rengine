@@ -63,7 +63,7 @@ public class DataSourceController {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful",
             content = { @Content(mediaType = "application/json") }) })
     @RequestMapping(path = { "query" }, method = { GET })
-    @PreAuthorize("hasAuthority('arn:rengine:datasource:query:v1')")
+    @PreAuthorize("hasPermission(#model,'arn:rengine:datasource:read:v1')")
     public RespBase<PageHolder<DataSourceProperties>> query(@Validated DataSourceQuery model) {
         log.debug("called: model={}", model);
         RespBase<PageHolder<DataSourceProperties>> resp = RespBase.create();
@@ -75,7 +75,7 @@ public class DataSourceController {
     @Operation(description = "Save dataSource.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    @PreAuthorize("hasAuthority('arn:rengine:datasource:save:v1')")
+    @PreAuthorize("hasPermission(#model,'arn:rengine:datasource:write:v1')")
     public RespBase<DataSourceSaveResult> save(@Validated @RequestBody DataSourceSave model) {
         log.debug("called: model={}", model);
         RespBase<DataSourceSaveResult> resp = RespBase.create();
@@ -87,7 +87,7 @@ public class DataSourceController {
     @Operation(description = "Delete dataSource.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
-    @PreAuthorize("hasAuthority('arn:rengine:datasource:delete:v1')")
+    @PreAuthorize("hasPermission(#model,'arn:rengine:datasource:delete:v1')")
     public RespBase<DataSourceDeleteResult> delete(@Validated @RequestBody DataSourceDelete model) {
         log.debug("called: model={}", model);
         RespBase<DataSourceDeleteResult> resp = RespBase.create();

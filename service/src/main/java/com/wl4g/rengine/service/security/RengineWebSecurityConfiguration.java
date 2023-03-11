@@ -21,6 +21,7 @@ import static com.wl4g.rengine.common.constants.RengineConstants.API_LOGIN_PAGE_
 import static com.wl4g.rengine.common.constants.RengineConstants.API_LOGIN_PASSWORD_ENDPOINT;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_V1_USER_BASE_URI;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_V1_USER_SECURE_URI;
+import static java.lang.String.format;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,9 +31,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder.BCryptVersion;
@@ -62,7 +65,7 @@ import com.wl4g.rengine.service.security.user.UsernamePasswordAuthenticationProv
  */
 @Configuration
 @ConditionalOnDefaultWebSecurity
-// @EnableWebSecurity
+@EnableWebSecurity
 public class RengineWebSecurityConfiguration implements WebSecurityCustomizer {
 
     @Value("${springdoc.api-docs.path:/v3/api-docs}")
@@ -131,12 +134,19 @@ public class RengineWebSecurityConfiguration implements WebSecurityCustomizer {
                 // see:org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter
                 // see:org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint
                 .authenticationEntryPoint((request, response, authEx) -> {
-                    SmartRedirectStrategy.defaultInstanceOfUnauthc.doSendRedirect(request, response, API_LOGIN_PAGE_PATH, false, authEx);
+                    SmartRedirectStrategy.defaultInstanceOfUnauth.doSendRedirect(request, response, API_LOGIN_PAGE_PATH, false,
+                            authEx);
+                })
+                .accessDeniedHandler((request, response, authEx) -> {
+                    SmartRedirectStrategy.defaultInstanceOfAccessDenied.doSendRedirect(request, response, null, false,
+                            new AccessDeniedException(format(
+                                    "Sorry, you do not have permission to access this resource yet, you may need to contact the administrator to authorize this resource!"),
+                                    authEx));
                 })
                 .and()
                 .logout(customizer -> {
                     final var logoutSuccessHandler = new SimpleUrlLogoutSuccessHandler();
-                    logoutSuccessHandler.setRedirectStrategy(SmartRedirectStrategy.defaultInstanceOfAuthed);
+                    logoutSuccessHandler.setRedirectStrategy(SmartRedirectStrategy.defaultInstanceOfUnauth);
                     customizer.logoutSuccessHandler(logoutSuccessHandler);
                 })
                 // @formatter:off

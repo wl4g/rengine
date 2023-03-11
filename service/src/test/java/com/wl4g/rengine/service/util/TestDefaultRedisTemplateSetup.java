@@ -32,7 +32,19 @@ public class TestDefaultRedisTemplateSetup {
 
     public static RedisTemplate<String, String> createRedisTemplate() {
         final RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(createLettuceConnectionFactory());
+        redisTemplate.afterPropertiesSet();
+        return redisTemplate;
+    }
 
+    public static RedisTemplate<String, byte[]> createRedisTemplateWithByteArray() {
+        final RedisTemplate<String, byte[]> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(createLettuceConnectionFactory());
+        redisTemplate.afterPropertiesSet();
+        return redisTemplate;
+    }
+
+    public static LettuceConnectionFactory createLettuceConnectionFactory() {
         final RedisClusterConfiguration clusterConfiguration = new RedisClusterConfiguration(
                 asList("localhost:6379,localhost:6380,localhost:6381,localhost:7379,localhost:7380,localhost:7381"));
         clusterConfiguration.setPassword("zzx!@#$%");
@@ -40,9 +52,7 @@ public class TestDefaultRedisTemplateSetup {
         final LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(clusterConfiguration);
         connectionFactory.afterPropertiesSet();
 
-        redisTemplate.setConnectionFactory(connectionFactory);
-        redisTemplate.afterPropertiesSet();
-        return redisTemplate;
+        return connectionFactory;
     }
 
 }

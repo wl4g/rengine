@@ -55,7 +55,8 @@ import com.wl4g.rengine.service.security.user.AuthenticationService.UserAuthInfo
 @Service
 public class UserServiceImpl implements UserService {
 
-    private @Autowired MongoTemplate mongoTemplate;
+    @Autowired
+    MongoTemplate mongoTemplate;
 
     @Override
     public PageHolder<User> query(UserQuery model) {
@@ -68,12 +69,6 @@ public class UserServiceImpl implements UserService {
         return new PageHolder<User>(model.getPageNum(), model.getPageSize())
                 .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.SYS_USERS.getName()))
                 .withRecords(users);
-    }
-
-    @Override
-    public User loadUserByUsername(String username) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override

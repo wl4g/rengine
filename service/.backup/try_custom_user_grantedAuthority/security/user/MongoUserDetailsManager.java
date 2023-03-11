@@ -2,17 +2,16 @@ package com.wl4g.rengine.service.security.user;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static com.wl4g.rengine.common.constants.ServiceRengineConstants.USER_ROLE_ORGAN_MENUS_LOOKUP_FILTER;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.bson.Document;
-import org.bson.conversions.Bson;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -26,18 +25,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsPasswordService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.core.oidc.OidcIdToken;
+import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
+import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
+import org.springframework.security.oauth2.core.user.OAuth2UserAuthority;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.util.Assert;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Aggregates;
-import com.mongodb.client.model.Filters;
 import com.wl4g.infra.common.bean.BaseBean;
-import com.wl4g.rengine.common.entity.sys.Menu;
-import com.wl4g.rengine.common.entity.sys.MenuRole;
-import com.wl4g.rengine.common.entity.sys.Role;
-import com.wl4g.rengine.common.entity.sys.UserRole;
 import com.wl4g.rengine.common.exception.RengineException;
 import com.wl4g.rengine.common.util.BsonEntitySerializers;
 import com.wl4g.rengine.service.security.RengineWebSecurityProperties;
@@ -155,34 +152,15 @@ public final class MongoUserDetailsManager implements UserDetailsManager, UserDe
     // see:org.springframework.security.access.expression.SecurityExpressionRoot#getAuthoritySet
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        //// @formatter:off
-        //final Document query = new Document("username", username);
-        //final Document userDoc = userCollection.find(query).first();
-        //if (isNull(userDoc)) {
-        //    throw new UsernameNotFoundException(format("User %s not found", username));
-        //}
-        //final com.wl4g.rengine.common.entity.sys.User user = BsonEntitySerializers.fromDocument(userDoc,
-        //        com.wl4g.rengine.common.entity.sys.User.class);
-        //// @formatter:on
-        // return fromEntityUser(user);
-
-        final var aggregates = new ArrayList<Bson>(2);
-        aggregates.add(Aggregates.match(Filters.in("username", username)));
-        USER_ROLE_ORGAN_MENUS_LOOKUP_FILTER.stream().forEach(rs -> aggregates.add(rs.asDocument()));
-        // System.out.println(BsonUtils2.toJson(USER_ROLE_ORGAN_MENUS_LOOKUP_FILTER));
-
-        try (var cursor = userCollection.aggregate(aggregates)
-                .map(userDoc -> BsonEntitySerializers.fromDocument(userDoc, com.wl4g.rengine.common.entity.sys.User.class))
-                .cursor();) {
-            if (!cursor.hasNext()) {
-                throw new UsernameNotFoundException(format("The user %s not found", username));
-            }
-            final var user = cursor.next();
-            if (cursor.hasNext()) {
-                throw new IllegalStateException(format("The ambiguous users found, multiple names are %s", username));
-            }
-            return fromEntityUser(user);
+        final Document query = new Document("username", username);
+        final Document userDoc = userCollection.find(query).first();
+        if (isNull(userDoc)) {
+            throw new UsernameNotFoundException(format("User %s not found", username));
         }
+
+        final com.wl4g.rengine.common.entity.sys.User user = BsonEntitySerializers.fromDocument(userDoc,
+                com.wl4g.rengine.common.entity.sys.User.class);
+        return fromEntityUser(user);
     }
 
     @Override
@@ -210,34 +188,50 @@ public final class MongoUserDetailsManager implements UserDetailsManager, UserDe
                 .accountNonExpired(userDetails.isAccountNonExpired())
                 .accountNonLocked(userDetails.isAccountNonLocked())
                 .credentialsNonExpired(userDetails.isCredentialsNonExpired())
-                .authorities(userDetails.getAuthorities())
+                .authorities(safeList(userDetails.getAuthorities()).stream().map(auth -> {
+                    if (auth instanceof SimplePermissionGrantedAuthority) {
+                        return (SimplePermissionGrantedAuthority) auth;
+                    } else if (auth instanceof SimpleGrantedAuthority) {
+                        return new com.wl4g.rengine.common.entity.sys.User.SimpleGrantedAuthority(auth.getAuthority());
+                    } else if (auth instanceof OAuth2UserAuthority) {
+                        return new com.wl4g.rengine.common.entity.sys.User.OAuth2UserAuthority(auth.getAuthority(),
+                                ((OAuth2UserAuthority) auth).getAttributes());
+                    } else if (auth instanceof OidcUserAuthority) {
+                        final var oidcAuth = ((OidcUserAuthority) auth);
+                        final var oidcIdToken = oidcAuth.getIdToken();
+                        final var newIdToken = new com.wl4g.rengine.common.entity.sys.User.OidcIdToken(
+                                oidcIdToken.getTokenValue(), oidcIdToken.getIssuedAt(), oidcIdToken.getExpiresAt(),
+                                oidcIdToken.getClaims());
+                        final var newUserInfo = new com.wl4g.rengine.common.entity.sys.User.OidcUserInfo(
+                                oidcAuth.getUserInfo().getClaims());
+                        return new com.wl4g.rengine.common.entity.sys.User.OidcUserAuthority(auth.getAuthority(), newIdToken,
+                                newUserInfo);
+                    }
+                    throw new UnsupportedOperationException(format("No supported granted authority for %s", auth));
+                }).collect(toSet()))
                 .build();
     }
 
     public static UserDetails fromEntityUser(com.wl4g.rengine.common.entity.sys.User user) {
-        // Transform user role menu permissions set to userDetails granted
-        // authories.
-        final var allRoleGrantedAuthorities = new ArrayList<GrantedAuthority>(4);
-        final var allPermissionGrantedAuthorities = new ArrayList<GrantedAuthority>(16);
-        for (UserRole userRole : safeList(user.getUserRoles())) {
-            for (Role role : safeList(userRole.getRoles())) {
-                allRoleGrantedAuthorities.add(new SimpleGrantedAuthority(role.getRoleCode()));
-                for (MenuRole menuRole : safeList(role.getMenuRoles())) {
-                    for (Menu menu : safeList(menuRole.getMenus())) {
-                        for (String permission : safeList(menu.getPermissions())) {
-                            allPermissionGrantedAuthorities.add(new SimplePermissionGrantedAuthority(permission));
-                        }
-                    }
-                }
-            }
-        }
-        // Merge all granted authorities.
-        allRoleGrantedAuthorities.addAll(allPermissionGrantedAuthorities);
-
-        // Wrap to spring security user.
         return new SpringSecurityUser(user.getId(), user.getEnable(), user.getLabels(), user.getRemark(), user.getUsername(),
                 user.getPassword(), (user.getEnable() == BaseBean.ENABLED ? true : false), user.isAccountNonExpired(),
-                user.isAccountNonExpired(), user.isCredentialsNonExpired(), allRoleGrantedAuthorities);
+                user.isAccountNonExpired(), user.isCredentialsNonExpired(), safeList(user.getAuthorities()).stream().map(auth -> {
+                    if (auth instanceof SimplePermissionGrantedAuthority) {
+                        return (SimplePermissionGrantedAuthority) auth;
+                    } else if (auth instanceof com.wl4g.rengine.common.entity.sys.User.SimpleGrantedAuthority) {
+                        return new SimpleGrantedAuthority(auth.getAuthority());
+                    } else if (auth instanceof com.wl4g.rengine.common.entity.sys.User.OAuth2UserAuthority) {
+                        return new OAuth2UserAuthority(auth.getAuthority(), ((OAuth2UserAuthority) auth).getAttributes());
+                    } else if (auth instanceof com.wl4g.rengine.common.entity.sys.User.OidcUserAuthority) {
+                        final var oidcAuth = ((com.wl4g.rengine.common.entity.sys.User.OidcUserAuthority) auth);
+                        final var oidcIdToken = oidcAuth.getIdToken();
+                        final var newIdToken = new OidcIdToken(oidcIdToken.getTokenValue(), oidcIdToken.getIssuedAt(),
+                                oidcIdToken.getExpiresAt(), oidcIdToken.getClaims());
+                        final var newUserInfo = new OidcUserInfo(oidcAuth.getUserInfo().getClaims());
+                        return new OidcUserAuthority(auth.getAuthority(), newIdToken, newUserInfo);
+                    }
+                    throw new UnsupportedOperationException(format("No supported granted authority for %s", auth));
+                }).collect(toSet()));
     }
 
     @Getter

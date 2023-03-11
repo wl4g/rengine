@@ -15,7 +15,6 @@
  */
 package com.wl4g.rengine.service;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
@@ -37,8 +36,6 @@ import com.wl4g.rengine.service.security.user.AuthenticationService.UserAuthInfo
 public interface UserService {
 
     PageHolder<User> query(@NotNull UserQuery model);
-
-    User loadUserByUsername(@NotBlank String username);
 
     UserSaveResult save(@NotNull UserSave model);
 

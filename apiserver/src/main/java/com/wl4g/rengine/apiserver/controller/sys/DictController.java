@@ -63,6 +63,7 @@ public class DictController {
     @Operation(description = "Load init dicts.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "loadinit" }, produces = "application/json", method = { GET })
+    @PreAuthorize("isAuthenticated()")
     public RespBase<Map<String, Object>> loadInit(@Validated DictQuery model) {
         RespBase<Map<String, Object>> resp = RespBase.create();
         resp.setData(dictService.loadInitDicts(model));
@@ -73,6 +74,7 @@ public class DictController {
     @Operation(description = "Query dicts.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
+    @PreAuthorize("isAuthenticated()")
     public RespBase<PageHolder<Dict>> query(@Validated DictQuery model) {
         log.debug("called: model={}", model);
         RespBase<PageHolder<Dict>> resp = RespBase.create();
@@ -84,7 +86,7 @@ public class DictController {
     @Operation(description = "Save dict.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    @PreAuthorize("hasAuthority('arn:sys:dict:save:v1')")
+    @PreAuthorize("hasPermission(#model,'arn:sys:dict:write:v1')")
     public RespBase<DictSaveResult> save(@Validated @RequestBody DictSave model) {
         log.debug("called: model={}", model);
         RespBase<DictSaveResult> resp = RespBase.create();
@@ -96,7 +98,7 @@ public class DictController {
     @Operation(description = "Delete dict.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
-    @PreAuthorize("hasAuthority('arn:sys:dict:delete:v1')")
+    @PreAuthorize("hasPermission(#model,'arn:sys:dict:delete:v1')")
     public RespBase<DictDeleteResult> delete(@Validated @RequestBody DictDelete model) {
         log.debug("called: model={}", model);
         RespBase<DictDeleteResult> resp = RespBase.create();

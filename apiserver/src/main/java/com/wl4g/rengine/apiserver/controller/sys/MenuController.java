@@ -61,7 +61,7 @@ public class MenuController {
     @Operation(description = "Query menues.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
-    @PreAuthorize("hasAuthority('arn:sys:menu:query:v1')")
+    @PreAuthorize("hasPermission(#model,'arn:sys:menu:read:v1')")
     public RespBase<PageHolder<Menu>> query(@Validated MenuQuery model) {
         log.debug("called: model={}", model);
         RespBase<PageHolder<Menu>> resp = RespBase.create();
@@ -73,7 +73,7 @@ public class MenuController {
     @Operation(description = "Save menu.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    @PreAuthorize("hasAuthority('arn:sys:menu:save:v1')")
+    @PreAuthorize("hasPermission(#model,'arn:sys:menu:write:v1')")
     public RespBase<MenuSaveResult> save(@Validated @RequestBody MenuSave model) {
         log.debug("called: model={}", model);
         RespBase<MenuSaveResult> resp = RespBase.create();
@@ -85,7 +85,7 @@ public class MenuController {
     @Operation(description = "Delete menu.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
-    @PreAuthorize("hasAuthority('arn:sys:menu:delete:v1')")
+    @PreAuthorize("hasPermission(#model,'arn:sys:menu:delete:v1')")
     public RespBase<MenuDeleteResult> delete(@Validated @RequestBody MenuDelete model) {
         log.debug("called: model={}", model);
         RespBase<MenuDeleteResult> resp = RespBase.create();

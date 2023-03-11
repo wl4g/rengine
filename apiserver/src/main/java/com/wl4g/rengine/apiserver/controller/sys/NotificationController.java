@@ -59,7 +59,7 @@ public class NotificationController {
     @Operation(description = "Query notification settings.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
-    @PreAuthorize("hasAuthority('arn:sys:notification:query:v1')")
+    @PreAuthorize("hasPermission(#model,'arn:sys:notification:read:v1')")
     public RespBase<NotificationQueryResult> query(@Validated NotificationQuery model) {
         log.debug("called: model={}", model);
         RespBase<NotificationQueryResult> resp = RespBase.create();
@@ -71,7 +71,7 @@ public class NotificationController {
     @Operation(description = "Save notification settings.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    @PreAuthorize("hasAuthority('arn:sys:notification:save:v1')")
+    @PreAuthorize("hasPermission(#model,'arn:sys:notification:write:v1')")
     public RespBase<NotificationSaveResult> save(@Validated @RequestBody NotificationSave model) {
         log.debug("called: model={}", model);
         RespBase<NotificationSaveResult> resp = RespBase.create();
@@ -84,7 +84,7 @@ public class NotificationController {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "exchageDingtalkUserId" }, consumes = "application/json", produces = "application/json",
             method = { POST })
-    @PreAuthorize("hasAuthority('arn:sys:notification:exchageDingtalkUserId:v1')")
+    @PreAuthorize("hasPermission(#model,'arn:sys:notification:exchageDingtalkUserId:v1')")
     public RespBase<NotificationDingtalkUserIdExchageResult> exchageDingtalkUserId(
             @RequestBody @Validated NotificationDingtalkUserIdExchage model) {
         log.debug("called: model={}", model);

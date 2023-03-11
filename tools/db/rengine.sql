@@ -11,7 +11,7 @@
  Target Server Version : 40406
  File Encoding         : 65001
 
- Date: 10/03/2023 17:51:56
+ Date: 11/03/2023 14:15:22
 */
 
 
@@ -29,7 +29,7 @@ session.startTransaction();
 db = session.getDatabase("rengine");
 db.getCollection("global_sequences").insert([ {
     _id: "WorkflowGraph.revision",
-    seq: NumberInt("3")
+    seq: NumberInt("8")
 } ]);
 session.commitTransaction(); session.endSession();
 
@@ -312,14 +312,16 @@ db.getCollection("sys_menus").insert([ {
     updateDate: "2021-04-23 14:27:39",
     delFlag: NumberInt("0"),
     enable: NumberInt("1"),
-    classify: "classifyE",
+    classify: "B",
     nameEn: "Home",
-    nameZh: "主页",
+    nameZh: "概览",
     type: 1,
     status: 0,
     level: 1,
     parentId: 0,
-    permission: "home",
+    permissions: [
+        "arn:rengine:home:read:v1"
+    ],
     pageLocation: "",
     routePath: "/home",
     routeNamespace: "/home",
@@ -336,42 +338,22 @@ db.getCollection("sys_menus").insert([ {
     updateDate: "2020-10-26 11:08:59",
     delFlag: NumberInt("0"),
     enable: NumberInt("1"),
+    classify: "B",
     nameEn: "System Settings",
     nameZh: "系统设置",
     type: 1,
     status: 0,
     level: 1,
     parentId: 0,
-    permission: "rengine",
+    permissions: [
+        "arn:sys:user:read:v1"
+    ],
     pageLocation: "/rengine",
     routePath: "/rengine",
     routeNamespace: "/rengine",
     renderTarget: "_self",
     icon: "icon-xitongshezhi",
     sort: 100,
-    _class: "com.wl4g.rengine.common.entity.sys.Menu"
-} ]);
-db.getCollection("sys_menus").insert([ {
-    _id: NumberLong("6305460145405100"),
-    createBy: null,
-    createDate: "2022-08-15 11:02:30",
-    updateBy: 1,
-    updateDate: "2022-08-15 11:02:36",
-    delFlag: NumberInt("0"),
-    enable: NumberInt("1"),
-    nameEn: "Overview",
-    nameZh: "首页",
-    type: 1,
-    status: 0,
-    level: 2,
-    parentId: 5,
-    permission: "rengine:overview",
-    pageLocation: "/rengine/overview/home/home",
-    routePath: "/rengine/overview",
-    routeNamespace: "/overview",
-    renderTarget: "_self",
-    icon: "icon-monitoring",
-    sort: 90,
     _class: "com.wl4g.rengine.common.entity.sys.Menu"
 } ]);
 db.getCollection("sys_menus").insert([ {
@@ -382,13 +364,16 @@ db.getCollection("sys_menus").insert([ {
     updateDate: "2022-08-15 11:02:36",
     delFlag: NumberInt("0"),
     enable: NumberInt("1"),
+    classify: "B",
     nameEn: "Scenes",
     nameZh: "场景管理",
     type: 1,
     status: 0,
     level: 2,
     parentId: 5,
-    permission: "rengine:scenes",
+    permissions: [
+        "arn:rengine:scenes:read:v1"
+    ],
     pageLocation: "/rengine/scenes/scenes/scenes",
     routePath: "/rengine/scenes",
     routeNamespace: "/scenes",
@@ -405,13 +390,16 @@ db.getCollection("sys_menus").insert([ {
     updateDate: "2022-08-15 11:13:20",
     delFlag: NumberInt("0"),
     enable: NumberInt("1"),
+    classify: "B",
     nameEn: "Scenes List",
     nameZh: "场景配置",
     type: 1,
     status: 0,
     level: 3,
     parentId: 110,
-    permission: "rengine:scenes:sceneses",
+    permissions: [
+        "arn:rengine:scenes:write:v1"
+    ],
     pageLocation: "/rengine/scenes/scenes/scenes",
     routePath: "/rengine/scenes/sceneses",
     routeNamespace: "/sceneses",
@@ -428,13 +416,16 @@ db.getCollection("sys_menus").insert([ {
     updateDate: "2022-08-15 11:13:20",
     delFlag: NumberInt("0"),
     enable: NumberInt("1"),
+    classify: "B",
     nameEn: "Workflows",
     nameZh: "工作流",
     type: 1,
     status: 0,
     level: 3,
     parentId: 110,
-    permission: "rengine:workflows",
+    permissions: [
+        "arn:rengine:workflow:read:v1"
+    ],
     pageLocation: "/rengine/scenes/workflows/workflows",
     routePath: "/rengine/workflows",
     routeNamespace: "/workflows",
@@ -451,13 +442,16 @@ db.getCollection("sys_menus").insert([ {
     updateDate: "2022-08-15 11:13:20",
     delFlag: NumberInt("0"),
     enable: NumberInt("1"),
+    classify: "B",
     nameEn: "Scheduler",
     nameZh: "调度配置",
     type: 1,
     status: 0,
     level: 3,
     parentId: 110,
-    permission: "rengine:scheduler",
+    permissions: [
+        "arn:rengine:controllerschedule:read:v1"
+    ],
     pageLocation: "/rengine/scenes/scheduler/scheduler",
     routePath: "/rengine/scheduler",
     routeNamespace: "/scheduler",
@@ -474,13 +468,16 @@ db.getCollection("sys_menus").insert([ {
     updateDate: "2022-08-15 11:13:20",
     delFlag: NumberInt("0"),
     enable: NumberInt("1"),
-    nameEn: "Scheduler log",
+    classify: "B",
+    nameEn: "Controller logs",
     nameZh: "运行日志",
     type: 3,
     status: 0,
     level: 3,
     parentId: 11011,
-    permission: "rengine:scheduler:schedulerlog",
+    permissions: [
+        "arn:rengine:controllerlog:read:v1"
+    ],
     pageLocation: "/rengine/scenes/scheduler/schedulerlog/schedulerlog",
     routePath: "/rengine/scheduler/schedulerlog",
     routeNamespace: "/schedulerlog",
@@ -497,13 +494,16 @@ db.getCollection("sys_menus").insert([ {
     updateDate: "2022-08-15 11:13:20",
     delFlag: NumberInt("0"),
     enable: NumberInt("1"),
-    nameEn: "Scheduler log",
+    classify: "B",
+    nameEn: "Schedulers",
     nameZh: "调度编辑",
     type: 3,
     status: 0,
     level: 3,
     parentId: 11011,
-    permission: "rengine:scheduler:scheduleredit",
+    permissions: [
+        "arn:rengine:controllerschedule:read:v1"
+    ],
     pageLocation: "/rengine/scenes/scheduler/scheduleredit/scheduleredit",
     routePath: "/rengine/scheduler/scheduleredit",
     routeNamespace: "/scheduleredit",
@@ -520,13 +520,16 @@ db.getCollection("sys_menus").insert([ {
     updateDate: "2022-08-15 11:13:20",
     delFlag: NumberInt("0"),
     enable: NumberInt("1"),
+    classify: "B",
     nameEn: "Running History",
-    nameZh: "运行历史",
+    nameZh: "工作流图",
     type: 3,
     status: 0,
     level: 3,
     parentId: 110,
-    permission: "rengine:workflows:workflowgraph",
+    permissions: [
+        "arn:rengine:workflowgraph:read:v1"
+    ],
     pageLocation: "/rengine/scenes/workflows/workflowgraph/workflowgraph",
     routePath: "/rengine/workflows/workflowgraph",
     routeNamespace: "/workflowgraph",
@@ -543,13 +546,16 @@ db.getCollection("sys_menus").insert([ {
     updateDate: "2022-08-15 11:13:20",
     delFlag: NumberInt("0"),
     enable: NumberInt("1"),
-    nameEn: "Running History",
+    classify: "B",
+    nameEn: "Histories",
     nameZh: "工作流设计",
     type: 3,
     status: 0,
     level: 3,
     parentId: 110,
-    permission: "rengine:workflows:design",
+    permissions: [
+        "arn:rengine:workflowgraph:write:v1"
+    ],
     pageLocation: "/rengine/scenes/workflows/design/design",
     routePath: "/rengine/workflows/design",
     routeNamespace: "/design",
@@ -566,13 +572,16 @@ db.getCollection("sys_menus").insert([ {
     updateDate: "2022-08-15 11:13:20",
     delFlag: NumberInt("0"),
     enable: NumberInt("1"),
-    nameEn: "Rule Models",
+    classify: "B",
+    nameEn: "Rule models",
     nameZh: "规则模型",
     type: 1,
     status: 0,
     level: 3,
     parentId: 110,
-    permission: "rengine:rules",
+    permissions: [
+        "arn:rengine:rule:read:v1"
+    ],
     pageLocation: "/rengine/scenes/rules/rules",
     routePath: "/rengine/rules",
     routeNamespace: "/rules",
@@ -589,13 +598,16 @@ db.getCollection("sys_menus").insert([ {
     updateDate: "2022-08-15 16:17:37",
     delFlag: NumberInt("0"),
     enable: NumberInt("1"),
-    nameEn: "Rule Templates Edit",
-    nameZh: "规则模型编辑",
+    classify: "B",
+    nameEn: "Rule models",
+    nameZh: "模型编辑",
     type: 3,
     status: 0,
     level: 3,
     parentId: 113,
-    permission: "rengine:edit",
+    permissions: [
+        "arn:rengine:rule:write:v1"
+    ],
     pageLocation: "/rengine/scenes/rules/ruleedit/ruleedit",
     routePath: "/rengine/rules/ruleedit",
     routeNamespace: "/ruleedit",
@@ -611,13 +623,17 @@ db.getCollection("sys_menus").insert([ {
     updateDate: "2022-08-15 16:17:37",
     delFlag: NumberInt("0"),
     enable: NumberInt("1"),
-    nameEn: "Rule Templates Edit",
+    classify: "B",
+    nameEn: "Rule models",
     nameZh: "规则设计",
     type: 3,
     status: 0,
     level: 3,
     parentId: 113,
-    permission: "rengine:design",
+    permissions: [
+        "arn:rengine:rulescript:read:v1",
+        "arn:rengine:rulescript:write:v1"
+    ],
     pageLocation: "/rengine/scenes/rules/edit/rulescript-editor",
     routePath: "/rengine/rules/edit",
     routeNamespace: "/ruletemplatesEdit",
@@ -633,13 +649,16 @@ db.getCollection("sys_menus").insert([ {
     updateDate: "2022-08-15 11:13:20",
     delFlag: NumberInt("0"),
     enable: NumberInt("1"),
+    classify: "B",
     nameEn: "User Librarys",
     nameZh: "自定义库",
     type: 1,
     status: 0,
     level: 3,
     parentId: 110,
-    permission: "rengine:userlibrarys",
+    permissions: [
+        "arn:rengine:upload:read:v1"
+    ],
     pageLocation: "/rengine/scenes/userlibrarys/userlibrarys",
     routePath: "/rengine/userlibrarys",
     routeNamespace: "/userlibrarys",
@@ -656,200 +675,22 @@ db.getCollection("sys_menus").insert([ {
     updateDate: "2022-08-15 11:13:20",
     delFlag: NumberInt("0"),
     enable: NumberInt("1"),
+    classify: "B",
     nameEn: "Test Datasets",
     nameZh: "测试数据集",
     type: 1,
     status: 0,
     level: 3,
     parentId: 110,
-    permission: "rengine:testdatasets",
+    permissions: [
+        "arn:rengine:upload:read:v1"
+    ],
     pageLocation: "/rengine/scenes/testdatasets/testdatasets",
     routePath: "/rengine/testdatasets",
     routeNamespace: "/testdatasets",
     renderTarget: "_self",
     icon: "icon-codeoptimizatio",
     sort: 10,
-    _class: "com.wl4g.rengine.common.entity.sys.Menu"
-} ]);
-db.getCollection("sys_menus").insert([ {
-    _id: NumberLong("6305460145405120"),
-    createBy: null,
-    createDate: "2022-08-15 11:02:30",
-    updateBy: 1,
-    updateDate: "2022-08-15 11:02:36",
-    delFlag: NumberInt("0"),
-    enable: NumberInt("1"),
-    nameEn: "Analysis",
-    nameZh: "数据洞察",
-    type: 1,
-    status: 0,
-    level: 2,
-    parentId: 5,
-    permission: "rengine:analysis",
-    routePath: "/rengine/analysis",
-    routeNamespace: "/analysis",
-    renderTarget: "_self",
-    icon: "icon-monitoring",
-    sort: 100,
-    _class: "com.wl4g.rengine.common.entity.sys.Menu"
-} ]);
-db.getCollection("sys_menus").insert([ {
-    _id: NumberLong("6305460145405121"),
-    createBy: null,
-    createDate: "2022-08-15 11:13:15",
-    updateBy: 1,
-    updateDate: "2022-08-15 11:13:20",
-    delFlag: NumberInt("0"),
-    enable: NumberInt("1"),
-    nameEn: "Task Analysis",
-    nameZh: "任务分析",
-    type: 1,
-    status: 0,
-    level: 3,
-    parentId: 120,
-    permission: "rengine:taskanalysis",
-    pageLocation: "/rengine/analysis/taskanalysis/taskanalysis",
-    routePath: "/rengine/taskanalysis",
-    routeNamespace: "/taskanalysis",
-    renderTarget: "_self",
-    icon: "icon-codeoptimizatio",
-    sort: 10,
-    _class: "com.wl4g.rengine.common.entity.sys.Menu"
-} ]);
-db.getCollection("sys_menus").insert([ {
-    _id: NumberLong("6305460145405122"),
-    createBy: null,
-    createDate: "2022-08-15 11:13:15",
-    updateBy: 1,
-    updateDate: "2022-08-15 11:13:20",
-    delFlag: NumberInt("0"),
-    enable: NumberInt("1"),
-    nameEn: "Hits Statistics",
-    nameZh: "命中分析",
-    type: 1,
-    status: 0,
-    level: 3,
-    parentId: 120,
-    permission: "rengine:hitsstatistics",
-    pageLocation: "/rengine/analysis/hitsstatistics/hitsstatistics",
-    routePath: "/rengine/hitsstatistics",
-    routeNamespace: "/hitsstatistics",
-    renderTarget: "_self",
-    icon: "icon-codeoptimizatio",
-    sort: 10,
-    _class: "com.wl4g.rengine.common.entity.sys.Menu"
-} ]);
-db.getCollection("sys_menus").insert([ {
-    _id: NumberLong("6305460145405130"),
-    createBy: null,
-    createDate: "2022-08-15 11:02:30",
-    updateBy: 1,
-    updateDate: "2022-08-15 11:02:36",
-    delFlag: NumberInt("0"),
-    enable: NumberInt("1"),
-    nameEn: "Sources",
-    nameZh: "事件溯源",
-    type: 1,
-    status: 0,
-    level: 2,
-    parentId: 5,
-    permission: "rengine:sources",
-    routePath: "/rengine/sources",
-    routeNamespace: "/sources",
-    renderTarget: "_self",
-    icon: "icon-monitoring",
-    sort: 100,
-    _class: "com.wl4g.rengine.common.entity.sys.Menu"
-} ]);
-db.getCollection("sys_menus").insert([ {
-    _id: NumberLong("6305460145405131"),
-    createBy: null,
-    createDate: "2022-08-15 11:13:15",
-    updateBy: 1,
-    updateDate: "2022-08-15 11:13:20",
-    delFlag: NumberInt("0"),
-    enable: NumberInt("1"),
-    nameEn: "Organizational management",
-    nameZh: "事件列表",
-    type: 1,
-    status: 0,
-    level: 3,
-    parentId: 130,
-    permission: "rengine:mapstatistics:list",
-    pageLocation: "/rengine/analysis/mapstatistics/list/list",
-    routePath: "/rengine/mapstatistics/list",
-    routeNamespace: "/list",
-    renderTarget: "_self",
-    icon: "icon-codeoptimizatio",
-    sort: 10,
-    _class: "com.wl4g.rengine.common.entity.sys.Menu"
-} ]);
-db.getCollection("sys_menus").insert([ {
-    _id: NumberLong("6305460145405132"),
-    createBy: null,
-    createDate: "2022-08-15 11:13:15",
-    updateBy: 1,
-    updateDate: "2022-08-15 11:13:20",
-    delFlag: NumberInt("0"),
-    enable: NumberInt("1"),
-    nameEn: "Organizational management",
-    nameZh: "事件列表详情",
-    type: 3,
-    status: 0,
-    level: 3,
-    parentId: 131,
-    permission: "rengine:mapstatistics:list:details",
-    pageLocation: "/rengine/analysis/mapstatistics/list/details/details",
-    routePath: "/rengine/mapstatistics/list/details",
-    routeNamespace: "/list",
-    renderTarget: "_self",
-    icon: "icon-codeoptimizatio",
-    sort: 10,
-    _class: "com.wl4g.rengine.common.entity.sys.Menu"
-} ]);
-db.getCollection("sys_menus").insert([ {
-    _id: NumberLong("6305460145405133"),
-    createBy: null,
-    createDate: "2022-08-15 11:13:15",
-    updateBy: 1,
-    updateDate: "2022-08-15 11:13:20",
-    delFlag: NumberInt("0"),
-    enable: NumberInt("1"),
-    nameEn: "Organizational management",
-    nameZh: "事件地图",
-    type: 1,
-    status: 0,
-    level: 3,
-    parentId: 130,
-    permission: "rengine:mapstatistics:map",
-    pageLocation: "/rengine/analysis/mapstatistics/map/map",
-    routePath: "/rengine/mapstatistics/map",
-    routeNamespace: "/map",
-    renderTarget: "_self",
-    icon: "icon-codeoptimizatio",
-    sort: 10,
-    _class: "com.wl4g.rengine.common.entity.sys.Menu"
-} ]);
-db.getCollection("sys_menus").insert([ {
-    _id: NumberLong("6305460145405140"),
-    createBy: null,
-    createDate: "2022-08-15 11:02:30",
-    updateBy: 1,
-    updateDate: "2022-08-15 11:02:36",
-    delFlag: NumberInt("0"),
-    enable: NumberInt("1"),
-    nameEn: "Settings",
-    nameZh: "系统设置",
-    type: 1,
-    status: 0,
-    level: 2,
-    parentId: 5,
-    permission: "rengine:settings",
-    routePath: "/rengine/settings",
-    routeNamespace: "/settings",
-    renderTarget: "_self",
-    icon: "icon-monitoring",
-    sort: 100,
     _class: "com.wl4g.rengine.common.entity.sys.Menu"
 } ]);
 db.getCollection("sys_menus").insert([ {
@@ -860,13 +701,16 @@ db.getCollection("sys_menus").insert([ {
     updateDate: "2022-08-15 11:13:20",
     delFlag: NumberInt("0"),
     enable: NumberInt("1"),
-    nameEn: "Data Source management",
+    classify: "B",
+    nameEn: "Data Sources",
     nameZh: "数据源管理",
     type: 1,
     status: 0,
     level: 3,
     parentId: 140,
-    permission: "rengine:datasources",
+    permissions: [
+        "arn:rengine:datasource:read:v1"
+    ],
     pageLocation: "/rengine/settings/datasources/datasources",
     routePath: "/rengine/datasources",
     routeNamespace: "/datasources",
@@ -883,13 +727,16 @@ db.getCollection("sys_menus").insert([ {
     updateDate: "2022-08-15 11:13:20",
     delFlag: NumberInt("0"),
     enable: NumberInt("1"),
-    nameEn: "Data Source management",
-    nameZh: "数据源管理编辑",
+    classify: "B",
+    nameEn: "Data Sources",
+    nameZh: "数据源配置",
     type: 3,
     status: 0,
     level: 3,
     parentId: 145,
-    permission: "rengine:datasources:datasourcesEdit",
+    permissions: [
+        "arn:rengine:datasource:write:v1"
+    ],
     pageLocation: "/rengine/settings/datasources/datasourcesEdit/datasourcesEdit",
     routePath: "/rengine/datasources/datasourcesEdit",
     routeNamespace: "/datasourcesEdit",
@@ -899,23 +746,309 @@ db.getCollection("sys_menus").insert([ {
     _class: "com.wl4g.rengine.common.entity.sys.Menu"
 } ]);
 db.getCollection("sys_menus").insert([ {
-    _id: NumberLong("6305460145405142"),
+    _id: NumberLong("6305460145405120"),
+    createBy: null,
+    createDate: "2022-08-15 11:02:30",
+    updateBy: 1,
+    updateDate: "2022-08-15 11:02:36",
+    delFlag: NumberInt("0"),
+    enable: NumberInt("1"),
+    classify: "B",
+    nameEn: "Analysis",
+    nameZh: "数据洞察",
+    type: 1,
+    status: 0,
+    level: 2,
+    parentId: 5,
+    permissions: [
+        "arn:rengine:analysis:read:v1"
+    ],
+    routePath: "/rengine/analysis",
+    routeNamespace: "/analysis",
+    renderTarget: "_self",
+    icon: "icon-monitoring",
+    sort: 100,
+    _class: "com.wl4g.rengine.common.entity.sys.Menu"
+} ]);
+db.getCollection("sys_menus").insert([ {
+    _id: NumberLong("6305460145405121"),
     createBy: null,
     createDate: "2022-08-15 11:13:15",
     updateBy: 1,
     updateDate: "2022-08-15 11:13:20",
     delFlag: NumberInt("0"),
     enable: NumberInt("1"),
-    nameEn: "Notifications",
-    nameZh: "通知管理",
+    classify: "B",
+    nameEn: "Task Analysis",
+    nameZh: "任务分析",
+    type: 1,
+    status: 0,
+    level: 3,
+    parentId: 120,
+    permissions: [
+        "arn:rengine:analysis:read:v1"
+    ],
+    pageLocation: "/rengine/analysis/taskanalysis/taskanalysis",
+    routePath: "/rengine/taskanalysis",
+    routeNamespace: "/taskanalysis",
+    renderTarget: "_self",
+    icon: "icon-codeoptimizatio",
+    sort: 10,
+    _class: "com.wl4g.rengine.common.entity.sys.Menu"
+} ]);
+db.getCollection("sys_menus").insert([ {
+    _id: NumberLong("6305460145405122"),
+    createBy: null,
+    createDate: "2022-08-15 11:13:15",
+    updateBy: 1,
+    updateDate: "2022-08-15 11:13:20",
+    delFlag: NumberInt("0"),
+    enable: NumberInt("1"),
+    classify: "B",
+    nameEn: "Hits Statistics",
+    nameZh: "命中分析",
+    type: 1,
+    status: 0,
+    level: 3,
+    parentId: 120,
+    permissions: [
+        "arn:rengine:analysis:read:v1"
+    ],
+    pageLocation: "/rengine/analysis/hitsstatistics/hitsstatistics",
+    routePath: "/rengine/hitsstatistics",
+    routeNamespace: "/hitsstatistics",
+    renderTarget: "_self",
+    icon: "icon-codeoptimizatio",
+    sort: 10,
+    _class: "com.wl4g.rengine.common.entity.sys.Menu"
+} ]);
+db.getCollection("sys_menus").insert([ {
+    _id: NumberLong("6305460145405130"),
+    createBy: null,
+    createDate: "2022-08-15 11:02:30",
+    updateBy: 1,
+    updateDate: "2022-08-15 11:02:36",
+    delFlag: NumberInt("0"),
+    enable: NumberInt("1"),
+    classify: "B",
+    nameEn: "Event Sources",
+    nameZh: "事件溯源",
+    type: 1,
+    status: 0,
+    level: 2,
+    parentId: 5,
+    permissions: [
+        "arn:rengine:eventdatasource:read:v1"
+    ],
+    routePath: "/rengine/sources",
+    routeNamespace: "/sources",
+    renderTarget: "_self",
+    icon: "icon-monitoring",
+    sort: 100,
+    _class: "com.wl4g.rengine.common.entity.sys.Menu"
+} ]);
+db.getCollection("sys_menus").insert([ {
+    _id: NumberLong("6305460145405131"),
+    createBy: null,
+    createDate: "2022-08-15 11:13:15",
+    updateBy: 1,
+    updateDate: "2022-08-15 11:13:20",
+    delFlag: NumberInt("0"),
+    enable: NumberInt("1"),
+    classify: "B",
+    nameEn: "Events",
+    nameZh: "事件列表",
+    type: 1,
+    status: 0,
+    level: 3,
+    parentId: 130,
+    permissions: [
+        "arn:rengine:eventdatasource:read:v1"
+    ],
+    pageLocation: "/rengine/analysis/mapstatistics/list/list",
+    routePath: "/rengine/mapstatistics/list",
+    routeNamespace: "/list",
+    renderTarget: "_self",
+    icon: "icon-codeoptimizatio",
+    sort: 10,
+    _class: "com.wl4g.rengine.common.entity.sys.Menu"
+} ]);
+db.getCollection("sys_menus").insert([ {
+    _id: NumberLong("6305460145405132"),
+    createBy: null,
+    createDate: "2022-08-15 11:13:15",
+    updateBy: 1,
+    updateDate: "2022-08-15 11:13:20",
+    delFlag: NumberInt("0"),
+    enable: NumberInt("1"),
+    classify: "B",
+    nameEn: "Events",
+    nameZh: "事件列表详情",
+    type: 3,
+    status: 0,
+    level: 3,
+    parentId: 131,
+    permissions: [
+        "arn:rengine:eventdatasource:read:v1"
+    ],
+    pageLocation: "/rengine/analysis/mapstatistics/list/details/details",
+    routePath: "/rengine/mapstatistics/list/details",
+    routeNamespace: "/list",
+    renderTarget: "_self",
+    icon: "icon-codeoptimizatio",
+    sort: 10,
+    _class: "com.wl4g.rengine.common.entity.sys.Menu"
+} ]);
+db.getCollection("sys_menus").insert([ {
+    _id: NumberLong("6305460145405133"),
+    createBy: null,
+    createDate: "2022-08-15 11:13:15",
+    updateBy: 1,
+    updateDate: "2022-08-15 11:13:20",
+    delFlag: NumberInt("0"),
+    enable: NumberInt("1"),
+    classify: "B",
+    nameEn: "Event Map",
+    nameZh: "事件地图",
+    type: 1,
+    status: 0,
+    level: 3,
+    parentId: 130,
+    permissions: [
+        "arn:rengine:eventdatasource:read:v1"
+    ],
+    pageLocation: "/rengine/analysis/mapstatistics/map/map",
+    routePath: "/rengine/mapstatistics/map",
+    routeNamespace: "/map",
+    renderTarget: "_self",
+    icon: "icon-codeoptimizatio",
+    sort: 10,
+    _class: "com.wl4g.rengine.common.entity.sys.Menu"
+} ]);
+db.getCollection("sys_menus").insert([ {
+    _id: NumberLong("6305460145405140"),
+    createBy: null,
+    createDate: "2022-08-15 11:02:30",
+    updateBy: 1,
+    updateDate: "2022-08-15 11:02:36",
+    delFlag: NumberInt("0"),
+    enable: NumberInt("1"),
+    classify: "A",
+    nameEn: "Settings",
+    nameZh: "系统设置",
+    type: 1,
+    status: 0,
+    level: 2,
+    parentId: 5,
+    permissions: [
+        "arn:sys:user:read:v1"
+    ],
+    routePath: "/rengine/settings",
+    routeNamespace: "/settings",
+    renderTarget: "_self",
+    icon: "icon-monitoring",
+    sort: 100,
+    _class: "com.wl4g.rengine.common.entity.sys.Menu"
+} ]);
+db.getCollection("sys_menus").insert([ {
+    _id: NumberLong("6305460145405143"),
+    createBy: null,
+    createDate: "2022-08-15 11:13:15",
+    updateBy: 1,
+    updateDate: "2022-08-15 11:13:20",
+    delFlag: NumberInt("0"),
+    enable: NumberInt("1"),
+    classify: "A",
+    nameEn: "Users",
+    nameZh: "用户管理",
     type: 1,
     status: 0,
     level: 3,
     parentId: 140,
-    permission: "rengine:notifications",
-    pageLocation: "/rengine/settings/notifications/notifications",
-    routePath: "/rengine/notifications",
-    routeNamespace: "/notifications",
+    permissions: [
+        "arn:sys:user:read:v1"
+    ],
+    pageLocation: "/rengine/settings/users/users",
+    routePath: "/rengine/users",
+    routeNamespace: "/users",
+    renderTarget: "_self",
+    icon: "icon-codeoptimizatio",
+    sort: 10,
+    _class: "com.wl4g.rengine.common.entity.sys.Menu"
+} ]);
+db.getCollection("sys_menus").insert([ {
+    _id: NumberLong("6305460145405167"),
+    createBy: null,
+    createDate: "2022-08-15 11:13:15",
+    updateBy: 1,
+    updateDate: "2022-08-15 11:13:20",
+    delFlag: NumberInt("0"),
+    enable: NumberInt("1"),
+    classify: "A",
+    nameEn: "Users",
+    nameZh: "用户配置",
+    type: 1,
+    status: 0,
+    level: 3,
+    parentId: 140,
+    permissions: [
+        "arn:sys:user:write:v1"
+    ],
+    pageLocation: "TODO",
+    routePath: "TODO",
+    routeNamespace: "/users",
+    renderTarget: "_self",
+    icon: "icon-codeoptimizatio",
+    sort: 10,
+    _class: "com.wl4g.rengine.common.entity.sys.Menu"
+} ]);
+db.getCollection("sys_menus").insert([ {
+    _id: NumberLong("6305460145405343"),
+    createBy: null,
+    createDate: "2022-08-15 11:13:15",
+    updateBy: 1,
+    updateDate: "2022-08-15 11:13:20",
+    delFlag: NumberInt("0"),
+    enable: NumberInt("1"),
+    classify: "A",
+    nameEn: "Roles",
+    nameZh: "角色管理",
+    type: 1,
+    status: 0,
+    level: 3,
+    parentId: 140,
+    permissions: [
+        "arn:sys:role:read:v1"
+    ],
+    pageLocation: "/rengine/settings/roles/roles",
+    routePath: "/rengine/roles",
+    routeNamespace: "/roles",
+    renderTarget: "_self",
+    icon: "icon-codeoptimizatio",
+    sort: 10,
+    _class: "com.wl4g.rengine.common.entity.sys.Menu"
+} ]);
+db.getCollection("sys_menus").insert([ {
+    _id: NumberLong("6305460145405367"),
+    createBy: null,
+    createDate: "2022-08-15 11:13:15",
+    updateBy: 1,
+    updateDate: "2022-08-15 11:13:20",
+    delFlag: NumberInt("0"),
+    enable: NumberInt("1"),
+    classify: "A",
+    nameEn: "Roles",
+    nameZh: "角色配置",
+    type: 1,
+    status: 0,
+    level: 3,
+    parentId: 140,
+    permissions: [
+        "arn:sys:role:write:v1"
+    ],
+    pageLocation: "TODO",
+    routePath: "TODO",
+    routeNamespace: "/roles",
     renderTarget: "_self",
     icon: "icon-codeoptimizatio",
     sort: 10,
@@ -929,13 +1062,16 @@ db.getCollection("sys_menus").insert([ {
     updateDate: "2022-08-15 11:13:20",
     delFlag: NumberInt("0"),
     enable: NumberInt("1"),
-    nameEn: "Organizational management",
+    classify: "A",
+    nameEn: "Organ management",
     nameZh: "组织管理",
     type: 1,
     status: 0,
     level: 3,
     parentId: 140,
-    permission: "rengine:orgmanage",
+    permissions: [
+        "arn:sys:org:read:v1"
+    ],
     pageLocation: "/rengine/settings/orgmanage/orgmanage",
     routePath: "/rengine/orgmanage",
     routeNamespace: "/orgmanage",
@@ -945,23 +1081,105 @@ db.getCollection("sys_menus").insert([ {
     _class: "com.wl4g.rengine.common.entity.sys.Menu"
 } ]);
 db.getCollection("sys_menus").insert([ {
-    _id: NumberLong("6305460145405143"),
+    _id: NumberLong("6305460145405191"),
     createBy: null,
     createDate: "2022-08-15 11:13:15",
     updateBy: 1,
     updateDate: "2022-08-15 11:13:20",
     delFlag: NumberInt("0"),
     enable: NumberInt("1"),
-    nameEn: "Users",
-    nameZh: "用户管理",
+    classify: "A",
+    nameEn: "Organ management",
+    nameZh: "组织配置",
     type: 1,
     status: 0,
     level: 3,
     parentId: 140,
-    permission: "rengine:users",
-    pageLocation: "/rengine/settings/users/users",
-    routePath: "/rengine/users",
-    routeNamespace: "/users",
+    permissions: [
+        "arn:sys:org:write:v1"
+    ],
+    pageLocation: "TODO",
+    routePath: "TODO",
+    routeNamespace: "/orgmanage",
+    renderTarget: "_self",
+    icon: "icon-codeoptimizatio",
+    sort: 10,
+    _class: "com.wl4g.rengine.common.entity.sys.Menu"
+} ]);
+db.getCollection("sys_menus").insert([ {
+    _id: NumberLong("6305460145405881"),
+    createBy: null,
+    createDate: "2022-08-15 11:13:15",
+    updateBy: 1,
+    updateDate: "2022-08-15 11:13:20",
+    delFlag: NumberInt("0"),
+    enable: NumberInt("1"),
+    classify: "A",
+    nameEn: "Menus",
+    nameZh: "菜单管理",
+    type: 1,
+    status: 0,
+    level: 3,
+    parentId: 140,
+    permissions: [
+        "arn:sys:menu:read:v1"
+    ],
+    pageLocation: "/rengine/settings/menu/menu",
+    routePath: "/rengine/menu",
+    routeNamespace: "/menu",
+    renderTarget: "_self",
+    icon: "icon-codeoptimizatio",
+    sort: 10,
+    _class: "com.wl4g.rengine.common.entity.sys.Menu"
+} ]);
+db.getCollection("sys_menus").insert([ {
+    _id: NumberLong("6305460145405991"),
+    createBy: null,
+    createDate: "2022-08-15 11:13:15",
+    updateBy: 1,
+    updateDate: "2022-08-15 11:13:20",
+    delFlag: NumberInt("0"),
+    enable: NumberInt("1"),
+    classify: "A",
+    nameEn: "Menus Configuration",
+    nameZh: "菜单配置",
+    type: 1,
+    status: 0,
+    level: 3,
+    parentId: 140,
+    permissions: [
+        "arn:sys:menu:write:v1"
+    ],
+    pageLocation: "TODO",
+    routePath: "TODO",
+    routeNamespace: "/menu",
+    renderTarget: "_self",
+    icon: "icon-codeoptimizatio",
+    sort: 10,
+    _class: "com.wl4g.rengine.common.entity.sys.Menu"
+} ]);
+db.getCollection("sys_menus").insert([ {
+    _id: NumberLong("6305460145405142"),
+    createBy: null,
+    createDate: "2022-08-15 11:13:15",
+    updateBy: 1,
+    updateDate: "2022-08-15 11:13:20",
+    delFlag: NumberInt("0"),
+    enable: NumberInt("1"),
+    classify: "A",
+    nameEn: "Notifications",
+    nameZh: "通知管理",
+    type: 1,
+    status: 0,
+    level: 3,
+    parentId: 140,
+    permissions: [
+        "arn:sys:notification:read:v1",
+        "arn:sys:notification:write:v1"
+    ],
+    pageLocation: "/rengine/settings/notifications/notifications",
+    routePath: "/rengine/notifications",
+    routeNamespace: "/notifications",
     renderTarget: "_self",
     icon: "icon-codeoptimizatio",
     sort: 10,
@@ -975,13 +1193,17 @@ db.getCollection("sys_menus").insert([ {
     updateDate: "2022-08-15 11:13:20",
     delFlag: NumberInt("0"),
     enable: NumberInt("1"),
+    classify: "A",
     nameEn: "Authentcation",
     nameZh: "认证集成",
     type: 1,
     status: 0,
     level: 3,
     parentId: 140,
-    permission: "rengine:authentcation",
+    permissions: [
+        "arn:sys:idp:read:v1",
+        "arn:sys:idp:write:v1"
+    ],
     pageLocation: "/rengine/settings/authentcation/authentcation",
     routePath: "/rengine/authentcation",
     routeNamespace: "/authentcation",
@@ -1233,7 +1455,7 @@ session = db.getMongo().startSession();
 session.startTransaction();
 db = session.getDatabase("rengine");
 db.getCollection("sys_users").insert([ {
-    _id: NumberLong("61508655614689001"),
+    _id: NumberLong("61508655614689889"),
     username: "root",
     password: "$2y$13$omIlVnJQbPgVxt4cz9eXpeLpJ2so3SCaXqdJSVc.0p5AZmBxtABAy",
     accountNonExpired: false,
@@ -1246,6 +1468,25 @@ db.getCollection("sys_users").insert([ {
         "admin"
     ],
     remark: "超级管理员",
+    createDate: ISODate("2023-02-02T04:46:55.274Z"),
+    updateDate: ISODate("2023-02-02T04:46:55.274Z"),
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.sys.User"
+} ]);
+db.getCollection("sys_users").insert([ {
+    _id: NumberLong("61508655614689001"),
+    username: "huanglq",
+    password: "$2y$13$omIlVnJQbPgVxt4cz9eXpeLpJ2so3SCaXqdJSVc.0p5AZmBxtABAy",
+    accountNonExpired: false,
+    accountNonLocked: false,
+    credentialsNonExpired: false,
+    enable: NumberInt("1"),
+    attributes: { },
+    orgCode: "crd",
+    labels: [
+        "admin"
+    ],
+    remark: "综合研发",
     createDate: ISODate("2023-02-02T04:46:55.274Z"),
     updateDate: ISODate("2023-02-02T04:46:55.274Z"),
     delFlag: NumberInt("0"),
@@ -4144,6 +4385,3318 @@ db.getCollection("t_uploads").insert([ {
     md5: null,
     sha1: null
 } ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383669988687872"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-10 23:47:49",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383676670214144"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-10 23:54:37",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383676966666240"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-10 23:54:55",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383677158883328"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-10 23:55:07",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383678618320896"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-10 23:56:36",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383679003525120"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-10 23:57:00",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383679564529664"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-10 23:57:34",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383680258899968"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-10 23:58:16",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383680516259840"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-10 23:58:32",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383681206337536"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-10 23:59:14",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383681454637056"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-10 23:59:29",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383682195406848"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:00:14",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383682356609024"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:00:24",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383683438051328"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:01:30",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383683580510208"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:01:39",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383683718709248"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:01:47",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383684170891264"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:02:15",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383684329078784"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:02:25",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383685764202496"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:03:52",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383686197968896"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:04:19",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383687155187712"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:05:17",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383688791851008"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:06:57",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383689612787712"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:07:47",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383689738928128"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:07:55",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383690001416192"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:08:11",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383690245799936"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:08:26",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383690830725120"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:09:01",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383691658756096"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:09:52",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383692433063936"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:10:39",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383692521947136"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:10:45",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383693031358464"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:11:16",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383693166690304"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:11:24",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383693270548480"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:11:30",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383693362118656"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:11:36",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383693627113472"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:11:52",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383693638811648"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:11:53",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/commons-lang-1.0.0.js",
+    filename: "commons-lang-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383693848166400"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:12:06",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383693911408640"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:12:09",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383693934592000"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:12:11",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383694584545280"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:12:51",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383694630764544"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:12:53",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383694683897856"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:12:57",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383695038431232"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:13:18",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383695063023616"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:13:20",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383695198797824"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:13:28",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383695216345088"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:13:29",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383695219359744"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:13:29",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383695221178368"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:13:29",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383695328477184"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:13:36",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383696873504768"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:15:10",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383697098473472"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:15:24",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383701572042752"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:19:57",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383701673410560"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:20:03",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383701683306496"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:20:04",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383701694414848"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:20:05",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/commons-lang-1.0.0.js",
+    filename: "commons-lang-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383701710897152"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:20:06",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383701744123904"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:20:08",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/commons-lang-1.0.0.js",
+    filename: "commons-lang-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383701753266176"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:20:08",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383701925085184"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:20:19",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383702036430848"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:20:25",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383702047031296"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:20:26",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383702051094528"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:20:26",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383702613688320"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:21:01",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383702622715904"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:21:01",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383702807298048"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:21:12",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383702829694976"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:21:14",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383703104258048"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:21:31",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383703123148800"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:21:32",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383703205314560"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:21:37",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383703987109888"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:22:24",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383704298520576"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:22:43",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383706805600256"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:25:16",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383706983579648"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:25:27",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/commons-lang-1.0.0.js",
+    filename: "commons-lang-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383706994114560"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:25:28",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383708207546368"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:26:42",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383708406366208"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:26:54",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383708461318144"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:26:58",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383708572565504"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:27:04",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/commons-lang-1.0.0.js",
+    filename: "commons-lang-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383708664479744"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:27:10",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383708965830656"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:27:28",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383709115006976"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:27:37",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383709210411008"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:27:43",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/commons-lang-1.0.0.js",
+    filename: "commons-lang-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383709274800128"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:27:47",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383709492330496"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:28:00",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383709546315776"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:28:04",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383710366351360"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:28:54",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383710584029184"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:29:07",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383710892736512"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:29:26",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383710952783872"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:29:30",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383711052546048"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:29:36",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383711185682432"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:29:44",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/commons-lang-1.0.0.js",
+    filename: "commons-lang-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383711254790144"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:29:48",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383712889192448"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:31:28",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383713245855744"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:31:50",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383713588690944"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:32:10",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383713849114624"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:32:26",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383715868475392"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:34:30",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383716159373312"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:34:47",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383718955941888"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:37:38",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383720261009408"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:38:58",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383720773615616"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:39:29",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383721229811712"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:39:57",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383721517924352"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:40:14",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383723073601536"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:41:49",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383724178243584"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:42:57",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383726537539584"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:45:21",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383726856404992"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:45:40",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383727329935360"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:46:09",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383727834333184"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:46:40",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383728175398912"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:47:01",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383728297558016"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:47:08",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383728808001536"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:47:39",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383729241817088"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:48:06",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383729961615360"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:48:50",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383730321866752"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:49:12",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383730781913088"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:49:40",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383731154993152"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:50:03",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383732452573184"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:51:22",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383732879097856"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:51:48",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383733096726528"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:52:01",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383733430960128"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:52:22",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383733656354816"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:52:35",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383733930147840"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:52:52",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383734331064320"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:53:17",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383734564536320"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:53:31",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383737880281088"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:56:53",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383739265400832"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 00:58:18",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383740989882368"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 01:00:03",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383741275570176"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 01:00:20",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383741863788544"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 01:00:56",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383747337093120"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 01:06:30",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/commons-lang-1.0.0.js",
+    filename: "commons-lang-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383747347283968"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 01:06:31",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383747397091328"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 01:06:34",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383748370972672"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 01:07:33",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383748377362432"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 01:07:34",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383748466802688"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 01:07:39",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383748874797056"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 01:08:04",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/commons-lang-1.0.0.js",
+    filename: "commons-lang-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
+db.getCollection("t_uploads").insert([ {
+    _id: NumberLong("6383748886462464"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: null,
+    createDate: null,
+    updateBy: NumberInt("-1"),
+    updateDate: "2023-03-11 01:08:05",
+    delFlag: NumberInt("0"),
+    uploadType: "USER_LIBRARY_WITH_JS",
+    objectPrefix: "rengine/library/js/print-1.0.0.js",
+    filename: "print-1.0.0.js",
+    extension: "string",
+    size: NumberInt("10000"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
+} ]);
 session.commitTransaction(); session.endSession();
 
 // ----------------------------
@@ -5318,6 +8871,1276 @@ db.getCollection("t_workflow_graphs").insert([ {
                 top: "840px",
                 color: "#5f5f5f",
                 left: "520px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        }
+    ],
+    connections: [
+        {
+            name: "Unnamed Connection",
+            to: "11",
+            from: "0",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "21",
+            from: "11",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "31",
+            from: "21",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "41",
+            from: "31",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "42",
+            from: "31",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "51",
+            from: "41",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "52",
+            from: "41",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "53",
+            from: "42",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "54",
+            from: "42",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "61",
+            from: "51",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "62",
+            from: "52",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "63",
+            from: "54",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "71",
+            from: "62",
+            attributes: null
+        }
+    ],
+    attributes: { }
+} ]);
+db.getCollection("t_workflow_graphs").insert([ {
+    _id: NumberLong("6383629764853760"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: NumberInt("-1"),
+    createDate: "2023-03-10 23:06:54",
+    updateBy: null,
+    updateDate: null,
+    delFlag: NumberInt("0"),
+    revision: NumberInt("4"),
+    workflowId: NumberLong("6150868953448439"),
+    nodes: [
+        {
+            "@type": "BOOT",
+            id: "0",
+            priority: null,
+            name: "The Boot",
+            attributes: {
+                top: "380px",
+                color: "#5f5f5f",
+                left: "700px"
+            }
+        },
+        {
+            "@type": "PROCESS",
+            id: "11",
+            priority: null,
+            name: "预处理(如篡改当前时间以用于测试目的)",
+            attributes: {
+                top: "480px",
+                color: "#5f5f5f",
+                left: "680px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "RELATION",
+            id: "21",
+            priority: null,
+            name: "当前时间是否满足(10.1~10.8)",
+            attributes: {
+                top: "550px",
+                color: "#5f5f5f",
+                left: "820px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "LOGICAL",
+            id: "31",
+            priority: null,
+            name: "ALL_AND逻辑运算",
+            attributes: {
+                top: "680px",
+                color: "#5f5f5f",
+                left: "680px"
+            },
+            logical: "ALL_AND"
+        },
+        {
+            "@type": "LOGICAL",
+            id: "41",
+            priority: null,
+            name: "AND逻辑运算",
+            attributes: {
+                top: "700px",
+                color: "#5f5f5f",
+                left: "880px"
+            },
+            logical: "AND"
+        },
+        {
+            "@type": "LOGICAL",
+            id: "42",
+            priority: null,
+            name: "AND逻辑运算",
+            attributes: {
+                top: "720px",
+                color: "#5f5f5f",
+                left: "500px"
+            },
+            logical: "AND"
+        },
+        {
+            "@type": "RELATION",
+            id: "51",
+            priority: null,
+            name: "充值是否>=120元",
+            attributes: {
+                top: "820px",
+                color: "#5f5f5f",
+                left: "980px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "LOGICAL",
+            id: "52",
+            priority: null,
+            name: "AND逻辑运算",
+            attributes: {
+                top: "820px",
+                color: "#5f5f5f",
+                left: "805px"
+            },
+            logical: "AND"
+        },
+        {
+            "@type": "RELATION",
+            id: "53",
+            priority: null,
+            name: "当前时间是否满足(10.5~10.8)",
+            attributes: {
+                top: "900px",
+                color: "#5f5f5f",
+                left: "420px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "RELATION",
+            id: "54",
+            priority: null,
+            name: "充值是否>=50元",
+            attributes: {
+                top: "880px",
+                color: "#5f5f5f",
+                left: "560px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "FAILBACK",
+            id: "62",
+            priority: null,
+            name: "如果赠送余额失败则执行回退规则",
+            attributes: {
+                top: "925px",
+                color: "#5f5f5f",
+                left: "860px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "RUN",
+            id: "63",
+            priority: null,
+            name: "赠送20积分",
+            attributes: {
+                top: "1025px",
+                color: "#5f5f5f",
+                left: "550px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "RUN",
+            id: "71",
+            priority: null,
+            name: "赠送10元余额",
+            attributes: {
+                top: "960px",
+                color: "#5f5f5f",
+                left: "700px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        }
+    ],
+    connections: [
+        {
+            name: "Unnamed Connection",
+            to: "11",
+            from: "0",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "21",
+            from: "11",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "31",
+            from: "21",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "41",
+            from: "31",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "42",
+            from: "31",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "51",
+            from: "41",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "52",
+            from: "41",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "53",
+            from: "42",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "54",
+            from: "42",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "61",
+            from: "51",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "62",
+            from: "52",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "63",
+            from: "54",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "71",
+            from: "62",
+            attributes: null
+        }
+    ],
+    attributes: { }
+} ]);
+db.getCollection("t_workflow_graphs").insert([ {
+    _id: NumberLong("6383629928775680"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: NumberInt("-1"),
+    createDate: "2023-03-10 23:07:04",
+    updateBy: null,
+    updateDate: null,
+    delFlag: NumberInt("0"),
+    revision: NumberInt("5"),
+    workflowId: NumberLong("6150868953448439"),
+    nodes: [
+        {
+            "@type": "BOOT",
+            id: "0",
+            priority: null,
+            name: "The Boot",
+            attributes: {
+                top: "380px",
+                color: "#5f5f5f",
+                left: "700px"
+            }
+        },
+        {
+            "@type": "PROCESS",
+            id: "11",
+            priority: null,
+            name: "预处理(如篡改当前时间以用于测试目的)",
+            attributes: {
+                top: "480px",
+                color: "#5f5f5f",
+                left: "680px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "RELATION",
+            id: "21",
+            priority: null,
+            name: "当前时间是否满足(10.1~10.8)",
+            attributes: {
+                top: "560px",
+                color: "#5f5f5f",
+                left: "680px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "LOGICAL",
+            id: "31",
+            priority: null,
+            name: "ALL_AND逻辑运算",
+            attributes: {
+                top: "680px",
+                color: "#5f5f5f",
+                left: "680px"
+            },
+            logical: "ALL_AND"
+        },
+        {
+            "@type": "LOGICAL",
+            id: "41",
+            priority: null,
+            name: "AND逻辑运算",
+            attributes: {
+                top: "605px",
+                color: "#5f5f5f",
+                left: "965px"
+            },
+            logical: "AND"
+        },
+        {
+            "@type": "LOGICAL",
+            id: "42",
+            priority: null,
+            name: "AND逻辑运算",
+            attributes: {
+                top: "720px",
+                color: "#5f5f5f",
+                left: "500px"
+            },
+            logical: "AND"
+        },
+        {
+            "@type": "RELATION",
+            id: "51",
+            priority: null,
+            name: "充值是否>=120元",
+            attributes: {
+                top: "820px",
+                color: "#5f5f5f",
+                left: "980px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "LOGICAL",
+            id: "52",
+            priority: null,
+            name: "AND逻辑运算",
+            attributes: {
+                top: "800px",
+                color: "#5f5f5f",
+                left: "800px"
+            },
+            logical: "AND"
+        },
+        {
+            "@type": "RELATION",
+            id: "53",
+            priority: null,
+            name: "当前时间是否满足(10.5~10.8)",
+            attributes: {
+                top: "860px",
+                color: "#5f5f5f",
+                left: "420px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "RELATION",
+            id: "54",
+            priority: null,
+            name: "充值是否>=50元",
+            attributes: {
+                top: "880px",
+                color: "#5f5f5f",
+                left: "560px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "FAILBACK",
+            id: "62",
+            priority: null,
+            name: "如果赠送余额失败则执行回退规则",
+            attributes: {
+                top: "900px",
+                color: "#5f5f5f",
+                left: "840px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "RUN",
+            id: "63",
+            priority: null,
+            name: "赠送20积分",
+            attributes: {
+                top: "980px",
+                color: "#5f5f5f",
+                left: "520px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "RUN",
+            id: "71",
+            priority: null,
+            name: "赠送10元余额",
+            attributes: {
+                top: "960px",
+                color: "#5f5f5f",
+                left: "700px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        }
+    ],
+    connections: [
+        {
+            name: "Unnamed Connection",
+            to: "11",
+            from: "0",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "21",
+            from: "11",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "31",
+            from: "21",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "41",
+            from: "31",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "42",
+            from: "31",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "51",
+            from: "41",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "52",
+            from: "41",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "53",
+            from: "42",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "54",
+            from: "42",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "61",
+            from: "51",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "62",
+            from: "52",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "63",
+            from: "54",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "71",
+            from: "62",
+            attributes: null
+        }
+    ],
+    attributes: { }
+} ]);
+db.getCollection("t_workflow_graphs").insert([ {
+    _id: NumberLong("6383630076903424"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: NumberInt("-1"),
+    createDate: "2023-03-10 23:07:13",
+    updateBy: null,
+    updateDate: null,
+    delFlag: NumberInt("0"),
+    revision: NumberInt("6"),
+    workflowId: NumberLong("6150868953448439"),
+    nodes: [
+        {
+            "@type": "BOOT",
+            id: "0",
+            priority: null,
+            name: "The Boot",
+            attributes: {
+                top: "380px",
+                color: "#5f5f5f",
+                left: "700px"
+            }
+        },
+        {
+            "@type": "PROCESS",
+            id: "11",
+            priority: null,
+            name: "预处理(如篡改当前时间以用于测试目的)",
+            attributes: {
+                top: "480px",
+                color: "#5f5f5f",
+                left: "680px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "RELATION",
+            id: "21",
+            priority: null,
+            name: "当前时间是否满足(10.1~10.8)",
+            attributes: {
+                top: "560px",
+                color: "#5f5f5f",
+                left: "680px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "LOGICAL",
+            id: "31",
+            priority: null,
+            name: "ALL_AND逻辑运算",
+            attributes: {
+                top: "680px",
+                color: "#5f5f5f",
+                left: "680px"
+            },
+            logical: "ALL_AND"
+        },
+        {
+            "@type": "LOGICAL",
+            id: "41",
+            priority: null,
+            name: "AND逻辑运算",
+            attributes: {
+                top: "700px",
+                color: "#5f5f5f",
+                left: "880px"
+            },
+            logical: "AND"
+        },
+        {
+            "@type": "LOGICAL",
+            id: "42",
+            priority: null,
+            name: "AND逻辑运算",
+            attributes: {
+                top: "720px",
+                color: "#5f5f5f",
+                left: "500px"
+            },
+            logical: "AND"
+        },
+        {
+            "@type": "RELATION",
+            id: "51",
+            priority: null,
+            name: "充值是否>=120元",
+            attributes: {
+                top: "820px",
+                color: "#5f5f5f",
+                left: "980px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "LOGICAL",
+            id: "52",
+            priority: null,
+            name: "AND逻辑运算",
+            attributes: {
+                top: "800px",
+                color: "#5f5f5f",
+                left: "800px"
+            },
+            logical: "AND"
+        },
+        {
+            "@type": "RELATION",
+            id: "53",
+            priority: null,
+            name: "当前时间是否满足(10.5~10.8)",
+            attributes: {
+                top: "860px",
+                color: "#5f5f5f",
+                left: "420px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "RELATION",
+            id: "54",
+            priority: null,
+            name: "充值是否>=50元",
+            attributes: {
+                top: "880px",
+                color: "#5f5f5f",
+                left: "560px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "FAILBACK",
+            id: "62",
+            priority: null,
+            name: "如果赠送余额失败则执行回退规则",
+            attributes: {
+                top: "900px",
+                color: "#5f5f5f",
+                left: "840px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "RUN",
+            id: "63",
+            priority: null,
+            name: "赠送20积分",
+            attributes: {
+                top: "980px",
+                color: "#5f5f5f",
+                left: "520px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "RUN",
+            id: "71",
+            priority: null,
+            name: "赠送10元余额",
+            attributes: {
+                top: "960px",
+                color: "#5f5f5f",
+                left: "700px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        }
+    ],
+    connections: [
+        {
+            name: "Unnamed Connection",
+            to: "11",
+            from: "0",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "21",
+            from: "11",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "31",
+            from: "21",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "41",
+            from: "31",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "42",
+            from: "31",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "51",
+            from: "41",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "52",
+            from: "41",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "53",
+            from: "42",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "54",
+            from: "42",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "61",
+            from: "51",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "62",
+            from: "52",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "63",
+            from: "54",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "71",
+            from: "62",
+            attributes: null
+        }
+    ],
+    attributes: { }
+} ]);
+db.getCollection("t_workflow_graphs").insert([ {
+    _id: NumberLong("6383644127608832"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: NumberInt("-1"),
+    createDate: "2023-03-10 23:21:31",
+    updateBy: null,
+    updateDate: null,
+    delFlag: NumberInt("0"),
+    revision: NumberInt("7"),
+    workflowId: NumberLong("6150868953448439"),
+    nodes: [
+        {
+            "@type": "BOOT",
+            id: "0",
+            priority: null,
+            name: "The Boot",
+            attributes: {
+                top: "380px",
+                color: "#5f5f5f",
+                left: "700px"
+            }
+        },
+        {
+            "@type": "PROCESS",
+            id: "11",
+            priority: null,
+            name: "预处理(如篡改当前时间以用于测试目的)",
+            attributes: {
+                top: "480px",
+                color: "#5f5f5f",
+                left: "680px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "RELATION",
+            id: "21",
+            priority: null,
+            name: "当前时间是否满足(10.1~10.8)",
+            attributes: {
+                top: "560px",
+                color: "#5f5f5f",
+                left: "680px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "LOGICAL",
+            id: "31",
+            priority: null,
+            name: "ALL_AND逻辑运算",
+            attributes: {
+                top: "680px",
+                color: "#5f5f5f",
+                left: "680px"
+            },
+            logical: "ALL_AND"
+        },
+        {
+            "@type": "LOGICAL",
+            id: "41",
+            priority: null,
+            name: "AND逻辑运算",
+            attributes: {
+                top: "700px",
+                color: "#5f5f5f",
+                left: "880px"
+            },
+            logical: "AND"
+        },
+        {
+            "@type": "LOGICAL",
+            id: "42",
+            priority: null,
+            name: "AND逻辑运算",
+            attributes: {
+                top: "720px",
+                color: "#5f5f5f",
+                left: "500px"
+            },
+            logical: "AND"
+        },
+        {
+            "@type": "RELATION",
+            id: "51",
+            priority: null,
+            name: "充值是否>=120元",
+            attributes: {
+                top: "820px",
+                color: "#5f5f5f",
+                left: "980px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "LOGICAL",
+            id: "52",
+            priority: null,
+            name: "AND逻辑运算",
+            attributes: {
+                top: "800px",
+                color: "#5f5f5f",
+                left: "800px"
+            },
+            logical: "AND"
+        },
+        {
+            "@type": "RELATION",
+            id: "53",
+            priority: null,
+            name: "当前时间是否满足(10.5~10.8)",
+            attributes: {
+                top: "860px",
+                color: "#5f5f5f",
+                left: "420px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "RELATION",
+            id: "54",
+            priority: null,
+            name: "充值是否>=50元",
+            attributes: {
+                top: "880px",
+                color: "#5f5f5f",
+                left: "560px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "FAILBACK",
+            id: "62",
+            priority: null,
+            name: "如果赠送余额失败则执行回退规则",
+            attributes: {
+                top: "900px",
+                color: "#5f5f5f",
+                left: "840px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "RUN",
+            id: "63",
+            priority: null,
+            name: "赠送20积分",
+            attributes: {
+                top: "980px",
+                color: "#5f5f5f",
+                left: "520px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "RUN",
+            id: "71",
+            priority: null,
+            name: "赠送10元余额",
+            attributes: {
+                top: "960px",
+                color: "#5f5f5f",
+                left: "700px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        }
+    ],
+    connections: [
+        {
+            name: "Unnamed Connection",
+            to: "11",
+            from: "0",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "21",
+            from: "11",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "31",
+            from: "21",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "41",
+            from: "31",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "42",
+            from: "31",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "51",
+            from: "41",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "52",
+            from: "41",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "53",
+            from: "42",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "54",
+            from: "42",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "61",
+            from: "51",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "62",
+            from: "52",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "63",
+            from: "54",
+            attributes: null
+        },
+        {
+            name: "Unnamed Connection",
+            to: "71",
+            from: "62",
+            attributes: null
+        }
+    ],
+    attributes: { }
+} ]);
+db.getCollection("t_workflow_graphs").insert([ {
+    _id: NumberLong("6383661396344832"),
+    orgCode: "string",
+    enable: NumberInt("1"),
+    labels: [
+        "string"
+    ],
+    remark: "string",
+    createBy: NumberInt("-1"),
+    createDate: "2023-03-10 23:39:05",
+    updateBy: null,
+    updateDate: null,
+    delFlag: NumberInt("0"),
+    revision: NumberInt("8"),
+    workflowId: NumberLong("6150868953448439"),
+    nodes: [
+        {
+            "@type": "BOOT",
+            id: "0",
+            priority: null,
+            name: "The Boot",
+            attributes: {
+                top: "380px",
+                color: "#5f5f5f",
+                left: "700px"
+            }
+        },
+        {
+            "@type": "PROCESS",
+            id: "11",
+            priority: null,
+            name: "预处理(如篡改当前时间以用于测试目的)",
+            attributes: {
+                top: "480px",
+                color: "#5f5f5f",
+                left: "680px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "RELATION",
+            id: "21",
+            priority: null,
+            name: "当前时间是否满足(10.1~10.8)",
+            attributes: {
+                top: "560px",
+                color: "#5f5f5f",
+                left: "680px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "LOGICAL",
+            id: "31",
+            priority: null,
+            name: "ALL_AND逻辑运算",
+            attributes: {
+                top: "680px",
+                color: "#5f5f5f",
+                left: "680px"
+            },
+            logical: "ALL_AND"
+        },
+        {
+            "@type": "LOGICAL",
+            id: "41",
+            priority: null,
+            name: "AND逻辑运算",
+            attributes: {
+                top: "700px",
+                color: "#5f5f5f",
+                left: "880px"
+            },
+            logical: "AND"
+        },
+        {
+            "@type": "LOGICAL",
+            id: "42",
+            priority: null,
+            name: "AND逻辑运算",
+            attributes: {
+                top: "720px",
+                color: "#5f5f5f",
+                left: "500px"
+            },
+            logical: "AND"
+        },
+        {
+            "@type": "RELATION",
+            id: "51",
+            priority: null,
+            name: "充值是否>=120元",
+            attributes: {
+                top: "820px",
+                color: "#5f5f5f",
+                left: "980px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "LOGICAL",
+            id: "52",
+            priority: null,
+            name: "AND逻辑运算",
+            attributes: {
+                top: "800px",
+                color: "#5f5f5f",
+                left: "800px"
+            },
+            logical: "AND"
+        },
+        {
+            "@type": "RELATION",
+            id: "53",
+            priority: null,
+            name: "当前时间是否满足(10.5~10.8)",
+            attributes: {
+                top: "860px",
+                color: "#5f5f5f",
+                left: "420px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "RELATION",
+            id: "54",
+            priority: null,
+            name: "充值是否>=50元",
+            attributes: {
+                top: "880px",
+                color: "#5f5f5f",
+                left: "560px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "FAILBACK",
+            id: "62",
+            priority: null,
+            name: "如果赠送余额失败则执行回退规则",
+            attributes: {
+                top: "900px",
+                color: "#5f5f5f",
+                left: "840px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "RUN",
+            id: "63",
+            priority: null,
+            name: "赠送20积分",
+            attributes: {
+                top: "980px",
+                color: "#5f5f5f",
+                left: "520px"
+            },
+            ruleId: NumberLong("6150869239922100")
+        },
+        {
+            "@type": "RUN",
+            id: "71",
+            priority: null,
+            name: "赠送10元余额",
+            attributes: {
+                top: "960px",
+                color: "#5f5f5f",
+                left: "700px"
             },
             ruleId: NumberLong("6150869239922100")
         }

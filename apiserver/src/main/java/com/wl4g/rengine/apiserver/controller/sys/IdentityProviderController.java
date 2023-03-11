@@ -59,7 +59,7 @@ public class IdentityProviderController {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
     @ResponseBody
-    @PreAuthorize("hasAuthority('arn:sys:idp:query:v1')")
+    @PreAuthorize("hasPermission(#model,'arn:sys:idp:read:v1')")
     public RespBase<PageHolder<IdentityProvider>> query(@Validated IdentityProviderQuery model) {
         log.debug("called: model={}", model);
         RespBase<PageHolder<IdentityProvider>> resp = RespBase.create();
@@ -71,7 +71,7 @@ public class IdentityProviderController {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
     @ResponseBody
-    @PreAuthorize("hasAuthority('arn:sys:idp:save:v1')")
+    @PreAuthorize("hasPermission(#model,'arn:sys:idp:write:v1')")
     public RespBase<IdentityProviderSaveResult> save(@Validated @RequestBody IdentityProviderSave model) {
         log.debug("called: model={}", model);
         RespBase<IdentityProviderSaveResult> resp = RespBase.create();
