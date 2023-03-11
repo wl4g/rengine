@@ -21,7 +21,7 @@ import static com.wl4g.infra.common.resource.ResourceUtils2.getResourceString;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_BASE;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_INTERNAL_RULESCRIPT;
-import static com.wl4g.rengine.common.constants.ServiceRengineConstants.RULE_SCRIPT_LOOKUP_FILTER_WITH_UNIT_RUN;
+import static com.wl4g.rengine.common.util.ServiceAggregateFilters.RULE_SCRIPT_UPLOAD_LOOKUP_FILTERS;
 import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isCriteria;
@@ -45,7 +45,6 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
-import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.DeleteResult;
@@ -128,37 +127,38 @@ public class RuleScriptServiceImpl implements RuleScriptService {
     public ScriptASTInfo parse(final @NotNull RuleEngine engine, final @NotNull Long scriptId) {
         final List<Bson> aggregates = Lists.newArrayList();
         aggregates.add(Aggregates.match(Filters.in("_id", scriptId)));
-        RULE_SCRIPT_LOOKUP_FILTER_WITH_UNIT_RUN.stream().forEach(rs -> aggregates.add(rs.asDocument()));
+        RULE_SCRIPT_UPLOAD_LOOKUP_FILTERS.stream().forEach(rs -> aggregates.add(rs.asDocument()));
 
-        final MongoCursor<RuleScriptWrapper> cursor = mongoTemplate.getDb()
+        try (final var cursor = mongoTemplate.getDb()
                 .getCollection(MongoCollectionDefinition.T_RULE_SCRIPTS.getName())
                 .aggregate(aggregates)
                 .map(ruleScriptDoc -> RuleScriptWrapper
                         .validate(BsonEntitySerializers.fromDocument(ruleScriptDoc, RuleScriptWrapper.class)))
-                .iterator();
+                .iterator();) {
 
-        if (!cursor.hasNext()) {
-            throw new IllegalArgumentException(format("Could't to load rule script for %s", scriptId));
-        }
-
-        final RuleScriptWrapper ruleScript = cursor.next();
-        // Load all depends content.
-        final List<ScriptInfo> depends = safeList(ruleScript.getUploads()).stream().map(upload -> {
-            try {
-                final byte[] buf = minioManager.getObjectToByteArray(upload.getObjectPrefix());
-                return new ScriptInfo(upload, buf);
-            } catch (Throwable ex) {
-                throw new IllegalStateException(ex);
+            if (!cursor.hasNext()) {
+                throw new IllegalArgumentException(format("Could't to load rule script for %s", scriptId));
             }
-        }).collect(toList());
 
-        // Dynamic to parse user depends scripts AST.
-        final ScriptASTInfo scriptAst = RuleScriptParser.parse(scriptId, ruleScript.getRevision(), engine, depends);
+            final RuleScriptWrapper ruleScript = cursor.next();
+            // Load all depends content.
+            final List<ScriptInfo> depends = safeList(ruleScript.getUploads()).stream().map(upload -> {
+                try {
+                    final byte[] buf = minioManager.getObjectToByteArray(upload.getObjectPrefix());
+                    return new ScriptInfo(upload, buf);
+                } catch (Throwable ex) {
+                    throw new IllegalStateException(ex);
+                }
+            }).collect(toList());
 
-        // Add system built JS SDK scripts AST.
-        scriptAst.getTypes().addAll(BUILT_JSSDK_TYPE_LIST);
+            // Dynamic to parse user depends scripts AST.
+            final ScriptASTInfo scriptAst = RuleScriptParser.parse(scriptId, ruleScript.getRevision(), engine, depends);
 
-        return scriptAst;
+            // Add system built JS SDK scripts AST.
+            scriptAst.getTypes().addAll(BUILT_JSSDK_TYPE_LIST);
+
+            return scriptAst;
+        }
     }
 
     @Override

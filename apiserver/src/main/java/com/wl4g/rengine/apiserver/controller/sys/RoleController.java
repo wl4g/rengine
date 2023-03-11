@@ -19,16 +19,21 @@ import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
+import com.wl4g.rengine.common.entity.sys.Menu;
 import com.wl4g.rengine.common.entity.sys.Role;
+import com.wl4g.rengine.common.entity.sys.User;
 import com.wl4g.rengine.service.RoleService;
 import com.wl4g.rengine.service.model.sys.RoleDelete;
 import com.wl4g.rengine.service.model.sys.RoleDeleteResult;
@@ -58,7 +63,7 @@ public class RoleController {
     private @Autowired RoleService roleService;
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Query rolees.")
+    @Operation(description = "Query roles.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
     @PreAuthorize("hasPermission(#model,'arn:sys:role:read:v1')")
@@ -91,6 +96,46 @@ public class RoleController {
         RespBase<RoleDeleteResult> resp = RespBase.create();
         resp.setData(roleService.delete(model));
         return resp;
+    }
+
+    // @SecurityRequirement(name = "default_oauth")
+    @Operation(description = "Find users by roleIds.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
+    @RequestMapping(path = { "users" }, produces = "application/json", method = { GET })
+    @PreAuthorize("hasPermission(#model,'arn:sys:role:users:read:v1')")
+    public RespBase<List<User>> users(@RequestParam("roleIds") List<Long> roleIds) {
+        log.debug("called: roleIds={}", roleIds);
+        return RespBase.<List<User>> create().withData(roleService.findUsersByRoleIds(roleIds));
+    }
+
+    // @SecurityRequirement(name = "default_oauth")
+    @Operation(description = "Find menus by roleIds.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
+    @RequestMapping(path = { "menus" }, produces = "application/json", method = { GET })
+    @PreAuthorize("hasPermission(#model,'arn:sys:role:menus:read:v1')")
+    public RespBase<List<Menu>> menus(@RequestParam("roleIds") List<Long> roleIds) {
+        log.debug("called: roleIds={}", roleIds);
+        return RespBase.<List<Menu>> create().withData(roleService.findMenusByRoleIds(roleIds));
+    }
+
+    // @SecurityRequirement(name = "default_oauth")
+    @Operation(description = "Assign users by roleId.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
+    @RequestMapping(path = { "assign/users" }, produces = "application/json", method = { GET })
+    @PreAuthorize("hasPermission(#model,'arn:sys:role:users:write:v1')")
+    public RespBase<List<Long>> assignUsers(@RequestParam("roleId") Long roleId, @RequestParam("userIds") List<Long> userIds) {
+        log.debug("called: roleId={}, userIds={}", roleId, userIds);
+        return RespBase.<List<Long>> create().withData(roleService.assignUsers(roleId, userIds));
+    }
+
+    // @SecurityRequirement(name = "default_oauth")
+    @Operation(description = "Assign menus by roleId.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
+    @RequestMapping(path = { "assign/menus" }, produces = "application/json", method = { GET })
+    @PreAuthorize("hasPermission(#model,'arn:sys:role:menus:write:v1')")
+    public RespBase<List<Long>> assignMenus(@RequestParam("roleId") Long roleId, @RequestParam("menuIds") List<Long> menuIds) {
+        log.debug("called: roleId={}, menuIds={}", roleId, menuIds);
+        return RespBase.<List<Long>> create().withData(roleService.assignMenus(roleId, menuIds));
     }
 
 }

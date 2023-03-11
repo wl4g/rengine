@@ -33,6 +33,7 @@ import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -57,12 +58,22 @@ public abstract class BeanSensitiveTransforms {
 
     private static final Map<Class<?>, List<SensitiveMethod>> modelSetterCaching = new ConcurrentHashMap<>(32);
 
-    public static Object transform(@NotNull Object bean) {
-        return transform(bean,
-                f -> DEFAULT_SEFINITION_SENSITIVE_FIELDS.stream().anyMatch(dfn -> containsIgnoreCase(f.getName(), dfn)));
+    public static void transform(@NotNull Object bean) {
+        transform(bean, f -> DEFAULT_SEFINITION_SENSITIVE_FIELDS.stream().anyMatch(dfn -> containsIgnoreCase(f.getName(), dfn)));
     }
 
-    public static Object transform(@NotNull Object bean, @NotNull Predicate<Field> filter) {
+    @SuppressWarnings("unchecked")
+    public static void transform(@NotNull Object bean, @NotNull Predicate<Field> filter) {
+        notNullOf(bean, "model");
+        notNullOf(filter, "filter");
+        if (bean instanceof Collection) {
+            ((Collection<Object>) bean).forEach(ele -> doSafeTransform(ele, filter));
+        } else {
+            doSafeTransform(bean, filter);
+        }
+    }
+
+    public static void doSafeTransform(@NotNull Object bean, @NotNull Predicate<Field> filter) {
         notNullOf(bean, "model");
         notNullOf(filter, "filter");
 
@@ -101,14 +112,12 @@ public abstract class BeanSensitiveTransforms {
             final String value = (String) invokeMethod(sm.getGetter(), bean);
             if (nonNull(value)) {
                 String transformed = EMPTY;
-                for (int i = 0; i < value.length(); i++) {
+                for (int i = 0; i < 6 /* value.length() */; i++) {
                     transformed += "*";
                 }
                 invokeMethod(sm.getSetter(), bean, transformed);
             }
         });
-
-        return bean;
     }
 
     @Getter

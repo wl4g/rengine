@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.common.constants;
+package com.wl4g.rengine.common.util;
 
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_MENUS;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_MENU_ROLES;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_ORANIZATIONS;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_ROLES;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_USERS;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_USER_ROLES;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_RULES;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_RULE_SCRIPTS;
@@ -27,7 +28,6 @@ import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollection
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_WORKFLOW_GRAPHS;
 
 import org.bson.BsonArray;
-import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
@@ -37,13 +37,13 @@ import com.mongodb.client.model.Projections;
 import com.wl4g.infra.common.bean.BaseBean;
 
 /**
- * {@link ServiceRengineConstants}
+ * {@link ServiceAggregateFilters}
  * 
  * @author James Wong
  * @version 2023-02-20
  * @since v1.0.0
  */
-public abstract class ServiceRengineConstants extends RengineConstants {
+public abstract class ServiceAggregateFilters {
 
     // Basic filters.
     public static final Bson DEFAULT_ENABLE_FILTER = Aggregates.match(Filters.eq("enable", BaseBean.ENABLED));
@@ -53,10 +53,9 @@ public abstract class ServiceRengineConstants extends RengineConstants {
     public static final Bson DEFAULT_SORT = Aggregates.sort(new Document("revision", -1));
     public static final Bson DEFAULT_LIMIT = Aggregates.limit(1);
 
-    // Rule script lookup filter (Unit Run).
+    // Lookup for rulescript(latest),uploads by rule filters.
     // @formatter:off
-    public static final BsonArray RULE_SCRIPT_LOOKUP_FILTER_WITH_UNIT_RUN = BsonArray.parse(""
-                    + "["
+    public static final BsonArray RULE_SCRIPT_UPLOAD_LOOKUP_FILTERS = BsonArray.parse("["
                     //+ "{ $match: { $expr: { $eq: [ \"$_id\",  \"$$rule_id\" ] } } },"
                     + "{ $match: { \"enable\": { $eq: 1 } } },"
                     + "{ $match: { \"delFlag\": { $eq: 0 } } },"
@@ -78,9 +77,14 @@ public abstract class ServiceRengineConstants extends RengineConstants {
                     + "]");
     // @formatter:on
 
-    // Workflow lookup filter.
+    // Lookup for workflow,workflowgraph(latest),rule,rulescript,uploads by
+    // scenes filters.
     // @formatter:off
-    public static final Bson WORKFLOW_LOOKUP_FILTER = BsonDocument.parse(""
+    public static final BsonArray WORKFLOW_GRAPH_RULE_SCRIPT_UPLOAD_LOOKUP_FILTERS = BsonArray.parse("["
+            //+ "{ $match: { $expr: { $in: [ \"$scenesCode\",  \"test_script_sdk_example\" ] } } },"
+            + "{ $match: { \"enable\": { $eq: 1 } } },"
+            + "{ $match: { \"delFlag\": { $eq: 0 } } },"
+            + "{ $project: { \"_class\": 0, \"delFlag\": 0 } },"
             + "{ $lookup: {"
             + "    from: \"" + T_WORKFLOWS.getName() + "\",  "
             + "    let: { scenes_id: { $toLong: \"$_id\" } },  "
@@ -144,12 +148,13 @@ public abstract class ServiceRengineConstants extends RengineConstants {
             + "    ],"
             + "    as: \"workflows\""
             + "    }"
-            + "}");
+            + "}"
+            + "]");
     // @formatter:on
 
-    // User role organization menus lookup filter(deep cascade).
+    // Lookup for role,organ,menus by user filters.
     // @formatter:off
-    public static final BsonArray USER_ROLE_ORGAN_MENUS_LOOKUP_FILTER = BsonArray.parse("["
+    public static final BsonArray USER_ROLE_ORGAN_MENU_LOOKUP_FILTERS = BsonArray.parse("["
             // + "    { $match: { \"username\": { $in: [\"root\"] } } },"
             + "    { $match: { \"enable\": { $eq: 1 } } },"
             + "    { $match: { \"delFlag\": { $eq: 0 } } },"
@@ -209,6 +214,93 @@ public abstract class ServiceRengineConstants extends RengineConstants {
             + "        as: \"userRoles\""
             + "        }"
             + "    }"
+            + "]");
+    // @formatter:on
+
+    // Lookup for organ,menus by role filters.
+    // @formatter:off
+    public static final BsonArray ROLE_ORGAN_MENU_LOOKUP_FILTERS = BsonArray.parse("["
+            //+ "{ $match: { \"roleCode\": { $in: [\"r:admin\"] } } },"
+            + "{ $match: { \"_id\": { $in: [ NumberLong(\"61508655614612341\") ] } } },"
+            + "{ $match: { \"enable\": { $eq: 1 } } },"
+            + "{ $match: { \"delFlag\": { $eq: 0 } } },"
+            + "{ $project: { \"_class\": 0, \"delFlag\": 0 } },"
+            + "{ $lookup: {"
+            + "    from: \"sys_menu_roles\","
+            + "    let: { role_id: { $toLong: \"$_id\" } },"
+            + "    pipeline: ["
+            + "        { $match: { $expr: { $eq: [ \"$roleId\", \"$$role_id\" ] } } }, "
+            + "        { $lookup: {"
+            + "            from: \"sys_menus\", "
+            + "            let: { menu_id: { $toLong: \"$menuId\" } },"
+            + "            pipeline: ["
+            + "                { $match: { $expr: { $eq: [ \"$_id\", \"$$menu_id\" ] } } },"
+            + "                { $match: { \"enable\": { $eq: 1 } } },"
+            + "                { $match: { \"delFlag\": { $eq: 0 } } },"
+            + "                { $project: { \"_class\": 0, \"delFlag\": 0 } }"
+            + "            ],"
+            + "            as: \"menus\""
+            + "            }"
+            + "        },"
+            + "    ],"
+            + "    as: \"menuRoles\""
+            + "    }"
+            + "},"
+            + "{ $lookup: {"
+            + "    from: \"sys_organizations\","
+            + "    localField: \"orgCode\","
+            + "    foreignField: \"orgCode\","
+            + "    as: \"org\""
+            + "  }"
+            + "},"
+            + "{ $unwind: {"
+            + "    path: \"$org\","
+            + "    preserveNullAndEmptyArrays: true"
+            + "  }"
+            + "}"
+            + "]");
+    // @formatter:on
+
+    // Lookup for organ,users by role filters.
+    // @formatter:off
+    public static final BsonArray ROLE_ORGAN_USER_LOOKUP_FILTERS = BsonArray.parse("["
+            //+ "{ $match: { \"roleCode\": { $in: [\"r:admin\"] } } },"
+            + "{ $match: { \"enable\": { $eq: 1 } } },"
+            + "{ $match: { \"delFlag\": { $eq: 0 } } },"
+            + "{ $project: { \"_class\": 0, \"delFlag\": 0 } },"
+            + "{ $lookup: {"
+            + "    from: \"" + SYS_USER_ROLES.getName() + "\","
+            + "    let: { role_id: { $toLong: \"$_id\" } },"
+            + "    pipeline: ["
+            + "        { $match: { $expr: { $eq: [ \"$roleId\", \"$$role_id\" ] } } }, "
+            + "        { $lookup: {"
+            + "            from: \"" + SYS_USERS.getName() + "\", "
+            + "            let: { user_id: { $toLong: \"$userId\" } },"
+            + "            pipeline: ["
+            + "                { $match: { $expr: { $eq: [ \"$_id\", \"$$user_id\" ] } } },"
+            + "                { $match: { \"enable\": { $eq: 1 } } },"
+            + "                { $match: { \"delFlag\": { $eq: 0 } } },"
+            + "                { $project: { \"_class\": 0, \"delFlag\": 0 } }"
+            + "            ],"
+            + "            as: \"users\""
+            + "            }"
+            + "        },"
+            + "    ],"
+            + "    as: \"userRoles\""
+            + "    }"
+            + "},"
+            + "{ $lookup: {"
+            + "    from: \"" + SYS_ORANIZATIONS.getName() + "\","
+            + "    localField: \"orgCode\","
+            + "    foreignField: \"orgCode\","
+            + "    as: \"org\""
+            + "  }"
+            + "},"
+            + "{ $unwind: {"
+            + "    path: \"$org\","
+            + "    preserveNullAndEmptyArrays: true"
+            + "  }"
+            + "}"
             + "]");
     // @formatter:on
 

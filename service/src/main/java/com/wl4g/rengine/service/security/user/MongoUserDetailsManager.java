@@ -2,7 +2,7 @@ package com.wl4g.rengine.service.security.user;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static com.wl4g.rengine.common.constants.ServiceRengineConstants.USER_ROLE_ORGAN_MENUS_LOOKUP_FILTER;
+import static com.wl4g.rengine.common.util.ServiceAggregateFilters.USER_ROLE_ORGAN_MENU_LOOKUP_FILTERS;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -168,7 +168,7 @@ public final class MongoUserDetailsManager implements UserDetailsManager, UserDe
 
         final var aggregates = new ArrayList<Bson>(2);
         aggregates.add(Aggregates.match(Filters.in("username", username)));
-        USER_ROLE_ORGAN_MENUS_LOOKUP_FILTER.stream().forEach(rs -> aggregates.add(rs.asDocument()));
+        USER_ROLE_ORGAN_MENU_LOOKUP_FILTERS.stream().forEach(rs -> aggregates.add(rs.asDocument()));
         // System.out.println(BsonUtils2.toJson(USER_ROLE_ORGAN_MENUS_LOOKUP_FILTER));
 
         try (var cursor = userCollection.aggregate(aggregates)

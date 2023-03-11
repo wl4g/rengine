@@ -25,16 +25,14 @@ import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_RULE_SCRIPTS;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_SCENESES;
-import static com.wl4g.rengine.common.constants.ServiceRengineConstants.DEFAULT_DELFLAT_FILTER;
-import static com.wl4g.rengine.common.constants.ServiceRengineConstants.DEFAULT_ENABLE_FILTER;
-import static com.wl4g.rengine.common.constants.ServiceRengineConstants.DEFAULT_PROJECT_FILTER;
-import static com.wl4g.rengine.common.constants.ServiceRengineConstants.RULE_SCRIPT_LOOKUP_FILTER_WITH_UNIT_RUN;
-import static com.wl4g.rengine.common.constants.ServiceRengineConstants.WORKFLOW_LOOKUP_FILTER;
+import static com.wl4g.rengine.common.util.ServiceAggregateFilters.RULE_SCRIPT_UPLOAD_LOOKUP_FILTERS;
+import static com.wl4g.rengine.common.util.ServiceAggregateFilters.WORKFLOW_GRAPH_RULE_SCRIPT_UPLOAD_LOOKUP_FILTERS;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.joining;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -225,7 +223,7 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
 
         final List<Bson> aggregates = Lists.newArrayList();
         aggregates.add(Aggregates.match(Filters.in("_id", ruleScriptIds)));
-        RULE_SCRIPT_LOOKUP_FILTER_WITH_UNIT_RUN.stream().forEach(rs -> aggregates.add(rs.asDocument()));
+        RULE_SCRIPT_UPLOAD_LOOKUP_FILTERS.stream().forEach(rs -> aggregates.add(rs.asDocument()));
 
         final ReactiveMongoCollection<Document> collection = mongoRepository.getReactiveCollection(T_RULE_SCRIPTS);
         return collection.aggregate(aggregates)
@@ -377,13 +375,10 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
         //        "workflows");
         //// @formatter:on
 
-        final List<Bson> aggregates = Lists.newArrayList();
+        final List<Bson> aggregates = new ArrayList<>(2);
         aggregates.add(Aggregates.match(Filters.in("scenesCode", scenesCodes)));
-        aggregates.add(DEFAULT_ENABLE_FILTER);
-        aggregates.add(DEFAULT_DELFLAT_FILTER);
-        aggregates.add(DEFAULT_PROJECT_FILTER);
+        WORKFLOW_GRAPH_RULE_SCRIPT_UPLOAD_LOOKUP_FILTERS.stream().forEach(rs -> aggregates.add(rs.asDocument()));
         // aggregates.add(workflowLookup);
-        aggregates.add(WORKFLOW_LOOKUP_FILTER);
         // The temporary collections are automatically created.
         // aggregates.add(Aggregates.merge("_tmp_load_scenes_with_cascade"));
 

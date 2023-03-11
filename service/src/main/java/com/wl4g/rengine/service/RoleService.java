@@ -15,10 +15,15 @@
  */
 package com.wl4g.rengine.service;
 
+import java.util.List;
+
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
+import com.wl4g.rengine.common.entity.sys.Menu;
 import com.wl4g.rengine.common.entity.sys.Role;
+import com.wl4g.rengine.common.entity.sys.User;
 import com.wl4g.rengine.service.model.sys.RoleDelete;
 import com.wl4g.rengine.service.model.sys.RoleDeleteResult;
 import com.wl4g.rengine.service.model.sys.RoleQuery;
@@ -39,5 +44,13 @@ public interface RoleService {
     RoleSaveResult save(@NotNull RoleSave model);
 
     RoleDeleteResult delete(@NotNull RoleDelete model);
+
+    List<User> findUsersByRoleIds(@NotEmpty List<Long> roleIds);
+
+    List<Menu> findMenusByRoleIds(@NotEmpty List<Long> roleIds);
+
+    List<Long> assignUsers(@NotNull Long roleId, @NotEmpty List<Long> userIds);
+
+    List<Long> assignMenus(@NotNull Long roleId, @NotEmpty List<Long> menuIds);
 
 }

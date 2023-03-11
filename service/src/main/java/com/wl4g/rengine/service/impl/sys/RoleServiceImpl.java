@@ -15,14 +15,23 @@
  */
 package com.wl4g.rengine.service.impl.sys;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.rengine.common.util.ServiceAggregateFilters.ROLE_ORGAN_MENU_LOOKUP_FILTERS;
+import static com.wl4g.rengine.common.util.ServiceAggregateFilters.ROLE_ORGAN_USER_LOOKUP_FILTERS;
 import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
 import static java.util.Objects.isNull;
+import static java.util.stream.Collectors.toList;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
+import org.bson.conversions.Bson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -32,10 +41,19 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import com.mongodb.client.model.Aggregates;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
+import com.wl4g.infra.common.lang.Assert2;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
+import com.wl4g.rengine.common.entity.sys.Menu;
+import com.wl4g.rengine.common.entity.sys.MenuRole;
 import com.wl4g.rengine.common.entity.sys.Role;
+import com.wl4g.rengine.common.entity.sys.User;
+import com.wl4g.rengine.common.entity.sys.UserRole;
+import com.wl4g.rengine.common.util.BeanSensitiveTransforms;
+import com.wl4g.rengine.common.util.BsonEntitySerializers;
 import com.wl4g.rengine.service.RoleService;
 import com.wl4g.rengine.service.model.sys.RoleDelete;
 import com.wl4g.rengine.service.model.sys.RoleDeleteResult;
@@ -88,6 +106,78 @@ public class RoleServiceImpl implements RoleService {
         DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
                 MongoCollectionDefinition.SYS_ROLES.getName());
         return RoleDeleteResult.builder().deletedCount(result.getDeletedCount()).build();
+    }
+
+    @Override
+    public List<User> findUsersByRoleIds(@NotEmpty List<Long> roleIds) {
+        Assert2.notEmpty(roleIds, "roleIds");
+
+        final var aggregates = new ArrayList<Bson>(2);
+        aggregates.add(Aggregates.match(Filters.in("_id", roleIds)));
+        ROLE_ORGAN_USER_LOOKUP_FILTERS.stream().forEach(rs -> aggregates.add(rs.asDocument()));
+
+        try (var cursor = mongoTemplate.getCollection(MongoCollectionDefinition.SYS_ROLES.getName())
+                .aggregate(aggregates)
+                .map(roleDoc -> BsonEntitySerializers.fromDocument(roleDoc, Role.class))
+                .cursor();) {
+            if (cursor.hasNext()) {
+                final var role = cursor.next();
+                final var users = safeList(role.getUserRoles()).stream()
+                        .flatMap(ur -> safeList(ur.getUsers()).stream())
+                        .collect(toList());
+                BeanSensitiveTransforms.transform(users);
+                return users;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public List<Menu> findMenusByRoleIds(@NotEmpty List<Long> roleIds) {
+        Assert2.notEmpty(roleIds, "roleIds");
+
+        final var aggregates = new ArrayList<Bson>(2);
+        aggregates.add(Aggregates.match(Filters.in("_id", roleIds)));
+        ROLE_ORGAN_MENU_LOOKUP_FILTERS.stream().forEach(rs -> aggregates.add(rs.asDocument()));
+
+        try (var cursor = mongoTemplate.getCollection(MongoCollectionDefinition.SYS_ROLES.getName())
+                .aggregate(aggregates)
+                .map(roleDoc -> BsonEntitySerializers.fromDocument(roleDoc, Role.class))
+                .cursor();) {
+            if (cursor.hasNext()) {
+                final var role = cursor.next();
+                return safeList(role.getMenuRoles()).stream().flatMap(mr -> safeList(mr.getMenus()).stream()).collect(toList());
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public List<Long> assignUsers(@NotNull Long roleId, @NotEmpty List<Long> userIds) {
+        notNullOf(roleId, "roleId");
+        Assert2.notEmpty(userIds, "userIds");
+
+        return userIds.parallelStream().map(userId -> {
+            return mongoTemplate
+                    .save(UserRole.builder().roleId(roleId).userId(userId).build(),
+                            MongoCollectionDefinition.SYS_USER_ROLES.getName())
+                    .getId();
+        }).collect(toList());
+    }
+
+    @Override
+    public List<Long> assignMenus(@NotNull Long roleId, @NotEmpty List<Long> menuIds) {
+        notNullOf(roleId, "roleId");
+        Assert2.notEmpty(menuIds, "menuIds");
+
+        return menuIds.parallelStream().map(menuId -> {
+            return mongoTemplate
+                    .save(MenuRole.builder().roleId(roleId).menuId(menuId).build(),
+                            MongoCollectionDefinition.SYS_USER_ROLES.getName())
+                    .getId();
+        }).collect(toList());
     }
 
 }

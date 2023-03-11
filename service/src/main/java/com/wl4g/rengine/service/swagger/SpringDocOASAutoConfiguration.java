@@ -15,7 +15,16 @@
  */
 package com.wl4g.rengine.service.swagger;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.contains;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
+import java.util.List;
+
+import org.springdoc.core.GroupedOpenApi;
 import org.springdoc.core.SpringDocUtils;
+import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -23,6 +32,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import com.wl4g.infra.common.lang.StringUtils2;
 import com.wl4g.rengine.service.swagger.SpringDocOASProperties.CustomOASConfig;
@@ -52,7 +62,12 @@ public class SpringDocOASAutoConfiguration {
     }
 
     @Bean
-    public OpenAPI customOpenAPI(SpringDocOASProperties config) {
+    public OpenAPI customOpenAPI(SpringDocOASProperties config, List<GroupedOpenApi> groups) {
+        // Add custom extra customizers.
+        for (GroupedOpenApi group : safeList(groups)) {
+            group.getOperationCustomizers().add(preAuthorizeOperationCustomizer());
+        }
+
         // Replace with classes configuration.
         config.getCustomOASConfig()
                 .getReplaceClassConfig()
@@ -80,6 +95,23 @@ public class SpringDocOASAutoConfiguration {
         return openAPI.info(info).components(securitySchemes);
     }
 
+    @Bean
+    public OperationCustomizer preAuthorizeOperationCustomizer() {
+        return (operation, handlerMethod) -> {
+            PreAuthorize preAuthorize = handlerMethod.getMethodAnnotation(PreAuthorize.class);
+            if (preAuthorize != null) {
+                final var addAuthoritiesInfo = format(DEFAULT_EXTRA_AUTHORITIES_PREFIX.concat("%s"), preAuthorize.value());
+                // operation.addTagsItem(addAuthoritiesInfo);
+                var description = operation.getDescription();
+                if (!contains(description, DEFAULT_EXTRA_AUTHORITIES_PREFIX)) {
+                    description = isBlank(description) ? "" : description.concat(" - ");
+                    operation.setDescription(description.concat(addAuthoritiesInfo));
+                }
+            }
+            return operation;
+        };
+    }
+
     public static String transformDocTitle(String appName) {
         return StringUtils2.replaceGroups(appName, DEFAULT_TITLE_REGEX, gs -> {
             if (gs.getIndex() == 0 || gs.getIndex() == 3) {
@@ -91,6 +123,7 @@ public class SpringDocOASAutoConfiguration {
         }).trim();
     }
 
+    public static final String DEFAULT_EXTRA_AUTHORITIES_PREFIX = "Requirement authorities: ";
     public static final String DEFAULT_TITLE_REGEX = "([a-zA-Z0-9])([a-zA-Z0-9]+)([-_]*)([a-zA-Z0-9]?)([a-zA-Z0-9]*)";
 
 }

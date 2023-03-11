@@ -22,6 +22,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotBlank;
 
@@ -138,6 +140,16 @@ public class UserController {
                 .withCode(RetCode.OK)
                 .withStatus(SmartRedirectStrategy.DEFAULT_AUTHORIZED_STATUS)
                 .withData(userService.userInfo());
+    }
+
+    // @SecurityRequirement(name = "default_oauth")
+    @Operation(description = "Assign roles by userId.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
+    @RequestMapping(path = { "assign/roles" }, produces = "application/json", method = { GET })
+    @PreAuthorize("hasPermission(#model,'arn:sys:user:roles:write:v1')")
+    public RespBase<List<Long>> assignRoles(@RequestParam("roleId") Long userId, @RequestParam("menuIds") List<Long> roleIds) {
+        log.debug("called: userId={}, roleIds={}", userId, roleIds);
+        return RespBase.<List<Long>> create().withData(userService.assignRoles(userId, roleIds));
     }
 
 }

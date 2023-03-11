@@ -22,8 +22,12 @@ import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
 import static java.util.Objects.isNull;
+import static java.util.stream.Collectors.toList;
 
 import java.util.List;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -34,8 +38,10 @@ import org.springframework.stereotype.Service;
 
 import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
+import com.wl4g.infra.common.lang.Assert2;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.sys.User;
+import com.wl4g.rengine.common.entity.sys.UserRole;
 import com.wl4g.rengine.service.UserService;
 import com.wl4g.rengine.service.model.sys.UserDelete;
 import com.wl4g.rengine.service.model.sys.UserDeleteResult;
@@ -582,6 +588,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserAuthInfo userInfo() {
         return AuthenticationService.currentUserInfo();
+    }
+
+    @Override
+    public List<Long> assignRoles(@NotNull Long userId, @NotEmpty List<Long> roleIds) {
+        notNullOf(userId, "userId");
+        Assert2.notEmpty(roleIds, "roleIds");
+
+        return roleIds.parallelStream().map(roleId -> {
+            return mongoTemplate
+                    .save(UserRole.builder().roleId(roleId).userId(userId).build(),
+                            MongoCollectionDefinition.SYS_USER_ROLES.getName())
+                    .getId();
+        }).collect(toList());
     }
 
 }

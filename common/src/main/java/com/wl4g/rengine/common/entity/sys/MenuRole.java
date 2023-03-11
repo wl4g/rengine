@@ -15,8 +15,11 @@
  */
 package com.wl4g.rengine.common.entity.sys;
 
-import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.wl4g.rengine.common.entity.BaseEntity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,11 +40,135 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class MenuRole implements Serializable {
+public class MenuRole extends BaseEntity {
     private static final long serialVersionUID = -5762348176963349685L;
     private Long menuId;
     private Long roleId;
 
     // The temporary wrap fields.
+    private List<Role> roles;
     private List<Menu> menus;
+
+    // Ignore organization getter/setter.
+    @JsonIgnore
+    @Override
+    public String getOrgCode() {
+        return null;
+    }
+
+    @JsonIgnore
+    @Override
+    public void setOrgCode(String orgCode) {
+    }
+
+    @JsonIgnore
+    @Override
+    public Integer getEnable() {
+        return null;
+    }
+
+    @JsonIgnore
+    @Override
+    public void setEnable(Integer enable) {
+    }
+
+    @JsonIgnore
+    @Override
+    public List<String> getLabels() {
+        return null;
+    }
+
+    @JsonIgnore
+    @Override
+    public void setLabels(List<String> labels) {
+    }
+
+    @JsonIgnore
+    @Override
+    public Long getCreateBy() {
+        return null;
+    }
+
+    @JsonIgnore
+    @Override
+    public Date getCreateDate() {
+        return null;
+    }
+
+    @JsonIgnore
+    @Override
+    public Integer getDelFlag() {
+        return null;
+    }
+
+    @JsonIgnore
+    @Override
+    public String getHumanCreateDate() {
+        return null;
+    }
+
+    @JsonIgnore
+    @Override
+    public String getHumanUpdateDate() {
+        return null;
+    }
+
+    @JsonIgnore
+    @Override
+    public String getRemark() {
+        return null;
+    }
+
+    @JsonIgnore
+    @Override
+    public Long getUpdateBy() {
+        return null;
+    }
+
+    @JsonIgnore
+    @Override
+    public Date getUpdateDate() {
+        return null;
+    }
+
+    @JsonIgnore
+    @Override
+    public void setCreateBy(Long createBy) {
+    }
+
+    @JsonIgnore
+    @Override
+    public void setCreateDate(Date createDate) {
+    }
+
+    @JsonIgnore
+    @Override
+    public void setDelFlag(Integer delFlag) {
+    }
+
+    @JsonIgnore
+    @Override
+    public void setHumanCreateDate(String humanCreateDate) {
+    }
+
+    @JsonIgnore
+    @Override
+    public void setHumanUpdateDate(String humanUpdateDate) {
+    }
+
+    @JsonIgnore
+    @Override
+    public void setRemark(String remark) {
+    }
+
+    @JsonIgnore
+    @Override
+    public void setUpdateBy(Long updateBy) {
+    }
+
+    @JsonIgnore
+    @Override
+    public void setUpdateDate(Date updateDate) {
+    }
+
 }

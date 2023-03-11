@@ -15,6 +15,9 @@
  */
 package com.wl4g.rengine.service;
 
+import java.util.List;
+
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
@@ -42,5 +45,7 @@ public interface UserService {
     UserDeleteResult delete(@NotNull UserDelete model);
 
     UserAuthInfo userInfo();
+
+    List<Long> assignRoles(@NotNull Long userId, @NotEmpty List<Long> roleIds);
 
 }
