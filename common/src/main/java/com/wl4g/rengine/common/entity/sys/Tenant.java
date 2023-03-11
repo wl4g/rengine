@@ -15,10 +15,9 @@
  */
 package com.wl4g.rengine.common.entity.sys;
 
-import java.util.List;
 import java.util.Objects;
 
-import com.wl4g.rengine.common.entity.BaseEntity;
+import com.wl4g.infra.common.bean.BaseBean;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,7 +26,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link Organization}
+ * {@link Tenant}
  * 
  * @author James Wong
  * @version 2023-03-08
@@ -38,15 +37,11 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class Organization extends BaseEntity {
+public class Tenant extends BaseBean {
     private static final long serialVersionUID = 381411777614066880L;
 
     private String nameEn;
     private String nameZh;
-    private String type;
-    private Long parentId;
-
-    private List<Organization> childrens;
 
     @Override
     public boolean equals(Object o) {
@@ -54,7 +49,7 @@ public class Organization extends BaseEntity {
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
-        Organization group = (Organization) o;
+        Tenant group = (Tenant) o;
         return Objects.equals(getId(), group.getId());
     }
 

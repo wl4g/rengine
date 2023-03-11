@@ -41,7 +41,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public abstract class BaseQuery<Q> {
     private @Nullable String name;
-    private @Nullable String orgCode;
+    // private @Nullable String orgCode;
+    private @Nullable Long tenantId;
     private @Nullable List<String> labels;
     private @Nullable Boolean enable;
     private @Min(0) @Default Integer pageNum = 0; // zero-based,see:org.springframework.data.domain.PageRequest

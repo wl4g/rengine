@@ -69,8 +69,11 @@ public abstract class QueryHolder {
         if (nonNull(model.getLabels()) && !model.getLabels().isEmpty()) {
             criterias.add(Criteria.where("labels").in(model.getLabels()));
         }
-        if (nonNull(model.getOrgCode())) {
-            criterias.add(Criteria.where("orgCode").is(model.getOrgCode()));
+        // if (nonNull(model.getOrgCode())) {
+        // criterias.add(Criteria.where("orgCode").is(model.getOrgCode()));
+        // }
+        if (nonNull(model.getTenantId())) {
+            criterias.add(Criteria.where("tenantId").is(model.getTenantId()));
         }
         if (delFlagNormal) {
             criterias.add(Criteria.where("delFlag").is(BaseBean.DEL_FLAG_NORMAL));

@@ -28,13 +28,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.common.entity.sys.Organization;
-import com.wl4g.rengine.service.OrganizationService;
-import com.wl4g.rengine.service.model.sys.OrganizationDelete;
-import com.wl4g.rengine.service.model.sys.OrganizationDeleteResult;
-import com.wl4g.rengine.service.model.sys.OrganizationQuery;
-import com.wl4g.rengine.service.model.sys.OrganizationSave;
-import com.wl4g.rengine.service.model.sys.OrganizationSaveResult;
+import com.wl4g.rengine.common.entity.sys.Tenant;
+import com.wl4g.rengine.service.TenantService;
+import com.wl4g.rengine.service.model.sys.TenantDelete;
+import com.wl4g.rengine.service.model.sys.TenantDeleteResult;
+import com.wl4g.rengine.service.model.sys.TenantQuery;
+import com.wl4g.rengine.service.model.sys.TenantSave;
+import com.wl4g.rengine.service.model.sys.TenantSaveResult;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -43,53 +43,53 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link OrganizationController}
+ * {@link TenantController}
  * 
  * @author James Wong
  * @version 2022-08-28
  * @since v1.0.0
  */
-@Tag(name = "OrganizationAPI", description = "The Organization management API")
+@Tag(name = "TenantAPI", description = "The Tenant management API")
 @Slf4j
 @RestController
-@RequestMapping("/v1/organization")
-public class OrganizationController {
+@RequestMapping("/v1/tenant")
+public class TenantController {
 
-    private @Autowired OrganizationService organizationService;
+    private @Autowired TenantService tenantService;
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Query organizationes.")
+    @Operation(description = "Query tenantes.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
-    @PreAuthorize("hasPermission(#model,'arn:sys:org:read:v1')")
-    public RespBase<PageHolder<Organization>> query(@Validated OrganizationQuery model) {
+    @PreAuthorize("hasPermission(#model,'arn:sys:tenant:read:v1')")
+    public RespBase<PageHolder<Tenant>> query(@Validated TenantQuery model) {
         log.debug("called: model={}", model);
-        RespBase<PageHolder<Organization>> resp = RespBase.create();
-        resp.setData(organizationService.query(model));
+        RespBase<PageHolder<Tenant>> resp = RespBase.create();
+        resp.setData(tenantService.query(model));
         return resp;
     }
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Save organization.")
+    @Operation(description = "Save tenant.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    @PreAuthorize("hasPermission(#model,'arn:sys:org:write:v1')")
-    public RespBase<OrganizationSaveResult> save(@Validated @RequestBody OrganizationSave model) {
+    @PreAuthorize("hasPermission(#model,'arn:sys:tenant:write:v1')")
+    public RespBase<TenantSaveResult> save(@Validated @RequestBody TenantSave model) {
         log.debug("called: model={}", model);
-        RespBase<OrganizationSaveResult> resp = RespBase.create();
-        resp.setData(organizationService.save(model));
+        RespBase<TenantSaveResult> resp = RespBase.create();
+        resp.setData(tenantService.save(model));
         return resp;
     }
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Delete organization.")
+    @Operation(description = "Delete tenant.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
-    @PreAuthorize("hasPermission(#model,'arn:sys:org:delete:v1')")
-    public RespBase<OrganizationDeleteResult> delete(@Validated @RequestBody OrganizationDelete model) {
+    @PreAuthorize("hasPermission(#model,'arn:sys:tenant:delete:v1')")
+    public RespBase<TenantDeleteResult> delete(@Validated @RequestBody TenantDelete model) {
         log.debug("called: model={}", model);
-        RespBase<OrganizationDeleteResult> resp = RespBase.create();
-        resp.setData(organizationService.delete(model));
+        RespBase<TenantDeleteResult> resp = RespBase.create();
+        resp.setData(tenantService.delete(model));
         return resp;
     }
 

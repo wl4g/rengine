@@ -25,7 +25,6 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -58,18 +57,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class Notification extends BaseEntity {
     private static final long serialVersionUID = 1L;
-
-    // Ignore organization getter/setter.
-    @JsonIgnore
-    @Override
-    public String getOrgCode() {
-        return null;
-    }
-
-    @JsonIgnore
-    @Override
-    public void setOrgCode(String orgCode) {
-    }
 
     @NotNull
     NotifierDetailsBase details;

@@ -47,7 +47,6 @@ public class Role extends BaseEntity {
     private String nameZh;
 
     // The temporary wrap fields.
-    private Organization org;
     private List<UserRole> userRoles;
     private List<MenuRole> menuRoles;
 

@@ -64,18 +64,6 @@ public class DictQuery extends BaseQuery<Dict> {
     // Ignore organization getter/setter.
     @JsonIgnore
     @Override
-    public String getOrgCode() {
-        return null;
-    }
-
-    @JsonIgnore
-    @Override
-    public void setOrgCode(String orgCode) {
-    }
-
-    // Ignore organization getter/setter.
-    @JsonIgnore
-    @Override
     public String getName() {
         return null;
     }

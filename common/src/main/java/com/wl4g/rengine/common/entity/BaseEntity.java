@@ -15,6 +15,7 @@
  */
 package com.wl4g.rengine.common.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wl4g.infra.common.bean.BaseBean;
 
 import lombok.Getter;
@@ -37,5 +38,19 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public abstract class BaseEntity extends BaseBean {
     private static final long serialVersionUID = 2096342971580901508L;
-    // private String tenant;
+
+    private Long tenantId;
+
+    // Ignore organization getter/setter.
+    @JsonIgnore
+    @Override
+    public String getOrgCode() {
+        return null;
+    }
+
+    @JsonIgnore
+    @Override
+    public void setOrgCode(String orgCode) {
+    }
+
 }

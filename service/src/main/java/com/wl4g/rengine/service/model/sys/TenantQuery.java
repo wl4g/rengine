@@ -15,7 +15,10 @@
  */
 package com.wl4g.rengine.service.model.sys;
 
-import com.wl4g.rengine.service.model.BaseDelete;
+import javax.annotation.Nullable;
+
+import com.wl4g.rengine.common.entity.sys.Tenant;
+import com.wl4g.rengine.service.model.BaseQuery;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,7 +27,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link OrganizationDelete}
+ * {@link TenantQuery}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -35,5 +38,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class OrganizationDelete extends BaseDelete {
+public class TenantQuery extends BaseQuery<Tenant> {
+    private @Nullable Long organizationId;
 }

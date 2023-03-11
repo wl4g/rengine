@@ -15,7 +15,7 @@
  */
 package com.wl4g.rengine.service.model.sys;
 
-import com.wl4g.rengine.common.entity.sys.Organization;
+import com.wl4g.rengine.service.model.BaseDeleteResult;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,7 +24,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link OrganizationSave}
+ * {@link TenantDeleteResult}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -35,6 +35,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class OrganizationSave extends Organization {
-    private static final long serialVersionUID = -8089363065684705215L;
+public class TenantDeleteResult extends BaseDeleteResult {
 }

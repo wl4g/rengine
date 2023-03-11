@@ -15,7 +15,7 @@
  */
 package com.wl4g.rengine.service.model.sys;
 
-import com.wl4g.rengine.service.model.BaseSaveResult;
+import com.wl4g.rengine.service.model.BaseDelete;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,7 +24,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link OrganizationSaveResult}
+ * {@link TenantDelete}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -35,5 +35,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class OrganizationSaveResult extends BaseSaveResult {
+public class TenantDelete extends BaseDelete {
 }

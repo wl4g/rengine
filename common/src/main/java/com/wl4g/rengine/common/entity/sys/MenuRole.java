@@ -49,18 +49,6 @@ public class MenuRole extends BaseEntity {
     private List<Role> roles;
     private List<Menu> menus;
 
-    // Ignore organization getter/setter.
-    @JsonIgnore
-    @Override
-    public String getOrgCode() {
-        return null;
-    }
-
-    @JsonIgnore
-    @Override
-    public void setOrgCode(String orgCode) {
-    }
-
     @JsonIgnore
     @Override
     public Integer getEnable() {

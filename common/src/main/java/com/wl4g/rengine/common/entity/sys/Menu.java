@@ -18,7 +18,6 @@ package com.wl4g.rengine.common.entity.sys;
 import java.util.List;
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.wl4g.rengine.common.entity.BaseEntity;
 
@@ -60,18 +59,6 @@ public class Menu extends BaseEntity {
     private List<String> permissions;
 
     private List<Menu> childrens;
-
-    // Ignore organization getter/setter.
-    @JsonIgnore
-    @Override
-    public String getOrgCode() {
-        return null;
-    }
-
-    @JsonIgnore
-    @Override
-    public void setOrgCode(String orgCode) {
-    }
 
     @Override
     public boolean equals(Object o) {

@@ -18,26 +18,26 @@ package com.wl4g.rengine.service;
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
-import com.wl4g.rengine.common.entity.sys.Organization;
-import com.wl4g.rengine.service.model.sys.OrganizationDelete;
-import com.wl4g.rengine.service.model.sys.OrganizationDeleteResult;
-import com.wl4g.rengine.service.model.sys.OrganizationQuery;
-import com.wl4g.rengine.service.model.sys.OrganizationSave;
-import com.wl4g.rengine.service.model.sys.OrganizationSaveResult;
+import com.wl4g.rengine.common.entity.sys.Tenant;
+import com.wl4g.rengine.service.model.sys.TenantDelete;
+import com.wl4g.rengine.service.model.sys.TenantDeleteResult;
+import com.wl4g.rengine.service.model.sys.TenantQuery;
+import com.wl4g.rengine.service.model.sys.TenantSave;
+import com.wl4g.rengine.service.model.sys.TenantSaveResult;
 
 /**
- * {@link OrganizationService}
+ * {@link TenantService}
  * 
  * @author James Wong
  * @version 2022-08-29
  * @since v1.0.0
  */
-public interface OrganizationService {
+public interface TenantService {
 
-    PageHolder<Organization> query(@NotNull OrganizationQuery model);
+    PageHolder<Tenant> query(@NotNull TenantQuery model);
 
-    OrganizationSaveResult save(@NotNull OrganizationSave model);
+    TenantSaveResult save(@NotNull TenantSave model);
 
-    OrganizationDeleteResult delete(@NotNull OrganizationDelete model);
+    TenantDeleteResult delete(@NotNull TenantDelete model);
 
 }

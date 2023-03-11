@@ -116,9 +116,9 @@ public class DictServiceImpl implements DictService {
                         if (nonNull(model.getDictId())) {
                             hitId = eqIgnCase(model.getDictId(), dict.getId());
                         }
-                        boolean hitOrgCode = isBlank(model.getOrgCode());
-                        if (!isBlank(model.getOrgCode())) {
-                            hitOrgCode = eqIgnCase(model.getOrgCode(), dict.getOrgCode());
+                        boolean hitTenantId = isNull(model.getTenantId());
+                        if (!isNull(model.getTenantId())) {
+                            hitTenantId = eqIgnCase(model.getTenantId(), dict.getOrgCode());
                         }
                         boolean hitLabels = CollectionUtils2.isEmpty(model.getLabels());
                         if (!CollectionUtils2.isEmpty(model.getLabels())) {
@@ -141,7 +141,7 @@ public class DictServiceImpl implements DictService {
                         if (!isBlank(model.getValue())) {
                             hitValue = eqIgnCase(model.getValue(), dict.getValue());
                         }
-                        return hitId && hitOrgCode && hitLabels && hitEnable && hitType && hitKey && hitValue;
+                        return hitId && hitTenantId && hitLabels && hitEnable && hitType && hitKey && hitValue;
                     })
                     .collect(toList());
         }

@@ -17,7 +17,7 @@ package com.wl4g.rengine.common.util;
 
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_MENUS;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_MENU_ROLES;
-import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_ORANIZATIONS;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_TENANTS;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_ROLES;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_USERS;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_USER_ROLES;
@@ -194,7 +194,7 @@ public abstract class ServiceAggregateFilters {
             + "                    },"
             + "                    {"
             + "                        $lookup: {"
-            + "                            from: \"" + SYS_ORANIZATIONS.getName() + "\","
+            + "                            from: \"" + SYS_TENANTS.getName() + "\","
             + "                            localField: \"orgCode\","
             + "                            foreignField: \"orgCode\","
             + "                            as: \"org\""
@@ -290,7 +290,7 @@ public abstract class ServiceAggregateFilters {
             + "    }"
             + "},"
             + "{ $lookup: {"
-            + "    from: \"" + SYS_ORANIZATIONS.getName() + "\","
+            + "    from: \"" + SYS_TENANTS.getName() + "\","
             + "    localField: \"orgCode\","
             + "    foreignField: \"orgCode\","
             + "    as: \"org\""

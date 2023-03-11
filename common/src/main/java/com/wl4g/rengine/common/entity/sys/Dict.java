@@ -21,7 +21,6 @@ import static java.lang.String.valueOf;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wl4g.rengine.common.entity.BaseEntity;
 
 import lombok.Getter;
@@ -50,18 +49,6 @@ public class Dict extends BaseEntity {
     private @NotBlank String value;
     private @Nullable String name;
     private @Nullable Integer sort;
-
-    // Ignore organization getter/setter.
-    @JsonIgnore
-    @Override
-    public String getOrgCode() {
-        return null;
-    }
-
-    @JsonIgnore
-    @Override
-    public void setOrgCode(String orgCode) {
-    }
 
     public static String buildCacheHashKey(@NotBlank String type, @NotBlank String key) {
         hasTextOf(type, "type");

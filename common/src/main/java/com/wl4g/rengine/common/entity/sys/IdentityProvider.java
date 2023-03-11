@@ -26,7 +26,6 @@ import java.util.Set;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -59,21 +58,10 @@ import lombok.experimental.SuperBuilder;
 public class IdentityProvider extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
-    private String name;
+    String name;
 
-    private ProviderDetailsBase details;
-
-    // Ignore organization getter/setter.
-    @JsonIgnore
-    @Override
-    public String getOrgCode() {
-        return null;
-    }
-
-    @JsonIgnore
-    @Override
-    public void setOrgCode(String orgCode) {
-    }
+    @NotNull
+    ProviderDetailsBase details;
 
     // 1.多态参见:https://swagger.io/docs/specification/data-models/inheritance-and-polymorphism/
     // 2.对于swagger3注解,父类必须是抽象的，否则swagger3页面请求参数schemas展开后会以父类名重复展示3个.

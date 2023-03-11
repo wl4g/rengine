@@ -23,7 +23,6 @@ import javax.validation.constraints.NotBlank;
 
 import org.springframework.security.core.GrantedAuthority;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wl4g.rengine.common.entity.BaseEntity;
 
 import lombok.Getter;
@@ -47,6 +46,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class User extends BaseEntity {
     private static final long serialVersionUID = -5762348176963349685L;
+
     private @NotBlank String username; // email
     private String password;
     private boolean accountNonExpired;
@@ -56,18 +56,6 @@ public class User extends BaseEntity {
     private Map<String, Object> attributes;
 
     private List<UserRole> userRoles;
-
-    // Ignore organization getter/setter.
-    @JsonIgnore
-    @Override
-    public String getOrgCode() {
-        return null;
-    }
-
-    @JsonIgnore
-    @Override
-    public void setOrgCode(String orgCode) {
-    }
 
     // --- TODO LDAP authority.---
 

@@ -15,10 +15,7 @@
  */
 package com.wl4g.rengine.service.model.sys;
 
-import javax.annotation.Nullable;
-
-import com.wl4g.rengine.common.entity.sys.Organization;
-import com.wl4g.rengine.service.model.BaseQuery;
+import com.wl4g.rengine.service.model.BaseSaveResult;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,7 +24,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link OrganizationQuery}
+ * {@link TenantSaveResult}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -38,6 +35,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class OrganizationQuery extends BaseQuery<Organization> {
-    private @Nullable Long organizationId;
+public class TenantSaveResult extends BaseSaveResult {
 }

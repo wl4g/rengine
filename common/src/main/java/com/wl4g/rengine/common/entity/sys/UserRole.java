@@ -49,18 +49,6 @@ public class UserRole extends BaseEntity {
     private List<User> users;
     private List<Role> roles;
 
-    // Ignore organization getter/setter.
-    @JsonIgnore
-    @Override
-    public String getOrgCode() {
-        return null;
-    }
-
-    @JsonIgnore
-    @Override
-    public void setOrgCode(String orgCode) {
-    }
-
     @JsonIgnore
     @Override
     public Integer getEnable() {
