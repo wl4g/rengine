@@ -110,18 +110,29 @@
             <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
-        <!-- FLINK CEP -->
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-cep${suffix-scala.version}</artifactId>
+            <artifactId>flink-table-planner${suffix-scala.version}</artifactId>
+            <version>${flink.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-runtime${suffix-scala.version}</artifactId>
             <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
         <!-- <dependency> -->
         <!-- <groupId>org.apache.flink</groupId> -->
-        <!-- <artifactId>flink-cep-scala${suffix-scala.version}</artifactId> -->
+        <!-- <artifactId>flink-table-uber${suffix-scala.version}</artifactId> -->
         <!-- <version>${flink.version}</version> -->
         <!-- <scope>provided</scope> -->
+        <!-- </dependency> -->
+        <!-- <dependency> -->
+        <!--     <groupId>org.apache.flink</groupId> -->
+        <!--     <artifactId>flink-table-planner-loader${suffix-scala.version}</artifactId> -->
+        <!--     <version>${flink.version}</version> -->
+        <!--     <optional>true</optional> -->
         <!-- </dependency> -->
         <!-- <dependency> -->
         <!-- <groupId>org.apache.flink</groupId> -->
@@ -134,27 +145,15 @@
         <!-- <version>${flink.version}</version> -->
         <!-- <scope>provided</scope> -->
         <!-- </dependency> -->
+        <!-- FLINK CEP -->
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-table-planner${suffix-scala.version}</artifactId>
+            <artifactId>flink-cep${suffix-scala.version}</artifactId>
             <version>${flink.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- <dependency> -->
-        <!--     <groupId>org.apache.flink</groupId> -->
-        <!--     <artifactId>flink-table-planner-loader${suffix-scala.version}</artifactId> -->
-        <!--     <version>${flink.version}</version> -->
-        <!--     <optional>true</optional> -->
-        <!-- </dependency> -->
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-table-runtime${suffix-scala.version}</artifactId>
-            <version>${flink.version}</version>
-            <scope>provided</scope>
         </dependency>
         <!-- <dependency> -->
         <!-- <groupId>org.apache.flink</groupId> -->
-        <!-- <artifactId>flink-table-uber${suffix-scala.version}</artifactId> -->
+        <!-- <artifactId>flink-cep-scala${suffix-scala.version}</artifactId> -->
         <!-- <version>${flink.version}</version> -->
         <!-- <scope>provided</scope> -->
         <!-- </dependency> -->
@@ -306,6 +305,22 @@
         </dependency>
     </dependencies>
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**.*</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**.*</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -335,6 +350,33 @@
                     <!-- see:https://maven.apache.org/plugins/maven-deploy-plugin/deploy-mojo.html#parameter-details -->
                     <skip>releases</skip>
                 </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Java-Version>${java.version}</Java-Version>
+                            <Implementation-Version>${project.version}</Implementation-Version>
+                        </manifestEntries>
+                    </archive>
+                    <descriptors>
+                        <descriptor>src/main/assembly/package.xml</descriptor>
+                    </descriptors>
+                    <!-- <descriptorRefs> -->
+                    <!-- <descriptorRef>jar-with-dependencies</descriptorRef> -->
+                    <!-- </descriptorRefs> -->
+                    <!-- <appendAssemblyId>false</appendAssemblyId> -->
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

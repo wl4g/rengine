@@ -22,7 +22,7 @@ import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.common.entity.WorkflowGraph;
 import com.wl4g.rengine.common.model.WorkflowExecuteRequest;
 import com.wl4g.rengine.common.model.WorkflowExecuteResult;
-import com.wl4g.rengine.service.model.WorkflowDeleteGraph;
+import com.wl4g.rengine.service.model.WorkflowGraphDelete;
 import com.wl4g.rengine.service.model.WorkflowGraphDeleteResult;
 import com.wl4g.rengine.service.model.WorkflowGraphLogfile;
 import com.wl4g.rengine.service.model.WorkflowGraphLogfileResult;
@@ -43,7 +43,7 @@ public interface WorkflowGraphService {
 
     WorkflowGraphResultSave save(@NotNull WorkflowGraphSave model);
 
-    WorkflowGraphDeleteResult delete(@NotNull WorkflowDeleteGraph model);
+    WorkflowGraphDeleteResult delete(@NotNull WorkflowGraphDelete model);
 
     WorkflowGraphLogfileResult logtail(@NotNull WorkflowGraphLogfile model);
 

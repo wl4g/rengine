@@ -1,4 +1,4 @@
-# Development guide for Rengine Controller
+# Developer's guide for Rengine Controller
 
 ## Building
 

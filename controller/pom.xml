@@ -52,6 +52,7 @@
         <elastic-logback.version>1.5.0</elastic-logback.version>
         <bootstrap-classname>com.wl4g.RengineController</bootstrap-classname>
         <final.name>controller</final.name>
+        <image.name>wl4g/rengine-${final.name}</image.name>
     </properties>
     <parent>
         <groupId>com.wl4g</groupId>
@@ -357,7 +358,7 @@
                             <!-- see:https://github.com/spotify/dockerfile-maven/issues/154 -->
                             <contextDirectory>${project.basedir}</contextDirectory>
                             <dockerfile>${project.basedir}/build/docker/Dockerfile.springtar</dockerfile>
-                            <repository>wl4g/${project.build.finalName}</repository>
+                            <repository>${image.name}</repository>
                             <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
                             <tag>${project.version}</tag>
                             <readTimeoutMillis>60000</readTimeoutMillis>

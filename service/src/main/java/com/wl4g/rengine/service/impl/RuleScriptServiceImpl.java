@@ -21,6 +21,7 @@ import static com.wl4g.infra.common.resource.ResourceUtils2.getResourceString;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_BASE;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_INTERNAL_RULESCRIPT;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_RULE_SCRIPTS;
 import static com.wl4g.rengine.common.util.ServiceAggregateFilters.RULE_SCRIPT_UPLOAD_LOOKUP_FILTERS;
 import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
@@ -39,7 +40,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
@@ -47,7 +47,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
-import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.collection.multimap.LinkedMultiValueMap;
 import com.wl4g.infra.common.collection.multimap.MultiValueMap;
@@ -58,7 +57,6 @@ import com.wl4g.infra.common.remoting.RestClient;
 import com.wl4g.infra.common.remoting.uri.UriComponentsBuilder;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.common.web.rest.RespBase.RetCode;
-import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.Rule.RuleEngine;
 import com.wl4g.rengine.common.entity.RuleScript;
 import com.wl4g.rengine.common.entity.RuleScript.RuleScriptWrapper;
@@ -91,7 +89,7 @@ import lombok.CustomLog;
  */
 @Service
 @CustomLog
-public class RuleScriptServiceImpl implements RuleScriptService {
+public class RuleScriptServiceImpl extends BasicServiceImpl implements RuleScriptService {
 
     @Autowired
     RengineServiceProperties config;
@@ -112,14 +110,13 @@ public class RuleScriptServiceImpl implements RuleScriptService {
 
         query.with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
 
-        final List<RuleScript> ruleScripts = mongoTemplate.find(query, RuleScript.class,
-                MongoCollectionDefinition.T_RULE_SCRIPTS.getName());
+        final List<RuleScript> ruleScripts = mongoTemplate.find(query, RuleScript.class, RE_RULE_SCRIPTS.getName());
         // Collections.sort(ruleScripts, (o1, o2) ->
         // (o2.getUpdateDate().getTime()
         // - o1.getUpdateDate().getTime()) > 0 ? 1 : -1);
 
         return new PageHolder<RuleScript>(model.getPageNum(), model.getPageSize())
-                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.T_RULE_SCRIPTS.getName()))
+                .withTotal(mongoTemplate.count(query, RE_RULE_SCRIPTS.getName()))
                 .withRecords(ruleScripts);
     }
 
@@ -130,7 +127,7 @@ public class RuleScriptServiceImpl implements RuleScriptService {
         RULE_SCRIPT_UPLOAD_LOOKUP_FILTERS.stream().forEach(rs -> aggregates.add(rs.asDocument()));
 
         try (final var cursor = mongoTemplate.getDb()
-                .getCollection(MongoCollectionDefinition.T_RULE_SCRIPTS.getName())
+                .getCollection(RE_RULE_SCRIPTS.getName())
                 .aggregate(aggregates)
                 .map(ruleScriptDoc -> RuleScriptWrapper
                         .validate(BsonEntitySerializers.fromDocument(ruleScriptDoc, RuleScriptWrapper.class)))
@@ -185,7 +182,7 @@ public class RuleScriptServiceImpl implements RuleScriptService {
         // @formatter:off
         //final Query query = new Query(new Criteria().orOperator(Criteria.where("ruleId").is(model.getRuleId()),
         //        Criteria.where("orgCode").is(model.getOrgCode()))).with(Sort.by(Direction.DESC, "revision")).limit(1);
-        //final Long maxRevision = safeList(mongoTemplate.find(query, Long.class, MongoCollectionDefinition.T_RULE_SCRIPTS.getName()))
+        //final Long maxRevision = safeList(mongoTemplate.find(query, Long.class, RE_RULE_SCRIPTS.getName()))
         //        .stream()
         //        .findFirst()
         //        .orElseThrow(() -> new IllegalStateException(
@@ -195,16 +192,13 @@ public class RuleScriptServiceImpl implements RuleScriptService {
 
         script.setRevision(mongoSequenceService.getNextSequence(GlobalMongoSequenceService.SCRIPTS_REVISION_SEQ));
 
-        RuleScript saved = mongoTemplate.save(script, MongoCollectionDefinition.T_RULE_SCRIPTS.getName());
+        RuleScript saved = mongoTemplate.save(script, RE_RULE_SCRIPTS.getName());
         return RuleScriptSaveResult.builder().id(saved.getId()).build();
     }
 
     @Override
     public RuleScriptDeleteResult delete(RuleScriptDelete model) {
-        // 'id' is a keyword, it will be automatically converted to '_id'
-        DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
-                MongoCollectionDefinition.T_RULE_SCRIPTS.getName());
-        return RuleScriptDeleteResult.builder().deletedCount(result.getDeletedCount()).build();
+        return RuleScriptDeleteResult.builder().deletedCount(doDeleteWithGracefully(model, RE_RULE_SCRIPTS)).build();
     }
 
     @Override

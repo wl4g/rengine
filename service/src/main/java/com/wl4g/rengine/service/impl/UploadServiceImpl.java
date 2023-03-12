@@ -16,6 +16,7 @@
 package com.wl4g.rengine.service.impl;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_UPLOADS;
 import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
@@ -33,14 +34,11 @@ import javax.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.constants.RengineConstants;
-import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.UploadObject;
 import com.wl4g.rengine.common.entity.UploadObject.UploadType;
 import com.wl4g.rengine.common.util.IdGenUtils;
@@ -64,7 +62,7 @@ import io.minio.credentials.Credentials;
  * @since v1.0.0
  */
 @Service
-public class UploadServiceImpl implements UploadService {
+public class UploadServiceImpl extends BasicServiceImpl implements UploadService {
 
     private @Autowired Validator validator;
     private @Autowired MongoTemplate mongoTemplate;
@@ -77,13 +75,13 @@ public class UploadServiceImpl implements UploadService {
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
         final List<UploadObject> uploads = mongoTemplate.find(query, UploadObject.class,
-                MongoCollectionDefinition.T_UPLOADS.getName());
+                RE_UPLOADS.getName());
         // Collections.sort(uploads, (o1, o2) ->
         // safeLongToInt(o2.getUpdateDate().getTime() -
         // o1.getUpdateDate().getTime()));
 
         return new PageHolder<UploadObject>(model.getPageNum(), model.getPageSize())
-                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.T_UPLOADS.getName()))
+                .withTotal(mongoTemplate.count(query, RE_UPLOADS.getName()))
                 .withRecords(uploads);
     }
 
@@ -116,7 +114,7 @@ public class UploadServiceImpl implements UploadService {
         validator.validate(upload, ValidForEntityMarker.class);
 
         // Save metadata to mongo table.
-        mongoTemplate.save(upload, MongoCollectionDefinition.T_UPLOADS.getName());
+        mongoTemplate.save(upload, RE_UPLOADS.getName());
 
         // New create temporary STS credentials.
         try {
@@ -143,10 +141,7 @@ public class UploadServiceImpl implements UploadService {
 
     @Override
     public UploadDeleteResult delete(DeleteUpload model) {
-        // 'id' is a keyword, it will be automatically converted to '_id'
-        DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
-                MongoCollectionDefinition.T_UPLOADS.getName());
-        return UploadDeleteResult.builder().deletedCount(result.getDeletedCount()).build();
+        return UploadDeleteResult.builder().deletedCount(doDeleteWithGracefully(model, RE_UPLOADS)).build();
     }
 
 }

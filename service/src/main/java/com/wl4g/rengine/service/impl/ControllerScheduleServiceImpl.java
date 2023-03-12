@@ -16,6 +16,7 @@
 package com.wl4g.rengine.service.impl;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_CONTROLLER_SCHEDULE;
 import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
@@ -29,16 +30,11 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
-import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.ControllerSchedule;
 import com.wl4g.rengine.service.ControllerScheduleService;
 import com.wl4g.rengine.service.model.ControllerScheduleDelete;
@@ -54,9 +50,7 @@ import com.wl4g.rengine.service.model.ControllerScheduleSaveResult;
  * @since v1.0.0
  */
 @Service
-public class ControllerScheduleServiceImpl implements ControllerScheduleService {
-
-    private @Autowired MongoTemplate mongoTemplate;
+public class ControllerScheduleServiceImpl extends BasicServiceImpl implements ControllerScheduleService {
 
     @Override
     public PageHolder<ControllerSchedule> query(ControllerScheduleQuery model) {
@@ -65,10 +59,10 @@ public class ControllerScheduleServiceImpl implements ControllerScheduleService 
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
         final List<ControllerSchedule> triggeres = mongoTemplate.find(query, ControllerSchedule.class,
-                MongoCollectionDefinition.T_CONTROLLER_SCHEDULE.getName());
+                RE_CONTROLLER_SCHEDULE.getName());
 
         return new PageHolder<ControllerSchedule>(model.getPageNum(), model.getPageSize())
-                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.T_CONTROLLER_SCHEDULE.getName()))
+                .withTotal(mongoTemplate.count(query, RE_CONTROLLER_SCHEDULE.getName()))
                 .withRecords(triggeres);
     }
 
@@ -81,7 +75,7 @@ public class ControllerScheduleServiceImpl implements ControllerScheduleService 
                 modIdCriteria(divisor, remainder), isCriteria("details.type", model.getType()))).with(defaultSort());
 
         final List<ControllerSchedule> schedules = mongoTemplate.find(query, ControllerSchedule.class,
-                MongoCollectionDefinition.T_CONTROLLER_SCHEDULE.getName());
+                RE_CONTROLLER_SCHEDULE.getName());
         Collections.sort(schedules, (o1, o2) -> (o2.getUpdateDate().getTime() - o1.getUpdateDate().getTime()) > 0 ? 1 : -1);
 
         return schedules;
@@ -98,16 +92,15 @@ public class ControllerScheduleServiceImpl implements ControllerScheduleService 
             trigger.preUpdate();
         }
 
-        ControllerSchedule saved = mongoTemplate.save(trigger, MongoCollectionDefinition.T_CONTROLLER_SCHEDULE.getName());
+        ControllerSchedule saved = mongoTemplate.save(trigger, RE_CONTROLLER_SCHEDULE.getName());
         return ControllerScheduleSaveResult.builder().id(saved.getId()).build();
     }
 
     @Override
     public ControllerScheduleDeleteResult delete(ControllerScheduleDelete model) {
-        // 'id' is a keyword, it will be automatically converted to '_id'
-        final DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
-                MongoCollectionDefinition.T_CONTROLLER_SCHEDULE.getName());
-        return ControllerScheduleDeleteResult.builder().deletedCount(result.getDeletedCount()).build();
+        return ControllerScheduleDeleteResult.builder()
+                .deletedCount(doDeleteWithGracefully(model, RE_CONTROLLER_SCHEDULE))
+                .build();
     }
 
 }

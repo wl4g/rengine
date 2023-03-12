@@ -16,6 +16,7 @@
 package com.wl4g.rengine.service.impl;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_WORKFLOW_GRAPHS;
 import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
@@ -31,11 +32,9 @@ import javax.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.io.FileIOUtils;
 import com.wl4g.infra.common.io.FileIOUtils.ReadTailFrame;
@@ -44,14 +43,13 @@ import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.common.web.rest.RespBase.RetCode;
 import com.wl4g.rengine.client.core.RengineClient;
 import com.wl4g.rengine.client.core.config.ClientConfig;
-import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.WorkflowGraph;
 import com.wl4g.rengine.common.model.WorkflowExecuteRequest;
 import com.wl4g.rengine.common.model.WorkflowExecuteResult;
 import com.wl4g.rengine.common.util.ScriptEngineUtil;
 import com.wl4g.rengine.service.WorkflowGraphService;
 import com.wl4g.rengine.service.config.RengineServiceProperties;
-import com.wl4g.rengine.service.model.WorkflowDeleteGraph;
+import com.wl4g.rengine.service.model.WorkflowGraphDelete;
 import com.wl4g.rengine.service.model.WorkflowGraphDeleteResult;
 import com.wl4g.rengine.service.model.WorkflowGraphLogfile;
 import com.wl4g.rengine.service.model.WorkflowGraphLogfileResult;
@@ -71,7 +69,7 @@ import lombok.CustomLog;
  */
 @CustomLog
 @Service
-public class WorkflowGraphServiceImpl implements WorkflowGraphService {
+public class WorkflowGraphServiceImpl extends BasicServiceImpl implements WorkflowGraphService {
 
     @Autowired
     RengineServiceProperties config;
@@ -92,10 +90,10 @@ public class WorkflowGraphServiceImpl implements WorkflowGraphService {
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
         final List<WorkflowGraph> graphs = mongoTemplate.find(query, WorkflowGraph.class,
-                MongoCollectionDefinition.T_WORKFLOW_GRAPHS.getName());
+                RE_WORKFLOW_GRAPHS.getName());
 
         return new PageHolder<WorkflowGraph>(model.getPageNum(), model.getPageSize())
-                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.T_WORKFLOW_GRAPHS.getName()))
+                .withTotal(mongoTemplate.count(query, RE_WORKFLOW_GRAPHS.getName()))
                 .withRecords(graphs);
     }
 
@@ -124,7 +122,7 @@ public class WorkflowGraphServiceImpl implements WorkflowGraphService {
         // final Query query = new Query(new Criteria().orOperator(Criteria.where("ruleId").is(graph.getWorkflowId()),
         //         Criteria.where("orgCode").is(model.getOrgCode()))).with(Sort.by(Direction.DESC, "revision")).limit(1);
         // final Long maxRevision = safeList(
-        //         mongoTemplate.find(query, Long.class, MongoCollectionDefinition.T_WORKFLOW_GRAPHS.getName())).stream()
+        //         mongoTemplate.find(query, Long.class, RE_WORKFLOW_GRAPHS.getName())).stream()
         //                 .findFirst()
         //                 .orElseThrow(() -> new IllegalStateException(
         //                         format("Could not get max revision by workflowId: %s, orgCode: %s", graph.getWorkflowId(),
@@ -134,16 +132,13 @@ public class WorkflowGraphServiceImpl implements WorkflowGraphService {
 
         graph.setRevision(mongoSequenceService.getNextSequence(GlobalMongoSequenceService.GRAPHS_REVISION_SEQ));
 
-        final WorkflowGraph saved = mongoTemplate.save(graph, MongoCollectionDefinition.T_WORKFLOW_GRAPHS.getName());
+        final WorkflowGraph saved = mongoTemplate.save(graph, RE_WORKFLOW_GRAPHS.getName());
         return WorkflowGraphResultSave.builder().id(saved.getId()).build();
     }
 
     @Override
-    public WorkflowGraphDeleteResult delete(WorkflowDeleteGraph model) {
-        // 'id' is a keyword, it will be automatically converted to '_id'
-        DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
-                MongoCollectionDefinition.T_WORKFLOW_GRAPHS.getName());
-        return WorkflowGraphDeleteResult.builder().deletedCount(result.getDeletedCount()).build();
+    public WorkflowGraphDeleteResult delete(WorkflowGraphDelete model) {
+        return WorkflowGraphDeleteResult.builder().deletedCount(doDeleteWithGracefully(model, RE_WORKFLOW_GRAPHS)).build();
     }
 
     @Override

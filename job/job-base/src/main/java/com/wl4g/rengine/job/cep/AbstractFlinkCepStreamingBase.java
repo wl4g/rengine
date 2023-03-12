@@ -94,7 +94,7 @@ import lombok.experimental.SuperBuilder;
  *              "condition": {
  *                  "nestedConditions": [
  *                      {
- *                          "className": "org.apache.flink.cep.pattern.conditions.SubtypeCondition",
+ *                          "className": "com.wl4g.rengine.job.cep.pattern.conditions.SubtypeCondition",
  *                          "subClassName": "com.wl4g.rengine.common.event.RengineEvent",
  *                          "type": "CLASS"
  *                      },
@@ -104,7 +104,7 @@ import lombok.experimental.SuperBuilder;
  *                      }
  *                  ],
  *                  "type": "CLASS",
- *                  "className": "org.apache.flink.cep.pattern.conditions.RichAndCondition"
+ *                  "className": "com.wl4g.rengine.job.cep.pattern.conditions.RichAndCondition"
  *              },
  *              "type": "ATOMIC"
  *          },

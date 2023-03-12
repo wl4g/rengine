@@ -16,6 +16,7 @@
 package com.wl4g.rengine.service.impl;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_DATASOURCES;
 import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
@@ -29,13 +30,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
-import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.DataSourceProperties;
 import com.wl4g.rengine.common.util.BeanSensitiveTransforms;
 import com.wl4g.rengine.service.DataSourceService;
@@ -53,7 +51,7 @@ import com.wl4g.rengine.service.model.DataSourceSaveResult;
  * @since v1.0.0
  */
 @Service
-public class DataSourceServiceImpl implements DataSourceService {
+public class DataSourceServiceImpl extends BasicServiceImpl implements DataSourceService {
 
     private @Autowired MongoTemplate mongoTemplate;
 
@@ -64,7 +62,7 @@ public class DataSourceServiceImpl implements DataSourceService {
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
         final List<DataSourceProperties> dataSourceProperties = mongoTemplate.find(query, DataSourceProperties.class,
-                MongoCollectionDefinition.T_DATASOURCES.getName());
+                RE_DATASOURCES.getName());
 
         // Mask sensitive information.
         for (DataSourceProperties ds : dataSourceProperties) {
@@ -72,12 +70,12 @@ public class DataSourceServiceImpl implements DataSourceService {
         }
 
         return new PageHolder<DataSourceProperties>(model.getPageNum(), model.getPageSize())
-                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.T_DATASOURCES.getName()))
+                .withTotal(mongoTemplate.count(query, RE_DATASOURCES.getName()))
                 .withRecords(dataSourceProperties);
     }
 
     @Override
-    public DataSourceSaveResult save(DataSourceSave model) {
+    public DataSourceSaveResult save(DataSourceSave model) { 
         DataSourceProperties dataSourceProperties = model;
         // @formatter:off
         //DataSourceProperties dataSource = DataSourceProperties.builder()
@@ -98,16 +96,13 @@ public class DataSourceServiceImpl implements DataSourceService {
             dataSourceProperties.preUpdate();
         }
 
-        DataSourceProperties saved = mongoTemplate.save(dataSourceProperties, MongoCollectionDefinition.T_DATASOURCES.getName());
+        DataSourceProperties saved = mongoTemplate.save(dataSourceProperties, RE_DATASOURCES.getName());
         return DataSourceSaveResult.builder().id(saved.getId()).build();
     }
 
     @Override
     public DataSourceDeleteResult delete(DataSourceDelete model) {
-        // 'id' is a keyword, it will be automatically converted to '_id'
-        DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
-                MongoCollectionDefinition.T_DATASOURCES.getName());
-        return DataSourceDeleteResult.builder().deletedCount(result.getDeletedCount()).build();
+        return DataSourceDeleteResult.builder().deletedCount(doDeleteWithGracefully(model, RE_DATASOURCES)).build();
     }
 
 }

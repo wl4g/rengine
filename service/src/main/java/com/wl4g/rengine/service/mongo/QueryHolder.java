@@ -32,7 +32,9 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.mongodb.core.query.BasicUpdate;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.UpdateDefinition;
 
 import com.google.common.collect.Lists;
 import com.wl4g.infra.common.bean.BaseBean;
@@ -187,7 +189,12 @@ public abstract class QueryHolder {
         return Sort.by(direction, fieldNames);
     }
 
+    public static UpdateDefinition logicalDelete() {
+        return BasicUpdate.update(QueryHolder.DEFAULT_FIELD_DEL_FLAG, BaseBean.DEL_FLAG_DELETED);
+    }
+
     public static final String DEFAULT_FIELD_ID = "_id";
     public static final String DEFAULT_FIELD_UPDATE_DATE = "updateDate";
+    public static final String DEFAULT_FIELD_DEL_FLAG = "delFlag";
 
 }

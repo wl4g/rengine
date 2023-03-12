@@ -10,7 +10,7 @@ Please let us know if you have urgent needs which are not presented in the plan.
 
 - Supported to Flink CEP(Real-time compute) or Flink SQL(Offline compute)
 
-- Integrate Arthas (proxy/tunnel) with Rengine Manager for easy troubleshooting by sysadmins
+- Integrate Arthas (proxy/tunnel) with Rengine ApiServer for easy troubleshooting by sysadmins
 
 - Support docker-compose one-click deployment demo environment (including all: `apiserver, executor, controller, mongo, redis, mysql, kafka, flink, hbase`)
 
@@ -27,7 +27,7 @@ Please let us know if you have urgent needs which are not presented in the plan.
   - b. Iot collection and cleaning (set different invalid data filter conditions for different device models + installation information),  
   - c. Scrape prometheus metrics calculation alarm (n consecutive over-threshold within 10m), etc.
 
-- Improve Rengine Manager configuration management, friendly to user configuration rules, support online simulation of test-data sets
+- Improve Rengine ApiServer configuration management, friendly to user configuration rules, support online simulation of test-data sets
 
 ## 1.0.0
 

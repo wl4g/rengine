@@ -20,11 +20,11 @@ import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollection
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_ROLES;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_USERS;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_USER_ROLES;
-import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_RULES;
-import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_RULE_SCRIPTS;
-import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_UPLOADS;
-import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_WORKFLOWS;
-import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_WORKFLOW_GRAPHS;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_RULES;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_RULE_SCRIPTS;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_UPLOADS;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_WORKFLOWS;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_WORKFLOW_GRAPHS;
 
 import org.bson.BsonArray;
 import org.bson.Document;
@@ -62,7 +62,7 @@ public abstract class ServiceAggregateFilters {
                     + "{ $sort: { \"revision\": -1 } },  "
                     + "{ $limit: 1 },"
                     + "{ $lookup: {"
-                    + "    from: \"" + T_UPLOADS.getName() + "\",  "
+                    + "    from: \"" + RE_UPLOADS.getName() + "\",  "
                     + "    let: { upload_ids: { $map: { input: \"$uploadIds\", in: { $toLong: \"$$this\"} } } },"
                     + "    pipeline: ["
                     + "        { $match: { $expr: { $in: [ \"$_id\",  \"$$upload_ids\" ] } } }, "
@@ -85,7 +85,7 @@ public abstract class ServiceAggregateFilters {
             + "{ $match: { \"delFlag\": { $eq: 0 } } },"
             + "{ $project: { \"_class\": 0, \"delFlag\": 0 } },"
             + "{ $lookup: {"
-            + "    from: \"" + T_WORKFLOWS.getName() + "\",  "
+            + "    from: \"" + RE_WORKFLOWS.getName() + "\",  "
             + "    let: { scenes_id: { $toLong: \"$_id\" } },  "
             + "    pipeline: ["
             + "        { $match: { $expr: { $eq: [ \"$scenesId\", \"$$scenes_id\" ] } } }, "
@@ -93,7 +93,7 @@ public abstract class ServiceAggregateFilters {
             + "        { $match: { \"delFlag\": { $eq: 0 } } },"
             + "        { $project: { \"_class\": 0, \"delFlag\": 0 } },"
             + "        { $lookup: {"
-            + "            from: \"" + T_WORKFLOW_GRAPHS.getName() + "\", "
+            + "            from: \"" + RE_WORKFLOW_GRAPHS.getName() + "\", "
             + "            let: { workflow_id: { $toLong: \"$_id\" } },"
             + "            pipeline: ["
             + "                { $match: { $expr: { $eq: [ \"$workflowId\", \"$$workflow_id\" ] } } },"
@@ -103,7 +103,7 @@ public abstract class ServiceAggregateFilters {
             + "                { $sort: { \"revision\": -1 } }, "
             + "                { $limit: 1 },"
             + "                { $lookup: {"
-            + "                    from: \"" + T_RULES.getName() + "\","
+            + "                    from: \"" + RE_RULES.getName() + "\","
             + "                    let: { rule_ids: { $map: { input: \"$nodes\", in: { $toLong: \"$$this.ruleId\" } } } },"
             + "                    pipeline: ["
             + "                        { $match: { $expr: { $in: [ \"$_id\",  \"$$rule_ids\" ] } } },"
@@ -111,7 +111,7 @@ public abstract class ServiceAggregateFilters {
             + "                        { $match: { \"delFlag\": { $eq: 0 } } },"
             + "                        { $project: { \"_class\": 0, \"delFlag\": 0 } },"
             + "                        { $lookup: {"
-            + "                            from: \"" + T_RULE_SCRIPTS.getName() + "\","
+            + "                            from: \"" + RE_RULE_SCRIPTS.getName() + "\","
             + "                            let: { rule_id: { $toLong: \"$_id\" } },"
             + "                            pipeline: ["
             + "                                { $match: { $expr: { $eq: [ \"$ruleId\",  \"$$rule_id\" ] } } },"
@@ -121,7 +121,7 @@ public abstract class ServiceAggregateFilters {
             + "                                { $sort: { \"revision\": -1 } },  "
             + "                                { $limit: 1 },"
             + "                                { $lookup: {"
-            + "                                    from: \"" + T_UPLOADS.getName() + "\",  "
+            + "                                    from: \"" + RE_UPLOADS.getName() + "\",  "
             + "                                    let: { upload_ids: { $map: { input: \"$uploadIds\", in: { $toLong: \"$$this\"} } } },"
             + "                                    pipeline: ["
             + "                                        { $match: { $expr: { $in: [ \"$_id\",  \"$$upload_ids\" ] } } }, "

@@ -70,6 +70,8 @@ Unified and flexible rules engine platform, naturally suitable for scenarios whe
 
 - [Architecture](./docs/en/architecture.md)
 
+- [Examples for user](./docs/en/user-examples/user-examples.md)
+
 - [Deploy for standalone](./docs/en/deploy-standalone.md)
 
 - [Deploy for production](./docs/en/deploy-production.md)
@@ -82,13 +84,11 @@ Unified and flexible rules engine platform, naturally suitable for scenarios whe
 
 - [Configuration for executor](./docs/en/configuration-executor.md)
 
-- [Configuration for job](./docs/en/configuration-job.md)
+- [Configuration for jobs](./docs/en/configuration-job.md)
 
-- [Best examples](./docs/en/best-cases/best-cases.md)
+- [Developer's quide](./docs/en/devel.md)
 
-- [Development quide](./docs/en/devel.md)
-
-- [Operation quide](./docs/en/operation.md)
+- [Operation's quide](./docs/en/operation.md)
 
 - [Benchmark for executor](./docs/en/benchmark-executor.md)
 

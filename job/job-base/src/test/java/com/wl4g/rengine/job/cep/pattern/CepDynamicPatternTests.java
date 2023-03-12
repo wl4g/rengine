@@ -18,8 +18,8 @@ package com.wl4g.rengine.job.cep.pattern;
 //import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 //import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 //
-//import org.apache.flink.cep.pattern.Pattern;
-//import org.apache.flink.cep.pattern.conditions.SimpleCondition;
+//import com.wl4g.rengine.job.cep.pattern.Pattern;
+//import com.wl4g.rengine.job.cep.pattern.conditions.SimpleCondition;
 //import org.apache.flink.streaming.api.windowing.time.Time;
 //import org.junit.Test;
 //

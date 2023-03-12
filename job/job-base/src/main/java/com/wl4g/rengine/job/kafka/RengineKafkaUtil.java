@@ -63,15 +63,15 @@ public abstract class RengineKafkaUtil {
      */
     @SuppressWarnings({ "unchecked" })
     public static <T, S extends SourceSplit, E> Source<T, S, E> createKafkaSource(
-            @NotNull OffsetResetStrategy defaultOffsetResetStrategy,
+            @NotNull OffsetResetStrategy offsetResetStrategy,
             @NotNull AbstractFlinkStreamingBase streaming) {
-        notNullOf(defaultOffsetResetStrategy, "defaultOffsetResetStrategy");
+        notNullOf(offsetResetStrategy, "offsetResetStrategy");
         notNullOf(streaming, "streaming");
 
         // see:https://github.com/apache/flink/blob/release-1.14.4/docs/content/docs/connectors/datastream/kafka.md#starting-offset
         // Start from committed offset, also use EARLIEST as reset strategy if
         // committed offset doesn't exist
-        OffsetsInitializer offsets = OffsetsInitializer.committedOffsets(defaultOffsetResetStrategy);
+        OffsetsInitializer offsets = OffsetsInitializer.committedOffsets(offsetResetStrategy);
         if (streaming.getFromOffsetTime() > 0) { // By-default
             // Start from the first record whose timestamp is greater than
             // or equals a timestamp.

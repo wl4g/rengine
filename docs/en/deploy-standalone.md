@@ -1,6 +1,6 @@
 # Rengine for Deploy Standalone
 
-## Deploy on Docker(Compose)
+## 1. Deploy on Docker (compose)
 
 ```bash
 git clone https://github.com/wl4g/rengine.git
@@ -8,9 +8,9 @@ cd tools/deploy/compose
 docker-compose up -d
 ```
 
-## Deploy on Docker(Manual)
+## 2. Deploy on Docker (manual, step-to-step)
 
-- Deploy local HBase
+- Deploy standalone HBase
 
 ```bash
 mkdir -p /mnt/disk1/log/hbase-standalone/ # Logs directory
@@ -25,13 +25,13 @@ wl4g/hbase:hbase-2.1.0-phoenix-5.1.1 \
 /bin/sh -c "hbase-daemon.sh start master; tail -f /dev/null"
 ```
 
-- Deploy local Kafka
+- Deploy standalone Kafka
 
 ```bash
 docker run -d --name kafka1 --network host -e ALLOW_PLAINTEXT_LISTENER=yes bitnami/kafka:2.2.0
 ```
 
-- Deploy local Flink(optional, for session mode)
+- Deploy standalone Flink(optional, for session mode)
 
 ```bash
 docker run -d --name flink-jm1 --network host flink:1.14.4-scala_2.11-java11 jobmanager
@@ -40,22 +40,22 @@ docker run -d --name flink-tm1 --network host flink:1.14.4-scala_2.11-java11 tas
 
 - Browser accessing: http://localhost:8081
 
-- Deploy local Rengine Manager
+- Deploy standalone Rengine ApiServer
 
 ```bash
 docker run -d \
---name=rengine-manager \
+--name=rengine-apiserver \
 --network=host \
 --restart=no \
 -e SPRING_HIKARI_JDBCURL='jdbc:mysql://127.0.0.1:3306/rengine?useunicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf-8&useSSL=false' \
 -e SPRING_DATA_MONGODB_URI='mongodb://127.0.0.1:27017/rengine' \
--e RENGINE_MANAGER_MINIO_ENDPOINT='http://127.0.0.1:19000' \
--e RENGINE_MANAGER_MINIO_TENANTACCESSKEY='rengine' \
--e RENGINE_MANAGER_MINIO_TENANTSECRETKEY='12345678' \
-wl4g/rengine-manager
+-e MINIO_ENDPOINT='http://127.0.0.1:19000' \
+-e MINIO_TENANTACCESSKEY='rengine' \
+-e MINIO_TENANTSECRETKEY='12345678' \
+wl4g/rengine-apiserver
 ```
 
-- Deploy local Rengine Executor
+- Deploy standalone Rengine Executor
 
 ```bash
 docker run -d \
@@ -64,9 +64,9 @@ docker run -d \
 --restart=no \
 -e QUARKUS_HTTP_PORT="28002" \
 -e QUARKUS_MONGODB_CONNECTION_STRING="mongodb://localhost:27017" \
--e RENGINE_EVALUATOR_MINIO_ENDPOINT="http://localhost:9000" \
--e RENGINE_EVALUATOR_MINIO_TENANTACCESSKEY="rengine" \
--e RENGINE_EVALUATOR_MINIO_TENANTSECRETKEY="12345678" \
+-e MINIO_ENDPOINT="http://localhost:9000" \
+-e MINIO_TENANTACCESSKEY="rengine" \
+-e MINIO_TENANTSECRETKEY="12345678" \
 wl4g/rengine-evaluator-native
 ```
 

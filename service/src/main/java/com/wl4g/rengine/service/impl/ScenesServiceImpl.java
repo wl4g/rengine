@@ -16,6 +16,7 @@
 package com.wl4g.rengine.service.impl;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_SCENESES;
 import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
@@ -27,13 +28,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
-import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.Scenes;
 import com.wl4g.rengine.service.ScenesService;
 import com.wl4g.rengine.service.model.ScenesDelete;
@@ -50,7 +48,7 @@ import com.wl4g.rengine.service.model.ScenesSaveResult;
  * @since v1.0.0
  */
 @Service
-public class ScenesServiceImpl implements ScenesService {
+public class ScenesServiceImpl extends BasicServiceImpl implements ScenesService {
 
     private @Autowired MongoTemplate mongoTemplate;
 
@@ -59,7 +57,7 @@ public class ScenesServiceImpl implements ScenesService {
         final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getScenesId())))
                 .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
-        final List<Scenes> sceneses = mongoTemplate.find(query, Scenes.class, MongoCollectionDefinition.T_SCENESES.getName());
+        final List<Scenes> sceneses = mongoTemplate.find(query, Scenes.class, RE_SCENESES.getName());
         // Collections.sort(sceneses, (o1, o2) -> (o2.getUpdateDate().getTime()
         // - o1.getUpdateDate().getTime()) > 0 ? 1 : -1);
 
@@ -79,7 +77,7 @@ public class ScenesServiceImpl implements ScenesService {
         // .build();
 
         return new PageHolder<Scenes>(model.getPageNum(), model.getPageSize())
-                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.T_SCENESES.getName()))
+                .withTotal(mongoTemplate.count(query, RE_SCENESES.getName()))
                 .withRecords(sceneses);
     }
 
@@ -105,16 +103,13 @@ public class ScenesServiceImpl implements ScenesService {
             scenes.preUpdate();
         }
 
-        Scenes saved = mongoTemplate.save(scenes, MongoCollectionDefinition.T_SCENESES.getName());
+        Scenes saved = mongoTemplate.save(scenes, RE_SCENESES.getName());
         return ScenesSaveResult.builder().id(saved.getId()).build();
     }
 
     @Override
     public ScenesDeleteResult delete(ScenesDelete model) {
-        // 'id' is a keyword, it will be automatically converted to '_id'
-        DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
-                MongoCollectionDefinition.T_SCENESES.getName());
-        return ScenesDeleteResult.builder().deletedCount(result.getDeletedCount()).build();
+        return ScenesDeleteResult.builder().deletedCount(doDeleteWithGracefully(model, RE_SCENESES)).build();
     }
 
 }

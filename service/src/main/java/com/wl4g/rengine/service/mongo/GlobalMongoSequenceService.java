@@ -16,6 +16,7 @@
 package com.wl4g.rengine.service.mongo;
 
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_GLOBAL_SEQUENCES;
 import static java.util.Objects.isNull;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
@@ -25,7 +26,6 @@ import javax.validation.constraints.NotBlank;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.query.Update;
 
 import com.wl4g.rengine.common.entity.RuleScript;
@@ -53,11 +53,10 @@ public class GlobalMongoSequenceService {
         hasTextOf(seqName, "seqName");
         final FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true).upsert(true);
         final GlobalSequence seq = mongoOperations.findAndModify(query(where("_id").is(seqName)), new Update().inc("seq", 1),
-                options, GlobalSequence.class);
+                options, GlobalSequence.class, SYS_GLOBAL_SEQUENCES.getName());
         return !isNull(seq) ? seq.getSeq() : 1;
     }
 
-    @Document(collection = "global_sequences")
     @Getter
     @Setter
     @ToString

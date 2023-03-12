@@ -48,6 +48,7 @@ import com.wl4g.infra.common.cli.CommandLineTool.CommandLineFacade;
 import com.wl4g.rengine.common.event.RengineEvent;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * {@link AbstractFlinkStreamingBase}
@@ -57,6 +58,7 @@ import lombok.Getter;
  * @since v1.0.0
  */
 @Getter
+@Slf4j
 public abstract class AbstractFlinkStreamingBase implements Runnable {
 
     // Flink MQ(kafka/pulsar/rabbitmq/...) options.
@@ -152,7 +154,7 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
      * @throws ParseException
      */
     protected AbstractFlinkStreamingBase parse(String[] args) throws ParseException {
-        this.line = builder.helpIfEmpty(args).build(args);
+        this.line = builder.width(150).helpIfEmpty(args).build(args);
         // KAFKA options.
         this.brokers = line.get("brokers");
         this.topicPattern = line.get("topicPattern");
@@ -291,6 +293,7 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
         }
 
         try {
+            log.info("Starting for : {} ...", jobName);
             handleJobExecutionResult(env.execute(jobName));
         } catch (Throwable ex) {
             throw new IllegalStateException(ex);

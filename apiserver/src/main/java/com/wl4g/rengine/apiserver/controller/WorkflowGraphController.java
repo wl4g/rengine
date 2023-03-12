@@ -32,7 +32,7 @@ import com.wl4g.rengine.common.entity.WorkflowGraph;
 import com.wl4g.rengine.common.model.WorkflowExecuteRequest;
 import com.wl4g.rengine.common.model.WorkflowExecuteResult;
 import com.wl4g.rengine.service.WorkflowGraphService;
-import com.wl4g.rengine.service.model.WorkflowDeleteGraph;
+import com.wl4g.rengine.service.model.WorkflowGraphDelete;
 import com.wl4g.rengine.service.model.WorkflowGraphDeleteResult;
 import com.wl4g.rengine.service.model.WorkflowGraphLogfile;
 import com.wl4g.rengine.service.model.WorkflowGraphLogfileResult;
@@ -90,7 +90,7 @@ public class WorkflowGraphController {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
     @PreAuthorize("hasPermission(#model,'arn:rengine:workflowgraph:delete:v1')")
-    public RespBase<WorkflowGraphDeleteResult> delete(@Validated @RequestBody WorkflowDeleteGraph model) {
+    public RespBase<WorkflowGraphDeleteResult> delete(@Validated @RequestBody WorkflowGraphDelete model) {
         log.debug("called: model={}", model);
         RespBase<WorkflowGraphDeleteResult> resp = RespBase.create();
         resp.setData(workflowGraphService.delete(model));

@@ -16,6 +16,7 @@
 package com.wl4g.rengine.service.impl;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_WORKFLOWS;
 import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
@@ -28,13 +29,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
-import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.Workflow;
 import com.wl4g.rengine.service.WorkflowService;
 import com.wl4g.rengine.service.model.WorkflowDelete;
@@ -51,7 +49,7 @@ import com.wl4g.rengine.service.model.WorkflowSaveResult;
  * @since v1.0.0
  */
 @Service
-public class WorkflowServiceImpl implements WorkflowService {
+public class WorkflowServiceImpl extends BasicServiceImpl implements WorkflowService {
 
     private @Autowired MongoTemplate mongoTemplate;
 
@@ -62,12 +60,12 @@ public class WorkflowServiceImpl implements WorkflowService {
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
         final List<Workflow> workflows = mongoTemplate.find(query, Workflow.class,
-                MongoCollectionDefinition.T_WORKFLOWS.getName());
+                RE_WORKFLOWS.getName());
         // Collections.sort(workflows, (o1, o2) -> (o2.getUpdateDate().getTime()
         // - o1.getUpdateDate().getTime()) > 0 ? 1 : -1);
 
         return new PageHolder<Workflow>(model.getPageNum(), model.getPageSize())
-                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.T_WORKFLOWS.getName()))
+                .withTotal(mongoTemplate.count(query, RE_WORKFLOWS.getName()))
                 .withRecords(workflows);
     }
 
@@ -93,16 +91,13 @@ public class WorkflowServiceImpl implements WorkflowService {
             workflow.preUpdate();
         }
 
-        Workflow saved = mongoTemplate.save(workflow, MongoCollectionDefinition.T_WORKFLOWS.getName());
+        Workflow saved = mongoTemplate.save(workflow, RE_WORKFLOWS.getName());
         return WorkflowSaveResult.builder().id(saved.getId()).build();
     }
 
     @Override
     public WorkflowDeleteResult delete(WorkflowDelete model) {
-        // 'id' is a keyword, it will be automatically converted to '_id'
-        DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
-                MongoCollectionDefinition.T_WORKFLOWS.getName());
-        return WorkflowDeleteResult.builder().deletedCount(result.getDeletedCount()).build();
+        return WorkflowDeleteResult.builder().deletedCount(doDeleteWithGracefully(model, RE_WORKFLOWS)).build();
     }
 
 }

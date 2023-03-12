@@ -33,12 +33,12 @@ import org.testcontainers.containers.MongoDBContainer;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.wl4g.infra.common.serialize.BsonUtils2;
-import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.DataSourceProperties.DataSourceType;
 import com.wl4g.rengine.executor.execution.sdk.datasource.JDBCSourceFacade.JDBCSourceFacadeBuilder;
 import com.wl4g.rengine.executor.execution.sdk.datasource.KafkaSourceFacade.KafkaSourceFacadeBuilder;
 import com.wl4g.rengine.executor.execution.sdk.datasource.MongoSourceFacade.MongoSourceFacadeBuilder;
 import com.wl4g.rengine.executor.execution.sdk.datasource.RedisSourceFacade.RedisSourceFacadeBuilder;
+import com.wl4g.rengine.executor.execution.sdk.notifier.GlobalMessageNotifierManagerTests;
 import com.wl4g.rengine.executor.meter.TestDefaultMeterSetup;
 import com.wl4g.rengine.executor.util.TestDefaultBaseSetup;
 
@@ -102,7 +102,7 @@ public class GlobalDataSourceManagerTests {
         final List<Map<String, Object>> bsonFilters = new ArrayList<>();
         bsonFilters.add(BsonUtils2.asMap(BsonDocument.parse(queryBson)));
 
-        List<JsonNode> result = mongoSourceFacade.findList(MongoCollectionDefinition.R_AGGREGATES.getName(), bsonFilters);
+        List<JsonNode> result = mongoSourceFacade.findList("gen_aggregates", bsonFilters);
         System.out.println(toJSONString(result));
     }
 

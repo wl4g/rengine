@@ -138,6 +138,8 @@ public abstract class RengineConstants extends EnvironmentUtil {
     @AllArgsConstructor
     public static enum MongoCollectionDefinition {
 
+        SYS_GLOBAL_SEQUENCES("sys_global_sequences", true),
+
         SYS_DICTS("sys_dicts", true),
 
         SYS_TENANTS("sys_tenants", true),
@@ -156,25 +158,23 @@ public abstract class RengineConstants extends EnvironmentUtil {
 
         SYS_NOTIFICATIONS("sys_notifications", true),
 
-        T_SCENESES("t_sceneses", true),
+        RE_SCENESES("re_sceneses", true),
 
-        T_WORKFLOWS("t_workflows", true),
+        RE_WORKFLOWS("re_workflows", true),
 
-        T_WORKFLOW_GRAPHS("t_workflow_graphs", true),
+        RE_WORKFLOW_GRAPHS("re_workflow_graphs", true),
 
-        T_RULES("t_rules", true),
+        RE_RULES("re_rules", true),
 
-        T_RULE_SCRIPTS("t_rule_scripts", true),
+        RE_RULE_SCRIPTS("re_rule_scripts", true),
 
-        T_UPLOADS("t_uploads", true),
+        RE_UPLOADS("re_uploads", true),
 
-        T_DATASOURCES("t_datasources", true),
+        RE_DATASOURCES("re_datasources", true),
 
-        T_CONTROLLER_SCHEDULE("t_controller_schedules", true),
+        RE_CONTROLLER_SCHEDULE("re_controller_schedules", true),
 
-        T_CONTROLLER_LOG("t_controller_logs", true),
-
-        R_AGGREGATES("r_aggregates", true);
+        RE_CONTROLLER_LOG("re_controller_logs", true);
 
         private final String name;
         private final boolean isWriteConcernSafe;

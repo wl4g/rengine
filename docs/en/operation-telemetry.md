@@ -12,20 +12,50 @@ curl -v localhost:28001/actuator/health
 curl -v localhost:28001/actuator/prometheus
 ```
 
+## Deploy Fluent bit
+
+```bash
+# Configuration.
+sudo mkdir -p /mnt/disk1/fluent-bit/{data,conf}
+sudo chmod -R 777 /mnt/disk1/fluent-bit
+
+curl -L -o /mnt/disk1/fluent-bit/conf/fluent-bit.conf \
+'https://raw.githubusercontent.com/wl4g/rengine/master/tools/operation/fluent-bit/fluent-bit.conf'
+
+# Run container.
+docker run -d \
+--name fluent-bit \
+--restart no \
+-v /mnt/disk1/fluent-bit/conf/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf \
+-v /var/lib/docker/containers:/containers \
+-p 2020:2020 \
+fluent/fluent-bit:2.0.8
+
+docker logs -f --tail 99 fluent-bit
+```
+
 ## Deploy OTel collector
 
 ```bash
-# Download collector configuration.
+# Configuration.
 sudo mkdir -p /etc/otel
-curl -L -o /etc/otel/collector.yaml 'https://raw.githubusercontent.com/wl4g/rengine/master/tools/operation/otel/collector.yaml'
+curl -L -o /etc/otel/collector.yaml \
+'https://raw.githubusercontent.com/wl4g/rengine/master/tools/operation/otel/collector.yaml'
 
-# Run OTel collector.
+# for debugging
+sudo mkdir -p /tmp/otel; sudo chmod 777 -R /tmp/otel
+
+# Run container.
 docker run -d \
---name=otel-collector1 \
+--name=otel-collector \
 --network=host \
 --restart=no \
--v /etc/otel/collector.yaml:/etc/otelcol/config.yaml \
-otel/opentelemetry-collector:0.60.0
+-v /etc/otel/collector.yaml:/etc/otelcol-contrib/config.yaml \
+-v /var/log:/var/log \
+-v /tmp/otel:/tmp/otel \
+otel/opentelemetry-collector-contrib:0.72.0
+
+docker logs -f --tail 99 otel-collector
 ```
 
 ## FAQ
@@ -42,12 +72,12 @@ namespace mapping to hbase is supported, but you must manually configure the HBa
 in hbase-site.xml (need restart) e.g:
 
 ```xml
-    <property>
-        <name>phoenix.connection.isNamespaceMappingEnabled</name>
-        <value>true</value>
-    </property>
-    <property>
-        <name>phoenix.schema.isNamespaceMappingEnabled=true</name>
-        <value>true</value>
-    </property>
+<property>
+    <name>phoenix.connection.isNamespaceMappingEnabled</name>
+    <value>true</value>
+</property>
+<property>
+    <name>phoenix.schema.isNamespaceMappingEnabled=true</name>
+    <value>true</value>
+</property>
 ```

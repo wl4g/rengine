@@ -1,16 +1,16 @@
-# Rengine for Development Guide
+# Rengine for Developoper's Guide
 
 ## Directories
 
-- [Development for Manager](./devel-manager.md)
+- [Developer's for ApiServer](./devel-apiserver.md)
 
-- [Development for Executor](./devel-evaluator.md)
+- [Developer's for Executor](./devel-executor.md)
 
-- [Development for Job](./devel-job.md)
+- [Developer's for Controller](./devel-controller.md)
 
-- [Development for Collector](./devel-collector.md)
+- [Developer's for Job](./devel-job.md)
 
-- [Development for Client](./devel-client.md)
+- [Developer's for Client](./devel-client.md)
 
 ## Building
 

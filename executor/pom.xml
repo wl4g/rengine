@@ -65,6 +65,7 @@
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.parameters>true</maven.compiler.parameters>
         <final.name>executor</final.name>
+        <image.name>wl4g/rengine-${final.name}</image.name>
     </properties>
     <parent>
         <groupId>com.wl4g</groupId>
@@ -660,7 +661,7 @@ and see:https://github.com/apache/groovy/blob/GROOVY_4_0_5/build.gradle#L98 -->
                             <!-- see:https://github.com/spotify/dockerfile-maven/issues/154 -->
                             <contextDirectory>${project.basedir}</contextDirectory>
                             <dockerfile>${project.basedir}/build/docker/Dockerfile.quarkustar</dockerfile>
-                            <repository>wl4g/${project.build.finalName}</repository>
+                            <repository>${image.name}</repository>
                             <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
                             <tag>${project.version}</tag>
                             <readTimeoutMillis>60000</readTimeoutMillis>

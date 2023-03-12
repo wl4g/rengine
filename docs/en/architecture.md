@@ -2,7 +2,7 @@
 
 - ![Global](../shots/architecture.png)
 
-## Collector/Eventbus collect Event to MQ (Model definition)
+## Client eventbus and Job collect Event to MQ (Model definition)
 
 - for example1: (see: [com/wl4g/rengine/common/event/RengineEvent.java](../../common/src/main/java/com/wl4g/rengine/common/event/RengineEvent.java))
 

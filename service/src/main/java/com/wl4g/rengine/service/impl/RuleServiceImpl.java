@@ -16,6 +16,7 @@
 package com.wl4g.rengine.service.impl;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_RULES;
 import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isCriteria;
@@ -29,13 +30,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
-import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.Rule;
 import com.wl4g.rengine.service.RuleService;
 import com.wl4g.rengine.service.model.RuleDelete;
@@ -52,7 +50,7 @@ import com.wl4g.rengine.service.model.RuleSaveResult;
  * @since v1.0.0
  */
 @Service
-public class RuleServiceImpl implements RuleService {
+public class RuleServiceImpl extends BasicServiceImpl implements RuleService {
 
     private @Autowired MongoTemplate mongoTemplate;
 
@@ -62,12 +60,12 @@ public class RuleServiceImpl implements RuleService {
                 andCriteria(baseCriteria(model), isIdCriteria(model.getRuleId()), isCriteria("scenesId", model.getScenesId())))
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
 
-        List<Rule> rules = mongoTemplate.find(query, Rule.class, MongoCollectionDefinition.T_RULES.getName());
+        List<Rule> rules = mongoTemplate.find(query, Rule.class, RE_RULES.getName());
         // Collections.sort(rules, (o1, o2) -> (o2.getUpdateDate().getTime()
         // - o1.getUpdateDate().getTime()) > 0 ? 1 : -1);
 
         return new PageHolder<Rule>(model.getPageNum(), model.getPageSize())
-                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.T_RULES.getName()))
+                .withTotal(mongoTemplate.count(query, RE_RULES.getName()))
                 .withRecords(rules);
     }
 
@@ -83,7 +81,7 @@ public class RuleServiceImpl implements RuleService {
         //        .enable(model.getEnable())
         //        .remark(model.getRemark())
         //        .build();
-        // @formatter:off
+        // @formatter:on
         notNullOf(rule, "rule");
 
         if (isNull(rule.getId())) {
@@ -92,16 +90,13 @@ public class RuleServiceImpl implements RuleService {
             rule.preUpdate();
         }
 
-        Rule saved = mongoTemplate.save(rule, MongoCollectionDefinition.T_RULES.getName());
+        final Rule saved = mongoTemplate.save(rule, RE_RULES.getName());
         return RuleSaveResult.builder().id(saved.getId()).build();
     }
 
     @Override
     public RuleDeleteResult delete(RuleDelete model) {
-        // 'id' is a keyword, it will be automatically converted to '_id'
-        DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
-                MongoCollectionDefinition.T_RULES.getName());
-        return RuleDeleteResult.builder().deletedCount(result.getDeletedCount()).build();
+        return RuleDeleteResult.builder().deletedCount(doDeleteWithGracefully(model, RE_RULES)).build();
     }
 
 }

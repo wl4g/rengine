@@ -14,16 +14,34 @@ receivers:
   # Data sources: traces, metrics, logs
   otlp/1:
     protocols:
+      ## see:https://github1s.com/open-telemetry/opentelemetry-collector/blob/v0.72.0/receiver/otlpreceiver/factory.go#L32-L33
       grpc:
-        endpoint: 0.0.0.0:55690
+        endpoint: 0.0.0.0:4317
+        #tls:
+        #  ca_file:
+        #  cert_file:
+        #  key_file:
       http:
+        endpoint: 0.0.0.0:4318
+        #read_buffer_size:
+        #write_buffer_size:
+        #tls:
+        #  ca_file:
+        #  cert_file:
+        #  key_file:
+        #cors:
+        #  allowed_origins:
+        #    - https://*.example.com
+        #  allowed_headers:
+        #    - Example-Header
+        #  max_age: 7200
   # Data sources: traces
-  jaeger/1:
-    protocols:
-      grpc:
-      thrift_binary:
-      thrift_compact:
-      thrift_http:
+  #jaeger/1:
+  #  protocols:
+  #    grpc:
+  #    thrift_binary:
+  #    thrift_compact:
+  #    thrift_http:
   # Data sources: metrics
   prometheus/1:
     config:
@@ -51,50 +69,115 @@ receivers:
       #swap:
   # in 0.60.0 unknown type?
   # Data sources: logs
-  #fluentforward/1:
-  #  endpoint: 0.0.0.0:8006
+  fluentforward/1:
+    endpoint: 0.0.0.0:8006
+  # Data sources: logs.
+  # see:https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/v0.72.0/receiver/filelogreceiver#configuration
+  filelog/1:
+    include: ["/var/log/rengine-*/*.log"]
+    exclude: []
+    start_at: beginning # beginning,end
+    poll_interval: 5s
 
 ## Define the processors component.
 processors:
   batch/1:
+    timeout: 10s
+  # Data sources: traces, metrics, logs
+  memory_limiter:
+    check_interval: 5s
+    limit_mib: 4000
+    spike_limit_mib: 500
+  # Data sources: traces
+  probabilistic_sampler:
+    hash_seed: 22
+    sampling_percentage: 15
 
 ## Define the exporters component.
 exporters:
   # Data sources: traces, metrics, logs
-  otlp/1:
-    endpoint: localhost:4317
+  #otlp/1:
+  #  endpoint: localhost:4317
     #tls:
     #  cert_file: cert.pem
     #  key_file: cert-key.pem
   # Data sources: traces, metrics
-  otlphttp/1:
-    endpoint: "http://localhost:4318/v1/traces"
+  #otlphttp/1:
+  #  endpoint: "http://localhost:4318/v1/traces"
   # Data sources: traces
-  jaeger/1:
-    endpoint: "localhost:14250"
+  #jaeger/1:
+  #  endpoint: "localhost:14250"
     #tls:
     #  cert_file: cert.pem
     #  key_file: cert-key.pem
   # Data sources: traces
-  zipkin/1:
-    endpoint: "http://localhost:9411/api/v2/spans"
+  #zipkin/1:
+  #  endpoint: "http://localhost:9411/api/v2/spans"
   # Data sources: traces
+  # see:https://github1s.com/open-telemetry/opentelemetry-collector-contrib/blob/HEAD/exporter/kafkaexporter/config.go#L27-L28
   kafka/1:
     protocol_version: 2.0.0
+    brokers: localhost:9092
+    topic: wl4g_otlp_traces
+    encoding: otlp_proto
+    metadata:
+      #full: true
+      retry:
+        max: 3
+        backoff: 250ms
+    producer:
+      max_message_bytes: 1024000 # 1MB
+      required_acks: 1 # 0:NoResponse,1:WaitForLocal,-1:WaitForAll
+      compression: gzip
+      flush_max_messages: 0
+    #auth:
+      #plain_text:
+      #  username:
+      #  password:
+      #tls:
+      #  ca_file:
+      #  cert_file:
+      #  key_file:
   # Data sources: metrics
-  prometheus/1:
-    endpoint: "prometheus:8889"
-    namespace: "default"
+  kafka/2:
+    protocol_version: 2.0.0
+    brokers: localhost:9092
+    topic: wl4g_otlp_metrics
+    encoding: otlp_proto
+    producer:
+      max_message_bytes: 1024000 # 1MB
+      required_acks: 1 # 0:NoResponse,1:WaitForLocal,-1:WaitForAll
+      compression: gzip
+      flush_max_messages: 0
+  # Data sources: logs
+  kafka/3:
+    protocol_version: 2.0.0
+    brokers: localhost:9092
+    topic: wl4g_otlp_logs
+    encoding: otlp_proto
+    producer:
+      max_message_bytes: 4096000 # 4MB
+      required_acks: 1 # 0:NoResponse,1:WaitForLocal,-1:WaitForAll
+      compression: gzip
+      flush_max_messages: 0
   # Data sources: metrics
-  prometheusremotewrite/1:
-    endpoint: "http://localhost:9411/api/prom/push"
+  #prometheus/1:
+  #  endpoint: "prometheus:8889"
+  #  namespace: "default"
+  # Data sources: metrics
+  #prometheusremotewrite/1:
+  #  endpoint: "http://localhost:9411/api/prom/push"
     # For offical Prometheus (e.g. running via Docker)
     # endpoint: 'http://prometheus:9090/api/v1/write'
     # tls:
     #   insecure: true
   # Data sources: traces, metrics, logs
   file/1:
-    path: /tmp/otel_collector_generated.json
+    path: /tmp/otel/traces.json
+  file/2:
+    path: /tmp/otel/metrics.json
+  file/3:
+    path: /tmp/otel/logs.json
   # Data sources: traces, metrics, logs
   logging/1:
     loglevel: debug
@@ -102,6 +185,7 @@ exporters:
 ## Define the extension configuration.
 extensions:
   health_check:
+    - endpoint: 0.0.0.0:13133
   pprof:
   zpages:
   memory_ballast:
@@ -109,23 +193,24 @@ extensions:
   # 在 agent 端，这是一个让 OTLP exporter 获取 OIDC 令牌的示例，将它们添加到发送到远程收集器的每个 RPC 中
   #oauth2client:
   #  client_id: agent
-  #  client_secret: some-secret
+  #  client_secret: some_secret
   #  token_url: http://localhost:8080/auth/realms/opentelemetry/protocol/openid-connect/token
 
 ## Actual startup services.
 service:
-  extensions: [health_check, pprof, zpages] # oidc: in 0.60.0 unknown type?
+  extensions: [health_check, pprof, zpages] # oidc: otel/collector-0.60.0 unknown type?
   pipelines:
     traces:
-      receivers: ["otlp/1", "jaeger/1"]
+      #receivers: ["otlp/1", "jaeger/1"]
+      receivers: ["otlp/1"]
       processors: ["batch/1"]
-      exporters: ["otlp/1", "logging/1"]
+      exporters: ["logging/1", "file/1", "kafka/1"]
     metrics:
       receivers: ["prometheus/1"]
       processors: ["batch/1"]
-      exporters: ["otlp/1", "logging/1"]
+      exporters: ["logging/1", "file/2", "kafka/2"]
     logs:
       #receivers: ["fluentforward/1"]
-      receivers: ["otlp/1"]
+      receivers: ["otlp/1","filelog/1"]
       processors: ["batch/1"]
-      exporters: ["otlp/1", "logging/1"]
+      exporters: ["logging/1", "file/3", "kafka/3"]

@@ -202,7 +202,7 @@ public final class GlobalDataSourceManager {
         notNullOf(dataSourceType, "dataSourceType");
         hasTextOf(dataSourceName, "dataSourceName");
 
-        final MongoCollection<Document> collection = mongoRepository.getCollection(MongoCollectionDefinition.T_DATASOURCES);
+        final MongoCollection<Document> collection = mongoRepository.getCollection(MongoCollectionDefinition.RE_DATASOURCES);
 
         try (final MongoCursor<DataSourceProperties> cursor = collection
                 .find(Filters.and(Filters.eq("details.type", dataSourceType), Filters.eq("name", dataSourceName)))

@@ -23,8 +23,8 @@ import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
 import static com.wl4g.infra.common.lang.Exceptions.getRootCausesString;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
-import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_RULE_SCRIPTS;
-import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_SCENESES;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_RULE_SCRIPTS;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_SCENESES;
 import static com.wl4g.rengine.common.util.ServiceAggregateFilters.RULE_SCRIPT_UPLOAD_LOOKUP_FILTERS;
 import static com.wl4g.rengine.common.util.ServiceAggregateFilters.WORKFLOW_GRAPH_RULE_SCRIPT_UPLOAD_LOOKUP_FILTERS;
 import static java.lang.String.format;
@@ -225,7 +225,7 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
         aggregates.add(Aggregates.match(Filters.in("_id", ruleScriptIds)));
         RULE_SCRIPT_UPLOAD_LOOKUP_FILTERS.stream().forEach(rs -> aggregates.add(rs.asDocument()));
 
-        final ReactiveMongoCollection<Document> collection = mongoRepository.getReactiveCollection(T_RULE_SCRIPTS);
+        final ReactiveMongoCollection<Document> collection = mongoRepository.getReactiveCollection(RE_RULE_SCRIPTS);
         return collection.aggregate(aggregates)
                 .map(ruleScriptDoc -> RuleScriptWrapper
                         .validate(BsonEntitySerializers.fromDocument(ruleScriptDoc, RuleScriptWrapper.class)))
@@ -339,7 +339,7 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
         // directly compiling the workflow lookup bson string.
         //
         //// @formatter:off
-        //final Bson uploadsLookup = Aggregates.lookup(T_UPLOADS.getName(),
+        //final Bson uploadsLookup = Aggregates.lookup(RE_UPLOADS.getName(),
         //        asList(new Variable<>("upload_ids",
         //                BsonDocument.parse("{ $map: { input: \"$uploadIds\", in: { $toLong: \"$$this.ruleId\" } } }"))),
         //        asList(Aggregates
@@ -347,13 +347,13 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
         //                DEFAULT_ENABLE_FILTER, DEFAULT_DELFLAT_FILTER, DEFAULT_PROJECT_FILTER),
         //        "uploads");
         //
-        //final Bson ruleScriptsLookup = Aggregates.lookup(T_RULE_SCRIPTS.getName(),
+        //final Bson ruleScriptsLookup = Aggregates.lookup(RE_RULE_SCRIPTS.getName(),
         //        asList(new Variable<>("rule_id", BsonDocument.parse("{ $toLong: \"$_id\" }"))),
         //        asList(Aggregates.match(Filters.expr(Filters.eq("$ruleId", "$$rule_id"))), DEFAULT_ENABLE_FILTER,
         //                DEFAULT_DELFLAT_FILTER, DEFAULT_PROJECT_FILTER, DEFAULT_SORT, DEFAULT_LIMIT, uploadsLookup),
         //        "scripts");
         //
-        //final Bson rulesLookup = Aggregates.lookup(T_RULES.getName(), asList(new Variable<>("rule_ids",
+        //final Bson rulesLookup = Aggregates.lookup(RE_RULES.getName(), asList(new Variable<>("rule_ids",
         //        BsonDocument.parse("{ $map: { input: \"$nodes\", in: { $toLong: \"$$this.ruleId\" } } }"))),
         //// $in 表达式匹配应直接使用 Document 对象? 否则:
         //// Issue1: 若使用 Filters.in("$_id","$$ruleIds") 则会生成为: {$expr:{$in:["$$ruleIds"]}}} 它会报错至少需要2个参数
@@ -363,13 +363,13 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
         //                DEFAULT_ENABLE_FILTER, DEFAULT_DELFLAT_FILTER, DEFAULT_PROJECT_FILTER, ruleScriptsLookup),
         //        "rules");
         //
-        //final Bson workflowGraphLookup = Aggregates.lookup(T_WORKFLOW_GRAPHS.getName(),
+        //final Bson workflowGraphLookup = Aggregates.lookup(RE_WORKFLOW_GRAPHS.getName(),
         //        asList(new Variable<>("workflow_id", BsonDocument.parse("{ $toLong: \"$_id\" }"))),
         //        asList(Aggregates.match(Filters.expr(Filters.eq("$workflowId", "$$workflow_id"))), DEFAULT_ENABLE_FILTER,
         //                DEFAULT_DELFLAT_FILTER, DEFAULT_PROJECT_FILTER, DEFAULT_SORT, DEFAULT_LIMIT, rulesLookup),
         //        "graphs");
         //
-        //final Bson workflowLookup = Aggregates.lookup(T_WORKFLOWS.getName(), asList(new Variable<>("scenes_id", "$_id")),
+        //final Bson workflowLookup = Aggregates.lookup(RE_WORKFLOWS.getName(), asList(new Variable<>("scenes_id", "$_id")),
         //        asList(Aggregates.match(Filters.expr(Filters.eq("$scenesId", "$$scenes_id"))), DEFAULT_ENABLE_FILTER,
         //                DEFAULT_DELFLAT_FILTER, DEFAULT_PROJECT_FILTER, workflowGraphLookup),
         //        "workflows");
@@ -382,7 +382,7 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
         // The temporary collections are automatically created.
         // aggregates.add(Aggregates.merge("_tmp_load_scenes_with_cascade"));
 
-        final ReactiveMongoCollection<Document> collection = mongoRepository.getReactiveCollection(T_SCENESES);
+        final ReactiveMongoCollection<Document> collection = mongoRepository.getReactiveCollection(RE_SCENESES);
         final Multi<Document> scenesesMulti = collection.aggregate(aggregates);
         return scenesesMulti.map(scenesDoc -> {
             // Solution-1:

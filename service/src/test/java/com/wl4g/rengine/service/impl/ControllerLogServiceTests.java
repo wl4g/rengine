@@ -15,7 +15,7 @@
  */
 package com.wl4g.rengine.service.impl;
 
-import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.T_CONTROLLER_LOG;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_CONTROLLER_LOG;
 
 import java.text.ParseException;
 import java.time.Duration;
@@ -54,26 +54,26 @@ public class ControllerLogServiceTests {
     @Test
     public void testDeleteWithRetentionCountAndUpdateDateUpper() {
         // Intiail testdata.
-        mongoTemplate.dropCollection(T_CONTROLLER_LOG.getName());
+        mongoTemplate.dropCollection(RE_CONTROLLER_LOG.getName());
 
         mongoTemplate.insert(ControllerLog.builder().id(1001010111L).updateDate(buildDate("2023-02-11 00:00:00")).build(),
-                T_CONTROLLER_LOG.getName());
+                RE_CONTROLLER_LOG.getName());
         mongoTemplate.insert(ControllerLog.builder().id(1001010112L).updateDate(buildDate("2023-02-12 00:00:00")).build(),
-                T_CONTROLLER_LOG.getName());
+                RE_CONTROLLER_LOG.getName());
         mongoTemplate.insert(ControllerLog.builder().id(1001010113L).updateDate(buildDate("2023-02-13 00:00:00")).build(),
-                T_CONTROLLER_LOG.getName());
+                RE_CONTROLLER_LOG.getName());
         mongoTemplate.insert(ControllerLog.builder().id(1001010114L).updateDate(buildDate("2023-02-14 00:00:00")).build(),
-                T_CONTROLLER_LOG.getName());
+                RE_CONTROLLER_LOG.getName());
         mongoTemplate.insert(ControllerLog.builder().id(1001010115L).updateDate(buildDate("2023-02-15 00:00:00")).build(),
-                T_CONTROLLER_LOG.getName());
+                RE_CONTROLLER_LOG.getName());
         mongoTemplate.insert(ControllerLog.builder().id(1001010116L).updateDate(buildDate("2023-02-16 00:00:00")).build(),
-                T_CONTROLLER_LOG.getName());
+                RE_CONTROLLER_LOG.getName());
         mongoTemplate.insert(ControllerLog.builder().id(1001010117L).updateDate(buildDate("2023-02-17 00:00:00")).build(),
-                T_CONTROLLER_LOG.getName());
+                RE_CONTROLLER_LOG.getName());
         mongoTemplate.insert(ControllerLog.builder().id(1001010118L).updateDate(buildDate("2023-02-18 00:00:00")).build(),
-                T_CONTROLLER_LOG.getName());
+                RE_CONTROLLER_LOG.getName());
         mongoTemplate.insert(ControllerLog.builder().id(1001010119L).updateDate(buildDate("2023-02-19 00:00:00")).build(),
-                T_CONTROLLER_LOG.getName());
+                RE_CONTROLLER_LOG.getName());
 
         // Testing deleting.
         final long currentTime = buildDate("2023-02-19 01:00:00").getTime();

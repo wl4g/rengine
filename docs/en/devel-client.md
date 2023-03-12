@@ -1,4 +1,4 @@
-# Development guide for Rengine Client
+# Developer's guide for Rengine Client
 
 ## Building
 
