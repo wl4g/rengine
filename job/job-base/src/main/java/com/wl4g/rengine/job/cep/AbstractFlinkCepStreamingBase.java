@@ -16,10 +16,10 @@
 package com.wl4g.rengine.job.cep;
 
 import static com.wl4g.infra.common.codec.Encodes.decodeBase64String;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.flink.api.java.functions.KeySelector;
@@ -36,7 +36,6 @@ import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.util.Collector;
 
 import com.wl4g.rengine.common.event.RengineEvent;
-import com.wl4g.rengine.common.event.RengineEvent.EventSource;
 import com.wl4g.rengine.job.AbstractFlinkStreamingBase;
 
 import lombok.AllArgsConstructor;
@@ -159,11 +158,14 @@ import lombok.experimental.SuperBuilder;
 public abstract class AbstractFlinkCepStreamingBase extends AbstractFlinkStreamingBase {
 
     private String patternJsonBase64;
+    private String keyByExpression;
     private String partitionDiscoveryIntervalMs;
 
     public AbstractFlinkCepStreamingBase() {
         super();
         this.builder.mustOption("P", "patternJsonBase64", "The cep pattern json base64.")
+                .option("K", "keyByExpression", ".source.principals[0]",
+                        "The jq expression to extract the grouping key, it extraction from the rengine event object.")
                 .longOption("partitionDiscoveryIntervalMs", "30000", "The per millis for discover new partitions interval.");
     }
 
@@ -171,13 +173,15 @@ public abstract class AbstractFlinkCepStreamingBase extends AbstractFlinkStreami
     protected AbstractFlinkStreamingBase parse(String[] args) throws ParseException {
         super.parse(args);
         this.patternJsonBase64 = line.get("patternJsonBase64");
+        this.keyByExpression = line.get("keyByExpression");
         this.partitionDiscoveryIntervalMs = line.get("partitionDiscoveryIntervalMs");
         return this;
     }
 
     @Override
-    protected void customProps(Properties props) {
+    protected void customProps(Map<String, String> props) {
         super.customProps(props);
+
         // props.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,brokers);
         // props.setProperty(ConsumerConfig.GROUP_ID_CONFIG,groupId);
         // see:https://github.com/apache/flink/blob/release-1.14.4/docs/content/docs/connectors/datastream/kafka.md#consumer-offset-committing
@@ -186,18 +190,19 @@ public abstract class AbstractFlinkCepStreamingBase extends AbstractFlinkStreami
         // props.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,"earliest");
         // props.setProperty(FlinkKafkaConsumerBase.KEY_DISABLE_METRICS,"true");
         // see:https://github.com/apache/flink/blob/release-1.14.4/docs/content/docs/connectors/datastream/kafka.md#dynamic-partition-discovery
-        props.setProperty(KafkaSourceOptions.PARTITION_DISCOVERY_INTERVAL_MS.key(), partitionDiscoveryIntervalMs);
+        props.put(KafkaSourceOptions.PARTITION_DISCOVERY_INTERVAL_MS.key(), partitionDiscoveryIntervalMs);
     }
 
     @SuppressWarnings({ "unchecked", "serial" })
     @Override
     protected DataStream<?> customStream(DataStreamSource<RengineEvent> dataStreamSource) {
+        final String keyByExpr = keyByExpression;
         final KeyedStream<RengineEvent, String> keyedStreamSource = dataStreamSource
                 .keyBy(new KeySelector<RengineEvent, String>() {
                     @Override
                     public String getKey(RengineEvent event) throws Exception {
-                        // TODO The grouping default by principal 0.
-                        return ((EventSource) event.getSource()).getPrincipals().get(0);
+                        final String keyBy = event.atAsText(keyByExpr);
+                        return isBlank(keyBy) ? "none_principal" : keyBy;
                     }
                 });
 

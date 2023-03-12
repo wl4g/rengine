@@ -16,13 +16,17 @@
 package com.wl4g.rengine.job;
 
 import static com.wl4g.infra.common.lang.Assert2.notNull;
+import static com.wl4g.infra.common.runtime.JvmRuntimeTool.isJvmInDebugging;
+import static java.lang.String.valueOf;
 import static java.time.Duration.ofMillis;
 import static java.util.Arrays.asList;
 import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.startsWith;
 import static org.apache.flink.api.common.restartstrategy.RestartStrategies.fixedDelayRestart;
 
-import java.util.Properties;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.cli.ParseException;
@@ -41,7 +45,6 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 import com.wl4g.infra.common.cli.CommandLineTool;
 import com.wl4g.infra.common.cli.CommandLineTool.CommandLineFacade;
-import static com.wl4g.infra.common.runtime.JvmRuntimeTool.*;
 import com.wl4g.rengine.common.event.RengineEvent;
 
 import lombok.Getter;
@@ -61,6 +64,7 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
     private String topicPattern;
     private String groupId;
     private Long fromOffsetTime;
+    private String deserializerClass;
 
     // FLINK basic options.
     private RuntimeExecutionMode runtimeMode;
@@ -94,7 +98,7 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
     // Command line.
     protected transient final CommandLineTool.Builder builder;
     protected transient CommandLineFacade line;
-    protected transient Properties props;
+    protected transient Map<String, String> props;
 
     protected AbstractFlinkStreamingBase() {
         this.builder = CommandLineTool.builder()
@@ -104,6 +108,8 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
                 .mustOption("G", "groupId", "Flink source consumer group id.")
                 .option("O", "fromOffsetTime", "-1",
                         "Start consumption from the first record with a timestamp greater than or equal to a certain timestamp. if <=0, it will not be setup and keep the default behavior.")
+                .option("D", "deserializerClass", "com.wl4g.rengine.job.kafka.GenericKafkaDeserializationSchema",
+                        "Deserializer class for Flink-streaming to consuming from MQ.")
                 // FLINK basic options.
                 .option("R", "runtimeMode", RuntimeExecutionMode.STREAMING.name(),
                         "Set the job execution mode. default is: STREAMING")
@@ -152,6 +158,7 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
         this.topicPattern = line.get("topicPattern");
         this.groupId = line.get("groupId");
         this.fromOffsetTime = line.getLong("fromOffsetTime");
+        this.deserializerClass = line.get("deserializerClass");
         // FLINK Basic options.
         this.runtimeMode = line.getEnum("runtimeMode", RuntimeExecutionMode.class);
         this.restartAttempts = line.getInteger("restartAttempts");
@@ -183,7 +190,7 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
      * 
      * @return
      */
-    protected void customProps(Properties props) {
+    protected void customProps(Map<String, String> props) {
     }
 
     /**
@@ -214,7 +221,12 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
                 "Parse arguments are not initialized, must call #parse() before");
 
         // Custom details.
-        customProps(props = (Properties) System.getProperties().clone());
+        this.props = System.getProperties()
+                .entrySet()
+                .stream()
+                .filter(e -> startsWith(valueOf(e.getKey()), "--"))
+                .collect(toMap(e -> valueOf(e.getKey()), e -> valueOf(e.getValue())));
+        customProps(props);
 
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setRuntimeMode(runtimeMode);

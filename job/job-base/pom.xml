@@ -50,6 +50,11 @@
             <groupId>com.wl4g</groupId>
             <artifactId>infra-common</artifactId>
         </dependency>
+        <!-- OTLP -->
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-proto</artifactId>
+        </dependency>
         <!-- FLINK streaming -->
         <dependency>
             <groupId>org.apache.flink</groupId>
@@ -61,6 +66,7 @@
         <!-- <artifactId>flink-streaming-scala${suffix-scala.version}</artifactId> -->
         <!-- <version>${flink.version}</version> -->
         <!-- </dependency> -->
+        <!-- FLINK Runtime -->
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-clients${suffix-scala.version}</artifactId>
@@ -81,13 +87,13 @@
             <artifactId>flink-metrics-jmx</artifactId>
             <version>${flink.version}</version>
         </dependency>
-        <!-- Recommends -->
+        <!-- recommends -->
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-runtime-web${suffix-scala.version}</artifactId>
             <version>${flink.version}</version>
         </dependency>
-        <!-- FLINK TABLES -->
+        <!-- FLINK tables -->
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-table-common</artifactId>

@@ -231,7 +231,7 @@ public class CepJsonUtilsTests {
     public static class MiddleCondition extends SimpleCondition<RengineEvent> {
         @Override
         public boolean filter(RengineEvent value) throws Exception {
-            return safeMap(value.getAttributes()).keySet().contains("middle");
+            return safeMap(value.getLabels()).keySet().contains("middle");
         }
     }
 

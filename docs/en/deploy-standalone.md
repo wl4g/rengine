@@ -110,15 +110,13 @@ select * from "rengine"."t_ods_event" limit 10;
 - Init Kafka topic.
 
 ```bash
-docker exec -it kafka1 bash
-
-kafka-topics.sh --zookeeper 127.0.0.1:2181 --create --topic rengine_event --partitions 10 --replication-factor 1
+docker exec -it kafka1 kafka-topics.sh --zookeeper 127.0.0.1:2181 --create --topic rengine_event --partitions 10 --replication-factor 1
 ```
 
 - Manual publish events to Kafka
 
 ```bash
-kafka-console-producer.sh --broker-list 127.0.0.1:9092 --topic rengine_event --property parse.key=true --property key.separator=:
+docker exec -it kafka1 kafka-console-producer.sh --broker-list 127.0.0.1:9092 --topic rengine_event --property parse.key=true --property key.separator=:
 
 rengine_event:{"source":{"time":1665847350487,"principals":["jameswong1234@gmail.com"],"location":{"ipAddress":"1.1.1.1","ipv6":false,"isp":null,"domain":null,"country":null,"region":null,"city":null,"latitude":null,"longitude":null,"timezone":null,"zipcode":"20500","elevation":null}},"type":"iot_temp_warn","observedTime":1665847350490,"body":"52","attributes":{}}
 ```
@@ -126,5 +124,5 @@ rengine_event:{"source":{"time":1665847350487,"principals":["jameswong1234@gmail
 - Manual subscribe event from Kafka
 
 ```bash
-kafka-console-consumer.sh --bootstrap-server 127.0.0.1:9092 --topic rengine_event
+docker exec -it kafka1 kafka-console-consumer.sh --bootstrap-server 127.0.0.1:9092 --topic rengine_event
 ```

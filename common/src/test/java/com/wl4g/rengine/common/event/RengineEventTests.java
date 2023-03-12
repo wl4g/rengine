@@ -19,6 +19,7 @@ import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.regex.Pattern;
@@ -39,22 +40,12 @@ public class RengineEventTests {
 
     @Test
     public void testEventToJson() {
-        RengineEvent event = new RengineEvent("iot_temp_warn1",
-                EventSource.builder()
-                        .time(currentTimeMillis())
-                        .principals(singletonList("jameswong1234@gmail.com"))
-                        .location(EventLocation.builder().ipAddress("1.1.1.1").zipcode("20500").build())
-                        .build(),
-                // BsonEntitySerializers serious alarm occurs when the device
-                // temperature is greater
-                // than 52℃
-                singletonList("52"));
-        System.out.println(toJSONString(event));
+        System.out.println(toJSONString(DEFAULT_TEST_EVENT));
     }
 
     @Test
     public void testEventFromJson() {
-        String json = "{\"source\":{\"time\":1677255692660,\"principals\":[\"jameswong1234@gmail.com\"],\"location\":{\"ipAddress\":\"1.1.1.1\",\"ipv6\":null,\"isp\":null,\"domain\":null,\"elevation\":null,\"latitude\":null,\"longitude\":null,\"timezone\":null,\"zipcode\":\"20500\",\"city\":null,\"region\":null,\"country\":null}},\"id\":\"iot_temp_warn1:1677255692662:jameswong1234@gmail.com\",\"type\":\"iot_temp_warn1\",\"observedTime\":1677255692662,\"body\":[\"52\"],\"attributes\":{}}";
+        String json = "{\"source\":{\"time\":1678590267752,\"principals\":[\"jameswong1234@gmail.com\"],\"location\":{\"ipAddress\":\"1.1.1.1\",\"ipv6\":null,\"isp\":null,\"domain\":null,\"elevation\":null,\"latitude\":null,\"longitude\":null,\"timezone\":null,\"zipcode\":\"20500\",\"city\":null,\"region\":null,\"country\":null}},\"id\":\"iot_temp_warn1:1678590267753:jameswong1234@gmail.com\",\"type\":\"iot_temp_warn1\",\"observedTime\":1678590267753,\"body\":{\"value\":\"52\"},\"labels\":{}}";
         RengineEvent event = parseJSON(json, RengineEvent.class);
         System.out.println("         EventType: " + event.getType());
         System.out.println("      ObservedTime: " + event.getObservedTime());
@@ -62,7 +53,7 @@ public class RengineEventTests {
         System.out.println("       Source.time: " + ((EventSource) event.getSource()).getTime());
         System.out.println(" Source.principals: " + ((EventSource) event.getSource()).getPrincipals());
         System.out.println("   Source.location: " + ((EventSource) event.getSource()).getLocation());
-        System.out.println("        Attributes: " + event.getAttributes());
+        System.out.println("            Labels: " + event.getLabels());
     }
 
     @Test
@@ -131,5 +122,27 @@ public class RengineEventTests {
         System.out.println(matches);
         assert !matches;
     }
+
+    @Test
+    public void testAtAsText() {
+        System.out.println(DEFAULT_TEST_EVENT.atAsText(".type"));
+        System.out.println(DEFAULT_TEST_EVENT.atAsText(".source.principals"));
+        System.out.println(DEFAULT_TEST_EVENT.atAsText(".source.principals[0]"));
+    }
+
+    @Test(expected = Throwable.class)
+    public void testAtAsTextFailure() {
+        System.out.println(DEFAULT_TEST_EVENT.atAsText(".source.principals[1]"));
+    }
+
+    static final RengineEvent DEFAULT_TEST_EVENT = new RengineEvent("iot_temp_warn1",
+            EventSource.builder()
+                    .time(currentTimeMillis())
+                    .principals(singletonList("jameswong1234@gmail.com"))
+                    .location(EventLocation.builder().ipAddress("1.1.1.1").zipcode("20500").build())
+                    .build(),
+            // BsonEntitySerializers serious alarm occurs when the device
+            // temperature is greater than 52℃
+            singletonMap("value", "52"));
 
 }

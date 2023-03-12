@@ -43,7 +43,7 @@ public abstract class RabbitMQUtil {
     // // .setStartingOffsets(offsets)
     // // .setClientIdPrefix(program.getJobName())
     // // .setProperties(program.getProps())
-    // // .setDeserializer(new RengineKafkaRecordDeserializationSchema())
+    // // .setDeserializer(new AbstractDeserializationSchema())
     // .build();
     // return (Source<T, S, E>) source;
     // }

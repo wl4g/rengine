@@ -15,16 +15,26 @@
  */
 package com.wl4g.rengine.job.kafka;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static java.lang.String.format;
+
+import java.util.Properties;
 import java.util.regex.Pattern;
+
+import javax.validation.constraints.NotNull;
 
 import org.apache.flink.api.connector.source.Source;
 import org.apache.flink.api.connector.source.SourceSplit;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
+import org.apache.flink.connector.kafka.source.reader.deserializer.KafkaRecordDeserializationSchema;
 import org.apache.kafka.clients.consumer.OffsetResetStrategy;
 
-import com.wl4g.rengine.job.AbstractFlinkStreamingBase;
+import com.wl4g.infra.common.lang.ClassUtils2;
 import com.wl4g.rengine.common.event.RengineEvent;
+import com.wl4g.rengine.job.AbstractFlinkStreamingBase;
+import com.wl4g.rengine.job.pulsar.RenginePulsarUtil;
 
 /**
  * {@link RenginePulsarUtil}
@@ -51,10 +61,13 @@ public abstract class RengineKafkaUtil {
      * @param streaming
      * @return
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked" })
     public static <T, S extends SourceSplit, E> Source<T, S, E> createKafkaSource(
-            OffsetResetStrategy defaultOffsetResetStrategy,
-            AbstractFlinkStreamingBase streaming) {
+            @NotNull OffsetResetStrategy defaultOffsetResetStrategy,
+            @NotNull AbstractFlinkStreamingBase streaming) {
+        notNullOf(defaultOffsetResetStrategy, "defaultOffsetResetStrategy");
+        notNullOf(streaming, "streaming");
+
         // see:https://github.com/apache/flink/blob/release-1.14.4/docs/content/docs/connectors/datastream/kafka.md#starting-offset
         // Start from committed offset, also use EARLIEST as reset strategy if
         // committed offset doesn't exist
@@ -64,16 +77,29 @@ public abstract class RengineKafkaUtil {
             // or equals a timestamp.
             offsets = OffsetsInitializer.timestamp(streaming.getFromOffsetTime());
         }
-        KafkaSource<RengineEvent> source = KafkaSource.<RengineEvent> builder()
+
+        KafkaRecordDeserializationSchema<RengineEvent> deserializer = null;
+        try {
+            final Class<?> deserialzerClass = ClassUtils2.forName(streaming.getDeserializerClass(), null);
+            deserializer = (KafkaRecordDeserializationSchema<RengineEvent>) deserialzerClass
+                    .getConstructor(AbstractFlinkStreamingBase.class)
+                    .newInstance(streaming);
+        } catch (Throwable ex) {
+            throw new IllegalStateException(
+                    format("Could't to load deserializer class for '%s'", streaming.getDeserializerClass()), ex);
+        }
+
+        final Properties _props = new Properties();
+        safeMap(streaming.getProps()).forEach((key, value) -> _props.put(key, value));
+        return (Source<T, S, E>) KafkaSource.<RengineEvent> builder()
                 .setBootstrapServers(streaming.getBrokers())
                 .setGroupId(streaming.getGroupId())
                 .setTopicPattern(Pattern.compile(streaming.getTopicPattern()))
                 .setStartingOffsets(offsets)
                 .setClientIdPrefix(streaming.getJobName())
-                .setProperties(streaming.getProps())
-                .setDeserializer(new RengineKafkaRecordDeserializationSchema())
+                .setProperties(_props)
+                .setDeserializer(deserializer)
                 .build();
-        return (Source<T, S, E>) source;
     }
 
 }

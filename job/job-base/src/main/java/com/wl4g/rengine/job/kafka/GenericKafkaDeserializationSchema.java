@@ -22,6 +22,8 @@ import static java.util.Objects.nonNull;
 
 import java.io.IOException;
 
+import javax.validation.constraints.NotNull;
+
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.connector.kafka.source.reader.deserializer.KafkaRecordDeserializationSchema;
 import org.apache.flink.util.Collector;
@@ -30,12 +32,13 @@ import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
 import com.wl4g.rengine.common.event.RengineEvent;
+import com.wl4g.rengine.job.AbstractFlinkStreamingBase;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link RengineKafkaRecordDeserializationSchema}
+ * {@link AbstractDeserializationSchema}
  * 
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2022-06-03 v3.0.0
@@ -43,22 +46,25 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Getter
-public class RengineKafkaRecordDeserializationSchema implements KafkaRecordDeserializationSchema<RengineEvent> {
+public class GenericKafkaDeserializationSchema implements KafkaRecordDeserializationSchema<RengineEvent> {
     private static final long serialVersionUID = -3765473065594331694L;
 
     private transient Deserializer<String> deserializer = new StringDeserializer();
 
+    public GenericKafkaDeserializationSchema(@NotNull AbstractFlinkStreamingBase streaming) {
+    }
+
     @Override
-    public void deserialize(ConsumerRecord<byte[], byte[]> record, Collector<RengineEvent> collector) throws IOException {
+    public void deserialize(ConsumerRecord<byte[], byte[]> record, Collector<RengineEvent> out) throws IOException {
         if (isNull(deserializer)) {
             this.deserializer = new StringDeserializer();
         }
         if (nonNull(record.value())) {
             String json = deserializer.deserialize(record.topic(), record.value());
             try {
-                collector.collect(parseJSON(json, RengineEvent.class).validate());
-            } catch (Exception e) {
-                log.warn(format("Unable to parse event json. - %s", json), e);
+                out.collect(parseJSON(json, RengineEvent.class).validate());
+            } catch (Throwable ex) {
+                log.warn(format("Unable to parse event json. - %s", json), ex);
             }
         }
     }

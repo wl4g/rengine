@@ -15,13 +15,14 @@
  */
 package com.wl4g.rengine.job;
 
-import java.util.Properties;
+import java.util.Map;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.flink.api.connector.source.Source;
 import org.apache.flink.api.connector.source.SourceSplit;
 import org.apache.flink.connector.kafka.source.KafkaSourceOptions;
 
+import com.wl4g.rengine.job.cep.AbstractFlinkCepStreamingBase;
 import com.wl4g.rengine.job.hbase.HBaseFlinkStreamingSupport;
 import com.wl4g.rengine.job.kafka.RengineKafkaUtil;
 
@@ -57,8 +58,9 @@ public class RengineKafka2HBaseStreaming extends HBaseFlinkStreamingSupport {
     }
 
     @Override
-    protected void customProps(Properties props) {
+    protected void customProps(Map<String, String> props) {
         super.customProps(props);
+
         // props.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,brokers);
         // props.setProperty(ConsumerConfig.GROUP_ID_CONFIG,groupId);
         // see:https://github.com/apache/flink/blob/release-1.14.4/docs/content/docs/connectors/datastream/kafka.md#consumer-offset-committing
@@ -67,7 +69,7 @@ public class RengineKafka2HBaseStreaming extends HBaseFlinkStreamingSupport {
         // props.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,"earliest");
         // props.setProperty(FlinkKafkaConsumerBase.KEY_DISABLE_METRICS,"true");
         // see:https://github.com/apache/flink/blob/release-1.14.4/docs/content/docs/connectors/datastream/kafka.md#dynamic-partition-discovery
-        props.setProperty(KafkaSourceOptions.PARTITION_DISCOVERY_INTERVAL_MS.key(), partitionDiscoveryIntervalMs);
+        props.put(KafkaSourceOptions.PARTITION_DISCOVERY_INTERVAL_MS.key(), partitionDiscoveryIntervalMs);
     }
 
     @Override

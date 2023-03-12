@@ -15,8 +15,6 @@
  */
 package com.wl4g.rengine.service.model.sys;
 
-import javax.annotation.Nullable;
-
 import com.wl4g.rengine.common.entity.sys.Tenant;
 import com.wl4g.rengine.service.model.BaseQuery;
 
@@ -39,5 +37,4 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 @NoArgsConstructor
 public class TenantQuery extends BaseQuery<Tenant> {
-    private @Nullable Long organizationId;
 }

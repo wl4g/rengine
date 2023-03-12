@@ -17,7 +17,6 @@ package com.wl4g.rengine.common.util;
 
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_MENUS;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_MENU_ROLES;
-import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_TENANTS;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_ROLES;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_USERS;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_USER_ROLES;
@@ -191,20 +190,6 @@ public abstract class ServiceAggregateFilters {
             + "                        ],"
             + "                        as: \"menuRoles\""
             + "                        }"
-            + "                    },"
-            + "                    {"
-            + "                        $lookup: {"
-            + "                            from: \"" + SYS_TENANTS.getName() + "\","
-            + "                            localField: \"orgCode\","
-            + "                            foreignField: \"orgCode\","
-            + "                            as: \"org\""
-            + "                        }"
-            + "                    },"
-            + "                    {"
-            + "                        $unwind: {"
-            + "                            path: \"$org\","
-            + "                            preserveNullAndEmptyArrays: true"
-            + "                        }"
             + "                    }"
             + "                ],"
             + "                as: \"roles\""
@@ -245,18 +230,6 @@ public abstract class ServiceAggregateFilters {
             + "    ],"
             + "    as: \"menuRoles\""
             + "    }"
-            + "},"
-            + "{ $lookup: {"
-            + "    from: \"sys_organizations\","
-            + "    localField: \"orgCode\","
-            + "    foreignField: \"orgCode\","
-            + "    as: \"org\""
-            + "  }"
-            + "},"
-            + "{ $unwind: {"
-            + "    path: \"$org\","
-            + "    preserveNullAndEmptyArrays: true"
-            + "  }"
             + "}"
             + "]");
     // @formatter:on
@@ -288,18 +261,6 @@ public abstract class ServiceAggregateFilters {
             + "    ],"
             + "    as: \"userRoles\""
             + "    }"
-            + "},"
-            + "{ $lookup: {"
-            + "    from: \"" + SYS_TENANTS.getName() + "\","
-            + "    localField: \"orgCode\","
-            + "    foreignField: \"orgCode\","
-            + "    as: \"org\""
-            + "  }"
-            + "},"
-            + "{ $unwind: {"
-            + "    path: \"$org\","
-            + "    preserveNullAndEmptyArrays: true"
-            + "  }"
             + "}"
             + "]");
     // @formatter:on

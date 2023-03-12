@@ -17,11 +17,13 @@ package com.wl4g.rengine.job.hbase;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getIntProperty;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getStringProperty;
 import static com.wl4g.infra.common.lang.StringUtils2.getBytes;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+import static java.lang.String.valueOf;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
@@ -69,11 +71,11 @@ public class EventToMutationConverter implements HBaseMutationConverter<RengineE
     }
 
     @Override
-    public Mutation convertToMutation(@NotNull RengineEvent model) {
-        notNullOf(model, "model");
-        model.validate();
+    public Mutation convertToMutation(@NotNull RengineEvent event) {
+        notNullOf(event, "event");
+        event.validate();
 
-        final Put put = new Put(generateRowkey(model));
+        final Put put = new Put(generateRowkey(event));
 
         // Automatic mapped.
         // for (Field f : RengineEvent.ORDERED_FIELDS) {
@@ -86,13 +88,15 @@ public class EventToMutationConverter implements HBaseMutationConverter<RengineE
         // }
 
         // observedTime
-        addPutColumn(put, "observedTime", DateFormatUtils.format(model.getObservedTime(), "yyMMddHHmmss"));
-        // body TODO
-        addPutColumn(put, "body", join(model.getBody().toArray(), ","));
-        // attributes
-        addPutColumn(put, "attributes", toJSONString(model.getAttributes()));
+        addPutColumn(put, "observedTime", DateFormatUtils.format(event.getObservedTime(), "yyMMddHHmmss"));
+        // body
+        safeMap(event.getBody()).entrySet()
+                .stream()
+                .forEach(e -> addPutColumn(put, "body.".concat(e.getKey()), valueOf(e.getValue())));
+        // labels
+        addPutColumn(put, "labels", toJSONString(event.getLabels()));
         // source
-        final EventSource source = (EventSource) model.getSource();
+        final EventSource source = (EventSource) event.getSource();
         if (nonNull(source)) {
             addPutColumn(put, "sourceTime", DateFormatUtils.format(source.getTime(), "yyMMddHHmmss"));
             addPutColumn(put, "sourcePrincipals", getSourcePrincipalsString(source));

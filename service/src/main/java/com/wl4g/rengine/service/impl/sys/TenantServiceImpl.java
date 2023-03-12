@@ -57,11 +57,10 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public PageHolder<Tenant> query(TenantQuery model) {
-        final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getOrganizationId())))
+        final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getTenantId())))
                 .with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
 
-        final List<Tenant> tenants = mongoTemplate.find(query, Tenant.class,
-                MongoCollectionDefinition.SYS_TENANTS.getName());
+        final List<Tenant> tenants = mongoTemplate.find(query, Tenant.class, MongoCollectionDefinition.SYS_TENANTS.getName());
 
         return new PageHolder<Tenant>(model.getPageNum(), model.getPageSize())
                 .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.SYS_TENANTS.getName()))
@@ -71,7 +70,7 @@ public class TenantServiceImpl implements TenantService {
     @Override
     public TenantSaveResult save(TenantSave model) {
         Tenant tenant = model;
-        notNullOf(tenant, "organization");
+        notNullOf(tenant, "tenant");
 
         if (isNull(tenant.getId())) {
             tenant.preInsert();

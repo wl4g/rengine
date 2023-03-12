@@ -17,6 +17,7 @@ package com.wl4g.rengine.job.hbase;
 
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
 
 import org.apache.hadoop.hbase.client.Mutation;
 import org.junit.Test;
@@ -49,7 +50,7 @@ public class EventToMutationConverterTests {
                         .build(),
                 // BsonEntitySerializers serious alarm occurs when the device
                 // temperature is greater than 52℃
-                singletonList("52"));
+                singletonMap("value", "52"));
 
         EventToMutationConverter converter = new EventToMutationConverter();
         converter.open();

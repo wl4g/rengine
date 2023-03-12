@@ -23,11 +23,16 @@ import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseFromNode;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
+import static com.wl4g.infra.common.serialize.JacksonUtils.parseToNode;
+import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.emptyMap;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.replaceChars;
+import static org.apache.commons.lang3.StringUtils.startsWith;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -46,6 +51,9 @@ import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+import com.wl4g.infra.common.serialize.JacksonUtils;
 
 import lombok.Builder.Default;
 import lombok.Data;
@@ -84,41 +92,90 @@ public class RengineEvent extends EventObject {
     /**
      * Event observed time-stamp.
      */
-    // private @NotNull @Min(0)
-    // @PersistenceConverter(dateFormatter="yyMMddHHmmssSSS") Long observedTime;
-    private @NotNull @Min(0) Long observedTime;
+    private @NotNull @Min(-1) Long observedTime;
 
     /**
-     * Event body.
+     * Event body data.
      */
-    private @Nullable List<String> body;
+    private @Nullable Map<String, Object> body;
 
     /**
-     * Event extension attributes.
+     * Event extension labels.
      */
-    private @Nullable Map<String, String> attributes = new HashMap<>();
+    private @Nullable Map<String, String> labels = new HashMap<>();
+
+    /***
+     * Convert to temporary json node tree format, such as for key path lookup.
+     */
+    private transient JsonNode _toJsonNode;
 
     public RengineEvent(@NotBlank String type, @NotNull EventSource source) {
         this(type, currentTimeMillis(), source, null, new HashMap<>());
     }
 
-    public RengineEvent(@NotBlank String type, @NotNull EventSource source, @Nullable List<String> body) {
+    public RengineEvent(@NotBlank String type, @NotNull EventSource source, @Nullable Map<String, Object> body) {
         this(type, currentTimeMillis(), source, body, emptyMap());
     }
 
+    public RengineEvent(@NotBlank String type, @NotNull EventSource source, @Nullable Map<String, Object> body,
+            @Nullable Map<String, String> labels) {
+        this(type, currentTimeMillis(), source, body, labels);
+    }
+
     public RengineEvent(@NotBlank String type, @Min(0) Long observedTime, @NotNull EventSource source,
-            @Nullable List<String> body, @Nullable Map<String, String> attributes) {
+            @Nullable Map<String, Object> body, @Nullable Map<String, String> labels) {
         super(notNullOf(source, "eventSource"));
         isTrueOf(observedTime > 0, format("observedTime > 0, but is: %s", observedTime));
         this.type = hasTextOf(type, "eventType");
         this.observedTime = observedTime;
         this.id = format("%s:%s:%s", type, observedTime, safeList(source.getPrincipals()).stream().findFirst().orElse(null));
         this.body = body;
-        this.attributes = attributes;
+        this.labels = labels;
     }
 
     public RengineEvent validate() {
         return RengineEvent.validate(this);
+    }
+
+    public JsonNode asJsonNode() {
+        if (isNull(_toJsonNode)) {
+            synchronized (this) {
+                if (isNull(_toJsonNode)) {
+                    this._toJsonNode = parseToNode(toJSONString(this));
+                }
+            }
+        }
+        return _toJsonNode;
+    }
+
+    public String atAsText(@NotBlank String jqExpr) {
+        hasTextOf(jqExpr, "jqExpr");
+        if (!startsWith(jqExpr, ".")) {
+            throw new IllegalArgumentException(format("Invalid json jq expression '%s', must start with '.'"));
+        }
+
+        String expr = replaceChars(jqExpr, ".", "/");
+        int arrayIndex = -1;
+        final int start = expr.indexOf("[");
+        final int end = expr.indexOf("]");
+        if (start >= 0 && start < end) {
+            arrayIndex = Integer.parseInt(expr.substring(start + 1, end));
+            expr = expr.substring(0, start);
+        }
+
+        final JsonNode value = asJsonNode().at(expr);
+        if (value instanceof TextNode) {
+            return value.textValue();
+        } else if (value instanceof ArrayNode) {
+            if (arrayIndex >= 0) {
+                final JsonNode arrayValue = ((ArrayNode) value).get(arrayIndex);
+                return nonNull(arrayValue) ? arrayValue.asText() : null;
+            } else {
+                return ((ArrayNode) value).toString();
+            }
+        }
+
+        return null;
     }
 
     public static RengineEvent fromJson(String json) {
@@ -134,17 +191,15 @@ public class RengineEvent extends EventObject {
         final String type = node.at("/type").asText();
         final Long observedTime = node.at("/observedTime").asLong();
 
-        final List<String> body = new ArrayList<>(4);
-        final JsonNode bodyArr = node.at("/body");
-        if (nonNull(bodyArr)) {
-            for (int i = 0; i < bodyArr.size(); i++) {
-                body.add(bodyArr.get(i).asText());
-            }
-        }
+        final JsonNode bodyNode = node.at("/body");
+        final Map<String, Object> bodyMap = (nonNull(bodyNode) && !bodyNode.isMissingNode() && !isBlank(bodyNode.asText()))
+                ? parseJSON(bodyNode.asText(), JacksonUtils.MAP_OBJECT_TYPE_REF)
+                : null;
 
-        final JsonNode attributesNode = node.at("/attributes");
-        final Map<String, String> attributes = (nonNull(attributesNode) && !attributesNode.isMissingNode()
-                && !isBlank(attributesNode.asText())) ? parseJSON(attributesNode.asText(), HASHMAP_TYPEREF) : null;
+        final JsonNode labelsNode = node.at("/labels");
+        final Map<String, String> labels = (nonNull(labelsNode) && !labelsNode.isMissingNode() && !isBlank(labelsNode.asText()))
+                ? parseJSON(labelsNode.asText(), HASHMAP_TYPEREF)
+                : null;
 
         // Event source.
         final Long sourceTime = node.at("/source/time").asLong();
@@ -152,7 +207,7 @@ public class RengineEvent extends EventObject {
         final EventLocation location = parseFromNode(node, "/source/location", EventLocation.class);
 
         return new RengineEvent(type, observedTime,
-                EventSource.builder().time(sourceTime).principals(principals).location(location).build(), body, attributes);
+                EventSource.builder().time(sourceTime).principals(principals).location(location).build(), bodyMap, labels);
     }
 
     public static RengineEvent validate(RengineEvent event) {
@@ -198,15 +253,13 @@ public class RengineEvent extends EventObject {
     @NoArgsConstructor
     public static class EventSource implements Serializable {
         private static final long serialVersionUID = -4689601246194850124L;
-        // private @NotNull @Min(0)
-        // @PersistenceConverter(dateFormatter="yyMMddHHmmssSSS") Long time;
-        private @NotNull @Min(0) Long time;
+        private @NotNull @Min(-1) Long time;
         private @NotEmpty @Default List<String> principals = new ArrayList<>();
         private @Nullable @Default EventLocation location = EventLocation.builder().build();
     }
 
     /**
-     * Fix for example:
+     * For example:
      * 
      * <pre>
      *  IP2LocationRecord:
@@ -266,12 +319,5 @@ public class RengineEvent extends EventObject {
     public static final String EVENT_LOCATION_COUNTRY_REGEX = "^([a-zA-Z0-9_-]){1,2}$";
     public static final String EVENT_LOCATION_REGION_REGEX = "^([a-zA-Z0-9_-]){1,16}$";
     public static final String EVENT_LOCATION_CITY_REGEX = "^([a-zA-Z0-9_-]){1,16}$";
-
-    // @Target(FIELD)
-    // @Retention(RUNTIME)
-    // @Documented
-    // public static @interface PersistenceConverter {
-    // String dateFormatter();
-    // }
 
 }
