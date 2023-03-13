@@ -70,7 +70,7 @@ public class ExecutionGraphTests {
             collections.add(new NodeConnection("42", "999"));
 
             WorkflowGraph workflowGraph = new WorkflowGraph(10101010L, nodes, collections);
-            out.println("Workflow Nodes Json : " + toJSONString(workflowGraph));
+            out.println("Workflow Node Json : " + toJSONString(workflowGraph));
             ExecutionGraph.from(workflowGraph);
         } catch (Throwable ex) {
             // ex.printStackTrace();
@@ -97,7 +97,7 @@ public class ExecutionGraphTests {
             collections.add(new NodeConnection("42", "31"));
 
             WorkflowGraph workflowGraph = new WorkflowGraph(10101010L, nodes, collections);
-            out.println("Workflow Nodes Json : " + toJSONString(workflowGraph));
+            out.println("Workflow Node Json : " + toJSONString(workflowGraph));
             ExecutionGraph.from(workflowGraph);
         } catch (Throwable ex) {
             // ex.printStackTrace();
@@ -110,7 +110,7 @@ public class ExecutionGraphTests {
         try {
 
             final WorkflowGraph workflowGraph = WorkflowGraphTests.buildDefaultWorkflowGraph();
-            out.println("Workflow Nodes Json : " + toJSONString(workflowGraph));
+            out.println("Workflow Node Json : " + toJSONString(workflowGraph));
 
             ExecutionGraphParameter parameter = ExecutionGraphParameter.builder()
                     .requestTime(currentTimeMillis())

@@ -137,13 +137,16 @@ public class OtlpLogKafkaDeserializationSchema implements KafkaRecordDeserializa
                                     })
                                     .collect(toList());
 
-                            out.collect(new RengineEvent(eventType,
-                                    EventSource.builder()
+                            out.collect(RengineEvent.builder()
+                                    .type(eventType)
+                                    .source(EventSource.builder()
                                             .time(timestamp)
                                             .principals(principals)
                                             .location(EventLocation.builder().build())
-                                            .build(),
-                                    body, labels));
+                                            .build())
+                                    .body(body)
+                                    .labels(labels)
+                                    .build());
                         }
                     }
                 }

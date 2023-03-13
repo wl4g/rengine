@@ -19,6 +19,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
+import com.wl4g.rengine.service.security.user.AuthenticationServiceTests;
 import com.wl4g.rengine.service.util.TestDefaultMongoSetup;
 
 /**
@@ -35,8 +36,12 @@ public class UserServiceTests {
 
     @BeforeClass
     public static void init() {
-        userService = new UserServiceImpl();
-        userService.mongoTemplate = (mongoTemplate = TestDefaultMongoSetup.createMongoTemplate());
+        userService = new UserServiceImpl() {
+            {
+                this.mongoTemplate = TestDefaultMongoSetup.createMongoTemplate();
+                this.authenticationService = AuthenticationServiceTests.getAuthenticationService();
+            }
+        };
     }
 
     @Test

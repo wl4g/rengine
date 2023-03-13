@@ -14,8 +14,8 @@
 spring:
   application.name: rengine-apiserver
   profiles:
-    #include: devtool,base,arthas,arthas-override,telemetry,telemetry-override,swagger,mongo,redis,minio,session,security-oauth,security-static
-    include: base,arthas,arthas-override,telemetry,telemetry-override,swagger,mongo,redis,minio,session,security-oauth
+    ## devtool,base,arthas,arthas-override,telemetry,telemetry-override,swagger,mongo,redis,minio,session,security
+    include: base,arthas,arthas-override,telemetry,telemetry-override,swagger,mongo,redis,minio,session,security
     active: dev
 
 server: ## see:org.springframework.boot.autoconfigure.web.ServerProperties

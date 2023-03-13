@@ -142,8 +142,8 @@ public class Quantifier {
 
     @Override
     public String toString() {
-        return "Quantifier{" + "details=" + properties + ", consumingStrategy=" + consumingStrategy
-                + ", innerConsumingStrategy=" + innerConsumingStrategy + '}';
+        return "Quantifier{" + "details=" + properties + ", consumingStrategy=" + consumingStrategy + ", innerConsumingStrategy="
+                + innerConsumingStrategy + '}';
     }
 
     /**
@@ -159,9 +159,7 @@ public class Quantifier {
      * See docs for more info.
      */
     public enum ConsumingStrategy {
-        STRICT, SKIP_TILL_NEXT, SKIP_TILL_ANY,
-
-        NOT_FOLLOW, NOT_NEXT
+        STRICT, SKIP_TILL_NEXT, SKIP_TILL_ANY, NOT_FOLLOW, NOT_NEXT
     }
 
     /** Describe the times this {@link Pattern} can occur. */

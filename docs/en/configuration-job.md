@@ -12,7 +12,7 @@
 |    --checkpointMinPauseBetween <default=null>                                                   | The minimum time interval between two checkpoints.
 |    --checkpointMode <default=AT_LEAST_ONCE>                                                     | Sets the checkpoint mode, the default is null means not enabled. options: [EXACTLY_ONCE, AT_LEAST_ONCE]
 |    --checkpointTimeout <default=null>                                                           | Checkpoint timeout millis.
-| -D,--deserializerClass <default=com.wl4g.rengine.job.kafka.GenericKafkaDeserializationSchema>   | Deserializer class for Flink-streaming to consuming from MQ.
+| -D,--deserializerClass <default=com.wl4g.rengine.job.kafka.RengineEventKafkaDeserializationSchema>   | Deserializer class for Flink-streaming to consuming from MQ.
 |    --externalizedCheckpointCleanup <default=null>                                               | The program is closed, an extra checkpoint is triggered.
 | -F,--forceUsePrintSink <default=false>                                                          | Force override set to stdout print sink function.
 | -G,--groupId <required>                                                                         | Flink source consumer group id.
@@ -22,12 +22,11 @@
 | -O,--fromOffsetTime <default=-1>                                                                | Start consumption from the first record with a timestamp greater than or equal to a certain timestamp. if <=0, it will not be setup and keep the default behavior.
 |    --outOfOrdernessMillis <default=120000>                                                      | The maximum millis out-of-orderness watermark generator assumes.
 | -p,--parallelism <default=-1>                                                                   | The parallelism for operator. if <=0, it will not be setup and keep the default behavior.
-| -P,--patternJsonBase64 <required>                                                               | The cep pattern json base64.
-|    --partitionDiscoveryIntervalMs <default=30000>                                               | The per millis for discover new partitions interval.
 | -R,--runtimeMode <default=STREAMING>                                                            | Set the job execution mode. default is: STREAMING
 |    --restartAttempts <default=3>                                                                | Set the maximum number of failed restart attempts. default is: 3
 |    --restartDelaySeconds <default=15>                                                           | Set the maximum number of failed interval between each restart. default is: 15
-| -T,--topicPattern <default=rengine_event>                                                       | MQ topic regex pattern.
+| -T,--eventTopicPattern <default=rengine_events>                                                 | Topic pattern for consuming events from MQ.
+| -K,--keyByExpression <default=.source.principals[0]>                                            | The jq expression to extract the grouping key, it extraction from the rengine event object.
 
 ## Flink consuming kafka with CEP
 
@@ -45,7 +44,10 @@ com.wl4g.rengine.job.cep.RengineKafkaFlinkCepStreaming
 
 | Options | Description |
 | - | - |
-| -K,--keyByExpression <default=.source.principals[0]>                                            | The jq expression to extract the grouping key, it extraction from the rengine event object.
+| -P,--cepPatterns <required>                                                                     | The cep patterns array json with base64 encode.
+|    --alertTopic <default=30000>                                                                 | Topic for producer the alerts message of Flink CEP match generated.
+|    --offsetResetStrategy <default=LATEST>                                                       | Consuming kafka events offset reset strategy.
+|    --partitionDiscoveryIntervalMs <default=30000>                                               | The per millis for discover new partitions interval.
 
 ## Flink consuming kafka to HBase
 

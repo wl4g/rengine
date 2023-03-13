@@ -26,6 +26,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
@@ -83,7 +84,9 @@ public class RuleScriptController {
             content = { @Content(mediaType = "application/json") }) })
     @RequestMapping(path = { "parse" }, method = { GET })
     @PreAuthorize("hasPermission(#model,'arn:rengine:rulescript:parse:v1')")
-    public RespBase<ScriptASTInfo> parse(@NotNull RuleEngine engine, @NotNull Long scriptId) {
+    public RespBase<ScriptASTInfo> parse(
+            @Validated @NotNull @RequestParam("engine") RuleEngine engine,
+            @Validated @NotNull @RequestParam("scriptId") Long scriptId) {
         log.debug("called: engine={}, scriptId={}", engine, scriptId);
         RespBase<ScriptASTInfo> resp = RespBase.create();
         resp.setData(ruleScriptService.parse(engine, scriptId));

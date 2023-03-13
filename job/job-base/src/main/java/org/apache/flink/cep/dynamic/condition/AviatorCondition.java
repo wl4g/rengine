@@ -42,11 +42,13 @@ import com.wl4g.infra.common.collection.CollectionUtils2;
 import com.wl4g.rengine.common.event.RengineEvent;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /** Condition that accepts aviator expression. */
+@Slf4j
 @Getter
 @Internal
-public class AviatorCondition<T> extends SimpleCondition<T> {
+public class AviatorCondition<T extends RengineEvent> extends SimpleCondition<T> {
 
     private static final long serialVersionUID = 1L;
 
@@ -77,13 +79,12 @@ public class AviatorCondition<T> extends SimpleCondition<T> {
     }
 
     @Override
-    public boolean filter(T eventBean) throws Exception {
-        final List<String> variableNames = getCompiledExpression().getVariableNames();
+    public boolean filter(T event) throws Exception {
+        final List<String> variableNames = getCompiledExpression().getVariableFullNames();
         if (CollectionUtils2.isEmpty(variableNames)) {
             return true;
         }
 
-        final RengineEvent event = (RengineEvent) eventBean;
         final Map<String, Object> variables = new HashMap<>();
         for (String variableName : variableNames) {
             // Object value = getVariableValue(eventBean, variableName);
@@ -91,8 +92,9 @@ public class AviatorCondition<T> extends SimpleCondition<T> {
             if (nonNull(value)) {
                 variables.put(variableName, value);
             } else {
-                throw new IllegalArgumentException(
-                        format("Could't to get path expr value '%s' from event: %s", variableName, event));
+                final String errmsg = format("Unable to get path expr value '%s' from event: %s", variableName, event);
+                log.warn(errmsg);
+                // throw new IllegalArgumentException(errmsg);
             }
         }
 

@@ -39,14 +39,14 @@ import org.apache.flink.util.Collector;
 import com.google.common.io.Resources;
 
 /**
- * {@link LoginEventCepStreamingDemo}
+ * {@link LoginEventCepStreamingDemoIT}
  * 
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2022-06-15 v3.0.0
  * @since v1.0.0
  */
 @SuppressWarnings("deprecation")
-public class LoginEventCepStreamingDemo {
+public class LoginEventCepStreamingDemoIT {
 
     // 需求：检测一个用户在3秒内连续登陆失败。
     public static void main(String[] args) throws Exception {

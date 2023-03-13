@@ -16,136 +16,37 @@
 package com.wl4g.rengine.job.cep;
 
 import static com.wl4g.infra.common.codec.Encodes.decodeBase64String;
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
+import static com.wl4g.infra.common.serialize.JacksonUtils.parseToNode;
+import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.cli.ParseException;
-import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.cep.CEP;
 import org.apache.flink.cep.PatternFlatSelectFunction;
 import org.apache.flink.cep.PatternStream;
 import org.apache.flink.cep.dynamic.impl.json.util.CepJsonUtils;
 import org.apache.flink.cep.pattern.Pattern;
-import org.apache.flink.connector.kafka.source.KafkaSourceOptions;
 import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.datastream.DataStreamSource;
-import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.util.Collector;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.wl4g.rengine.common.event.RengineEvent;
+import com.wl4g.rengine.common.event.RengineEvent.EventSource;
 import com.wl4g.rengine.job.AbstractFlinkStreamingBase;
 
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.SuperBuilder;
 
 /**
  * {@link AbstractFlinkCepStreamingBase} </br>
- * </br>
- * 
- * for example (cep pattern json):
- * 
- * <pre>
- *  {
- *      "name": "end",
- *      "quantifier": {
- *          "consumingStrategy": "SKIP_TILL_NEXT",
- *          "details": [
- *              "SINGLE"
- *          ],
- *          "times": null,
- *          "untilCondition": null
- *      },
- *      "condition": null,
- *      "nodes": [
- *          {
- *              "name": "end",
- *              "quantifier": {
- *                  "consumingStrategy": "SKIP_TILL_NEXT",
- *                  "details": [
- *                      "SINGLE"
- *                  ],
- *                  "times": null,
- *                  "untilCondition": null
- *              },
- *              "condition": {
- *                  "expression": "type == 'login_success'",
- *                  "type": "AVIATOR"
- *              },
- *              "type": "ATOMIC"
- *          },
- *          {
- *              "name": "middle",
- *              "quantifier": {
- *                  "consumingStrategy": "SKIP_TILL_NEXT",
- *                  "details": [
- *                      "SINGLE"
- *                  ],
- *                  "times": null,
- *                  "untilCondition": null
- *              },
- *              "condition": {
- *                  "nestedConditions": [
- *                      {
- *                          "className": "com.wl4g.rengine.job.cep.pattern.conditions.SubtypeCondition",
- *                          "subClassName": "com.wl4g.rengine.common.event.RengineEvent",
- *                          "type": "CLASS"
- *                      },
- *                      {
- *                          "expression": "type == 'login_tail'",
- *                          "type": "AVIATOR"
- *                      }
- *                  ],
- *                  "type": "CLASS",
- *                  "className": "com.wl4g.rengine.job.cep.pattern.conditions.RichAndCondition"
- *              },
- *              "type": "ATOMIC"
- *          },
- *          {
- *              "name": "start",
- *              "quantifier": {
- *                  "consumingStrategy": "SKIP_TILL_NEXT",
- *                  "details": [
- *                      "SINGLE"
- *                  ],
- *                  "times": null,
- *                  "untilCondition": null
- *              },
- *              "condition": {
- *                  "expression": "type == 'login_tail'",
- *                  "type": "AVIATOR"
- *              },
- *              "type": "ATOMIC"
- *          }
- *      ],
- *      "edges": [
- *          {
- *              "source": "middle",
- *              "target": "end",
- *              "type": "SKIP_TILL_ANY"
- *          },
- *          {
- *              "source": "start",
- *              "target": "middle",
- *              "type": "SKIP_TILL_ANY"
- *          }
- *      ],
- *      "window": null,
- *      "afterMatchStrategy": {
- *          "type": "NO_SKIP",
- *          "patternName": null
- *      },
- *      "type": "COMPOSITE",
- *      "version": 1
- *  }
- * </pre>
  * 
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @version 2022-05-31 v3.0.0
@@ -157,85 +58,77 @@ import lombok.experimental.SuperBuilder;
 @CustomLog
 public abstract class AbstractFlinkCepStreamingBase extends AbstractFlinkStreamingBase {
 
-    private String patternJsonBase64;
-    private String keyByExpression;
-    private String partitionDiscoveryIntervalMs;
+    private String cepPatterns;
+    private String alertTopic;
 
     public AbstractFlinkCepStreamingBase() {
         super();
-        this.builder.mustOption("P", "patternJsonBase64", "The cep pattern json base64.")
-                .option("K", "keyByExpression", ".source.principals[0]",
-                        "The jq expression to extract the grouping key, it extraction from the rengine event object.")
-                .longOption("partitionDiscoveryIntervalMs", "30000", "The per millis for discover new partitions interval.");
+        this.builder.mustOption("P", "cepPatterns", "he cep patterns array json with base64 encode.")
+                .longOption("alertTopic", "rengine_alerts",
+                        "Topic for producer the alerts message of Flink CEP match generated.");
     }
 
     @Override
     protected AbstractFlinkStreamingBase parse(String[] args) throws ParseException {
         super.parse(args);
-        this.patternJsonBase64 = line.get("patternJsonBase64");
-        this.keyByExpression = line.get("keyByExpression");
-        this.partitionDiscoveryIntervalMs = line.get("partitionDiscoveryIntervalMs");
+        this.cepPatterns = line.get("cepPatterns");
+        this.alertTopic = line.get("alertTopic");
         return this;
     }
 
+    @SuppressWarnings({ "unchecked" })
     @Override
-    protected void customProps(Map<String, String> props) {
-        super.customProps(props);
+    protected DataStream<?> customStream(DataStream<RengineEvent> dataStreamSource) {
+        final DataStream<RengineEvent> keyedStreamSource = (DataStream<RengineEvent>) super.customStream(dataStreamSource);
 
-        // props.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,brokers);
-        // props.setProperty(ConsumerConfig.GROUP_ID_CONFIG,groupId);
-        // see:https://github.com/apache/flink/blob/release-1.14.4/docs/content/docs/connectors/datastream/kafka.md#consumer-offset-committing
-        // props.setProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG,"false");
-        // props.setProperty(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG,"10");
-        // props.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,"earliest");
-        // props.setProperty(FlinkKafkaConsumerBase.KEY_DISABLE_METRICS,"true");
-        // see:https://github.com/apache/flink/blob/release-1.14.4/docs/content/docs/connectors/datastream/kafka.md#dynamic-partition-discovery
-        props.put(KafkaSourceOptions.PARTITION_DISCOVERY_INTERVAL_MS.key(), partitionDiscoveryIntervalMs);
-    }
+        final JsonNode cepPatternNode = parseToNode(decodeBase64String(cepPatterns));
+        final List<Pattern<RengineEvent, RengineEvent>> mergeCePatterns = new ArrayList<>(cepPatternNode.size());
+        cepPatternNode.forEach(
+                jn -> mergeCePatterns.add((Pattern<RengineEvent, RengineEvent>) CepJsonUtils.toPattern(toJSONString(jn))));
 
-    @SuppressWarnings({ "unchecked", "serial" })
-    @Override
-    protected DataStream<?> customStream(DataStreamSource<RengineEvent> dataStreamSource) {
-        final String keyByExpr = keyByExpression;
-        final KeyedStream<RengineEvent, String> keyedStreamSource = dataStreamSource
-                .keyBy(new KeySelector<RengineEvent, String>() {
-                    @Override
-                    public String getKey(RengineEvent event) throws Exception {
-                        final String keyBy = event.atAsText(keyByExpr);
-                        return isBlank(keyBy) ? "none_principal" : keyBy;
-                    }
-                });
+        DataStream<RengineEvent> mergeSelectStream = null;
+        for (Pattern<RengineEvent, RengineEvent> pattern : mergeCePatterns) {
+            log.info("Using cep pattern : {}", pattern);
 
-        final Pattern<RengineEvent, RengineEvent> cepPattern = (Pattern<RengineEvent, RengineEvent>) CepJsonUtils
-                .toPattern(decodeBase64String(patternJsonBase64));
-        log.info("Using cep pattern : {}", cepPattern);
-
-        final PatternStream<RengineEvent> patternStream = CEP.pattern(keyedStreamSource, cepPattern);
-
-        final SingleOutputStreamOperator<WarningEvent> selectStream = patternStream.flatSelect(new GenericEventMatcher());
-
-        return selectStream;
-    }
-
-    public static class GenericEventMatcher
-            implements /* PatternSelectFunction , */ PatternFlatSelectFunction<RengineEvent, WarningEvent> {
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        public void flatSelect(Map<String, List<RengineEvent>> pattern, Collector<WarningEvent> out) throws Exception {
-            out.collect(WarningEvent.builder().patternMap(pattern).warningMsg("The matched warning msg.").build());
+            final PatternStream<RengineEvent> patternStream = CEP.pattern(keyedStreamSource,
+                    (Pattern<RengineEvent, RengineEvent>) pattern);
+            // Matching and union streams.
+            final SingleOutputStreamOperator<RengineEvent> selectStream = patternStream
+                    .flatSelect(new GenericEventMatcher(alertTopic));
+            if (nonNull(mergeSelectStream)) {
+                mergeSelectStream = mergeSelectStream.union(selectStream);
+            } else {
+                mergeSelectStream = selectStream;
+            }
         }
+
+        return mergeSelectStream;
     }
 
     @Getter
-    @Setter
-    @SuperBuilder
-    @ToString
-    @NoArgsConstructor
     @AllArgsConstructor
-    public static class WarningEvent {
-        private Map<String, List<RengineEvent>> patternMap;
-        private String warningMsg;
+    public static class GenericEventMatcher
+            implements /* PatternSelectFunction , */ PatternFlatSelectFunction<RengineEvent, RengineEvent> {
+        private static final long serialVersionUID = 1L;
+
+        private String alertTopic;
+
+        @Override
+        public void flatSelect(Map<String, List<RengineEvent>> pattern, Collector<RengineEvent> out) throws Exception {
+            final EventSource source = EventSource.builder().build();
+
+            // TODO using alertTopic as event type ?
+            final RengineEvent alertEvent = RengineEvent.builder().type(alertTopic).source(source).build();
+            alertEvent.getBody().put("warningMsg", "The matched warning msg.");
+
+            // add alerts properties.
+            safeMap(pattern).entrySet().stream().forEach(e -> {
+                // source.setTime(null);
+                alertEvent.getBody().put("MATCH_".concat(trimToEmpty(e.getKey())), toJSONString(e.getValue()));
+            });
+
+            out.collect(alertEvent);
+        }
     }
 
 }

@@ -15,6 +15,8 @@
  */
 package com.wl4g.rengine.service;
 
+import java.util.List;
+
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
@@ -35,6 +37,8 @@ import com.wl4g.rengine.service.model.sys.MenuSaveResult;
 public interface MenuService {
 
     PageHolder<Menu> query(@NotNull MenuQuery model);
+
+    List<Menu> loadMenuTree();
 
     MenuSaveResult save(@NotNull MenuSave model);
 

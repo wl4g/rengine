@@ -18,6 +18,8 @@
 
 package org.apache.flink.cep.dynamic.impl.json.spec;
 
+import static com.wl4g.infra.common.lang.Assert2.notNull;
+import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.equalsAnyIgnoreCase;
 
 import org.apache.flink.cep.pattern.conditions.IterativeCondition;
@@ -38,6 +40,9 @@ public class ClassConditionSpec extends ConditionSpec {
     public ClassConditionSpec(IterativeCondition<?> condition) {
         super(ConditionType.CLASS);
         this.className = condition.getClass().getCanonicalName();
+        notNull(className, format(
+                "No supported serialze lambda type of '%s', because it cannot be deserialized even after forced serialization",
+                condition));
     }
 
     @Override

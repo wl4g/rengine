@@ -101,4 +101,5 @@ public class AfterMatchSkipStrategySpec {
             this.className = className;
         }
     }
+
 }

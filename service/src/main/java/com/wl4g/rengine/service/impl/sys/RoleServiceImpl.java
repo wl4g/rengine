@@ -17,8 +17,10 @@ package com.wl4g.rengine.service.impl.sys;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static com.wl4g.rengine.common.util.ServiceAggregateFilters.ROLE_ORGAN_MENU_LOOKUP_FILTERS;
-import static com.wl4g.rengine.common.util.ServiceAggregateFilters.ROLE_ORGAN_USER_LOOKUP_FILTERS;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_ROLES;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_USER_ROLES;
+import static com.wl4g.rengine.common.util.ServiceAggregateFilters.ROLE_MENU_LOOKUP_FILTERS;
+import static com.wl4g.rengine.common.util.ServiceAggregateFilters.ROLE_USER_LOOKUP_FILTERS;
 import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
@@ -32,18 +34,14 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import org.bson.conversions.Bson;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
-import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.lang.Assert2;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
@@ -55,6 +53,7 @@ import com.wl4g.rengine.common.entity.sys.UserRole;
 import com.wl4g.rengine.common.util.BeanSensitiveTransforms;
 import com.wl4g.rengine.common.util.BsonEntitySerializers;
 import com.wl4g.rengine.service.RoleService;
+import com.wl4g.rengine.service.impl.BasicServiceImpl;
 import com.wl4g.rengine.service.model.sys.RoleDelete;
 import com.wl4g.rengine.service.model.sys.RoleDeleteResult;
 import com.wl4g.rengine.service.model.sys.RoleQuery;
@@ -69,9 +68,7 @@ import com.wl4g.rengine.service.model.sys.RoleSaveResult;
  * @since v1.0.0
  */
 @Service
-public class RoleServiceImpl implements RoleService {
-
-    private @Autowired MongoTemplate mongoTemplate;
+public class RoleServiceImpl extends BasicServiceImpl implements RoleService {
 
     @Override
     public PageHolder<Role> query(RoleQuery model) {
@@ -81,7 +78,7 @@ public class RoleServiceImpl implements RoleService {
         final List<Role> roles = mongoTemplate.find(query, Role.class, MongoCollectionDefinition.SYS_ROLES.getName());
 
         return new PageHolder<Role>(model.getPageNum(), model.getPageSize())
-                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.SYS_ROLES.getName()))
+                .withTotal(mongoTemplate.count(query, SYS_ROLES.getName()))
                 .withRecords(roles);
     }
 
@@ -96,16 +93,13 @@ public class RoleServiceImpl implements RoleService {
             role.preUpdate();
         }
 
-        Role saved = mongoTemplate.save(role, MongoCollectionDefinition.SYS_ROLES.getName());
+        Role saved = mongoTemplate.save(role, SYS_ROLES.getName());
         return RoleSaveResult.builder().id(saved.getId()).build();
     }
 
     @Override
     public RoleDeleteResult delete(RoleDelete model) {
-        // 'id' is a keyword, it will be automatically converted to '_id'
-        DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
-                MongoCollectionDefinition.SYS_ROLES.getName());
-        return RoleDeleteResult.builder().deletedCount(result.getDeletedCount()).build();
+        return RoleDeleteResult.builder().deletedCount(doDeleteWithGracefully(model, SYS_ROLES)).build();
     }
 
     @Override
@@ -114,9 +108,9 @@ public class RoleServiceImpl implements RoleService {
 
         final var aggregates = new ArrayList<Bson>(2);
         aggregates.add(Aggregates.match(Filters.in("_id", roleIds)));
-        ROLE_ORGAN_USER_LOOKUP_FILTERS.stream().forEach(rs -> aggregates.add(rs.asDocument()));
+        ROLE_USER_LOOKUP_FILTERS.stream().forEach(rs -> aggregates.add(rs.asDocument()));
 
-        try (var cursor = mongoTemplate.getCollection(MongoCollectionDefinition.SYS_ROLES.getName())
+        try (var cursor = mongoTemplate.getCollection(SYS_ROLES.getName())
                 .aggregate(aggregates)
                 .map(roleDoc -> BsonEntitySerializers.fromDocument(roleDoc, Role.class))
                 .cursor();) {
@@ -139,9 +133,9 @@ public class RoleServiceImpl implements RoleService {
 
         final var aggregates = new ArrayList<Bson>(2);
         aggregates.add(Aggregates.match(Filters.in("_id", roleIds)));
-        ROLE_ORGAN_MENU_LOOKUP_FILTERS.stream().forEach(rs -> aggregates.add(rs.asDocument()));
+        ROLE_MENU_LOOKUP_FILTERS.stream().forEach(rs -> aggregates.add(rs.asDocument()));
 
-        try (var cursor = mongoTemplate.getCollection(MongoCollectionDefinition.SYS_ROLES.getName())
+        try (var cursor = mongoTemplate.getCollection(SYS_ROLES.getName())
                 .aggregate(aggregates)
                 .map(roleDoc -> BsonEntitySerializers.fromDocument(roleDoc, Role.class))
                 .cursor();) {
@@ -162,7 +156,7 @@ public class RoleServiceImpl implements RoleService {
         return userIds.parallelStream().map(userId -> {
             return mongoTemplate
                     .save(UserRole.builder().roleId(roleId).userId(userId).build(),
-                            MongoCollectionDefinition.SYS_USER_ROLES.getName())
+                            SYS_USER_ROLES.getName())
                     .getId();
         }).collect(toList());
     }
@@ -175,7 +169,7 @@ public class RoleServiceImpl implements RoleService {
         return menuIds.parallelStream().map(menuId -> {
             return mongoTemplate
                     .save(MenuRole.builder().roleId(roleId).menuId(menuId).build(),
-                            MongoCollectionDefinition.SYS_USER_ROLES.getName())
+                            SYS_USER_ROLES.getName())
                     .getId();
         }).collect(toList());
     }

@@ -10,7 +10,6 @@
 #
 # #### Environment Security configuration. ####
 #
-
 rengine:
   security:
     ignore-swagger-auth: true ## Default by true
@@ -31,6 +30,11 @@ rengine:
 # see:org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter
 #spring:
 #  security:
+#    user:
+#      ## Notice: The production environment should be closed.
+#      name: user
+#      password: 123
+#      roles: admin
 #    ## Builtin start for oauth api: /oauth2/authorization/{registrationId}
 #    ## see:https://github.com/spring-projects/spring-security/blob/5.7.x/config/src/main/java/org/springframework/security/config/http/OAuth2LoginBeanDefinitionParser.java#L78
 #    ## see:org.springframework.security.config.oauth2.client.ClientRegistrationsBeanDefinitionParser

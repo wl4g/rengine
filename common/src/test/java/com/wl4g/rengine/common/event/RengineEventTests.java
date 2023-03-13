@@ -20,6 +20,7 @@ import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
+import static java.util.Objects.isNull;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.regex.Pattern;
@@ -64,7 +65,7 @@ public class RengineEventTests {
         EventSource source2 = EventSource.builder().build();
         assertNotNull(source2.getLocation());
 
-        RengineEvent event1 = new RengineEvent("test_event", source1);
+        RengineEvent event1 = RengineEvent.builder().type("test_event").source(source1).build();
         assertNotNull(event1.getSource());
     }
 
@@ -127,22 +128,28 @@ public class RengineEventTests {
     public void testAtAsText() {
         System.out.println(DEFAULT_TEST_EVENT.atAsText(".type"));
         System.out.println(DEFAULT_TEST_EVENT.atAsText(".source.principals"));
-        System.out.println(DEFAULT_TEST_EVENT.atAsText(".source.principals[0]"));
+        String result3 = DEFAULT_TEST_EVENT.atAsText(".source.principals[0]");
+        System.out.println(result3);
+        assert "jameswong1234@gmail.com".equals(result3);
     }
 
-    @Test(expected = Throwable.class)
+    @Test
     public void testAtAsTextFailure() {
-        System.out.println(DEFAULT_TEST_EVENT.atAsText(".source.principals[1]"));
+        String result = DEFAULT_TEST_EVENT.atAsText(".source.principals[11]");
+        System.out.println(result);
+        assert isNull(result);
     }
 
-    static final RengineEvent DEFAULT_TEST_EVENT = new RengineEvent("iot_temp_warn1",
-            EventSource.builder()
+    static final RengineEvent DEFAULT_TEST_EVENT = RengineEvent.builder()
+            .type("iot_temp_warn1")
+            .source(EventSource.builder()
                     .time(currentTimeMillis())
                     .principals(singletonList("jameswong1234@gmail.com"))
                     .location(EventLocation.builder().ipAddress("1.1.1.1").zipcode("20500").build())
-                    .build(),
-            // BsonEntitySerializers serious alarm occurs when the device
-            // temperature is greater than 52℃
-            singletonMap("value", "52"));
+                    .build())
+            // BsonEntitySerializers serious alarm occurs when the
+            // device temperature is greater than 52℃
+            .body(singletonMap("value", "52"))
+            .build();
 
 }

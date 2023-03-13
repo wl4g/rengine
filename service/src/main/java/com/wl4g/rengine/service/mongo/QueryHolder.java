@@ -194,6 +194,7 @@ public abstract class QueryHolder {
     }
 
     public static final String DEFAULT_FIELD_ID = "_id";
+    public static final String DEFAULT_FIELD_REVISION = "revision";
     public static final String DEFAULT_FIELD_UPDATE_DATE = "updateDate";
     public static final String DEFAULT_FIELD_DEL_FLAG = "delFlag";
 

@@ -18,12 +18,11 @@ package com.wl4g.rengine.job.hbase;
 import static java.lang.String.format;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Arrays;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.flink.connector.hbase.sink.HBaseSinkFunction;
-import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HConstants;
@@ -37,7 +36,6 @@ import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.hadoop.hbase.client.TableDescriptor;
 import org.apache.hadoop.hbase.client.TableDescriptorBuilder;
 
-import com.wl4g.rengine.common.event.RengineEvent;
 import com.wl4g.rengine.job.AbstractFlinkStreamingBase;
 
 import lombok.CustomLog;
@@ -88,8 +86,8 @@ public abstract class HBaseFlinkStreamingSupport extends AbstractFlinkStreamingB
     }
 
     @Override
-    protected DataStream<?> customStream(DataStreamSource<RengineEvent> dataStreamSource) {
-        Configuration conf = HBaseConfiguration.create();
+    protected Serializable createSink() {
+        final Configuration conf = HBaseConfiguration.create();
         // Clients prefer to use this configuration.
         conf.set(HConstants.CLIENT_ZOOKEEPER_QUORUM, hbaseZkAddrs, getClass().getSimpleName());
         // fix-see:org.apache.flink.connector.hbase.sink.HBaseSinkFunction#prepareRuntimeConfiguration()#L169
@@ -98,16 +96,14 @@ public abstract class HBaseFlinkStreamingSupport extends AbstractFlinkStreamingB
         createHTableIfNecessary(conf, hTableNamespace, hTableName, 1);
 
         // add HTable sink
-        EventToMutationConverter converter = new EventToMutationConverter();
+        final EventToMutationConverter converter = new EventToMutationConverter();
 
         // Note: If the not full table name, an error like this will be
         // reported: RetriesExhaustedWithDetailsException: Failed 1 action: 1
         // time, servers with issues: null
-        String fullTableName = hTableNamespace.concat(":").concat(hTableName);
-        dataStreamSource.addSink(new HBaseSinkFunction<>(fullTableName, conf, converter, bufferFlushMaxSizeInBytes,
-                bufferFlushMaxRows, bufferFlushIntervalMillis));
-
-        return dataStreamSource;
+        final String fullTableName = hTableNamespace.concat(":").concat(hTableName);
+        return new HBaseSinkFunction<>(fullTableName, conf, converter, bufferFlushMaxSizeInBytes, bufferFlushMaxRows,
+                bufferFlushIntervalMillis);
     }
 
     /**

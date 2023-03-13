@@ -16,8 +16,10 @@
 package com.wl4g.rengine.service.impl.sys;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_MENUS;
 import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
+import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
 import static java.util.Objects.isNull;
 
@@ -25,23 +27,22 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
-import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
+import com.wl4g.infra.common.function.TreeConvertor;
 import com.wl4g.rengine.common.entity.sys.Menu;
 import com.wl4g.rengine.service.MenuService;
+import com.wl4g.rengine.service.impl.BasicServiceImpl;
 import com.wl4g.rengine.service.model.sys.MenuDelete;
 import com.wl4g.rengine.service.model.sys.MenuDeleteResult;
 import com.wl4g.rengine.service.model.sys.MenuQuery;
 import com.wl4g.rengine.service.model.sys.MenuSave;
 import com.wl4g.rengine.service.model.sys.MenuSaveResult;
+import com.wl4g.rengine.service.security.user.AuthenticationService;
 
 /**
  * {@link MenuServiceImpl}
@@ -51,20 +52,35 @@ import com.wl4g.rengine.service.model.sys.MenuSaveResult;
  * @since v1.0.0
  */
 @Service
-public class MenuServiceImpl implements MenuService {
+public class MenuServiceImpl extends BasicServiceImpl implements MenuService {
 
-    private @Autowired MongoTemplate mongoTemplate;
+    @Autowired
+    AuthenticationService authenticationService;
 
     @Override
     public PageHolder<Menu> query(MenuQuery model) {
         final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getMenuId())))
-                .with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
+                .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
-        final List<Menu> menus = mongoTemplate.find(query, Menu.class, MongoCollectionDefinition.SYS_MENUS.getName());
+        final List<Menu> menus = mongoTemplate.find(query, Menu.class, SYS_MENUS.getName());
 
         return new PageHolder<Menu>(model.getPageNum(), model.getPageSize())
-                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.SYS_MENUS.getName()))
+                .withTotal(mongoTemplate.count(query, SYS_MENUS.getName()))
                 .withRecords(menus);
+    }
+
+    @Override
+    public List<Menu> loadMenuTree() {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        notNullOf(authentication, "authentication");
+
+        final List<Menu> flatMenus = authenticationService.loadMenusByUsername(authentication.getName());
+
+        final TreeConvertor<Long, Menu> convertor = new TreeConvertor<>(Menu.DEFAULT_ROOT_PARENT_ID, (id1, id2) -> {
+            // Prevent wrapping type (Long) from can't using '=='.
+            return id1.compareTo(id2) == 0;
+        });
+        return convertor.formatToChildren(flatMenus, false);
     }
 
     @Override
@@ -78,16 +94,13 @@ public class MenuServiceImpl implements MenuService {
             menu.preUpdate();
         }
 
-        Menu saved = mongoTemplate.save(menu, MongoCollectionDefinition.SYS_MENUS.getName());
+        Menu saved = mongoTemplate.save(menu, SYS_MENUS.getName());
         return MenuSaveResult.builder().id(saved.getId()).build();
     }
 
     @Override
     public MenuDeleteResult delete(MenuDelete model) {
-        // 'id' is a keyword, it will be automatically converted to '_id'
-        DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
-                MongoCollectionDefinition.SYS_MENUS.getName());
-        return MenuDeleteResult.builder().deletedCount(result.getDeletedCount()).build();
+        return MenuDeleteResult.builder().deletedCount(doDeleteWithGracefully(model, SYS_MENUS)).build();
     }
 
 }

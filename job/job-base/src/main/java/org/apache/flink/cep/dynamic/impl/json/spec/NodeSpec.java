@@ -30,7 +30,7 @@ import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonPro
 
 /**
  * The Node is used to describe a Pattern and contains all necessary fields of a
- * Pattern. This class is to (de)serialize Nodes in json format.
+ * Pattern. This class is to (de)serialize Node in json format.
  */
 @SuppressWarnings("unchecked")
 public class NodeSpec {
@@ -51,7 +51,7 @@ public class NodeSpec {
         this.type = type;
     }
 
-    /** Build NodeSpec from given Pattern. */
+    /** Build Node from given Pattern. */
     public static NodeSpec fromPattern(Pattern<?, ?> pattern) {
         QuantifierSpec quantifier = new QuantifierSpec(pattern.getQuantifier(), pattern.getTimes(), pattern.getUntilCondition());
         return new Builder().name(pattern.getName())
@@ -69,7 +69,6 @@ public class NodeSpec {
      * @throws Exception
      *             Exceptions thrown while deserialization of the Pattern.
      */
-
     @SuppressWarnings("rawtypes")
     public Pattern<?, ?> toPattern(
             final Pattern<?, ?> previous,

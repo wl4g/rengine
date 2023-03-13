@@ -17,8 +17,11 @@ package com.wl4g.rengine.service.impl;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_RULES;
+import static com.wl4g.rengine.service.mongo.QueryHolder.DEFAULT_FIELD_REVISION;
+import static com.wl4g.rengine.service.mongo.QueryHolder.DEFAULT_FIELD_UPDATE_DATE;
 import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
+import static com.wl4g.rengine.service.mongo.QueryHolder.descSort;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
 import static java.util.Objects.isNull;
@@ -27,8 +30,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -58,7 +59,8 @@ public class RuleServiceImpl extends BasicServiceImpl implements RuleService {
     public PageHolder<Rule> query(RuleQuery model) {
         final Query query = new Query(
                 andCriteria(baseCriteria(model), isIdCriteria(model.getRuleId()), isCriteria("scenesId", model.getScenesId())))
-                        .with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
+                        .with(PageRequest.of(model.getPageNum(), model.getPageSize(),
+                                descSort(DEFAULT_FIELD_REVISION, DEFAULT_FIELD_UPDATE_DATE)));
 
         List<Rule> rules = mongoTemplate.find(query, Rule.class, RE_RULES.getName());
         // Collections.sort(rules, (o1, o2) -> (o2.getUpdateDate().getTime()

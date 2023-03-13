@@ -51,7 +51,7 @@ public abstract class BasicServiceImpl {
     protected MongoTemplate mongoTemplate;
 
     @Autowired
-    RedisTemplate<String, String> redisTemplate;
+    protected RedisTemplate<String, String> redisTemplate;
 
     @Autowired
     protected GlobalMongoSequenceService mongoSequenceService;

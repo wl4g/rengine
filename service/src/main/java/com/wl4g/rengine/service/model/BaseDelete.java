@@ -17,6 +17,7 @@ package com.wl4g.rengine.service.model;
 
 import javax.validation.constraints.NotNull;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,5 +39,5 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class BaseDelete {
     private @NotNull Long id;
-    private @Default @NotNull Boolean force = false;
+    private @Schema(defaultValue = "false") @Default @NotNull Boolean force = false;
 }

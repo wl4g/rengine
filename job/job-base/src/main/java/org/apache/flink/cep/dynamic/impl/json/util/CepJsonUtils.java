@@ -80,8 +80,8 @@ public class CepJsonUtils {
     }
 
     public static String toJson(Pattern<?, ?> pattern) {
-        GraphSpec graphSpec = GraphSpec.fromPattern(pattern);
         try {
+            GraphSpec graphSpec = GraphSpec.fromPattern(pattern);
             return objectMapper.writeValueAsString(graphSpec);
         } catch (Throwable ex) {
             throw new IllegalArgumentException(ex);

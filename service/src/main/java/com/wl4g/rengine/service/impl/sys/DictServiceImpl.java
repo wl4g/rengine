@@ -38,12 +38,9 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.mongodb.client.result.DeleteResult;
@@ -53,7 +50,7 @@ import com.wl4g.infra.common.collection.CollectionUtils2;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.sys.Dict;
 import com.wl4g.rengine.service.DictService;
-import com.wl4g.rengine.service.config.RengineServiceProperties;
+import com.wl4g.rengine.service.impl.BasicServiceImpl;
 import com.wl4g.rengine.service.model.DictDelete;
 import com.wl4g.rengine.service.model.DictDeleteResult;
 import com.wl4g.rengine.service.model.DictQuery;
@@ -72,16 +69,7 @@ import lombok.CustomLog;
  */
 @Service
 @CustomLog
-public class DictServiceImpl implements DictService {
-
-    @Autowired
-    RengineServiceProperties config;
-
-    @Autowired
-    MongoTemplate mongoTemplate;
-
-    @Autowired
-    RedisTemplate<String, String> redisTemplate;
+public class DictServiceImpl extends BasicServiceImpl implements DictService {
 
     HashOperations<String, String, String> hashOperations;
 

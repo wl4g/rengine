@@ -38,20 +38,20 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link AbstractDeserializationSchema}
+ * {@link RengineEventKafkaDeserializationSchema}
  * 
- * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
- * @version 2022-06-03 v3.0.0
+ * @author James Wong
+ * @version 2022-06-03
  * @since v1.0.0
  */
 @Slf4j
 @Getter
-public class GenericKafkaDeserializationSchema implements KafkaRecordDeserializationSchema<RengineEvent> {
+public class RengineEventKafkaDeserializationSchema implements KafkaRecordDeserializationSchema<RengineEvent> {
     private static final long serialVersionUID = -3765473065594331694L;
 
     private transient Deserializer<String> deserializer = new StringDeserializer();
 
-    public GenericKafkaDeserializationSchema(@NotNull AbstractFlinkStreamingBase streaming) {
+    public RengineEventKafkaDeserializationSchema(@NotNull AbstractFlinkStreamingBase streaming) {
     }
 
     @Override

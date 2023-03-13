@@ -36,8 +36,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * The Graph is used to describe a complex Pattern which contains Nodes(i.e
- * {@link Pattern}) and Edges. The Node of a Graph can be a embedded Graph as
+ * The Graph is used to describe a complex Pattern which contains Node(i.e
+ * {@link Pattern}) and Edge. The Node of a Graph can be a embedded Graph as
  * well. This class is to (de)serialize Graphs in json format.
  */
 public class GraphSpec extends NodeSpec {
@@ -59,8 +59,7 @@ public class GraphSpec extends NodeSpec {
     }
 
     public static GraphSpec fromPattern(Pattern<?, ?> pattern) {
-        // Build the metadata of the GraphSpec from pattern
-        // Name
+        // Build the metadata of the GraphSpec from pattern Name
         String name = pattern instanceof GroupPattern ? ((GroupPattern<?, ?>) pattern).getRawPattern().getName()
                 : pattern.getName();
 

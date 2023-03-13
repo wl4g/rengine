@@ -37,8 +37,9 @@ public class EventToMutationConverterTests {
 
     @Test
     public void testEventToMutationConverter() {
-        RengineEvent model = new RengineEvent("device_temp_warning",
-                EventSource.builder()
+        final RengineEvent event = RengineEvent.builder()
+                .type("iot_temp_alarm")
+                .source(EventSource.builder()
                         .time(currentTimeMillis())
                         .principals(singletonList("admin"))
                         .location(EventLocation.builder()
@@ -47,14 +48,15 @@ public class EventToMutationConverterTests {
                                 .region("Pennsylvania Avenue")
                                 .zipcode("20500")
                                 .build())
-                        .build(),
-                // BsonEntitySerializers serious alarm occurs when the device
-                // temperature is greater than 52℃
-                singletonMap("value", "52"));
+                        .build())
+                // BsonEntitySerializers serious alarm occurs when the
+                // device temperature is greater than 52℃
+                .body(singletonMap("value", "52"))
+                .build();
 
         EventToMutationConverter converter = new EventToMutationConverter();
         converter.open();
-        Mutation mutation = converter.convertToMutation(model);
+        Mutation mutation = converter.convertToMutation(event);
         System.out.println(mutation);
     }
 

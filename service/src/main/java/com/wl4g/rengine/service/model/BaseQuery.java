@@ -39,7 +39,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public abstract class BaseQuery<Q> {
+public class BaseQuery<Q> {
     private @Nullable String name;
     // private @Nullable String orgCode;
     private @Nullable Long tenantId;

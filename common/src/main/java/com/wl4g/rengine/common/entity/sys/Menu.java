@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.wl4g.infra.common.function.TreeConvertor.TreeNode;
 import com.wl4g.rengine.common.entity.BaseEntity;
 
 import lombok.Getter;
@@ -40,7 +41,7 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Menu extends BaseEntity {
+public class Menu extends BaseEntity implements TreeNode<Long, Menu> {
     private static final long serialVersionUID = 381411777614066880L;
 
     private String nameEn;
@@ -50,7 +51,6 @@ public class Menu extends BaseEntity {
     private Integer level;
     private String pageLocation;
     private String routePath;
-    private String routeNamespace;
     private String renderTarget;
     private String parentRoutePath;
     private String classify;
@@ -59,6 +59,21 @@ public class Menu extends BaseEntity {
     private List<String> permissions;
 
     private List<Menu> childrens;
+
+    @Override
+    public int getLevel() {
+        return level;
+    }
+
+    @Override
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    @Override
+    public List<Menu> getChildrens() {
+        return childrens;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -74,5 +89,7 @@ public class Menu extends BaseEntity {
     public int hashCode() {
         return Objects.hash(getId());
     }
+
+    public static final Long DEFAULT_ROOT_PARENT_ID = 0L;
 
 }

@@ -32,7 +32,6 @@ import java.util.Map;
  */
 public class WindowSpec {
     private final WithinType type;
-
     private final Time time;
 
     public WindowSpec(@JsonProperty("type") WithinType type, @JsonProperty("time") Time time) {

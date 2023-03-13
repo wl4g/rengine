@@ -104,7 +104,7 @@ public class CepJsonUtilsTests {
                 + "                \"type\": \"CLASS\""
                 + "            }],"
                 + "            \"type\": \"CLASS\","
-                + "            \"className\": \"com.wl4g.rengine.job.cep.pattern.conditions.RichAndCondition\""
+                + "            \"className\": \"org.apache.flink.cep.pattern.conditions.RichAndCondition\""
                 + "        },"
                 + "        \"type\": \"ATOMIC\""
                 + "    }, {"

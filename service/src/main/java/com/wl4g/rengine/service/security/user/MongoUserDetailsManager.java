@@ -2,17 +2,18 @@ package com.wl4g.rengine.service.security.user;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static com.wl4g.rengine.common.util.ServiceAggregateFilters.USER_ROLE_ORGAN_MENU_LOOKUP_FILTERS;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
+import javax.validation.constraints.NotBlank;
+
 import org.bson.Document;
-import org.bson.conversions.Bson;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -30,9 +31,6 @@ import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.util.Assert;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Aggregates;
-import com.mongodb.client.model.Filters;
 import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.rengine.common.entity.sys.Menu;
 import com.wl4g.rengine.common.entity.sys.MenuRole;
@@ -62,18 +60,15 @@ public final class MongoUserDetailsManager implements UserDetailsManager, UserDe
 
     private final RengineWebSecurityProperties config;
     private final BCryptPasswordEncoder passwordEncoder;
-    private final MongoCollection<Document> userCollection;
     private final AuthenticationManager authenticationManager;
     private final AuthenticationService authenticationService;
 
     public MongoUserDetailsManager(RengineWebSecurityProperties config, BCryptPasswordEncoder passwordEncoder,
-            MongoCollection<Document> userCollection, AuthenticationService authenticationService,
-            AuthenticationManager authenticationManager) {
+            AuthenticationService authenticationService, AuthenticationManager authenticationManager) {
         this.config = notNullOf(config, "config");
         this.passwordEncoder = notNullOf(passwordEncoder, "passwordEncoder");
-        this.userCollection = notNullOf(userCollection, "userCollection");
-        this.authenticationManager = authenticationManager;
         this.authenticationService = notNullOf(authenticationService, "authenticationService");
+        this.authenticationManager = authenticationManager;
     }
 
     @Override
@@ -90,7 +85,7 @@ public final class MongoUserDetailsManager implements UserDetailsManager, UserDe
             throw new RengineException(format("Already the user '%s'", user.getUsername()));
         }
 
-        userCollection.insertOne(document);
+        authenticationService.getUserCollection().insertOne(document);
     }
 
     @Override
@@ -101,12 +96,13 @@ public final class MongoUserDetailsManager implements UserDetailsManager, UserDe
 
         final Document document = BsonEntitySerializers.toDocument(toEntityUser(user));
 
-        userCollection.updateOne(new BasicDBObject("username", user.getUsername()), new Document("$set", document));
+        authenticationService.getUserCollection()
+                .updateOne(new BasicDBObject("username", user.getUsername()), new Document("$set", document));
     }
 
     @Override
     public void deleteUser(String username) {
-        userCollection.deleteOne(new BasicDBObject("username", username));
+        authenticationService.getUserCollection().deleteOne(new BasicDBObject("username", username));
     }
 
     @Override
@@ -149,40 +145,13 @@ public final class MongoUserDetailsManager implements UserDetailsManager, UserDe
 
     @Override
     public boolean userExists(String username) {
-        return userCollection.find(new BasicDBObject("username", username)).first() != null;
+        return authenticationService.getUserCollection().find(new BasicDBObject("username", username)).first() != null;
     }
 
     // see:org.springframework.security.access.expression.SecurityExpressionRoot#getAuthoritySet
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        //// @formatter:off
-        //final Document query = new Document("username", username);
-        //final Document userDoc = userCollection.find(query).first();
-        //if (isNull(userDoc)) {
-        //    throw new UsernameNotFoundException(format("User %s not found", username));
-        //}
-        //final com.wl4g.rengine.common.entity.sys.User user = BsonEntitySerializers.fromDocument(userDoc,
-        //        com.wl4g.rengine.common.entity.sys.User.class);
-        //// @formatter:on
-        // return fromEntityUser(user);
-
-        final var aggregates = new ArrayList<Bson>(2);
-        aggregates.add(Aggregates.match(Filters.in("username", username)));
-        USER_ROLE_ORGAN_MENU_LOOKUP_FILTERS.stream().forEach(rs -> aggregates.add(rs.asDocument()));
-        // System.out.println(BsonUtils2.toJson(USER_ROLE_ORGAN_MENUS_LOOKUP_FILTER));
-
-        try (var cursor = userCollection.aggregate(aggregates)
-                .map(userDoc -> BsonEntitySerializers.fromDocument(userDoc, com.wl4g.rengine.common.entity.sys.User.class))
-                .cursor();) {
-            if (!cursor.hasNext()) {
-                throw new UsernameNotFoundException(format("The user %s not found", username));
-            }
-            final var user = cursor.next();
-            if (cursor.hasNext()) {
-                throw new IllegalStateException(format("The ambiguous users found, multiple names are %s", username));
-            }
-            return fromEntityUser(user);
-        }
+    public UserDetails loadUserByUsername(@NotBlank String username) throws UsernameNotFoundException {
+        return fromEntityUser(authenticationService.findUserRoleMenusByUsername(username));
     }
 
     @Override
@@ -217,8 +186,8 @@ public final class MongoUserDetailsManager implements UserDetailsManager, UserDe
     public static UserDetails fromEntityUser(com.wl4g.rengine.common.entity.sys.User user) {
         // Transform user role menu permissions set to userDetails granted
         // authories.
-        final var allRoleGrantedAuthorities = new ArrayList<GrantedAuthority>(4);
-        final var allPermissionGrantedAuthorities = new ArrayList<GrantedAuthority>(16);
+        final var allRoleGrantedAuthorities = new HashSet<GrantedAuthority>(4);
+        final var allPermissionGrantedAuthorities = new HashSet<GrantedAuthority>(16);
         for (UserRole userRole : safeList(user.getUserRoles())) {
             for (Role role : safeList(userRole.getRoles())) {
                 allRoleGrantedAuthorities.add(new SimpleGrantedAuthority(role.getRoleCode()));
@@ -245,7 +214,6 @@ public final class MongoUserDetailsManager implements UserDetailsManager, UserDe
     @ToString
     public static class SpringSecurityUser extends User {
         private static final long serialVersionUID = 570;
-
         private Long userId;
         private Integer enable;
         private List<String> labels;

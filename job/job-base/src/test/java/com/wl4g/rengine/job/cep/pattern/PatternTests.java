@@ -65,7 +65,7 @@ import org.junit.Test;
  * @see https://github1s.com/apache/flink/blob/release-1.14.4/flink-libraries/flink-cep/src/test/java/org/apache/flink/cep/pattern/PatternTest.java
  */
 @SuppressWarnings({ "serial", "deprecation" })
-public class CepPatternTests {
+public class PatternTests {
 
     /**
      * Checks that a certain event sequence is recognized.

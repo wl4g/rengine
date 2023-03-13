@@ -151,9 +151,78 @@ public abstract class ServiceAggregateFilters {
             + "]");
     // @formatter:on
 
-    // Lookup for role,organ,menus by user filters.
+    // Lookup for users by role filters.
     // @formatter:off
-    public static final BsonArray USER_ROLE_ORGAN_MENU_LOOKUP_FILTERS = BsonArray.parse("["
+    public static final BsonArray ROLE_USER_LOOKUP_FILTERS = BsonArray.parse("["
+            //+ "{ $match: { \"roleCode\": { $in: [\"r:admin\"] } } },"
+            + "{ $match: { \"enable\": { $eq: 1 } } },"
+            + "{ $match: { \"delFlag\": { $eq: 0 } } },"
+            + "{ $project: { \"_class\": 0, \"delFlag\": 0 } },"
+            + "{ $lookup: {"
+            + "    from: \"" + SYS_USER_ROLES.getName() + "\","
+            + "    let: { role_id: { $toLong: \"$_id\" } },"
+            + "    pipeline: ["
+            + "        { $match: { $expr: { $eq: [ \"$roleId\", \"$$role_id\" ] } } }, "
+            + "        { $lookup: {"
+            + "            from: \"" + SYS_USERS.getName() + "\", "
+            + "            let: { user_id: { $toLong: \"$userId\" } },"
+            + "            pipeline: ["
+            + "                { $match: { $expr: { $eq: [ \"$_id\", \"$$user_id\" ] } } },"
+            + "                { $match: { \"enable\": { $eq: 1 } } },"
+            + "                { $match: { \"delFlag\": { $eq: 0 } } },"
+            + "                { $project: { \"_class\": 0, \"delFlag\": 0 } }"
+            + "            ],"
+            + "            as: \"users\""
+            + "            }"
+            + "        },"
+            + "    ],"
+            + "    as: \"userRoles\""
+            + "    }"
+            + "}"
+            + "]");
+    // @formatter:on
+
+    // Lookup for menus by role filters.
+    // @formatter:off
+    public static final BsonArray ROLE_MENU_LOOKUP_FILTERS = BsonArray.parse("["
+            //+ "{ $match: { \"roleCode\": { $in: [\"r:admin\"] } } },"
+            //+ "{ $match: { \"_id\": { $in: [ NumberLong(\"61508655614612341\") ] } } },"
+            + "{ $match: { \"enable\": { $eq: 1 } } },"
+            + "{ $match: { \"delFlag\": { $eq: 0 } } },"
+            + "{ $project: { \"_class\": 0, \"delFlag\": 0 } },"
+            + "{ $lookup: {"
+            + "    from: \"sys_menu_roles\","
+            + "    let: { role_id: { $toLong: \"$_id\" } },"
+            + "    pipeline: ["
+            + "        { $match: { $expr: { $eq: [ \"$roleId\", \"$$role_id\" ] } } }, "
+            + "        { $lookup: {"
+            + "            from: \"sys_menus\", "
+            + "            let: { menu_id: { $toLong: \"$menuId\" } },"
+            + "            pipeline: ["
+            + "                { $match: { $expr: { $eq: [ \"$_id\", \"$$menu_id\" ] } } },"
+            + "                { $match: { \"enable\": { $eq: 1 } } },"
+            + "                { $match: { \"delFlag\": { $eq: 0 } } },"
+            + "                { $project: { \"_class\": 0, \"delFlag\": 0 } }"
+            + "            ],"
+            + "            as: \"menus\""
+            + "            }"
+            + "        },"
+            + "    ],"
+            + "    as: \"menuRoles\""
+            + "    }"
+            + "}"
+            + "]");
+    // @formatter:on
+
+    // Lookup for role,menus by user filters.
+    /**
+     * 深度嵌套子查询根据 username 查询 user 下的 roles 以及 menus. </br>
+     * </br>
+     * 优点: 深度嵌套, 数据完整, 多层级结构清晰, 适合查询关联的完整数据. (如:查询 user 下 roles 以及下的 menus,
+     * 也需要返回其他中间关联信息 user_roles,menu_roles 等)</br>
+     */
+    // @formatter:off
+    public static final BsonArray USER_ROLE_MENU_LOOKUP_FILTERS = BsonArray.parse("["
             // + "    { $match: { \"username\": { $in: [\"root\"] } } },"
             + "    { $match: { \"enable\": { $eq: 1 } } },"
             + "    { $match: { \"delFlag\": { $eq: 0 } } },"
@@ -202,66 +271,55 @@ public abstract class ServiceAggregateFilters {
             + "]");
     // @formatter:on
 
-    // Lookup for organ,menus by role filters.
+    // Lookup for menus by user filters.
+    /**
+     * 连接查询根据 username 查询 user 下的 roles 下的 menus. </br>
+     * </br>
+     * 优点: 交叉平面, 按需返回, 多层级结构不清晰, 适合只需提取子子节点的数据. (如:查询 user 下 roles 下所有去重的 menus,
+     * 无需返回其他中间关联信息 user_roles,menu_roles 等) </br>
+     * </br>
+     * 将子节点menus提取合并到上一层:
+     * https://www.mongodb.com/docs/manual/reference/operator/aggregation/mergeObjects/#-mergeobjects
+     */
     // @formatter:off
-    public static final BsonArray ROLE_ORGAN_MENU_LOOKUP_FILTERS = BsonArray.parse("["
-            //+ "{ $match: { \"roleCode\": { $in: [\"r:admin\"] } } },"
-            + "{ $match: { \"_id\": { $in: [ NumberLong(\"61508655614612341\") ] } } },"
-            + "{ $match: { \"enable\": { $eq: 1 } } },"
-            + "{ $match: { \"delFlag\": { $eq: 0 } } },"
-            + "{ $project: { \"_class\": 0, \"delFlag\": 0 } },"
-            + "{ $lookup: {"
-            + "    from: \"sys_menu_roles\","
-            + "    let: { role_id: { $toLong: \"$_id\" } },"
-            + "    pipeline: ["
-            + "        { $match: { $expr: { $eq: [ \"$roleId\", \"$$role_id\" ] } } }, "
-            + "        { $lookup: {"
-            + "            from: \"sys_menus\", "
-            + "            let: { menu_id: { $toLong: \"$menuId\" } },"
-            + "            pipeline: ["
-            + "                { $match: { $expr: { $eq: [ \"$_id\", \"$$menu_id\" ] } } },"
-            + "                { $match: { \"enable\": { $eq: 1 } } },"
-            + "                { $match: { \"delFlag\": { $eq: 0 } } },"
-            + "                { $project: { \"_class\": 0, \"delFlag\": 0 } }"
-            + "            ],"
+    public static final BsonArray USER_MENU_LOOKUP_FILTERS = BsonArray.parse("["
+            //+ "  { $match: { \"username\": { $in: [\"root\"] } } },"
+            + "  { $match: { \"enable\": { $eq: 1 } } },"
+            + "  { $match: { \"delFlag\": { $eq: 0 } } },"
+            // like e.g: left join sys_user_roles on u._id=ur.userId
+            + "  { $lookup: {"
+            + "      from: \"" + SYS_USER_ROLES.getName() + "\","
+            + "      localField: \"_id\","
+            + "      foreignField: \"userId\","
+            + "      as: \"userRoles\""
+            + "    }"
+            + "  },"
+            + "  { $unwind: \"$userRoles\" },"
+            + "  { $group: { _id: \"$userRoles.roleId\" } },"
+            // like e.g: left join sys_menu_roles on ur.roleId=mr.roleId
+            + "    { $lookup: {"
+            + "            from: \"" + SYS_MENU_ROLES.getName() + "\","
+            + "            localField: \"_id\","
+            + "            foreignField: \"roleId\","
+            + "            as: \"menuRoles\""
+            + "        }"
+            + "    },"
+            + "  { $unwind: \"$menuRoles\" },"
+            + "  { $group: { _id: \"$menuRoles.menuId\" } },"
+            // like e.g: left join sys_menus on mr.menuId=m._id
+            + "    { $lookup: {"
+            + "            from: \"" + SYS_MENUS.getName() + "\","
+            + "            localField: \"_id\","
+            + "            foreignField: \"_id\","
             + "            as: \"menus\""
-            + "            }"
-            + "        },"
-            + "    ],"
-            + "    as: \"menuRoles\""
-            + "    }"
-            + "}"
-            + "]");
-    // @formatter:on
-
-    // Lookup for organ,users by role filters.
-    // @formatter:off
-    public static final BsonArray ROLE_ORGAN_USER_LOOKUP_FILTERS = BsonArray.parse("["
-            //+ "{ $match: { \"roleCode\": { $in: [\"r:admin\"] } } },"
-            + "{ $match: { \"enable\": { $eq: 1 } } },"
-            + "{ $match: { \"delFlag\": { $eq: 0 } } },"
-            + "{ $project: { \"_class\": 0, \"delFlag\": 0 } },"
-            + "{ $lookup: {"
-            + "    from: \"" + SYS_USER_ROLES.getName() + "\","
-            + "    let: { role_id: { $toLong: \"$_id\" } },"
-            + "    pipeline: ["
-            + "        { $match: { $expr: { $eq: [ \"$roleId\", \"$$role_id\" ] } } }, "
-            + "        { $lookup: {"
-            + "            from: \"" + SYS_USERS.getName() + "\", "
-            + "            let: { user_id: { $toLong: \"$userId\" } },"
-            + "            pipeline: ["
-            + "                { $match: { $expr: { $eq: [ \"$_id\", \"$$user_id\" ] } } },"
-            + "                { $match: { \"enable\": { $eq: 1 } } },"
-            + "                { $match: { \"delFlag\": { $eq: 0 } } },"
-            + "                { $project: { \"_class\": 0, \"delFlag\": 0 } }"
-            + "            ],"
-            + "            as: \"users\""
-            + "            }"
-            + "        },"
-            + "    ],"
-            + "    as: \"userRoles\""
-            + "    }"
-            + "}"
+            + "        }"
+            + "    },"
+            + " { $match: { \"menus.enable\": { $eq: 1 } } },"
+            + " { $match: { \"menus.delFlag\": { $eq: 0 } } },"
+            // 将子节点menus提取合并到上一层:https://www.mongodb.com/docs/manual/reference/operator/aggregation/mergeObjects/#-mergeobjects
+            + "  { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ \"$menus\", 0 ] }, \"$$ROOT\" ] } } },"
+            // 隐藏(不返回)子节点menus
+            + "    { $project: { menus: 0 } }"
             + "]");
     // @formatter:on
 

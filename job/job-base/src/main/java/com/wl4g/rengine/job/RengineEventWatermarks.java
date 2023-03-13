@@ -39,8 +39,8 @@ public class RengineEventWatermarks extends BoundedOutOfOrdernessWatermarks<Reng
     }
 
     @Override
-    public void onEvent(RengineEvent model, long eventTimestamp, WatermarkOutput output) {
-        super.onEvent(model, ((EventSource) model.getSource()).getTime(), output);
+    public void onEvent(RengineEvent event, long eventTimestamp, WatermarkOutput output) {
+        super.onEvent(event, ((EventSource) event.getSource()).getTime(), output);
     }
 
     /**

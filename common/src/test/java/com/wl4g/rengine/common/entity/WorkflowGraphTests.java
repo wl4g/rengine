@@ -48,8 +48,8 @@ public class WorkflowGraphTests {
     @Test
     public void testWorkflowGraphSerialze() {
         final WorkflowGraph graph = buildDefaultWorkflowGraph();
-        System.out.println("Workflow Nodes Json1 : " + toJSONString(graph, false));
-        System.out.println("Workflow Nodes Json2 : " + BsonEntitySerializers.serialize(graph));
+        System.out.println("Workflow Node Json1 : " + toJSONString(graph, false));
+        System.out.println("Workflow Node Json2 : " + BsonEntitySerializers.serialize(graph));
     }
 
     @Test

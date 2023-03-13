@@ -21,7 +21,6 @@ import static com.wl4g.infra.common.web.WebUtils2.ResponseType.isRespJSON;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_LOGIN_PAGE_PATH;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_V1_USER_BASE_URI;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_V1_USER_USERINFO_URI;
-import static com.wl4g.rengine.service.security.user.AuthenticationService.currentUserInfo;
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -47,6 +46,8 @@ import com.wl4g.infra.common.remoting.uri.UriComponentsBuilder;
 import com.wl4g.infra.common.web.WebUtils2;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.common.web.rest.RespBase.RetCode;
+import com.wl4g.infra.context.utils.SpringContextHolder;
+import com.wl4g.rengine.service.security.user.AuthenticationService;
 
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;
@@ -106,7 +107,7 @@ public class SmartRedirectStrategy extends DefaultRedirectStrategy {
                         .withStatus(DEFAULT_AUTHORIZED_STATUS)
                         .withMessage("Authentication successful")
                         .forMap()
-                        .andPut(DEFAULT_USERINFO_KEY, currentUserInfo());
+                        .andPut(DEFAULT_USERINFO_KEY, getAuthenticationService().currentUserInfo());
                 if (!isBlank(redirectUri)) {
                     respBody.put(DEFAULT_REDIRECT_URI_KEY, redirectUri);
                 }
@@ -158,6 +159,10 @@ public class SmartRedirectStrategy extends DefaultRedirectStrategy {
         final var failureHandler = new SimpleUrlAuthenticationFailureHandler(API_LOGIN_PAGE_PATH + "?error");
         failureHandler.setRedirectStrategy(defaultInstanceOfUnauth);
         configurer.failureHandler(failureHandler);
+    }
+
+    public static AuthenticationService getAuthenticationService() {
+        return SpringContextHolder.getBean(AuthenticationService.class);
     }
 
     public static final SmartRedirectStrategy defaultInstanceOfAuthed = new SmartRedirectStrategy(false, RetCode.OK);

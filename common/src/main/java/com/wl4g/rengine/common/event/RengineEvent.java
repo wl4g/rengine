@@ -27,7 +27,6 @@ import static com.wl4g.infra.common.serialize.JacksonUtils.parseToNode;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
-import static java.util.Collections.emptyMap;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -38,6 +37,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -49,16 +49,19 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.wl4g.infra.common.serialize.JacksonUtils;
 
+import lombok.AccessLevel;
 import lombok.Builder.Default;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
@@ -102,33 +105,53 @@ public class RengineEvent extends EventObject {
     /**
      * Event extension labels.
      */
-    private @Nullable Map<String, String> labels = new HashMap<>();
+    private @Nullable Map<String, String> labels;
 
     /***
      * Convert to temporary json node tree format, such as for key path lookup.
      */
-    private transient JsonNode _toJsonNode;
+    @Setter(AccessLevel.NONE)
+    @Getter(AccessLevel.NONE)
+    private transient @JsonIgnore JsonNode _toJsonNode;
 
     public RengineEvent(@NotBlank String type, @NotNull EventSource source) {
-        this(type, currentTimeMillis(), source, null, new HashMap<>());
+        this(null, type, currentTimeMillis(), source, new LinkedHashMap<>(1), new LinkedHashMap<>(1));
+    }
+
+    public RengineEvent(@NotBlank String id, @NotBlank String type, @NotNull EventSource source) {
+        this(id, type, currentTimeMillis(), source, new LinkedHashMap<>(1), new LinkedHashMap<>(1));
+    }
+
+    public RengineEvent(@NotBlank String type, @Nullable Map<String, Object> body) {
+        this(null, type, currentTimeMillis(), null, body, new LinkedHashMap<>(1));
+    }
+
+    public RengineEvent(@NotBlank String id, @NotBlank String type, @Nullable Map<String, Object> body) {
+        this(id, type, currentTimeMillis(), null, body, new LinkedHashMap<>(1));
     }
 
     public RengineEvent(@NotBlank String type, @NotNull EventSource source, @Nullable Map<String, Object> body) {
-        this(type, currentTimeMillis(), source, body, emptyMap());
+        this(null, type, currentTimeMillis(), source, body, new LinkedHashMap<>(1));
     }
 
-    public RengineEvent(@NotBlank String type, @NotNull EventSource source, @Nullable Map<String, Object> body,
-            @Nullable Map<String, String> labels) {
-        this(type, currentTimeMillis(), source, body, labels);
+    public RengineEvent(@NotBlank String id, @NotBlank String type, @NotNull EventSource source,
+            @Nullable Map<String, Object> body) {
+        this(id, type, currentTimeMillis(), source, body, new LinkedHashMap<>(1));
     }
 
-    public RengineEvent(@NotBlank String type, @Min(0) Long observedTime, @NotNull EventSource source,
+    public RengineEvent(@NotBlank String id, @NotBlank String type, @NotNull EventSource source,
             @Nullable Map<String, Object> body, @Nullable Map<String, String> labels) {
-        super(notNullOf(source, "eventSource"));
-        isTrueOf(observedTime > 0, format("observedTime > 0, but is: %s", observedTime));
+        this(id, type, currentTimeMillis(), source, body, labels);
+    }
+
+    public RengineEvent(@Nullable String id, @NotBlank String type, @NotNull @Min(0) Long observedTime,
+            @NotNull EventSource source, @Nullable Map<String, Object> body, @Nullable Map<String, String> labels) {
+        super(notNullOf(source, "source"));
+        // this.id = hasTextOf(id, "eventId");
         this.type = hasTextOf(type, "eventType");
+        isTrueOf(nonNull(observedTime) && observedTime > 0, format("observedTime > 0, but is: %s", observedTime));
         this.observedTime = observedTime;
-        this.id = format("%s:%s:%s", type, observedTime, safeList(source.getPrincipals()).stream().findFirst().orElse(null));
+        this.id = Builder.buildDefaultEventId(type, observedTime, source);
         this.body = body;
         this.labels = labels;
     }
@@ -151,7 +174,10 @@ public class RengineEvent extends EventObject {
     public String atAsText(@NotBlank String jqExpr) {
         hasTextOf(jqExpr, "jqExpr");
         if (!startsWith(jqExpr, ".")) {
-            throw new IllegalArgumentException(format("Invalid json jq expression '%s', must start with '.'"));
+            // @formatter:off
+            // throw new IllegalArgumentException(format("Invalid json jq expression '%s', must start with '.'", jqExpr));
+            // @formatter:on
+            jqExpr = ".".concat(jqExpr);
         }
 
         String expr = replaceChars(jqExpr, ".", "/");
@@ -178,6 +204,10 @@ public class RengineEvent extends EventObject {
         return null;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static RengineEvent fromJson(String json) {
         return fromJson(parseJSON(json, JsonNode.class));
     }
@@ -188,6 +218,7 @@ public class RengineEvent extends EventObject {
         notNullOf(node, "node");
 
         // Event base.
+        final String id = node.at("/id").asText();
         final String type = node.at("/type").asText();
         final Long observedTime = node.at("/observedTime").asLong();
 
@@ -206,12 +237,13 @@ public class RengineEvent extends EventObject {
         final List principals = parseFromNode(node, "/source/principals", List.class);
         final EventLocation location = parseFromNode(node, "/source/location", EventLocation.class);
 
-        return new RengineEvent(type, observedTime,
+        return new RengineEvent(id, type, observedTime,
                 EventSource.builder().time(sourceTime).principals(principals).location(location).build(), bodyMap, labels);
     }
 
     public static RengineEvent validate(RengineEvent event) {
         // Basic validate.
+        validateForEventType(event.getId());
         validateForEventType(event.getType());
         notNullOf(event.getObservedTime(), "observedTime");
         isTrueOf(event.getObservedTime() > 0, "Must observedTime > 0");
@@ -305,6 +337,69 @@ public class RengineEvent extends EventObject {
         private @Nullable String city;
         private @Nullable String region;
         private @Nullable String country;
+    }
+
+    public static class Builder {
+        private String id;
+        private String type;
+        private Long observedTime;
+        private EventSource source;
+        private Map<String, Object> body;
+        private Map<String, String> labels;
+
+        public Builder id(String id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder type(String type) {
+            this.type = type;
+            return this;
+        }
+
+        public Builder observedTime(Long observedTime) {
+            this.observedTime = observedTime;
+            return this;
+        }
+
+        public Builder source(EventSource source) {
+            this.source = source;
+            return this;
+        }
+
+        public Builder body(Map<String, Object> body) {
+            this.body = body;
+            return this;
+        }
+
+        public Builder labels(Map<String, String> labels) {
+            this.labels = labels;
+            return this;
+        }
+
+        public RengineEvent build() {
+            if (isBlank(id)) {
+                final String firstPrincipal = nonNull(source) ? safeList(source.getPrincipals()).stream().findFirst().orElse(null)
+                        : null;
+                this.id = format("%s:%s:%s", type, observedTime, firstPrincipal);
+            }
+            if (isNull(observedTime)) {
+                this.observedTime = currentTimeMillis();
+            }
+            if (isNull(source)) {
+                this.source = EventSource.builder().build();
+            }
+            return new RengineEvent(id, type, observedTime, source, body, labels);
+        }
+
+        static String buildDefaultEventId(@NotBlank String eventType, @NotNull Long observedTime, @Nullable EventSource source) {
+            hasTextOf(eventType, "eventType");
+            notNullOf(observedTime, "observedTime");
+            // notNullOf(source, "source");
+            final String firstPrincipal = nonNull(source) ? safeList(source.getPrincipals()).stream().findFirst().orElse(null)
+                    : null;
+            return format("%s:%s:%s", eventType, observedTime, firstPrincipal);
+        }
     }
 
     /**

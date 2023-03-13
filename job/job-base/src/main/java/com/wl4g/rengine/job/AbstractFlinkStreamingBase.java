@@ -17,6 +17,7 @@ package com.wl4g.rengine.job;
 
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.runtime.JvmRuntimeTool.isJvmInDebugging;
+import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.time.Duration.ofMillis;
 import static java.util.Arrays.asList;
@@ -26,6 +27,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.startsWith;
 import static org.apache.flink.api.common.restartstrategy.RestartStrategies.fixedDelayRestart;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -33,6 +35,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.common.RuntimeExecutionMode;
 import org.apache.flink.api.common.time.Time;
+import org.apache.flink.api.connector.sink.Sink;
 import org.apache.flink.api.connector.source.Source;
 import org.apache.flink.api.connector.source.SourceSplit;
 import org.apache.flink.runtime.state.hashmap.HashMapStateBackend;
@@ -42,6 +45,7 @@ import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.CheckpointConfig.ExternalizedCheckpointCleanup;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 
 import com.wl4g.infra.common.cli.CommandLineTool;
 import com.wl4g.infra.common.cli.CommandLineTool.CommandLineFacade;
@@ -61,12 +65,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class AbstractFlinkStreamingBase implements Runnable {
 
-    // Flink MQ(kafka/pulsar/rabbitmq/...) options.
+    // Flink source MQ (kafka/pulsar/rabbitmq/...) options.
     private String brokers;
-    private String topicPattern;
+    private String eventTopicPattern;
     private String groupId;
     private Long fromOffsetTime;
     private String deserializerClass;
+    private String keyByExpression;
 
     // FLINK basic options.
     private RuntimeExecutionMode runtimeMode;
@@ -106,12 +111,14 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
         this.builder = CommandLineTool.builder()
                 // MQ(Kafka/Pulsar/Rabbitmq/...) options.
                 .option("B", "brokers", "localhost:9092", "Connect MQ brokers addresses. default is local kafka brokers")
-                .option("T", "topicPattern", "rengine_event", "MQ topic regex pattern.")
+                .option("T", "eventTopicPattern", "rengine_events", "Topic pattern for consuming events from MQ.")
                 .mustOption("G", "groupId", "Flink source consumer group id.")
                 .option("O", "fromOffsetTime", "-1",
                         "Start consumption from the first record with a timestamp greater than or equal to a certain timestamp. if <=0, it will not be setup and keep the default behavior.")
-                .option("D", "deserializerClass", "com.wl4g.rengine.job.kafka.GenericKafkaDeserializationSchema",
+                .option("D", "deserializerClass", "com.wl4g.rengine.job.kafka.RengineEventKafkaDeserializationSchema",
                         "Deserializer class for Flink-streaming to consuming from MQ.")
+                .option("K", "keyByExpression", ".source.principals[0]",
+                        "The jq expression to extract the grouping key, it extraction from the rengine event object.")
                 // FLINK basic options.
                 .option("R", "runtimeMode", RuntimeExecutionMode.STREAMING.name(),
                         "Set the job execution mode. default is: STREAMING")
@@ -157,10 +164,11 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
         this.line = builder.width(150).helpIfEmpty(args).build(args);
         // KAFKA options.
         this.brokers = line.get("brokers");
-        this.topicPattern = line.get("topicPattern");
+        this.eventTopicPattern = line.get("eventTopicPattern");
         this.groupId = line.get("groupId");
         this.fromOffsetTime = line.getLong("fromOffsetTime");
         this.deserializerClass = line.get("deserializerClass");
+        this.keyByExpression = line.get("keyByExpression");
         // FLINK Basic options.
         this.runtimeMode = line.getEnum("runtimeMode", RuntimeExecutionMode.class);
         this.restartAttempts = line.getInteger("restartAttempts");
@@ -207,7 +215,20 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
      * 
      * @return
      */
-    protected abstract DataStream<?> customStream(DataStreamSource<RengineEvent> dataStreamSource);
+    protected DataStream<?> customStream(DataStream<RengineEvent> dataStreamSource) {
+        final String keyByExpr = keyByExpression;
+        return dataStreamSource.keyBy(event -> {
+            final String keyBy = event.atAsText(keyByExpr);
+            return isBlank(keyBy) ? event.getType() : keyBy;
+        });
+    }
+
+    /**
+     * Create FLINK sink.
+     * 
+     * @return
+     */
+    protected abstract Serializable createSink();
 
     /**
      * Handling job execution result.
@@ -217,6 +238,7 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
     protected void handleJobExecutionResult(JobExecutionResult result) {
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public void run() {
         notNull(line, errmsg -> new IllegalStateException(errmsg),
@@ -286,16 +308,28 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
             dataStream.setBufferTimeout(bufferTimeoutMillis);
         }
 
-        final DataStream<?> customDataStream = customStream(dataStream);
-
-        if (nonNull(forceUsePrintSink) && forceUsePrintSink) {
-            customDataStream.print();
-        }
-
         try {
+            final DataStream<?> customDataStream = customStream(dataStream);
+
+            if (nonNull(forceUsePrintSink) && forceUsePrintSink) {
+                customDataStream.print();
+            } else {
+                final String sinkName = getClass().getSimpleName().concat("Sink");
+                final Serializable sink = createSink();
+                if (sink instanceof SinkFunction) {
+                    customDataStream.addSink((SinkFunction) sink).name(sinkName).setParallelism(parallelism);
+                } else if (sink instanceof Sink) {
+                    customDataStream.sinkTo((Sink) sink).name(sinkName).setParallelism(parallelism);
+                } else {
+                    throw new UnsupportedOperationException(format("No support sink type of %s", sink));
+                }
+            }
+
             log.info("Starting for : {} ...", jobName);
             handleJobExecutionResult(env.execute(jobName));
+
         } catch (Throwable ex) {
+            log.error("Failed to execute streaming job", ex);
             throw new IllegalStateException(ex);
         }
     }

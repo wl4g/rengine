@@ -16,6 +16,8 @@
 package com.wl4g.rengine.service.impl.sys;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_USERS;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_USER_ROLES;
 import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
@@ -31,18 +33,15 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import com.mongodb.client.result.DeleteResult;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.lang.Assert2;
-import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.entity.sys.User;
 import com.wl4g.rengine.common.entity.sys.UserRole;
 import com.wl4g.rengine.service.UserService;
+import com.wl4g.rengine.service.impl.BasicServiceImpl;
 import com.wl4g.rengine.service.model.sys.UserDelete;
 import com.wl4g.rengine.service.model.sys.UserDeleteResult;
 import com.wl4g.rengine.service.model.sys.UserQuery;
@@ -59,10 +58,10 @@ import com.wl4g.rengine.service.security.user.AuthenticationService.UserAuthInfo
  * @since v1.0.0
  */
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends BasicServiceImpl implements UserService {
 
     @Autowired
-    MongoTemplate mongoTemplate;
+    AuthenticationService authenticationService;
 
     @Override
     public PageHolder<User> query(UserQuery model) {
@@ -70,10 +69,10 @@ public class UserServiceImpl implements UserService {
                 andCriteria(baseCriteria(model), isIdCriteria(model.getUserId()), isCriteria("email", model.getEmail())))
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
-        final List<User> users = mongoTemplate.find(query, User.class, MongoCollectionDefinition.SYS_USERS.getName());
+        final List<User> users = mongoTemplate.find(query, User.class, SYS_USERS.getName());
 
         return new PageHolder<User>(model.getPageNum(), model.getPageSize())
-                .withTotal(mongoTemplate.count(query, MongoCollectionDefinition.SYS_USERS.getName()))
+                .withTotal(mongoTemplate.count(query, SYS_USERS.getName()))
                 .withRecords(users);
     }
 
@@ -88,16 +87,13 @@ public class UserServiceImpl implements UserService {
             user.preUpdate();
         }
 
-        User saved = mongoTemplate.save(user, MongoCollectionDefinition.SYS_USERS.getName());
+        User saved = mongoTemplate.save(user, SYS_USERS.getName());
         return UserSaveResult.builder().id(saved.getId()).build();
     }
 
     @Override
     public UserDeleteResult delete(UserDelete model) {
-        // 'id' is a keyword, it will be automatically converted to '_id'
-        final DeleteResult result = mongoTemplate.remove(new Query(Criteria.where("_id").is(model.getId())),
-                MongoCollectionDefinition.SYS_USERS.getName());
-        return UserDeleteResult.builder().deletedCount(result.getDeletedCount()).build();
+        return UserDeleteResult.builder().deletedCount(doDeleteWithGracefully(model, SYS_USERS)).build();
     }
 
     /**
@@ -587,7 +583,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserAuthInfo userInfo() {
-        return AuthenticationService.currentUserInfo();
+        return authenticationService.currentUserInfo();
     }
 
     @Override
@@ -596,10 +592,7 @@ public class UserServiceImpl implements UserService {
         Assert2.notEmpty(roleIds, "roleIds");
 
         return roleIds.parallelStream().map(roleId -> {
-            return mongoTemplate
-                    .save(UserRole.builder().roleId(roleId).userId(userId).build(),
-                            MongoCollectionDefinition.SYS_USER_ROLES.getName())
-                    .getId();
+            return mongoTemplate.save(UserRole.builder().roleId(roleId).userId(userId).build(), SYS_USER_ROLES.getName()).getId();
         }).collect(toList());
     }
 

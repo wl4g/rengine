@@ -46,7 +46,6 @@ import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuc
 
 import com.wl4g.infra.context.utils.SpringContextHolder;
 import com.wl4g.rengine.common.constants.RengineConstants;
-import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.service.IdentityProviderService;
 import com.wl4g.rengine.service.security.authentication.SmartRedirectStrategy;
 import com.wl4g.rengine.service.security.oauth2.MongoClientRegistrationRepository;
@@ -205,20 +204,18 @@ public class RengineWebSecurityConfiguration implements WebSecurityCustomizer {
     @Bean
     public AuthenticationService authenticationService(
             RengineWebSecurityProperties config,
-            RedisTemplate<String, byte[]> redisTemplate) {
-        return new AuthenticationService(config, redisTemplate);
+            RedisTemplate<String, byte[]> redisTemplate,
+            MongoTemplate mongoTemplate) {
+        return new AuthenticationService(config, redisTemplate, mongoTemplate);
     }
 
     @Bean
     public MongoUserDetailsManager mongoUserDetailsManager(
             RengineWebSecurityProperties config,
             BCryptPasswordEncoder passwordEncoder,
-            MongoTemplate mongoTemplate,
             AuthenticationService authenticationService,
             @Autowired(required = false) AuthenticationManager authenticationManager) {
-        return new MongoUserDetailsManager(config, passwordEncoder,
-                mongoTemplate.getDb().getCollection(MongoCollectionDefinition.SYS_USERS.getName()), authenticationService,
-                authenticationManager);
+        return new MongoUserDetailsManager(config, passwordEncoder, authenticationService, authenticationManager);
     }
 
     @Bean

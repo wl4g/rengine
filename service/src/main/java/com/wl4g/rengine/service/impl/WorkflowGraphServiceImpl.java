@@ -17,9 +17,11 @@ package com.wl4g.rengine.service.impl;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_WORKFLOW_GRAPHS;
+import static com.wl4g.rengine.service.mongo.QueryHolder.DEFAULT_FIELD_REVISION;
+import static com.wl4g.rengine.service.mongo.QueryHolder.DEFAULT_FIELD_UPDATE_DATE;
 import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
-import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
+import static com.wl4g.rengine.service.mongo.QueryHolder.descSort;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
 import static java.lang.String.format;
@@ -87,10 +89,10 @@ public class WorkflowGraphServiceImpl extends BasicServiceImpl implements Workfl
     public PageHolder<WorkflowGraph> query(WorkflowGraphQuery model) {
         final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getGraphId()),
                 isCriteria("workflowId", model.getWorkflowId())))
-                        .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
+                        .with(PageRequest.of(model.getPageNum(), model.getPageSize(),
+                                descSort(DEFAULT_FIELD_REVISION, DEFAULT_FIELD_UPDATE_DATE)));
 
-        final List<WorkflowGraph> graphs = mongoTemplate.find(query, WorkflowGraph.class,
-                RE_WORKFLOW_GRAPHS.getName());
+        final List<WorkflowGraph> graphs = mongoTemplate.find(query, WorkflowGraph.class, RE_WORKFLOW_GRAPHS.getName());
 
         return new PageHolder<WorkflowGraph>(model.getPageNum(), model.getPageSize())
                 .withTotal(mongoTemplate.count(query, RE_WORKFLOW_GRAPHS.getName()))
@@ -224,4 +226,5 @@ public class WorkflowGraphServiceImpl extends BasicServiceImpl implements Workfl
 
     static final ParameterizedTypeReference<RespBase<WorkflowExecuteResult>> WORKFLOW_EXECUTE_RESULT_TYPE = new ParameterizedTypeReference<>() {
     };
+
 }

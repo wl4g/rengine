@@ -1,5 +1,7 @@
 package org.apache.flink.cep.dynamic.impl.json.deserializer;
 
+import static java.util.Objects.nonNull;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -31,35 +33,43 @@ public class NodeSpecStdDeserializer extends StdDeserializer<NodeSpec> {
     }
 
     public NodeSpec deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-        JsonNode node = (JsonNode) jsonParser.getCodec().readTree(jsonParser);
-        NodeSpec.PatternNodeType type = NodeSpec.PatternNodeType.valueOf(node.get("type").asText());
-        String name = node.get("name").asText();
+        final JsonNode node = (JsonNode) jsonParser.getCodec().readTree(jsonParser);
+        final NodeSpec.PatternNodeType type = NodeSpec.PatternNodeType.valueOf(node.get("type").asText());
+        final String name = node.get("name").asText();
 
-        QuantifierSpec quantifierSpec = (QuantifierSpec) jsonParser.getCodec()
+        final QuantifierSpec quantifierSpec = (QuantifierSpec) jsonParser.getCodec()
                 .treeToValue((TreeNode) node.get("quantifier"), QuantifierSpec.class);
 
-        ConditionSpec conditionSpec = (ConditionSpec) jsonParser.getCodec()
+        final ConditionSpec conditionSpec = (ConditionSpec) jsonParser.getCodec()
                 .treeToValue((TreeNode) node.get("condition"), ConditionSpec.class);
         if (type.equals(NodeSpec.PatternNodeType.COMPOSITE)) {
-            List<NodeSpec> nodeSpecs = new ArrayList<>();
-            Iterator<JsonNode> embeddedElementNames = node.get("nodes").elements();
-            while (embeddedElementNames.hasNext()) {
-                JsonNode jsonNode = embeddedElementNames.next();
-                NodeSpec embedNode = (NodeSpec) jsonParser.getCodec().treeToValue((TreeNode) jsonNode, NodeSpec.class);
-                nodeSpecs.add(embedNode);
+            // nodes
+            final List<NodeSpec> nodeSpecs = new ArrayList<>();
+            final JsonNode nodes = node.get("nodes");
+            if (nonNull(nodes)) {
+                final Iterator<JsonNode> embeddedElementNames = nodes.elements();
+                while (embeddedElementNames.hasNext()) {
+                    JsonNode jsonNode = embeddedElementNames.next();
+                    NodeSpec embedNode = (NodeSpec) jsonParser.getCodec().treeToValue((TreeNode) jsonNode, NodeSpec.class);
+                    nodeSpecs.add(embedNode);
+                }
             }
-
-            List<EdgeSpec> edgeSpecs = new ArrayList<>();
-            Iterator<JsonNode> jsonNodeIterator = node.get("edges").elements();
-            while (jsonNodeIterator.hasNext()) {
-                JsonNode jsonNode = jsonNodeIterator.next();
-                EdgeSpec embedNode = (EdgeSpec) jsonParser.getCodec().treeToValue((TreeNode) jsonNode, EdgeSpec.class);
-                edgeSpecs.add(embedNode);
+            // edges
+            final List<EdgeSpec> edgeSpecs = new ArrayList<>();
+            final JsonNode edges = node.get("edges");
+            if (nonNull(edges)) {
+                Iterator<JsonNode> jsonNodeIterator = edges.elements();
+                while (jsonNodeIterator.hasNext()) {
+                    JsonNode jsonNode = jsonNodeIterator.next();
+                    EdgeSpec embedNode = (EdgeSpec) jsonParser.getCodec().treeToValue((TreeNode) jsonNode, EdgeSpec.class);
+                    edgeSpecs.add(embedNode);
+                }
             }
-
-            WindowSpec window = (WindowSpec) jsonParser.getCodec().treeToValue((TreeNode) node.get("window"), WindowSpec.class);
-
-            AfterMatchSkipStrategySpec afterMatchStrategy = (AfterMatchSkipStrategySpec) jsonParser.getCodec()
+            // window
+            final WindowSpec window = (WindowSpec) jsonParser.getCodec()
+                    .treeToValue((TreeNode) node.get("window"), WindowSpec.class);
+            // after match strategy
+            final AfterMatchSkipStrategySpec afterMatchStrategy = (AfterMatchSkipStrategySpec) jsonParser.getCodec()
                     .treeToValue((TreeNode) node.get("afterMatchStrategy"), AfterMatchSkipStrategySpec.class);
 
             return (NodeSpec) new GraphSpec(name, quantifierSpec, conditionSpec, nodeSpecs, edgeSpecs, window,
