@@ -76,10 +76,18 @@ public class PatternTests {
     public void testSimplePatternCEP() throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-        DataStream<Event> input = env.fromElements(new Event(1, "barfoo", 1.0), new Event(2, "start", 2.0),
-                new Event(3, "foobar", 3.0), new SubEvent(4, "foo", 4.0, 1.0), new Event(5, "middle", 5.0),
-                new SubEvent(6, "middle", 6.0, 2.0), new SubEvent(7, "bar", 3.0, 3.0), new Event(42, "42", 42.0),
+        // @formatter:off
+        DataStream<Event> input = env.fromElements(
+                new Event(1, "barfoo", 1.0),
+                new Event(2, "start", 2.0),
+                new Event(3, "foobar", 3.0),
+                new SubEvent(4, "foo", 4.0, 1.0),
+                new Event(5, "middle", 5.0),
+                new SubEvent(6, "middle", 6.0, 2.0),
+                new SubEvent(7, "bar", 3.0, 3.0),
+                new Event(42, "42", 42.0),
                 new Event(8, "end", 1.0));
+        // @formatter:on
 
         Pattern<Event, ?> pattern = Pattern.<Event> begin("start").where(new SimpleCondition<Event>() {
 

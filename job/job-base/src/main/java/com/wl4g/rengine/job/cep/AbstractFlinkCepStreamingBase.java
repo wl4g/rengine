@@ -17,10 +17,11 @@ package com.wl4g.rengine.job.cep;
 
 import static com.wl4g.infra.common.codec.Encodes.decodeBase64String;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseToNode;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.util.Objects.nonNull;
-import static org.apache.commons.lang3.StringUtils.trimToEmpty;
+import static java.util.stream.Collectors.toMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,20 +29,21 @@ import java.util.Map;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.flink.cep.CEP;
-import org.apache.flink.cep.PatternFlatSelectFunction;
 import org.apache.flink.cep.PatternStream;
 import org.apache.flink.cep.dynamic.impl.json.util.CepJsonUtils;
+import org.apache.flink.cep.functions.PatternProcessFunction;
+import org.apache.flink.cep.functions.TimedOutPartialMatchHandler;
 import org.apache.flink.cep.pattern.Pattern;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.util.Collector;
+import org.apache.flink.util.OutputTag;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.wl4g.rengine.common.event.RengineEvent;
 import com.wl4g.rengine.common.event.RengineEvent.EventSource;
 import com.wl4g.rengine.job.AbstractFlinkStreamingBase;
 
-import lombok.AllArgsConstructor;
 import lombok.CustomLog;
 import lombok.Getter;
 
@@ -94,7 +96,7 @@ public abstract class AbstractFlinkCepStreamingBase extends AbstractFlinkStreami
                     (Pattern<RengineEvent, RengineEvent>) pattern);
             // Matching and union streams.
             final SingleOutputStreamOperator<RengineEvent> selectStream = patternStream
-                    .flatSelect(new GenericEventMatcher(alertTopic));
+                    .process(new GenericEventMatcher(alertTopic));
             if (nonNull(mergeSelectStream)) {
                 mergeSelectStream = mergeSelectStream.union(selectStream);
             } else {
@@ -105,30 +107,54 @@ public abstract class AbstractFlinkCepStreamingBase extends AbstractFlinkStreami
         return mergeSelectStream;
     }
 
+    /**
+     * @see https://nightlies.apache.org/flink/flink-docs-release-1.14/zh/docs/libs/cep/#从模式中选取
+     */
     @Getter
-    @AllArgsConstructor
-    public static class GenericEventMatcher
-            implements /* PatternSelectFunction , */ PatternFlatSelectFunction<RengineEvent, RengineEvent> {
+    public static class GenericEventMatcher extends PatternProcessFunction<RengineEvent, RengineEvent> implements
+            /* PatternFlatSelectFunction<RengineEvent, RengineEvent>, */ TimedOutPartialMatchHandler<RengineEvent> {
         private static final long serialVersionUID = 1L;
 
-        private String alertTopic;
+        private final String alertTopic;
+        private final OutputTag<RengineEvent> outputTag;
+
+        @SuppressWarnings("serial")
+        public GenericEventMatcher(String alertTopic) {
+            this.alertTopic = hasTextOf(alertTopic, "alertTopic");
+            this.outputTag = new OutputTag<RengineEvent>("timeout-alert-out-stream") {
+            };
+        }
 
         @Override
-        public void flatSelect(Map<String, List<RengineEvent>> pattern, Collector<RengineEvent> out) throws Exception {
-            final EventSource source = EventSource.builder().build();
-
-            // TODO using alertTopic as event type ?
-            final RengineEvent alertEvent = RengineEvent.builder().type(alertTopic).source(source).build();
-            alertEvent.getBody().put("warningMsg", "The matched warning msg.");
-
-            // add alerts properties.
-            safeMap(pattern).entrySet().stream().forEach(e -> {
-                // source.setTime(null);
-                alertEvent.getBody().put("MATCH_".concat(trimToEmpty(e.getKey())), toJSONString(e.getValue()));
-            });
+        public void processMatch(Map<String, List<RengineEvent>> match, Context ctx, Collector<RengineEvent> out)
+                throws Exception {
+            final RengineEvent alertEvent = RengineEvent.builder()
+                    .type(alertTopic)
+                    .source(EventSource.builder().time(ctx.timestamp()).build())
+                    .build();
+            alertEvent.getBody().put("description", "The matched alert event msg.");
+            alertEvent.getBody()
+                    .put("match",
+                            safeMap(match).entrySet().stream().collect(toMap(e -> e.getKey(), e -> toJSONString(e.getValue()))));
 
             out.collect(alertEvent);
         }
+
+        @Override
+        public void processTimedOutMatch(Map<String, List<RengineEvent>> match, Context ctx) throws Exception {
+            final RengineEvent alertEvent = RengineEvent.builder()
+                    .type(alertTopic.concat("_TIMEOUT")) // TODO using-config?
+                    .observedTime(ctx.currentProcessingTime())
+                    .source(EventSource.builder().time(ctx.timestamp()).build())
+                    .build();
+            alertEvent.getBody().put("description", "The timed out match event msg.");
+            alertEvent.getBody()
+                    .put("match",
+                            safeMap(match).entrySet().stream().collect(toMap(e -> e.getKey(), e -> toJSONString(e.getValue()))));
+
+            ctx.output(outputTag, alertEvent);
+        }
+
     }
 
 }

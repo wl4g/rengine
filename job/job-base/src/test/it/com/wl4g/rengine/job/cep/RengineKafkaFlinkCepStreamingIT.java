@@ -69,11 +69,11 @@ public class RengineKafkaFlinkCepStreamingIT {
             put(1, "INFO");
             put(2, "ERROR");
             put(3, "INFO");
-            put(4, "ERROR");
-            put(5, "WARN");
-            put(6, "INFO");
-            put(7, "INFO");
-            put(8, "FATAL");
+            put(4, "FATAL");
+            put(5, "INFO");
+            put(6, "WARN");
+            put(7, "DEBUG");
+            put(8, "INFO");
             put(9, "INFO");
         }
     };
@@ -113,7 +113,7 @@ public class RengineKafkaFlinkCepStreamingIT {
     static void startMockLogsProducing() {
         new Thread(() -> {
             System.out.println("Mock logs producing for waiting init sleep 6s ...");
-            ThreadUtils2.sleep(6_000);
+            ThreadUtils2.sleep(10_000);
 
             final Properties props = new Properties();
             props.put("bootstrap.servers", IT_MOCK_KAFKA_BROKERS);
@@ -129,18 +129,8 @@ public class RengineKafkaFlinkCepStreamingIT {
                     final String logMsg = format(LOG_MESSAGE, logTime, level, IT_MOCK_LOGS_SERVICE_NAME, count.getAndIncrement());
                     System.out.println("Send log : " + logMsg);
 
-                    ExportLogsServiceRequest request = ExportLogsServiceRequest.newBuilder()
-                            .addResourceLogs(ResourceLogs.newBuilder()
-                                    .addInstrumentationLibraryLogs(InstrumentationLibraryLogs.newBuilder()
-                                            .addLogs(LogRecord.newBuilder()
-                                                    .setBody(AnyValue.newBuilder().setStringValue(logMsg).build())
-                                                    .build())
-                                            .build())
-                                    .build())
-                            .build();
+                    ExportLogsServiceRequest request = buildOtlpLogsRequest(logMsg);
                     producer.send(new ProducerRecord<String, byte[]>(IT_MOCK_EVENT_TOPIC, request.toByteArray()));
-
-                    ThreadUtils2.sleepRandom(1000, 3000);
                 });
             } catch (Throwable ex) {
                 ex.printStackTrace();
@@ -188,115 +178,74 @@ public class RengineKafkaFlinkCepStreamingIT {
 
     }
 
-    // @formatter:off
-    static final String DEFAULT_CEP_PATTERNS_JSON_1 = "[{"
-            + "   \"name\": \"logerror\","
-            + "   \"quantifier\": {"
-            + "       \"consumingStrategy\": \"SKIP_TILL_NEXT\","
-            + "       \"properties\": [\"SINGLE\"],"
-            + "       \"times\": null,"
-            + "       \"untilCondition\": null"
-            + "   },"
-            + "   \"condition\": null,"
-            + "   \"nodes\": [{"
-            + "       \"name\": \"error\","
-            + "       \"quantifier\": {"
-            + "           \"consumingStrategy\": \"SKIP_TILL_NEXT\","
-            + "           \"properties\": [\"SINGLE\"],"
-            + "           \"times\": null,"
-            + "           \"untilCondition\": null"
-            + "       },"
-            + "       \"condition\": {"
-            + "           \"expression\": \"body.level == 'ERROR' || body.level == 'FATAL'\","
-            + "           \"type\": \"AVIATOR\""
-            + "       },"
-            + "       \"type\": \"ATOMIC\""
-            + "   }],"
-            + "   \"edges\": [],"
-            + "   \"window\": null,"
-            + "   \"afterMatchStrategy\": {"
-            + "       \"type\": \"NO_SKIP\","
-            + "       \"patternName\": null"
-            + "   },"
-            + "   \"type\": \"COMPOSITE\","
-            + "   \"version\": 1"
-            + "}]";
-    // @formatter:on
+    static ExportLogsServiceRequest buildOtlpLogsRequest(String logMsg) {
+        return ExportLogsServiceRequest.newBuilder()
+                .addResourceLogs(ResourceLogs.newBuilder()
+                        .addInstrumentationLibraryLogs(InstrumentationLibraryLogs.newBuilder()
+                                .addLogs(LogRecord.newBuilder()
+                                        .setBody(AnyValue.newBuilder().setStringValue(logMsg).build())
+                                        .build())
+                                .build())
+                        .build())
+                .build();
+    }
 
     // @formatter:off
-    static final String DEFAULT_CEP_PATTERNS_JSON_2 = "[{"
-            + "   \"name\": \"logerror\","
-            + "   \"quantifier\": {"
-            + "       \"consumingStrategy\": \"SKIP_TILL_NEXT\","
-            + "       \"properties\": [\"SINGLE\"],"
-            + "       \"times\": null,"
-            + "       \"untilCondition\": null"
-            + "   },"
-            + "   \"condition\": null,"
-            + "   \"nodes\": [{"
-            + "       \"name\": \"start\","
-            + "       \"quantifier\": {"
-            + "           \"consumingStrategy\": \"SKIP_TILL_NEXT\","
-            + "           \"properties\": [\"SINGLE\"],"
-            + "           \"times\": null,"
-            + "           \"untilCondition\": null"
-            + "       },"
-            + "       \"condition\": {"
-            + "           \"expression\": \"body.level == 'TRACE' || body.level == 'DEBUG' || body.level == 'INFO' || body.level == 'WARN'\","
-            + "           \"type\": \"AVIATOR\""
-            + "       },"
-            + "       \"type\": \"ATOMIC\""
-            + "   }, {"
-            + "       \"name\": \"middle\","
-            + "       \"quantifier\": {"
-            + "           \"consumingStrategy\": \"SKIP_TILL_NEXT\","
-            + "           \"properties\": [\"SINGLE\"],"
-            + "           \"times\": null,"
-            + "           \"untilCondition\": null"
-            + "       },"
-            + "       \"condition\": {"
-            + "           \"nestedConditions\": [{"
-            + "               \"className\": \"org.apache.flink.cep.pattern.conditions.SubtypeCondition\","
-            + "               \"subClassName\": \"com.wl4g.rengine.common.event.RengineEvent\","
-            + "               \"type\": \"CLASS\""
-            + "           }, {"
-            + "               \"expression\": \"body.level == 'ERROR' || body.level == 'FATAL'\","
-            + "               \"type\": \"AVIATOR\""
-            + "           }],"
-            + "           \"type\": \"CLASS\","
-            + "           \"className\": \"org.apache.flink.cep.pattern.conditions.RichAndCondition\""
-            + "       },"
-            + "       \"type\": \"ATOMIC\""
-            + "   }, {"
-            + "       \"name\": \"end\","
-            + "       \"quantifier\": {"
-            + "           \"consumingStrategy\": \"SKIP_TILL_NEXT\","
-            + "           \"properties\": [\"SINGLE\"],"
-            + "           \"times\": null,"
-            + "           \"untilCondition\": null"
-            + "       },"
-            + "       \"condition\": {"
-            + "           \"expression\": \"body.level == 'TRACE' || body.level == 'DEBUG' || body.level == 'INFO' || body.level == 'WARN'\","
-            + "           \"type\": \"AVIATOR\""
-            + "       },"
-            + "       \"type\": \"ATOMIC\""
-            + "   }],"
-            + "   \"edges\": [{"
-            + "       \"source\": \"start\","
-            + "       \"target\": \"middle\","
-            + "       \"type\": \"SKIP_TILL_ANY\""
-            + "   }, {"
-            + "       \"source\": \"middle\","
-            + "       \"target\": \"end\","
-            + "       \"type\": \"SKIP_TILL_ANY\""
-            + "   }],"
-            + "   \"window\": null,"
-            + "   \"afterMatchStrategy\": {"
-            + "       \"type\": \"NO_SKIP\","
-            + "       \"patternName\": null"
-            + "   },"
-            + "   \"type\": \"COMPOSITE\","
-            + "   \"version\": 1"
+    static final String PATTERN_ARRAY_JSON_1 = "[{"
+            + "    \"name\": \"end\","
+            + "    \"quantifier\": {"
+            + "        \"consumingStrategy\": \"SKIP_TILL_NEXT\","
+            + "        \"times\": null,"
+            + "        \"untilCondition\": null,"
+            + "        \"properties\": [\"SINGLE\"]"
+            + "    },"
+            + "    \"condition\": null,"
+            + "    \"nodes\": [{"
+            + "        \"name\": \"end\","
+            + "        \"quantifier\": {"
+            + "            \"consumingStrategy\": \"SKIP_TILL_NEXT\","
+            + "            \"times\": null,"
+            + "            \"untilCondition\": null,"
+            + "            \"properties\": [\"SINGLE\"]"
+            + "        },"
+            + "        \"condition\": {"
+            + "            \"nestedConditions\": [{"
+            + "                \"expression\": \"body.level == 'ERROR'\","
+            + "                \"type\": \"AVIATOR\""
+            + "            }, {"
+            + "                \"expression\": \"body.level == 'FATAL'\","
+            + "                \"type\": \"AVIATOR\""
+            + "            }],"
+            + "            \"type\": \"CLASS\","
+            + "            \"className\": \"org.apache.flink.cep.pattern.conditions.RichOrCondition\""
+            + "        },"
+            + "        \"type\": \"ATOMIC\""
+            + "    }, {"
+            + "        \"name\": \"start\","
+            + "        \"quantifier\": {"
+            + "            \"consumingStrategy\": \"SKIP_TILL_NEXT\","
+            + "            \"times\": null,"
+            + "            \"untilCondition\": null,"
+            + "            \"properties\": [\"SINGLE\"]"
+            + "        },"
+            + "        \"condition\": {"
+            + "            \"expression\": \"body.level == 'TRACE' || body.level == 'DEBUG' || body.level == 'INFO' || body.level == 'WARN'\","
+            + "            \"type\": \"AVIATOR\""
+            + "        },"
+            + "        \"type\": \"ATOMIC\""
+            + "    }],"
+            + "    \"edges\": [{"
+            + "        \"source\": \"start\","
+            + "        \"target\": \"end\","
+            + "        \"type\": \"SKIP_TILL_NEXT\""
+            + "    }],"
+            + "    \"window\": null,"
+            + "    \"afterMatchStrategy\": {"
+            + "        \"type\": \"NO_SKIP\","
+            + "        \"patternName\": null"
+            + "    },"
+            + "    \"type\": \"COMPOSITE\","
+            + "    \"version\": 1"
             + "}]";
     // @formatter:on
 
@@ -309,7 +258,7 @@ public class RengineKafkaFlinkCepStreamingIT {
             "--deserializerClass", "com.wl4g.rengine.job.kafka.OtlpLogKafkaDeserializationSchema",
             //"--keyByExpression", "type", // grouping by logs event type.(default)
             "--keyByExpression", "body.service", // grouping by logs application name.
-            "--cepPatterns", Encodes.encodeBase64(DEFAULT_CEP_PATTERNS_JSON_1)
+            "--cepPatterns", Encodes.encodeBase64(PATTERN_ARRAY_JSON_1)
             };
     // @formatter:on
 

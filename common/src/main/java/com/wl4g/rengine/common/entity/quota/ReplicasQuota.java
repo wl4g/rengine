@@ -13,10 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.common.entity.sys;
-
-import com.wl4g.infra.common.bean.BaseBean;
-import com.wl4g.rengine.common.entity.quota.ResourceQuota;
+package com.wl4g.rengine.common.entity.quota;
 
 import lombok.Builder.Default;
 import lombok.Getter;
@@ -26,10 +23,10 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link Tenant}
+ * {@link ReplicasQuota}
  * 
  * @author James Wong
- * @version 2023-03-08
+ * @version 2023-03-17
  * @since v1.0.0
  */
 @Getter
@@ -37,12 +34,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class Tenant extends BaseBean {
-    private static final long serialVersionUID = 381411777614066880L;
-
-    private String nameEn;
-    private String nameZh;
-    private @Default ResourceQuota executorQuota = new ResourceQuota();
-    private @Default ResourceQuota controllerQuota = new ResourceQuota();
-
+public class ReplicasQuota {
+    private @Default Integer minReplicas = 1;
+    private @Default Integer maxReplicas = 1;
 }

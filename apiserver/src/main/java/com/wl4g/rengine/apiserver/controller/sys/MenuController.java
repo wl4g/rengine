@@ -19,6 +19,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -67,6 +69,15 @@ public class MenuController {
         RespBase<PageHolder<Menu>> resp = RespBase.create();
         resp.setData(menuService.query(model));
         return resp;
+    }
+
+    // @SecurityRequirement(name = "default_oauth")
+    @Operation(description = "Load menu tree by current user.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
+    @RequestMapping(path = { "tree" }, produces = "application/json", method = { GET })
+    @PreAuthorize("hasPermission(#model,'arn:sys:menu:read:v1')")
+    public RespBase<List<Menu>> loadTreeMenu() {
+        return RespBase.<List<Menu>> create().withData(menuService.loadMenuTree());
     }
 
     // @SecurityRequirement(name = "default_oauth")

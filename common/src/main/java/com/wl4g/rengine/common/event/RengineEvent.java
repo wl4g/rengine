@@ -15,7 +15,6 @@
  */
 package com.wl4g.rengine.common.event;
 
-import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
@@ -151,7 +150,7 @@ public class RengineEvent extends EventObject {
         this.type = hasTextOf(type, "eventType");
         isTrueOf(nonNull(observedTime) && observedTime > 0, format("observedTime > 0, but is: %s", observedTime));
         this.observedTime = observedTime;
-        this.id = Builder.buildDefaultEventId(type, observedTime, source);
+        this.id = isBlank(id) ? Builder.buildDefaultEventId(type, observedTime, source) : id;
         this.body = body;
         this.labels = labels;
     }
@@ -378,11 +377,6 @@ public class RengineEvent extends EventObject {
         }
 
         public RengineEvent build() {
-            if (isBlank(id)) {
-                final String firstPrincipal = nonNull(source) ? safeList(source.getPrincipals()).stream().findFirst().orElse(null)
-                        : null;
-                this.id = format("%s:%s:%s", type, observedTime, firstPrincipal);
-            }
             if (isNull(observedTime)) {
                 this.observedTime = currentTimeMillis();
             }
@@ -394,11 +388,14 @@ public class RengineEvent extends EventObject {
 
         static String buildDefaultEventId(@NotBlank String eventType, @NotNull Long observedTime, @Nullable EventSource source) {
             hasTextOf(eventType, "eventType");
-            notNullOf(observedTime, "observedTime");
+            isTrueOf(nonNull(observedTime) && observedTime > 0, "observedTime > 0");
             // notNullOf(source, "source");
-            final String firstPrincipal = nonNull(source) ? safeList(source.getPrincipals()).stream().findFirst().orElse(null)
-                    : null;
-            return format("%s:%s:%s", eventType, observedTime, firstPrincipal);
+
+            // @formatter:off
+            //final String firstPrincipal = nonNull(source) ? safeList(source.getPrincipals()).stream().findFirst().orElse(null) : null;
+            // @formatter:on
+
+            return format("%s@%s", observedTime, eventType);
         }
     }
 
