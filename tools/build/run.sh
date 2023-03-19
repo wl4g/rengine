@@ -81,8 +81,8 @@ Usage: ./$(basename $0) [OPTIONS] [arg1] [arg2] ...
 function print_pom_version() {
     # see:https://cloud.tencent.com/developer/article/1476991
     MAVEN_OPTS="$DEFAULT_MAVEN_OPTS -Dorg.slf4j.simpleLogger.log.org.apache.maven.plugins.help=INFO"
-    #./mvnw org.apache.maven.plugins:maven-help-plugin:3.3.0:evaluate -o -Dexpression=project.version | grep -v '[INFO]'
-    POM_VERSION=$(./mvnw -Dexec.executable='echo' -Dexec.args='${project.version}' --non-recursive exec:exec -q)
+    #${BASE_DIR}/mvnw org.apache.maven.plugins:maven-help-plugin:3.3.0:evaluate -o -Dexpression=project.version | grep -v '[INFO]'
+    POM_VERSION=$(${BASE_DIR}/mvnw -Dexec.executable='echo' -Dexec.args='${project.version}' --non-recursive exec:exec -q)
     unset MAVEN_OPTS
     echo $POM_VERSION
 }
