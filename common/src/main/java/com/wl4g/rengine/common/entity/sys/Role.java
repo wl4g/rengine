@@ -43,8 +43,6 @@ public class Role extends BaseEntity {
 
     private String roleCode;
     private Integer type;
-    private String nameEn;
-    private String nameZh;
 
     // The temporary wrap fields.
     private List<UserRole> userRoles;

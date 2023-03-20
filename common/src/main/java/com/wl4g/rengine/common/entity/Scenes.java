@@ -47,7 +47,6 @@ import lombok.experimental.SuperBuilder;
 public class Scenes extends BaseEntity {
     private static final long serialVersionUID = -5069149346132378733L;
     private @NotBlank String scenesCode;
-    private @NotBlank String name;
 
     @Getter
     @Setter

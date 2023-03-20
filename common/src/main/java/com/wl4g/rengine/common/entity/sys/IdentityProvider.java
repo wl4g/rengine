@@ -58,8 +58,6 @@ import lombok.experimental.SuperBuilder;
 public class IdentityProvider extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
-    String name;
-
     @NotNull
     ProviderDetailsBase details;
 

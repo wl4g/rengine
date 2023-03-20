@@ -78,7 +78,6 @@ import lombok.experimental.SuperBuilder;
 public class ControllerSchedule extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
-    private @NotBlank String name;
     // ElasticJob standard configuration.
     // private @NotBlank @Default String cron = DEFAULT_CRON;
     private @NotNull @Default Boolean monitorExecution = DEFAULT_MONITOR_EXECUTION;

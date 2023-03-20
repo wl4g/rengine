@@ -43,7 +43,7 @@ public class DataSourcePropertiesTests {
     public void testMongoDataSourcePropertiesSerialize() {
         final DataSourceProperties datasource = new DataSourceProperties();
         datasource.setId(10101001L);
-        datasource.setName("default");
+        datasource.setDsCode("default");
         datasource.setDetails(MongoDataSourceProperties.builder()
                 // .type(DataSourceType.MONGO)
                 .connectionString("mongodb://localhost:27017")
@@ -62,7 +62,7 @@ public class DataSourcePropertiesTests {
     public void testJDBCDataSourcePropertiesSerialize() {
         final DataSourceProperties datasource = new DataSourceProperties();
         datasource.setId(10101001L);
-        datasource.setName("default");
+        datasource.setDsCode("default");
         datasource.setDetails(JDBCDataSourceProperties.builder()
                 // .type(DataSourceType.JDBC)
                 .fetchSize(1024)
@@ -85,7 +85,7 @@ public class DataSourcePropertiesTests {
     public void testRedisDataSourcePropertiesSerialize() {
         final DataSourceProperties datasource = new DataSourceProperties();
         datasource.setId(10101001L);
-        datasource.setName("default");
+        datasource.setDsCode("default");
         datasource.setDetails(RedisDataSourceProperties.builder()
                 // .type(DataSourceType.REDIS)
                 .nodes(asList("localhost:6379,localhost:6380,localhost:6381,localhost:7379,localhost:7380,localhost:7381"))
@@ -107,7 +107,7 @@ public class DataSourcePropertiesTests {
     public void testKafkaDataSourcePropertiesSerialize() {
         final DataSourceProperties datasource1 = new DataSourceProperties();
         datasource1.setId(10101001L);
-        datasource1.setName("default");
+        datasource1.setDsCode("default");
         datasource1.setDetails(KafkaDataSourceProperties.builder()
                 // .type(DataSourceType.KAFKA)
                 .bootstrapServers("localhost:9092")

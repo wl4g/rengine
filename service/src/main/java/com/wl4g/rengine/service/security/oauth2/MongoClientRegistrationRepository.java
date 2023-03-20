@@ -65,14 +65,14 @@ public final class MongoClientRegistrationRepository implements ClientRegistrati
 
     @Override
     public ClientRegistration findByRegistrationId(String registrationId) {
-        final IdentityProvider identityProvider = identityProviderService.getRegistrationId(registrationId);
-        if (isNull(identityProvider)) {
+        final IdentityProvider idp = identityProviderService.getRegistrationId(registrationId);
+        if (isNull(idp)) {
             throw new IllegalArgumentException(format("No found OIDC client registration configuration for %s", registrationId));
         }
 
         final String defaultOAuth2RedirectUri = buildDefaultOAuth2RedirectUri(registrationId);
 
-        final OidcConfig oidcClientRegistration = (OidcConfig) identityProvider.getDetails();
+        final OidcConfig oidcClientRegistration = (OidcConfig) idp.getDetails();
         final UserInfoEndpoint userInfoEndpoint = oidcClientRegistration.getUserInfoEndpoint();
         return ClientRegistration.withRegistrationId(registrationId)
                 .clientId(oidcClientRegistration.getClientId())
@@ -94,7 +94,7 @@ public final class MongoClientRegistrationRepository implements ClientRegistrati
                 .jwkSetUri(oidcClientRegistration.getJwkSetUri())
                 .issuerUri(oidcClientRegistration.getIssuerUri())
                 .providerConfigurationMetadata(oidcClientRegistration.getConfigurationMetadata())
-                .clientName(identityProvider.getName())
+                .clientName(format("%s_OIDC_CLIENT", registrationId))
                 .build();
     }
 

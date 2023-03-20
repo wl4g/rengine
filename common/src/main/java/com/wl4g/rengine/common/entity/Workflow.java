@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -52,7 +51,6 @@ import lombok.experimental.SuperBuilder;
 public class Workflow extends BaseEntity {
     private static final long serialVersionUID = -8038218208189261648L;
     private @NotNull Long scenesId;
-    private @NotBlank String name;
     private @NotNull WorkflowEngine engine;
 
     public static enum WorkflowEngine {

@@ -75,7 +75,7 @@ public class DataSourceProperties extends BaseEntity {
     static final long serialVersionUID = -7441054887057231030L;
 
     @NotBlank
-    String name;
+    String dsCode;
 
     @NotNull
     DataSourcePropertiesBase details;

@@ -15,6 +15,8 @@
  */
 package com.wl4g.rengine.common.entity;
 
+import javax.annotation.Nullable;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wl4g.infra.common.bean.BaseBean;
 
@@ -39,6 +41,8 @@ import lombok.experimental.SuperBuilder;
 public abstract class BaseEntity extends BaseBean {
     private static final long serialVersionUID = 2096342971580901508L;
 
+    private @Nullable String nameEn;
+    private @Nullable String nameZh;
     private Long tenantId;
 
     // Ignore organization getter/setter.

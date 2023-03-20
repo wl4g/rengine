@@ -19,7 +19,6 @@ import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 
 import java.util.List;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -45,7 +44,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class Rule extends BaseEntity {
     private static final long serialVersionUID = -7441054887057231030L;
-    private @NotBlank String name;
     private @NotNull RuleEngine engine;
 
     public static enum RuleEngine {

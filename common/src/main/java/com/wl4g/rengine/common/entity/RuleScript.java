@@ -47,10 +47,14 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class RuleScript extends BaseEntity {
     private static final long serialVersionUID = -4525858823849417654L;
+
     private @NotNull(groups = ValidForEntityMarker.class) Long revision;
+
     private @NotNull Long ruleId;
+
     // Rule script program entry-point file
     private @NotNull Long entrypointUploadId;
+
     private @NotEmpty @Default List<Long> uploadIds = new ArrayList<>(1);
 
     @Getter

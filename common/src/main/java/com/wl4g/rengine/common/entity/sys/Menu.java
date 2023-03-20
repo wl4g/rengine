@@ -44,8 +44,6 @@ import lombok.experimental.SuperBuilder;
 public class Menu extends BaseEntity implements TreeNode<Long, Menu> {
     private static final long serialVersionUID = 381411777614066880L;
 
-    private String nameEn;
-    private String nameZh;
     private Integer type;
     private Long parentId;
     private Integer level;

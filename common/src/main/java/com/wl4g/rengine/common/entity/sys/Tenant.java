@@ -15,7 +15,7 @@
  */
 package com.wl4g.rengine.common.entity.sys;
 
-import com.wl4g.infra.common.bean.BaseBean;
+import com.wl4g.rengine.common.entity.BaseEntity;
 import com.wl4g.rengine.common.entity.quota.ResourceQuota;
 
 import lombok.Builder.Default;
@@ -37,11 +37,9 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class Tenant extends BaseBean {
+public class Tenant extends BaseEntity {
     private static final long serialVersionUID = 381411777614066880L;
 
-    private String nameEn;
-    private String nameZh;
     private @Default ResourceQuota executorQuota = new ResourceQuota();
     private @Default ResourceQuota controllerQuota = new ResourceQuota();
 

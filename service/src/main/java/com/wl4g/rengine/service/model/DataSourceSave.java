@@ -37,5 +37,4 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class DataSourceSave extends DataSourceProperties {
     private static final long serialVersionUID = -8089363065684705215L;
-
 }
