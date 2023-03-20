@@ -11,26 +11,28 @@
 # #### Environment Database configuration. ####
 #
 spring:
-  datasource:
-    type: com.zaxxer.hikari.HikariDataSource
-    driverClassName: com.mysql.cj.jdbc.Driver
-    hikari:
-      jdbcUrl: ${RENGINE_DB_URL:jdbc:mysql://localhost:3306/rengine?useunicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf-8&useSSL=false&allowMultiQueries=true&autoReconnect=true}
-      username: ${RENGINE_DB_USER:rengine}
-      password: ${RENGINE_DB_PASSWORD:rengine}
-      connectionTimeout: 30000
-      idleTimeout: 600000
-      initializationFailTimeout: 1
-      minimumIdle: 10
-      maxLifetime: 1800000
-      maximumPoolSize: 100
-      validationTimeout: 5000
-      leakDetectionThreshold: 0
+  #datasource:
+  #  type: com.zaxxer.hikari.HikariDataSource
+  #  driverClassName: com.mysql.cj.jdbc.Driver
+  #  hikari:
+  #    jdbcUrl: ${RENGINE_DB_URL:jdbc:mysql://localhost:3306/rengine?useunicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf-8&useSSL=false&allowMultiQueries=true&autoReconnect=true}
+  #    username: ${RENGINE_DB_USER:rengine}
+  #    password: ${RENGINE_DB_PASSWORD:rengine}
+  #    connectionTimeout: 30000
+  #    idleTimeout: 600000
+  #    initializationFailTimeout: 1
+  #    minimumIdle: 10
+  #    maxLifetime: 1800000
+  #    maximumPoolSize: 100
+  #    validationTimeout: 5000
+  #    leakDetectionThreshold: 0
   data:
     ## see:https://docs.spring.io/spring-data/mongodb/docs/3.4.2/reference/html/#mongo-template.writeconcern
+    ## see:org.springframework.boot.autoconfigure.data.mongo.MongoDatabaseFactoryDependentConfiguration
     ## see:org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
+    ## see:org.springframework.data.mongodb.config.AbstractMongoClientConfiguration#mongoTemplate
     mongodb:
-      #uri: mongodb://rengine:123456@localhost:27017/rengine
-      uri: mongodb://localhost:27017/rengine
+      #uri: ${RENGINE_DB_URI:mongodb+srv://rengine:123456@mongo.wl4g.io/rengine}
+      uri: ${RENGINE_DB_URI:mongodb://localhost:27017/rengine}
       #username: rengine
       #password: '123456'

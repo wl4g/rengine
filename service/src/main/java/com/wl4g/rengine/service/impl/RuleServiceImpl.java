@@ -28,9 +28,7 @@ import static java.util.Objects.isNull;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
@@ -52,8 +50,6 @@ import com.wl4g.rengine.service.model.RuleSaveResult;
  */
 @Service
 public class RuleServiceImpl extends BasicServiceImpl implements RuleService {
-
-    private @Autowired MongoTemplate mongoTemplate;
 
     @Override
     public PageHolder<Rule> query(RuleQuery model) {

@@ -89,7 +89,7 @@ import lombok.extern.slf4j.Slf4j;
  * @since v1.0.0
  */
 @Slf4j
-public abstract class AbstractScriptEngine implements IEngine {
+public abstract class AbstractScriptEngine implements IScriptEngine {
 
     @Inject
     EngineConfig engineConfig;

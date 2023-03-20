@@ -19,6 +19,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wl4g.infra.common.validation.EnumValue;
 import com.wl4g.rengine.common.entity.ControllerLog;
 import com.wl4g.rengine.common.entity.ControllerSchedule.ScheduleType;
@@ -47,4 +48,31 @@ public class ControllerLogQuery extends BaseQuery<ControllerLog> {
     private @Nullable @EnumValue(enumCls = ScheduleType.class) String type;
     private @Nullable List<Long> scheduleIds;
     private @Nullable List<Long> controllerLogIds;
+
+    // Notice: The disable reading and writing of the name field in the swagger
+    // document. (because the rule script does not have a name field)
+    @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
+    @JsonIgnore
+    @Override
+    public String getNameEn() {
+        return null;
+    }
+
+    @JsonIgnore
+    public void setNameEn(String nameEn) {
+        super.setNameEn(nameEn);
+    }
+
+    @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
+    @JsonIgnore
+    @Override
+    public String getNameZh() {
+        return null;
+    }
+
+    @JsonIgnore
+    public void setNameZh(String nameZh) {
+        super.setNameZh(nameZh);
+    }
+
 }

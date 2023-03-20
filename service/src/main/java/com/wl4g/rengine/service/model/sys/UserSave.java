@@ -15,8 +15,13 @@
  */
 package com.wl4g.rengine.service.model.sys;
 
-import com.wl4g.rengine.common.entity.sys.User;
+import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.wl4g.rengine.common.entity.sys.User;
+import com.wl4g.rengine.common.entity.sys.UserRole;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -37,4 +42,19 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class UserSave extends User {
     private static final long serialVersionUID = 1L;
+
+    // Notice: The disable reading and writing of the name field in the swagger
+    // document. (because the rule script does not have a name field)
+    @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
+    @JsonIgnore
+    @Override
+    public List<UserRole> getUserRoles() {
+        return null;
+    }
+
+    @JsonIgnore
+    public void setUserRoles(List<UserRole> userRoles) {
+        super.setUserRoles(userRoles);
+    }
+
 }

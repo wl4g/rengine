@@ -18,6 +18,7 @@ package com.wl4g.rengine.service.impl;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.rengine.service.mongo.QueryHolder.logicalDelete;
 
+import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,7 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.service.config.RengineServiceProperties;
+import com.wl4g.rengine.service.minio.MinioClientManager;
 import com.wl4g.rengine.service.model.BaseDelete;
 import com.wl4g.rengine.service.mongo.GlobalMongoSequenceService;
 
@@ -44,17 +46,17 @@ import com.wl4g.rengine.service.mongo.GlobalMongoSequenceService;
 @Service
 public abstract class BasicServiceImpl {
 
-    @Autowired
-    protected RengineServiceProperties config;
+    protected @Autowired Validator validator;
 
-    @Autowired
-    protected MongoTemplate mongoTemplate;
+    protected @Autowired RengineServiceProperties config;
 
-    @Autowired
-    protected RedisTemplate<String, String> redisTemplate;
+    protected @Autowired MongoTemplate mongoTemplate;
 
-    @Autowired
-    protected GlobalMongoSequenceService mongoSequenceService;
+    protected @Autowired RedisTemplate<String, String> redisTemplate;
+
+    protected @Autowired GlobalMongoSequenceService mongoSequenceService;
+
+    protected @Autowired(required = false) MinioClientManager minioManager;
 
     protected long doDeleteWithGracefully(@NotNull BaseDelete model, @NotNull MongoCollectionDefinition collection) {
         notNullOf(model, "delete");

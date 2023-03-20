@@ -25,9 +25,7 @@ import static java.util.Objects.isNull;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
@@ -49,8 +47,6 @@ import com.wl4g.rengine.service.model.ScenesSaveResult;
  */
 @Service
 public class ScenesServiceImpl extends BasicServiceImpl implements ScenesService {
-
-    private @Autowired MongoTemplate mongoTemplate;
 
     @Override
     public PageHolder<Scenes> query(ScenesQuery model) {

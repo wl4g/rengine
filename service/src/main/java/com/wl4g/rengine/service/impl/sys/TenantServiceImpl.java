@@ -19,14 +19,13 @@ import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_TENANTS;
 import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
+import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
 import static java.util.Objects.isNull;
 
 import java.util.List;
 
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
@@ -53,7 +52,7 @@ public class TenantServiceImpl extends BasicServiceImpl implements TenantService
     @Override
     public PageHolder<Tenant> query(TenantQuery model) {
         final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getTenantId())))
-                .with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
+                .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
         final List<Tenant> tenants = mongoTemplate.find(query, Tenant.class, SYS_TENANTS.getName());
 

@@ -27,9 +27,7 @@ import static java.util.Objects.nonNull;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
@@ -53,8 +51,6 @@ import com.wl4g.rengine.service.model.DataSourceSaveResult;
 @Service
 public class DataSourceServiceImpl extends BasicServiceImpl implements DataSourceService {
 
-    private @Autowired MongoTemplate mongoTemplate;
-
     @Override
     public PageHolder<DataSourceProperties> query(DataSourceQuery model) {
         final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getDataSourceId()),
@@ -75,7 +71,7 @@ public class DataSourceServiceImpl extends BasicServiceImpl implements DataSourc
     }
 
     @Override
-    public DataSourceSaveResult save(DataSourceSave model) { 
+    public DataSourceSaveResult save(DataSourceSave model) {
         DataSourceProperties dataSourceProperties = model;
         // @formatter:off
         //DataSourceProperties dataSource = DataSourceProperties.builder()

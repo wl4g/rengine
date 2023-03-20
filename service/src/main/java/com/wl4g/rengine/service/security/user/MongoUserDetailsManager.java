@@ -8,6 +8,7 @@ import static java.util.Objects.nonNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -170,16 +171,28 @@ public final class MongoUserDetailsManager implements UserDetailsManager, UserDe
     }
 
     public static com.wl4g.rengine.common.entity.sys.User toEntityUser(UserDetails userDetails) {
-        final var _user = (SpringSecurityUser) userDetails;
+        final var ud = (SpringSecurityUser) userDetails;
         return com.wl4g.rengine.common.entity.sys.User.builder()
-                .id(_user.getUserId())
-                .username(userDetails.getUsername())
-                .password(userDetails.getPassword())
-                .enable(userDetails.isEnabled() ? BaseBean.ENABLED : BaseBean.DISABLED)
-                .accountNonExpired(userDetails.isAccountNonExpired())
-                .accountNonLocked(userDetails.isAccountNonLocked())
-                .credentialsNonExpired(userDetails.isCredentialsNonExpired())
-                .authorities(userDetails.getAuthorities())
+                .id(ud.getUserId())
+                .subject(ud.getSubject())
+                .name(ud.getName())
+                .givenName(ud.getGivenName())
+                .familyName(ud.getFamilyName())
+                .middleName(ud.getMiddleName())
+                .nickname(ud.getNickname())
+                .preferredUsername(ud.getPreferredUsername())
+                .gender(ud.getGender())
+                .locale(ud.getLocale())
+                .birthdate(ud.getBirthdate())
+                .picture(ud.getPicture())
+                .zoneinfo(ud.getZoneinfo())
+                .username(ud.getUsername())
+                .password(ud.getPassword())
+                .enable(ud.isEnabled() ? BaseBean.ENABLED : BaseBean.DISABLED)
+                .accountNonExpired(ud.isAccountNonExpired())
+                .accountNonLocked(ud.isAccountNonLocked())
+                .credentialsNonExpired(ud.isCredentialsNonExpired())
+                .authorities(ud.getAuthorities())
                 .build();
     }
 
@@ -204,9 +217,23 @@ public final class MongoUserDetailsManager implements UserDetailsManager, UserDe
         allRoleGrantedAuthorities.addAll(allPermissionGrantedAuthorities);
 
         // Wrap to spring security user.
-        return new SpringSecurityUser(user.getId(), user.getEnable(), user.getLabels(), user.getRemark(), user.getUsername(),
-                user.getPassword(), (user.getEnable() == BaseBean.ENABLED ? true : false), user.isAccountNonExpired(),
-                user.isAccountNonExpired(), user.isCredentialsNonExpired(), allRoleGrantedAuthorities);
+        final var _user = new SpringSecurityUser(user.getId(), user.getEnable(), user.getLabels(), user.getRemark(),
+                user.getUsername(), user.getPassword(), (user.getEnable() == BaseBean.ENABLED ? true : false),
+                user.isAccountNonExpired(), user.isAccountNonExpired(), user.isCredentialsNonExpired(),
+                allRoleGrantedAuthorities);
+        _user.setSubject(user.getSubject());
+        _user.setName(user.getName());
+        _user.setGivenName(user.getGivenName());
+        _user.setFamilyName(user.getFamilyName());
+        _user.setMiddleName(user.getMiddleName());
+        _user.setNickname(user.getNickname());
+        _user.setPreferredUsername(user.getPreferredUsername());
+        _user.setGender(user.getGender());
+        _user.setLocale(user.getLocale());
+        _user.setBirthdate(user.getBirthdate());
+        _user.setPicture(user.getPicture());
+        _user.setZoneinfo(user.getZoneinfo());
+        return _user;
     }
 
     @Getter
@@ -214,6 +241,18 @@ public final class MongoUserDetailsManager implements UserDetailsManager, UserDe
     @ToString
     public static class SpringSecurityUser extends User {
         private static final long serialVersionUID = 570;
+        private String subject;
+        private String name;
+        private String givenName;
+        private String familyName;
+        private String middleName;
+        private String nickname;
+        private String preferredUsername;
+        private String gender;
+        private String locale;
+        private Date birthdate;
+        private String picture;
+        private String zoneinfo;
         private Long userId;
         private Integer enable;
         private List<String> labels;

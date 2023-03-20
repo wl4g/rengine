@@ -17,16 +17,12 @@ package com.wl4g.rengine.service.mongo;
 
 import javax.validation.constraints.NotNull;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.core.MongoAction;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.WriteConcernResolver;
 
-import com.mongodb.WriteConcern;
-import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
+import com.wl4g.rengine.service.mongo.CustomMongoClientConfiguration.RengineWriteConcernResolver;
 
 /**
  * {@link RengineWriteConcernResolver}
@@ -36,33 +32,12 @@ import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinit
  * @since v1.0.0
  */
 @Configuration
+@Import({ CustomMongoClientConfiguration.class })
 public class RengineMongoAutoConfiguration {
-
-    @Bean
-    @ConditionalOnClass(MongoTemplate.class)
-    public WriteConcernResolver rengineWriteConcernResolver(MongoTemplate mongoTemplate) {
-        return new RengineWriteConcernResolver(mongoTemplate);
-    }
 
     @Bean
     public GlobalMongoSequenceService globalMongoSequenceService(@NotNull final MongoOperations mongoOperations) {
         return new GlobalMongoSequenceService(mongoOperations);
-    }
-
-    public static class RengineWriteConcernResolver implements WriteConcernResolver {
-
-        public RengineWriteConcernResolver(MongoTemplate mongoTemplate) {
-            mongoTemplate.setWriteConcernResolver(this);
-        }
-
-        @Override
-        public WriteConcern resolve(MongoAction action) {
-            if (MongoCollectionDefinition.of(action.getCollectionName()).isWriteConcernSafe()) {
-                return WriteConcern.MAJORITY;
-            }
-            return action.getDefaultWriteConcern();
-        }
-
     }
 
 }

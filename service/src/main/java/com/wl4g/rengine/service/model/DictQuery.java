@@ -17,7 +17,6 @@ package com.wl4g.rengine.service.model;
 
 import javax.annotation.Nullable;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wl4g.infra.common.validation.EnumValue;
 import com.wl4g.rengine.common.entity.sys.Dict;
 import com.wl4g.rengine.common.entity.sys.Dict.DictType;
@@ -60,17 +59,5 @@ public class DictQuery extends BaseQuery<Dict> {
     // @Nullable
     // @Default
     // Boolean isSimple = false;
-
-    // Ignore organization getter/setter.
-    @JsonIgnore
-    @Override
-    public String getName() {
-        return null;
-    }
-
-    @JsonIgnore
-    public void setName(String name) {
-        super.setName(name);
-    }
 
 }

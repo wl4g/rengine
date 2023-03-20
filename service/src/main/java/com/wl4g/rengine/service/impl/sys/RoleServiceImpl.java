@@ -23,6 +23,7 @@ import static com.wl4g.rengine.common.util.ServiceAggregateFilters.ROLE_MENU_LOO
 import static com.wl4g.rengine.common.util.ServiceAggregateFilters.ROLE_USER_LOOKUP_FILTERS;
 import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
+import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toList;
@@ -35,8 +36,6 @@ import javax.validation.constraints.NotNull;
 
 import org.bson.conversions.Bson;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
@@ -73,7 +72,7 @@ public class RoleServiceImpl extends BasicServiceImpl implements RoleService {
     @Override
     public PageHolder<Role> query(RoleQuery model) {
         final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getRoleId())))
-                .with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
+                .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
         final List<Role> roles = mongoTemplate.find(query, Role.class, MongoCollectionDefinition.SYS_ROLES.getName());
 
@@ -154,10 +153,7 @@ public class RoleServiceImpl extends BasicServiceImpl implements RoleService {
         Assert2.notEmpty(userIds, "userIds");
 
         return userIds.parallelStream().map(userId -> {
-            return mongoTemplate
-                    .save(UserRole.builder().roleId(roleId).userId(userId).build(),
-                            SYS_USER_ROLES.getName())
-                    .getId();
+            return mongoTemplate.save(UserRole.builder().roleId(roleId).userId(userId).build(), SYS_USER_ROLES.getName()).getId();
         }).collect(toList());
     }
 
@@ -167,10 +163,7 @@ public class RoleServiceImpl extends BasicServiceImpl implements RoleService {
         Assert2.notEmpty(menuIds, "menuIds");
 
         return menuIds.parallelStream().map(menuId -> {
-            return mongoTemplate
-                    .save(MenuRole.builder().roleId(roleId).menuId(menuId).build(),
-                            SYS_USER_ROLES.getName())
-                    .getId();
+            return mongoTemplate.save(MenuRole.builder().roleId(roleId).menuId(menuId).build(), SYS_USER_ROLES.getName()).getId();
         }).collect(toList());
     }
 

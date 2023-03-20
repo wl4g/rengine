@@ -44,11 +44,29 @@ public class WorkflowGraphQuery extends BaseQuery<WorkflowGraph> {
     private @Nullable Long workflowId;
 
     // Notice: The disable reading and writing of the name field in the swagger
-    // document. (because the workflow graph does not have a name field)
+    // document. (because the rule script does not have a name field)
     @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
     @JsonIgnore
-    public String getName() {
-        return super.getName();
+    @Override
+    public String getNameEn() {
+        return null;
+    }
+
+    @JsonIgnore
+    public void setNameEn(String nameEn) {
+        super.setNameEn(nameEn);
+    }
+
+    @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
+    @JsonIgnore
+    @Override
+    public String getNameZh() {
+        return null;
+    }
+
+    @JsonIgnore
+    public void setNameZh(String nameZh) {
+        super.setNameZh(nameZh);
     }
 
 }

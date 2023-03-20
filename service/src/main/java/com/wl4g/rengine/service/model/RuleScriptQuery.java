@@ -17,6 +17,7 @@ package com.wl4g.rengine.service.model;
 
 import javax.annotation.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wl4g.rengine.common.entity.RuleScript;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -45,7 +46,27 @@ public class RuleScriptQuery extends BaseQuery<RuleScript> {
     // Notice: The disable reading and writing of the name field in the swagger
     // document. (because the rule script does not have a name field)
     @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
-    public String getName() {
-        return super.getName();
+    @JsonIgnore
+    @Override
+    public String getNameEn() {
+        return null;
     }
+
+    @JsonIgnore
+    public void setNameEn(String nameEn) {
+        super.setNameEn(nameEn);
+    }
+
+    @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
+    @JsonIgnore
+    @Override
+    public String getNameZh() {
+        return null;
+    }
+
+    @JsonIgnore
+    public void setNameZh(String nameZh) {
+        super.setNameZh(nameZh);
+    }
+
 }

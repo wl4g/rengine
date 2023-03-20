@@ -28,7 +28,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.wl4g.rengine.common.entity.Rule.RuleEngine;
 import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
 
 import lombok.Builder.Default;
@@ -54,7 +53,11 @@ public class Workflow extends BaseEntity {
     private static final long serialVersionUID = -8038218208189261648L;
     private @NotNull Long scenesId;
     private @NotBlank String name;
-    private @NotNull RuleEngine engine;
+    private @NotNull WorkflowEngine engine;
+
+    public static enum WorkflowEngine {
+        STANDARD, FLINK_CEP_GRAPH
+    }
 
     @Getter
     @Setter

@@ -58,6 +58,7 @@ import com.wl4g.infra.common.web.rest.RespBase.RetCode;
 import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
 import com.wl4g.rengine.common.entity.RuleScript.RuleScriptWrapper;
 import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
+import com.wl4g.rengine.common.entity.Workflow.WorkflowEngine;
 import com.wl4g.rengine.common.entity.Workflow.WorkflowGraphWrapper;
 import com.wl4g.rengine.common.entity.Workflow.WorkflowWrapper;
 import com.wl4g.rengine.common.entity.WorkflowGraph.BaseNode;
@@ -145,28 +146,34 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
             final Long virtualGraphId = ruleScriptId;
             final Long virtualWorkflowId = ruleScriptId;
 
-            final List<BaseNode<?>> virtualNodes = new LinkedList<>();
-            virtualNodes.add(new BootNode().withId("0").withName("The virtual Boot node"));
-            virtualNodes.add(new ProcessNode().withId("1").withName("The virtual Process node").withRuleId(rule.getId()));
+            // vistual workflow graph nodes.
+            final List<BaseNode<?>> vNodes = new LinkedList<>();
+            vNodes.add(new BootNode().withId("0").withName("The virtual Boot node"));
+            vNodes.add(new ProcessNode().withId("1").withName("The virtual Process node").withRuleId(rule.getId()));
 
-            final List<NodeConnection> virtualCollections = new LinkedList<>();
-            virtualCollections.add(new NodeConnection("1", "0"));
+            // vistual workflow graph connections.
+            final List<NodeConnection> vCollections = new LinkedList<>();
+            vCollections.add(new NodeConnection("1", "0"));
 
-            final WorkflowGraphWrapper virtualGraph = new WorkflowGraphWrapper();
-            virtualGraph.setId(virtualGraphId);
-            virtualGraph.setWorkflowId(virtualWorkflowId);
-            virtualGraph.setNodes(virtualNodes);
-            virtualGraph.setConnections(virtualCollections);
-            virtualGraph.setRules(singletonList(rule));
+            // vistual workflow graph.
+            final WorkflowGraphWrapper vGraph = new WorkflowGraphWrapper();
+            vGraph.setId(virtualGraphId);
+            vGraph.setWorkflowId(virtualWorkflowId);
+            vGraph.setNodes(vNodes);
+            vGraph.setConnections(vCollections);
+            vGraph.setRules(singletonList(rule));
 
-            final WorkflowWrapper virtualWorkflow = WorkflowWrapper.builder()
+            // vistual workflow.
+            final WorkflowWrapper vWorkflow = WorkflowWrapper.builder()
                     .id(virtualWorkflowId)
-                    .engine(rule.getEngine())
-                    .graphs(singletonList(virtualGraph.validateForBasic()))
+                    // Notice: The current online script debugging execution
+                    // only supports standard workflows.
+                    .engine(WorkflowEngine.STANDARD)
+                    .graphs(singletonList(vGraph.validateForBasic()))
                     .build();
 
-            final ResultDescription result = lifecycleExecutionService.getExecution(rule.getEngine())
-                    .execute(executeRequest, virtualWorkflow.validate(), false);
+            final ResultDescription result = lifecycleExecutionService.getExecution(vWorkflow.getEngine())
+                    .execute(executeRequest, vWorkflow.validate(), false);
             log.debug("Executed virtual workflow result : {}", result);
 
             return resp.withCode(RetCode.OK)

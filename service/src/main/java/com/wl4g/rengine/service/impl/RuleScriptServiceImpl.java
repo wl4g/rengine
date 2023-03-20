@@ -35,11 +35,9 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 
 import org.bson.conversions.Bson;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
@@ -64,8 +62,6 @@ import com.wl4g.rengine.common.model.RuleScriptExecuteRequest;
 import com.wl4g.rengine.common.model.RuleScriptExecuteResult;
 import com.wl4g.rengine.common.util.BsonEntitySerializers;
 import com.wl4g.rengine.service.RuleScriptService;
-import com.wl4g.rengine.service.config.RengineServiceProperties;
-import com.wl4g.rengine.service.minio.MinioClientManager;
 import com.wl4g.rengine.service.model.RuleScriptDelete;
 import com.wl4g.rengine.service.model.RuleScriptDeleteResult;
 import com.wl4g.rengine.service.model.RuleScriptQuery;
@@ -90,18 +86,6 @@ import lombok.CustomLog;
 @Service
 @CustomLog
 public class RuleScriptServiceImpl extends BasicServiceImpl implements RuleScriptService {
-
-    @Autowired
-    RengineServiceProperties config;
-
-    @Autowired
-    MongoTemplate mongoTemplate;
-
-    @Autowired
-    GlobalMongoSequenceService mongoSequenceService;
-
-    @Autowired(required = false)
-    MinioClientManager minioManager;
 
     @Override
     public PageHolder<RuleScript> query(RuleScriptQuery model) {

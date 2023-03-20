@@ -48,7 +48,8 @@ public interface DictService {
                 .type(model.getType())
                 .key(model.getKey())
                 .value(model.getValue())
-                .name(model.getName())
+                .nameEn(model.getNameEn())
+                .nameZh(model.getNameZh())
                 .pageSize(Integer.MAX_VALUE)
                 .build()).getRecords());
 

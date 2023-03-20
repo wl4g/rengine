@@ -26,9 +26,7 @@ import static java.util.Objects.isNull;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
@@ -51,16 +49,13 @@ import com.wl4g.rengine.service.model.WorkflowSaveResult;
 @Service
 public class WorkflowServiceImpl extends BasicServiceImpl implements WorkflowService {
 
-    private @Autowired MongoTemplate mongoTemplate;
-
     @Override
     public PageHolder<Workflow> query(WorkflowQuery model) {
         final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getWorkflowId()),
                 isCriteria("scenesId", model.getScenesId())))
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
-        final List<Workflow> workflows = mongoTemplate.find(query, Workflow.class,
-                RE_WORKFLOWS.getName());
+        final List<Workflow> workflows = mongoTemplate.find(query, Workflow.class, RE_WORKFLOWS.getName());
         // Collections.sort(workflows, (o1, o2) -> (o2.getUpdateDate().getTime()
         // - o1.getUpdateDate().getTime()) > 0 ? 1 : -1);
 

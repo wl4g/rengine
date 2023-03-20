@@ -48,11 +48,6 @@ public class Rule extends BaseEntity {
     private @NotBlank String name;
     private @NotNull RuleEngine engine;
 
-    // Temporary fields.
-    // @Schema(hidden = true, accessMode =
-    // io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
-    // private @Nullable transient List<UploadObject> uploads;
-
     public static enum RuleEngine {
 
         /**
@@ -60,11 +55,7 @@ public class Rule extends BaseEntity {
          */
         // GROOVY,
 
-        JS,
-
-        FLINK_SQL,
-
-        FLINK_CEP_SQL
+        JS
     }
 
     @Getter

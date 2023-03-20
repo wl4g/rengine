@@ -25,9 +25,7 @@ import static java.util.Objects.isNull;
 import java.util.Date;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -39,6 +37,7 @@ import com.wl4g.rengine.common.entity.sys.IdentityProvider;
 import com.wl4g.rengine.common.util.BeanSensitiveTransforms;
 import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.service.IdentityProviderService;
+import com.wl4g.rengine.service.impl.BasicServiceImpl;
 import com.wl4g.rengine.service.model.sys.IdentityProviderDelete;
 import com.wl4g.rengine.service.model.sys.IdentityProviderDeleteResult;
 import com.wl4g.rengine.service.model.sys.IdentityProviderQuery;
@@ -53,9 +52,7 @@ import com.wl4g.rengine.service.model.sys.IdentityProviderSaveResult;
  * @since v1.0.0
  */
 @Service
-public class IdentityProviderServiceImpl implements IdentityProviderService {
-
-    private @Autowired MongoTemplate mongoTemplate;
+public class IdentityProviderServiceImpl extends BasicServiceImpl implements IdentityProviderService {
 
     @Override
     public PageHolder<IdentityProvider> query(IdentityProviderQuery model) {

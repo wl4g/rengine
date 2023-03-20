@@ -44,4 +44,5 @@ public class ControllerScheduleQuery extends BaseQuery<ControllerSchedule> {
     @Schema(implementation = ScheduleType.class)
     private @Nullable @EnumValue(enumCls = ScheduleType.class) String type;
     private @Nullable Long scheduleId;
+
 }

@@ -16,6 +16,7 @@
 package com.wl4g.rengine.common.entity.sys;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +48,19 @@ import lombok.experimental.SuperBuilder;
 public class User extends BaseEntity {
     private static final long serialVersionUID = -5762348176963349685L;
 
-    private @NotBlank String username; // email
+    private String subject;
+    private String name;
+    private String givenName;
+    private String familyName;
+    private String middleName;
+    private String nickname;
+    private String preferredUsername;
+    private String gender;
+    private String locale;
+    private Date birthdate;
+    private String picture;
+    private String zoneinfo;
+    private @NotBlank String username; // or email
     private String password;
     private boolean accountNonExpired;
     private boolean accountNonLocked;

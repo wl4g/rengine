@@ -22,13 +22,13 @@ import com.wl4g.rengine.common.graph.ExecutionGraphContext;
 import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
 
 /**
- * {@link IEngine}
+ * {@link IScriptEngine}
  * 
  * @author James Wong
  * @version 2022-09-22
  * @since v1.0.0
  */
-public interface IEngine {
+public interface IScriptEngine {
     ScriptResult execute(
             @NotNull final ExecutionGraphContext graphContext,
             @NotNull final RuleWrapper rule,

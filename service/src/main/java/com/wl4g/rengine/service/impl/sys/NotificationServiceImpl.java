@@ -28,8 +28,6 @@ import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -42,6 +40,7 @@ import com.wl4g.rengine.common.entity.sys.Notification;
 import com.wl4g.rengine.common.entity.sys.Notification.DingtalkConfig;
 import com.wl4g.rengine.common.util.IdGenUtils;
 import com.wl4g.rengine.service.NotificationService;
+import com.wl4g.rengine.service.impl.BasicServiceImpl;
 import com.wl4g.rengine.service.model.sys.NotificationDingtalkUserIdExchage;
 import com.wl4g.rengine.service.model.sys.NotificationDingtalkUserIdExchageResult;
 import com.wl4g.rengine.service.model.sys.NotificationQuery;
@@ -60,9 +59,7 @@ import lombok.CustomLog;
  */
 @CustomLog
 @Service
-public class NotificationServiceImpl implements NotificationService {
-
-    private @Autowired MongoTemplate mongoTemplate;
+public class NotificationServiceImpl extends BasicServiceImpl implements NotificationService {
 
     @Override
     public NotificationQueryResult query(NotificationQuery model) {

@@ -31,9 +31,7 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
@@ -50,7 +48,6 @@ import com.wl4g.rengine.common.model.WorkflowExecuteRequest;
 import com.wl4g.rengine.common.model.WorkflowExecuteResult;
 import com.wl4g.rengine.common.util.ScriptEngineUtil;
 import com.wl4g.rengine.service.WorkflowGraphService;
-import com.wl4g.rengine.service.config.RengineServiceProperties;
 import com.wl4g.rengine.service.model.WorkflowGraphDelete;
 import com.wl4g.rengine.service.model.WorkflowGraphDeleteResult;
 import com.wl4g.rengine.service.model.WorkflowGraphLogfile;
@@ -72,18 +69,6 @@ import lombok.CustomLog;
 @CustomLog
 @Service
 public class WorkflowGraphServiceImpl extends BasicServiceImpl implements WorkflowGraphService {
-
-    @Autowired
-    RengineServiceProperties config;
-
-    @Autowired
-    MongoTemplate mongoTemplate;
-
-    @Autowired
-    GlobalMongoSequenceService mongoSequenceService;
-
-    // @Autowired
-    // MinioClientManager minioClientManager;
 
     @Override
     public PageHolder<WorkflowGraph> query(WorkflowGraphQuery model) {

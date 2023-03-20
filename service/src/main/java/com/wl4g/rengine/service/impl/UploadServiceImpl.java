@@ -29,11 +29,8 @@ import static java.util.stream.Collectors.toList;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
-import javax.validation.Validator;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
@@ -64,8 +61,6 @@ import io.minio.credentials.Credentials;
 @Service
 public class UploadServiceImpl extends BasicServiceImpl implements UploadService {
 
-    private @Autowired Validator validator;
-    private @Autowired MongoTemplate mongoTemplate;
     private @Autowired(required = false) MinioClientManager minioManager;
 
     @Override
@@ -74,8 +69,7 @@ public class UploadServiceImpl extends BasicServiceImpl implements UploadService
                 isCriteria("uploadType", model.getUploadType())))
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
-        final List<UploadObject> uploads = mongoTemplate.find(query, UploadObject.class,
-                RE_UPLOADS.getName());
+        final List<UploadObject> uploads = mongoTemplate.find(query, UploadObject.class, RE_UPLOADS.getName());
         // Collections.sort(uploads, (o1, o2) ->
         // safeLongToInt(o2.getUpdateDate().getTime() -
         // o1.getUpdateDate().getTime()));

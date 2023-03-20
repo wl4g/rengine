@@ -19,14 +19,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.service.meter.RengineMeterService;
-import com.wl4g.rengine.service.minio.MinioClientAutoConfiguration;
-import com.wl4g.rengine.service.mongo.CustomMongoConfigure;
 
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 
@@ -38,7 +35,6 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
  * @since v1.0.0
  */
 @Configuration
-@Import({ MinioClientAutoConfiguration.class, CustomMongoConfigure.class })
 public class RengineServiceAutoConfiguration {
 
     @Bean

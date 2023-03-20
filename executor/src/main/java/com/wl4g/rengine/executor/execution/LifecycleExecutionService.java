@@ -58,8 +58,8 @@ import com.google.common.collect.Iterables;
 import com.wl4g.infra.common.lang.tuples.Tuple2;
 import com.wl4g.infra.common.task.GenericTaskRunner;
 import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
-import com.wl4g.rengine.common.entity.Rule.RuleEngine;
 import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
+import com.wl4g.rengine.common.entity.Workflow.WorkflowEngine;
 import com.wl4g.rengine.common.entity.Workflow.WorkflowWrapper;
 import com.wl4g.rengine.common.exception.RengineException;
 import com.wl4g.rengine.common.model.WorkflowExecuteRequest;
@@ -187,7 +187,7 @@ public class LifecycleExecutionService {
                 .build();
     }
 
-    public WorkflowExecution getExecution(RuleEngine engine) {
+    public WorkflowExecution getExecution(WorkflowEngine engine) {
         switch (engine) {
         default:
             return notNull(getBean(DefaultWorkflowExecution.class), "Could't obtain workflow execution of engine : %s", engine);
@@ -226,8 +226,8 @@ public class LifecycleExecutionService {
             // support scenes to workflow as one-to-one.
             final WorkflowWrapper workflow = scenes.getEffectivePriorityWorkflow();
 
-            final RuleEngine engine = workflow.getEngine();
-            notNull(engine, "Please check if the configuration is correct, rule engine type of workflow is null.");
+            final WorkflowEngine engine = workflow.getEngine();
+            notNull(engine, "Please check if the configuration is correct, workflow engine is null.");
 
             try {
                 // Buried-point: total workflowExecuteRequest.

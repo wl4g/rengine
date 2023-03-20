@@ -44,10 +44,11 @@ import lombok.experimental.SuperBuilder;
 public class Dict extends BaseEntity {
     private static final long serialVersionUID = -5762348176963349685L;
 
+    private @Nullable String nameEn;
+    private @Nullable String nameZh;
     private @NotBlank DictType type;
     private @NotBlank String key;
     private @NotBlank String value;
-    private @Nullable String name;
     private @Nullable Integer sort;
 
     public static String buildCacheHashKey(@NotBlank String type, @NotBlank String key) {

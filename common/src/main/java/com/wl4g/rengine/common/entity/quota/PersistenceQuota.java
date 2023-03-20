@@ -15,8 +15,6 @@
  */
 package com.wl4g.rengine.common.entity.quota;
 
-import com.wl4g.infra.common.io.DataSize;
-
 import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,5 +35,5 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 @NoArgsConstructor
 public class PersistenceQuota {
-    private @Default DataSize maxSize = DataSize.ofMegabytes(20);
+    private @Default String maxSize = "20M";
 }

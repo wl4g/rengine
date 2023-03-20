@@ -62,8 +62,11 @@ public abstract class QueryHolder {
         // if (nonNull(model.getId())) {
         // criterias.add(Criteria.where(DEFAULT_FIELD_ID_.is(model.getId()));
         // }
-        if (nonNull(model.getName())) {
-            criterias.add(Criteria.where("name").regex(format("(%s)+", model.getName())));
+        if (nonNull(model.getNameEn())) {
+            criterias.add(Criteria.where("nameEn").regex(format("(%s)+", model.getNameEn())));
+        }
+        if (nonNull(model.getNameZh())) {
+            criterias.add(Criteria.where("nameZh").regex(format("(%s)+", model.getNameZh())));
         }
         if (nonNull(model.getEnable())) {
             criterias.add(Criteria.where("enable").is(model.getEnable() ? BaseBean.ENABLED : BaseBean.DISABLED));

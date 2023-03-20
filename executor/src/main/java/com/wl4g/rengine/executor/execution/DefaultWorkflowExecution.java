@@ -41,7 +41,7 @@ import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
 import com.wl4g.rengine.common.model.ExecuteRequest;
 import com.wl4g.rengine.common.model.WorkflowExecuteResult.ResultDescription;
 import com.wl4g.rengine.executor.execution.engine.GraalJSScriptEngine;
-import com.wl4g.rengine.executor.execution.engine.IEngine;
+import com.wl4g.rengine.executor.execution.engine.IScriptEngine;
 import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
 
 import lombok.CustomLog;
@@ -70,7 +70,6 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
             final boolean usingCache) {
         workflow.validate();
         final WorkflowGraphWrapper workflowGraph = workflow.getEffectiveLatestGraph();
-        final IEngine engine = getEngine(workflow.getEngine());
 
         try {
             final ExecutionGraphParameter parameter = ExecutionGraphParameter.builder()
@@ -92,7 +91,9 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
                 final RuleWrapper rule = Assert2.notNull(ruleMap.get(ruleId),
                         "Rule '%s' is missing. please check workflow graph rules configuration.", ruleId);
 
-                final ScriptResult result = engine.execute(ctx, rule, usingCache);
+                final IScriptEngine scriptEngine = getScriptEngine(rule.getEngine());
+
+                final ScriptResult result = scriptEngine.execute(ctx, rule, usingCache);
                 if (nonNull(result)) {
                     return new ExecutionGraphResult(ReturnState.of(result.getState()), result.getValueMap());
                 }
@@ -115,8 +116,8 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
         }
     }
 
-    protected IEngine getEngine(RuleEngine kind) {
-        switch (kind) {
+    protected IScriptEngine getScriptEngine(RuleEngine engine) {
+        switch (engine) {
         // case GROOVY:
         // return groovyScriptEngine;
         case JS:

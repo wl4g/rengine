@@ -1,9 +1,20 @@
 package com.wl4g.rengine.service.mongo;
 
+import javax.annotation.PostConstruct;
+
 import org.bson.Document;
+import org.bson.UuidRepresentation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.mongo.MongoProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.ConverterFactory;
+import org.springframework.data.mongodb.SpringDataMongoDB;
 import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
+import org.springframework.data.mongodb.core.MongoAction;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.WriteConcernResolver;
 //import java.util.Arrays;
 //import org.springframework.boot.autoconfigure.mongo.MongoProperties;
 //import org.springframework.context.annotation.Bean;
@@ -16,22 +27,50 @@ import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 //import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions.MongoConverterConfigurationAdapter;
 
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.WriteConcern;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.internal.MongoClientImpl;
 import com.wl4g.infra.common.bean.BaseBean;
+import com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition;
 import com.wl4g.rengine.common.util.BsonEntitySerializers;
 
+import lombok.Getter;
+
 /**
- * {@link CustomMongoConfigure}
+ * {@link CustomMongoClientConfiguration}
  * 
  * @author James Wong
  * @version 2022-12-08
  * @since v1.0.0
  * @see https://github.com/spring-projects/spring-data-mongodb/blob/3.4.6/src/main/asciidoc/reference/mongo-custom-conversions.adoc
  */
-public class CustomMongoConfigure extends AbstractMongoClientConfiguration {
+@Getter
+public class CustomMongoClientConfiguration extends AbstractMongoClientConfiguration {
+
+    private @Autowired MongoProperties mongoProperties;
+    private ConnectionString connectionString;
+
+    @PostConstruct
+    public void init() {
+        // poritited for connection string.
+        this.connectionString = new ConnectionString(mongoProperties.getUri());
+    }
 
     @Override
     public String getDatabaseName() {
-        return "rengine";
+        return connectionString.getDatabase();
+    }
+
+    @Override
+    protected MongoClient createMongoClient(MongoClientSettings settings) {
+        // issure: spring.data.mongodb.uri not working.
+        // see:https://github.com/spring-projects/spring-boot/issues/6739
+        return new MongoClientImpl(MongoClientSettings.builder()
+                .uuidRepresentation(UuidRepresentation.JAVA_LEGACY)
+                .applyConnectionString(connectionString)
+                .build(), SpringDataMongoDB.driverInformation());
     }
 
     //// @formatter:off
@@ -192,5 +231,25 @@ public class CustomMongoConfigure extends AbstractMongoClientConfiguration {
     //    }
     //}
     //// @formatter:on
+
+    @Bean
+    @ConditionalOnClass(MongoTemplate.class)
+    public WriteConcernResolver rengineWriteConcernResolver(MongoTemplate mongoTemplate) {
+        return new RengineWriteConcernResolver(mongoTemplate);
+    }
+
+    public static class RengineWriteConcernResolver implements WriteConcernResolver {
+        public RengineWriteConcernResolver(MongoTemplate mongoTemplate) {
+            mongoTemplate.setWriteConcernResolver(this);
+        }
+
+        @Override
+        public WriteConcern resolve(MongoAction action) {
+            if (MongoCollectionDefinition.of(action.getCollectionName()).isWriteConcernSafe()) {
+                return WriteConcern.MAJORITY;
+            }
+            return action.getDefaultWriteConcern();
+        }
+    }
 
 }
