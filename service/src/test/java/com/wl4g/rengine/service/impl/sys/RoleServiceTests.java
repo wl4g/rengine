@@ -22,35 +22,39 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import com.wl4g.rengine.service.security.user.AuthenticationServiceTests;
 import com.wl4g.rengine.service.util.TestDefaultMongoSetup;
 
 /**
- * {@link UserServiceTests}
+ * {@link RoleServiceTests}
  * 
  * @author James Wong
  * @version 2023-02-14
  * @since v1.0.0
  */
-public class UserServiceTests {
+public class RoleServiceTests {
 
-    static UserServiceImpl userService;
+    static RoleServiceImpl roleService;
     static MongoTemplate mongoTemplate;
 
     @BeforeClass
     public static void init() {
-        userService = new UserServiceImpl() {
+        roleService = new RoleServiceImpl() {
             {
                 this.mongoTemplate = TestDefaultMongoSetup.createMongoTemplate();
-                this.authenticationService = AuthenticationServiceTests.getAuthenticationService();
             }
         };
     }
 
     @Test
-    public void testFindRolesByUserIds() {
-        final var roles = userService.findRolesByUserIds(singletonList(61508655614689001L));
-        System.out.println(toJSONString(roles, true));
+    public void testFindUsersByRoleIds() {
+        final var users = roleService.findUsersByRoleIds(singletonList(61508655614612341L));
+        System.out.println(toJSONString(users, true));
+    }
+
+    @Test
+    public void testFindMenusByRoleIds() {
+        final var menus = roleService.findMenusByRoleIds(singletonList(61508655614612341L));
+        System.out.println(toJSONString(menus, true));
     }
 
 }

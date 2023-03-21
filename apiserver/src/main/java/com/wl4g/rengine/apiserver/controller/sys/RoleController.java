@@ -121,7 +121,7 @@ public class RoleController {
     // @SecurityRequirement(name = "default_oauth")
     @Operation(description = "Assign users by roleId.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
-    @RequestMapping(path = { "assign/users" }, produces = "application/json", method = { GET })
+    @RequestMapping(path = { "assign/users" }, produces = "application/json", method = { POST })
     @PreAuthorize("hasPermission(#model,'arn:sys:role:users:write:v1')")
     public RespBase<List<Long>> assignUsers(@RequestParam("roleId") Long roleId, @RequestParam("userIds") List<Long> userIds) {
         log.debug("called: roleId={}, userIds={}", roleId, userIds);
@@ -131,7 +131,7 @@ public class RoleController {
     // @SecurityRequirement(name = "default_oauth")
     @Operation(description = "Assign menus by roleId.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
-    @RequestMapping(path = { "assign/menus" }, produces = "application/json", method = { GET })
+    @RequestMapping(path = { "assign/menus" }, produces = "application/json", method = { POST })
     @PreAuthorize("hasPermission(#model,'arn:sys:role:menus:write:v1')")
     public RespBase<List<Long>> assignMenus(@RequestParam("roleId") Long roleId, @RequestParam("menuIds") List<Long> menuIds) {
         log.debug("called: roleId={}, menuIds={}", roleId, menuIds);

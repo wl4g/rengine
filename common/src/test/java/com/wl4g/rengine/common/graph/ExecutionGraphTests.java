@@ -109,7 +109,6 @@ public class ExecutionGraphTests {
     @Test
     public void testECommerceTradeWorkflow() {
         try {
-
             final WorkflowGraph workflowGraph = WorkflowGraphTests.buildDefaultWorkflowGraph();
             out.println("Workflow Node Json : " + toJSONString(workflowGraph));
 
@@ -134,11 +133,11 @@ public class ExecutionGraphTests {
                 return new ExecutionGraphResult(ReturnState.TRUE, singletonMap("foo" + nodeId, "bar" + nodeId));
             });
 
-            ExecutionGraph<?> graph = ExecutionGraph.from((StandardGraph) workflowGraph.getDetails());
-            ExecutionGraphResult result = graph.apply(context);
+            ExecutionGraph<?> execution = ExecutionGraph.from((StandardGraph) workflowGraph.getDetails());
+            ExecutionGraphResult result = execution.apply(context);
 
             out.println("-------------------------------------------------------");
-            out.println("                           Final result : " + toJSONString(result));
+            out.println("      Executed result : " + toJSONString(result));
             out.println("-------------------------------------------------------");
             out.println("Executed tracing info : \n" + context.asTraceText(true));
 

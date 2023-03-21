@@ -18,6 +18,7 @@ package com.wl4g.rengine.service.impl.sys;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_USERS;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_USER_ROLES;
+import static com.wl4g.rengine.common.util.BsonAggregateFilters.USER_ROLE_LOOKUP_FILTERS;
 import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
@@ -26,20 +27,27 @@ import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toList;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.collections.IteratorUtils;
+import org.bson.conversions.Bson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import com.mongodb.client.model.Aggregates;
+import com.mongodb.client.model.Filters;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.lang.Assert2;
+import com.wl4g.rengine.common.entity.sys.Role;
 import com.wl4g.rengine.common.entity.sys.User;
 import com.wl4g.rengine.common.entity.sys.UserRole;
+import com.wl4g.rengine.common.util.BsonEntitySerializers;
 import com.wl4g.rengine.service.UserService;
 import com.wl4g.rengine.service.impl.BasicServiceImpl;
 import com.wl4g.rengine.service.model.sys.UserDelete;
@@ -582,8 +590,25 @@ public class UserServiceImpl extends BasicServiceImpl implements UserService {
      * </pre>
      */
     @Override
-    public UserAuthInfo userInfo() {
+    public UserAuthInfo currentUserInfo() {
         return authenticationService.currentUserInfo();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Role> findRolesByUserIds(@NotEmpty List<Long> userIds) {
+        Assert2.notEmpty(userIds, "userIds");
+
+        final var aggregates = new ArrayList<Bson>(2);
+        aggregates.add(Aggregates.match(Filters.in("_id", userIds)));
+        USER_ROLE_LOOKUP_FILTERS.stream().forEach(rs -> aggregates.add(rs.asDocument()));
+
+        try (var cursor = mongoTemplate.getCollection(SYS_USERS.getName())
+                .aggregate(aggregates)
+                .map(roleDoc -> BsonEntitySerializers.fromDocument(roleDoc, Role.class))
+                .cursor();) {
+            return IteratorUtils.toList(cursor);
+        }
     }
 
     @Override

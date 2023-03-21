@@ -278,7 +278,7 @@ public abstract class BsonAggregateFilters {
      * 优点: 交叉平面, 按需返回, 多层级结构不清晰, 适合只需提取子子节点的数据. (如:查询 user 下 roles 下所有去重的 menus,
      * 无需返回其他中间关联信息 user_roles,menu_roles 等) </br>
      * </br>
-     * 将子节点menus提取合并到上一层:
+     * 将子节点 menus 提取合并到上一层:
      * https://www.mongodb.com/docs/manual/reference/operator/aggregation/mergeObjects/#-mergeobjects
      */
     // @formatter:off
@@ -320,6 +320,47 @@ public abstract class BsonAggregateFilters {
             + "  { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ \"$menus\", 0 ] }, \"$$ROOT\" ] } } },"
             // 隐藏(不返回)子节点menus
             + "    { $project: { menus: 0 } }"
+            + "]");
+    // @formatter:on
+
+    // Lookup for roles by user filters.
+    /**
+     * 连接查询根据 username 查询 user 下的 roles. </br>
+     * </br>
+     * 优点: 交叉平面, 按需返回, 多层级结构不清晰, 适合只需提取子子节点的数据. (如:查询 user 下所有去重的 roles,
+     * 无需返回其他中间关联信息 user_roles 等) </br>
+     * </br>
+     * 将子节点 roles 提取合并到上一层:
+     * https://www.mongodb.com/docs/manual/reference/operator/aggregation/mergeObjects/#-mergeobjects
+     */
+    // @formatter:off
+    public static final BsonArray USER_ROLE_LOOKUP_FILTERS = BsonArray.parse("["
+            //+ "  { $match: { \"username\": { $in: [\"root\"] } } },"
+            + "  { $match: { \"enable\": { $eq: 1 } } },"
+            + "  { $match: { \"delFlag\": { $eq: 0 } } },"
+            // like e.g: left join sys_user_roles on u._id=ur.userId
+            + "  { $lookup: {"
+            + "      from: \"" + SYS_USER_ROLES.getName() + "\","
+            + "      localField: \"_id\","
+            + "      foreignField: \"userId\","
+            + "      as: \"userRoles\""
+            + "    }"
+            + "  },"
+            + "  { $unwind: \"$userRoles\" },"
+            + "  { $group: { _id: \"$userRoles.roleId\" } },"
+            + "    { $lookup: {"
+            + "            from: \"" + SYS_ROLES.getName() + "\","
+            + "            localField: \"_id\","
+            + "            foreignField: \"_id\","
+            + "            as: \"roles\""
+            + "        }"
+            + "    },"
+            + " { $match: { \"roles.enable\": { $eq: 1 } } },"
+            + " { $match: { \"roles.delFlag\": { $eq: 0 } } },"
+            // 将子节点menus提取合并到上一层:https://www.mongodb.com/docs/manual/reference/operator/aggregation/mergeObjects/#-mergeobjects
+            + "  { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ \"$roles\", 0 ] }, \"$$ROOT\" ] } } },"
+            // 隐藏(不返回)子节点menus
+            + "    { $project: { roles: 0 } }"
             + "]");
     // @formatter:on
 

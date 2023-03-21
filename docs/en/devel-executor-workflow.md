@@ -12,8 +12,8 @@
     // Ignore some codes ...
     // ...
 
-    // 1. Create workflow graph.
-    WorkflowGraph workflow = new WorkflowGraph(1001010L, nodes, collections);
+    // 1. Create standard workflow graph.
+    StandardGraph graph = new StandardGraph(nodes, edges);
 
     // 2. Create execution parameter.
     ExecutionGraphParameter parameter = ExecutionGraphParameter.builder()
@@ -36,13 +36,11 @@
         });
 
     // 4. Invoking execution
-    ExecutionGraph<?> graph = ExecutionGraph.from(workflow);
-    ExecutionGraphResult result = graph.apply(context);
+    ExecutionGraph<?> execution = ExecutionGraph.from(graph);
+    ExecutionGraphResult result = execution.apply(context);
 
     // 5. Result
-    out.println("-------------------------------------------------------");
-    out.println("                           Final result : " + toJSONString(result));
-    out.println("-------------------------------------------------------");
+    out.println("      Executed result : " + toJSONString(result));
     out.println("Executed tracing info : \n" + context.asTraceText(true));
 ```
 

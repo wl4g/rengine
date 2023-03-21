@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.common.web.rest.RespBase.RetCode;
+import com.wl4g.rengine.common.entity.sys.Role;
 import com.wl4g.rengine.common.entity.sys.User;
 import com.wl4g.rengine.service.UserService;
 import com.wl4g.rengine.service.model.sys.UserDelete;
@@ -139,15 +140,25 @@ public class UserController {
         return RespBase.<UserAuthInfo> create()
                 .withCode(RetCode.OK)
                 .withStatus(SmartRedirectStrategy.DEFAULT_AUTHORIZED_STATUS)
-                .withData(userService.userInfo());
+                .withData(userService.currentUserInfo());
+    }
+
+    // @SecurityRequirement(name = "default_oauth")
+    @Operation(description = "Query roles by userId.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
+    @RequestMapping(path = { "roles" }, produces = "application/json", method = { GET })
+    @PreAuthorize("hasPermission(#model,'arn:sys:role:users:write:v1')")
+    public RespBase<List<Role>> roles(@RequestParam("userId") List<Long> userIds) {
+        log.debug("called: userIds={}", userIds);
+        return RespBase.<List<Role>> create().withData(userService.findRolesByUserIds(userIds));
     }
 
     // @SecurityRequirement(name = "default_oauth")
     @Operation(description = "Assign roles by userId.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
-    @RequestMapping(path = { "assign/roles" }, produces = "application/json", method = { GET })
+    @RequestMapping(path = { "assign/roles" }, produces = "application/json", method = { POST })
     @PreAuthorize("hasPermission(#model,'arn:sys:user:roles:write:v1')")
-    public RespBase<List<Long>> assignRoles(@RequestParam("roleId") Long userId, @RequestParam("menuIds") List<Long> roleIds) {
+    public RespBase<List<Long>> assignRoles(@RequestParam("userId") Long userId, @RequestParam("roleIds") List<Long> roleIds) {
         log.debug("called: userId={}, roleIds={}", userId, roleIds);
         return RespBase.<List<Long>> create().withData(userService.assignRoles(userId, roleIds));
     }
