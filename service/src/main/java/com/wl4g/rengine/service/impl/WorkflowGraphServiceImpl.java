@@ -43,7 +43,7 @@ import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.common.web.rest.RespBase.RetCode;
 import com.wl4g.rengine.client.core.RengineClient;
 import com.wl4g.rengine.client.core.config.ClientConfig;
-import com.wl4g.rengine.common.entity.WorkflowGraph;
+import com.wl4g.rengine.common.entity.graph.WorkflowGraph;
 import com.wl4g.rengine.common.model.WorkflowExecuteRequest;
 import com.wl4g.rengine.common.model.WorkflowExecuteResult;
 import com.wl4g.rengine.common.util.ScriptEngineUtil;
@@ -88,7 +88,7 @@ public class WorkflowGraphServiceImpl extends BasicServiceImpl implements Workfl
     public WorkflowGraphResultSave save(WorkflowGraphSave model) {
         WorkflowGraph graph = model;
         notNullOf(graph, "workflowGraph");
-        graph.validateForBasic();
+        graph.validate();
 
         // The workflow graph only increments the revision and does not allow
         // modification.

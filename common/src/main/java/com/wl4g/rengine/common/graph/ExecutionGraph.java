@@ -19,16 +19,16 @@ import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static com.wl4g.rengine.common.entity.WorkflowGraph.LogicalType.ALL_AND;
-import static com.wl4g.rengine.common.entity.WorkflowGraph.LogicalType.ALL_OR;
-import static com.wl4g.rengine.common.entity.WorkflowGraph.LogicalType.AND;
-import static com.wl4g.rengine.common.entity.WorkflowGraph.LogicalType.OR;
-import static com.wl4g.rengine.common.entity.WorkflowGraph.NodeType.BOOT;
-import static com.wl4g.rengine.common.entity.WorkflowGraph.NodeType.FAILBACK;
-import static com.wl4g.rengine.common.entity.WorkflowGraph.NodeType.LOGICAL;
-import static com.wl4g.rengine.common.entity.WorkflowGraph.NodeType.PROCESS;
-import static com.wl4g.rengine.common.entity.WorkflowGraph.NodeType.RELATION;
-import static com.wl4g.rengine.common.entity.WorkflowGraph.NodeType.RUN;
+import static com.wl4g.rengine.common.entity.graph.StandardGraph.LogicalType.ALL_AND;
+import static com.wl4g.rengine.common.entity.graph.StandardGraph.LogicalType.ALL_OR;
+import static com.wl4g.rengine.common.entity.graph.StandardGraph.LogicalType.AND;
+import static com.wl4g.rengine.common.entity.graph.StandardGraph.LogicalType.OR;
+import static com.wl4g.rengine.common.entity.graph.StandardGraph.NodeType.BOOT;
+import static com.wl4g.rengine.common.entity.graph.StandardGraph.NodeType.FAILBACK;
+import static com.wl4g.rengine.common.entity.graph.StandardGraph.NodeType.LOGICAL;
+import static com.wl4g.rengine.common.entity.graph.StandardGraph.NodeType.PROCESS;
+import static com.wl4g.rengine.common.entity.graph.StandardGraph.NodeType.RELATION;
+import static com.wl4g.rengine.common.entity.graph.StandardGraph.NodeType.RUN;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -48,16 +48,16 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.lang.Assert2;
-import com.wl4g.rengine.common.entity.WorkflowGraph;
-import com.wl4g.rengine.common.entity.WorkflowGraph.BaseNode;
-import com.wl4g.rengine.common.entity.WorkflowGraph.BootNode;
-import com.wl4g.rengine.common.entity.WorkflowGraph.FailbackNode;
-import com.wl4g.rengine.common.entity.WorkflowGraph.LogicalNode;
-import com.wl4g.rengine.common.entity.WorkflowGraph.NodeConnection;
-import com.wl4g.rengine.common.entity.WorkflowGraph.NodeType;
-import com.wl4g.rengine.common.entity.WorkflowGraph.ProcessNode;
-import com.wl4g.rengine.common.entity.WorkflowGraph.RelationNode;
-import com.wl4g.rengine.common.entity.WorkflowGraph.RunNode;
+import com.wl4g.rengine.common.entity.graph.StandardGraph;
+import com.wl4g.rengine.common.entity.graph.StandardGraph.BaseNode;
+import com.wl4g.rengine.common.entity.graph.StandardGraph.BootNode;
+import com.wl4g.rengine.common.entity.graph.StandardGraph.FailbackNode;
+import com.wl4g.rengine.common.entity.graph.StandardGraph.LogicalNode;
+import com.wl4g.rengine.common.entity.graph.StandardGraph.NodeEdge;
+import com.wl4g.rengine.common.entity.graph.StandardGraph.NodeType;
+import com.wl4g.rengine.common.entity.graph.StandardGraph.ProcessNode;
+import com.wl4g.rengine.common.entity.graph.StandardGraph.RelationNode;
+import com.wl4g.rengine.common.entity.graph.StandardGraph.RunNode;
 import com.wl4g.rengine.common.exception.ExecutionGraphException;
 import com.wl4g.rengine.common.exception.InvalidNodeRelationException;
 import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
@@ -105,9 +105,9 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
      * @return
      * @see https://www.java-success.com/00-%E2%99%A6-creating-tree-list-flattening-back-list-java/
      */
-    public static ExecutionGraph<?> from(@NotNull WorkflowGraph graph) {
+    public static ExecutionGraph<?> from(@NotNull StandardGraph graph) {
         notNullOf(graph, "workflowGraph");
-        graph.validateForBasic();
+        graph.validate();
 
         final List<BaseOperator<?>> flatNodes = safeList(graph.getNodes()).stream().map(n -> {
             switch (NodeType.of(n.getType())) {
@@ -146,7 +146,7 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
 
         // Coonvert to node connections.
         final Map<String, String> toConnectionMap = new LinkedHashMap<>();
-        for (NodeConnection link : safeList(graph.getConnections())) {
+        for (NodeEdge link : safeList(graph.getEdges())) {
             final String from = toConnectionMap.get(link.getTo());
             if (isBlank(from)) {
                 toConnectionMap.put(link.getTo(), link.getFrom());

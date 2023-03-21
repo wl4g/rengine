@@ -15,7 +15,7 @@
  */
 package com.wl4g.rengine.service.model;
 
-import com.wl4g.rengine.common.entity.WorkflowGraph;
+import com.wl4g.rengine.common.entity.graph.WorkflowGraph;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -43,4 +43,5 @@ public class WorkflowGraphSave extends WorkflowGraph {
     public Long getRevision() {
         return super.getRevision();
     }
+
 }

@@ -16,6 +16,7 @@
 package com.wl4g.rengine.executor.execution;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static com.wl4g.infra.common.lang.Assert2.isInstanceOf;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Objects.nonNull;
@@ -30,8 +31,10 @@ import javax.validation.constraints.NotNull;
 import com.wl4g.infra.common.lang.Assert2;
 import com.wl4g.rengine.common.entity.Rule.RuleEngine;
 import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
-import com.wl4g.rengine.common.entity.Workflow.WorkflowGraphWrapper;
 import com.wl4g.rengine.common.entity.Workflow.WorkflowWrapper;
+import com.wl4g.rengine.common.entity.graph.FlinkCepGraph;
+import com.wl4g.rengine.common.entity.graph.StandardGraph;
+import com.wl4g.rengine.common.entity.graph.WorkflowGraph.WorkflowGraphWrapper;
 import com.wl4g.rengine.common.graph.ExecutionGraph;
 import com.wl4g.rengine.common.graph.ExecutionGraph.IRunOperator;
 import com.wl4g.rengine.common.graph.ExecutionGraphContext;
@@ -70,6 +73,9 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
             final boolean usingCache) {
         workflow.validate();
         final WorkflowGraphWrapper workflowGraph = workflow.getEffectiveLatestGraph();
+        isInstanceOf(StandardGraph.class, workflowGraph.getDetails(),
+                "Unsupported workflow graph, this executor currently only supported for execution of '%s'. e.g '%s' should to submit execution by flink job.",
+                StandardGraph.class.getSimpleName(), FlinkCepGraph.class.getSimpleName());
 
         try {
             final ExecutionGraphParameter parameter = ExecutionGraphParameter.builder()
@@ -101,7 +107,7 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
                 return new ExecutionGraphResult(ReturnState.FALSE);
             });
 
-            final ExecutionGraph<?> graph = ExecutionGraph.from(workflowGraph);
+            final ExecutionGraph<?> graph = ExecutionGraph.from((StandardGraph) workflowGraph.getDetails());
             final ExecutionGraphResult result = graph.apply(graphContext);
 
             return ResultDescription.builder().success(true).valueMap(result.getValueMap()).build();

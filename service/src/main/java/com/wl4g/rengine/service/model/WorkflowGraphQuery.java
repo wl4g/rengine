@@ -18,7 +18,7 @@ package com.wl4g.rengine.service.model;
 import javax.annotation.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.wl4g.rengine.common.entity.WorkflowGraph;
+import com.wl4g.rengine.common.entity.graph.WorkflowGraph;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;

@@ -25,8 +25,8 @@ import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_RULE_SCRIPTS;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_SCENESES;
-import static com.wl4g.rengine.common.util.ServiceAggregateFilters.RULE_SCRIPT_UPLOAD_LOOKUP_FILTERS;
-import static com.wl4g.rengine.common.util.ServiceAggregateFilters.WORKFLOW_GRAPH_RULE_SCRIPT_UPLOAD_LOOKUP_FILTERS;
+import static com.wl4g.rengine.common.util.BsonAggregateFilters.RULE_SCRIPT_UPLOAD_LOOKUP_FILTERS;
+import static com.wl4g.rengine.common.util.BsonAggregateFilters.WORKFLOW_GRAPH_RULE_SCRIPT_UPLOAD_LOOKUP_FILTERS;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.joining;
@@ -59,12 +59,13 @@ import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
 import com.wl4g.rengine.common.entity.RuleScript.RuleScriptWrapper;
 import com.wl4g.rengine.common.entity.Scenes.ScenesWrapper;
 import com.wl4g.rengine.common.entity.Workflow.WorkflowEngine;
-import com.wl4g.rengine.common.entity.Workflow.WorkflowGraphWrapper;
 import com.wl4g.rengine.common.entity.Workflow.WorkflowWrapper;
-import com.wl4g.rengine.common.entity.WorkflowGraph.BaseNode;
-import com.wl4g.rengine.common.entity.WorkflowGraph.BootNode;
-import com.wl4g.rengine.common.entity.WorkflowGraph.NodeConnection;
-import com.wl4g.rengine.common.entity.WorkflowGraph.ProcessNode;
+import com.wl4g.rengine.common.entity.graph.StandardGraph;
+import com.wl4g.rengine.common.entity.graph.StandardGraph.BaseNode;
+import com.wl4g.rengine.common.entity.graph.StandardGraph.BootNode;
+import com.wl4g.rengine.common.entity.graph.StandardGraph.NodeEdge;
+import com.wl4g.rengine.common.entity.graph.StandardGraph.ProcessNode;
+import com.wl4g.rengine.common.entity.graph.WorkflowGraph.WorkflowGraphWrapper;
 import com.wl4g.rengine.common.exception.RengineException;
 import com.wl4g.rengine.common.model.RuleScriptExecuteRequest;
 import com.wl4g.rengine.common.model.RuleScriptExecuteResult;
@@ -152,24 +153,24 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
             vNodes.add(new ProcessNode().withId("1").withName("The virtual Process node").withRuleId(rule.getId()));
 
             // vistual workflow graph connections.
-            final List<NodeConnection> vCollections = new LinkedList<>();
-            vCollections.add(new NodeConnection("1", "0"));
+            final List<NodeEdge> vEdges = new LinkedList<>();
+            vEdges.add(new NodeEdge("1", "0"));
 
             // vistual workflow graph.
             final WorkflowGraphWrapper vGraph = new WorkflowGraphWrapper();
             vGraph.setId(virtualGraphId);
             vGraph.setWorkflowId(virtualWorkflowId);
-            vGraph.setNodes(vNodes);
-            vGraph.setConnections(vCollections);
             vGraph.setRules(singletonList(rule));
+            vGraph.setDetails(new StandardGraph(vNodes, vEdges));
+            vGraph.validate();
 
             // vistual workflow.
             final WorkflowWrapper vWorkflow = WorkflowWrapper.builder()
                     .id(virtualWorkflowId)
                     // Notice: The current online script debugging execution
                     // only supports standard workflows.
-                    .engine(WorkflowEngine.STANDARD)
-                    .graphs(singletonList(vGraph.validateForBasic()))
+                    .engine(WorkflowEngine.STANDARD_GRAPH)
+                    .graphs(singletonList(vGraph))
                     .build();
 
             final ResultDescription result = lifecycleExecutionService.getExecution(vWorkflow.getEngine())
@@ -281,7 +282,7 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
      *                      { $lookup: {
      *                          from: "t_rules",
      *                          // 定义外键关联变量, 并通过 $map 函数提取 ruleIds(int64) 列表
-     *                          let: { rule_ids: { $map: { input: "$nodes", in: { $toLong: "$$this.ruleId" } } } },
+     *                          let: { rule_ids: { $map: { input: "$details.nodes", in: { $toLong: "$$this.ruleId" } } } },
      *                          pipeline: [
      *                              { $match: { $expr: { $in: [ "$_id",  "$$rule_ids" ] } } },
      *                              { $match: { "enable": { $eq: 1 } } },

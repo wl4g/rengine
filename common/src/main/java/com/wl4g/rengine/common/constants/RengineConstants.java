@@ -34,7 +34,7 @@ import lombok.Getter;
 public abstract class RengineConstants extends EnvironmentUtil {
 
     // ----------------------------------------------------------------------------
-    // ----- Common constants. -----
+    // ----- Rengine Common constants. -----
     // ----------------------------------------------------------------------------
 
     public static final String CONF_PREFIX = "rengine";
@@ -45,7 +45,7 @@ public abstract class RengineConstants extends EnvironmentUtil {
     public static final String DEFAULT_MINIO_BUCKET = "rengine";
 
     // ----------------------------------------------------------------------------
-    // ----- ApiServer constants. -----
+    // ----- Rengine ApiServer constants. -----
     // ----------------------------------------------------------------------------
 
     public static final String CONF_PREFIX_APISERVER = CONF_PREFIX + ".apiserver";
@@ -75,13 +75,13 @@ public abstract class RengineConstants extends EnvironmentUtil {
     public static final String API_LOGIN_OAUTH2_CALLBACK_ENDPOINT_BASE = "/login/oauth2/callback/*";
 
     // ----------------------------------------------------------------------------
-    // ----- Controller constants. -----
+    // ----- Rengine Controller constants. -----
     // ----------------------------------------------------------------------------
 
     public static final String CONF_PREFIX_CONTROLLER = CONF_PREFIX + ".controller";
 
     //
-    // ----- Executor constants. -----
+    // ----- Rengine Executor constants. -----
     //
 
     public static final String CONF_PREFIX_EXECUTOR = CONF_PREFIX + ".executor";
@@ -114,13 +114,13 @@ public abstract class RengineConstants extends EnvironmentUtil {
             10 * 1024 * 1024);
 
     // ----------------------------------------------------------------------------
-    // ----- Job constants. -----
+    // ----- Rengine Job constants. -----
     // ----------------------------------------------------------------------------
 
     public static final String DEFAULT_EVENTBUS_TOPIC = "rengine_event";
 
     // ----------------------------------------------------------------------------
-    // ----- Eventbus constants. -----
+    // ----- Rengine Eventbus constants. -----
     // ----------------------------------------------------------------------------
 
     public static final String CONF_PREFIX_EVENTBUS = CONF_PREFIX + ".eventbus";
@@ -129,7 +129,7 @@ public abstract class RengineConstants extends EnvironmentUtil {
     public static final String CONF_PREFIX_EVENTBUS_ROCKETMQ = CONF_PREFIX_EVENTBUS + ".rabbitmq";
 
     // ----------------------------------------------------------------------------
-    // ----- Client constants. -----
+    // ----- Rengine Client constants. -----
     // ----------------------------------------------------------------------------
 
     public static final String CONF_PREFIX_CLIENT = CONF_PREFIX + ".client";

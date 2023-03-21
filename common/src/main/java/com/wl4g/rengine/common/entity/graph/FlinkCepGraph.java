@@ -1,7 +1,7 @@
 /**
   * Copyright 2023 bejson.com 
   */
-package com.wl4g.rengine.common.entity;
+package com.wl4g.rengine.common.entity.graph;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
@@ -9,7 +9,6 @@ import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -23,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.wl4g.rengine.common.entity.graph.WorkflowGraph.GraphBase;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -33,7 +33,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link CepPattern}
+ * {@link FlinkCepGraph}
  * 
  * @author James Wong
  * @version 2023-03-13
@@ -44,7 +44,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @NoArgsConstructor
-public class CepPattern implements Serializable {
+public class FlinkCepGraph extends GraphBase {
     private static final long serialVersionUID = 3180228245679360435L;
 
     private @NotBlank String name;
@@ -57,7 +57,9 @@ public class CepPattern implements Serializable {
     private @NotNull PatternNodeType type;
     private int version;
 
-    public CepPattern validate() {
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T extends GraphBase> T validate() {
         hasTextOf(name, "name");
         notNullOf(quantifier, "quantifier");
 
@@ -72,7 +74,7 @@ public class CepPattern implements Serializable {
         afterMatchStrategy.validate();
 
         notNullOf(type, "type");
-        return this;
+        return (T) this;
     }
 
     @Getter

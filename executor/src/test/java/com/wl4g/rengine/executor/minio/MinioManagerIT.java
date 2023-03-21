@@ -28,13 +28,13 @@ import org.junit.Test;
 import com.wl4g.rengine.common.entity.UploadObject.UploadType;
 
 /**
- * {@link MinioManagerTests}
+ * {@link MinioManagerIT}
  * 
  * @author James Wong
  * @version 2022-10-09
  * @since v1.0.0
  */
-public class MinioManagerTests {
+public class MinioManagerIT {
 
     @Test
     public void testDetermineLocalFile() throws IOException {

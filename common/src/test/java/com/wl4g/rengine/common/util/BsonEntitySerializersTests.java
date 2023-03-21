@@ -25,8 +25,9 @@ import java.util.Map;
 import org.junit.Test;
 
 import com.wl4g.infra.common.collection.CollectionUtils2;
-import com.wl4g.rengine.common.entity.WorkflowGraph;
-import com.wl4g.rengine.common.entity.WorkflowGraphTests;
+import com.wl4g.rengine.common.entity.graph.StandardGraph;
+import com.wl4g.rengine.common.entity.graph.WorkflowGraph;
+import com.wl4g.rengine.common.entity.graph.WorkflowGraphTests;
 
 /**
  * {@link BsonEntitySerializersTests}
@@ -62,7 +63,7 @@ public class BsonEntitySerializersTests {
         System.out.println("graph : " + graph);
 
         assert nonNull(graph.getId());
-        assert nonNull(graph.getNodes().get(0).getId());
+        assert nonNull(((StandardGraph) graph.getDetails()).getNodes().get(0).getId());
     }
 
 }

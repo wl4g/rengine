@@ -29,7 +29,7 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Update;
 
 import com.wl4g.rengine.common.entity.RuleScript;
-import com.wl4g.rengine.common.entity.WorkflowGraph;
+import com.wl4g.rengine.common.entity.graph.WorkflowGraph;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

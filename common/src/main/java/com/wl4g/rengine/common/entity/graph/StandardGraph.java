@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.common.entity;
+package com.wl4g.rengine.common.entity.graph;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
-import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
 import static com.wl4g.infra.common.lang.Assert2.notEmpty;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.lang.String.format;
-import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
@@ -32,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -43,8 +40,8 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.wl4g.rengine.common.entity.graph.WorkflowGraph.GraphBase;
 import com.wl4g.rengine.common.exception.InvalidNodeRelationException;
-import com.wl4g.rengine.common.validation.ValidForEntityMarker;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
@@ -65,42 +62,27 @@ import lombok.experimental.SuperBuilder;
  */
 @Getter
 @Setter
+@SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class WorkflowGraph extends BaseEntity {
+public class StandardGraph extends GraphBase {
     private static final long serialVersionUID = 1917204508937266181L;
 
-    private @NotNull(groups = ValidForEntityMarker.class) @Min(value = 0, groups = ValidForEntityMarker.class) Long revision;
+    private @NotEmpty @Default List<BaseNode<?>> nodes = new LinkedList<>();
+    private @NotEmpty @Default List<NodeEdge> edges = new LinkedList<>();
 
-    private @NotNull @Min(0) Long workflowId;
-
-    private @NotEmpty List<BaseNode<?>> nodes = new LinkedList<>();
-
-    private @NotEmpty List<NodeConnection> connections = new LinkedList<>();
-
-    /**
-     * The extended attribute configuration of the workflow graph, for example,
-     * calling
-     * <b>{@link com.wl4g.rengine.executor.execution.sdk.notifier.DingtalkScriptMessageNotifier}</b>
-     * in the execution node (script) of <b>dingtalk_workflow</b> to send group
-     * messages, at this time, the <b>openConversationId</b>, <b>robotCode</b>,
-     * etc. are required, which can be get from here.
-     */
-    private @Nullable Map<String, Object> attributes = new HashMap<>();
-
-    public WorkflowGraph(@NotNull @Min(0) Long workflowId, @NotEmpty List<BaseNode<?>> nodes,
-            @NotEmpty List<NodeConnection> connections) {
-        this.workflowId = workflowId;
+    public StandardGraph(@NotEmpty List<BaseNode<?>> nodes, @NotEmpty List<NodeEdge> edges) {
         this.nodes = nodes;
-        this.connections = connections;
-        validateForBasic();
+        this.edges = edges;
+        validate();
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends WorkflowGraph> T validateForBasic() {
-        isTrueOf(nonNull(workflowId) && workflowId >= 0, "workflowId >= 0");
+    @Override
+    public <T extends GraphBase> T validate() {
+        // isTrueOf(nonNull(workflowId) && workflowId >= 0, "workflowId >= 0");
         notEmpty(getNodes(), "graph.nodes");
-        notEmpty(getConnections(), "graph.connections");
+        notEmpty(getEdges(), "graph.edges");
 
         // Check the node property (sush as:
         // type,id,name,priority,logical,ruleId etc) is missing.
@@ -158,10 +140,6 @@ public class WorkflowGraph extends BaseEntity {
     /**
      * The basic execution DAG(directed acyclic graph) graph node definition of
      * rule process.
-     * 
-     * @author James Wong
-     * @version 2022-10-20
-     * @since v1.0.0
      */
     @SuppressWarnings("unchecked")
     @Schema(oneOf = { BootNode.class, ProcessNode.class, FailbackNode.class, RelationNode.class, LogicalNode.class,
@@ -318,9 +296,8 @@ public class WorkflowGraph extends BaseEntity {
         }
     }
 
-    // Notice: It is recommended to disable the toString method, otherwise
-    // swagger will generate the name of the example long enumeration type by
-    // default.
+    // Notice: toString should be disabled, otherwise swagger will generate long
+    // name of example long enumeration type by default.
     // @ToString
     @Getter
     @AllArgsConstructor
@@ -383,17 +360,17 @@ public class WorkflowGraph extends BaseEntity {
     @ToString
     @SuperBuilder
     @NoArgsConstructor
-    public static class NodeConnection {
+    public static class NodeEdge {
         private @Nullable String name;
         private @NotBlank String to;
         private @NotBlank String from;
         private @Nullable @Default Map<String, Object> attributes = new HashMap<>(2);
 
-        public NodeConnection(final @NotBlank String to, final @NotBlank String from) {
+        public NodeEdge(final @NotBlank String to, final @NotBlank String from) {
             this(null, from, to);
         }
 
-        public NodeConnection(final @Nullable String name, final @NotBlank String from, final @NotBlank String to) {
+        public NodeEdge(final @Nullable String name, final @NotBlank String from, final @NotBlank String to) {
             this.name = name;
             this.to = hasTextOf(to, "to");
             this.from = hasTextOf(from, "from");
@@ -401,4 +378,5 @@ public class WorkflowGraph extends BaseEntity {
     }
 
     public static final String DEFAULT_NODE_NAME = "Unnamed Node";
+
 }

@@ -29,15 +29,16 @@ import java.util.UUID;
 
 import org.junit.Test;
 
-import com.wl4g.rengine.common.entity.WorkflowGraph;
-import com.wl4g.rengine.common.entity.WorkflowGraph.BaseNode;
-import com.wl4g.rengine.common.entity.WorkflowGraph.BootNode;
-import com.wl4g.rengine.common.entity.WorkflowGraph.LogicalNode;
-import com.wl4g.rengine.common.entity.WorkflowGraph.LogicalType;
-import com.wl4g.rengine.common.entity.WorkflowGraph.NodeConnection;
-import com.wl4g.rengine.common.entity.WorkflowGraph.ProcessNode;
-import com.wl4g.rengine.common.entity.WorkflowGraph.RelationNode;
-import com.wl4g.rengine.common.entity.WorkflowGraphTests;
+import com.wl4g.rengine.common.entity.graph.StandardGraph;
+import com.wl4g.rengine.common.entity.graph.StandardGraph.BaseNode;
+import com.wl4g.rengine.common.entity.graph.StandardGraph.BootNode;
+import com.wl4g.rengine.common.entity.graph.StandardGraph.LogicalNode;
+import com.wl4g.rengine.common.entity.graph.StandardGraph.LogicalType;
+import com.wl4g.rengine.common.entity.graph.StandardGraph.NodeEdge;
+import com.wl4g.rengine.common.entity.graph.StandardGraph.ProcessNode;
+import com.wl4g.rengine.common.entity.graph.StandardGraph.RelationNode;
+import com.wl4g.rengine.common.entity.graph.WorkflowGraph;
+import com.wl4g.rengine.common.entity.graph.WorkflowGraphTests;
 import com.wl4g.rengine.common.graph.ExecutionGraph.BaseOperator;
 import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
 
@@ -51,7 +52,7 @@ import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
 public class ExecutionGraphTests {
 
     @Test(expected = Throwable.class)
-    public void testInvalidNodeConnection() {
+    public void testInvalidNodeEdge() {
         try {
             List<BaseNode<?>> nodes = new LinkedList<>();
             nodes.add(new BootNode().withId("0").withName("The Boot"));
@@ -61,17 +62,17 @@ public class ExecutionGraphTests {
             nodes.add(new LogicalNode().withId("41").withPriority(1).withName("AND逻辑运算").withLogical(LogicalType.AND));
             nodes.add(new LogicalNode().withId("42")./* withPriority(2). */withName("AND逻辑运算").withLogical(LogicalType.AND));
 
-            List<NodeConnection> collections = new LinkedList<>();
-            collections.add(new NodeConnection("11", "0"));
-            collections.add(new NodeConnection("21", "11"));
-            collections.add(new NodeConnection("31", "21"));
-            collections.add(new NodeConnection("41", "31"));
-            // collections.add(new NodeConnection("42", "31"));
-            collections.add(new NodeConnection("42", "999"));
+            List<NodeEdge> edges = new LinkedList<>();
+            edges.add(new NodeEdge("11", "0"));
+            edges.add(new NodeEdge("21", "11"));
+            edges.add(new NodeEdge("31", "21"));
+            edges.add(new NodeEdge("41", "31"));
+            // edges.add(new NodeEdge("42", "31"));
+            edges.add(new NodeEdge("42", "999"));
 
-            WorkflowGraph workflowGraph = new WorkflowGraph(10101010L, nodes, collections);
-            out.println("Workflow Node Json : " + toJSONString(workflowGraph));
-            ExecutionGraph.from(workflowGraph);
+            StandardGraph graph = new StandardGraph(nodes, edges);
+            out.println("Standard graph json : " + toJSONString(graph));
+            ExecutionGraph.from(graph);
         } catch (Throwable ex) {
             // ex.printStackTrace();
             throw ex;
@@ -89,16 +90,16 @@ public class ExecutionGraphTests {
             nodes.add(new LogicalNode().withId("41").withPriority(1).withName("AND逻辑运算").withLogical(LogicalType.AND));
             nodes.add(new LogicalNode().withId("42")./* withPriority(2). */withName("AND逻辑运算").withLogical(LogicalType.AND));
 
-            List<NodeConnection> collections = new LinkedList<>();
-            collections.add(new NodeConnection("11", "0"));
-            collections.add(new NodeConnection("21", "11"));
-            collections.add(new NodeConnection("31", "21"));
-            collections.add(new NodeConnection("41", "31"));
-            collections.add(new NodeConnection("42", "31"));
+            List<NodeEdge> edges = new LinkedList<>();
+            edges.add(new NodeEdge("11", "0"));
+            edges.add(new NodeEdge("21", "11"));
+            edges.add(new NodeEdge("31", "21"));
+            edges.add(new NodeEdge("41", "31"));
+            edges.add(new NodeEdge("42", "31"));
 
-            WorkflowGraph workflowGraph = new WorkflowGraph(10101010L, nodes, collections);
-            out.println("Workflow Node Json : " + toJSONString(workflowGraph));
-            ExecutionGraph.from(workflowGraph);
+            StandardGraph graph = new StandardGraph(nodes, edges);
+            out.println("Standard graph json : " + toJSONString(graph));
+            ExecutionGraph.from(graph);
         } catch (Throwable ex) {
             // ex.printStackTrace();
             throw ex;
@@ -133,7 +134,7 @@ public class ExecutionGraphTests {
                 return new ExecutionGraphResult(ReturnState.TRUE, singletonMap("foo" + nodeId, "bar" + nodeId));
             });
 
-            ExecutionGraph<?> graph = ExecutionGraph.from(workflowGraph);
+            ExecutionGraph<?> graph = ExecutionGraph.from((StandardGraph) workflowGraph.getDetails());
             ExecutionGraphResult result = graph.apply(context);
 
             out.println("-------------------------------------------------------");

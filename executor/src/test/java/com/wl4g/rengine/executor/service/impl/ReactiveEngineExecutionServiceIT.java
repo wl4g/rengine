@@ -36,7 +36,7 @@ import com.wl4g.rengine.executor.util.TestDefaultRedisSetup;
 import io.smallrye.mutiny.Uni;
 
 /**
- * {@link ReactiveEngineExecutionServiceTests}
+ * {@link ReactiveEngineExecutionServiceIT}
  * 
  * @author James Wong
  * @version 2022-09-27
@@ -46,7 +46,7 @@ import io.smallrye.mutiny.Uni;
 // @ExtendWith(MockitoExtension.class)
 // @QuarkusTestResource(value = MongoTestResource.class, initArgs =
 // @ResourceArg(name = MongoTestResource.PORT, value = "27017"))
-public class ReactiveEngineExecutionServiceTests {
+public class ReactiveEngineExecutionServiceIT {
 
     // @Mock
     // @org.mockito.Mock
@@ -61,7 +61,7 @@ public class ReactiveEngineExecutionServiceTests {
         // DictService mock = Mockito.mock(DictService.class);
         // QuarkusMock.installMockForType(mock, DictService.class);
         if (isNull(engineExecutionService)) {
-            synchronized (ReactiveEngineExecutionServiceTests.class) {
+            synchronized (ReactiveEngineExecutionServiceIT.class) {
                 if (isNull(engineExecutionService)) {
                     // Manual setup/inject depends.
                     engineExecutionService = new ReactiveEngineExecutionServiceImpl();

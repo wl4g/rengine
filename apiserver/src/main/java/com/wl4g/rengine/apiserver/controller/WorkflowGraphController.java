@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.common.entity.WorkflowGraph;
+import com.wl4g.rengine.common.entity.graph.WorkflowGraph;
 import com.wl4g.rengine.common.model.WorkflowExecuteRequest;
 import com.wl4g.rengine.common.model.WorkflowExecuteResult;
 import com.wl4g.rengine.service.WorkflowGraphService;

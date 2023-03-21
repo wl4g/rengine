@@ -36,13 +36,13 @@ import com.mongodb.client.model.Projections;
 import com.wl4g.infra.common.bean.BaseBean;
 
 /**
- * {@link ServiceAggregateFilters}
+ * {@link BsonAggregateFilters}
  * 
  * @author James Wong
  * @version 2023-02-20
  * @since v1.0.0
  */
-public abstract class ServiceAggregateFilters {
+public abstract class BsonAggregateFilters {
 
     // Basic filters.
     public static final Bson DEFAULT_ENABLE_FILTER = Aggregates.match(Filters.eq("enable", BaseBean.ENABLED));
@@ -104,7 +104,7 @@ public abstract class ServiceAggregateFilters {
             + "                { $limit: 1 },"
             + "                { $lookup: {"
             + "                    from: \"" + RE_RULES.getName() + "\","
-            + "                    let: { rule_ids: { $map: { input: \"$nodes\", in: { $toLong: \"$$this.ruleId\" } } } },"
+            + "                    let: { rule_ids: { $map: { input: \"$details.nodes\", in: { $toLong: \"$$this.ruleId\" } } } },"
             + "                    pipeline: ["
             + "                        { $match: { $expr: { $in: [ \"$_id\",  \"$$rule_ids\" ] } } },"
             + "                        { $match: { \"enable\": { $eq: 1 } } },"

@@ -22,7 +22,7 @@ import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_BASE;
 import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_INTERNAL_RULESCRIPT;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_RULE_SCRIPTS;
-import static com.wl4g.rengine.common.util.ServiceAggregateFilters.RULE_SCRIPT_UPLOAD_LOOKUP_FILTERS;
+import static com.wl4g.rengine.common.util.BsonAggregateFilters.RULE_SCRIPT_UPLOAD_LOOKUP_FILTERS;
 import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isCriteria;

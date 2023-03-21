@@ -17,8 +17,6 @@ package com.wl4g.rengine.common.entity;
 
 import static com.wl4g.infra.common.lang.Assert2.notEmpty;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toSet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +25,7 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
+import com.wl4g.rengine.common.entity.graph.WorkflowGraph.WorkflowGraphWrapper;
 
 import lombok.Builder.Default;
 import lombok.Getter;
@@ -54,7 +52,7 @@ public class Workflow extends BaseEntity {
     private @NotNull WorkflowEngine engine;
 
     public static enum WorkflowEngine {
-        STANDARD, FLINK_CEP_GRAPH
+        STANDARD_GRAPH, FLINK_CEP_GRAPH
     }
 
     @Getter
@@ -86,42 +84,6 @@ public class Workflow extends BaseEntity {
                 WorkflowGraphWrapper.validate(graph);
             }
             return workflow;
-        }
-
-    }
-
-    @Getter
-    @Setter
-    @ToString
-    @NoArgsConstructor
-    public static class WorkflowGraphWrapper extends WorkflowGraph {
-        private static final long serialVersionUID = 1L;
-        private @Nullable List<RuleWrapper> rules = new ArrayList<>(4);
-
-        public static WorkflowGraphWrapper validate(WorkflowGraphWrapper graph) {
-            notNullOf(graph, "graph");
-            graph.validateForBasic();
-            notEmpty(graph.getRules(), "graph.rules");
-
-            // Check for graph rules number.
-            final long expectedRuleIdNodes = graph.getNodes()
-                    .stream()
-                    .filter(n -> n instanceof RunNode)
-                    .map(n -> ((RunNode) n).getRuleId())
-                    .collect(toSet())
-                    .size();
-            final long existingRuleIdNodes = graph.getRules().size();
-            if (expectedRuleIdNodes != existingRuleIdNodes) {
-                throw new IllegalArgumentException(
-                        format("Invalid workflow graph rules configuration, expected number of rules: %s, but actual rules: %s",
-                                expectedRuleIdNodes, existingRuleIdNodes));
-            }
-
-            // Check for rule script.
-            for (RuleWrapper rule : graph.getRules()) {
-                RuleWrapper.validate(rule);
-            }
-            return graph;
         }
     }
 

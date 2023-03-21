@@ -56,19 +56,19 @@ import io.vertx.mutiny.redis.client.Redis;
 import io.vertx.mutiny.redis.client.Response;
 
 /**
- * {@link ReactiveDictServiceTests}
+ * {@link ReactiveDictServiceIT}
  * 
  * @author James Wong
  * @version 2022-09-27
  * @since v1.0.0
  */
-public class ReactiveDictServiceTests {
+public class ReactiveDictServiceIT {
 
     static ReactiveDictServiceImpl dictService;
 
     public void setup() {
         if (isNull(dictService)) {
-            synchronized (ReactiveDictServiceTests.class) {
+            synchronized (ReactiveDictServiceIT.class) {
                 if (isNull(dictService)) {
                     dictService = new ReactiveDictServiceImpl();
                     dictService.serviceConfig = TestDefaultBaseSetup.createServiceConfig();

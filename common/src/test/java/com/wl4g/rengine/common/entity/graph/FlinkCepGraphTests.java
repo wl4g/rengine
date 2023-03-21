@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.common.entity;
+package com.wl4g.rengine.common.entity.graph;
 
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
@@ -23,19 +23,21 @@ import static java.util.Objects.nonNull;
 
 import org.junit.Test;
 
-import com.wl4g.rengine.common.entity.CepPattern.AfterMatchSkipStrategyType;
-import com.wl4g.rengine.common.entity.CepPattern.AfterMatchStrategy;
-import com.wl4g.rengine.common.entity.CepPattern.AviatorCondition;
-import com.wl4g.rengine.common.entity.CepPattern.ClassCondition;
-import com.wl4g.rengine.common.entity.CepPattern.ConditionType;
-import com.wl4g.rengine.common.entity.CepPattern.ConsumingStrategy;
-import com.wl4g.rengine.common.entity.CepPattern.Edge;
-import com.wl4g.rengine.common.entity.CepPattern.Node;
-import com.wl4g.rengine.common.entity.CepPattern.PatternNodeType;
-import com.wl4g.rengine.common.entity.CepPattern.Quantifier;
-import com.wl4g.rengine.common.entity.CepPattern.QuantifierProperty;
-import com.wl4g.rengine.common.entity.CepPattern.Time;
-import com.wl4g.rengine.common.entity.CepPattern.Window;
+import com.wl4g.rengine.common.entity.graph.FlinkCepGraph.AfterMatchSkipStrategyType;
+import com.wl4g.rengine.common.entity.graph.FlinkCepGraph.AfterMatchStrategy;
+import com.wl4g.rengine.common.entity.graph.FlinkCepGraph.AviatorCondition;
+import com.wl4g.rengine.common.entity.graph.FlinkCepGraph.ClassCondition;
+import com.wl4g.rengine.common.entity.graph.FlinkCepGraph.ConditionType;
+import com.wl4g.rengine.common.entity.graph.FlinkCepGraph.ConsumingStrategy;
+import com.wl4g.rengine.common.entity.graph.FlinkCepGraph.Edge;
+import com.wl4g.rengine.common.entity.graph.FlinkCepGraph.Node;
+import com.wl4g.rengine.common.entity.graph.FlinkCepGraph.PatternNodeType;
+import com.wl4g.rengine.common.entity.graph.FlinkCepGraph.Quantifier;
+import com.wl4g.rengine.common.entity.graph.FlinkCepGraph.QuantifierProperty;
+import com.wl4g.rengine.common.entity.graph.FlinkCepGraph.Time;
+import com.wl4g.rengine.common.entity.graph.FlinkCepGraph.Times;
+import com.wl4g.rengine.common.entity.graph.FlinkCepGraph.Window;
+import com.wl4g.rengine.common.entity.graph.FlinkCepGraph.WithinType;
 
 /**
  * Refer to {@link com.wl4g.rengine.job.cep.pattern.PatternTests}
@@ -44,16 +46,16 @@ import com.wl4g.rengine.common.entity.CepPattern.Window;
  * @version 2023-03-13
  * @since v1.0.0
  */
-public class CepPatternTests {
+public class FlinkCepGraphTests {
 
     @Test
     public void testCepPatternSerialize() throws Exception {
-        final CepPattern cepPattern = CepPattern.builder()
+        final FlinkCepGraph flinkCepGraph = FlinkCepGraph.builder()
                 .name("end")
                 .quantifier(Quantifier.builder()
                         .consumingStrategy(ConsumingStrategy.SKIP_TILL_NEXT)
                         .details(asList(QuantifierProperty.SINGLE))
-                        .times(null)
+                        .times(Times.of(3, Time.minutes(5)))
                         .untilCondition(null)
                         .build())
                 .condition(null)
@@ -112,7 +114,7 @@ public class CepPatternTests {
                                 .build()))
                 .edges(asList(Edge.builder().source("start").target("middle").type(ConsumingStrategy.SKIP_TILL_NEXT).build(),
                         Edge.builder().source("middle").target("end").type(ConsumingStrategy.SKIP_TILL_NEXT).build()))
-                .window(Window.builder().time(Time.minutes(5)).build())
+                .window(Window.builder().type(WithinType.PREVIOUS_AND_CURRENT).time(Time.minutes(5)).build())
                 .afterMatchStrategy(AfterMatchStrategy.builder()
                         .type(AfterMatchSkipStrategyType.SKIP_PAST_LAST_EVENT)
                         .patternName(null)
@@ -122,7 +124,7 @@ public class CepPatternTests {
                 .build()
                 .validate();
 
-        System.out.println(toJSONString(cepPattern));
+        System.out.println("flinkCepGraph : " + toJSONString(flinkCepGraph));
     }
 
     @Test
@@ -130,9 +132,17 @@ public class CepPatternTests {
         // @formatter:off
         final String patternJson = "{"
                 + "    \"name\": \"end\","
+                + "    \"engine\": \"FLINK_CEP_GRAPH\","
                 + "    \"quantifier\": {"
                 + "        \"consumingStrategy\": \"SKIP_TILL_NEXT\","
-                + "        \"times\": null,"
+                + "        \"times\": {"
+                + "             \"from\": 3,"
+                + "             \"to\": 3,"
+                + "             \"windowTime\": {"
+                + "                 \"unit\": \"MINUTES\","
+                + "                 \"size\": 5"
+                + "             }"
+                + "         },"
                 + "        \"untilCondition\": null,"
                 + "        \"details\": [\"SINGLE\"]"
                 + "    },"
@@ -216,7 +226,7 @@ public class CepPatternTests {
         out.println("patternJson : " + patternJson.replace(" ", ""));
 
         try {
-            final CepPattern pattern = parseJSON(patternJson, CepPattern.class);
+            final FlinkCepGraph pattern = parseJSON(patternJson, FlinkCepGraph.class);
             out.println("pattern : " + pattern);
             assert nonNull(pattern);
         } catch (Throwable ex) {

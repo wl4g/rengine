@@ -19,7 +19,7 @@
 //import org.junit.Test;
 //
 //import com.wl4g.rengine.executor.minio.MinioManager;
-//import com.wl4g.rengine.executor.minio.MinioManagerTests;
+//import com.wl4g.rengine.executor.minio.MinioManagerIT;
 //
 ///**
 // * {@link ScriptLoggerTests}
@@ -34,7 +34,7 @@
 //
 //    @Before
 //    public void setup() {
-//        minioManager = MinioManagerTests.createDefaultMinioManager();
+//        minioManager = MinioManagerIT.createDefaultMinioManager();
 //    }
 //
 //    @Test
