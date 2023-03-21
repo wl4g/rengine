@@ -15,6 +15,8 @@
  */
 package com.wl4g.rengine.job;
 
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+
 import java.time.Duration;
 
 import org.apache.flink.api.common.eventtime.BoundedOutOfOrdernessWatermarks;
@@ -22,8 +24,8 @@ import org.apache.flink.api.common.eventtime.WatermarkOutput;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.eventtime.WatermarksWithIdleness;
 
-import com.wl4g.rengine.common.event.RengineEvent.EventSource;
 import com.wl4g.rengine.common.event.RengineEvent;
+import com.wl4g.rengine.common.event.RengineEvent.EventSource;
 
 /**
  * {@link RengineEventWatermarks}
@@ -40,7 +42,10 @@ public class RengineEventWatermarks extends BoundedOutOfOrdernessWatermarks<Reng
 
     @Override
     public void onEvent(RengineEvent event, long eventTimestamp, WatermarkOutput output) {
-        super.onEvent(event, ((EventSource) event.getSource()).getTime(), output);
+        notNullOf(event.getSource(), "eventSource");
+        final Long sourceTime = ((EventSource) event.getSource()).getTime();
+        notNullOf(sourceTime, "eventSource.time");
+        super.onEvent(event, sourceTime, output);
     }
 
     /**

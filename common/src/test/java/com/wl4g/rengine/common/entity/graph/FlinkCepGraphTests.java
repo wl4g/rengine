@@ -19,10 +19,12 @@ import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.System.out;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonMap;
 import static java.util.Objects.nonNull;
 
 import org.junit.Test;
 
+import com.wl4g.rengine.common.entity.Workflow.WorkflowEngine;
 import com.wl4g.rengine.common.entity.graph.FlinkCepGraph.AfterMatchSkipStrategyType;
 import com.wl4g.rengine.common.entity.graph.FlinkCepGraph.AfterMatchStrategy;
 import com.wl4g.rengine.common.entity.graph.FlinkCepGraph.AviatorCondition;
@@ -52,6 +54,7 @@ public class FlinkCepGraphTests {
     public void testCepPatternSerialize() throws Exception {
         final FlinkCepGraph flinkCepGraph = FlinkCepGraph.builder()
                 .name("end")
+                .engine(WorkflowEngine.FLINK_CEP_GRAPH.name())
                 .quantifier(Quantifier.builder()
                         .consumingStrategy(ConsumingStrategy.SKIP_TILL_NEXT)
                         .details(asList(QuantifierProperty.SINGLE))
@@ -73,6 +76,7 @@ public class FlinkCepGraphTests {
                                         .type(ConditionType.CLASS)
                                         .className("org.apache.flink.cep.pattern.conditions.RichAndCondition")
                                         .build())
+                                .attributes(singletonMap("top", "10px"))
                                 .build(),
                         Node.builder()
                                 .name("middle")
@@ -97,6 +101,7 @@ public class FlinkCepGraphTests {
                                                                 .expression("body.level == 'ERROR' || body.level == 'FATAL'")
                                                                 .build()))
                                                 .build())
+                                .attributes(singletonMap("top", "20px"))
                                 .build(),
                         Node.builder()
                                 .name("end")
@@ -111,6 +116,7 @@ public class FlinkCepGraphTests {
                                         .type(ConditionType.AVIATOR)
                                         .expression("body.level == 'ERROR' || body.level == 'FATAL'")
                                         .build())
+                                .attributes(singletonMap("top", "10px"))
                                 .build()))
                 .edges(asList(Edge.builder().source("start").target("middle").type(ConsumingStrategy.SKIP_TILL_NEXT).build(),
                         Edge.builder().source("middle").target("end").type(ConsumingStrategy.SKIP_TILL_NEXT).build()))
@@ -131,18 +137,18 @@ public class FlinkCepGraphTests {
     public void testCepPatternDeserialize() throws Throwable {
         // @formatter:off
         final String patternJson = "{"
-                + "    \"name\": \"end\","
                 + "    \"engine\": \"FLINK_CEP_GRAPH\","
+                + "    \"name\": \"end\","
                 + "    \"quantifier\": {"
                 + "        \"consumingStrategy\": \"SKIP_TILL_NEXT\","
                 + "        \"times\": {"
-                + "             \"from\": 3,"
-                + "             \"to\": 3,"
-                + "             \"windowTime\": {"
-                + "                 \"unit\": \"MINUTES\","
-                + "                 \"size\": 5"
-                + "             }"
-                + "         },"
+                + "            \"from\": 1,"
+                + "            \"to\": 3,"
+                + "            \"windowTime\": {"
+                + "                \"unit\": \"MINUTES\","
+                + "                \"size\": 5"
+                + "            }"
+                + "        },"
                 + "        \"untilCondition\": null,"
                 + "        \"details\": [\"SINGLE\"]"
                 + "    },"
@@ -161,7 +167,10 @@ public class FlinkCepGraphTests {
                 + "            \"nestedConditions\": null,"
                 + "            \"subClassName\": null"
                 + "        },"
-                + "        \"type\": \"ATOMIC\""
+                + "        \"type\": \"ATOMIC\","
+                + "        \"attributes\": {"
+                + "            \"top\": \"10px\""
+                + "        }"
                 + "    }, {"
                 + "        \"name\": \"middle\","
                 + "        \"quantifier\": {"
@@ -184,7 +193,10 @@ public class FlinkCepGraphTests {
                 + "            }],"
                 + "            \"subClassName\": null"
                 + "        },"
-                + "        \"type\": \"ATOMIC\""
+                + "        \"type\": \"ATOMIC\","
+                + "        \"attributes\": {"
+                + "            \"top\": \"20px\""
+                + "        }"
                 + "    }, {"
                 + "        \"name\": \"end\","
                 + "        \"quantifier\": {"
@@ -197,19 +209,24 @@ public class FlinkCepGraphTests {
                 + "            \"type\": \"AVIATOR\","
                 + "            \"expression\": \"body.level == 'ERROR' || body.level == 'FATAL'\""
                 + "        },"
-                + "        \"type\": \"ATOMIC\""
+                + "        \"type\": \"ATOMIC\","
+                + "        \"attributes\": {"
+                + "            \"top\": \"10px\""
+                + "        }"
                 + "    }],"
                 + "    \"edges\": [{"
                 + "        \"source\": \"start\","
                 + "        \"target\": \"middle\","
-                + "        \"type\": \"SKIP_TILL_NEXT\""
+                + "        \"type\": \"SKIP_TILL_NEXT\","
+                + "        \"attributes\": {}"
                 + "    }, {"
                 + "        \"source\": \"middle\","
                 + "        \"target\": \"end\","
-                + "        \"type\": \"SKIP_TILL_NEXT\""
+                + "        \"type\": \"SKIP_TILL_NEXT\","
+                + "        \"attributes\": {}"
                 + "    }],"
                 + "    \"window\": {"
-                + "        \"type\": null,"
+                + "        \"type\": \"PREVIOUS_AND_CURRENT\","
                 + "        \"time\": {"
                 + "            \"unit\": \"MINUTES\","
                 + "            \"size\": 5"

@@ -45,6 +45,7 @@ com.wl4g.rengine.job.cep.RengineKafkaFlinkCepStreaming
 | Options | Description |
 | - | - |
 | -P,--cepPatterns <required>                                                                     | The cep patterns array json with base64 encode.
+|    --inProcessingTime <default=false>                                                           | Use the pattern stream for processing time, event source time will be ignored.
 |    --alertTopic <default=30000>                                                                 | Topic for producer the alerts message of Flink CEP match generated.
 |    --offsetResetStrategy <default=LATEST>                                                       | Consuming kafka events offset reset strategy.
 |    --partitionDiscoveryIntervalMs <default=30000>                                               | The per millis for discover new partitions interval.

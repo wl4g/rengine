@@ -25,6 +25,7 @@ import org.apache.flink.cep.dynamic.impl.json.spec.ConditionSpec;
 import org.apache.flink.cep.dynamic.impl.json.spec.GraphSpec;
 import org.apache.flink.cep.dynamic.impl.json.spec.NodeSpec;
 import org.apache.flink.cep.pattern.Pattern;
+import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.DeserializationFeature;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.module.SimpleModule;
 import org.apache.flink.streaming.api.windowing.time.Time;
@@ -44,7 +45,8 @@ public class CepJsonUtils {
     private static final ObjectMapper objectMapper = new ObjectMapper()
             .registerModule(new SimpleModule().addDeserializer(ConditionSpec.class, ConditionSpecStdDeserializer.INSTANCE)
                     .addDeserializer(Time.class, TimeStdDeserializer.INSTANCE)
-                    .addDeserializer(NodeSpec.class, NodeSpecStdDeserializer.INSTANCE));
+                    .addDeserializer(NodeSpec.class, NodeSpecStdDeserializer.INSTANCE))
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     public static Pattern<?, ?> toPattern(String jsonString) {
         return toPattern(jsonString, Thread.currentThread().getContextClassLoader());

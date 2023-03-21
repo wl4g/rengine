@@ -28,7 +28,6 @@ import org.apache.flink.cep.CEP;
 import org.apache.flink.cep.dynamic.impl.json.util.CepJsonUtils;
 import org.apache.flink.cep.pattern.Pattern;
 import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.datastream.DataStreamUtils;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.junit.Test;
@@ -45,7 +44,6 @@ import com.wl4g.rengine.common.event.RengineEvent;
  * @version 2023-03-16
  * @since v1.0.0
  */
-@SuppressWarnings({ "deprecation" })
 public class RengineKafkaFlinkCepStreamingTests {
 
     @Test
@@ -66,7 +64,7 @@ public class RengineKafkaFlinkCepStreamingTests {
         @SuppressWarnings("unchecked")
         Pattern<RengineEvent, ?> pattern = (Pattern<RengineEvent, ?>) CepJsonUtils.toPattern(PATTERN_JSON_1);
 
-        DataStream<String> result = CEP.pattern(input, pattern).inProcessingTime().flatSelect((p, o) -> {
+        DataStream<String> resultDS = CEP.pattern(input, pattern).inProcessingTime().flatSelect((p, o) -> {
             StringBuilder builder = new StringBuilder();
 
             builder.append(p.get("start").get(0).getId())
@@ -80,7 +78,8 @@ public class RengineKafkaFlinkCepStreamingTests {
 
         List<String> resultList = new ArrayList<>();
 
-        DataStreamUtils.collect(result).forEachRemaining(resultList::add);
+        // DataStreamUtils.collect(resultDS).forEachRemaining(resultList::add);
+        resultDS.executeAndCollect().forEachRemaining(resultList::add);
 
         assertEquals(Arrays.asList("2,5,8", "2,6,8"), resultList);
     }
@@ -154,7 +153,7 @@ public class RengineKafkaFlinkCepStreamingTests {
             return isBlank(keyBy) ? event.getType() : keyBy;
         });
 
-        DataStream<String> result = CEP.pattern(keyedInput, pattern).inProcessingTime().flatSelect((p, o) -> {
+        DataStream<String> resultDS = CEP.pattern(keyedInput, pattern).inProcessingTime().flatSelect((p, o) -> {
             StringBuilder builder = new StringBuilder();
             builder.append(p.get("start").get(0).getId()).append(",").append(p.get("middle").get(0).getId());
             o.collect(builder.toString());
@@ -162,7 +161,8 @@ public class RengineKafkaFlinkCepStreamingTests {
 
         List<String> resultList = new ArrayList<>();
 
-        DataStreamUtils.collect(result).forEachRemaining(resultList::add);
+        // DataStreamUtils.collect(resultDS).forEachRemaining(resultList::add);
+        resultDS.executeAndCollect().forEachRemaining(resultList::add);
 
         assertEquals(Arrays.asList("1,3", "2,3", "4,5"), resultList);
     }
@@ -170,11 +170,12 @@ public class RengineKafkaFlinkCepStreamingTests {
     // @formatter:off
     static final String PATTERN_JSON_1 = "{"
             + "    \"name\": \"end\","
+            + "    \"engine\": \"FLINK_CEP_GRAPH\","
             + "    \"quantifier\": {"
             + "        \"consumingStrategy\": \"SKIP_TILL_NEXT\","
             + "        \"times\": {"
             + "             \"from\": 1,"
-            + "             \"to\": 1,"
+            + "             \"to\": 3,"
             + "             \"windowTime\": {"
             + "                 \"unit\": \"MINUTES\","
             + "                 \"size\": 5"
@@ -196,6 +197,9 @@ public class RengineKafkaFlinkCepStreamingTests {
             + "            \"expression\": \"type == 'end'\","
             + "            \"type\": \"AVIATOR\""
             + "        },"
+            + "        \"attributes\": {"
+            + "            \"top\": \"10px\""
+            + "        },"
             + "        \"type\": \"ATOMIC\""
             + "    }, {"
             + "        \"name\": \"middle\","
@@ -216,6 +220,9 @@ public class RengineKafkaFlinkCepStreamingTests {
             + "            \"type\": \"CLASS\","
             + "            \"className\": \"org.apache.flink.cep.pattern.conditions.RichOrCondition\""
             + "        },"
+            + "        \"attributes\": {"
+            + "            \"top\": \"20px\""
+            + "        },"
             + "        \"type\": \"ATOMIC\""
             + "    }, {"
             + "        \"name\": \"start\","
@@ -229,6 +236,9 @@ public class RengineKafkaFlinkCepStreamingTests {
             + "            \"expression\": \"type == 'start'\","
             + "            \"type\": \"AVIATOR\""
             + "        },"
+            + "        \"attributes\": {"
+            + "            \"top\": \"20px\""
+            + "        },"
             + "        \"type\": \"ATOMIC\""
             + "    }],"
             + "    \"edges\": [{"
@@ -240,7 +250,13 @@ public class RengineKafkaFlinkCepStreamingTests {
             + "        \"target\": \"middle\","
             + "        \"type\": \"SKIP_TILL_ANY\""
             + "    }],"
-            + "    \"window\": null,"
+            + "    \"window\": {"
+            + "        \"type\": \"PREVIOUS_AND_CURRENT\","
+            + "        \"time\": {"
+            + "            \"unit\": \"MINUTES\","
+            + "            \"size\": 5"
+            + "        }"
+            + "    },"
             + "    \"afterMatchStrategy\": {"
             + "        \"type\": \"NO_SKIP\","
             + "        \"patternName\": null"
@@ -253,11 +269,12 @@ public class RengineKafkaFlinkCepStreamingTests {
     // @formatter:off
     static final String PATTERN_JSON_2 = "{"
             + "    \"name\": \"end\","
+            + "    \"engine\": \"FLINK_CEP_GRAPH\","
             + "    \"quantifier\": {"
             + "        \"consumingStrategy\": \"SKIP_TILL_NEXT\","
             + "        \"times\": {"
             + "             \"from\": 1,"
-            + "             \"to\": 1,"
+            + "             \"to\": 3,"
             + "             \"windowTime\": {"
             + "                 \"unit\": \"MINUTES\","
             + "                 \"size\": 5"
@@ -286,6 +303,9 @@ public class RengineKafkaFlinkCepStreamingTests {
             + "            \"type\": \"CLASS\","
             + "            \"className\": \"org.apache.flink.cep.pattern.conditions.RichOrCondition\""
             + "        },"
+            + "        \"attributes\": {"
+            + "            \"top\": \"10px\""
+            + "        },"
             + "        \"type\": \"ATOMIC\""
             + "    }, {"
             + "        \"name\": \"start\","
@@ -299,6 +319,9 @@ public class RengineKafkaFlinkCepStreamingTests {
             + "            \"expression\": \"body.logRecord.item2 == 'TRACE' || body.logRecord.item2 == 'DEBUG' || body.logRecord.item2 == 'INFO' || body.logRecord.item2 == 'WARN'\","
             + "            \"type\": \"AVIATOR\""
             + "        },"
+            + "        \"attributes\": {"
+            + "            \"top\": \"20px\""
+            + "        },"
             + "        \"type\": \"ATOMIC\""
             + "    }],"
             + "    \"edges\": [{"
@@ -307,7 +330,7 @@ public class RengineKafkaFlinkCepStreamingTests {
             + "        \"type\": \"SKIP_TILL_NEXT\""
             + "    }],"
             + "    \"window\": {"
-            + "        \"type\": null,"
+            + "        \"type\": \"PREVIOUS_AND_CURRENT\","
             + "        \"time\": {"
             + "            \"unit\": \"MINUTES\","
             + "            \"size\": 5"

@@ -15,10 +15,10 @@ package com.wl4g.rengine.job.cep;
  * limitations under the License.
  */
 
-import static com.wl4g.infra.common.lang.DateUtils2.formatDate;
 import static com.wl4g.infra.common.lang.EnvironmentUtil.getProperty;
-import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
+import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.lang.String.format;
+import static java.lang.String.valueOf;
 import static java.util.Collections.singleton;
 import static java.util.Collections.synchronizedList;
 import static java.util.Objects.nonNull;
@@ -31,16 +31,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.serialization.Deserializer;
+import org.apache.kafka.common.serialization.StringDeserializer;
 
 import com.wl4g.infra.common.codec.Encodes;
+import com.wl4g.infra.common.lang.Assert2;
 import com.wl4g.infra.common.lang.ThreadUtils2;
+import com.wl4g.infra.common.lang.tuples.Tuple3;
 import com.wl4g.rengine.common.event.RengineEvent;
 
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
@@ -59,29 +63,19 @@ import io.opentelemetry.proto.logs.v1.ResourceLogs;
 public class RengineKafkaFlinkCepStreamingIT {
 
     static final String IT_MOCK_KAFKA_BROKERS = getProperty("IT_KAFKA_BROKERS", "localhost:9092");
-    static final String IT_MOCK_LOGS_SERVICE_NAME = getProperty("IT_MOCK_LOGS_SERVICE_NAME", "order-service");
-    static final String IT_MOCK_EVENT_TOPIC = getProperty("IT_MOCK_EVENT_TOPIC", "test_wl4g_rengine_otlp_logs");
-    static final String IT_MOCK_ALERTS_TOPIC = getProperty("IT_MOCK_ALERTS_TOPIC", "test_wl4g_rengine_alert");
-    static final Map<Integer, String> MOCK_LOGS_LEVELS = new LinkedHashMap<Integer, String>() {
-        private static final long serialVersionUID = 1L;
-        {
-            put(0, "INFO");
-            put(1, "INFO");
-            put(2, "ERROR");
-            put(3, "INFO");
-            put(4, "FATAL");
-            put(5, "INFO");
-            put(6, "WARN");
-            put(7, "DEBUG");
-            put(8, "INFO");
-            put(9, "INFO");
-        }
-    };
-
+    // static final int IT_MOCK_SUFFIX = RandomUtils.nextInt(1, 10000);
+    static final int IT_MOCK_SUFFIX = 0;
+    static final String IT_MOCK_EVENT_TOPIC = getProperty("IT_MOCK_EVENT_TOPIC_PREFIX", "test_wl4g_rengine_otlp_logs") + "_"
+            + IT_MOCK_SUFFIX;
+    static final String IT_MOCK_ALERTS_TOPIC = getProperty("IT_MOCK_ALERTS_TOPIC_PREFIX", "test_wl4g_rengine_alert") + "_"
+            + IT_MOCK_SUFFIX;
+    static final Tuple3[] MOCK_LOGS_RECORDS = { new Tuple3("2023-03-22T14:13:33.697+08:00", "", "") };
     static final AtomicBoolean running = new AtomicBoolean(true);
+    static final Long alertsConsumingTimeoutMs = 5 * 1000L;
+    static final Deserializer<String> defaultDeserializer = new StringDeserializer();
     static final List<RengineEvent> alerts = synchronizedList(new ArrayList<>());
     static KafkaProducer<String, byte[]> producer;
-    static KafkaConsumer<String, String> consumer;
+    static KafkaConsumer<String, byte[]> consumer;
 
     public static void main(String[] args) throws Exception {
         // LogManager.getLogger("org.apache.flink").setLevel(Level.DEBUG);
@@ -103,16 +97,13 @@ public class RengineKafkaFlinkCepStreamingIT {
         }));
 
         startMockLogsProducing();
-        startAlertsConsuming();
 
         RengineKafkaFlinkCepStreaming.main((nonNull(args) && args.length > 0) ? args : DEFAULT_ARGS);
-
-        assertion();
     }
 
     static void startMockLogsProducing() {
         new Thread(() -> {
-            System.out.println("Mock logs producing for waiting init sleep 6s ...");
+            System.out.println("Mock logs producing for waiting init sleep 10s ...");
             ThreadUtils2.sleep(10_000);
 
             final Properties props = new Properties();
@@ -122,24 +113,54 @@ public class RengineKafkaFlinkCepStreamingIT {
             props.put("value.serializer", "org.apache.kafka.common.serialization.ByteArraySerializer");
             producer = new KafkaProducer<>(props);
             try {
-                final AtomicInteger count = new AtomicInteger(0);
-                MOCK_LOGS_LEVELS.entrySet().forEach(e -> {
-                    String level = e.getValue();
-                    final String logTime = formatDate(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-                    final String logMsg = format(LOG_MESSAGE, logTime, level, IT_MOCK_LOGS_SERVICE_NAME, count.getAndIncrement());
-                    System.out.println("Send log : " + logMsg);
+                Tuple3[] mockLogRecords = { new Tuple3("1970-01-01T08:03:33.001+08:00", "INFO", "order-service"),
+                        new Tuple3("1970-01-01T08:03:44.002+08:00", "INFO", "order-service"),
+                        new Tuple3("1970-01-01T08:03:52.003+08:00", "ERROR", "order-service"),
+                        new Tuple3("1970-01-01T08:03:59.004+08:00", "INFO", "order-service"),
+                        new Tuple3("1970-01-01T08:04:24.005+08:00", "FATAL", "order-service"),
+                        new Tuple3("1970-01-01T08:04:54.006+08:00", "INFO", "order-service"),
+                        new Tuple3("1970-01-01T08:05:34.007+08:00", "WARN", "order-service"),
+                        new Tuple3("1970-01-01T08:05:56.008+08:00", "DEBUG", "order-service"),
+                        new Tuple3("1970-01-01T08:06:43.009+08:00", "INFO", "order-service"),
+                        new Tuple3("1970-01-01T08:07:12.010+08:00", "INFO", "order-service") };
+
+                for (int i = 0; i < mockLogRecords.length; i++) {
+                    Map<String, Object> logRecord = new LinkedHashMap<>();
+                    logRecord.put("@timestamp", mockLogRecords[i].getItem1());
+                    logRecord.put("@version", "1");
+                    logRecord.put("level", mockLogRecords[i].getItem2());
+                    logRecord.put("service", mockLogRecords[i].getItem3());
+                    logRecord.put("message", format("This is the %sth log message for completed started on 16 ms.", i));
+                    logRecord.put("logger_name", "o.s.w.s.DispatcherServlet");
+                    logRecord.put("thread_name", "http-nio-0.0.0.0-28001-exec-1");
+                    logRecord.put("level_value", 20000);
+                    logRecord.put("caller_class_name", "org.springframework.web.servlet.FrameworkServlet");
+                    logRecord.put("caller_method_name", "initServletBean");
+                    logRecord.put("caller_file_name", "FrameworkServlet.java");
+                    logRecord.put("caller_line_number", 547);
+                    logRecord.put("logger_group", "main");
+
+                    String logMsg = toJSONString(logRecord);
+                    System.out.println(format("Send log (%s) : %s", IT_MOCK_EVENT_TOPIC, logMsg));
 
                     ExportLogsServiceRequest request = buildOtlpLogsRequest(logMsg);
                     producer.send(new ProducerRecord<String, byte[]>(IT_MOCK_EVENT_TOPIC, request.toByteArray()));
-                });
+                }
             } catch (Throwable ex) {
                 ex.printStackTrace();
             }
+
+            System.out.println("Mock completed.");
+            startAlertsConsuming();
+
         }).start();
     }
 
     static void startAlertsConsuming() {
         new Thread(() -> {
+            System.out.println("Start alerts consuming for waiting init sleep 3s ...");
+            ThreadUtils2.sleep(3_000);
+
             final Properties props = new Properties();
             props.put("bootstrap.servers", IT_MOCK_KAFKA_BROKERS);
             props.put("group.id", RengineKafkaFlinkCepStreamingIT.class.getSimpleName() + "_alerts");
@@ -149,32 +170,68 @@ public class RengineKafkaFlinkCepStreamingIT {
             props.put("value.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
             consumer = new KafkaConsumer<>(props);
             consumer.subscribe(singleton(IT_MOCK_ALERTS_TOPIC));
-            while (true) {
-                try {
-                    ConsumerRecords<String, String> records = consumer.poll(Duration.ofSeconds(1));
+            try {
+                int c = 0;
+                while (++c < 20) {
+                    ConsumerRecords<String, byte[]> records = consumer.poll(Duration.ofSeconds(1));
+                    System.out.println(new Date() + " - " + IT_MOCK_ALERTS_TOPIC + " - consumed records: " + records.count());
                     if (!records.isEmpty()) {
-                        for (ConsumerRecord<String, String> record : records) {
-                            final RengineEvent alert = parseJSON(record.value(), RengineEvent.class);
+                        for (ConsumerRecord<String, byte[]> record : records) {
+                            final RengineEvent alert = RengineEvent
+                                    .fromJson(defaultDeserializer.deserialize(record.topic(), record.value()));
                             alerts.add(alert);
                             System.out.println("Alert : " + alert);
                         }
                     }
-                    ThreadUtils2.sleep(1000);
-
-                    if (!running.get()) {
+                    if (alerts.size() >= 1) {
                         break;
                     }
-                } catch (Throwable ex) {
-                    ex.printStackTrace();
+                    Thread.sleep(500L);
                 }
+            } catch (Throwable ex) {
+                ex.printStackTrace();
+            } finally {
+                consumer.commitSync();
+                System.exit(0);
             }
         }).start();
     }
 
+    @SuppressWarnings({ "rawtypes" })
     static void assertion() {
-        System.out.println("---------- alerts ----------");
-        System.out.println(alerts);
-        // TODO
+        // for example:
+        // System.out.println("---------- alerts ----------");
+        // alerts.forEach(System.out::println);
+
+        // @formatter:off
+        //
+        // RengineEvent(id=1679473958849@test_wl4g_rengine_alert_0, type=test_wl4g_rengine_alert_0, observedTime=1679473958849, body={description=The matched alert event msg., match={middle=[{@timestamp=2023-03-22T14:13:52.003+08:00, @version=1, level=ERROR, service=order-service, message=This is the 2th log message for completed started on 16 ms., logger_name=o.s.w.s.DispatcherServlet, thread_name=http-nio-0.0.0.0-28001-exec-1, level_value=20000, caller_class_name=org.springframework.web.servlet.FrameworkServlet, caller_method_name=initServletBean, caller_file_name=FrameworkServlet.java, caller_line_number=547, logger_group=main}], start=[{@timestamp=2023-03-22T14:13:33.001+08:00, @version=1, level=INFO, service=order-service, message=This is the 0th log message for completed started on 16 ms., logger_name=o.s.w.s.DispatcherServlet, thread_name=http-nio-0.0.0.0-28001-exec-1, level_value=20000, caller_class_name=org.springframework.web.servlet.FrameworkServlet, caller_method_name=initServletBean, caller_file_name=FrameworkServlet.java, caller_line_number=547, logger_group=main}]}}, labels=null)
+        // RengineEvent(id=1679473958871@test_wl4g_rengine_alert_0, type=test_wl4g_rengine_alert_0, observedTime=1679473958871, body={description=The matched alert event msg., match={middle=[{@timestamp=2023-03-22T14:13:52.003+08:00, @version=1, level=ERROR, service=order-service, message=This is the 2th log message for completed started on 16 ms., logger_name=o.s.w.s.DispatcherServlet, thread_name=http-nio-0.0.0.0-28001-exec-1, level_value=20000, caller_class_name=org.springframework.web.servlet.FrameworkServlet, caller_method_name=initServletBean, caller_file_name=FrameworkServlet.java, caller_line_number=547, logger_group=main}], start=[{@timestamp=2023-03-22T14:13:44.002+08:00, @version=1, level=INFO, service=order-service, message=This is the 1th log message for completed started on 16 ms., logger_name=o.s.w.s.DispatcherServlet, thread_name=http-nio-0.0.0.0-28001-exec-1, level_value=20000, caller_class_name=org.springframework.web.servlet.FrameworkServlet, caller_method_name=initServletBean, caller_file_name=FrameworkServlet.java, caller_line_number=547, logger_group=main}]}}, labels=null)
+        // RengineEvent(id=1679473958882@test_wl4g_rengine_alert_0, type=test_wl4g_rengine_alert_0, observedTime=1679473958882, body={description=The matched alert event msg., match={middle=[{@timestamp=2023-03-22T14:14:24.005+08:00, @version=1, level=FATAL, service=order-service, message=This is the 4th log message for completed started on 16 ms., logger_name=o.s.w.s.DispatcherServlet, thread_name=http-nio-0.0.0.0-28001-exec-1, level_value=20000, caller_class_name=org.springframework.web.servlet.FrameworkServlet, caller_method_name=initServletBean, caller_file_name=FrameworkServlet.java, caller_line_number=547, logger_group=main}], start=[{@timestamp=2023-03-22T14:13:59.004+08:00, @version=1, level=INFO, service=order-service, message=This is the 3th log message for completed started on 16 ms., logger_name=o.s.w.s.DispatcherServlet, thread_name=http-nio-0.0.0.0-28001-exec-1, level_value=20000, caller_class_name=org.springframework.web.servlet.FrameworkServlet, caller_method_name=initServletBean, caller_file_name=FrameworkServlet.java, caller_line_number=547, logger_group=main}]}}, labels=null)
+        //
+        // @formatter:on
+
+        Assert2.isTrue(alerts.size() == 3, "alerts.size(%s) == 3", alerts.size());
+
+        Map body0 = alerts.get(0).getBody();
+        Assert2.notEmpty(body0, "body0");
+        Map match0 = (Map) body0.get("match");
+        Assert2.notEmpty(match0, "match0");
+        List middle0 = (List) match0.get("middle");
+        Assert2.notEmpty(middle0, "middle0");
+        Map middelMap0 = (Map) middle0.get(0);
+        Assert2.notEmpty(middelMap0, "middelMap0");
+        Assert2.isTrueOf("ERROR".equals(valueOf(middelMap0.get("level"))), "level == 'ERROR'");
+
+        Map body2 = alerts.get(2).getBody();
+        Assert2.notEmpty(body2, "body2");
+        Map match2 = (Map) body2.get("match");
+        Assert2.notEmpty(match2, "match2");
+        List middle2 = (List) match2.get("middle");
+        Assert2.notEmpty(middle2, "middle2");
+        Map middelMap2 = (Map) middle2.get(0);
+        Assert2.notEmpty(middelMap2, "middelMap2");
+        Assert2.isTrueOf("FATAL".equals(valueOf(middelMap2.get("level"))), "level == 'FATAL'");
 
     }
 
@@ -193,15 +250,23 @@ public class RengineKafkaFlinkCepStreamingIT {
     // @formatter:off
     static final String PATTERN_ARRAY_JSON_1 = "[{"
             + "    \"name\": \"end\","
+            + "    \"engine\": \"FLINK_CEP_GRAPH\","
             + "    \"quantifier\": {"
             + "        \"consumingStrategy\": \"SKIP_TILL_NEXT\","
-            + "        \"times\": null,"
+            + "        \"times\": {"
+            + "             \"from\": 1,"
+            + "             \"to\": 3,"
+            + "             \"windowTime\": {"
+            + "                 \"unit\": \"MINUTES\","
+            + "                 \"size\": 5"
+            + "             }"
+            + "         },"
             + "        \"untilCondition\": null,"
             + "        \"properties\": [\"SINGLE\"]"
             + "    },"
             + "    \"condition\": null,"
             + "    \"nodes\": [{"
-            + "        \"name\": \"end\","
+            + "        \"name\": \"middle\","
             + "        \"quantifier\": {"
             + "            \"consumingStrategy\": \"SKIP_TILL_NEXT\","
             + "            \"times\": null,"
@@ -236,10 +301,16 @@ public class RengineKafkaFlinkCepStreamingIT {
             + "    }],"
             + "    \"edges\": [{"
             + "        \"source\": \"start\","
-            + "        \"target\": \"end\","
+            + "        \"target\": \"middle\","
             + "        \"type\": \"SKIP_TILL_NEXT\""
             + "    }],"
-            + "    \"window\": null,"
+            + "    \"window\": {"
+            + "        \"type\": \"PREVIOUS_AND_CURRENT\","
+            + "        \"time\": {"
+            + "            \"unit\": \"MINUTES\","
+            + "            \"size\": 5"
+            + "        }"
+            + "    },"
             + "    \"afterMatchStrategy\": {"
             + "        \"type\": \"NO_SKIP\","
             + "        \"patternName\": null"
@@ -251,8 +322,10 @@ public class RengineKafkaFlinkCepStreamingIT {
 
     // @formatter:off
     static final String[] DEFAULT_ARGS = {
-            "--groupId", "rengine_test",
+            "--checkpointDir", "file:///tmp/flink-checkpoint",
+            "--groupId", "rengine_test_" + RandomUtils.nextInt(),
             "--eventTopicPattern", IT_MOCK_EVENT_TOPIC,
+            "--inProcessingTime", "true",
             "--alertTopic", IT_MOCK_ALERTS_TOPIC,
             //"--fromOffsetTime", "1",
             "--deserializerClass", "com.wl4g.rengine.job.kafka.OtlpLogKafkaDeserializationSchema",
@@ -260,10 +333,6 @@ public class RengineKafkaFlinkCepStreamingIT {
             "--keyByExpression", "body.service", // grouping by logs application name.
             "--cepPatterns", Encodes.encodeBase64(PATTERN_ARRAY_JSON_1)
             };
-    // @formatter:on
-
-    // @formatter:off
-    static final String LOG_MESSAGE = "{\"@timestamp\":\"%s\",\"level\":\"%s\",\"service\":\"%s\",\"message\":[\"This is the %sth log message for completed started on 16 ms.\"],\"@version\":\"1\",\"logger_name\":\"o.s.w.s.DispatcherServlet\",\"thread_name\":\"http-nio-0.0.0.0-28001-exec-1\",\"level_value\":20000,\"caller_class_name\":\"org.springframework.web.servlet.FrameworkServlet\",\"caller_method_name\":\"initServletBean\",\"caller_file_name\":\"FrameworkServlet.java\",\"caller_line_number\":547,\"logger_group\":\"main\"}";
     // @formatter:on
 
 }

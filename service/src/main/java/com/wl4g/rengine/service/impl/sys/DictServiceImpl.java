@@ -67,8 +67,8 @@ import lombok.CustomLog;
  * @since v1.0.0
  * @see {@link com.wl4g.rengine.executor.service.impl.ReactiveDictServiceImpl}
  */
-@Service
 @CustomLog
+@Service
 public class DictServiceImpl extends BasicServiceImpl implements DictService {
 
     HashOperations<String, String, String> hashOperations;
@@ -139,8 +139,8 @@ public class DictServiceImpl extends BasicServiceImpl implements DictService {
         if (CollectionUtils2.isEmpty(dicts)) {
             final Query query = new Query(
                     andCriteria(baseCriteria(model), isCriteria("type", nonNull(model.getType()) ? model.getType().name() : null),
-                            isCriteria("key", model.getKey()), isCriteria("value", model.getValue()))).with(
-                                    PageRequest.of(model.getPageNum(), model.getPageSize(), descSort("sort", "updateDate")));
+                            isCriteria("key", model.getKey()), isCriteria("value", model.getValue())))
+                    .with(PageRequest.of(model.getPageNum(), model.getPageSize(), descSort("sort", "updateDate")));
             dicts = mongoTemplate.find(query, Dict.class, MongoCollectionDefinition.SYS_DICTS.getName());
             total = mongoTemplate.count(query, MongoCollectionDefinition.SYS_DICTS.getName());
 

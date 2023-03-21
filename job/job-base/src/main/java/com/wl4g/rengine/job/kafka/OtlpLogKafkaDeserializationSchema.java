@@ -102,11 +102,11 @@ public class OtlpLogKafkaDeserializationSchema implements KafkaRecordDeserializa
                                     .collect(toMap(kv -> kv.getKey(), kv -> kv.getValue().getStringValue()));
 
                             // event timestamp.
-                            final Long timestamp = safeMap(body).entrySet()
+                            final Long time = safeMap(body).entrySet()
                                     .stream()
                                     .filter(e -> timeFieldNames.contains(e.getKey()))
                                     .map(e -> {
-                                        Object timeObj = e.getValue();
+                                        final Object timeObj = e.getValue();
                                         if (timeObj instanceof String) {
                                             try {
                                                 return DateUtils2.parseDate((String) timeObj, DEFAULT_TIME_PATTERNS).getTime();
@@ -140,7 +140,7 @@ public class OtlpLogKafkaDeserializationSchema implements KafkaRecordDeserializa
                             out.collect(RengineEvent.builder()
                                     .type(eventType)
                                     .source(EventSource.builder()
-                                            .time(timestamp)
+                                            .time(time)
                                             .principals(principals)
                                             .location(EventLocation.builder().build())
                                             .build())

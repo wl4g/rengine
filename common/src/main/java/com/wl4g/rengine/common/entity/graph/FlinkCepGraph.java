@@ -9,7 +9,9 @@ import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
@@ -26,6 +28,7 @@ import com.wl4g.rengine.common.entity.graph.WorkflowGraph.GraphBase;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -292,6 +295,7 @@ public class FlinkCepGraph extends GraphBase {
         private @NotNull Quantifier quantifier;
         private @NotNull BaseCondition condition;
         private @NotNull PatternNodeType type;
+        private @Nullable @Default Map<String, Object> attributes = new HashMap<>();
 
         public Node validate() {
             hasTextOf(name, "name");
@@ -311,6 +315,7 @@ public class FlinkCepGraph extends GraphBase {
         private @NotBlank String source;
         private @NotBlank String target;
         private @NotBlank ConsumingStrategy type;
+        private @Nullable @Default Map<String, Object> attributes = new HashMap<>();
 
         public Edge validate() {
             hasTextOf(source, "source");

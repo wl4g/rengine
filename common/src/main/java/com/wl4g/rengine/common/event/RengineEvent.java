@@ -33,7 +33,6 @@ import static org.apache.commons.lang3.StringUtils.replaceChars;
 import static org.apache.commons.lang3.StringUtils.startsWith;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -56,7 +55,6 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.wl4g.infra.common.serialize.JacksonUtils;
 
 import lombok.AccessLevel;
-import lombok.Builder.Default;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -74,7 +72,7 @@ import lombok.experimental.SuperBuilder;
  * @since v1.0.0
  */
 @Getter
-@ToString
+@ToString(exclude = "_toJsonNode")
 public class RengineEvent extends EventObject {
     private static final long serialVersionUID = 3242901223478600427L;
 
@@ -114,28 +112,28 @@ public class RengineEvent extends EventObject {
     private transient @JsonIgnore JsonNode _toJsonNode;
 
     public RengineEvent(@NotBlank String type, @NotNull EventSource source) {
-        this(null, type, currentTimeMillis(), source, new LinkedHashMap<>(1), new LinkedHashMap<>(1));
+        this(null, type, currentTimeMillis(), source, null, null);
     }
 
     public RengineEvent(@NotBlank String id, @NotBlank String type, @NotNull EventSource source) {
-        this(id, type, currentTimeMillis(), source, new LinkedHashMap<>(1), new LinkedHashMap<>(1));
+        this(id, type, currentTimeMillis(), source, null, null);
     }
 
     public RengineEvent(@NotBlank String type, @Nullable Map<String, Object> body) {
-        this(null, type, currentTimeMillis(), null, body, new LinkedHashMap<>(1));
+        this(null, type, currentTimeMillis(), null, body, null);
     }
 
     public RengineEvent(@NotBlank String id, @NotBlank String type, @Nullable Map<String, Object> body) {
-        this(id, type, currentTimeMillis(), null, body, new LinkedHashMap<>(1));
+        this(id, type, currentTimeMillis(), null, body, null);
     }
 
     public RengineEvent(@NotBlank String type, @NotNull EventSource source, @Nullable Map<String, Object> body) {
-        this(null, type, currentTimeMillis(), source, body, new LinkedHashMap<>(1));
+        this(null, type, currentTimeMillis(), source, body, null);
     }
 
     public RengineEvent(@NotBlank String id, @NotBlank String type, @NotNull EventSource source,
             @Nullable Map<String, Object> body) {
-        this(id, type, currentTimeMillis(), source, body, new LinkedHashMap<>(1));
+        this(id, type, currentTimeMillis(), source, body, null);
     }
 
     public RengineEvent(@NotBlank String id, @NotBlank String type, @NotNull EventSource source,
@@ -159,7 +157,7 @@ public class RengineEvent extends EventObject {
         return RengineEvent.validate(this);
     }
 
-    public JsonNode asJsonNode() {
+    public @JsonIgnore JsonNode asJsonNode() {
         if (isNull(_toJsonNode)) {
             synchronized (this) {
                 if (isNull(_toJsonNode)) {
@@ -222,8 +220,8 @@ public class RengineEvent extends EventObject {
         final Long observedTime = node.at("/observedTime").asLong();
 
         final JsonNode bodyNode = node.at("/body");
-        final Map<String, Object> bodyMap = (nonNull(bodyNode) && !bodyNode.isMissingNode() && !isBlank(bodyNode.asText()))
-                ? parseJSON(bodyNode.asText(), JacksonUtils.MAP_OBJECT_TYPE_REF)
+        final Map<String, Object> bodyMap = (nonNull(bodyNode) && !bodyNode.isMissingNode() && !isBlank(bodyNode.toString()))
+                ? parseJSON(bodyNode.toString(), JacksonUtils.MAP_OBJECT_TYPE_REF)
                 : null;
 
         final JsonNode labelsNode = node.at("/labels");
@@ -285,8 +283,8 @@ public class RengineEvent extends EventObject {
     public static class EventSource implements Serializable {
         private static final long serialVersionUID = -4689601246194850124L;
         private @NotNull @Min(-1) Long time;
-        private @NotEmpty @Default List<String> principals = new ArrayList<>();
-        private @Nullable @Default EventLocation location = EventLocation.builder().build();
+        private @NotEmpty List<String> principals;
+        private @Nullable EventLocation location;
     }
 
     /**
@@ -382,6 +380,12 @@ public class RengineEvent extends EventObject {
             }
             if (isNull(source)) {
                 this.source = EventSource.builder().build();
+            }
+            if (isNull(body)) {
+                this.body = new LinkedHashMap<>();
+            }
+            if (isNull(labels)) {
+                this.labels = new LinkedHashMap<>();
             }
             return new RengineEvent(id, type, observedTime, source, body, labels);
         }

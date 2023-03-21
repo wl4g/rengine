@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>rengine-service</artifactId>
     <name>Rengine Service</name>
@@ -168,7 +170,8 @@
         </dependency>
         <!-- Logging -->
         <!-- see:https://loki4j.github.io/loki-logback-appender/#quick-start -->
-        <!-- see:https://www.elastic.co/guide/en/ecs-logging/java/current/setup.html#setup -->
+        <!--
+        see:https://www.elastic.co/guide/en/ecs-logging/java/current/setup.html#setup -->
         <!-- <dependency>-->
         <!--     <groupId>co.elastic.logging</groupId>-->
         <!--     <artifactId>logback-ecs-encoder</artifactId>-->
@@ -312,7 +315,8 @@
                     <configLocation>/../tools/checkstyle/google_checks.xml</configLocation>
                 </configuration>
                 <executions>
-                    <!-- Solutions to maven checkstyle errors in Eclipse: https://gitee.com/wl4g/blogs/blob/master/articles/maven.checkstyle-eclipse-error/README_CN.md -->
+                    <!-- Solutions to maven checkstyle errors in Eclipse:
+                    https://gitee.com/wl4g/blogs/blob/master/articles/maven.checkstyle-eclipse-error/README_CN.md -->
                     <!-- <execution> -->
                     <!-- <id>checkstyle</id> -->
                     <!-- <phase>validate</phase> -->

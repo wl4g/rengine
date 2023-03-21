@@ -16,11 +16,13 @@
 package com.wl4g.rengine.job.cep;
 
 import static com.wl4g.infra.common.codec.Encodes.decodeBase64String;
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseToNode;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 import java.util.ArrayList;
@@ -61,11 +63,14 @@ import lombok.Getter;
 public abstract class AbstractFlinkCepStreamingBase extends AbstractFlinkStreamingBase {
 
     private String cepPatterns;
+    private Boolean inProcessingTime;
     private String alertTopic;
 
     public AbstractFlinkCepStreamingBase() {
         super();
         this.builder.mustOption("P", "cepPatterns", "he cep patterns array json with base64 encode.")
+                .longOption("inProcessingTime", "false",
+                        "Use the pattern stream for processing time, event source time will be ignored.")
                 .longOption("alertTopic", "rengine_alerts",
                         "Topic for producer the alerts message of Flink CEP match generated.");
     }
@@ -74,29 +79,33 @@ public abstract class AbstractFlinkCepStreamingBase extends AbstractFlinkStreami
     protected AbstractFlinkStreamingBase parse(String[] args) throws ParseException {
         super.parse(args);
         this.cepPatterns = line.get("cepPatterns");
+        this.inProcessingTime = line.getBoolean("inProcessingTime");
         this.alertTopic = line.get("alertTopic");
         return this;
     }
 
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     protected DataStream<?> customStream(DataStream<RengineEvent> dataStreamSource) {
         final DataStream<RengineEvent> keyedStreamSource = (DataStream<RengineEvent>) super.customStream(dataStreamSource);
 
         final JsonNode cepPatternNode = parseToNode(decodeBase64String(cepPatterns));
         final List<Pattern<RengineEvent, RengineEvent>> mergeCePatterns = new ArrayList<>(cepPatternNode.size());
-        cepPatternNode.forEach(
-                jn -> mergeCePatterns.add((Pattern<RengineEvent, RengineEvent>) CepJsonUtils.toPattern(toJSONString(jn))));
+        cepPatternNode.forEach(jn -> mergeCePatterns.add((Pattern) CepJsonUtils.toPattern(toJSONString(jn))));
 
         DataStream<RengineEvent> mergeSelectStream = null;
         for (Pattern<RengineEvent, RengineEvent> pattern : mergeCePatterns) {
             log.info("Using cep pattern : {}", pattern);
 
-            final PatternStream<RengineEvent> patternStream = CEP.pattern(keyedStreamSource,
-                    (Pattern<RengineEvent, RengineEvent>) pattern);
-            // Matching and union streams.
-            final SingleOutputStreamOperator<RengineEvent> selectStream = patternStream
-                    .process(new GenericEventMatcher(alertTopic));
+            PatternStream<RengineEvent> patternStream = CEP.pattern(keyedStreamSource, (Pattern) pattern);
+            // Default use event time.
+            if (this.inProcessingTime) {
+                patternStream = patternStream.inProcessingTime();
+            } else {
+                patternStream = patternStream.inEventTime();
+            }
+            // Match and union streams.
+            SingleOutputStreamOperator<RengineEvent> selectStream = patternStream.process(new GenericEventMatcher(alertTopic));
             if (nonNull(mergeSelectStream)) {
                 mergeSelectStream = mergeSelectStream.union(selectStream);
             } else {
@@ -121,7 +130,7 @@ public abstract class AbstractFlinkCepStreamingBase extends AbstractFlinkStreami
         @SuppressWarnings("serial")
         public GenericEventMatcher(String alertTopic) {
             this.alertTopic = hasTextOf(alertTopic, "alertTopic");
-            this.outputTag = new OutputTag<RengineEvent>("timeout-alert-out-stream") {
+            this.outputTag = new OutputTag<RengineEvent>(alertTopic.concat("-timeout-stream")) {
             };
         }
 
@@ -134,20 +143,24 @@ public abstract class AbstractFlinkCepStreamingBase extends AbstractFlinkStreami
                     .build();
             alertEvent.getBody().put("description", "The matched alert event msg.");
             alertEvent.getBody()
-                    .put("match",
-                            safeMap(match).entrySet().stream().collect(toMap(e -> e.getKey(), e -> toJSONString(e.getValue()))));
+                    .put("match", safeMap(match).entrySet()
+                            .stream()
+                            .collect(toMap(e -> e.getKey(),
+                                    e -> safeList(e.getValue()).stream().map(event -> event.getBody()).collect(toList()))));
 
+            log.debug("Generated alert: {}", alertEvent);
             out.collect(alertEvent);
         }
 
         @Override
         public void processTimedOutMatch(Map<String, List<RengineEvent>> match, Context ctx) throws Exception {
             final RengineEvent alertEvent = RengineEvent.builder()
-                    .type(alertTopic.concat("_TIMEOUT")) // TODO using-config?
+                    // TODO using config?
+                    .type(alertTopic.concat("_TIMEOUT"))
                     .observedTime(ctx.currentProcessingTime())
                     .source(EventSource.builder().time(ctx.timestamp()).build())
                     .build();
-            alertEvent.getBody().put("description", "The timed out match event msg.");
+            alertEvent.getBody().put("desc", "The timed out match event msg.");
             alertEvent.getBody()
                     .put("match",
                             safeMap(match).entrySet().stream().collect(toMap(e -> e.getKey(), e -> toJSONString(e.getValue()))));
