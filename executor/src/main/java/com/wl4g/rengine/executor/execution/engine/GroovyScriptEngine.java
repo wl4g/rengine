@@ -85,7 +85,7 @@
 //        try {
 //            // Load all scripts dependencies.
 //            Function<ScriptContext, String> mainFunction = null;
-//            for (ObjectResource script : loadScriptResources(UploadType.USER_LIBRARY_WITH_JS, scenes, true)) {
+//            for (ObjectResource script : loadScriptResources(UploadType.LIBRARY, scenes, true)) {
 //                if (log.isDebugEnabled()) {
 //                    log.debug("Parsing groovy dependency: {}", script.getObjectPrefix());
 //                }

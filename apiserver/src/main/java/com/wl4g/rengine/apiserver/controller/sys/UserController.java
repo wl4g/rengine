@@ -41,6 +41,7 @@ import com.wl4g.infra.common.web.rest.RespBase.RetCode;
 import com.wl4g.rengine.common.entity.sys.Role;
 import com.wl4g.rengine.common.entity.sys.User;
 import com.wl4g.rengine.service.UserService;
+import com.wl4g.rengine.service.model.sys.UserAssignRole;
 import com.wl4g.rengine.service.model.sys.UserDelete;
 import com.wl4g.rengine.service.model.sys.UserDeleteResult;
 import com.wl4g.rengine.service.model.sys.UserQuery;
@@ -158,9 +159,9 @@ public class UserController {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "assign/roles" }, produces = "application/json", method = { POST })
     @PreAuthorize("hasPermission(#model,'arn:sys:user:roles:write:v1')")
-    public RespBase<List<Long>> assignRoles(@RequestParam("userId") Long userId, @RequestParam("roleIds") List<Long> roleIds) {
-        log.debug("called: userId={}, roleIds={}", userId, roleIds);
-        return RespBase.<List<Long>> create().withData(userService.assignRoles(userId, roleIds));
+    public RespBase<List<Long>> assignRoles(@Validated @RequestBody UserAssignRole model) {
+        log.debug("called: model={}", model);
+        return RespBase.<List<Long>> create().withData(userService.assignRoles(model));
     }
 
 }

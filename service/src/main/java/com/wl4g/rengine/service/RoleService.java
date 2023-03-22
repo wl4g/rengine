@@ -24,6 +24,8 @@ import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.entity.sys.Menu;
 import com.wl4g.rengine.common.entity.sys.Role;
 import com.wl4g.rengine.common.entity.sys.User;
+import com.wl4g.rengine.service.model.sys.RoleAssignMenu;
+import com.wl4g.rengine.service.model.sys.RoleAssignUser;
 import com.wl4g.rengine.service.model.sys.RoleDelete;
 import com.wl4g.rengine.service.model.sys.RoleDeleteResult;
 import com.wl4g.rengine.service.model.sys.RoleQuery;
@@ -49,8 +51,8 @@ public interface RoleService {
 
     List<Menu> findMenusByRoleIds(@NotEmpty List<Long> roleIds);
 
-    List<Long> assignUsers(@NotNull Long roleId, @NotEmpty List<Long> userIds);
+    List<Long> assignUsers(RoleAssignUser model);
 
-    List<Long> assignMenus(@NotNull Long roleId, @NotEmpty List<Long> menuIds);
+    List<Long> assignMenus(RoleAssignMenu model);
 
 }

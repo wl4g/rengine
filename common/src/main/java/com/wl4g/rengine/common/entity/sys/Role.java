@@ -18,7 +18,9 @@ package com.wl4g.rengine.common.entity.sys;
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.wl4g.rengine.common.entity.BaseEntity;
+import com.wl4g.rengine.common.entity.Markers;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -45,8 +47,13 @@ public class Role extends BaseEntity {
     private Integer type;
 
     // The temporary wrap fields.
-    private List<UserRole> userRoles;
-    private List<MenuRole> menuRoles;
+
+    private List<User> users;
+    private List<Menu> menus;
+
+    // TODO remove?
+    private @JsonView(Markers.InternalMarker.class) List<UserRole> userRoles;
+    private @JsonView(Markers.InternalMarker.class) List<MenuRole> menuRoles;
 
     @Override
     public boolean equals(Object o) {

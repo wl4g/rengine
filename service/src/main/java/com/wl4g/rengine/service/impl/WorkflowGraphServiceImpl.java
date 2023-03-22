@@ -88,7 +88,6 @@ public class WorkflowGraphServiceImpl extends BasicServiceImpl implements Workfl
     public WorkflowGraphResultSave save(WorkflowGraphSave model) {
         WorkflowGraph graph = model;
         notNullOf(graph, "workflowGraph");
-        graph.validate();
 
         // The workflow graph only increments the revision and does not allow
         // modification.
@@ -118,6 +117,7 @@ public class WorkflowGraphServiceImpl extends BasicServiceImpl implements Workfl
         // @formatter:on
 
         graph.setRevision(mongoSequenceService.getNextSequence(GlobalMongoSequenceService.GRAPHS_REVISION_SEQ));
+        graph.validate();
 
         final WorkflowGraph saved = mongoTemplate.save(graph, RE_WORKFLOW_GRAPHS.getName());
         return WorkflowGraphResultSave.builder().id(saved.getId()).build();

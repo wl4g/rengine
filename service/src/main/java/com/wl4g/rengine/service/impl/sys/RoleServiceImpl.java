@@ -17,6 +17,7 @@ package com.wl4g.rengine.service.impl.sys;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_MENU_ROLES;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_ROLES;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_USER_ROLES;
 import static com.wl4g.rengine.common.util.BsonAggregateFilters.ROLE_MENU_LOOKUP_FILTERS;
@@ -25,6 +26,7 @@ import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
+import static java.util.Collections.singletonList;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toList;
 
@@ -32,8 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
+import org.apache.commons.collections.IteratorUtils;
 import org.bson.conversions.Bson;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.query.Query;
@@ -53,6 +55,8 @@ import com.wl4g.rengine.common.util.BeanSensitiveTransforms;
 import com.wl4g.rengine.common.util.BsonEntitySerializers;
 import com.wl4g.rengine.service.RoleService;
 import com.wl4g.rengine.service.impl.BasicServiceImpl;
+import com.wl4g.rengine.service.model.sys.RoleAssignMenu;
+import com.wl4g.rengine.service.model.sys.RoleAssignUser;
 import com.wl4g.rengine.service.model.sys.RoleDelete;
 import com.wl4g.rengine.service.model.sys.RoleDeleteResult;
 import com.wl4g.rengine.service.model.sys.RoleQuery;
@@ -75,6 +79,9 @@ public class RoleServiceImpl extends BasicServiceImpl implements RoleService {
                 .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
         final List<Role> roles = mongoTemplate.find(query, Role.class, MongoCollectionDefinition.SYS_ROLES.getName());
+
+        safeList(roles).parallelStream().forEach(r -> r.setUsers(findUsersByRoleIds(singletonList(r.getId()))));
+        safeList(roles).parallelStream().forEach(r -> r.setMenus(findMenusByRoleIds(singletonList(r.getId()))));
 
         return new PageHolder<Role>(model.getPageNum(), model.getPageSize())
                 .withTotal(mongoTemplate.count(query, SYS_ROLES.getName()))
@@ -101,6 +108,7 @@ public class RoleServiceImpl extends BasicServiceImpl implements RoleService {
         return RoleDeleteResult.builder().deletedCount(doDeleteWithGracefully(model, SYS_ROLES)).build();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<User> findUsersByRoleIds(@NotEmpty List<Long> roleIds) {
         Assert2.notEmpty(roleIds, "roleIds");
@@ -111,21 +119,15 @@ public class RoleServiceImpl extends BasicServiceImpl implements RoleService {
 
         try (var cursor = mongoTemplate.getCollection(SYS_ROLES.getName())
                 .aggregate(aggregates)
-                .map(roleDoc -> BsonEntitySerializers.fromDocument(roleDoc, Role.class))
+                .map(userDoc -> BsonEntitySerializers.fromDocument(userDoc, User.class))
                 .cursor();) {
-            if (cursor.hasNext()) {
-                final var role = cursor.next();
-                final var users = safeList(role.getUserRoles()).stream()
-                        .flatMap(ur -> safeList(ur.getUsers()).stream())
-                        .collect(toList());
-                BeanSensitiveTransforms.transform(users);
-                return users;
-            }
+            final List<User> users = IteratorUtils.toList(cursor);
+            BeanSensitiveTransforms.transform(users);
+            return users;
         }
-
-        return null;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<Menu> findMenusByRoleIds(@NotEmpty List<Long> roleIds) {
         Assert2.notEmpty(roleIds, "roleIds");
@@ -136,34 +138,35 @@ public class RoleServiceImpl extends BasicServiceImpl implements RoleService {
 
         try (var cursor = mongoTemplate.getCollection(SYS_ROLES.getName())
                 .aggregate(aggregates)
-                .map(roleDoc -> BsonEntitySerializers.fromDocument(roleDoc, Role.class))
+                .map(menuDoc -> BsonEntitySerializers.fromDocument(menuDoc, Menu.class))
                 .cursor();) {
-            if (cursor.hasNext()) {
-                final var role = cursor.next();
-                return safeList(role.getMenuRoles()).stream().flatMap(mr -> safeList(mr.getMenus()).stream()).collect(toList());
-            }
+            return IteratorUtils.toList(cursor);
         }
-
-        return null;
     }
 
     @Override
-    public List<Long> assignUsers(@NotNull Long roleId, @NotEmpty List<Long> userIds) {
-        notNullOf(roleId, "roleId");
-        Assert2.notEmpty(userIds, "userIds");
+    public List<Long> assignUsers(RoleAssignUser model) {
+        notNullOf(model, "model");
+        notNullOf(model.getRoleId(), "model.roleId");
+        Assert2.notEmpty(model.getUserIds(), "model.userIds");
 
-        return userIds.parallelStream().map(userId -> {
-            return mongoTemplate.save(UserRole.builder().roleId(roleId).userId(userId).build(), SYS_USER_ROLES.getName()).getId();
+        return model.getUserIds().parallelStream().map(userId -> {
+            final UserRole userRole = UserRole.builder().roleId(model.getRoleId()).userId(userId).build();
+            userRole.preInsert();
+            return mongoTemplate.save(userRole, SYS_USER_ROLES.getName()).getId();
         }).collect(toList());
     }
 
     @Override
-    public List<Long> assignMenus(@NotNull Long roleId, @NotEmpty List<Long> menuIds) {
-        notNullOf(roleId, "roleId");
-        Assert2.notEmpty(menuIds, "menuIds");
+    public List<Long> assignMenus(RoleAssignMenu model) {
+        notNullOf(model, "model");
+        notNullOf(model.getRoleId(), "model.roleId");
+        Assert2.notEmpty(model.getMenuIds(), "model.menuIds");
 
-        return menuIds.parallelStream().map(menuId -> {
-            return mongoTemplate.save(MenuRole.builder().roleId(roleId).menuId(menuId).build(), SYS_USER_ROLES.getName()).getId();
+        return model.getMenuIds().parallelStream().map(menuId -> {
+            final MenuRole menuRole = MenuRole.builder().roleId(model.getRoleId()).menuId(menuId).build();
+            menuRole.preInsert();
+            return mongoTemplate.save(menuRole, SYS_MENU_ROLES.getName()).getId();
         }).collect(toList());
     }
 

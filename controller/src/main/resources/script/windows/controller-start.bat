@@ -12,7 +12,7 @@ rem
 setlocal enabledelayedexpansion
 
 rem Title setting
-TITLE Rengine Collector
+TITLE Rengine Controller
 
 rem Using pushd popd to set BASE_DIR to the absolute path
 pushd %~dp0..\..

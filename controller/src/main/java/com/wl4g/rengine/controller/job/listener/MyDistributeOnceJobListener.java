@@ -36,7 +36,7 @@
 //
 //    @Override
 //    public String getType() {
-//        return ScheduleJobType.GLOBAL_ENGINE_CONTROLLER.name();
+//        return ScheduleJobType.GLOBAL_BOOTSTRAPER.name();
 //    }
 //
 //    @Override

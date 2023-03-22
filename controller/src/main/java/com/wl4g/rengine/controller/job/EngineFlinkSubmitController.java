@@ -64,7 +64,7 @@ package com.wl4g.rengine.controller.job;
 //
 //    @Override
 //    public String getType() {
-//        return ScheduleJobType.FLINK_SUBMIT_SCHEDULER.name();
+//        return ScheduleJobType.FLINK_SUBMITTER.name();
 //    }
 //
 //    @Override

@@ -106,14 +106,14 @@ public class ControllerSchedule extends BaseEntity {
     ScheduleDetailBase<?> details;
 
     public static enum ScheduleType {
-        GENERIC_EXECUTION_CONTROLLER,
+        GENERIC_EXECUTION,
 
-        KAFKA_EXECUTION_CONTROLLER,
+        KAFKA_SUBSCRIBER,
 
         // Notice: The flink cep job can be automatically scheduled, but
         // currently it is recommended to use a professional scheduling platform
         // such as Aws EMR or dolphinscheduler.
-        // FLINK_SUBMIT_SCHEDULER,
+        // FLINK_SUBMITTER,
 
         // Notice: The loop controller can be customized in the js rule codes.
         // /**
@@ -136,8 +136,8 @@ public class ControllerSchedule extends BaseEntity {
 
     @Schema(oneOf = { GenericExecutionScheduleConfig.class, KafkaExecutionScheduleConfig.class }, discriminatorProperty = "type")
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", visible = true)
-    @JsonSubTypes({ @Type(value = GenericExecutionScheduleConfig.class, name = "GENERIC_EXECUTION_CONTROLLER"),
-            @Type(value = KafkaExecutionScheduleConfig.class, name = "KAFKA_EXECUTION_CONTROLLER") })
+    @JsonSubTypes({ @Type(value = GenericExecutionScheduleConfig.class, name = "GENERIC_EXECUTION"),
+            @Type(value = KafkaExecutionScheduleConfig.class, name = "KAFKA_SUBSCRIBER") })
     @Getter
     @Setter
     @SuperBuilder

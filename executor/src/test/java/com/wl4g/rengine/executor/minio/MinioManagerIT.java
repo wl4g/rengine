@@ -38,7 +38,7 @@ public class MinioManagerIT {
 
     @Test
     public void testDetermineLocalFile() throws IOException {
-        File localFile = MinioManager.determineLocalFile(UploadType.USER_LIBRARY_WITH_JS,
+        File localFile = MinioManager.determineLocalFile(UploadType.LIBRARY,
                 "/rengine/library/js/commons-lang-3.0.0.js", 101001001L);
         System.out.println(localFile);
     }

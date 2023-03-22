@@ -287,7 +287,7 @@ public class RengineControllerProperties implements InitializingBean {
         public JobConfiguration toJobConfiguration(final String jobName) {
             hasTextOf(jobName, "jobName");
             final JobConfiguration jobConfig = JobConfiguration.builder()
-                    .jobType(ScheduleJobType.GLOBAL_ENGINE_CONTROLLER)
+                    .jobType(ScheduleJobType.GLOBAL_BOOTSTRAPER)
                     .jobName(jobName)
                     .disabled(nonNull(disabled) ? disabled : false)
                     .overwrite(nonNull(overwrite) ? overwrite : true)

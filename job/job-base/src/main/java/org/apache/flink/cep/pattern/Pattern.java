@@ -65,6 +65,8 @@ public class Pattern<T, F extends T> {
     /** The condition an event has to satisfy to be considered a matched. */
     private IterativeCondition<F> condition;
 
+    // add in apache flink-1.16+
+    // see:https://github1s.com/apache/flink/blob/release-1.16/flink-libraries/flink-cep/src/main/java/org/apache/flink/cep/pattern/Pattern.java#L67
     /** Window length in which the pattern match has to occur. */
     private final Map<WithinType, Time> windowTimes = new HashMap<>();
 

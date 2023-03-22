@@ -72,8 +72,8 @@ public class ControllerLog extends BaseEntity {
 
     @Schema(oneOf = { ExecutionControllerLog.class, KafkaSubscribeControllerLog.class }, discriminatorProperty = "type")
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", visible = true)
-    @JsonSubTypes({ @Type(value = ExecutionControllerLog.class, name = "GENERIC_EXECUTION_CONTROLLER"),
-            @Type(value = KafkaSubscribeControllerLog.class, name = "KAFKA_EXECUTION_CONTROLLER") })
+    @JsonSubTypes({ @Type(value = ExecutionControllerLog.class, name = "GENERIC_EXECUTION"),
+            @Type(value = KafkaSubscribeControllerLog.class, name = "KAFKA_SUBSCRIBER") })
     @Getter
     @Setter
     @SuperBuilder

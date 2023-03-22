@@ -23,6 +23,7 @@ import javax.validation.constraints.NotNull;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.entity.sys.Role;
 import com.wl4g.rengine.common.entity.sys.User;
+import com.wl4g.rengine.service.model.sys.UserAssignRole;
 import com.wl4g.rengine.service.model.sys.UserDelete;
 import com.wl4g.rengine.service.model.sys.UserDeleteResult;
 import com.wl4g.rengine.service.model.sys.UserQuery;
@@ -49,6 +50,6 @@ public interface UserService {
 
     List<Role> findRolesByUserIds(@NotEmpty List<Long> userIds);
 
-    List<Long> assignRoles(@NotNull Long userId, @NotEmpty List<Long> roleIds);
+    List<Long> assignRoles(UserAssignRole model);
 
 }

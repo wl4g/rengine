@@ -290,13 +290,13 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor, Close
     @ToString
     @AllArgsConstructor
     public static enum ScheduleJobType {
-        GLOBAL_ENGINE_CONTROLLER(null),
+        GLOBAL_BOOTSTRAPER(null),
 
-        GENERIC_EXECUTION_CONTROLLER(ScheduleType.GENERIC_EXECUTION_CONTROLLER),
+        GENERIC_EXECUTION(ScheduleType.GENERIC_EXECUTION),
 
-        KAFKA_EXECUTION_CONTROLLER(ScheduleType.KAFKA_EXECUTION_CONTROLLER);
+        KAFKA_SUBSCRIBER(ScheduleType.KAFKA_SUBSCRIBER);
 
-        // FLINK_SUBMIT_SCHEDULER(ScheduleType.FLINK_SUBMIT_SCHEDULER)
+        // FLINK_SUBMITTER(ScheduleType.FLINK_SUBMITTER)
 
         private final ScheduleType scheduleType;
 

@@ -152,65 +152,162 @@ public abstract class BsonAggregateFilters {
     // @formatter:on
 
     // Lookup for users by role filters.
+    // 连接查询根据 roleCode 查询 role 下的 users.
     // @formatter:off
     public static final BsonArray ROLE_USER_LOOKUP_FILTERS = BsonArray.parse("["
             //+ "{ $match: { \"roleCode\": { $in: [\"r:admin\"] } } },"
-            + "{ $match: { \"enable\": { $eq: 1 } } },"
-            + "{ $match: { \"delFlag\": { $eq: 0 } } },"
-            + "{ $project: { \"_class\": 0, \"delFlag\": 0 } },"
+            + "{ $match: { \"enable\": { $eq: " + BaseBean.ENABLED + " } } },"
+            + "{ $match: { \"delFlag\": { $eq: " + BaseBean.DEL_FLAG_NORMAL + " } } },"
+            // like e.g: left join sys_user_roles on u._id=ur.userId
             + "{ $lookup: {"
             + "    from: \"" + SYS_USER_ROLES.getName() + "\","
-            + "    let: { role_id: { $toLong: \"$_id\" } },"
-            + "    pipeline: ["
-            + "        { $match: { $expr: { $eq: [ \"$roleId\", \"$$role_id\" ] } } }, "
-            + "        { $lookup: {"
-            + "            from: \"" + SYS_USERS.getName() + "\", "
-            + "            let: { user_id: { $toLong: \"$userId\" } },"
-            + "            pipeline: ["
-            + "                { $match: { $expr: { $eq: [ \"$_id\", \"$$user_id\" ] } } },"
-            + "                { $match: { \"enable\": { $eq: 1 } } },"
-            + "                { $match: { \"delFlag\": { $eq: 0 } } },"
-            + "                { $project: { \"_class\": 0, \"delFlag\": 0 } }"
-            + "            ],"
-            + "            as: \"users\""
-            + "            }"
-            + "        },"
-            + "    ],"
+            + "    localField: \"_id\","
+            + "    foreignField: \"roleId\","
             + "    as: \"userRoles\""
-            + "    }"
-            + "}"
+            + "  }"
+            + "},"
+            + "{ $unwind: \"$userRoles\" },"
+            + "{ $group: { _id: \"$userRoles.userId\" } },"
+            + "  { $lookup: {"
+            + "          from: \"" + SYS_USERS.getName() + "\","
+            + "          localField: \"_id\","
+            + "          foreignField: \"_id\","
+            + "          as: \"users\""
+            + "      }"
+            + "  },"
+            + "{ $match: { \"users.enable\": { $eq: " + BaseBean.ENABLED + " } } },"
+            + "{ $match: { \"users.delFlag\": { $eq: " + BaseBean.DEL_FLAG_NORMAL + " } } },"
+            // 将子节点menus提取合并到上一层:https://www.mongodb.com/docs/manual/reference/operator/aggregation/mergeObjects/#-mergeobjects
+            + "{ $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ \"$users\", 0 ] }, \"$$ROOT\" ] } } },"
+            // 隐藏(不返回)子节点menus
+            + "  { $project: { users: 0, delFlag: 0 } }"
             + "]");
     // @formatter:on
 
     // Lookup for menus by role filters.
+    // 连接查询根据 roleCode 查询 role 下的 menus.
     // @formatter:off
     public static final BsonArray ROLE_MENU_LOOKUP_FILTERS = BsonArray.parse("["
             //+ "{ $match: { \"roleCode\": { $in: [\"r:admin\"] } } },"
-            //+ "{ $match: { \"_id\": { $in: [ NumberLong(\"61508655614612341\") ] } } },"
-            + "{ $match: { \"enable\": { $eq: 1 } } },"
-            + "{ $match: { \"delFlag\": { $eq: 0 } } },"
-            + "{ $project: { \"_class\": 0, \"delFlag\": 0 } },"
+            + "{ $match: { \"enable\": { $eq: " + BaseBean.ENABLED + " } } },"
+            + "{ $match: { \"delFlag\": { $eq: " + BaseBean.DEL_FLAG_NORMAL + " } } },"
+            // like e.g: left join sys_user_roles on u._id=ur.userId
             + "{ $lookup: {"
-            + "    from: \"sys_menu_roles\","
-            + "    let: { role_id: { $toLong: \"$_id\" } },"
-            + "    pipeline: ["
-            + "        { $match: { $expr: { $eq: [ \"$roleId\", \"$$role_id\" ] } } }, "
-            + "        { $lookup: {"
-            + "            from: \"sys_menus\", "
-            + "            let: { menu_id: { $toLong: \"$menuId\" } },"
-            + "            pipeline: ["
-            + "                { $match: { $expr: { $eq: [ \"$_id\", \"$$menu_id\" ] } } },"
-            + "                { $match: { \"enable\": { $eq: 1 } } },"
-            + "                { $match: { \"delFlag\": { $eq: 0 } } },"
-            + "                { $project: { \"_class\": 0, \"delFlag\": 0 } }"
-            + "            ],"
-            + "            as: \"menus\""
-            + "            }"
-            + "        },"
-            + "    ],"
-            + "    as: \"menuRoles\""
-            + "    }"
-            + "}"
+            + "    from: \"" + SYS_MENU_ROLES.getName() + "\","
+            + "    localField: \"_id\","
+            + "    foreignField: \"roleId\","
+            + "    as: \"userRoles\""
+            + "  }"
+            + "},"
+            + "{ $unwind: \"$userRoles\" },"
+            + "{ $group: { _id: \"$userRoles.menuId\" } },"
+            + "  { $lookup: {"
+            + "          from: \"" + SYS_MENUS.getName() + "\","
+            + "          localField: \"_id\","
+            + "          foreignField: \"_id\","
+            + "          as: \"menus\""
+            + "      }"
+            + "  },"
+            + "{ $match: { \"menus.enable\": { $eq: " + BaseBean.ENABLED + " } } },"
+            + "{ $match: { \"menus.delFlag\": { $eq: " + BaseBean.DEL_FLAG_NORMAL + " } } },"
+            // 将子节点menus提取合并到上一层:https://www.mongodb.com/docs/manual/reference/operator/aggregation/mergeObjects/#-mergeobjects
+            + "{ $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ \"$menus\", 0 ] }, \"$$ROOT\" ] } } },"
+            // 隐藏(不返回)子节点menus
+            + "  { $project: { menus: 0, delFlag: 0 } }"
+            + "]");
+    // @formatter:on
+
+    // Lookup for menus by user filters.
+    /**
+     * 连接查询根据 username 查询 user 下的 roles 下的 menus. </br>
+     * </br>
+     * 优点: 交叉平面, 按需返回, 多层级结构不清晰, 适合只需提取子子节点的数据. (如:查询 user 下 roles 下所有去重的 menus,
+     * 无需返回其他中间关联信息 user_roles,menu_roles 等) </br>
+     * </br>
+     * 将子节点 menus 提取合并到上一层:
+     * https://www.mongodb.com/docs/manual/reference/operator/aggregation/mergeObjects/#-mergeobjects
+     */
+    // @formatter:off
+    public static final BsonArray USER_MENU_LOOKUP_FILTERS = BsonArray.parse("["
+            //+ "{ $match: { \"username\": { $in: [\"root\"] } } },"
+            + "{ $match: { \"enable\": { $eq: " + BaseBean.ENABLED + " } } },"
+            + "{ $match: { \"delFlag\": { $eq: " + BaseBean.DEL_FLAG_NORMAL + " } } },"
+            + "{ $project: { \"_class\": 0, \"delFlag\": 0 } },"
+            // like e.g: left join sys_user_roles on u._id=ur.userId
+            + "{ $lookup: {"
+            + "    from: \"" + SYS_USER_ROLES.getName() + "\","
+            + "    localField: \"_id\","
+            + "    foreignField: \"userId\","
+            + "    as: \"userRoles\""
+            + "  }"
+            + "},"
+            + "{ $unwind: \"$userRoles\" },"
+            + "{ $group: { _id: \"$userRoles.roleId\" } },"
+            // like e.g: left join sys_menu_roles on ur.roleId=mr.roleId
+            + "  { $lookup: {"
+            + "          from: \"" + SYS_MENU_ROLES.getName() + "\","
+            + "          localField: \"_id\","
+            + "          foreignField: \"roleId\","
+            + "          as: \"menuRoles\""
+            + "      }"
+            + "  },"
+            + "{ $unwind: \"$menuRoles\" },"
+            + "{ $group: { _id: \"$menuRoles.menuId\" } },"
+            // like e.g: left join sys_menus on mr.menuId=m._id
+            + "  { $lookup: {"
+            + "          from: \"" + SYS_MENUS.getName() + "\","
+            + "          localField: \"_id\","
+            + "          foreignField: \"_id\","
+            + "          as: \"menus\""
+            + "      }"
+            + "  },"
+            + "{ $match: { \"menus.enable\": { $eq: " + BaseBean.ENABLED + " } } },"
+            + "{ $match: { \"menus.delFlag\": { $eq: " + BaseBean.DEL_FLAG_NORMAL + " } } },"
+            // 将子节点menus提取合并到上一层:https://www.mongodb.com/docs/manual/reference/operator/aggregation/mergeObjects/#-mergeobjects
+            + "  { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ \"$menus\", 0 ] }, \"$$ROOT\" ] } } },"
+            // 隐藏(不返回)子节点menus
+            + "    { $project: { menus: 0, delFlag: 0 } }"
+            + "]");
+    // @formatter:on
+
+    // Lookup for roles by user filters.
+    /**
+     * 连接查询根据 username 查询 user 下的 roles. </br>
+     * </br>
+     * 优点: 交叉平面, 按需返回, 多层级结构不清晰, 适合只需提取子子节点的数据. (如:查询 user 下所有去重的 roles,
+     * 无需返回其他中间关联信息 user_roles 等) </br>
+     * </br>
+     * 将子节点 roles 提取合并到上一层:
+     * https://www.mongodb.com/docs/manual/reference/operator/aggregation/mergeObjects/#-mergeobjects
+     */
+    // @formatter:off
+    public static final BsonArray USER_ROLE_LOOKUP_FILTERS = BsonArray.parse("["
+            //+ "{ $match: { \"username\": { $in: [\"root\"] } } },"
+            + "{ $match: { \"enable\": { $eq: " + BaseBean.ENABLED + " } } },"
+            + "{ $match: { \"delFlag\": { $eq: " + BaseBean.DEL_FLAG_NORMAL + " } } },"
+            // like e.g: left join sys_user_roles on u._id=ur.userId
+            + "{ $lookup: {"
+            + "    from: \"" + SYS_USER_ROLES.getName() + "\","
+            + "    localField: \"_id\","
+            + "    foreignField: \"userId\","
+            + "    as: \"userRoles\""
+            + "  }"
+            + "},"
+            + "{ $unwind: \"$userRoles\" },"
+            + "{ $group: { _id: \"$userRoles.roleId\" } },"
+            + "  { $lookup: {"
+            + "          from: \"" + SYS_ROLES.getName() + "\","
+            + "          localField: \"_id\","
+            + "          foreignField: \"_id\","
+            + "          as: \"roles\""
+            + "      }"
+            + "  },"
+            + "{ $match: { \"roles.enable\": { $eq: " + BaseBean.ENABLED + " } } },"
+            + "{ $match: { \"roles.delFlag\": { $eq: " + BaseBean.DEL_FLAG_NORMAL + " } } },"
+            // 将子节点menus提取合并到上一层:https://www.mongodb.com/docs/manual/reference/operator/aggregation/mergeObjects/#-mergeobjects
+            + "{ $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ \"$roles\", 0 ] }, \"$$ROOT\" ] } } },"
+            // 隐藏(不返回)子节点menus
+            + "  { $project: { roles: 0, delFlag: 0 } }"
             + "]");
     // @formatter:on
 
@@ -268,99 +365,6 @@ public abstract class BsonAggregateFilters {
             + "        as: \"userRoles\""
             + "        }"
             + "    }"
-            + "]");
-    // @formatter:on
-
-    // Lookup for menus by user filters.
-    /**
-     * 连接查询根据 username 查询 user 下的 roles 下的 menus. </br>
-     * </br>
-     * 优点: 交叉平面, 按需返回, 多层级结构不清晰, 适合只需提取子子节点的数据. (如:查询 user 下 roles 下所有去重的 menus,
-     * 无需返回其他中间关联信息 user_roles,menu_roles 等) </br>
-     * </br>
-     * 将子节点 menus 提取合并到上一层:
-     * https://www.mongodb.com/docs/manual/reference/operator/aggregation/mergeObjects/#-mergeobjects
-     */
-    // @formatter:off
-    public static final BsonArray USER_MENU_LOOKUP_FILTERS = BsonArray.parse("["
-            //+ "  { $match: { \"username\": { $in: [\"root\"] } } },"
-            + "  { $match: { \"enable\": { $eq: 1 } } },"
-            + "  { $match: { \"delFlag\": { $eq: 0 } } },"
-            // like e.g: left join sys_user_roles on u._id=ur.userId
-            + "  { $lookup: {"
-            + "      from: \"" + SYS_USER_ROLES.getName() + "\","
-            + "      localField: \"_id\","
-            + "      foreignField: \"userId\","
-            + "      as: \"userRoles\""
-            + "    }"
-            + "  },"
-            + "  { $unwind: \"$userRoles\" },"
-            + "  { $group: { _id: \"$userRoles.roleId\" } },"
-            // like e.g: left join sys_menu_roles on ur.roleId=mr.roleId
-            + "    { $lookup: {"
-            + "            from: \"" + SYS_MENU_ROLES.getName() + "\","
-            + "            localField: \"_id\","
-            + "            foreignField: \"roleId\","
-            + "            as: \"menuRoles\""
-            + "        }"
-            + "    },"
-            + "  { $unwind: \"$menuRoles\" },"
-            + "  { $group: { _id: \"$menuRoles.menuId\" } },"
-            // like e.g: left join sys_menus on mr.menuId=m._id
-            + "    { $lookup: {"
-            + "            from: \"" + SYS_MENUS.getName() + "\","
-            + "            localField: \"_id\","
-            + "            foreignField: \"_id\","
-            + "            as: \"menus\""
-            + "        }"
-            + "    },"
-            + " { $match: { \"menus.enable\": { $eq: 1 } } },"
-            + " { $match: { \"menus.delFlag\": { $eq: 0 } } },"
-            // 将子节点menus提取合并到上一层:https://www.mongodb.com/docs/manual/reference/operator/aggregation/mergeObjects/#-mergeobjects
-            + "  { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ \"$menus\", 0 ] }, \"$$ROOT\" ] } } },"
-            // 隐藏(不返回)子节点menus
-            + "    { $project: { menus: 0 } }"
-            + "]");
-    // @formatter:on
-
-    // Lookup for roles by user filters.
-    /**
-     * 连接查询根据 username 查询 user 下的 roles. </br>
-     * </br>
-     * 优点: 交叉平面, 按需返回, 多层级结构不清晰, 适合只需提取子子节点的数据. (如:查询 user 下所有去重的 roles,
-     * 无需返回其他中间关联信息 user_roles 等) </br>
-     * </br>
-     * 将子节点 roles 提取合并到上一层:
-     * https://www.mongodb.com/docs/manual/reference/operator/aggregation/mergeObjects/#-mergeobjects
-     */
-    // @formatter:off
-    public static final BsonArray USER_ROLE_LOOKUP_FILTERS = BsonArray.parse("["
-            //+ "  { $match: { \"username\": { $in: [\"root\"] } } },"
-            + "  { $match: { \"enable\": { $eq: 1 } } },"
-            + "  { $match: { \"delFlag\": { $eq: 0 } } },"
-            // like e.g: left join sys_user_roles on u._id=ur.userId
-            + "  { $lookup: {"
-            + "      from: \"" + SYS_USER_ROLES.getName() + "\","
-            + "      localField: \"_id\","
-            + "      foreignField: \"userId\","
-            + "      as: \"userRoles\""
-            + "    }"
-            + "  },"
-            + "  { $unwind: \"$userRoles\" },"
-            + "  { $group: { _id: \"$userRoles.roleId\" } },"
-            + "    { $lookup: {"
-            + "            from: \"" + SYS_ROLES.getName() + "\","
-            + "            localField: \"_id\","
-            + "            foreignField: \"_id\","
-            + "            as: \"roles\""
-            + "        }"
-            + "    },"
-            + " { $match: { \"roles.enable\": { $eq: 1 } } },"
-            + " { $match: { \"roles.delFlag\": { $eq: 0 } } },"
-            // 将子节点menus提取合并到上一层:https://www.mongodb.com/docs/manual/reference/operator/aggregation/mergeObjects/#-mergeobjects
-            + "  { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ \"$roles\", 0 ] }, \"$$ROOT\" ] } } },"
-            // 隐藏(不返回)子节点menus
-            + "    { $project: { roles: 0 } }"
             + "]");
     // @formatter:on
 

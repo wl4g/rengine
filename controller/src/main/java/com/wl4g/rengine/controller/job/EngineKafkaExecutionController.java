@@ -81,7 +81,7 @@ public class EngineKafkaExecutionController extends EngineGenericExecutionContro
 
     @Override
     public String getType() {
-        return ScheduleJobType.KAFKA_EXECUTION_CONTROLLER.name();
+        return ScheduleJobType.KAFKA_SUBSCRIBER.name();
     }
 
     @Override
@@ -192,7 +192,7 @@ public class EngineKafkaExecutionController extends EngineGenericExecutionContro
     protected ControllerLog newDefaultScheduleJobLog(final Long scheduleId) {
         return ControllerLog.builder()
                 .scheduleId(scheduleId)
-                .details(KafkaSubscribeControllerLog.builder().type(ScheduleType.KAFKA_EXECUTION_CONTROLLER.name()).build())
+                .details(KafkaSubscribeControllerLog.builder().type(ScheduleType.KAFKA_SUBSCRIBER.name()).build())
                 .build();
     }
 

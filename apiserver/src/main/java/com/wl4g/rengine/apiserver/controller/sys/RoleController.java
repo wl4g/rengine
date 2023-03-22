@@ -35,6 +35,8 @@ import com.wl4g.rengine.common.entity.sys.Menu;
 import com.wl4g.rengine.common.entity.sys.Role;
 import com.wl4g.rengine.common.entity.sys.User;
 import com.wl4g.rengine.service.RoleService;
+import com.wl4g.rengine.service.model.sys.RoleAssignMenu;
+import com.wl4g.rengine.service.model.sys.RoleAssignUser;
 import com.wl4g.rengine.service.model.sys.RoleDelete;
 import com.wl4g.rengine.service.model.sys.RoleDeleteResult;
 import com.wl4g.rengine.service.model.sys.RoleQuery;
@@ -123,9 +125,9 @@ public class RoleController {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "assign/users" }, produces = "application/json", method = { POST })
     @PreAuthorize("hasPermission(#model,'arn:sys:role:users:write:v1')")
-    public RespBase<List<Long>> assignUsers(@RequestParam("roleId") Long roleId, @RequestParam("userIds") List<Long> userIds) {
-        log.debug("called: roleId={}, userIds={}", roleId, userIds);
-        return RespBase.<List<Long>> create().withData(roleService.assignUsers(roleId, userIds));
+    public RespBase<List<Long>> assignUsers(@Validated @RequestBody RoleAssignUser model) {
+        log.debug("called: model={}", model);
+        return RespBase.<List<Long>> create().withData(roleService.assignUsers(model));
     }
 
     // @SecurityRequirement(name = "default_oauth")
@@ -133,9 +135,9 @@ public class RoleController {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "assign/menus" }, produces = "application/json", method = { POST })
     @PreAuthorize("hasPermission(#model,'arn:sys:role:menus:write:v1')")
-    public RespBase<List<Long>> assignMenus(@RequestParam("roleId") Long roleId, @RequestParam("menuIds") List<Long> menuIds) {
-        log.debug("called: roleId={}, menuIds={}", roleId, menuIds);
-        return RespBase.<List<Long>> create().withData(roleService.assignMenus(roleId, menuIds));
+    public RespBase<List<Long>> assignMenus(@Validated @RequestBody RoleAssignMenu model) {
+        log.debug("called: model={}", model);
+        return RespBase.<List<Long>> create().withData(roleService.assignMenus(model));
     }
 
 }

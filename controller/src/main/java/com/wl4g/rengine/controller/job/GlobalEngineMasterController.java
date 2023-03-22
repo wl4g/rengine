@@ -17,7 +17,7 @@ package com.wl4g.rengine.controller.job;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static com.wl4g.rengine.controller.job.AbstractJobExecutor.ScheduleJobType.GLOBAL_ENGINE_CONTROLLER;
+import static com.wl4g.rengine.controller.job.AbstractJobExecutor.ScheduleJobType.GLOBAL_BOOTSTRAPER;
 import static com.wl4g.rengine.service.meter.RengineMeterService.DEFAULT_PERCENTILES;
 import static com.wl4g.rengine.service.meter.RengineMeterService.MetricsName.global_schedule_controller;
 import static com.wl4g.rengine.service.meter.RengineMeterService.MetricsName.global_schedule_controller_failure;
@@ -75,7 +75,7 @@ public class GlobalEngineMasterController extends AbstractJobExecutor {
 
     @Override
     public String getType() {
-        return GLOBAL_ENGINE_CONTROLLER.name();
+        return GLOBAL_BOOTSTRAPER.name();
     }
 
     @Override
@@ -96,7 +96,7 @@ public class GlobalEngineMasterController extends AbstractJobExecutor {
         final List<ControllerSchedule> shardingSchedules = getControllerScheduleService()
                 .findWithSharding(ControllerScheduleQuery.builder()
                         // .enable(true)
-                        // .type(ScheduleType.GENERIC_EXECUTION_CONTROLLER.name())
+                        // .type(ScheduleType.GENERIC_EXECUTION.name())
                         .build(), currentShardingTotalCount, context.getShardingItem());
         log.info("Loaded the sharding schedules : {}", shardingSchedules);
 

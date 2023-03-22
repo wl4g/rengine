@@ -24,7 +24,9 @@ import javax.validation.constraints.NotBlank;
 
 import org.springframework.security.core.GrantedAuthority;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.wl4g.rengine.common.entity.BaseEntity;
+import com.wl4g.rengine.common.entity.Markers;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -68,7 +70,12 @@ public class User extends BaseEntity {
     private Collection<? extends GrantedAuthority> authorities;
     private Map<String, Object> attributes;
 
-    private List<UserRole> userRoles;
+    // The temporary wrap fields.
+
+    private List<Role> roles;
+
+    // TODO remove?
+    private @JsonView(Markers.InternalMarker.class) List<UserRole> userRoles;
 
     // --- TODO LDAP authority.---
 

@@ -92,7 +92,7 @@ public class EngineGenericExecutionController extends AbstractJobExecutor {
 
     @Override
     public String getType() {
-        return ScheduleJobType.GENERIC_EXECUTION_CONTROLLER.name();
+        return ScheduleJobType.GENERIC_EXECUTION.name();
     }
 
     @Override
@@ -197,7 +197,7 @@ public class EngineGenericExecutionController extends AbstractJobExecutor {
     protected ControllerLog newDefaultScheduleJobLog(final Long scheduleId) {
         return ControllerLog.builder()
                 .scheduleId(scheduleId)
-                .details(ExecutionControllerLog.builder().type(ScheduleType.GENERIC_EXECUTION_CONTROLLER.name()).build())
+                .details(ExecutionControllerLog.builder().type(ScheduleType.GENERIC_EXECUTION.name()).build())
                 .build();
     }
 

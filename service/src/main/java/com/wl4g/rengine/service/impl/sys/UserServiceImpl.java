@@ -15,6 +15,7 @@
  */
 package com.wl4g.rengine.service.impl.sys;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_USERS;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_USER_ROLES;
@@ -24,6 +25,7 @@ import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
+import static java.util.Collections.singletonList;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toList;
 
@@ -31,7 +33,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.bson.conversions.Bson;
@@ -50,6 +51,7 @@ import com.wl4g.rengine.common.entity.sys.UserRole;
 import com.wl4g.rengine.common.util.BsonEntitySerializers;
 import com.wl4g.rengine.service.UserService;
 import com.wl4g.rengine.service.impl.BasicServiceImpl;
+import com.wl4g.rengine.service.model.sys.UserAssignRole;
 import com.wl4g.rengine.service.model.sys.UserDelete;
 import com.wl4g.rengine.service.model.sys.UserDeleteResult;
 import com.wl4g.rengine.service.model.sys.UserQuery;
@@ -79,6 +81,8 @@ public class UserServiceImpl extends BasicServiceImpl implements UserService {
 
         final List<User> users = mongoTemplate.find(query, User.class, SYS_USERS.getName());
 
+        safeList(users).parallelStream().forEach(u -> u.setRoles(findRolesByUserIds(singletonList(u.getId()))));
+
         return new PageHolder<User>(model.getPageNum(), model.getPageSize())
                 .withTotal(mongoTemplate.count(query, SYS_USERS.getName()))
                 .withRecords(users);
@@ -95,7 +99,7 @@ public class UserServiceImpl extends BasicServiceImpl implements UserService {
             user.preUpdate();
         }
 
-        User saved = mongoTemplate.save(user, SYS_USERS.getName());
+        final User saved = mongoTemplate.save(user, SYS_USERS.getName());
         return UserSaveResult.builder().id(saved.getId()).build();
     }
 
@@ -612,12 +616,15 @@ public class UserServiceImpl extends BasicServiceImpl implements UserService {
     }
 
     @Override
-    public List<Long> assignRoles(@NotNull Long userId, @NotEmpty List<Long> roleIds) {
-        notNullOf(userId, "userId");
-        Assert2.notEmpty(roleIds, "roleIds");
+    public List<Long> assignRoles(UserAssignRole model) {
+        notNullOf(model, "model");
+        notNullOf(model.getUserId(), "model.userId");
+        Assert2.notEmpty(model.getRoleIds(), "model.roleIds");
 
-        return roleIds.parallelStream().map(roleId -> {
-            return mongoTemplate.save(UserRole.builder().roleId(roleId).userId(userId).build(), SYS_USER_ROLES.getName()).getId();
+        return model.getRoleIds().parallelStream().map(roleId -> {
+            final UserRole userRole = UserRole.builder().roleId(roleId).userId(model.getUserId()).build();
+            userRole.preInsert();
+            return mongoTemplate.save(userRole, SYS_USER_ROLES.getName()).getId();
         }).collect(toList());
     }
 

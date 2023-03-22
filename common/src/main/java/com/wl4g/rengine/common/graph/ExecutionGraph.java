@@ -280,8 +280,8 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
 
                 // Actual execution rule script.
                 return context.getHandler().apply(context);
-            } catch (Exception e) {
-                throw new ExecutionGraphException(this, e);
+            } catch (Throwable ex) {
+                throw new ExecutionGraphException(this, ex);
             }
         }
     }
@@ -365,7 +365,7 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
 
             // Run script rule handler.
             final ExecutionGraphResult result = doExecute(context);
-            if (result.getReturnState() == ReturnState.TRUE) {
+            if (nonNull(result.getReturnState()) && result.getReturnState() == ReturnState.TRUE) {
                 if (nonNull(getNext())) {
                     return getNext().apply(context);
                 }
@@ -426,8 +426,8 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
             try {
                 // Run script rule handler.
                 return getNext().apply(context);
-            } catch (Throwable e) {
-                log.debug("Failback to execute of caused by : {}", e.getMessage());
+            } catch (Throwable ex) {
+                log.debug("Failback to execute of caused by : {}", ex.getMessage());
                 return doExecute(context);
             }
         }
@@ -471,7 +471,7 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
                 // If all children return true, true is finally
                 // returned. If any node returns false, it ends and
                 // returns.
-                if (result.getReturnState() == ReturnState.FALSE) {
+                if (nonNull(result.getReturnState()) && result.getReturnState() == ReturnState.FALSE) {
                     return new ExecutionGraphResult(ReturnState.FALSE, result.getValueMap());
                 }
             }
@@ -500,7 +500,7 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
                 result = sub.apply(context);
                 // If any child returns true, it will eventually return
                 // true.
-                if (result.getReturnState() == ReturnState.TRUE) {
+                if (nonNull(result.getReturnState()) && result.getReturnState() == ReturnState.TRUE) {
                     return new ExecutionGraphResult(ReturnState.TRUE, result.getValueMap());
                 }
             }
@@ -532,7 +532,7 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
                 // returned. If any node returns false, it ends and
                 // returns. (If the current node returns false, the
                 // subsequent nodes workflowstill the execution)
-                if (isNull(hasFalse) && result.getReturnState() == ReturnState.FALSE) {
+                if (isNull(hasFalse) && nonNull(result.getReturnState()) && result.getReturnState() == ReturnState.FALSE) {
                     hasFalse = true;
                 }
             }

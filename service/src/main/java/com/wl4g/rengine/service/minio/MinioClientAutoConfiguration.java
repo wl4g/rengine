@@ -22,6 +22,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import io.minio.MinioClient;
 import okhttp3.OkHttpClient;
@@ -34,6 +35,7 @@ import okhttp3.OkHttpClient;
  * @since v1.0.0
  * @see http://docs.minio.org.cn/docs/master/minio-sts-quickstart-guide
  */
+@Configuration
 @ConditionalOnClass({ MinioClient.class })
 public class MinioClientAutoConfiguration {
 

@@ -278,6 +278,7 @@ public class AuthenticationService {
                         .collect(toList()));
     }
 
+    // @formatter:off
     // 深度嵌套子查询根据 username 查询 user 下 roles 及 menus.
     public User findUserRoleMenusByUsername(@NotBlank String username) {
         hasTextOf(username, "username");
@@ -299,6 +300,7 @@ public class AuthenticationService {
             return user;
         }
     }
+    // @formatter:on
 
     public List<Menu> loadMenusByUsername(@NotBlank String username) {
         List<Menu> menus = null;
