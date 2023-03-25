@@ -13,13 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.service.model;
+package com.wl4g.rengine.service.model.sys;
 
-import java.util.List;
-
-import javax.annotation.Nullable;
-
-import com.wl4g.rengine.common.entity.UploadObject;
+import com.wl4g.rengine.service.model.BaseDeleteResult;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +24,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link UploadQuery}
+ * {@link UploadDeleteResult}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -39,10 +35,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class UploadQuery extends BaseQuery<UploadObject> {
-    // Notice: Although the front end of this default writing method can
-    // also be used like this: xx?uploadIds=11&uploadIds=22
-    private @Nullable List<Long> uploadIds;
-    private @Nullable UploadObject.UploadType uploadType;
-    private @Nullable String extension;
+public class UploadDeleteResult extends BaseDeleteResult {
 }

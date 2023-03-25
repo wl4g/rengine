@@ -71,6 +71,8 @@ public class MinioClientProperties implements InitializingBean {
 
     private @Nullable String region = RengineConstants.DEFAULT_MINIO_REGION;
 
+    private @Nullable String bucket = RengineConstants.DEFAULT_MINIO_BUCKET;
+
     private @NotBlank String tenantAccessKey = "rengine";
 
     private @NotBlank String tenantSecretKey = "12345678";

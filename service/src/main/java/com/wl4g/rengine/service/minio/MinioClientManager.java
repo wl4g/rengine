@@ -72,13 +72,14 @@ public class MinioClientManager implements ApplicationRunner {
         }
     }
 
-    public Credentials createSTSCredentials(String fullObjectPrefix) throws NoSuchAlgorithmException {
-        hasTextOf(fullObjectPrefix, "fullObjectPrefix");
+    public Credentials createSTSCredentials(String objectPrefix) throws NoSuchAlgorithmException {
+        hasTextOf(objectPrefix, "objectPrefix");
 
         // e.g: bucket01//sub01/1.txt => bucket1/sub01/1.txt
-        String stsRoleArn = format("arn:aws:s3:::%s", fullObjectPrefix).replaceAll("\\/\\/", "\\/");
-        UserUploadAssumeConfig uploadConfig = config.getUserUpload();
-        String roleSessionName = "rengine-" + currentTimeMillis();
+        final String stsRoleArn = format("arn:aws:s3:::%s", format("%s/%s", config.getBucket(), objectPrefix))
+                .replaceAll("\\/\\/", "\\/");
+        final UserUploadAssumeConfig uploadConfig = config.getUserUpload();
+        final String roleSessionName = "rengine-" + currentTimeMillis();
 
         return createSTSCredentialsWithAssumeRole(config.getEndpoint(), config.getTenantAccessKey(), config.getTenantSecretKey(),
                 config.getRegion(), stsRoleArn, safeLongToInt(uploadConfig.getExpiredDuration().getSeconds()), roleSessionName,

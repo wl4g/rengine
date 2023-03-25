@@ -92,7 +92,7 @@ public class WorkflowServiceImpl extends BasicServiceImpl implements WorkflowSer
 
     @Override
     public WorkflowDeleteResult delete(WorkflowDelete model) {
-        return WorkflowDeleteResult.builder().deletedCount(doDeleteWithGracefully(model, RE_WORKFLOWS)).build();
+        return WorkflowDeleteResult.builder().deletedCount(doDeleteGracefully(model, RE_WORKFLOWS)).build();
     }
 
 }

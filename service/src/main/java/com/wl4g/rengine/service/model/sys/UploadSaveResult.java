@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.service.model;
+package com.wl4g.rengine.service.model.sys;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,7 +24,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link RuleScriptSaveResult}
+ * {@link UploadSaveResult}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -35,6 +35,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class RuleScriptSaveResult extends BaseSaveResult {
-    private @NotNull Long revision;
+public class UploadSaveResult extends UploadApplyResult {
+    private @NotBlank Long id;
 }

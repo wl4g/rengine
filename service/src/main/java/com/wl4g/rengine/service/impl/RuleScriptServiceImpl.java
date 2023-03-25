@@ -23,11 +23,15 @@ import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EX
 import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_INTERNAL_RULESCRIPT;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_RULE_SCRIPTS;
 import static com.wl4g.rengine.common.util.BsonAggregateFilters.RULE_SCRIPT_UPLOAD_LOOKUP_FILTERS;
+import static com.wl4g.rengine.service.mongo.QueryHolder.DEFAULT_FIELD_REVISION;
+import static com.wl4g.rengine.service.mongo.QueryHolder.DEFAULT_FIELD_UPDATE_DATE;
 import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
+import static com.wl4g.rengine.service.mongo.QueryHolder.descSort;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
 import static java.lang.String.format;
+import static java.lang.String.valueOf;
 import static java.util.stream.Collectors.toList;
 
 import java.util.List;
@@ -36,8 +40,6 @@ import javax.validation.constraints.NotNull;
 
 import org.bson.conversions.Bson;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
@@ -67,7 +69,6 @@ import com.wl4g.rengine.service.model.RuleScriptDeleteResult;
 import com.wl4g.rengine.service.model.RuleScriptQuery;
 import com.wl4g.rengine.service.model.RuleScriptSave;
 import com.wl4g.rengine.service.model.RuleScriptSaveResult;
-import com.wl4g.rengine.service.mongo.GlobalMongoSequenceService;
 import com.wl4g.rengine.service.util.RuleScriptParser;
 import com.wl4g.rengine.service.util.RuleScriptParser.ScriptASTInfo;
 import com.wl4g.rengine.service.util.RuleScriptParser.ScriptInfo;
@@ -92,12 +93,10 @@ public class RuleScriptServiceImpl extends BasicServiceImpl implements RuleScrip
         final Query query = new Query(
                 andCriteria(baseCriteria(model), isIdCriteria(model.getScriptId()), isCriteria("ruleId", model.getRuleId())));
 
-        query.with(PageRequest.of(model.getPageNum(), model.getPageSize(), Sort.by(Direction.DESC, "updateDate")));
+        query.with(PageRequest.of(model.getPageNum(), model.getPageSize(),
+                descSort(DEFAULT_FIELD_REVISION, DEFAULT_FIELD_UPDATE_DATE)));
 
         final List<RuleScript> ruleScripts = mongoTemplate.find(query, RuleScript.class, RE_RULE_SCRIPTS.getName());
-        // Collections.sort(ruleScripts, (o1, o2) ->
-        // (o2.getUpdateDate().getTime()
-        // - o1.getUpdateDate().getTime()) > 0 ? 1 : -1);
 
         return new PageHolder<RuleScript>(model.getPageNum(), model.getPageSize())
                 .withTotal(mongoTemplate.count(query, RE_RULE_SCRIPTS.getName()))
@@ -174,15 +173,15 @@ public class RuleScriptServiceImpl extends BasicServiceImpl implements RuleScrip
         //script.setRevision(1 + maxRevision);
         // @formatter:on
 
-        script.setRevision(mongoSequenceService.getNextSequence(GlobalMongoSequenceService.SCRIPTS_REVISION_SEQ));
+        script.setRevision(mongoSequenceService.getNextSequence(RuleScript.class, valueOf(script.getRuleId())));
 
         RuleScript saved = mongoTemplate.save(script, RE_RULE_SCRIPTS.getName());
-        return RuleScriptSaveResult.builder().id(saved.getId()).build();
+        return RuleScriptSaveResult.builder().id(saved.getId()).revision(saved.getRevision()).build();
     }
 
     @Override
     public RuleScriptDeleteResult delete(RuleScriptDelete model) {
-        return RuleScriptDeleteResult.builder().deletedCount(doDeleteWithGracefully(model, RE_RULE_SCRIPTS)).build();
+        return RuleScriptDeleteResult.builder().deletedCount(doDeleteGracefully(model, RE_RULE_SCRIPTS)).build();
     }
 
     @Override

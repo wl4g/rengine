@@ -145,8 +145,8 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
             // a real workflow), so you only need to generate a virtual
             // workflow objects to meet the parameters of the underlying API.
             rule.setId(ruleScriptId);
-            final Long virtualGraphId = ruleScriptId;
-            final Long virtualWorkflowId = ruleScriptId;
+            final Long vGraphId = ruleScriptId;
+            final Long vWorkflowId = ruleScriptId;
 
             // vistual workflow graph nodes.
             final List<BaseNode<?>> vNodes = new LinkedList<>();
@@ -159,15 +159,15 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
 
             // vistual workflow graph.
             final WorkflowGraphWrapper vGraph = new WorkflowGraphWrapper();
-            vGraph.setId(virtualGraphId);
-            vGraph.setWorkflowId(virtualWorkflowId);
+            vGraph.setId(vGraphId);
+            vGraph.setWorkflowId(vWorkflowId);
             vGraph.setRules(singletonList(rule));
             vGraph.setDetails(new StandardGraph(vNodes, vEdges));
             vGraph.validate();
 
             // vistual workflow.
             final WorkflowWrapper vWorkflow = WorkflowWrapper.builder()
-                    .id(virtualWorkflowId)
+                    .id(vWorkflowId)
                     // Notice: The current online script debugging execution
                     // only supports standard workflows.
                     .engine(WorkflowEngine.STANDARD_GRAPH)
@@ -348,7 +348,7 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
         // directly compiling the workflow lookup bson string.
         //
         //// @formatter:off
-        //final Bson uploadsLookup = Aggregates.lookup(RE_UPLOADS.getName(),
+        //final Bson uploadsLookup = Aggregates.lookup(SYS_UPLOADS.getName(),
         //        asList(new Variable<>("upload_ids",
         //                BsonDocument.parse("{ $map: { input: \"$uploadIds\", in: { $toLong: \"$$this.ruleId\" } } }"))),
         //        asList(Aggregates

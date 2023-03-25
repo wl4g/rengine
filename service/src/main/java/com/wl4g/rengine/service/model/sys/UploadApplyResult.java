@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.service.model;
+package com.wl4g.rengine.service.model.sys;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link UploadSaveResult}
+ * {@link UploadApplyResult}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -38,8 +38,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class UploadSaveResult {
-
+public class UploadApplyResult {
     private @NotBlank String endpoint;
     private @NotBlank int port;
     private @NotBlank String region;
@@ -50,7 +49,6 @@ public class UploadSaveResult {
     private @NotBlank String sessionToken;
     private @NotBlank long partSize;
 
-    private @NotBlank Long id;
     private @NotBlank long fileLimitSize;
     private @NotBlank String objectPrefix;
     private @NotEmpty List<String> extensions;

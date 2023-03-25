@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.service.model;
+package com.wl4g.rengine.service.model.sys;
+
+import com.wl4g.rengine.common.entity.sys.UploadObject;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,7 +24,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link UploadDeleteResult}
+ * {@link UploadObject}
  * 
  * @author James Wong
  * @version 2022-08-28
@@ -33,5 +35,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class UploadDeleteResult extends BaseDeleteResult {
+public class UploadSave extends UploadObject {
+    private static final long serialVersionUID = 6571225686501179120L;
 }

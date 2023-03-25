@@ -105,7 +105,7 @@ public class UserServiceImpl extends BasicServiceImpl implements UserService {
 
     @Override
     public UserDeleteResult delete(UserDelete model) {
-        return UserDeleteResult.builder().deletedCount(doDeleteWithGracefully(model, SYS_USERS)).build();
+        return UserDeleteResult.builder().deletedCount(doDeleteGracefully(model, SYS_USERS)).build();
     }
 
     /**

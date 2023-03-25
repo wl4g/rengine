@@ -19,9 +19,15 @@ import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.equalsAnyIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.join;
+import static org.apache.commons.lang3.StringUtils.split;
+
+import java.util.List;
 
 import javax.validation.constraints.NotBlank;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Lists;
 import com.wl4g.infra.common.lang.EnvironmentUtil;
 
 import lombok.AllArgsConstructor;
@@ -46,7 +52,7 @@ public abstract class RengineConstants extends EnvironmentUtil {
 
     public static final String DEFAULT_MINIO_ENDPOINT = "http://localhost:9000";
     public static final String DEFAULT_MINIO_REGION = "us-east-1";
-    public static final String DEFAULT_MINIO_BUCKET = getStringProperty("minio.bucket", "rengine");
+    public static final String DEFAULT_MINIO_BUCKET = "rengine";
 
     // ----------------------------------------------------------------------------
     // ----- Rengine ApiServer constants. -----
@@ -162,6 +168,8 @@ public abstract class RengineConstants extends EnvironmentUtil {
 
         SYS_NOTIFICATIONS("sys_notifications", true),
 
+        SYS_UPLOADS("sys_uploads", true),
+
         RE_SCENESES("re_sceneses", true),
 
         RE_WORKFLOWS("re_workflows", true),
@@ -171,8 +179,6 @@ public abstract class RengineConstants extends EnvironmentUtil {
         RE_RULES("re_rules", true),
 
         RE_RULE_SCRIPTS("re_rule_scripts", true),
-
-        RE_UPLOADS("re_uploads", true),
 
         RE_DATASOURCES("re_datasources", true),
 
@@ -215,21 +221,36 @@ public abstract class RengineConstants extends EnvironmentUtil {
      */
     public static interface TenantedHolder {
 
-        public static final String CURRENT_TENANT_ID = getStringProperty("tenant.id", "t0");
+        public static final String CURRENT_TENANT_ID = getStringProperty("tenant.id", "0");
 
         public static String getColonKey(@NotBlank String key) {
             hasTextOf(key, "key");
-            return format("%s:%s", CURRENT_TENANT_ID, key);
+            return transformKey(key, ":");
         }
 
         public static String getSlashKey(@NotBlank String key) {
             hasTextOf(key, "key");
-            return format("%s/%s", CURRENT_TENANT_ID, key);
+            return transformKey(key, "/");
         }
 
         public static String getUnderlineKey(@NotBlank String key) {
             hasTextOf(key, "key");
-            return format("%s_%s", CURRENT_TENANT_ID, key);
+            return transformKey(key, "_");
+        }
+
+        @VisibleForTesting
+        static String transformKey(@NotBlank String key, @NotBlank String delimiter) {
+            hasTextOf(key, "key");
+            hasTextOf(delimiter, "delimiter");
+            final List<String> parts = Lists.newArrayList(split(key, delimiter));
+            if (parts.isEmpty()) {
+                throw new IllegalArgumentException(format("invalid the key '%s'", key));
+            } else if (parts.size() == 1) {
+                parts.add(CURRENT_TENANT_ID);
+            } else {
+                parts.add(1, CURRENT_TENANT_ID);
+            }
+            return join(parts.toArray(new String[0]), delimiter);
         }
     }
 

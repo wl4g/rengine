@@ -78,7 +78,7 @@ public class TenantServiceImpl extends BasicServiceImpl implements TenantService
 
     @Override
     public TenantDeleteResult delete(TenantDelete model) {
-        return TenantDeleteResult.builder().deletedCount(doDeleteWithGracefully(model, SYS_TENANTS)).build();
+        return TenantDeleteResult.builder().deletedCount(doDeleteGracefully(model, SYS_TENANTS)).build();
     }
 
 }

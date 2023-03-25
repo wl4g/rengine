@@ -16,20 +16,20 @@
 package com.wl4g.rengine.service.mongo;
 
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_GLOBAL_SEQUENCES;
 import static java.util.Objects.isNull;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Update;
-
-import com.wl4g.rengine.common.entity.RuleScript;
-import com.wl4g.rengine.common.entity.graph.WorkflowGraph;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -49,11 +49,16 @@ public class GlobalMongoSequenceService {
 
     final MongoOperations mongoOperations;
 
-    public long getNextSequence(final @NotBlank String seqName) {
-        hasTextOf(seqName, "seqName");
+    public long getNextSequence(final @NotNull Class<?> entityType, final @NotBlank String ofResourceId) {
+        notNullOf(entityType, "entityType");
+        hasTextOf(ofResourceId, "ofResourceId");
+
         final FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true).upsert(true);
-        final GlobalSequence seq = mongoOperations.findAndModify(query(where("_id").is(seqName)), new Update().inc("seq", 1),
-                options, GlobalSequence.class, SYS_GLOBAL_SEQUENCES.getName());
+
+        final GlobalSequence seq = mongoOperations.findAndModify(
+                query(new Criteria().andOperator(where("_id").is(ofResourceId), where("type").is(entityType.getSimpleName()))),
+                new Update().inc("seq", 1), options, GlobalSequence.class, SYS_GLOBAL_SEQUENCES.getName());
+
         return !isNull(seq) ? seq.getSeq() : 1;
     }
 
@@ -63,11 +68,11 @@ public class GlobalMongoSequenceService {
     @NoArgsConstructor
     public static class GlobalSequence {
         @Id
-        String id;
-        long seq;
+        String _id;
+        @NotBlank
+        String resourceId;
+        @NotNull
+        Long seq;
     }
-
-    public static final String GRAPHS_REVISION_SEQ = WorkflowGraph.class.getSimpleName() + ".revision";
-    public static final String SCRIPTS_REVISION_SEQ = RuleScript.class.getSimpleName() + ".revision";
 
 }

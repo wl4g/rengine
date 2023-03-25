@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.apiserver.controller;
+package com.wl4g.rengine.apiserver.controller.sys;
 
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -29,13 +29,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.common.entity.UploadObject;
+import com.wl4g.rengine.common.entity.sys.UploadObject;
 import com.wl4g.rengine.service.UploadService;
 import com.wl4g.rengine.service.model.DeleteUpload;
-import com.wl4g.rengine.service.model.UploadDeleteResult;
-import com.wl4g.rengine.service.model.UploadQuery;
-import com.wl4g.rengine.service.model.UploadSave;
-import com.wl4g.rengine.service.model.UploadSaveResult;
+import com.wl4g.rengine.service.model.sys.UploadApply;
+import com.wl4g.rengine.service.model.sys.UploadApplyResult;
+import com.wl4g.rengine.service.model.sys.UploadDeleteResult;
+import com.wl4g.rengine.service.model.sys.UploadQuery;
+import com.wl4g.rengine.service.model.sys.UploadSave;
+import com.wl4g.rengine.service.model.sys.UploadSaveResult;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -73,15 +75,28 @@ public class UploadController {
     }
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(summary = "Preparing to upload file.")
+    @Operation(summary = "Apply the access STS.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful",
             content = { @Content(mediaType = "application/json") }) })
     @RequestMapping(path = { "apply" }, method = { POST })
     @PreAuthorize("hasPermission(#model,'arn:rengine:upload:apply:v1')")
-    public RespBase<UploadSaveResult> apply(@Validated @RequestBody UploadSave model) {
+    public RespBase<UploadApplyResult> apply(@Validated @RequestBody UploadApply model) {
+        log.debug("called: model={}", model);
+        RespBase<UploadApplyResult> resp = RespBase.create();
+        resp.setData(uploadService.apply(model));
+        return resp;
+    }
+
+    // @SecurityRequirement(name = "default_oauth")
+    @Operation(summary = "Save the upload")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful",
+            content = { @Content(mediaType = "application/json") }) })
+    @RequestMapping(path = { "save" }, method = { POST })
+    @PreAuthorize("hasPermission(#model,'arn:rengine:upload:write:v1')")
+    public RespBase<UploadSaveResult> save(@Validated @RequestBody UploadSave model) {
         log.debug("called: model={}", model);
         RespBase<UploadSaveResult> resp = RespBase.create();
-        resp.setData(uploadService.apply(model));
+        resp.setData(uploadService.save(model));
         return resp;
     }
 

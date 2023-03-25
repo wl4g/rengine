@@ -58,7 +58,7 @@ public abstract class BasicServiceImpl {
 
     protected @Autowired(required = false) MinioClientManager minioManager;
 
-    protected long doDeleteWithGracefully(@NotNull BaseDelete model, @NotNull MongoCollectionDefinition collection) {
+    protected long doDeleteGracefully(@NotNull BaseDelete model, @NotNull MongoCollectionDefinition collection) {
         notNullOf(model, "delete");
         notNullOf(collection, "collection");
 

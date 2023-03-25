@@ -105,7 +105,7 @@ public class ScenesServiceImpl extends BasicServiceImpl implements ScenesService
 
     @Override
     public ScenesDeleteResult delete(ScenesDelete model) {
-        return ScenesDeleteResult.builder().deletedCount(doDeleteWithGracefully(model, RE_SCENESES)).build();
+        return ScenesDeleteResult.builder().deletedCount(doDeleteGracefully(model, RE_SCENESES)).build();
     }
 
 }

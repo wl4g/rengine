@@ -54,7 +54,7 @@ import org.junit.Test;
 
 import com.wl4g.infra.common.reflect.ReflectionUtils3;
 import com.wl4g.rengine.common.entity.Rule.RuleEngine;
-import com.wl4g.rengine.common.entity.UploadObject;
+import com.wl4g.rengine.common.entity.sys.UploadObject;
 import com.wl4g.rengine.service.util.RuleScriptParser.ArgInfo;
 import com.wl4g.rengine.service.util.RuleScriptParser.MethodInfo;
 import com.wl4g.rengine.service.util.RuleScriptParser.ScriptASTInfo;

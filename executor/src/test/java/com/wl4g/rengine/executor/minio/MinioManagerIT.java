@@ -25,7 +25,7 @@ import javax.validation.constraints.NotNull;
 
 import org.junit.Test;
 
-import com.wl4g.rengine.common.entity.UploadObject.UploadType;
+import com.wl4g.rengine.common.entity.sys.UploadObject.UploadType;
 
 /**
  * {@link MinioManagerIT}
@@ -38,7 +38,7 @@ public class MinioManagerIT {
 
     @Test
     public void testDetermineLocalFile() throws IOException {
-        File localFile = MinioManager.determineLocalFile(UploadType.LIBRARY,
+        File localFile = MinioManager.determineLocalFile(UploadType.LIBJS,
                 "/rengine/library/js/commons-lang-3.0.0.js", 101001001L);
         System.out.println(localFile);
     }

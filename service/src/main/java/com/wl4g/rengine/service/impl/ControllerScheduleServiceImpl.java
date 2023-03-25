@@ -99,7 +99,7 @@ public class ControllerScheduleServiceImpl extends BasicServiceImpl implements C
     @Override
     public ControllerScheduleDeleteResult delete(ControllerScheduleDelete model) {
         return ControllerScheduleDeleteResult.builder()
-                .deletedCount(doDeleteWithGracefully(model, RE_CONTROLLER_SCHEDULE))
+                .deletedCount(doDeleteGracefully(model, RE_CONTROLLER_SCHEDULE))
                 .build();
     }
 

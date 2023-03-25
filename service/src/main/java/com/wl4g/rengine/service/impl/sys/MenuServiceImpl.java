@@ -100,7 +100,7 @@ public class MenuServiceImpl extends BasicServiceImpl implements MenuService {
 
     @Override
     public MenuDeleteResult delete(MenuDelete model) {
-        return MenuDeleteResult.builder().deletedCount(doDeleteWithGracefully(model, SYS_MENUS)).build();
+        return MenuDeleteResult.builder().deletedCount(doDeleteGracefully(model, SYS_MENUS)).build();
     }
 
 }

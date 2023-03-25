@@ -98,7 +98,7 @@ public class DataSourceServiceImpl extends BasicServiceImpl implements DataSourc
 
     @Override
     public DataSourceDeleteResult delete(DataSourceDelete model) {
-        return DataSourceDeleteResult.builder().deletedCount(doDeleteWithGracefully(model, RE_DATASOURCES)).build();
+        return DataSourceDeleteResult.builder().deletedCount(doDeleteGracefully(model, RE_DATASOURCES)).build();
     }
 
 }

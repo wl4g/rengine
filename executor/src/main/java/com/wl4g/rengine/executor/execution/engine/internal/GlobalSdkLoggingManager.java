@@ -140,7 +140,7 @@
 //                        .forEach(f -> {
 //                            final String objectPrefix = minioConfig.bucket()
 //                                    .concat("/")
-//                                    .getSlashKey(UploadObject.UploadType.SCRIPT_LOG.getPrefix()
+//                                    .getSlashKey(UploadObject.UploadType.SCRIPTLOG.getPrefix()
 //                                      .concat("/")
 //                                      .concat(f.getName()));
 //

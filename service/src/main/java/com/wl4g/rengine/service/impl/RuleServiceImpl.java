@@ -94,7 +94,7 @@ public class RuleServiceImpl extends BasicServiceImpl implements RuleService {
 
     @Override
     public RuleDeleteResult delete(RuleDelete model) {
-        return RuleDeleteResult.builder().deletedCount(doDeleteWithGracefully(model, RE_RULES)).build();
+        return RuleDeleteResult.builder().deletedCount(doDeleteGracefully(model, RE_RULES)).build();
     }
 
 }

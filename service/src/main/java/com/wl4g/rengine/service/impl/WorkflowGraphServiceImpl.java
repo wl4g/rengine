@@ -25,6 +25,7 @@ import static com.wl4g.rengine.service.mongo.QueryHolder.descSort;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
 import static java.lang.String.format;
+import static java.lang.String.valueOf;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.util.List;
@@ -55,7 +56,6 @@ import com.wl4g.rengine.service.model.WorkflowGraphLogfileResult;
 import com.wl4g.rengine.service.model.WorkflowGraphQuery;
 import com.wl4g.rengine.service.model.WorkflowGraphResultSave;
 import com.wl4g.rengine.service.model.WorkflowGraphSave;
-import com.wl4g.rengine.service.mongo.GlobalMongoSequenceService;
 
 import lombok.CustomLog;
 
@@ -116,16 +116,16 @@ public class WorkflowGraphServiceImpl extends BasicServiceImpl implements Workfl
         // graph.setRevision(1 + maxRevision);
         // @formatter:on
 
-        graph.setRevision(mongoSequenceService.getNextSequence(GlobalMongoSequenceService.GRAPHS_REVISION_SEQ));
+        graph.setRevision(mongoSequenceService.getNextSequence(WorkflowGraph.class, valueOf(graph.getWorkflowId())));
         graph.validate();
 
         final WorkflowGraph saved = mongoTemplate.save(graph, RE_WORKFLOW_GRAPHS.getName());
-        return WorkflowGraphResultSave.builder().id(saved.getId()).build();
+        return WorkflowGraphResultSave.builder().id(saved.getId()).revision(saved.getRevision()).build();
     }
 
     @Override
     public WorkflowGraphDeleteResult delete(WorkflowGraphDelete model) {
-        return WorkflowGraphDeleteResult.builder().deletedCount(doDeleteWithGracefully(model, RE_WORKFLOW_GRAPHS)).build();
+        return WorkflowGraphDeleteResult.builder().deletedCount(doDeleteGracefully(model, RE_WORKFLOW_GRAPHS)).build();
     }
 
     @Override

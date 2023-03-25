@@ -15,6 +15,8 @@
  */
 package com.wl4g.rengine.service.model;
 
+import javax.validation.constraints.NotNull;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -34,4 +36,5 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 @NoArgsConstructor
 public class WorkflowGraphResultSave extends BaseSaveResult {
+    private @NotNull Long revision;
 }

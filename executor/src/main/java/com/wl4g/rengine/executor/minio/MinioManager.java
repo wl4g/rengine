@@ -51,7 +51,7 @@ import javax.validation.constraints.NotNull;
 
 import com.google.common.io.Resources;
 import com.wl4g.infra.common.io.FileIOUtils;
-import com.wl4g.rengine.common.entity.UploadObject.UploadType;
+import com.wl4g.rengine.common.entity.sys.UploadObject.UploadType;
 import com.wl4g.rengine.executor.minio.MinioConfig.IOkHttpClientConfig;
 
 import io.minio.GetObjectArgs;

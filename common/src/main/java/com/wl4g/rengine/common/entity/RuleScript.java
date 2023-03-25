@@ -24,6 +24,7 @@ import java.util.List;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import com.wl4g.rengine.common.entity.sys.UploadObject;
 import com.wl4g.rengine.common.validation.ValidForEntityMarker;
 
 import lombok.Builder.Default;

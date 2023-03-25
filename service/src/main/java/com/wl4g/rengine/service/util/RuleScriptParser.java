@@ -35,7 +35,7 @@ import org.graalvm.polyglot.Value;
 
 import com.wl4g.infra.common.lang.StringUtils2;
 import com.wl4g.rengine.common.entity.Rule.RuleEngine;
-import com.wl4g.rengine.common.entity.UploadObject;
+import com.wl4g.rengine.common.entity.sys.UploadObject;
 
 import lombok.AllArgsConstructor;
 import lombok.CustomLog;

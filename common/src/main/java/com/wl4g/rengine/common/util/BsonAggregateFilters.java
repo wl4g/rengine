@@ -22,7 +22,7 @@ import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollection
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_USER_ROLES;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_RULES;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_RULE_SCRIPTS;
-import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_UPLOADS;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_UPLOADS;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_WORKFLOWS;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_WORKFLOW_GRAPHS;
 
@@ -62,7 +62,7 @@ public abstract class BsonAggregateFilters {
                     + "{ $sort: { \"revision\": -1 } },  "
                     + "{ $limit: 1 },"
                     + "{ $lookup: {"
-                    + "    from: \"" + RE_UPLOADS.getName() + "\",  "
+                    + "    from: \"" + SYS_UPLOADS.getName() + "\",  "
                     + "    let: { upload_ids: { $map: { input: \"$uploadIds\", in: { $toLong: \"$$this\"} } } },"
                     + "    pipeline: ["
                     + "        { $match: { $expr: { $in: [ \"$_id\",  \"$$upload_ids\" ] } } }, "
@@ -121,7 +121,7 @@ public abstract class BsonAggregateFilters {
             + "                                { $sort: { \"revision\": -1 } },  "
             + "                                { $limit: 1 },"
             + "                                { $lookup: {"
-            + "                                    from: \"" + RE_UPLOADS.getName() + "\",  "
+            + "                                    from: \"" + SYS_UPLOADS.getName() + "\",  "
             + "                                    let: { upload_ids: { $map: { input: \"$uploadIds\", in: { $toLong: \"$$this\"} } } },"
             + "                                    pipeline: ["
             + "                                        { $match: { $expr: { $in: [ \"$_id\",  \"$$upload_ids\" ] } } }, "

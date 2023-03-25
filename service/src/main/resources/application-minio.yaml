@@ -19,6 +19,7 @@ minio:
   #endpoint: http://10.0.0.114:9000
   endpoint: http://127.0.0.1:9000
   region: us-east-1
+  bucket: rengine
   ## The should manually create tenant accessKey and assign permission policies.
   ## Can use this tools: https://github.com/wl4g/rengine/tree/master/web/src/test/java/com/wl4g/rengine/minio/RengineMinioTool.java
   tenantAccessKey: rengine

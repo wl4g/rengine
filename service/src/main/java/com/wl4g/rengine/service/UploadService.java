@@ -15,15 +15,21 @@
  */
 package com.wl4g.rengine.service;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static java.util.Collections.singletonList;
+import static java.util.Objects.nonNull;
+
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
-import com.wl4g.rengine.common.entity.UploadObject;
+import com.wl4g.rengine.common.entity.sys.UploadObject;
 import com.wl4g.rengine.service.model.DeleteUpload;
-import com.wl4g.rengine.service.model.UploadDeleteResult;
-import com.wl4g.rengine.service.model.UploadQuery;
-import com.wl4g.rengine.service.model.UploadSave;
-import com.wl4g.rengine.service.model.UploadSaveResult;
+import com.wl4g.rengine.service.model.sys.UploadApply;
+import com.wl4g.rengine.service.model.sys.UploadApplyResult;
+import com.wl4g.rengine.service.model.sys.UploadDeleteResult;
+import com.wl4g.rengine.service.model.sys.UploadQuery;
+import com.wl4g.rengine.service.model.sys.UploadSave;
+import com.wl4g.rengine.service.model.sys.UploadSaveResult;
 
 /**
  * {@link UploadService}
@@ -34,9 +40,19 @@ import com.wl4g.rengine.service.model.UploadSaveResult;
  */
 public interface UploadService {
 
+    default UploadObject get(@NotNull Long uploadId) {
+        final PageHolder<UploadObject> result = query(UploadQuery.builder().uploadIds(singletonList(uploadId)).build());
+        if (nonNull(result) && !safeList(result.getRecords()).isEmpty()) {
+            return safeList(result.getRecords()).get(0);
+        }
+        return null;
+    }
+
     PageHolder<UploadObject> query(@NotNull UploadQuery model);
 
-    UploadSaveResult apply(@NotNull UploadSave model);
+    UploadApplyResult apply(@NotNull UploadApply model);
+
+    UploadSaveResult save(@NotNull UploadSave model);
 
     UploadDeleteResult delete(@NotNull DeleteUpload model);
 }

@@ -15,6 +15,7 @@
  */
 package com.wl4g.rengine.common.entity;
 
+import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 
 import java.util.List;
@@ -74,6 +75,7 @@ public class Rule extends BaseEntity {
         @JsonIgnore
         public RuleScriptWrapper getEffectiveLatestScript() {
             validate(this);
+            notEmptyOf(getScripts(), "ruleScripts");
             return getScripts().get(0);
         }
 

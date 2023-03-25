@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wl4g.rengine.common.entity;
+package com.wl4g.rengine.common.entity.sys;
 
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static java.lang.String.format;
@@ -29,6 +29,7 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.wl4g.infra.common.validation.EnumValue;
+import com.wl4g.rengine.common.entity.BaseEntity;
 import com.wl4g.rengine.common.validation.ValidForEntityMarker;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -59,8 +60,10 @@ public class UploadObject extends BaseEntity {
     private @NotBlank @EnumValue(enumCls = UploadObject.UploadType.class) String uploadType;
 
     // Save API front-end without objectPrefix.
-    private @Nullable @NotBlank(groups = ValidForEntityMarker.class) @Schema(hidden = false,
-            accessMode = AccessMode.READ_ONLY) String objectPrefix;
+    @Nullable
+    @NotBlank(groups = ValidForEntityMarker.class)
+    @Schema(hidden = false, accessMode = AccessMode.READ_ONLY)
+    private String objectPrefix;
 
     private @NotBlank String filename;
     private @NotBlank String extension;
@@ -73,45 +76,17 @@ public class UploadObject extends BaseEntity {
 
     @Getter
     @AllArgsConstructor
-    public static enum ExtensionType {
-        JAR(true, ".jar"),
-
-        GROOVY(false, ".groovy"),
-
-        JS(false, ".js"),
-
-        TS(false, ".ts"),
-
-        CSV(false, ".csv"),
-
-        MJS(false, "mjs");
-
-        private final boolean binary;
-        private final String suffix;
-
-        @JsonCreator
-        public static ExtensionType of(String type) {
-            for (ExtensionType a : values()) {
-                if (equalsAnyIgnoreCase(type, a.name().toLowerCase(), a.getSuffix())) {
-                    return a;
-                }
-            }
-            throw new IllegalArgumentException(format("Invalid extension type for '%s'", type));
-        }
-
-    }
-
-    @Getter
-    @AllArgsConstructor
     public static enum UploadType {
 
-        LIBRARY("library/js", asList(ExtensionType.JS, ExtensionType.TS, ExtensionType.MJS)),
+        LIBJS("libjs", asList(ExtensionType.JS, ExtensionType.TS, ExtensionType.MJS)),
 
-        USER_LIBRARY_WITH_GROOVY("library/groovy", asList(ExtensionType.GROOVY, ExtensionType.JAR)),
+        LIBGROOVY("libgroovy", asList(ExtensionType.GROOVY, ExtensionType.JAR)),
 
-        DATASET("testset/csv", asList(ExtensionType.CSV)),
+        LIBPYTHON("libpython", asList(ExtensionType.PY)),
 
-        SCRIPT_LOG("scriptlog", null);
+        TESTCSV("testcsv", asList(ExtensionType.CSV)),
+
+        SCRIPTLOG("scriptlog", null);
 
         private final String prefix;
         private final List<ExtensionType> extensions;
@@ -125,6 +100,48 @@ public class UploadObject extends BaseEntity {
                 }
             }
             throw new IllegalArgumentException(format("Invalid upload type for '%s'", type));
+        }
+
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static enum ExtensionType {
+        JAR(true, ".jar"),
+
+        GROOVY(false, ".groovy"),
+
+        PY(false, ".py"),
+
+        JS(false, ".js"),
+
+        TS(false, ".ts"),
+
+        CSV(false, ".csv"),
+
+        MJS(false, ".mjs"),
+
+        LOG(false, ".log"),
+
+        OUT(false, ".out"),
+
+        ERR(false, ".err"),
+
+        STDOUT(false, ".stdout"),
+
+        STDERR(false, ".stderr");
+
+        private final boolean binary;
+        private final String suffix;
+
+        @JsonCreator
+        public static ExtensionType of(String type) {
+            for (ExtensionType a : values()) {
+                if (equalsAnyIgnoreCase(type, a.name().toLowerCase(), a.getSuffix())) {
+                    return a;
+                }
+            }
+            throw new IllegalArgumentException(format("Invalid extension type for '%s'", type));
         }
 
     }

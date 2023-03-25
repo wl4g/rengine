@@ -105,7 +105,7 @@ public class RoleServiceImpl extends BasicServiceImpl implements RoleService {
 
     @Override
     public RoleDeleteResult delete(RoleDelete model) {
-        return RoleDeleteResult.builder().deletedCount(doDeleteWithGracefully(model, SYS_ROLES)).build();
+        return RoleDeleteResult.builder().deletedCount(doDeleteGracefully(model, SYS_ROLES)).build();
     }
 
     @SuppressWarnings("unchecked")
