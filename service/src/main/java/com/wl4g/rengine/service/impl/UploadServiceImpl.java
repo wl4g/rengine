@@ -16,6 +16,7 @@
 package com.wl4g.rengine.service.impl;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static com.wl4g.rengine.common.constants.RengineConstants.TenantedHolder.*;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_UPLOADS;
 import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
@@ -83,12 +84,13 @@ public class UploadServiceImpl extends BasicServiceImpl implements UploadService
         final UploadType uploadType = UploadType.of(model.getUploadType());
         // The precise object prefixes to ensure the creation of STS policy
         // with precise authorized write permissions.
-        final String objectPrefix = format("%s/%s/%s", RengineConstants.DEFAULT_MINIO_BUCKET, uploadType.getPrefix(),
-                model.getFilename());
+
+        final String fullObjectPrefix = format("%s/%s", RengineConstants.DEFAULT_MINIO_BUCKET,
+                getSlashKey(format("%s/%s", uploadType.getPrefix(), model.getFilename())));
         final UploadObject upload = UploadObject.builder()
                 .uploadType(model.getUploadType())
                 .id(IdGenUtils.nextLong())
-                .objectPrefix(objectPrefix)
+                .objectPrefix(fullObjectPrefix)
                 .filename(model.getFilename())
                 .extension(model.getExtension())
                 .orgCode(model.getOrgCode())
@@ -112,7 +114,7 @@ public class UploadServiceImpl extends BasicServiceImpl implements UploadService
 
         // New create temporary STS credentials.
         try {
-            final Credentials credentials = minioManager.createSTSCredentials(objectPrefix);
+            final Credentials credentials = minioManager.createSTSCredentials(fullObjectPrefix);
             final MinioClientProperties config = minioManager.getConfig();
             return UploadSaveResult.builder()
                     .id(upload.getId())
@@ -125,7 +127,7 @@ public class UploadServiceImpl extends BasicServiceImpl implements UploadService
                     .sessionToken(credentials.sessionToken())
                     .partSize(minioManager.getConfig().getUserUpload().getLibraryPartSize().toBytes())
                     .fileLimitSize(minioManager.getConfig().getUserUpload().getLibraryFileLimitSize().toBytes())
-                    .objectPrefix(objectPrefix)
+                    .objectPrefix(fullObjectPrefix)
                     .extensions(safeList(uploadType.getExtensions()).stream().map(t -> t.getSuffix()).collect(toList()))
                     .build();
         } catch (NoSuchAlgorithmException e) {

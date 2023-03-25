@@ -15,9 +15,12 @@
  */
 package com.wl4g.rengine.common.constants;
 
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.equalsAnyIgnoreCase;
+
+import javax.validation.constraints.NotBlank;
 
 import com.wl4g.infra.common.lang.EnvironmentUtil;
 
@@ -40,9 +43,10 @@ public abstract class RengineConstants extends EnvironmentUtil {
     public static final String CONF_PREFIX = "rengine";
 
     public static final String DEFAULT_MONGODB_DATABASE = getStringProperty("mongodb.database", "rengine");
+
     public static final String DEFAULT_MINIO_ENDPOINT = "http://localhost:9000";
     public static final String DEFAULT_MINIO_REGION = "us-east-1";
-    public static final String DEFAULT_MINIO_BUCKET = "rengine";
+    public static final String DEFAULT_MINIO_BUCKET = getStringProperty("minio.bucket", "rengine");
 
     // ----------------------------------------------------------------------------
     // ----- Rengine ApiServer constants. -----
@@ -196,6 +200,37 @@ public abstract class RengineConstants extends EnvironmentUtil {
             return null;
         }
 
+    }
+
+    /**
+     * This helper class is used to enable various resource key names to support
+     * multi-tenant isolation. For example, in the internal deployment
+     * environment of an enterprise, the possible requirement is to deploy two
+     * tenants, but the external middleware redis cluster, mongo cluster, and
+     * minio cluster that the rengine controller and rengine executor services
+     * depend on are actually the same shared instance. We should allow this,
+     * but should make sure that the data happens without conflicts. Therefore,
+     * we need to uniformly increase the tenant identifier prefix to solve this
+     * problem.
+     */
+    public static interface TenantedHolder {
+
+        public static final String CURRENT_TENANT_ID = getStringProperty("tenant.id", "t0");
+
+        public static String getColonKey(@NotBlank String key) {
+            hasTextOf(key, "key");
+            return format("%s:%s", CURRENT_TENANT_ID, key);
+        }
+
+        public static String getSlashKey(@NotBlank String key) {
+            hasTextOf(key, "key");
+            return format("%s/%s", CURRENT_TENANT_ID, key);
+        }
+
+        public static String getUnderlineKey(@NotBlank String key) {
+            hasTextOf(key, "key");
+            return format("%s_%s", CURRENT_TENANT_ID, key);
+        }
     }
 
 }

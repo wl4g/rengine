@@ -21,6 +21,7 @@ import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.StringUtils2.eqIgnCase;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+import static com.wl4g.rengine.common.constants.RengineConstants.TenantedHolder.getColonKey;
 import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.descSort;
@@ -84,7 +85,7 @@ public class DictServiceImpl extends BasicServiceImpl implements DictService {
 
         // The first priority get single from cache.
         if (nonNull(model.getType()) && !isBlank(model.getKey())) {
-            final Dict dict = parseJSON(hashOperations.get(config.getDict().getDictCachedPrefix(),
+            final Dict dict = parseJSON(hashOperations.get(getColonKey(config.getDict().getDictCachedPrefix()),
                     Dict.buildCacheHashKey(model.getType().name(), model.getKey())), Dict.class);
             if (nonNull(dict)) {
                 dicts = singletonList(dict);
@@ -92,7 +93,7 @@ public class DictServiceImpl extends BasicServiceImpl implements DictService {
         }
         // The second priority get all from cache, and filter.
         else if (isNull(model.getType()) || isBlank(model.getKey())) {
-            final Map<String, String> allDictJsonMap = hashOperations.entries(config.getDict().getDictCachedPrefix());
+            final Map<String, String> allDictJsonMap = hashOperations.entries(getColonKey(config.getDict().getDictCachedPrefix()));
             dicts = safeMap(allDictJsonMap).entrySet()
                     .parallelStream()
                     .map(e -> parseJSON(e.getValue(), Dict.class))
@@ -139,14 +140,14 @@ public class DictServiceImpl extends BasicServiceImpl implements DictService {
         if (CollectionUtils2.isEmpty(dicts)) {
             final Query query = new Query(
                     andCriteria(baseCriteria(model), isCriteria("type", nonNull(model.getType()) ? model.getType().name() : null),
-                            isCriteria("key", model.getKey()), isCriteria("value", model.getValue())))
-                    .with(PageRequest.of(model.getPageNum(), model.getPageSize(), descSort("sort", "updateDate")));
+                            isCriteria("key", model.getKey()), isCriteria("value", model.getValue()))).with(
+                                    PageRequest.of(model.getPageNum(), model.getPageSize(), descSort("sort", "updateDate")));
             dicts = mongoTemplate.find(query, Dict.class, MongoCollectionDefinition.SYS_DICTS.getName());
             total = mongoTemplate.count(query, MongoCollectionDefinition.SYS_DICTS.getName());
 
             // Save to cache.
             safeList(dicts).parallelStream().forEach(dict -> {
-                hashOperations.put(config.getDict().getDictCachedPrefix(),
+                hashOperations.put(getColonKey(config.getDict().getDictCachedPrefix()),
                         Dict.buildCacheHashKey(dict.getType().name(), dict.getKey()), toJSONString(dict));
             });
         }
@@ -172,7 +173,7 @@ public class DictServiceImpl extends BasicServiceImpl implements DictService {
 
         // Save to cached.
         if (nonNull(saved.getId()) && saved.getId() > 0) {
-            hashOperations.put(config.getDict().getDictCachedPrefix(),
+            hashOperations.put(getColonKey(config.getDict().getDictCachedPrefix()),
                     Dict.buildCacheHashKey(saved.getType().name(), saved.getKey()), toJSONString(saved));
             // Sets cached expire.
             setDictCachedExpire();
@@ -206,7 +207,7 @@ public class DictServiceImpl extends BasicServiceImpl implements DictService {
     }
 
     private Boolean setDictCachedExpire() {
-        return redisTemplate.expire(config.getDict().getDictCachedPrefix(), config.getDict().getDictCachedExpire(),
+        return redisTemplate.expire(getColonKey(config.getDict().getDictCachedPrefix()), config.getDict().getDictCachedExpire(),
                 TimeUnit.MILLISECONDS);
     }
 

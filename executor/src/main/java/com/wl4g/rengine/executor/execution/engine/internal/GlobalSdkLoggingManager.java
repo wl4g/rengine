@@ -20,6 +20,7 @@
 //import static com.wl4g.infra.common.lang.TypeConverts.parseLongOrNull;
 //import static com.wl4g.rengine.common.util.ScriptEngineUtil.getAllLogDirs;
 //import static com.wl4g.rengine.common.util.ScriptEngineUtil.getAllLogFilenames;
+//import static com.wl4g.rengine.common.constants.RengineConstants.TenantedHolder.getSlashKey;
 //
 //import java.io.File;
 //
@@ -139,9 +140,9 @@
 //                        .forEach(f -> {
 //                            final String objectPrefix = minioConfig.bucket()
 //                                    .concat("/")
-//                                    .concat(UploadObject.UploadType.SCRIPT_LOG.getPrefix())
-//                                    .concat("/")
-//                                    .concat(f.getName());
+//                                    .getSlashKey(UploadObject.UploadType.SCRIPT_LOG.getPrefix()
+//                                      .concat("/")
+//                                      .concat(f.getName()));
 //
 //                            log.info("Uploading script log to {} from {}", objectPrefix, f);
 //                            minioManager.uploadObject(objectPrefix, f.getAbsolutePath());

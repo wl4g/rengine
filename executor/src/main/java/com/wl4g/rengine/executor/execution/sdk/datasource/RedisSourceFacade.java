@@ -20,6 +20,7 @@ import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseToNode;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+import static com.wl4g.rengine.common.constants.RengineConstants.TenantedHolder.getColonKey;
 import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsName.execution_sdk_datasource_failure;
 import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsName.execution_sdk_datasource_success;
 import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsName.execution_sdk_datasource_time;
@@ -103,7 +104,7 @@ public class RedisSourceFacade implements DataSourceFacade {
 
     public @HostAccess.Export JsonNode get(final @NotBlank String key) {
         hasTextOf(key, "key");
-        checkPermission(key, false);
+        checkAccessDenied(key, false);
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.REDIS, METHOD_GET);
         try {
             final JsonNode result = MeterUtil.timer(execution_sdk_datasource_time, dataSourceName, DataSourceType.REDIS,
@@ -119,7 +120,7 @@ public class RedisSourceFacade implements DataSourceFacade {
 
     public @HostAccess.Export String set(final @NotBlank String key, final Object value) {
         hasTextOf(key, "key");
-        checkPermission(key, true);
+        checkAccessDenied(key, true);
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.REDIS, METHOD_SET);
         try {
             if (nonNull(value)) {
@@ -139,7 +140,7 @@ public class RedisSourceFacade implements DataSourceFacade {
 
     public @HostAccess.Export String setex(final @NotBlank String key, final Object value, final @Min(-2) long seconds) {
         hasTextOf(key, "key");
-        checkPermission(key, true);
+        checkAccessDenied(key, true);
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.REDIS, METHOD_SETEX);
         try {
             if (nonNull(value)) {
@@ -158,13 +159,13 @@ public class RedisSourceFacade implements DataSourceFacade {
     }
 
     public @HostAccess.Export Long setnx(final @NotBlank String key, final Object value) {
-        checkPermission(key, true);
+        checkAccessDenied(key, true);
         return setnxex(key, value, Long.MAX_VALUE);
     }
 
     public @HostAccess.Export Long setnxex(final @NotBlank String key, final Object value, final @Min(-2) long seconds) {
         hasTextOf(key, "key");
-        checkPermission(key, true);
+        checkAccessDenied(key, true);
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.REDIS, METHOD_SETNXEX);
         try {
             if (nonNull(value)) {
@@ -191,7 +192,7 @@ public class RedisSourceFacade implements DataSourceFacade {
 
     public @HostAccess.Export Long del(final @NotBlank String key) {
         hasTextOf(key, "key");
-        checkPermission(key, true);
+        checkAccessDenied(key, true);
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.REDIS, METHOD_DEL);
         try {
             final Long result = MeterUtil.timer(execution_sdk_datasource_time, dataSourceName, DataSourceType.REDIS, METHOD_DEL,
@@ -207,7 +208,7 @@ public class RedisSourceFacade implements DataSourceFacade {
 
     public @HostAccess.Export Long expire(final @NotBlank String key, final @Min(-2) long seconds) {
         hasTextOf(key, "key");
-        checkPermission(key, true);
+        checkAccessDenied(key, true);
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.REDIS, METHOD_EXPIRE);
         try {
             final Long result = MeterUtil.timer(execution_sdk_datasource_time, dataSourceName, DataSourceType.REDIS,
@@ -223,7 +224,7 @@ public class RedisSourceFacade implements DataSourceFacade {
 
     public @HostAccess.Export Map<String, JsonNode> hgetAll(final @NotBlank String key) {
         hasTextOf(key, "key");
-        checkPermission(key, false);
+        checkAccessDenied(key, false);
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.REDIS, METHOD_HGETALL);
         try {
             final Map<String, JsonNode> result = MeterUtil.timer(execution_sdk_datasource_time, dataSourceName,
@@ -259,7 +260,7 @@ public class RedisSourceFacade implements DataSourceFacade {
     public @HostAccess.Export Long hset(final @NotBlank String key, final @NotBlank String field, final Object value) {
         hasTextOf(key, "key");
         hasTextOf(field, "field");
-        checkPermission(key, false);
+        checkAccessDenied(key, false);
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.REDIS, METHOD_HSET);
         try {
             if (nonNull(value)) {
@@ -280,7 +281,7 @@ public class RedisSourceFacade implements DataSourceFacade {
     public @HostAccess.Export Long hsetnx(final @NotBlank String key, final @NotBlank String field, final Object value) {
         hasTextOf(key, "key");
         hasTextOf(field, "field");
-        checkPermission(key, true);
+        checkAccessDenied(key, true);
         MeterUtil.counter(execution_sdk_datasource_total, dataSourceName, DataSourceType.REDIS, METHOD_HSETNX);
         try {
             if (nonNull(value)) {
@@ -320,10 +321,11 @@ public class RedisSourceFacade implements DataSourceFacade {
      * @param key
      * @param forUpdate
      */
-    private void checkPermission(final @NotBlank String key, final boolean forUpdate) {
+    private void checkAccessDenied(final @NotBlank String key, final boolean forUpdate) {
         if (forUpdate) {
-            if (startsWithAny(key, engineConfig.scenesRulesCachedPrefix(), serviceConfig.dictCachedPrefix(),
-                    engineConfig.notifier().refreshedCachedPrefix())) {
+            if (startsWithAny(key, getColonKey(engineConfig.scenesRulesCachedPrefix()),
+                    getColonKey(serviceConfig.dictCachedPrefix()),
+                    getColonKey(engineConfig.notifier().refreshedCachedPrefix()))) {
                 throw new RengineException(format("Forbidden to modify system cache prefix of '%s'", key));
             }
         }

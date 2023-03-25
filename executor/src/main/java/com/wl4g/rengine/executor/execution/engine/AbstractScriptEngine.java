@@ -19,6 +19,7 @@ import static com.wl4g.infra.common.collection.CollectionUtils2.ensureMap;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.rengine.common.constants.RengineConstants.TenantedHolder.getSlashKey;
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.isNull;
@@ -141,12 +142,13 @@ public abstract class AbstractScriptEngine implements IScriptEngine {
         // Add upload object script dependencies all by scenes.workflow.rules
         final var ruleScript = rule.getEffectiveLatestScript();
         final var scriptObjects = safeList(ruleScript.getUploads()).stream().map(upload -> {
+            final String objectPrefix = getSlashKey(upload.getObjectPrefix());
             try {
-                return minioManager.loadObject(upload.getId(), UploadType.of(upload.getUploadType()), upload.getObjectPrefix(),
-                        workflowId, ExtensionType.of(upload.getExtension()).isBinary(),
+                return minioManager.loadObject(upload.getId(), UploadType.of(upload.getUploadType()), objectPrefix, workflowId,
+                        ExtensionType.of(upload.getExtension()).isBinary(),
                         usingCache ? engineConfig.executorScriptCachedExpire() : -1);
             } catch (Exception e) {
-                log.error(format("Unable to load dependency script from MinIO: %s", upload.getObjectPrefix()), e);
+                log.error(format("Unable to load dependency script from MinIO: %s", objectPrefix), e);
                 throw new IllegalStateException(e); // fast-fail:Stay-Strongly-Consistent
             }
         }).collect(toList());

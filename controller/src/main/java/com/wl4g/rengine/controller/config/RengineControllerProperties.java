@@ -17,6 +17,7 @@ package com.wl4g.rengine.controller.config;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.rengine.common.constants.RengineConstants.TenantedHolder.getSlashKey;
 import static com.wl4g.rengine.controller.util.Environments.resolveString;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -69,7 +70,8 @@ public class RengineControllerProperties implements InitializingBean {
     private GlobalEngineScheduleControllerProperties controller = new GlobalEngineScheduleControllerProperties();
     private EnginePurgerProperties purger = new EnginePurgerProperties();
     private EngineClientSchedulerProperties client = new EngineClientSchedulerProperties();
-    private EngineFlinkSchedulerProperties flink = new EngineFlinkSchedulerProperties();
+    // private EngineFlinkSchedulerProperties flink = new
+    // EngineFlinkSchedulerProperties();
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -202,7 +204,7 @@ public class RengineControllerProperties implements InitializingBean {
          * @return instance of ZooKeeper configuration
          */
         public ZookeeperConfiguration toZookeeperConfiguration() {
-            ZookeeperConfiguration result = new ZookeeperConfiguration(serverLists, namespace);
+            ZookeeperConfiguration result = new ZookeeperConfiguration(serverLists, getSlashKey(namespace));
             result.setBaseSleepTimeMilliseconds(baseSleepTimeMilliseconds);
             result.setMaxSleepTimeMilliseconds(maxSleepTimeMilliseconds);
             result.setMaxRetries(maxRetries);

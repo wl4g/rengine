@@ -20,6 +20,7 @@ import static com.wl4g.infra.common.collection.CollectionUtils2.safeMap;
 import static com.wl4g.infra.common.lang.StringUtils2.eqIgnCase;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+import static com.wl4g.rengine.common.constants.RengineConstants.TenantedHolder.getColonKey;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
@@ -93,7 +94,8 @@ public class ReactiveDictServiceImpl implements DictService {
 
         // The first priority get all from cache, and filter.
         if (nonNull(type) && !isBlank(key)) {
-            return reactiveHashCommands.hget(serviceConfig.dictCachedPrefix(), Dict.buildCacheHashKey(type.name(), key))
+            return reactiveHashCommands
+                    .hget(getColonKey(serviceConfig.dictCachedPrefix()), Dict.buildCacheHashKey(type.name(), key))
                     .chain(dictJson -> {
                         if (!isBlank(dictJson)) {
                             return Uni.createFrom()
@@ -116,7 +118,7 @@ public class ReactiveDictServiceImpl implements DictService {
         // Fix compatibility with Redis 5
         // see:https://github.com/quarkusio/quarkus/pull/28854
         //
-        return reactiveHashCommands.hgetall(serviceConfig.dictCachedPrefix()).map(allDictJsonMap -> {
+        return reactiveHashCommands.hgetall(getColonKey(serviceConfig.dictCachedPrefix())).map(allDictJsonMap -> {
             return safeMap(allDictJsonMap).entrySet()
                     .parallelStream()
                     .map(e -> parseJSON(e.getValue(), Dict.class))
@@ -196,7 +198,7 @@ public class ReactiveDictServiceImpl implements DictService {
         // when elements are larger than 25?
         // see:https://stackoverflow.com/questions/67495287/uni-combine-all-unis-v-s-multi-onitem-transformtomultiandconcatenate
         final List<Uni<Boolean>> allSavedUni = safeList(dicts).parallelStream().map(dict -> {
-            return reactiveHashCommands.hset(serviceConfig.dictCachedPrefix(),
+            return reactiveHashCommands.hset(getColonKey(serviceConfig.dictCachedPrefix()),
                     Dict.buildCacheHashKey(dict.getType().name(), dict.getKey()), toJSONString(dict));
         }).collect(toList());
 
@@ -208,7 +210,7 @@ public class ReactiveDictServiceImpl implements DictService {
     }
 
     private Uni<Boolean> setDictCachedExpire() {
-        return reactiveKeyCommands.pexpire(serviceConfig.dictCachedPrefix(), serviceConfig.dictCachedExpire());
+        return reactiveKeyCommands.pexpire(getColonKey(serviceConfig.dictCachedPrefix()), serviceConfig.dictCachedExpire());
     }
 
 }

@@ -21,6 +21,7 @@ import static com.wl4g.infra.common.lang.Assert2.notNull;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
+import static com.wl4g.rengine.common.constants.RengineConstants.TenantedHolder.getColonKey;
 import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsName.execution_sdk_notifier_manager_failure;
 import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsName.execution_sdk_notifier_manager_success;
 import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsName.execution_sdk_notifier_manager_time;
@@ -241,7 +242,7 @@ public class GlobalMessageNotifierManager {
 
     String buildRefreshedCachedKey(final @NotNull NotifierKind notifierType) {
         notNullOf(notifierType, "notifierType");
-        return engineConfig.notifier().refreshedCachedPrefix().concat(notifierType.name());
+        return getColonKey(engineConfig.notifier().refreshedCachedPrefix()).concat(notifierType.name());
     }
 
     @NotNull

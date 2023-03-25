@@ -25,6 +25,7 @@ import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.infra.common.serialize.JacksonUtils.toJSONString;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_RULE_SCRIPTS;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_SCENESES;
+import static com.wl4g.rengine.common.constants.RengineConstants.TenantedHolder.getColonKey;
 import static com.wl4g.rengine.common.util.BsonAggregateFilters.RULE_SCRIPT_UPLOAD_LOOKUP_FILTERS;
 import static com.wl4g.rengine.common.util.BsonAggregateFilters.WORKFLOW_GRAPH_RULE_SCRIPT_UPLOAD_LOOKUP_FILTERS;
 import static java.lang.String.format;
@@ -423,7 +424,7 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
         //
         // @formatter:off
         //final List<ScenesWrapper> cachedSceneses = safeList(executeRequest.getScenesCodes()).stream()
-        //        .map(scenesCode -> parseJSON(redisStringCommands.get(engineConfig.scenesRulesCachedPrefix().concat(scenesCode)),
+        //        .map(scenesCode -> parseJSON(redisStringCommands.get(getColonKey(engineConfig.scenesRulesCachedPrefix()).concat(scenesCode)),
         //                ScenesWrapper.class))
         //        .filter(s -> nonNull(s))
         //        .collect(toList());
@@ -437,7 +438,7 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
         //if (!uncachedScenesCodes.isEmpty()) {
         //    final List<ScenesWrapper> sceneses = findScenesWorkflowGraphRules(uncachedScenesCodes, revisions);
         //    sceneses.stream()
-        //            .forEach(s -> redisStringCommands.setex(engineConfig.scenesRulesCachedPrefix().concat(s.getScenesCode()),
+        //            .forEach(s -> redisStringCommands.setex(getColonKey(engineConfig.scenesRulesCachedPrefix()).concat(s.getScenesCode()),
         //                    engineConfig.scenesRulesCachedExpire(), toJSONString(s)));
         //    mergedSceneses.addAll(sceneses);
         //}
@@ -458,7 +459,7 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
         final String scenesCodesHash = Hashing.md5()
                 .hashBytes(safeList(executeRequest.getScenesCodes()).stream().collect(joining("-")).getBytes(UTF_8))
                 .toString();
-        final String batchQueryingKey = engineConfig.scenesRulesCachedPrefix().concat(scenesCodesHash);
+        final String batchQueryingKey = getColonKey(engineConfig.scenesRulesCachedPrefix()).concat(scenesCodesHash);
 
         final Uni<List<ScenesWrapper>> scenesesUni = reactiveRedisStringCommands.get(batchQueryingKey).flatMap(scenesJsons -> {
             if (Objects.isNull(scenesJsons)) {
