@@ -46,6 +46,7 @@ public abstract class BaseEntity extends BaseBean {
     private Long tenantId;
 
     // Ignore organization getter/setter.
+
     @JsonIgnore
     @Override
     public String getOrgCode() {
@@ -56,5 +57,16 @@ public abstract class BaseEntity extends BaseBean {
     @Override
     public void setOrgCode(String orgCode) {
     }
+
+    // @JsonIgnore
+    // @Override
+    // public Integer getDelFlag() {
+    // return null;
+    // }
+    //
+    // @JsonIgnore
+    // @Override
+    // public void setDelFlag(Integer delFlag) {
+    // }
 
 }

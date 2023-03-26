@@ -24,6 +24,7 @@ import static java.util.stream.Collectors.toSet;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -85,6 +87,52 @@ public class WorkflowGraph extends BaseEntity {
 
     public WorkflowGraph(@NotNull @Min(0) Long workflowId) {
         this.workflowId = workflowId;
+    }
+
+    // Ignore getter/setter.
+
+    @JsonIgnore
+    @Override
+    public String getNameEn() {
+        return null;
+    }
+
+    @JsonIgnore
+    @Override
+    public void setNameEn(String nameEn) {
+    }
+
+    @JsonIgnore
+    @Override
+    public String getNameZh() {
+        return null;
+    }
+
+    @JsonIgnore
+    @Override
+    public void setNameZh(String nameZh) {
+    }
+
+    @JsonIgnore
+    @Override
+    public Date getUpdateDate() {
+        return null;
+    }
+
+    @JsonIgnore
+    @Override
+    public void setUpdateDate(Date updateDate) {
+    }
+
+    @JsonIgnore
+    @Override
+    public Long getUpdateBy() {
+        return null;
+    }
+
+    @JsonIgnore
+    @Override
+    public void setUpdateBy(Long updateDate) {
     }
 
     public WorkflowGraph validate() {

@@ -11,7 +11,7 @@
  Target Server Version : 40406
  File Encoding         : 65001
 
- Date: 24/03/2023 18:46:55
+ Date: 26/03/2023 20:09:33
 */
 
 
@@ -108,7 +108,7 @@ db.getCollection("re_controller_schedules").insert([ {
     _id: NumberLong("62208697108652455"),
     nameEn: "Tests built Script SDK Example",
     nameZh: "测试内置Script SDK示例",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "example",
@@ -155,7 +155,7 @@ db.getCollection("re_controller_schedules").insert([ {
     _id: NumberLong("62208697108652456"),
     nameEn: "vm_health_detecter",
     nameZh: "vm_health_detecter",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("0"),
     labels: [
         "example",
@@ -197,7 +197,7 @@ db.getCollection("re_controller_schedules").insert([ {
     _id: NumberLong("62208697108652457"),
     nameEn: "db_records_yesterday_validator",
     nameZh: "db_records_yesterday_validator",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("0"),
     labels: [
         "example",
@@ -240,7 +240,7 @@ db.getCollection("re_controller_schedules").insert([ {
     _id: NumberLong("62208697108652459"),
     nameEn: "emr_spark_history_stream_job_monitor",
     nameZh: "emr_spark_history_stream_job_monitor",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("0"),
     labels: [
         "example",
@@ -283,7 +283,7 @@ db.getCollection("re_controller_schedules").insert([ {
     _id: NumberLong("62208697108652460"),
     nameEn: "kafka_subscribe_notification_warning",
     nameZh: "kafka_subscribe_notification_warning",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "example",
@@ -344,7 +344,7 @@ db.getCollection("re_datasources").insert([ {
     _id: NumberLong("6220869710864222"),
     nameEn: "default",
     nameZh: "default",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "foo",
@@ -363,7 +363,7 @@ db.getCollection("re_datasources").insert([ {
     _id: NumberLong("6220869710864223"),
     nameEn: "default",
     nameZh: "default",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "foo",
@@ -386,7 +386,7 @@ db.getCollection("re_datasources").insert([ {
     _id: NumberLong("6220869710864228"),
     nameEn: "sc-uat-mysql",
     nameZh: "sc-uat-mysql",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "foo",
@@ -409,7 +409,7 @@ db.getCollection("re_datasources").insert([ {
     _id: NumberLong("6220869710864224"),
     nameEn: "default",
     nameZh: "default",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "foo",
@@ -442,7 +442,7 @@ db.getCollection("re_datasources").insert([ {
     _id: NumberLong("6220869710864227"),
     nameEn: "sc-uat-redis",
     nameZh: "sc-uat-redis",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "foo",
@@ -475,7 +475,7 @@ db.getCollection("re_datasources").insert([ {
     _id: NumberLong("6220869710864225"),
     nameEn: "default",
     nameZh: "default",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "foo",
@@ -513,7 +513,7 @@ db.getCollection("re_rule_scripts").insert([ {
         NumberLong("650869710864310"),
         NumberLong("650869710864311")
     ],
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "generic",
@@ -536,7 +536,7 @@ db.getCollection("re_rule_scripts").insert([ {
         NumberLong("650869710864310"),
         NumberLong("650869710864311")
     ],
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "test",
@@ -560,7 +560,7 @@ db.getCollection("re_rule_scripts").insert([ {
         NumberLong("650869710864310"),
         NumberLong("650869710864311")
     ],
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "example",
@@ -585,7 +585,7 @@ db.getCollection("re_rule_scripts").insert([ {
         NumberLong("650869710864310"),
         NumberLong("650869710864311")
     ],
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "exmaple"
@@ -606,7 +606,7 @@ db.getCollection("re_rule_scripts").insert([ {
         NumberLong("650869710864310"),
         NumberLong("650869710864311")
     ],
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "example",
@@ -631,7 +631,7 @@ db.getCollection("re_rule_scripts").insert([ {
         NumberLong("650869710864310"),
         NumberLong("650869710864311")
     ],
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "example",
@@ -644,6 +644,28 @@ db.getCollection("re_rule_scripts").insert([ {
     updateDate: ISODate("2022-09-27T04:50:22.304Z"),
     delFlag: NumberInt("0"),
     _class: "com.wl4g.rengine.common.entity.Rule$RuleScript"
+} ]);
+db.getCollection("re_rule_scripts").insert([ {
+    _id: NumberLong("6406093745733632"),
+    enable: NumberInt("1"),
+    labels: [
+        "auto_save"
+    ],
+    remark: "Automatically save by editor",
+    createBy: NumberInt("-1"),
+    createDate: "2023-03-26 19:58:27",
+    updateBy: null,
+    updateDate: null,
+    nameEn: null,
+    nameZh: null,
+    tenantId: null,
+    revision: NumberInt("2"),
+    ruleId: NumberLong("650869239922100"),
+    entrypointUploadId: NumberLong("6406093742145536"),
+    uploadIds: [
+        NumberLong("650869710864311"),
+        NumberLong("6406093742145536")
+    ]
 } ]);
 session.commitTransaction(); session.endSession();
 
@@ -664,7 +686,7 @@ db.getCollection("re_rules").insert([ {
     nameEn: "Print rule",
     nameZh: "参数打印规则",
     engine: "JS",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "default",
@@ -682,7 +704,7 @@ db.getCollection("re_rules").insert([ {
     nameEn: "Test built script SDKs example",
     nameZh: "内置脚本SDKs测试示例",
     engine: "JS",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "test",
@@ -701,7 +723,7 @@ db.getCollection("re_rules").insert([ {
     nameEn: "Ecommerce Trade graft rule",
     nameZh: "电商充值赠送规则",
     engine: "JS",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "example",
@@ -720,7 +742,7 @@ db.getCollection("re_rules").insert([ {
     nameEn: "VM healthy detect rule",
     nameZh: "VM节点健康监视告警规则",
     engine: "JS",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "example",
@@ -739,7 +761,7 @@ db.getCollection("re_rules").insert([ {
     nameEn: "VM process watch and restart rule",
     nameZh: "VM进程监视告警并重启规则",
     engine: "JS",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "example",
@@ -759,7 +781,7 @@ db.getCollection("re_rules").insert([ {
     nameEn: "Iot temp warning rule",
     nameZh: "IoT设备温度告警规则",
     engine: "JS",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "example",
@@ -778,7 +800,7 @@ db.getCollection("re_rules").insert([ {
     nameEn: "Logs error alarm rule",
     nameZh: "日志异常告警规则",
     engine: "JS",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "example",
@@ -810,7 +832,7 @@ db.getCollection("re_sceneses").insert([ {
     nameEn: "Tests built Script SDK Example",
     nameZh: "测试内置Script SDK示例",
     scenesCode: "test_script_sdk_example",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "test",
@@ -829,7 +851,7 @@ db.getCollection("re_sceneses").insert([ {
     nameEn: "电商充值活动赠送策略",
     nameZh: "电商充值活动赠送策略",
     scenesCode: "ecommerce_trade_gift",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "example",
@@ -848,7 +870,7 @@ db.getCollection("re_sceneses").insert([ {
     nameEn: "VM节点健康状态探测",
     nameZh: "VM healthy detect",
     scenesCode: "vm_health_detect",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "example",
@@ -867,7 +889,7 @@ db.getCollection("re_sceneses").insert([ {
     nameEn: "VM process watch and restart",
     nameZh: "VM进程监视并重启",
     scenesCode: "vm_process_watch_restart",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "example",
@@ -887,7 +909,7 @@ db.getCollection("re_sceneses").insert([ {
     nameEn: "Iot device temp alarm",
     nameZh: "Iot设备温度告警",
     scenesCode: "iot_temp_warning",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "example",
@@ -906,7 +928,7 @@ db.getCollection("re_sceneses").insert([ {
     nameEn: "Logs error alarm",
     nameZh: "日志异常告警-流程",
     scenesCode: "iot_temp_warning",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "example",
@@ -918,157 +940,6 @@ db.getCollection("re_sceneses").insert([ {
     updateDate: ISODate("2023-02-02T04:46:55.274Z"),
     delFlag: NumberInt("0"),
     _class: "com.wl4g.rengine.common.entity.Scenes"
-} ]);
-session.commitTransaction(); session.endSession();
-
-// ----------------------------
-// Collection structure for re_uploads
-// ----------------------------
-db.getCollection("re_uploads").drop();
-db.createCollection("re_uploads");
-
-// ----------------------------
-// Documents of re_uploads
-// ----------------------------
-session = db.getMongo().startSession();
-session.startTransaction();
-db = session.getDatabase("rengine");
-db.getCollection("re_uploads").insert([ {
-    _id: NumberLong("650869710864309"),
-    uploadType: "DATASET",
-    objectPrefix: "testset/csv/test1.csv",
-    filename: "test1.csv",
-    extension: ".csv",
-    size: NumberLong("1"),
-    tenantId: NumberLong("6508655614689771"),
-    enable: NumberInt("1"),
-    labels: [
-        "example",
-        "testdata"
-    ],
-    remark: "Example testdata for CSV.",
-    updateDate: ISODate("2022-09-27T04:51:08.533Z"),
-    delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.UploadObject"
-} ]);
-db.getCollection("re_uploads").insert([ {
-    _id: NumberLong("650869710864310"),
-    uploadType: "LIBRARY",
-    objectPrefix: "library/js/print-1.0.0.js",
-    filename: "print-1.0.0.js",
-    extension: ".js",
-    size: NumberLong("1"),
-    tenantId: NumberLong("6508655614689771"),
-    enable: NumberInt("1"),
-    labels: [
-        "generic",
-        "print",
-        "library"
-    ],
-    remark: "Generic print library.",
-    updateDate: ISODate("2022-09-27T04:51:08.533Z"),
-    delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.UploadObject"
-} ]);
-db.getCollection("re_uploads").insert([ {
-    _id: NumberLong("650869710864311"),
-    uploadType: "LIBRARY",
-    objectPrefix: "library/js/commons-lang-1.0.0.js",
-    filename: "commons-lang-1.0.0.js",
-    extension: ".js",
-    size: NumberLong("1"),
-    tenantId: NumberLong("6508655614689771"),
-    enable: NumberInt("1"),
-    labels: [
-        "generic",
-        "lang",
-        "library"
-    ],
-    remark: "Generic lang library.",
-    updateDate: ISODate("2022-09-27T04:51:08.533Z"),
-    delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.UploadObject"
-} ]);
-db.getCollection("re_uploads").insert([ {
-    _id: NumberLong("650869710864381"),
-    uploadType: "LIBRARY",
-    objectPrefix: "library/js/test-sdk-all-examples-1.0.0.js",
-    filename: "test-sdk-all-examples-1.0.0.js",
-    extension: ".js",
-    size: NumberLong("1"),
-    tenantId: NumberLong("6508655614689771"),
-    enable: NumberInt("1"),
-    labels: [
-        "testing",
-        "example",
-        "sdk"
-    ],
-    remark: "Testing for all SDK examples.",
-    updateDate: ISODate("2022-09-27T04:51:08.533Z"),
-    _class: "com.wl4g.rengine.common.entity.UploadObject",
-    delFlag: NumberInt("0")
-} ]);
-db.getCollection("re_uploads").insert([ {
-    _id: NumberLong("650869710864382"),
-    uploadType: "LIBRARY",
-    objectPrefix: "library/js/vm-health-detecter-1.0.0.js",
-    filename: "vm-health-detecter-1.0.0.js",
-    extension: ".js",
-    size: NumberLong("1"),
-    tenantId: NumberLong("6508655614689771"),
-    enable: NumberInt("1"),
-    labels: [
-        "example",
-        "vm",
-        "health",
-        "detecter"
-    ],
-    remark: "Example VM health detecter js script.",
-    updateDate: ISODate("2022-09-27T04:51:08.533Z"),
-    delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.UploadObject"
-} ]);
-db.getCollection("re_uploads").insert([ {
-    _id: NumberLong("650869710864383"),
-    uploadType: "LIBRARY",
-    objectPrefix: "library/js/vm-process-restart-watcher-1.0.0.js",
-    filename: "vm-process-restart-watcher-1.0.0.js",
-    extension: ".js",
-    size: NumberLong("1"),
-    tenantId: NumberLong("6508655614689771"),
-    enable: NumberInt("1"),
-    labels: [
-        "example",
-        "vm",
-        "process",
-        "restart",
-        "watcher"
-    ],
-    remark: "Example VM process restart watcher js script.",
-    updateDate: ISODate("2022-09-27T04:51:08.533Z"),
-    delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.UploadObject"
-} ]);
-db.getCollection("re_uploads").insert([ {
-    _id: NumberLong("650869710864384"),
-    uploadType: "LIBRARY",
-    objectPrefix: "library/js/db-records-yesterday-validator-1.0.0.js",
-    filename: "db-records-yesterday-validator-1.0.0.js",
-    extension: ".js",
-    size: NumberLong("1"),
-    tenantId: NumberLong("6508655614689771"),
-    enable: NumberInt("1"),
-    labels: [
-        "example",
-        "db",
-        "records",
-        "yesterday",
-        "validator"
-    ],
-    remark: "Example DB records yesterday validator js script.",
-    updateDate: ISODate("2022-09-27T04:51:08.533Z"),
-    delFlag: NumberInt("0"),
-    _class: "com.wl4g.rengine.common.entity.UploadObject"
 } ]);
 session.commitTransaction(); session.endSession();
 
@@ -1733,7 +1604,7 @@ db.getCollection("re_workflows").insert([ {
     nameZh: "测试内置Script SDK示例-流程",
     scenesId: NumberLong("650865561468928"),
     engine: "STANDARD_GRAPH",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "test",
@@ -1753,7 +1624,7 @@ db.getCollection("re_workflows").insert([ {
     nameZh: "电商充值活动赠送策略-流程",
     scenesId: NumberLong("650865561468929"),
     engine: "STANDARD_GRAPH",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "example",
@@ -1772,7 +1643,7 @@ db.getCollection("re_workflows").insert([ {
     nameZh: "VM节点健康状态探测-流程",
     scenesId: NumberLong("650865561468930"),
     engine: "STANDARD_GRAPH",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "example",
@@ -1792,7 +1663,7 @@ db.getCollection("re_workflows").insert([ {
     nameZh: "VM进程监视并重启-流程",
     scenesId: NumberLong("650865561468931"),
     engine: "STANDARD_GRAPH",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "example",
@@ -1813,7 +1684,7 @@ db.getCollection("re_workflows").insert([ {
     nameZh: "Iot设备温度告警-流程",
     scenesId: NumberLong("650865561468932"),
     engine: "STANDARD_GRAPH",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "example",
@@ -1833,7 +1704,7 @@ db.getCollection("re_workflows").insert([ {
     nameZh: "日志异常告警-流程",
     scenesId: NumberLong("650865561468933"),
     engine: "FLINK_CEP_GRAPH",
-    tenantId: NumberLong("6508655614689771"),
+    tenantId: NumberLong("0"),
     enable: NumberInt("1"),
     labels: [
         "example",
@@ -2010,12 +1881,79 @@ session = db.getMongo().startSession();
 session.startTransaction();
 db = session.getDatabase("rengine");
 db.getCollection("sys_global_sequences").insert([ {
-    _id: "RuleScript.revision",
-    seq: NumberInt("2")
+    _id: "650869239922100",
+    type: "RuleScript",
+    seq: NumberLong("2")
 } ]);
 db.getCollection("sys_global_sequences").insert([ {
-    _id: "WorkflowGraph.revision",
-    seq: NumberInt("13")
+    _id: "650869239922658",
+    type: "RuleScript",
+    seq: NumberLong("14")
+} ]);
+db.getCollection("sys_global_sequences").insert([ {
+    _id: "650869239922659",
+    type: "RuleScript",
+    seq: NumberLong("1")
+} ]);
+db.getCollection("sys_global_sequences").insert([ {
+    _id: "650869239922660",
+    type: "RuleScript",
+    seq: NumberLong("1")
+} ]);
+db.getCollection("sys_global_sequences").insert([ {
+    _id: "650869239922661",
+    type: "RuleScript",
+    seq: NumberLong("1")
+} ]);
+db.getCollection("sys_global_sequences").insert([ {
+    _id: "650869239922662",
+    type: "RuleScript",
+    seq: NumberLong("1")
+} ]);
+db.getCollection("sys_global_sequences").insert([ {
+    _id: "650868953448438",
+    type: "WorkflowGraph",
+    seq: NumberLong("1")
+} ]);
+db.getCollection("sys_global_sequences").insert([ {
+    _id: "650868953448439",
+    type: "WorkflowGraph",
+    seq: NumberLong("1")
+} ]);
+db.getCollection("sys_global_sequences").insert([ {
+    _id: "650868953448440",
+    type: "WorkflowGraph",
+    seq: NumberLong("1")
+} ]);
+db.getCollection("sys_global_sequences").insert([ {
+    _id: "650868953448441",
+    type: "WorkflowGraph",
+    seq: NumberLong("1")
+} ]);
+db.getCollection("sys_global_sequences").insert([ {
+    _id: "650868953448442",
+    type: "WorkflowGraph",
+    seq: NumberLong("1")
+} ]);
+db.getCollection("sys_global_sequences").insert([ {
+    _id: "650868953448443",
+    type: "WorkflowGraph",
+    seq: NumberLong("1")
+} ]);
+db.getCollection("sys_global_sequences").insert([ {
+    _id: "global",
+    type: "UploadObject",
+    seq: NumberInt("7")
+} ]);
+db.getCollection("sys_global_sequences").insert([ {
+    _id: "test-sdk-all-examples",
+    type: "UploadObject",
+    seq: NumberInt("5")
+} ]);
+db.getCollection("sys_global_sequences").insert([ {
+    _id: "print",
+    type: "UploadObject",
+    seq: NumberInt("1")
 } ]);
 session.commitTransaction(); session.endSession();
 
@@ -3305,12 +3243,12 @@ session = db.getMongo().startSession();
 session.startTransaction();
 db = session.getDatabase("rengine");
 db.getCollection("sys_tenants").insert([ {
-    _id: NumberLong("6508655614689771"),
-    nameEn: "tenant 1",
-    nameZh: "租户 1",
+    _id: NumberLong("0"),
+    nameEn: "default tenant",
+    nameZh: "默认租户",
     enable: NumberInt("1"),
     labels: [
-        "top"
+        "default"
     ],
     remark: null,
     createDate: ISODate("2023-02-02T04:46:55.274Z"),
@@ -3320,11 +3258,11 @@ db.getCollection("sys_tenants").insert([ {
 } ]);
 db.getCollection("sys_tenants").insert([ {
     _id: NumberLong("6508655614689781"),
-    nameEn: "tenant 2",
-    nameZh: "租户 2",
+    nameEn: "tenant 1",
+    nameZh: "租户 1",
     enable: NumberInt("1"),
     labels: [
-        "crd"
+        "t1"
     ],
     remark: null,
     createDate: ISODate("2023-02-02T04:46:55.274Z"),
@@ -3334,17 +3272,193 @@ db.getCollection("sys_tenants").insert([ {
 } ]);
 db.getCollection("sys_tenants").insert([ {
     _id: NumberLong("6508655614689791"),
-    nameEn: "tenant 3",
-    nameZh: "租户 3",
+    nameEn: "tenant 2",
+    nameZh: "租户 2",
     enable: NumberInt("1"),
     labels: [
-        "test"
+        "t2"
     ],
     remark: null,
     createDate: ISODate("2023-02-02T04:46:55.274Z"),
     updateDate: ISODate("2023-02-02T04:46:55.274Z"),
     delFlag: NumberInt("0"),
     _class: "com.wl4g.rengine.common.entity.sys.Tenant"
+} ]);
+session.commitTransaction(); session.endSession();
+
+// ----------------------------
+// Collection structure for sys_uploads
+// ----------------------------
+db.getCollection("sys_uploads").drop();
+db.createCollection("sys_uploads");
+
+// ----------------------------
+// Documents of sys_uploads
+// ----------------------------
+session = db.getMongo().startSession();
+session.startTransaction();
+db = session.getDatabase("rengine");
+db.getCollection("sys_uploads").insert([ {
+    _id: NumberLong("650869710864309"),
+    uploadType: "TESTCSV",
+    objectPrefix: "testcsv/0/test/test-v1.csv",
+    filename: "test",
+    extension: ".csv",
+    size: NumberLong("1"),
+    tenantId: NumberLong("0"),
+    enable: NumberInt("1"),
+    labels: [
+        "example",
+        "testdata"
+    ],
+    remark: "Example testdata for CSV.",
+    updateDate: ISODate("2022-09-27T04:51:08.533Z"),
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.UploadObject"
+} ]);
+db.getCollection("sys_uploads").insert([ {
+    _id: NumberLong("650869710864310"),
+    uploadType: "LIBJS",
+    objectPrefix: "libjs/0/print/print-v1.js",
+    filename: "print",
+    extension: ".js",
+    size: NumberLong("1"),
+    tenantId: NumberLong("0"),
+    enable: NumberInt("1"),
+    labels: [
+        "generic",
+        "print",
+        "library"
+    ],
+    remark: "Generic print library.",
+    updateDate: ISODate("2022-09-27T04:51:08.533Z"),
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.UploadObject"
+} ]);
+db.getCollection("sys_uploads").insert([ {
+    _id: NumberLong("650869710864311"),
+    uploadType: "LIBJS",
+    objectPrefix: "libjs/0/commons-lang/commons-lang-v1.js",
+    filename: "commons-lang",
+    extension: ".js",
+    size: NumberLong("1"),
+    tenantId: NumberLong("0"),
+    enable: NumberInt("1"),
+    labels: [
+        "generic",
+        "lang",
+        "library"
+    ],
+    remark: "Generic lang library.",
+    updateDate: ISODate("2022-09-27T04:51:08.533Z"),
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.UploadObject"
+} ]);
+db.getCollection("sys_uploads").insert([ {
+    _id: NumberLong("650869710864381"),
+    uploadType: "LIBJS",
+    objectPrefix: "libjs/0/test-sdk-all-examples/test-sdk-all-examples-v1.js",
+    filename: "test-sdk-all-examples",
+    extension: ".js",
+    size: NumberLong("1"),
+    tenantId: NumberLong("0"),
+    enable: NumberInt("1"),
+    labels: [
+        "testing",
+        "example",
+        "sdk"
+    ],
+    remark: "Testing for all SDK examples.",
+    updateDate: ISODate("2022-09-27T04:51:08.533Z"),
+    _class: "com.wl4g.rengine.common.entity.UploadObject",
+    delFlag: NumberInt("0")
+} ]);
+db.getCollection("sys_uploads").insert([ {
+    _id: NumberLong("650869710864382"),
+    uploadType: "LIBJS",
+    objectPrefix: "libjs/0/vm-health-detecter/vm-health-detecter-v1.js",
+    filename: "vm-health-detecter",
+    extension: ".js",
+    size: NumberLong("1"),
+    tenantId: NumberLong("0"),
+    enable: NumberInt("1"),
+    labels: [
+        "example",
+        "vm",
+        "health",
+        "detecter"
+    ],
+    remark: "Example VM health detecter js script.",
+    updateDate: ISODate("2022-09-27T04:51:08.533Z"),
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.UploadObject"
+} ]);
+db.getCollection("sys_uploads").insert([ {
+    _id: NumberLong("650869710864383"),
+    uploadType: "LIBJS",
+    objectPrefix: "libjs/0/vm-process-restart-watcher/vm-process-restart-watcher-v1.js",
+    filename: "vm-process-restart-watcher",
+    extension: ".js",
+    size: NumberLong("1"),
+    tenantId: NumberLong("0"),
+    enable: NumberInt("1"),
+    labels: [
+        "example",
+        "vm",
+        "process",
+        "restart",
+        "watcher"
+    ],
+    remark: "Example VM process restart watcher js script.",
+    updateDate: ISODate("2022-09-27T04:51:08.533Z"),
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.UploadObject"
+} ]);
+db.getCollection("sys_uploads").insert([ {
+    _id: NumberLong("650869710864384"),
+    uploadType: "LIBJS",
+    objectPrefix: "libjs/0/db-records-yesterday-validator/db-records-yesterday-validator-v1.js",
+    filename: "db-records-yesterday-validator",
+    extension: ".js",
+    size: NumberLong("1"),
+    tenantId: NumberLong("0"),
+    enable: NumberInt("1"),
+    labels: [
+        "example",
+        "db",
+        "records",
+        "yesterday",
+        "validator"
+    ],
+    remark: "Example DB records yesterday validator js script.",
+    updateDate: ISODate("2022-09-27T04:51:08.533Z"),
+    delFlag: NumberInt("0"),
+    _class: "com.wl4g.rengine.common.entity.UploadObject"
+} ]);
+db.getCollection("sys_uploads").insert([ {
+    _id: NumberLong("6406093742145536"),
+    enable: NumberInt("1"),
+    labels: [
+        "auto_save"
+    ],
+    remark: "Automatically save by editor",
+    createBy: NumberInt("-1"),
+    createDate: "2023-03-26 19:58:27",
+    updateBy: null,
+    updateDate: null,
+    nameEn: null,
+    nameZh: null,
+    tenantId: null,
+    uploadType: "LIBJS",
+    objectPrefix: "libjs/0/print/print-v1.js",
+    filename: "print",
+    extension: ".js",
+    size: NumberInt("1"),
+    owner: null,
+    group: null,
+    accessMode: null,
+    md5: null,
+    sha1: null
 } ]);
 session.commitTransaction(); session.endSession();
 

@@ -3,3 +3,6 @@
 	path = rengine-ui
 	url = https://github.com/wl4g/rengine-ui.git
 	branch = master
+[submodule "rengine-operator"]
+	path = rengine-operator
+	url = git@github.com:wl4g/rengine-operator.git

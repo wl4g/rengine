@@ -20,6 +20,7 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang3.StringUtils.equalsAnyIgnoreCase;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -28,6 +29,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wl4g.infra.common.validation.EnumValue;
 import com.wl4g.rengine.common.entity.BaseEntity;
 import com.wl4g.rengine.common.validation.ValidForEntityMarker;
@@ -73,6 +75,52 @@ public class UploadObject extends BaseEntity {
     private @Nullable String accessMode;
     private @Nullable String md5;
     private @Nullable String sha1;
+
+    // Ignore getter/setter.
+
+    @JsonIgnore
+    @Override
+    public String getNameEn() {
+        return null;
+    }
+
+    @JsonIgnore
+    @Override
+    public void setNameEn(String nameEn) {
+    }
+
+    @JsonIgnore
+    @Override
+    public String getNameZh() {
+        return null;
+    }
+
+    @JsonIgnore
+    @Override
+    public void setNameZh(String nameZh) {
+    }
+
+    @JsonIgnore
+    @Override
+    public Date getUpdateDate() {
+        return null;
+    }
+
+    @JsonIgnore
+    @Override
+    public void setUpdateDate(Date updateDate) {
+    }
+
+    @JsonIgnore
+    @Override
+    public Long getUpdateBy() {
+        return null;
+    }
+
+    @JsonIgnore
+    @Override
+    public void setUpdateBy(Long updateDate) {
+    }
 
     @Getter
     @AllArgsConstructor

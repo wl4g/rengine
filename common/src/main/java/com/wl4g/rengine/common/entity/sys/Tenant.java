@@ -40,7 +40,19 @@ import lombok.experimental.SuperBuilder;
 public class Tenant extends BaseEntity {
     private static final long serialVersionUID = 381411777614066880L;
 
+    private @Default ServiceSettings serviceSettings = new ServiceSettings();
     private @Default ResourceQuota executorQuota = new ResourceQuota();
     private @Default ResourceQuota controllerQuota = new ResourceQuota();
+
+    @Getter
+    @Setter
+    @SuperBuilder
+    @ToString(callSuper = true)
+    @NoArgsConstructor
+    public static class ServiceSettings {
+        private @Default Boolean useSharedDefaultMongo = true;
+        private @Default Boolean useSharedDefaultRedis = true;
+        private @Default Boolean useSharedDefaultMinIO = true;
+    }
 
 }
