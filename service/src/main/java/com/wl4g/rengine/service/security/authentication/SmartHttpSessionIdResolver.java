@@ -15,22 +15,20 @@
  */
 package com.wl4g.rengine.service.security.authentication;
 
-import static com.wl4g.infra.common.lang.StringUtils2.eqIgnCase;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static java.util.Arrays.asList;
 
 import java.util.List;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.session.web.http.CookieSerializer;
+import org.springframework.session.web.http.CookieSerializer.CookieValue;
+import org.springframework.session.web.http.DefaultCookieSerializer;
 import org.springframework.session.web.http.HttpSessionIdResolver;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.wl4g.infra.common.codec.Encodes;
 
 /**
@@ -43,40 +41,39 @@ import com.wl4g.infra.common.codec.Encodes;
  */
 public class SmartHttpSessionIdResolver implements HttpSessionIdResolver {
 
+    private static final String WRITTEN_SESSION_ID_ATTR = SmartHttpSessionIdResolver.class.getName()
+            .concat(".WRITTEN_SESSION_ID_ATTR");
+
+    private static final CookieSerializer cookieSerializer = new DefaultCookieSerializer();
+
     @Autowired
     ServerProperties serverProperties;
 
     @Override
     public List<String> resolveSessionIds(HttpServletRequest request) {
-        String sessionId = getSessionIdFromCookie(getSessionIdName(), request);
-        if (isBlank(sessionId)) {
-            sessionId = request.getParameter(getSessionIdName());
+        List<String> sessionIds = cookieSerializer.readCookieValues(request);
+        if (sessionIds.isEmpty()) {
+            sessionIds = asList(Encodes.decodeBase64String(request.getParameter(getSessionIdName())));
         }
-        return isBlank(sessionId) ? emptyList() : singletonList(Encodes.decodeBase64String(sessionId));
+        return sessionIds;
     }
 
     @Override
     public void setSessionId(HttpServletRequest request, HttpServletResponse response, String sessionId) {
+        if (sessionId.equals(request.getAttribute(WRITTEN_SESSION_ID_ATTR))) {
+            return;
+        }
+        request.setAttribute(WRITTEN_SESSION_ID_ATTR, sessionId);
+        cookieSerializer.writeCookieValue(new CookieValue(request, response, sessionId));
+
         response.setHeader(getSessionIdName(), sessionId);
     }
 
     @Override
     public void expireSession(HttpServletRequest request, HttpServletResponse response) {
-        response.setHeader(getSessionIdName(), "");
-        request.getParameterMap().put(getSessionIdName(), new String[0]);
-    }
+        cookieSerializer.writeCookieValue(new CookieValue(request, response, ""));
 
-    @VisibleForTesting
-    String getSessionIdFromCookie(String sessionName, HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (eqIgnCase(sessionName, cookie.getName())) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
+        response.setHeader(getSessionIdName(), "");
     }
 
     private String getSessionIdName() {

@@ -43,10 +43,12 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
+import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 
 import com.wl4g.infra.context.utils.SpringContextHolder;
 import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.service.IdentityProviderService;
+import com.wl4g.rengine.service.security.authentication.SimpleKubernetesOperatorAuthenticationFilter;
 import com.wl4g.rengine.service.security.authentication.SmartHttpSessionIdResolver;
 import com.wl4g.rengine.service.security.authentication.SmartRedirectStrategy;
 import com.wl4g.rengine.service.security.oauth2.MongoClientRegistrationRepository;
@@ -109,7 +111,7 @@ public class RengineWebSecurityConfiguration implements WebSecurityCustomizer {
                 //.addFilterBefore(smartSessionIdFilter, BasicAuthenticationFilter.class)
                 //.addFilterBefore(smartSessionIdFilter, UsernamePasswordAuthenticationFilter.class)
                 // Valid for all types of authentication filters.
-                //.addFilterBefore(SmartSessionIdFilter.DEFAULT, AbstractPreAuthenticatedProcessingFilter.class)
+                .addFilterBefore(SimpleKubernetesOperatorAuthenticationFilter.DEFAULT, AbstractPreAuthenticatedProcessingFilter.class)
                 // @formatter:on
                 .authenticationProvider(userAuthcProvider)
                 .authorizeRequests()

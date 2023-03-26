@@ -84,6 +84,9 @@ public abstract class RengineConstants extends EnvironmentUtil {
     // see:org.springframework.security.config.annotation.web.configurers.oauth2.client.OAuth2LoginConfigurer#loginProcessingUrl()
     public static final String API_LOGIN_OAUTH2_CALLBACK_ENDPOINT_BASE = "/login/oauth2/callback/*";
 
+    // API base URI dedicated to kubernetes operator internal request processing.
+    public static final String API_V1_KUBERNETES_OPERATOR_BASE_URI = "/_/v1/operator";
+
     // ----------------------------------------------------------------------------
     // ----- Rengine Controller constants. -----
     // ----------------------------------------------------------------------------
