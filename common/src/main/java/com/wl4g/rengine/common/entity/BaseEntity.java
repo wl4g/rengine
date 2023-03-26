@@ -45,7 +45,7 @@ public abstract class BaseEntity extends BaseBean {
     private @Nullable String nameZh;
     private Long tenantId;
 
-    // Ignore organization getter/setter.
+    // Ignore getter/setter.
 
     @JsonIgnore
     @Override

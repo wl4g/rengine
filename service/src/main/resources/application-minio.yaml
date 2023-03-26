@@ -16,7 +16,6 @@ minio:
     connectTimeout: 5s
     readTimeout: 5s
     writeTimeout: 5s
-  #endpoint: http://10.0.0.114:9000
   endpoint: http://127.0.0.1:9000
   region: us-east-1
   bucket: rengine

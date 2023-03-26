@@ -37,7 +37,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class ComputeQuota {
     private @Default String requestsCpu = "100m";
-    private @Default String requestsMemeory = "256Mi";
+    private @Default String requestsMemory = "256Mi";
     private @Default String limitsCpu = "900m";
-    private @Default String limitsMemeory = "2048Mi";
+    private @Default String limitsMemory = "2048Mi";
 }

@@ -82,6 +82,7 @@ server: ## see:org.springframework.boot.autoconfigure.web.ServerProperties
     ## The spring-cloud-loadbalancer-2.2.6 not support metadata.contextPath
     #contextPath: /
     session:
+      timeout: 30m
       cookie:
         name: __r_sid
   tomcat: # see: org.springframework.boot.autoconfigure.web.ServerProperties.Tomcat

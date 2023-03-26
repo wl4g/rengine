@@ -15,6 +15,7 @@
  */
 package com.wl4g.rengine.common.entity.sys;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wl4g.rengine.common.entity.BaseEntity;
 import com.wl4g.rengine.common.entity.quota.ResourceQuota;
 
@@ -40,9 +41,22 @@ import lombok.experimental.SuperBuilder;
 public class Tenant extends BaseEntity {
     private static final long serialVersionUID = 381411777614066880L;
 
-    private @Default ServiceSettings serviceSettings = new ServiceSettings();
+    private @Default ServiceSettings settings = new ServiceSettings();
     private @Default ResourceQuota executorQuota = new ResourceQuota();
     private @Default ResourceQuota controllerQuota = new ResourceQuota();
+
+    // Ignore getter/setter.
+
+    @JsonIgnore
+    @Override
+    public Long getTenantId() {
+        return null;
+    }
+
+    @JsonIgnore
+    @Override
+    public void setTenantId(Long tenantId) {
+    }
 
     @Getter
     @Setter

@@ -47,6 +47,7 @@ import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuc
 import com.wl4g.infra.context.utils.SpringContextHolder;
 import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.service.IdentityProviderService;
+import com.wl4g.rengine.service.security.authentication.SmartHttpSessionIdResolver;
 import com.wl4g.rengine.service.security.authentication.SmartRedirectStrategy;
 import com.wl4g.rengine.service.security.oauth2.MongoClientRegistrationRepository;
 import com.wl4g.rengine.service.security.oauth2.MongoOAuth2AuthorizedClientService;
@@ -94,14 +95,22 @@ public class RengineWebSecurityConfiguration implements WebSecurityCustomizer {
     }
 
     @Bean
+    public SmartHttpSessionIdResolver smartHttpSessionIdResolver() {
+        return new SmartHttpSessionIdResolver();
+    }
+
+    @Bean
     public SecurityFilterChain customSecurityFilterChain(
             HttpSecurity http,
             UsernamePasswordAuthenticationProvider userAuthcProvider) throws Exception {
         // http.getSharedObject(AuthenticationManagerBuilder.class).userDetailsService(null);
-        return http.csrf()
-                .disable()
-                .cors()
-                .disable()
+        return http.csrf().disable().cors().disable()
+        // @formatter:off
+                //.addFilterBefore(smartSessionIdFilter, BasicAuthenticationFilter.class)
+                //.addFilterBefore(smartSessionIdFilter, UsernamePasswordAuthenticationFilter.class)
+                // Valid for all types of authentication filters.
+                //.addFilterBefore(SmartSessionIdFilter.DEFAULT, AbstractPreAuthenticatedProcessingFilter.class)
+                // @formatter:on
                 .authenticationProvider(userAuthcProvider)
                 .authorizeRequests()
                 // Login path without checking authentication.
