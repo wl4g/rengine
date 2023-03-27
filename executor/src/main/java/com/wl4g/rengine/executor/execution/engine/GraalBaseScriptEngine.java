@@ -248,6 +248,6 @@ public abstract class GraalBaseScriptEngine extends AbstractScriptEngine {
      *   ... 5 more
      * </pre>
      */
-    public static final String DEFAULT_SCRIPT_ERRMSG_REGEX = "Caused by:(.+)|at <js>(\\s|\\.)([a-zA-Z0-9]+)\\((.+)\\)";
+    public static final String DEFAULT_SCRIPT_ERRMSG_REGEX = "Caused by:(.+)|at <(js|python|py|r|ruby)>(\\s|\\.)([a-zA-Z0-9]+)\\((.+)\\)";
 
 }

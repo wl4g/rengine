@@ -54,9 +54,14 @@ public class Rule extends BaseEntity {
          */
         GROOVY,
 
+        JS,
+
         PYTHON,
 
-        JS
+        R,
+
+        RUBY
+
     }
 
     @Getter

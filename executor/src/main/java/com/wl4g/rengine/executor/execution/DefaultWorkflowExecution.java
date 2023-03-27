@@ -45,6 +45,8 @@ import com.wl4g.rengine.common.model.ExecuteRequest;
 import com.wl4g.rengine.common.model.WorkflowExecuteResult.ResultDescription;
 import com.wl4g.rengine.executor.execution.engine.GraalJSScriptEngine;
 import com.wl4g.rengine.executor.execution.engine.GraalPythonScriptEngine;
+import com.wl4g.rengine.executor.execution.engine.GraalRScriptEngine;
+import com.wl4g.rengine.executor.execution.engine.GraalRubyScriptEngine;
 import com.wl4g.rengine.executor.execution.engine.IScriptEngine;
 import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
 
@@ -69,6 +71,12 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
 
     @Inject
     GraalPythonScriptEngine graalPythonScriptEngine;
+
+    // @Inject
+    GraalRScriptEngine graalRScriptEngine;
+
+    // @Inject
+    GraalRubyScriptEngine graalRubyScriptEngine;
 
     @Override
     public ResultDescription execute(
@@ -133,8 +141,13 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
         case PYTHON:
             return graalPythonScriptEngine;
         case JS:
-        default:
             return graalJSScriptEngine;
+        case R:
+            return graalRScriptEngine;
+        case RUBY:
+            return graalRubyScriptEngine;
+        default:
+            throw new Error(format("No support rule engine '%s'", engine));
         }
     }
 

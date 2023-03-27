@@ -31,14 +31,14 @@ import com.wl4g.rengine.executor.util.TestDefaultBaseSetup;
 import com.wl4g.rengine.executor.util.TestDefaultRedisSetup;
 
 /**
- * {@link GraalJSScriptEngineTests}
+ * {@link GraalBaseScriptEngineTests}
  * 
  * @author James Wong
  * @version 2022-09-23
  * @since v1.0.0
  * @see https://github.com/wl4g/infra/blob/master/common-java11/src/test/java/com/wl4g/infra/common/graalvm/GraalPolyglotManagerTests.java#L97
  */
-public class GraalJSScriptEngineTests {
+public class GraalBaseScriptEngineTests {
 
     @Test
     public void testInitWithCustomLog() throws Exception {

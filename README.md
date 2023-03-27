@@ -48,21 +48,21 @@ Unified and flexible rules engine platform, naturally suitable for scenarios whe
 
 ## Features
 
-- Support [ApiServer](docs/en/devel-apiserver.md) static password login and standard OAuth2/OIDC authentication (the configure multiple), such as [keycloak](https://www.keycloak.org/), [github](https://github.com/), etc.
-
 - Support online coding development rules models, and upload the custom dependency script libraries.
-
-- Support [Controller](docs/en/devel-controller.md) actively scheduling invoke workflow graph.
-
-- Support [Job](docs/en/devel-job.md) large-scale MMP parallel real-time state recognition based on Flink CEP.
-
-- Support [Controller](docs/en/devel-controller.md), [ApiServer](docs/en/devel-apiserver.md) register connecting to [arthas tunnel](https://arthas.aliyun.com/en/doc/tunnel.html) for easy operator JVM troubleshooting (**Only in JVM run mode**).
 
 - Support [Executor](docs/en/devel-executor.md) run by native mode running. see: [native-image](https://www.graalvm.org/22.1/docs/getting-started/#native-image)
 
 - Support [Executor](docs/en/devel-executor.md) built-in multi SDKs(eg: **tools/common/datasource/notifier**), such as datasource sdk, which can be connected to multiple data-source instances by configuration.
 
-- Support [Executor](docs/en/devel-executor.md) multi-languages scripting engine for [JS (Graal.js)](https://www.graalvm.org/22.2/reference-manual/js/FAQ/#what-is-the-difference-between-running-graalvms-javascript-in-native-image-compared-to-the-jvm) (**default**), [Groovy](http://groovy-lang.org/differences.html#_default_imports) (**plan**).
+- Support [Executor](docs/en/devel-executor.md) [Js(graal.js)](https://www.graalvm.org/22.2/reference-manual/js/FAQ/#what-is-the-difference-between-running-graalvms-javascript-in-native-image-compared-to-the-jvm)(**default**), [Python](https://www.graalvm.org/22.2/reference-manual/python/Interoperability/)(**beta**), [Groovy](http://groovy-lang.org/differences.html#_default_imports)(**planning**), etc. Executor supports the unified orchestration and execution of multiple scripting language engines. This is an epoch-making technological revolution, thanks to the powerful multi language runtime of graal.
+
+- Support [Controller](docs/en/devel-controller.md) actively scheduling invoke workflow graph.
+
+- Support [Controller](docs/en/devel-controller.md), [ApiServer](docs/en/devel-apiserver.md) register connecting to [arthas tunnel](https://arthas.aliyun.com/en/doc/tunnel.html) for easy operator JVM troubleshooting (**Only in JVM run mode**).
+
+- Support [Job](docs/en/devel-job.md) large-scale MMP parallel real-time state recognition based on Flink CEP.
+
+- Support [ApiServer](docs/en/devel-apiserver.md) static password login and standard OAuth2/OIDC authentication (the configure multiple), such as [keycloak](https://www.keycloak.org/), [github](https://github.com/), etc.
 
 - Support automatic analysis of hit rate reports (**progressing**).
 

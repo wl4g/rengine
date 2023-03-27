@@ -48,6 +48,8 @@ public class GraalJSScriptEngine extends GraalBaseScriptEngine {
         return "js";
     }
 
+    // see:https://www.graalvm.org/22.2/reference-manual/js/
+    @Override
     protected GraalPolyglotManager createGraalPolyglotManager() {
         try {
             log.info("Initialzing graal js script engine ...");

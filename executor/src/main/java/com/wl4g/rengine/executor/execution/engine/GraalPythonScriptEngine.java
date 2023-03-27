@@ -48,6 +48,8 @@ public class GraalPythonScriptEngine extends GraalBaseScriptEngine {
         return "python";
     }
 
+    // see:https://www.graalvm.org/22.2/reference-manual/python/Interoperability/
+    @Override
     protected GraalPolyglotManager createGraalPolyglotManager() {
         try {
             log.info("Initialzing graal js script engine ...");
