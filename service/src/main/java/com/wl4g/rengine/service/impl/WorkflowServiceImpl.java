@@ -52,7 +52,7 @@ public class WorkflowServiceImpl extends BasicServiceImpl implements WorkflowSer
     @Override
     public PageHolder<Workflow> query(WorkflowQuery model) {
         final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getWorkflowId()),
-                isCriteria("scenesId", model.getScenesId())))
+                isCriteria("engine", model.getEngine()), isCriteria("scenesId", model.getScenesId())))
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
         final List<Workflow> workflows = mongoTemplate.find(query, Workflow.class, RE_WORKFLOWS.getName());

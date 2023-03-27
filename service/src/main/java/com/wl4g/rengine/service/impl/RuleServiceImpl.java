@@ -53,8 +53,8 @@ public class RuleServiceImpl extends BasicServiceImpl implements RuleService {
 
     @Override
     public PageHolder<Rule> query(RuleQuery model) {
-        final Query query = new Query(
-                andCriteria(baseCriteria(model), isIdCriteria(model.getRuleId()), isCriteria("scenesId", model.getScenesId())))
+        final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getRuleId()),
+                isCriteria("scenesId", model.getScenesId()), isCriteria("engine", model.getEngine())))
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(),
                                 descSort(DEFAULT_FIELD_REVISION, DEFAULT_FIELD_UPDATE_DATE)));
 

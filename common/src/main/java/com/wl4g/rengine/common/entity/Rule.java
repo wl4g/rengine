@@ -52,7 +52,9 @@ public class Rule extends BaseEntity {
         /**
          * Noice: The temporarily unable to support graalvm native mode.
          */
-        // GROOVY,
+        GROOVY,
+
+        PYTHON,
 
         JS
     }

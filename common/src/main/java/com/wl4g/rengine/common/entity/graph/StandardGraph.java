@@ -90,7 +90,7 @@ public class StandardGraph extends GraphBase {
             try {
                 n.validate();
             } catch (Throwable ex) {
-                throw new IllegalArgumentException(format("Missing node property values for : %s", n));
+                throw new IllegalArgumentException(format("Invalid node property of : %s, reason: %s", n, ex.getMessage()));
             }
         });
 

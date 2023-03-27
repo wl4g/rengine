@@ -16,7 +16,7 @@
 package com.wl4g.rengine.common.entity.graph;
 
 import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
-import static com.wl4g.infra.common.lang.Assert2.notEmpty;
+import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -175,7 +175,7 @@ public class WorkflowGraph extends BaseEntity {
             notNullOf(wrapper, "graph");
             wrapper.validate();
             notNullOf(wrapper.getDetails(), "graph.details");
-            notEmpty(wrapper.getRules(), "graph.rules");
+            notEmptyOf(wrapper.getRules(), "graph.rules");
 
             // Check for rule script.
             for (RuleWrapper rule : wrapper.getRules()) {

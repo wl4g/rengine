@@ -173,7 +173,7 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
         final List<String> invalidConnections = toConnectionMap.entrySet()
                 .stream()
                 .filter(e -> !treeNodes.containsKey(e.getKey()) || !treeNodes.containsKey(e.getValue()))
-                .map(e -> format("(to %s from %s)", e.getValue(), e.getKey()))
+                .map(e -> format("(to %s from %s)", e.getKey(), e.getValue()))
                 .collect(toList());
         if (!invalidConnections.isEmpty()) {
             throw new InvalidNodeRelationException(format("Invalid the node connection for : %s", invalidConnections));

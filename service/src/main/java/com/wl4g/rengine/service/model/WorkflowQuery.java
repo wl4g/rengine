@@ -18,6 +18,7 @@ package com.wl4g.rengine.service.model;
 import javax.annotation.Nullable;
 
 import com.wl4g.rengine.common.entity.Workflow;
+import com.wl4g.rengine.common.entity.Workflow.WorkflowEngine;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,4 +41,5 @@ import lombok.experimental.SuperBuilder;
 public class WorkflowQuery extends BaseQuery<Workflow> {
     private @Nullable Long workflowId;
     private @Nullable Long scenesId;
+    private @Nullable WorkflowEngine engine;
 }
