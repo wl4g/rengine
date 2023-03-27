@@ -26,6 +26,7 @@ import static com.wl4g.rengine.service.mongo.QueryHolder.isCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
+import static java.util.Collections.singletonList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.util.List;
@@ -170,7 +171,9 @@ public class WorkflowGraphServiceImpl extends BasicServiceImpl implements Workfl
         final String latestLogFile = ScriptEngineUtil.getLatestLogFile(config.getControllerLog().getBaseDir(),
                 model.getWorkflowId(), false);
         if (isBlank(latestLogFile)) {
-            throw new IllegalArgumentException(format("Could't to load workflow log file for %s.", model.getWorkflowId()));
+            final String errmsg = format("Could't to load workflow log file for %s.", model.getWorkflowId());
+            log.warn(errmsg);
+            return WorkflowGraphLogfileResult.builder().frame(NO_DATA_TAIL_FRAME).build();
         }
 
         final ReadTailFrame result = FileIOUtils.seekReadLines(latestLogFile, model.getStartPos(), model.getLimit(),
@@ -211,5 +214,9 @@ public class WorkflowGraphServiceImpl extends BasicServiceImpl implements Workfl
 
     static final ParameterizedTypeReference<RespBase<WorkflowExecuteResult>> WORKFLOW_EXECUTE_RESULT_TYPE = new ParameterizedTypeReference<>() {
     };
+
+    // see:com.wl4g.rengine.executor.execution.engine.GraalJSScriptEngine#init()
+    // see:com.wl4g.infra.common.graalvm.polyglot.JdkLoggingOutputStream#DEFAULT_FORMATTER
+    static final ReadTailFrame NO_DATA_TAIL_FRAME = new ReadTailFrame(0, 0, 0, singletonList("{\"message\":\"\"}"), false);
 
 }

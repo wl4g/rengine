@@ -10,6 +10,7 @@ function process(context) {
 
     const logConnString = "ssh " + vmUser + " -p " + vmPort + "@" + vmHost
     console.info("Detecting VM process of ", logConnString, "processFilter:", processFilter, "restartCmd:", restartCmd);
+
     try {
         const sshClient = context.getDataService().getDefaultSSHClient();
         const detectCmd = "/bin/ps -ef | grep -v grep | grep " + processFilter;
@@ -40,7 +41,4 @@ function process(context) {
             .addValue("vm_process_health_status_desc", "unhealthy");
     }
 
-    return new ScriptResult(false)
-        .addValue("vm_process_health_status_code", 3)
-        .addValue("vm_process_health_status_desc", "unhealthy");
 }

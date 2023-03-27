@@ -162,6 +162,7 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
             vGraph.setId(vGraphId);
             vGraph.setWorkflowId(vWorkflowId);
             vGraph.setRules(singletonList(rule));
+            vGraph.setRevision(Long.MAX_VALUE); // Default latest(max)
             vGraph.setDetails(new StandardGraph(vNodes, vEdges));
             vGraph.validate();
 

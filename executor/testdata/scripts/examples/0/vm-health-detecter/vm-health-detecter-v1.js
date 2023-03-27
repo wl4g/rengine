@@ -8,10 +8,16 @@ function process(context) {
 
     const logConnString = "ssh " + vmUser + " -p " + vmPort + "@" + vmHost
     console.info("Detecting VM of ", logConnString);
+
     try {
         const sshClient = context.getDataService().getDefaultSSHClient();
         const result = sshClient.execute(vmHost, parseInt(vmPort + ""), vmUser, vmPassword, "/bin/echo");
         console.info("Detected VM result of :", result);
+
+        return new ScriptResult(true)
+            .addValue("vm_health_status_code", 0)
+            .addValue("vm_health_status_desc", "healthy");
+
     } catch (ex) {
         console.error("Unable to detecting VM for :", logConnString, ", reason:", ex);
         return new ScriptResult(true)
@@ -20,7 +26,4 @@ function process(context) {
             .addValue("vm_health_status_desc", "unhealthy");
     }
 
-    return new ScriptResult(true)
-        .addValue("vm_health_status_code", 0)
-        .addValue("vm_health_status_desc", "healthy");
 }
