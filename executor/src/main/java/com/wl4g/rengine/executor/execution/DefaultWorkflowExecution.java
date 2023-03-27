@@ -44,6 +44,7 @@ import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
 import com.wl4g.rengine.common.model.ExecuteRequest;
 import com.wl4g.rengine.common.model.WorkflowExecuteResult.ResultDescription;
 import com.wl4g.rengine.executor.execution.engine.GraalJSScriptEngine;
+import com.wl4g.rengine.executor.execution.engine.GraalPythonScriptEngine;
 import com.wl4g.rengine.executor.execution.engine.IScriptEngine;
 import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
 
@@ -65,6 +66,9 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
 
     @Inject
     GraalJSScriptEngine graalJSScriptEngine;
+
+    @Inject
+    GraalPythonScriptEngine graalPythonScriptEngine;
 
     @Override
     public ResultDescription execute(
@@ -126,6 +130,8 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
         switch (engine) {
         // case GROOVY:
         // return groovyScriptEngine;
+        case PYTHON:
+            return graalPythonScriptEngine;
         case JS:
         default:
             return graalJSScriptEngine;

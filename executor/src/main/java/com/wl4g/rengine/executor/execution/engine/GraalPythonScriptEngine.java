@@ -32,7 +32,7 @@ import lombok.CustomLog;
 import lombok.Getter;
 
 /**
- * {@link GraalJSScriptEngine}
+ * {@link GraalPythonScriptEngine}
  * 
  * @author James Wong
  * @version 2022-09-22
@@ -41,28 +41,20 @@ import lombok.Getter;
 @CustomLog
 @Getter
 @Singleton
-public class GraalJSScriptEngine extends GraalBaseScriptEngine {
+public class GraalPythonScriptEngine extends GraalBaseScriptEngine {
 
     @Override
     protected String getPermittedLanguages() {
-        return "js";
+        return "python";
     }
 
     protected GraalPolyglotManager createGraalPolyglotManager() {
         try {
             log.info("Initialzing graal js script engine ...");
             final ScriptLogConfig scriptLogConfig = engineConfig.log();
-            /**
-             * TODO The best way is to let the rengine executor write to OSS in
-             * real time, but unfortunately MinIO/S3 does not support append
-             * writing (although it supports object merging, but it is still
-             * difficult to achieve), unless you use Alibaba Cloud OSS (supports
-             * real-time append writing), but this not a neutral approach.
-             * Therefore, at present, only direct reading and writing of disks
-             * is realized, and then shared mounts such as juiceFS, s3fs-fuse,
-             * ossfs, etc. can be used to realize clustering. see to:
-             * {@link com.wl4g.rengine.service.impl.ScheduleJobLogServiceImpl#logfile}
-             */
+            // TODO
+            // TODO using python languages options
+            // TODO
             return GraalPolyglotManager.newDefaultGraalJS(DEFAULT_EXECUTOR_SCRIPT_TMP_CACHE_DIR, metadata -> {
                 String filePattern = buildScriptLogFilePattern(scriptLogConfig.baseDir(), metadata, false);
                 // Make sure to generate a log file during
