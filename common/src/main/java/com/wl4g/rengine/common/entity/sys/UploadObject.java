@@ -132,9 +132,25 @@ public class UploadObject extends BaseEntity {
 
         LIBPYTHON("libpython", asList(ExtensionType.PY)),
 
+        LIBR("libr", asList(ExtensionType.R)),
+
+        LIBRUBY("libruby", asList(ExtensionType.RUBY)),
+
+        LIBGOLANG("libgolang", asList(ExtensionType.GOLANG)),
+
+        LIBRUST("librust", asList(ExtensionType.RUST)),
+
+        LIBCSHARP("libcsharp", asList(ExtensionType.CSHARP)),
+
+        LIBC("libc", asList(ExtensionType.C, ExtensionType.C_H)),
+
+        LIBCPP("libcpp", asList(ExtensionType.CPP)),
+
+        LIBSH("libsh", asList(ExtensionType.SHELL)),
+
         TESTCSV("testcsv", asList(ExtensionType.CSV)),
 
-        SCRIPTLOG("scriptlog", null);
+        SCRIPTLOG("scriptlog", asList(ExtensionType.LOG));
 
         private final String prefix;
         private final List<ExtensionType> extensions;
@@ -161,13 +177,31 @@ public class UploadObject extends BaseEntity {
 
         PY(false, ".py"),
 
+        R(false, ".r"),
+
+        RUBY(false, ".rb"),
+
+        GOLANG(false, ".go"),
+
+        RUST(false, ".rs"),
+
+        CSHARP(false, ".cs"),
+
+        C(false, ".c"),
+
+        C_H(false, ".h"),
+
+        CPP(false, ".cpp"),
+
+        SHELL(false, ".sh"),
+
         JS(false, ".js"),
 
         TS(false, ".ts"),
 
-        CSV(false, ".csv"),
-
         MJS(false, ".mjs"),
+
+        CSV(false, ".csv"),
 
         LOG(false, ".log"),
 
@@ -177,7 +211,9 @@ public class UploadObject extends BaseEntity {
 
         STDOUT(false, ".stdout"),
 
-        STDERR(false, ".stderr");
+        STDERR(false, ".stderr"),
+
+        UNKNOWN(false, ".unknown");
 
         private final boolean binary;
         private final String suffix;

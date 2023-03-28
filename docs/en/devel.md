@@ -20,7 +20,7 @@ git clone git@github.com/wl4g/rengine.git
 ./tools/build/run.sh
 
 # for examples
-export JAVA_VERSION=11 # Optional
+export JAVA_HOME=/usr/local/jdk-11.0.10/ # Recommands
 export MAVEN_OPTS='-Xss64m -Xms1g -Xmx12g -XX:ReservedCodeCacheSize=1g -Dorg.slf4j.simpleLogger.defaultLogLevel=WARN' # Optional
 export MAVEN_USERNAME='myuser'
 export MAVEN_PASSWORD='abc'

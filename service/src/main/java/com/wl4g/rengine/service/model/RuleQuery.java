@@ -15,6 +15,8 @@
  */
 package com.wl4g.rengine.service.model;
 
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import com.wl4g.rengine.common.entity.Rule;
@@ -40,7 +42,6 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 @NoArgsConstructor
 public class RuleQuery extends BaseQuery<Rule> {
-    private @Nullable Long ruleId;
-    private @Nullable Long scenesId;
+    private @Nullable List<Long> ruleIds;
     private @Nullable RuleEngine engine;
 }

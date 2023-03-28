@@ -47,7 +47,7 @@ function logErr() {
 function usages(){
     echo $"
 # for examples
-export JAVA_VERSION=11 # Optional
+export JAVA_HOME=/usr/local/jdk-11.0.10/ # Recommands
 export MAVEN_OPTS='-Xss64m -Xms1g -Xmx12g -XX:ReservedCodeCacheSize=1g -Dorg.slf4j.simpleLogger.defaultLogLevel=WARN' # Optional
 # Required (If needed)
 export MAVEN_USERNAME='myuser'
@@ -201,18 +201,23 @@ case $1 in
   build-image)
     case $2 in
       -a|--apiserver)
+        do_build_maven "-T 4C clean install"
         do_build_maven "package -f apiserver/pom.xml -Pbuild:tar:docker"
         ;;
       -c|--controller)
+        do_build_maven "-T 4C clean install"
         do_build_maven "package -f controller/pom.xml -Pbuild:tar:docker"
         ;;
       -e|--executor)
+        do_build_maven "-T 4C clean install"
         do_build_maven "package -f executor/pom.xml -Pbuild:tar:docker"
         ;;
       -E|--executor-native)
+        do_build_maven "-T 4C clean install"
         do_build_maven "package -f executor/pom.xml -Pnative -Dquarkus.native.container-build=true -Dquarkus.native.container-runtime=docker"
         ;;
-      -A,--all)
+      -A|--all)
+        do_build_maven "-T 4C clean install"
         do_build_maven "package -f apiserver/pom.xml -Pbuild:tar:docker"
         do_build_maven "package -f controller/pom.xml -Pbuild:tar:docker"
         do_build_maven "package -f executor/pom.xml -Pbuild:tar:docker"
@@ -248,6 +253,7 @@ case $1 in
     esac
     ;;
   all)
+    do_build_maven "-T 4C clean install"
     do_build_maven "package -f apiserver/pom.xml -Pbuild:tar:docker" &
     do_build_maven "package -f controller/pom.xml -Pbuild:tar:docker" &
     do_build_maven "package -f executor/pom.xml -Pbuild:tar:docker" &
