@@ -79,7 +79,7 @@
         <opentelemetry.version>1.14.0</opentelemetry.version>
         <opentelemetry-semconv.version>1.14.0-alpha</opentelemetry-semconv.version>
         <opentelemetry-proto.version>0.17.1</opentelemetry-proto.version>
-        <grpc.version>1.43.0</grpc.version>
+        <grpc.version>1.48.1</grpc.version>
         <protobuf-java.version>3.19.1</protobuf-java.version>
         <spring-sleuth-otel.version>1.1.0</spring-sleuth-otel.version>
         <!-- MQ -->
@@ -94,12 +94,12 @@
         <springdoc-openapi.version>1.6.11</springdoc-openapi.version>
         <!-- Notice: quarkus-2.12.2-netty-4.1.79.Final, quarkus-2.14.3-netty-4.1.82.Final -->
         <netty.version>4.1.82.Final</netty.version>
-        <!-- Common -->
+        <!-- Common --> 
         <okhttp.version>4.10.0</okhttp.version>
         <commons-dbutils.version>1.7</commons-dbutils.version>
         <hikaricp.version>4.0.3</hikaricp.version>
         <junit.version>4.13.2</junit.version>
-        <testcontainers.version>1.16.2</testcontainers.version>
+        <testcontainers.version>1.17.3</testcontainers.version>
     </properties>
     <dependencyManagement>
         <dependencies>
