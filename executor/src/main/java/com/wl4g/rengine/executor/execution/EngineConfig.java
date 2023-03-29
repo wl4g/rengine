@@ -16,7 +16,7 @@
 package com.wl4g.rengine.executor.execution;
 
 import static com.wl4g.rengine.common.constants.RengineConstants.CONF_PREFIX_EXECUTOR;
-import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_SCRIPT_LOG_BASE_DIR;
+import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_SCRIPT_LOG_DIR;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -86,7 +86,7 @@ public interface EngineConfig {
     SdkExecutorConfig executor();
 
     public static interface ScriptLogConfig {
-        @WithDefault(DEFAULT_EXECUTOR_SCRIPT_LOG_BASE_DIR)
+        @WithDefault(DEFAULT_EXECUTOR_SCRIPT_LOG_DIR)
         @NotBlank
         String baseDir();
 

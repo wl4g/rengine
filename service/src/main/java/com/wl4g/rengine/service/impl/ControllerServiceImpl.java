@@ -36,25 +36,25 @@ import org.springframework.stereotype.Service;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.rengine.common.entity.Controller;
-import com.wl4g.rengine.service.ControllerScheduleService;
+import com.wl4g.rengine.service.ControllerService;
 import com.wl4g.rengine.service.model.ControllerScheduleDelete;
 import com.wl4g.rengine.service.model.ControllerScheduleDeleteResult;
 import com.wl4g.rengine.service.model.ControllerScheduleQuery;
 import com.wl4g.rengine.service.model.ControllerScheduleSaveResult;
 
 /**
- * {@link ControllerScheduleServiceImpl}
+ * {@link ControllerServiceImpl}
  * 
  * @author James Wong
  * @version 2023-01-08
  * @since v1.0.0
  */
 @Service
-public class ControllerScheduleServiceImpl extends BasicServiceImpl implements ControllerScheduleService {
+public class ControllerServiceImpl extends BasicServiceImpl implements ControllerService {
 
     @Override
     public PageHolder<Controller> query(ControllerScheduleQuery model) {
-        final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getScheduleId()),
+        final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getControllerId()),
                 isCriteria("details.type", model.getType())))
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
@@ -71,7 +71,7 @@ public class ControllerScheduleServiceImpl extends BasicServiceImpl implements C
             final @NotNull ControllerScheduleQuery model,
             final @NotNull Integer divisor,
             final @NotNull Integer remainder) {
-        final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getScheduleId()),
+        final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getControllerId()),
                 modIdCriteria(divisor, remainder), isCriteria("details.type", model.getType()))).with(defaultSort());
 
         final List<Controller> schedules = mongoTemplate.find(query, Controller.class,

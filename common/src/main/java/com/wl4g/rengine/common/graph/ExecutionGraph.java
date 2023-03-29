@@ -225,8 +225,8 @@ public abstract class ExecutionGraph<E extends ExecutionGraph<?>>
             if (current instanceof LogicalOperator) {
                 final List<BaseOperator<?>> nexts = safeList(((LogicalOperator<?>) current).getNexts());
                 Collections.sort(nexts, (o1, o2) -> {
-                    Assert2.notNull(o1.getPriority(), format("priority is missing of (%s, %s)", o1.getId(), o1.getName()));
-                    Assert2.notNull(o2.getPriority(), format("priority is missing of (%s, %s)", o1.getId(), o2.getName()));
+                    Assert2.notNull(o1.getPriority(), format("priority is missing of node (%s, %s)", o1.getId(), o1.getName()));
+                    Assert2.notNull(o2.getPriority(), format("priority is missing of node (%s, %s)", o1.getId(), o2.getName()));
                     return o1.getPriority() - o2.getPriority();
                 });
             }

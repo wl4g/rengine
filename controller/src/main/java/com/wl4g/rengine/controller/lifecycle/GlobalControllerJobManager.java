@@ -100,7 +100,7 @@ public class GlobalControllerJobManager implements ApplicationRunner, Closeable 
             try {
                 closeJobExecutor(e.getValue());
             } catch (IOException ex) {
-                log.warn(format("Unable to closing job item executor for scheduleId: %s", e.getKey()), ex);
+                log.warn(format("Unable to closing job item executor for controllerId: %s", e.getKey()), ex);
             }
         });
     }
@@ -115,13 +115,13 @@ public class GlobalControllerJobManager implements ApplicationRunner, Closeable 
         masterControllerBootstrap.schedule();
     }
 
-    public boolean exists(Long scheduleId) {
-        return bootstrapRegistry.containsKey(scheduleId);
+    public boolean exists(Long controllerId) {
+        return bootstrapRegistry.containsKey(controllerId);
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends JobBootstrap> T get(Long scheduleId) {
-        return (T) bootstrapRegistry.get(scheduleId);
+    public <T extends JobBootstrap> T get(Long controllerId) {
+        return (T) bootstrapRegistry.get(controllerId);
     }
 
     @SuppressWarnings("unchecked")
@@ -147,12 +147,12 @@ public class GlobalControllerJobManager implements ApplicationRunner, Closeable 
         return (T) bootstrap;
     }
 
-    public GlobalControllerJobManager remove(Long... scheduleIds) {
-        final List<Long> _scheduleIds = safeToList(Long.class, scheduleIds);
+    public GlobalControllerJobManager remove(Long... controllerIds) {
+        final List<Long> _controllerIds = safeToList(Long.class, controllerIds);
         final var it = safeMap(bootstrapRegistry).entrySet().iterator();
         while (it.hasNext()) {
             Entry<Long, JobBootstrap> entry = it.next();
-            if (_scheduleIds.contains(entry.getKey())) {
+            if (_controllerIds.contains(entry.getKey())) {
                 it.remove();
                 scheduleMutexLocksRegistry.remove(entry.getKey());
             }
@@ -160,12 +160,12 @@ public class GlobalControllerJobManager implements ApplicationRunner, Closeable 
         return this;
     }
 
-    public List<Long> start(Long... scheduleIds) {
+    public List<Long> start(Long... controllerIds) {
         log.info("Schedule job bootstrap starting ...");
-        final List<Long> _scheduleIds = safeToList(Long.class, scheduleIds);
+        final List<Long> _controllerIds = safeToList(Long.class, controllerIds);
         return safeMap(bootstrapRegistry).entrySet()
                 .stream()
-                .filter(e -> _scheduleIds.isEmpty() || (!_scheduleIds.isEmpty() && _scheduleIds.contains(e.getKey())))
+                .filter(e -> _controllerIds.isEmpty() || (!_controllerIds.isEmpty() && _controllerIds.contains(e.getKey())))
                 .map(e -> {
                     try {
                         if (nonNull(e.getValue())) {
@@ -186,12 +186,12 @@ public class GlobalControllerJobManager implements ApplicationRunner, Closeable 
                 .collect(toList());
     }
 
-    public List<Long> shutdown(Long... scheduleIds) {
+    public List<Long> shutdown(Long... controllerIds) {
         log.info("Schedule job bootstrap shutdown ...");
-        final List<Long> _scheduleIds = safeToList(Long.class, scheduleIds);
+        final List<Long> _controllerIds = safeToList(Long.class, controllerIds);
         return safeMap(bootstrapRegistry).entrySet()
                 .stream()
-                .filter(e -> _scheduleIds.isEmpty() || (!_scheduleIds.isEmpty() && _scheduleIds.contains(e.getKey())))
+                .filter(e -> _controllerIds.isEmpty() || (!_controllerIds.isEmpty() && _controllerIds.contains(e.getKey())))
                 .map(e -> {
                     boolean error = false;
                     try {
@@ -219,16 +219,16 @@ public class GlobalControllerJobManager implements ApplicationRunner, Closeable 
                 .collect(toList());
     }
 
-    public InterProcessSemaphoreMutex getMutexLock(final Long scheduleId) {
-        InterProcessSemaphoreMutex mutex = scheduleMutexLocksRegistry.get(scheduleId);
+    public InterProcessSemaphoreMutex getMutexLock(final Long controllerId) {
+        InterProcessSemaphoreMutex mutex = scheduleMutexLocksRegistry.get(controllerId);
         if (isNull(mutex)) {
             synchronized (this) {
-                mutex = scheduleMutexLocksRegistry.get(scheduleId);
+                mutex = scheduleMutexLocksRegistry.get(controllerId);
                 if (isNull(mutex)) {
                     // Build path for bind trigger.
                     // see:https://curator.apache.org/curator-recipes/shared-lock.html
-                    final String path = format("%s/%s", PATH_MUTEX_TRIGGERS, notNullOf(scheduleId, "scheduleId"));
-                    scheduleMutexLocksRegistry.put(scheduleId,
+                    final String path = format("%s/%s", PATH_MUTEX_TRIGGERS, notNullOf(controllerId, "controllerId"));
+                    scheduleMutexLocksRegistry.put(controllerId,
                             (mutex = new InterProcessSemaphoreMutex(((ZookeeperRegistryCenter) regCenter).getClient(), path)));
                 }
             }

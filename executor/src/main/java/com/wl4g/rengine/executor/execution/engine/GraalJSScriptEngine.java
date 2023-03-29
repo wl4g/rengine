@@ -15,7 +15,7 @@
  */
 package com.wl4g.rengine.executor.execution.engine;
 
-import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_SCRIPT_TMP_CACHE_DIR;
+import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_SCRIPT_CACHE_DIR;
 
 import java.io.File;
 import java.util.logging.Level;
@@ -65,7 +65,7 @@ public class GraalJSScriptEngine extends GraalBaseScriptEngine {
              * ossfs, etc. can be used to realize clustering. see to:
              * {@link com.wl4g.rengine.service.impl.ScheduleJobLogServiceImpl#logfile}
              */
-            return GraalPolyglotManager.newDefaultGraalJS(DEFAULT_EXECUTOR_SCRIPT_TMP_CACHE_DIR, metadata -> {
+            return GraalPolyglotManager.newDefaultGraalJS(DEFAULT_EXECUTOR_SCRIPT_CACHE_DIR, metadata -> {
                 String filePattern = buildScriptLogFilePattern(scriptLogConfig.baseDir(), metadata, false);
                 // Make sure to generate a log file during
                 // initialization to solve the problem that there is no

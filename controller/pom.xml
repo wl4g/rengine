@@ -94,11 +94,6 @@
             <groupId>com.wl4g</groupId>
             <artifactId>rengine-service</artifactId>
         </dependency>
-        <!-- SECURITY -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-oauth2-client</artifactId>
-        </dependency>
         <!-- ElasticJob(Only refer to source code logic custom implementation) -->
         <!-- <dependency> -->
         <!--     <groupId>org.apache.shardingsphere.elasticjob</groupId> -->

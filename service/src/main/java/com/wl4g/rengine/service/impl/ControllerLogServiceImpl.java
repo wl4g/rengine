@@ -101,14 +101,14 @@ public class ControllerLogServiceImpl extends BasicServiceImpl implements Contro
     @Override
     public PageHolder<ControllerLog> query(ControllerLogQuery model) {
         final Query query = new Query(andCriteria(baseCriteria(model), inIdsCriteria(model.getControllerLogIds()),
-                inCriteria("scheduleId", model.getScheduleIds())))
+                inCriteria("controllerId", model.getControllerIds())))
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
-        final List<ControllerLog> jobs = mongoTemplate.find(query, ControllerLog.class, RE_CONTROLLER_LOG.getName());
+        final List<ControllerLog> logs = mongoTemplate.find(query, ControllerLog.class, RE_CONTROLLER_LOG.getName());
 
         return new PageHolder<ControllerLog>(model.getPageNum(), model.getPageSize())
                 .withTotal(mongoTemplate.count(query, RE_CONTROLLER_LOG.getName()))
-                .withRecords(jobs);
+                .withRecords(logs);
     }
 
     @Override

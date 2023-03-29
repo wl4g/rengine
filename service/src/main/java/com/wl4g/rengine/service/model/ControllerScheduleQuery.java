@@ -43,6 +43,6 @@ import lombok.experimental.SuperBuilder;
 public class ControllerScheduleQuery extends BaseQuery<Controller> {
     @Schema(implementation = ControllerType.class)
     private @Nullable @EnumValue(enumCls = ControllerType.class) String type;
-    private @Nullable Long scheduleId;
+    private @Nullable Long controllerId;
 
 }

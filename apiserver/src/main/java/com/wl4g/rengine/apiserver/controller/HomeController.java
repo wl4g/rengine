@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.common.entity.Controller.RunState;
 import com.wl4g.rengine.service.ControllerLogService;
-import com.wl4g.rengine.service.ControllerScheduleService;
+import com.wl4g.rengine.service.ControllerService;
 import com.wl4g.rengine.service.model.ControllerLogQuery;
 import com.wl4g.rengine.service.model.ControllerScheduleQuery;
 import com.wl4g.rengine.service.model.HomeQuery;
@@ -54,7 +54,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/v1/home")
 public class HomeController {
 
-    private @Autowired ControllerScheduleService controllerScheduleService;
+    private @Autowired ControllerService controllerService;
     private @Autowired ControllerLogService controllerLogService;
 
     // @SecurityRequirement(name = "default_oauth")
@@ -66,7 +66,7 @@ public class HomeController {
         log.debug("called: model={}", model);
         RespBase<HomeQueryResult> resp = RespBase.create();
 
-        final var scheduleResult = controllerScheduleService.query(ControllerScheduleQuery.builder().pageSize(100).build());
+        final var scheduleResult = controllerService.query(ControllerScheduleQuery.builder().pageSize(100).build());
 
         final var runningCount = safeList(scheduleResult.getRecords()).stream()
                 .filter(s -> s.getRunState() == RunState.RUNNING)
@@ -91,7 +91,7 @@ public class HomeController {
                 .filter(s -> s.getRunState() == RunState.RUNNING)
                 .map(s -> s.getId())
                 .collect(toList());
-        final var logResult = controllerLogService.query(ControllerLogQuery.builder().scheduleIds(runningScheduleIds).build());
+        final var logResult = controllerLogService.query(ControllerLogQuery.builder().controllerIds(runningScheduleIds).build());
 
         return resp.withData(HomeQueryResult.builder()
                 .state(ScheduleStateInfo.builder()

@@ -24,7 +24,7 @@ import static com.wl4g.infra.common.lang.StringUtils2.getFilename;
 import static com.wl4g.infra.common.lang.TypeConverts.safeLongToInt;
 import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_S3_OBJECT_MAX_LIMIT;
 import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_S3_OBJECT_READ_BUFFER;
-import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_SCRIPT_TMP_CACHE_DIR;
+import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_SCRIPT_CACHE_DIR;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -214,7 +214,7 @@ public class MinioManager {
         hasTextOf(objectPrefix, "objectPrefix");
         notNullOf(workflowId, "workflowId");
 
-        final File localFile = new File(DEFAULT_EXECUTOR_SCRIPT_TMP_CACHE_DIR.concat("/")
+        final File localFile = new File(DEFAULT_EXECUTOR_SCRIPT_CACHE_DIR.concat("/")
                 .concat(uploadType.name())
                 .concat("/")
                 .concat(workflowId + "")

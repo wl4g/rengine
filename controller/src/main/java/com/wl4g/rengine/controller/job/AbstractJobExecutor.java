@@ -47,8 +47,9 @@ import com.wl4g.rengine.common.entity.Controller.ControllerType;
 import com.wl4g.rengine.controller.config.RengineControllerProperties;
 import com.wl4g.rengine.controller.lifecycle.GlobalControllerJobManager;
 import com.wl4g.rengine.service.ControllerLogService;
-import com.wl4g.rengine.service.ControllerScheduleService;
+import com.wl4g.rengine.service.ControllerService;
 import com.wl4g.rengine.service.meter.RengineMeterService;
+import com.wl4g.rengine.service.minio.MinioClientManager;
 import com.wl4g.rengine.service.model.ControllerLogSaveResult;
 import com.wl4g.rengine.service.model.ControllerScheduleSaveResult;
 
@@ -80,8 +81,9 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor, Close
     private CoordinatorRegistryCenter regCenter;
     private RengineClient rengineClient;
     private GlobalControllerJobManager globalControllerJobManager;
-    private ControllerScheduleService controllerScheduleService;
+    private ControllerService controllerService;
     private ControllerLogService controllerLogService;
+    private MinioClientManager minioManager;
     // private Collection<RengineEventBusService> eventbusServices;
 
     protected RengineControllerProperties getConfig() {
@@ -139,15 +141,15 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor, Close
         return globalControllerJobManager;
     }
 
-    protected ControllerScheduleService getControllerScheduleService() {
-        if (isNull(controllerScheduleService)) {
+    protected ControllerService getControllerScheduleService() {
+        if (isNull(controllerService)) {
             synchronized (this) {
-                if (isNull(controllerScheduleService)) {
-                    this.controllerScheduleService = SpringContextHolder.getBean(ControllerScheduleService.class);
+                if (isNull(controllerService)) {
+                    this.controllerService = SpringContextHolder.getBean(ControllerService.class);
                 }
             }
         }
-        return controllerScheduleService;
+        return controllerService;
     }
 
     protected ControllerLogService getControllerLogService() {
@@ -159,6 +161,18 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor, Close
             }
         }
         return controllerLogService;
+    }
+
+    protected MinioClientManager getMinioManager() {
+        if (isNull(minioManager)) {
+            synchronized (this) {
+                if (isNull(minioManager)) {
+                    this.minioManager = SpringContextHolder.getBean(MinioClientManager.class);
+                    log.info("Initialized minioManager : {}", minioManager);
+                }
+            }
+        }
+        return minioManager;
     }
 
     // @formatter:off
@@ -221,14 +235,14 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor, Close
         return shardingTotalCount;
     }
 
-    protected Controller updateControllerRunState(final @NotNull Long scheduleId, final @NotNull RunState runState) {
+    protected Controller updateControllerRunState(final @NotNull Long controllerId, final @NotNull RunState runState) {
         notNullOf(runState, "runState");
         Controller trigger = null;
         ControllerScheduleSaveResult result = null;
         try {
-            trigger = getControllerScheduleService().get(notNullOf(scheduleId, "scheduleId"));
+            trigger = getControllerScheduleService().get(notNullOf(controllerId, "controllerId"));
             trigger.setRunState(runState);
-            notNull(trigger, "Not found schedule trigger of scheduleId: %s", scheduleId);
+            notNull(trigger, "Not found schedule trigger of controllerId: %s", controllerId);
 
             log.debug("Updating to scheduling trigger run-state : {}", trigger);
             result = getControllerScheduleService().save(trigger);
@@ -240,13 +254,13 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor, Close
     }
 
     protected ControllerLog upsertControllerLog(
-            final @NotNull Long scheduleId,
+            final @NotNull Long controllerId,
             final Long controllerLogId,
             final boolean updateStatupTime,
             final boolean updateFinishedTime,
             final Boolean success,
             final Consumer<ControllerLog> saveJobLogPrepared) {
-        notNullOf(scheduleId, "scheduleId");
+        notNullOf(controllerId, "controllerId");
         ControllerLog controllerLog = null;
         ControllerLogSaveResult result = null;
         try {
@@ -254,7 +268,7 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor, Close
                 controllerLog = getControllerLogService().get(controllerLogId);
                 notNull(controllerLog, "Could't get controller log for %s", controllerLogId);
             } else {
-                controllerLog = newDefaultScheduleJobLog(scheduleId);
+                controllerLog = newDefaultControllerLog(controllerId);
                 log.debug("Upserting to scheduling job info : {}", controllerLog);
                 result = getControllerLogService().save(controllerLog);
                 controllerLog.setId(result.getId());
@@ -282,7 +296,7 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor, Close
         return controllerLog;
     }
 
-    protected ControllerLog newDefaultScheduleJobLog(final Long scheduleId) {
+    protected ControllerLog newDefaultControllerLog(final Long controllerId) {
         throw new UnsupportedOperationException();
     }
 

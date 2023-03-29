@@ -16,7 +16,7 @@ spring:
   ## see:../../../pom.xml#L68
   application.name: controller
   profiles:
-    include: base,arthas,arthas-override,telemetry,telemetry-override,mongo,redis,controller
+    include: base,mongo,redis,minio,arthas,arthas-override,telemetry,telemetry-override,controller
     active: dev
 
 server: ## see:org.springframework.boot.autoconfigure.web.ServerProperties

@@ -61,12 +61,14 @@ public class UploadObject extends BaseEntity {
     @Schema(implementation = UploadObject.UploadType.class)
     private @NotBlank @EnumValue(enumCls = UploadObject.UploadType.class) String uploadType;
 
-    // Save API front-end without objectPrefix.
+    // Save API front-end without objectPrefix field.
     @Nullable
     @NotBlank(groups = ValidForEntityMarker.class)
     @Schema(hidden = false, accessMode = AccessMode.READ_ONLY)
     private String objectPrefix;
 
+    // Saved without file version and extension.
+    // e.g: common-lang-v2.js(common-lang)
     private @NotBlank String filename;
     private @NotBlank String extension;
     private @NotNull @Min(0) Long size;
@@ -150,7 +152,27 @@ public class UploadObject extends BaseEntity {
 
         TESTCSV("testcsv", asList(ExtensionType.CSV)),
 
-        SCRIPTLOG("scriptlog", asList(ExtensionType.LOG));
+        SCRIPTLOG("scriptlog", asList(ExtensionType.LOG)),
+
+        MEDIA_IMAGE("media/image",
+                asList(ExtensionType.MEDIA_PNG, ExtensionType.MEDIA_JPG, ExtensionType.MEDIA_JPEG, ExtensionType.MEDIA_BMP,
+                        ExtensionType.MEDIA_TIF, ExtensionType.MEDIA_GIF, ExtensionType.MEDIA_PCX, ExtensionType.MEDIA_TGA,
+                        ExtensionType.MEDIA_EXIF, ExtensionType.MEDIA_FPX, ExtensionType.MEDIA_SVG, ExtensionType.MEDIA_PSD,
+                        ExtensionType.MEDIA_CDR, ExtensionType.MEDIA_PCD, ExtensionType.MEDIA_DXF, ExtensionType.MEDIA_UFO,
+                        ExtensionType.MEDIA_EPS, ExtensionType.MEDIA_AI, ExtensionType.MEDIA_RAW, ExtensionType.MEDIA_WMF,
+                        ExtensionType.MEDIA_WEBP, ExtensionType.MEDIA_AVIF, ExtensionType.MEDIA_APNG)),
+
+        MEDIA_VIDEO("media/video",
+                asList(ExtensionType.MEDIA_MP4, ExtensionType.MEDIA_3GP, ExtensionType.MEDIA_MPE, ExtensionType.MEDIA_MPEG,
+                        ExtensionType.MEDIA_TS, ExtensionType.MEDIA_MOV, ExtensionType.MEDIA_WAV, ExtensionType.MEDIA_WMV,
+                        ExtensionType.MEDIA_AVI, ExtensionType.MEDIA_ASF, ExtensionType.MEDIA_FLV, ExtensionType.MEDIA_WEBM,
+                        ExtensionType.MEDIA_AVCHD, ExtensionType.MEDIA_RM, ExtensionType.MEDIA_RMVB, ExtensionType.MEDIA_DIV,
+                        ExtensionType.MEDIA_DV, ExtensionType.MEDIA_DVX, ExtensionType.MEDIA_VOB, ExtensionType.MEDIA_MKV,
+                        ExtensionType.MEDIA_LAVF, ExtensionType.MEDIA_CPK, ExtensionType.MEDIA_DIRAC, ExtensionType.MEDIA_RAM,
+                        ExtensionType.MEDIA_QT, ExtensionType.MEDIA_FLI, ExtensionType.MEDIA_FLC, ExtensionType.MEDIA_MOD,
+                        ExtensionType.MEDIA_DAT)),
+
+        MEDIA_AUDIO("media/audio", asList(ExtensionType.MEDIA_A, ExtensionType.MEDIA_AUD, ExtensionType.MEDIA_MP3));
 
         private final String prefix;
         private final List<ExtensionType> extensions;
@@ -213,7 +235,121 @@ public class UploadObject extends BaseEntity {
 
         STDERR(false, ".stderr"),
 
-        UNKNOWN(false, ".unknown");
+        // IMAGES
+
+        MEDIA_PNG(true, ".png"),
+
+        MEDIA_JPG(true, ".jpg"),
+
+        MEDIA_JPEG(true, ".jpeg"),
+
+        MEDIA_BMP(true, ".bmp"),
+
+        MEDIA_TIF(true, ".tifl"),
+
+        MEDIA_GIF(true, ".gifl"),
+
+        MEDIA_PCX(true, ".pcxl"),
+
+        MEDIA_TGA(true, ".tgal"),
+
+        MEDIA_EXIF(true, ".exifl"),
+
+        MEDIA_FPX(true, ".fpxl"),
+
+        MEDIA_SVG(true, ".svgl"),
+
+        MEDIA_PSD(true, ".psdl"),
+
+        MEDIA_CDR(true, ".cdrl"),
+
+        MEDIA_PCD(true, ".pcdl"),
+
+        MEDIA_DXF(true, ".dxfl"),
+
+        MEDIA_UFO(true, ".ufol"),
+
+        MEDIA_EPS(true, ".epsl"),
+
+        MEDIA_AI(true, ".ail"),
+
+        MEDIA_RAW(true, ".rawl"),
+
+        MEDIA_WMF(true, ".wmfl"),
+
+        MEDIA_WEBP(true, ".webpl"),
+
+        MEDIA_AVIF(true, ".avifl"),
+
+        MEDIA_APNG(true, ".apng"),
+
+        // VIDEOS
+
+        MEDIA_MP4(true, ".mp4"),
+
+        MEDIA_3GP(true, ".3gp"),
+
+        MEDIA_MPE(true, ".mpe"),
+
+        MEDIA_MPEG(true, ".mpeg"),
+
+        MEDIA_TS(true, ".ts"),
+
+        MEDIA_MOV(true, ".mov"),
+
+        MEDIA_WAV(true, ".wav"),
+
+        MEDIA_WMV(true, ".wmv"),
+
+        MEDIA_AVI(true, ".avi"),
+
+        MEDIA_ASF(true, ".asf"),
+
+        MEDIA_FLV(true, ".flv"),
+
+        MEDIA_WEBM(true, ".webm"),
+
+        MEDIA_AVCHD(true, ".avcdh"),
+
+        MEDIA_RM(true, ".rm"),
+
+        MEDIA_RMVB(true, ".rmvb"),
+
+        MEDIA_DIV(true, ".rmvb"),
+
+        MEDIA_DV(true, ".rmvb"),
+
+        MEDIA_DVX(true, ".rmvb"),
+
+        MEDIA_VOB(true, ".vob"),
+
+        MEDIA_MKV(true, ".mkv"),
+
+        MEDIA_LAVF(true, ".lavf"),
+
+        MEDIA_CPK(true, ".cpk"),
+
+        MEDIA_DIRAC(true, ".dirac"),
+
+        MEDIA_RAM(true, ".ram"),
+
+        MEDIA_QT(true, ".qt"),
+
+        MEDIA_FLI(true, ".fli"),
+
+        MEDIA_FLC(true, ".flc"),
+
+        MEDIA_MOD(true, ".mod"),
+
+        MEDIA_DAT(true, ".dat"),
+
+        // AUDIOS
+
+        MEDIA_MP3(true, ".mp3"),
+
+        MEDIA_A(true, ".a"),
+
+        MEDIA_AUD(true, ".aud");
 
         private final boolean binary;
         private final String suffix;

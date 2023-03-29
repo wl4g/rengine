@@ -22,6 +22,7 @@ import static com.wl4g.rengine.controller.util.Environments.resolveString;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nullable;
+import javax.net.ssl.KeyManager;
 import javax.validation.Validator;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -335,12 +337,22 @@ public class RengineControllerProperties implements InitializingBean {
         private @Min(1) int acceptQueue = 2;
     }
 
+    // see:com.nextbreakpoint.flinkclient.api.ApiClient
     @Getter
     @Setter
     @ToString
     public static class EngineFlinkSchedulerProperties {
-        private @Min(1) int concurrency = 5;
-        private @Min(1) int acceptQueue = 1;
+        private String endpoint = "http://localhost:8081";
+        private Boolean debugging = false;
+        private Boolean verifyingSsl = false;
+        private InputStream sslCaCert;
+        private KeyManager[] keyManagers;
+
+        private String username;
+        private String password;
+        private String apiKey;
+        private String apiKeyPrefix;
+        private String accessToken;
     }
 
 }

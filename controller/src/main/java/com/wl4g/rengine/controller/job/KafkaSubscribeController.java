@@ -108,7 +108,7 @@ public class KafkaSubscribeController extends StandardExecutionController {
             @NotNull ShardingContext context) throws Exception {
 
         final JobParameter jobParameter = notNullOf(parseJSON(jobConfig.getJobParameter(), JobParameter.class), "jobParameter");
-        final Long controllerId = notNullOf(jobParameter.getScheduleId(), "controllerScheduleId");
+        final Long controllerId = notNullOf(jobParameter.getControllerId(), "controllerScheduleId");
 
         updateControllerRunState(controllerId, RunState.RUNNING);
         final ControllerLog jobLog = upsertControllerLog(controllerId, null, true, false, null, null);
@@ -165,7 +165,7 @@ public class KafkaSubscribeController extends StandardExecutionController {
 
         } catch (Throwable ex) {
             final String errmsg = format(
-                    "Failed to executing requests job of currentShardingTotalCount: %s, context: %s, controllerId: %s, jobLogId: %s",
+                    "Failed to executing requests job of currentShardingTotalCount: %s, context: %s, controllerId: %s, controllerLogId: %s",
                     currentShardingTotalCount, context, schedule.getId(), jobLog.getId());
             if (log.isDebugEnabled()) {
                 log.error(errmsg, ex);
@@ -190,9 +190,9 @@ public class KafkaSubscribeController extends StandardExecutionController {
         getGlobalScheduleJobManager().remove(trigger.getId());
     }
 
-    protected ControllerLog newDefaultScheduleJobLog(final Long controllerId) {
+    protected ControllerLog newDefaultControllerLog(final Long controllerId) {
         return ControllerLog.builder()
-                .scheduleId(controllerId)
+                .controllerId(controllerId)
                 .details(KafkaSubscribeControllerLog.builder().type(ControllerType.KAFKA_SUBSCRIBER.name()).build())
                 .build();
     }
@@ -267,9 +267,9 @@ public class KafkaSubscribeController extends StandardExecutionController {
         final List<ConsumerRecord<String, String>> records;
 
         public KafkaSubscribeExecutionWorker(int currentShardingTotalCount, ShardingContext context, Long controllerId,
-                Long jobLogId, RengineClient rengineClient, WorkflowExecuteRequest request,
+                Long controllerLogId, RengineClient rengineClient, WorkflowExecuteRequest request,
                 List<ConsumerRecord<String, String>> records) {
-            super(currentShardingTotalCount, context, controllerId, jobLogId, rengineClient, request);
+            super(currentShardingTotalCount, context, controllerId, controllerLogId, rengineClient, request);
             this.records = notNullOf(records, "records");
         }
 

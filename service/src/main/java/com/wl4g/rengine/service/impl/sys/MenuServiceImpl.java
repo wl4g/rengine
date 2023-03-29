@@ -25,7 +25,6 @@ import static java.util.Objects.isNull;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.core.Authentication;
@@ -42,7 +41,6 @@ import com.wl4g.rengine.service.model.sys.MenuDeleteResult;
 import com.wl4g.rengine.service.model.sys.MenuQuery;
 import com.wl4g.rengine.service.model.sys.MenuSave;
 import com.wl4g.rengine.service.model.sys.MenuSaveResult;
-import com.wl4g.rengine.service.security.user.AuthenticationService;
 
 /**
  * {@link MenuServiceImpl}
@@ -53,9 +51,6 @@ import com.wl4g.rengine.service.security.user.AuthenticationService;
  */
 @Service
 public class MenuServiceImpl extends BasicServiceImpl implements MenuService {
-
-    @Autowired
-    AuthenticationService authenticationService;
 
     @Override
     public PageHolder<Menu> query(MenuQuery model) {

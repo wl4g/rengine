@@ -18,8 +18,10 @@ package com.wl4g.rengine.service.model.sys;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.wl4g.rengine.common.entity.sys.Menu;
 import com.wl4g.rengine.common.entity.sys.MenuRole;
 import com.wl4g.rengine.common.entity.sys.Role;
+import com.wl4g.rengine.common.entity.sys.User;
 import com.wl4g.rengine.common.entity.sys.UserRole;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -68,6 +70,34 @@ public class RoleSave extends Role {
     @JsonIgnore
     public void setMenuRoles(List<MenuRole> menuRoles) {
         super.setMenuRoles(menuRoles);
+    }
+
+    @JsonIgnore
+    @Override
+    public List<Menu> getMenus() {
+        // TODO Auto-generated method stub
+        return super.getMenus();
+    }
+
+    @JsonIgnore
+    @Override
+    public List<User> getUsers() {
+        // TODO Auto-generated method stub
+        return super.getUsers();
+    }
+
+    @JsonIgnore
+    @Override
+    public void setMenus(List<Menu> menus) {
+        // TODO Auto-generated method stub
+        super.setMenus(menus);
+    }
+
+    @JsonIgnore
+    @Override
+    public void setUsers(List<User> users) {
+        // TODO Auto-generated method stub
+        super.setUsers(users);
     }
 
 }

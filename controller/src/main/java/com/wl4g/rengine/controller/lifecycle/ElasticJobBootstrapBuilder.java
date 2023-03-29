@@ -182,10 +182,10 @@ public class ElasticJobBootstrapBuilder {
     @ToString
     @NoArgsConstructor
     public static class JobParameter {
-        private Long scheduleId;
+        private Long controllerId;
 
-        public JobParameter(@NotNull Long scheduleId) {
-            this.scheduleId = notNullOf(scheduleId, "scheduleId");
+        public JobParameter(@NotNull Long controllerId) {
+            this.controllerId = notNullOf(controllerId, "controllerId");
         }
     }
 

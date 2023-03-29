@@ -36,7 +36,6 @@ import javax.validation.constraints.NotEmpty;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.bson.conversions.Bson;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -57,7 +56,6 @@ import com.wl4g.rengine.service.model.sys.UserDeleteResult;
 import com.wl4g.rengine.service.model.sys.UserQuery;
 import com.wl4g.rengine.service.model.sys.UserSave;
 import com.wl4g.rengine.service.model.sys.UserSaveResult;
-import com.wl4g.rengine.service.security.user.AuthenticationService;
 import com.wl4g.rengine.service.security.user.AuthenticationService.UserAuthInfo;
 
 /**
@@ -69,9 +67,6 @@ import com.wl4g.rengine.service.security.user.AuthenticationService.UserAuthInfo
  */
 @Service
 public class UserServiceImpl extends BasicServiceImpl implements UserService {
-
-    @Autowired
-    AuthenticationService authenticationService;
 
     @Override
     public PageHolder<User> query(UserQuery model) {

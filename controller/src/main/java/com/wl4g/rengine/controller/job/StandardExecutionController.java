@@ -109,7 +109,7 @@ public class StandardExecutionController extends AbstractJobExecutor {
             @NotNull ShardingContext context) throws Exception {
 
         final JobParameter jobParameter = notNullOf(parseJSON(jobConfig.getJobParameter(), JobParameter.class), "jobParameter");
-        final Long controllerId = notNullOf(jobParameter.getScheduleId(), "controllerScheduleId");
+        final Long controllerId = notNullOf(jobParameter.getControllerId(), "controllerScheduleId");
 
         updateControllerRunState(controllerId, RunState.RUNNING);
         final ControllerLog controllerLog = upsertControllerLog(controllerId, null, true, false, null, null);
@@ -139,7 +139,7 @@ public class StandardExecutionController extends AbstractJobExecutor {
 
         } catch (Throwable ex) {
             final String errmsg = format(
-                    "Failed to executing requests job of currentShardingTotalCount: %s, context: %s, controllerId: %s, jobLogId: %s",
+                    "Failed to executing requests job of currentShardingTotalCount: %s, context: %s, controllerId: %s, controllerLogId: %s",
                     currentShardingTotalCount, context, schedule.getId(), controllerLog.getId());
             if (log.isDebugEnabled()) {
                 log.error(errmsg, ex);
@@ -196,9 +196,9 @@ public class StandardExecutionController extends AbstractJobExecutor {
     }
 
     @Override
-    protected ControllerLog newDefaultScheduleJobLog(final Long controllerId) {
+    protected ControllerLog newDefaultControllerLog(final Long controllerId) {
         return ControllerLog.builder()
-                .scheduleId(controllerId)
+                .controllerId(controllerId)
                 .details(ExecutionControllerLog.builder().type(ControllerType.STANDARD_EXECUTION.name()).build())
                 .build();
     }
@@ -225,17 +225,17 @@ public class StandardExecutionController extends AbstractJobExecutor {
         private final int currentShardingTotalCount;
         private final ShardingContext context;
         private final Long controllerId;
-        private final Long jobLogId;
+        private final Long controllerLogId;
         private final RengineClient rengineClient;
         private final WorkflowExecuteRequest request;
         private WorkflowExecuteResult result;
 
-        public ExecutionWorker(int currentShardingTotalCount, ShardingContext context, Long controllerId, Long jobLogId,
+        public ExecutionWorker(int currentShardingTotalCount, ShardingContext context, Long controllerId, Long controllerLogId,
                 RengineClient rengineClient, WorkflowExecuteRequest request) {
             this.currentShardingTotalCount = currentShardingTotalCount;
             this.context = notNullOf(context, "context");
             this.controllerId = notNullOf(controllerId, "controllerId");
-            this.jobLogId = notNullOf(jobLogId, "jobLogId");
+            this.controllerLogId = notNullOf(controllerLogId, "controllerLogId");
             this.rengineClient = notNullOf(rengineClient, "rengineClient");
             this.request = notNullOf(request, "request");
         }
@@ -254,8 +254,8 @@ public class StandardExecutionController extends AbstractJobExecutor {
                         .build())));
             } catch (Throwable ex) {
                 final String errmsg = format(
-                        "Failed to executing request job of currentShardingTotalCount: %s, context: %s, controllerId: %s, jobLogId: %s, request: %s",
-                        currentShardingTotalCount, context, controllerId, jobLogId, request);
+                        "Failed to executing request job of currentShardingTotalCount: %s, context: %s, controllerId: %s, controllerLogId: %s, request: %s",
+                        currentShardingTotalCount, context, controllerId, controllerLogId, request);
                 if (log.isDebugEnabled()) {
                     log.error(errmsg, ex);
                 } else {

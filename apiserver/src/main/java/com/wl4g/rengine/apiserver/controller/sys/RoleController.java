@@ -104,7 +104,7 @@ public class RoleController {
     @Operation(description = "Find users by roleIds.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "users" }, produces = "application/json", method = { GET })
-    @PreAuthorize("hasPermission(#model,'arn:sys:role:users:read:v1')")
+    @PreAuthorize("hasPermission(#model,'arn:sys:role:user:read:v1')")
     public RespBase<List<User>> users(@RequestParam("roleIds") List<Long> roleIds) {
         log.debug("called: roleIds={}", roleIds);
         return RespBase.<List<User>> create().withData(roleService.findUsersByRoleIds(roleIds));
@@ -114,7 +114,7 @@ public class RoleController {
     @Operation(description = "Find menus by roleIds.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "menus" }, produces = "application/json", method = { GET })
-    @PreAuthorize("hasPermission(#model,'arn:sys:role:menus:read:v1')")
+    @PreAuthorize("hasPermission(#model,'arn:sys:role:menu:read:v1')")
     public RespBase<List<Menu>> menus(@RequestParam("roleIds") List<Long> roleIds) {
         log.debug("called: roleIds={}", roleIds);
         return RespBase.<List<Menu>> create().withData(roleService.findMenusByRoleIds(roleIds));
@@ -124,7 +124,7 @@ public class RoleController {
     @Operation(description = "Assign users by roleId.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "assign/users" }, produces = "application/json", method = { POST })
-    @PreAuthorize("hasPermission(#model,'arn:sys:role:users:write:v1')")
+    @PreAuthorize("hasPermission(#model,'arn:sys:role:user:write:v1')")
     public RespBase<List<Long>> assignUsers(@Validated @RequestBody RoleAssignUser model) {
         log.debug("called: model={}", model);
         return RespBase.<List<Long>> create().withData(roleService.assignUsers(model));
@@ -134,7 +134,7 @@ public class RoleController {
     @Operation(description = "Assign menus by roleId.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "assign/menus" }, produces = "application/json", method = { POST })
-    @PreAuthorize("hasPermission(#model,'arn:sys:role:menus:write:v1')")
+    @PreAuthorize("hasPermission(#model,'arn:sys:role:menu:write:v1')")
     public RespBase<List<Long>> assignMenus(@Validated @RequestBody RoleAssignMenu model) {
         log.debug("called: model={}", model);
         return RespBase.<List<Long>> create().withData(roleService.assignMenus(model));

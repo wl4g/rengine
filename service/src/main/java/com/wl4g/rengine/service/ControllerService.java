@@ -32,19 +32,19 @@ import com.wl4g.rengine.service.model.ControllerScheduleQuery;
 import com.wl4g.rengine.service.model.ControllerScheduleSaveResult;
 
 /**
- * {@link ControllerScheduleService}
+ * {@link ControllerService}
  * 
  * @author James Wong
  * @version 2022-08-29
  * @since v1.0.0
  */
-public interface ControllerScheduleService {
+public interface ControllerService {
 
-    default Controller get(Long scheduleId) {
-        notNullOf(scheduleId, "scheduleId");
-        final PageHolder<Controller> result = query(ControllerScheduleQuery.builder().scheduleId(scheduleId).build());
+    default Controller get(Long controllerId) {
+        notNullOf(controllerId, "controllerId");
+        final PageHolder<Controller> result = query(ControllerScheduleQuery.builder().controllerId(controllerId).build());
         if (isNull(result) || CollectionUtils2.isEmpty(result.getRecords())) {
-            throw new IllegalArgumentException(format("No found schedule trigger by %s", scheduleId));
+            throw new IllegalArgumentException(format("No found schedule trigger by %s", controllerId));
         }
         return result.getRecords().get(0);
     }

@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.rengine.common.entity.Controller;
-import com.wl4g.rengine.service.ControllerScheduleService;
+import com.wl4g.rengine.service.ControllerService;
 import com.wl4g.rengine.service.model.ControllerScheduleDelete;
 import com.wl4g.rengine.service.model.ControllerScheduleDeleteResult;
 import com.wl4g.rengine.service.model.ControllerScheduleQuery;
@@ -55,7 +55,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/v1/controller")
 public class ControllerController {
 
-    private @Autowired ControllerScheduleService controllerScheduleService;
+    private @Autowired ControllerService controllerService;
 
     // @SecurityRequirement(name = "default_oauth")
     @Operation(description = "Query controllers.")
@@ -65,7 +65,7 @@ public class ControllerController {
     public RespBase<PageHolder<Controller>> query(@Validated ControllerScheduleQuery model) {
         log.debug("called: model={}", model);
         RespBase<PageHolder<Controller>> resp = RespBase.create();
-        resp.setData(controllerScheduleService.query(model));
+        resp.setData(controllerService.query(model));
         return resp;
     }
 
@@ -77,7 +77,7 @@ public class ControllerController {
     public RespBase<ControllerScheduleSaveResult> save(@Validated @RequestBody ControllerScheduleSave model) {
         log.debug("called: model={}", model);
         RespBase<ControllerScheduleSaveResult> resp = RespBase.create();
-        resp.setData(controllerScheduleService.save(model));
+        resp.setData(controllerService.save(model));
         return resp;
     }
 
@@ -89,7 +89,7 @@ public class ControllerController {
     public RespBase<ControllerScheduleDeleteResult> delete(@Validated @RequestBody ControllerScheduleDelete model) {
         log.debug("called: model={}", model);
         RespBase<ControllerScheduleDeleteResult> resp = RespBase.create();
-        resp.setData(controllerScheduleService.delete(model));
+        resp.setData(controllerService.delete(model));
         return resp;
     }
 

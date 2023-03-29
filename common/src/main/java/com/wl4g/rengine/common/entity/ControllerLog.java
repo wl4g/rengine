@@ -21,6 +21,7 @@ import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -57,7 +58,7 @@ import lombok.experimental.SuperBuilder;
 public class ControllerLog extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
-    private @NotNull Long scheduleId;
+    private @NotNull Long controllerId;
     private String jobName;
     private Date startupTime;
     private Date finishedTime;
@@ -104,6 +105,41 @@ public class ControllerLog extends BaseEntity {
     @AllArgsConstructor
     public static class KafkaSubscribeControllerLog extends LogDetailBase<KafkaSubscribeControllerLog> {
         private ResultInformation result;
+    }
+
+    /**
+     * {@link com.nextbreakpoint.flinkclient.model.JobDetailsInfo}
+     */
+    @Getter
+    @Setter
+    @SuperBuilder
+    @ToString
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class FlinkSubmitControllerLog extends LogDetailBase<FlinkSubmitControllerLog> {
+        private String jarId;
+        private Map<String, Object> jobArgs;
+        private String jobId;
+
+        // private String jid;
+        private String name;
+        private Boolean isStoppable;
+        private FlinkJobState state;
+        private Long startTime;
+        private Long endTime;
+        private Long duration;
+        private Long now;
+        private Map<String, Long> timestamps;
+        // private List<JobDetailsInfoJobVertexDetailsInfo> vertices;
+        private Map<String, Integer> statusCounts;
+        // private JobDetailsInfoJobPlan plan;
+
+        /**
+         * {@link com.nextbreakpoint.flinkclient.model.JobDetailsInfo.StateEnum}
+         */
+        public static enum FlinkJobState {
+            CREATED, RUNNING, FAILING, FAILED, CANCELLING, CANCELED, FINISHED, RESTARTING, SUSPENDING, SUSPENDED, RECONCILING,
+        }
     }
 
     @Getter

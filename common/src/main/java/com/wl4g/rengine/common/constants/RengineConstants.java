@@ -21,6 +21,7 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.equalsAnyIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.split;
+import static org.apache.commons.lang3.SystemUtils.JAVA_IO_TMPDIR;
 
 import java.util.List;
 
@@ -84,7 +85,8 @@ public abstract class RengineConstants extends EnvironmentUtil {
     // see:org.springframework.security.config.annotation.web.configurers.oauth2.client.OAuth2LoginConfigurer#loginProcessingUrl()
     public static final String API_LOGIN_OAUTH2_CALLBACK_ENDPOINT_BASE = "/login/oauth2/callback/*";
 
-    // API base URI dedicated to kubernetes operator internal request processing.
+    // API base URI dedicated to kubernetes operator internal request
+    // processing.
     public static final String API_V1_KUBERNETES_OPERATOR_BASE_URI = "/_/v1/operator";
 
     // ----------------------------------------------------------------------------
@@ -92,6 +94,9 @@ public abstract class RengineConstants extends EnvironmentUtil {
     // ----------------------------------------------------------------------------
 
     public static final String CONF_PREFIX_CONTROLLER = CONF_PREFIX + ".controller";
+
+    public static final String DEFAULT_CONTROLLER_JAR_TMP_DIR = getStringProperty("script.log.dir",
+            JAVA_IO_TMPDIR + "/__rengine_jars");
 
     //
     // ----- Rengine Executor constants. -----
@@ -119,8 +124,12 @@ public abstract class RengineConstants extends EnvironmentUtil {
 
     // Notice: The handcode entrypoint function is 'process'
     public static final String DEFAULT_EXECUTOR_MAIN_FUNCTION = "process";
-    public static final String DEFAULT_EXECUTOR_SCRIPT_TMP_CACHE_DIR = "/tmp/__rengine_script_caches";
-    public static final String DEFAULT_EXECUTOR_SCRIPT_LOG_BASE_DIR = "/tmp/__rengine_script_log";
+
+    public static final String DEFAULT_EXECUTOR_SCRIPT_CACHE_DIR = getStringProperty("script.cache.dir",
+            JAVA_IO_TMPDIR + "/__rengine_script_caches");
+    public static final String DEFAULT_EXECUTOR_SCRIPT_LOG_DIR = getStringProperty("script.log.dir",
+            JAVA_IO_TMPDIR + "/__rengine_script_log");
+
     public static final String DEFAULT_EXECUTOR_LOGGING_PREFIX = "log";
     public static final int DEFAULT_EXECUTOR_S3_OBJECT_READ_BUFFER = getIntProperty("EXECUTOR_S3_OBJECT_READ_BUFFER", 4 * 1024);
     public static final int DEFAULT_EXECUTOR_S3_OBJECT_MAX_LIMIT = getIntProperty("EXECUTOR_S3_OBJECT_MAX_LIMIT",

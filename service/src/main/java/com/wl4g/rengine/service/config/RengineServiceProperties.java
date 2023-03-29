@@ -75,7 +75,7 @@ public class RengineServiceProperties {
     @ToString
     @NoArgsConstructor
     public static class ControllerLogServiceProperties {
-        private String baseDir = RengineConstants.DEFAULT_EXECUTOR_SCRIPT_LOG_BASE_DIR;
+        private String baseDir = RengineConstants.DEFAULT_EXECUTOR_SCRIPT_LOG_DIR;
     }
 
 }

@@ -467,56 +467,67 @@ public class Controller extends BaseEntity {
     @ToString
     @NoArgsConstructor
     public static class FlinkSubmitExecutionConfig extends ScheduleDetailBase<FlinkSubmitExecutionConfig> {
-        // Flink source MQ (kafka/pulsar/rabbitmq/...) options.
-        private String brokers;
-        private @NotBlank @Default String eventTopicPattern = "rengine_event";
-        private @NotBlank @Default String groupId = "rengine_job_default";
-        private Long fromOffsetTime;
-        private @NotBlank @Default String deserializerClass = "com.wl4g.rengine.job.kafka.OtlpLogKafkaDeserializationSchema";
-        private @NotBlank @Default String keyByExprPath = "body.service";
-
-        // FLINK basic options.
-        private @Default String runtimeMode = "STREAMING";
-        private @Default Integer restartAttempts = 3;
-        private @Default Integer restartDelaySeconds = 15;
-
-        // FLINK Checkpoint options.
-        private @NotBlank @Default String checkpointDir = "file:///tmp/flink-checkpoint";
-        private @NotBlank @Default String checkpointMode = "AT_LEAST_ONCE";
-        private Long checkpointIntervalMs;
-        private Long checkpointTimeout;
-        private Long checkpointMinPauseBetween;
-        private Integer checkpointMaxConcurrent;
-        private String externalizedCheckpointCleanup;
-
-        // FLINK Performance options.
-        private @NotNull @Default Integer parallelis = -1;
-        private @NotNull @Default Integer maxParallelism = -1;
-        private @NotNull @Default Long bufferTimeoutMillis = -1L;
-        private @NotNull @Default Long outOfOrdernessMillis = 120000L;
-        private @NotNull @Default Long idleTimeoutMillis = 30000L;
-
-        // FLINK Sink options.
-        private Boolean forceUsePrintSink;
-
-        // FLINK ControllerLog options.
-        private String jobName;
-
-        // FLINK CEP job options.
-        private @NotBlank String cepPatterns; // IMPORTMENT!!!
-        private @NotBlank @Default Boolean inProcessingTime = false;
-        private @NotBlank @Default String alertTopic = "rengine_alert";
-
-        // FLINK CEP job with kafka options.
-        private @NotBlank @Default String offsetResetStrategy = "LATEST";
-        private String partitionDiscoveryIntervalMs;
-
-        // FLINK job manifests.
-        private @NotBlank @Default String entryClass = "com.wl4g.rengine.job.cep.RengineKafkaFlinkCepStreaming";
+        private String jobFileUrl; // e.g:"xx/rengine-job-base-1.0.0.jar"
+        private FlinkJobArgs jobArgs;
 
         public FlinkSubmitExecutionConfig validate() {
             return this;
         }
+
+        @Getter
+        @Setter
+        @SuperBuilder
+        @ToString
+        @NoArgsConstructor
+        public static class FlinkJobArgs {
+            // Flink source MQ (kafka/pulsar/rabbitmq/...) options.
+            private String brokers;
+            private @NotBlank @Default String eventTopicPattern = "rengine_event";
+            private @NotBlank @Default String groupId = "rengine_job_default";
+            private Long fromOffsetTime;
+            private @NotBlank @Default String deserializerClass = "com.wl4g.rengine.job.kafka.OtlpLogKafkaDeserializationSchema";
+            private @NotBlank @Default String keyByExprPath = "body.service";
+
+            // FLINK basic options.
+            private @Default String runtimeMode = "STREAMING";
+            private @Default Integer restartAttempts = 3;
+            private @Default Integer restartDelaySeconds = 15;
+
+            // FLINK Checkpoint options.
+            private @NotBlank @Default String checkpointDir = "file:///tmp/flink-checkpoint";
+            private @NotBlank @Default String checkpointMode = "AT_LEAST_ONCE";
+            private Long checkpointIntervalMs;
+            private Long checkpointTimeout;
+            private Long checkpointMinPauseBetween;
+            private Integer checkpointMaxConcurrent;
+            private String externalizedCheckpointCleanup;
+
+            // FLINK Performance options.
+            private @NotNull @Default Integer parallelis = -1;
+            private @NotNull @Default Integer maxParallelism = -1;
+            private @NotNull @Default Long bufferTimeoutMillis = -1L;
+            private @NotNull @Default Long outOfOrdernessMillis = 120000L;
+            private @NotNull @Default Long idleTimeoutMillis = 30000L;
+
+            // FLINK Sink options.
+            private Boolean forceUsePrintSink;
+
+            // FLINK ControllerLog options.
+            private String jobName;
+
+            // FLINK CEP job options.
+            private @NotBlank String cepPatterns; // IMPORTMENT!!!
+            private @NotBlank @Default Boolean inProcessingTime = false;
+            private @NotBlank @Default String alertTopic = "rengine_alert";
+
+            // FLINK CEP job with kafka options.
+            private @NotBlank @Default String offsetResetStrategy = "LATEST";
+            private String partitionDiscoveryIntervalMs;
+
+            // FLINK job manifests.
+            private @NotBlank @Default String entryClass = "com.wl4g.rengine.job.cep.RengineKafkaFlinkCepStreaming";
+        }
+
     }
 
     public static final String DEFAULT_CRON = "0/10 * * * * ?";

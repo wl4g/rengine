@@ -17,16 +17,26 @@ package com.wl4g.rengine.controller.job;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.infra.common.lang.StringUtils2.getFilenameExtension;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
-import static com.wl4g.infra.common.task.GenericTaskRunner.newDefaultScheduledExecutor;
+import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_CONTROLLER_JAR_TMP_DIR;
 import static java.lang.String.format;
+import static java.lang.String.valueOf;
+import static java.lang.System.currentTimeMillis;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static org.apache.commons.lang3.StringUtils.join;
+import static java.util.stream.Collectors.joining;
+import static org.apache.commons.lang3.StringUtils.equalsAnyIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.startsWith;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.FileOutputStream;
+import java.net.URI;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
@@ -41,17 +51,23 @@ import com.nextbreakpoint.flinkclient.model.JarListInfo;
 import com.nextbreakpoint.flinkclient.model.JarRunResponseBody;
 import com.nextbreakpoint.flinkclient.model.JarUploadResponseBody;
 import com.nextbreakpoint.flinkclient.model.JobDetailsInfo;
-import com.nextbreakpoint.flinkclient.model.JobIdsWithStatusOverview;
 import com.nextbreakpoint.flinkclient.model.JobDetailsInfo.StateEnum;
+import com.nextbreakpoint.flinkclient.model.JobIdsWithStatusOverview;
+import com.squareup.okhttp.OkHttpClient;
+import com.wl4g.infra.common.lang.Assert2;
 import com.wl4g.infra.common.lang.StringUtils2;
-import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
-import com.wl4g.rengine.common.entity.ControllerLog;
 import com.wl4g.rengine.common.entity.Controller;
 import com.wl4g.rengine.common.entity.Controller.FlinkSubmitExecutionConfig;
+import com.wl4g.rengine.common.entity.Controller.FlinkSubmitExecutionConfig.FlinkJobArgs;
 import com.wl4g.rengine.common.entity.Controller.RunState;
+import com.wl4g.rengine.common.entity.ControllerLog;
+import com.wl4g.rengine.common.entity.ControllerLog.FlinkSubmitControllerLog;
+import com.wl4g.rengine.common.entity.ControllerLog.FlinkSubmitControllerLog.FlinkJobState;
 import com.wl4g.rengine.controller.config.RengineControllerProperties.EngineFlinkSchedulerProperties;
 import com.wl4g.rengine.controller.lifecycle.ElasticJobBootstrapBuilder.JobParameter;
+import com.wl4g.rengine.service.minio.MinioClientProperties;
 
+import io.minio.DownloadObjectArgs;
 import lombok.CustomLog;
 import lombok.Getter;
 
@@ -73,7 +89,6 @@ import lombok.Getter;
 public class FlinkSubmitController extends AbstractJobExecutor {
 
     private FlinkApi flinkApi;
-    private SafeScheduledTaskPoolExecutor executor;
 
     @Override
     public String getType() {
@@ -85,27 +100,31 @@ public class FlinkSubmitController extends AbstractJobExecutor {
             synchronized (this) {
                 if (isNull(flinkApi)) {
                     final EngineFlinkSchedulerProperties flinkConfig = getConfig().getFlink();
-                    this.flinkApi = new FlinkApi(new ApiClient());
+                    final ApiClient apiClient = new ApiClient();
+                    apiClient.setBasePath(flinkConfig.getEndpoint());
+                    apiClient.setHttpClient(new OkHttpClient());
+                    apiClient.setUserAgent(FlinkSubmitController.class.getSimpleName().concat("/1.0/java"));
+                    apiClient.setConnectTimeout(5);
+                    apiClient.setReadTimeout(10);
+                    // for upload jars
+                    apiClient.setWriteTimeout(300);
+                    apiClient.setVerifyingSsl(flinkConfig.getVerifyingSsl());
+                    apiClient.setSslCaCert(flinkConfig.getSslCaCert());
+                    apiClient.setDebugging(flinkConfig.getDebugging());
+                    // for basic auth
+                    apiClient.setUsername(flinkConfig.getUsername());
+                    apiClient.setPassword(flinkConfig.getPassword());
+                    // for api auth
+                    apiClient.setApiKey(flinkConfig.getApiKey());
+                    apiClient.setApiKeyPrefix(flinkConfig.getApiKeyPrefix());
+                    // for oauth auth
+                    apiClient.setAccessToken(flinkConfig.getAccessToken());
+                    this.flinkApi = new FlinkApi(apiClient);
                     log.info("Initialized flinkApi of : {}", flinkConfig);
                 }
             }
         }
         return flinkApi;
-    }
-
-    protected SafeScheduledTaskPoolExecutor getExecutor() {
-        if (isNull(executor)) {
-            synchronized (this) {
-                if (isNull(executor)) {
-                    final EngineFlinkSchedulerProperties fr = getConfig().getFlink();
-                    this.executor = newDefaultScheduledExecutor(FlinkSubmitController.class.getSimpleName(),
-                            fr.getConcurrency(), fr.getAcceptQueue());
-                    log.info("Initialized schedule executor of concurrency: {}, acceptQueue: {}", fr.getConcurrency(),
-                            fr.getAcceptQueue());
-                }
-            }
-        }
-        return executor;
     }
 
     /**
@@ -119,7 +138,7 @@ public class FlinkSubmitController extends AbstractJobExecutor {
             @NotNull ShardingContext context) throws Exception {
 
         final JobParameter jobParameter = notNullOf(parseJSON(jobConfig.getJobParameter(), JobParameter.class), "jobParameter");
-        final Long controllerId = notNullOf(jobParameter.getScheduleId(), "controllerId");
+        final Long controllerId = notNullOf(jobParameter.getControllerId(), "controllerId");
 
         updateControllerRunState(controllerId, RunState.RUNNING);
         final ControllerLog controllerLog = upsertControllerLog(controllerId, null, true, false, null, null);
@@ -127,6 +146,7 @@ public class FlinkSubmitController extends AbstractJobExecutor {
         final Controller controller = notNullOf(getControllerScheduleService().get(controllerId), "controller");
         final FlinkSubmitExecutionConfig fssc = ((FlinkSubmitExecutionConfig) notNullOf(controller.getDetails(),
                 "flinkSubmitScheduleConfig")).validate();
+        final FlinkJobArgs jobArgsConfig = fssc.getJobArgs();
 
         try {
             log.info("Execution scheduling for : {}", controller);
@@ -138,57 +158,71 @@ public class FlinkSubmitController extends AbstractJobExecutor {
                 safeList(allJobInfo.getJobs());
             }
 
-            // rengine-job-base-1.0.0-jar-with-dependencies.jar
-            final JarUploadResponseBody upload = getFlinkApi().uploadJar(new File("xx/rengine-job-base-1.0.0.jar")); // TODO
+            // e.g: jobinfra/rengine-job-base-1.0.0.jar
+            // e.g: jobinfra/rengine-job-base-1.0.0-jar-with-dependencies.jar
+            final JarUploadResponseBody upload = getFlinkApi().uploadJar(obtainFlinkJobJarFile(fssc));
+            if (isNull(upload)) {
+                throw new IllegalStateException(format("Failed to upload jar for : %s", fssc.getJobFileUrl()));
+            }
 
             final JarListInfo jarsInfo = getFlinkApi().listJars();
+            if (isNull(jarsInfo)) {
+                throw new IllegalStateException(format("Unable to get flink upload jars."));
+            }
             final JarFileInfo jar = safeList(jarsInfo.getFiles()).stream()
                     .filter(j -> StringUtils2.equals(j.getName(), upload.getFilename()))
                     .findFirst()
                     .orElseGet(null);
+            if (isNull(jar)) {
+                throw new IllegalStateException(format("Could't find jar of flink upload file : {}", upload.getFilename()));
+            }
 
             // Make flink job arguments.
-            final List<String> jobArgs = new ArrayList<>(8);
+            final Map<String, Object> jobArgs = new LinkedHashMap<>(32);
             // Flink source MQ (kafka/pulsar/rabbitmq/...) options.
-            jobArgs.add(format("--brokers %s", fssc.getBrokers()));
-            jobArgs.add(format("--eventTopicPattern %s", fssc.getEventTopicPattern()));
-            jobArgs.add(format("--groupId %s", fssc.getGroupId()));
-            jobArgs.add(format("--fromOffsetTime %s", fssc.getFromOffsetTime()));
-            jobArgs.add(format("--deserializerClass %s", fssc.getDeserializerClass()));
-            jobArgs.add(format("--keyByExprPath %s", fssc.getKeyByExprPath()));
+            jobArgs.put("brokers", jobArgsConfig.getBrokers());
+            jobArgs.put("eventTopicPattern", jobArgsConfig.getEventTopicPattern());
+            jobArgs.put("groupId", jobArgsConfig.getGroupId());
+            jobArgs.put("fromOffsetTime", jobArgsConfig.getFromOffsetTime());
+            jobArgs.put("deserializerClass", jobArgsConfig.getDeserializerClass());
+            jobArgs.put("keyByExprPath", jobArgsConfig.getKeyByExprPath());
             // FLINK basic options.
-            jobArgs.add(format("--runtimeMode %s", fssc.getRuntimeMode()));
-            jobArgs.add(format("--restartAttempts %s", fssc.getRestartAttempts()));
-            jobArgs.add(format("--restartDelaySeconds %s", fssc.getRestartDelaySeconds()));
+            jobArgs.put("runtimeMode", jobArgsConfig.getRuntimeMode());
+            jobArgs.put("restartAttempts", jobArgsConfig.getRestartAttempts());
+            jobArgs.put("restartDelaySeconds", jobArgsConfig.getRestartDelaySeconds());
             // FLINK Checkpoint options.
-            jobArgs.add(format("--checkpointDir %s", fssc.getCheckpointDir()));
-            jobArgs.add(format("--checkpointMode %s", fssc.getCheckpointMode()));
-            jobArgs.add(format("--checkpointIntervalMs %s", fssc.getCheckpointIntervalMs()));
-            jobArgs.add(format("--checkpointMinPauseBetween %s", fssc.getCheckpointMinPauseBetween()));
-            jobArgs.add(format("--checkpointMaxConcurrent %s", fssc.getCheckpointMaxConcurrent()));
-            jobArgs.add(format("--externalizedCheckpointCleanup %s", fssc.getExternalizedCheckpointCleanup()));
+            jobArgs.put("checkpointDir", jobArgsConfig.getCheckpointDir());
+            jobArgs.put("checkpointMode", jobArgsConfig.getCheckpointMode());
+            jobArgs.put("checkpointIntervalMs", jobArgsConfig.getCheckpointIntervalMs());
+            jobArgs.put("checkpointMinPauseBetween", jobArgsConfig.getCheckpointMinPauseBetween());
+            jobArgs.put("checkpointMaxConcurrent", jobArgsConfig.getCheckpointMaxConcurrent());
+            jobArgs.put("externalizedCheckpointCleanup", jobArgsConfig.getExternalizedCheckpointCleanup());
             // FLINK Performance options.
-            jobArgs.add(format("--parallelis %s", fssc.getParallelis()));
-            jobArgs.add(format("--maxParallelism %s", fssc.getMaxParallelism()));
-            jobArgs.add(format("--bufferTimeoutMillis %s", fssc.getBufferTimeoutMillis()));
-            jobArgs.add(format("--outOfOrdernessMillis %s", fssc.getOutOfOrdernessMillis()));
-            jobArgs.add(format("--idleTimeoutMillis %s", fssc.getIdleTimeoutMillis()));
+            jobArgs.put("parallelis", jobArgsConfig.getParallelis());
+            jobArgs.put("maxParallelism", jobArgsConfig.getMaxParallelism());
+            jobArgs.put("bufferTimeoutMillis", jobArgsConfig.getBufferTimeoutMillis());
+            jobArgs.put("outOfOrdernessMillis", jobArgsConfig.getOutOfOrdernessMillis());
+            jobArgs.put("idleTimeoutMillis", jobArgsConfig.getIdleTimeoutMillis());
             // FLINK Sink options.
-            jobArgs.add(format("--forceUsePrintSink %s", fssc.getForceUsePrintSink()));
+            jobArgs.put("forceUsePrintSink", jobArgsConfig.getForceUsePrintSink());
             // FLINK ControllerLog options.
-            jobArgs.add(format("--jobName %s", fssc.getJobName()));
+            jobArgs.put("jobName", jobArgsConfig.getJobName());
             // FLINK CEP job options.
-            jobArgs.add(format("--cepPatterns %s", "TODO")); // TODO
-            jobArgs.add(format("--inProcessingTime %s", fssc.getInProcessingTime()));
-            jobArgs.add(format("--alertTopic %s", fssc.getAlertTopic()));
+            jobArgs.put("cepPatterns", "TODO"); // TODO
+            jobArgs.put("inProcessingTime", jobArgsConfig.getInProcessingTime());
+            jobArgs.put("alertTopic", jobArgsConfig.getAlertTopic());
             // FLINK CEP job with kafka options.
-            jobArgs.add(format("--offsetResetStrategy %s", fssc.getOffsetResetStrategy()));
-            jobArgs.add(format("--partitionDiscoveryIntervalMs %s", fssc.getPartitionDiscoveryIntervalMs()));
+            jobArgs.put("offsetResetStrategy", jobArgsConfig.getOffsetResetStrategy());
+            jobArgs.put("partitionDiscoveryIntervalMs", jobArgsConfig.getPartitionDiscoveryIntervalMs());
 
-            log.info("Run flink job args : {}", jobArgs);
+            final String jobArgsLine = jobArgs.entrySet()
+                    .stream()
+                    .map(e -> format("--%s %s", e.getKey(), e.getValue()))
+                    .collect(joining(","));
 
-            final JarRunResponseBody response = getFlinkApi().runJar(jar.getId(), true, null, null, join(jobArgs, ","),
-                    fssc.getEntryClass(), fssc.getParallelis());
+            log.info("Run flink job args line : {}", jobArgsLine);
+            final JarRunResponseBody response = getFlinkApi().runJar(jar.getId(), true, null, null, jobArgsLine,
+                    jobArgsConfig.getEntryClass(), jobArgsConfig.getParallelis());
 
             final JobDetailsInfo jobDetails = getFlinkApi().getJobDetails(response.getJobid());
             // TODO
@@ -197,9 +231,26 @@ public class FlinkSubmitController extends AbstractJobExecutor {
 
             updateControllerRunState(controllerId, RunState.SUCCESS);
 
+            upsertControllerLog(controllerId, controllerLog.getId(), false, true, true, _jobLog -> {
+                _jobLog.setDetails(FlinkSubmitControllerLog.builder()
+                        .jarId(jar.getId())
+                        .jobId(response.getJobid())
+                        .jobArgs(jobArgs)
+                        .name(jobDetails.getName())
+                        .isStoppable(jobDetails.isIsStoppable())
+                        .state(FlinkJobState.valueOf(jobDetails.getState().name()))
+                        .startTime(jobDetails.getStartTime())
+                        .endTime(jobDetails.getEndTime())
+                        .duration(jobDetails.getDuration())
+                        .now(jobDetails.getNow())
+                        .timestamps(jobDetails.getTimestamps())
+                        .statusCounts(jobDetails.getStatusCounts())
+                        .build());
+            });
+
         } catch (Throwable ex) {
             final String errmsg = format(
-                    "Failed to executing requests job of currentShardingTotalCount: %s, context: %s, controllerId: %s, jobLogId: %s",
+                    "Failed to executing requests job of currentShardingTotalCount: %s, context: %s, controllerId: %s, controllerLogId: %s",
                     currentShardingTotalCount, context, controller.getId(), controllerLog.getId());
             if (log.isDebugEnabled()) {
                 log.error(errmsg, ex);
@@ -210,6 +261,53 @@ public class FlinkSubmitController extends AbstractJobExecutor {
             updateControllerRunState(controllerId, RunState.FAILED);
             upsertControllerLog(controllerId, controllerLog.getId(), false, true, false, null);
         }
+    }
+
+    protected File obtainFlinkJobJarFile(FlinkSubmitExecutionConfig fssc) {
+        final URI jarUri = URI.create(fssc.getJobFileUrl());
+        final String scheme = isBlank(jarUri.getScheme()) ? "file://" : jarUri.getScheme();
+        final String resourcePath = jarUri.getRawPath();
+        Assert2.isTrue(resourcePath.contains("/"), "invalid resourcePath %s, missing is '/'", resourcePath);
+        final String localTmpPath = DEFAULT_CONTROLLER_JAR_TMP_DIR.concat("/")
+                .concat(resourcePath.substring(resourcePath.lastIndexOf("/")))
+                .concat("-")
+                .concat(valueOf(currentTimeMillis()))
+                .concat(getFilenameExtension(resourcePath));
+
+        try {
+            if (equalsAnyIgnoreCase(scheme, "file://")) {
+                return new File(fssc.getJobFileUrl());
+            } else if (equalsAnyIgnoreCase(scheme, "http://", "https://")) {
+                log.info("Downloading flink job jar file to '{}' from remote : '%s'", localTmpPath, resourcePath);
+
+                try (ReadableByteChannel channel = Channels.newChannel(jarUri.toURL().openStream());
+                        FileOutputStream fos = new FileOutputStream(localTmpPath, false);) {
+                    fos.getChannel().transferFrom(channel, 0, Long.MAX_VALUE);
+                }
+            } else if (equalsAnyIgnoreCase(scheme, "minio://", "s3://")) {
+                final MinioClientProperties config = getMinioManager().getConfig();
+
+                // The S3 specification must not prefix is '/'.
+                final String objectPrefix = startsWith(resourcePath, "/") ? resourcePath.substring(1) : resourcePath;
+                log.info("Downloading flink job jar file to '{}' from S3 : '%s'", localTmpPath, objectPrefix);
+
+                getMinioManager().getMinioClient()
+                        .downloadObject(DownloadObjectArgs.builder()
+                                .bucket(config.getBucket())
+                                .region(config.getRegion())
+                                .object(objectPrefix)
+                                .filename(localTmpPath)
+                                .build());
+            }
+            log.info("Downloaded flink job jar file '{}', length: {}", localTmpPath, new File(localTmpPath).length());
+
+        } catch (Throwable ex) {
+            log.error(format(
+                    "Failed to obtain flink job jar file : '%s', The currently only supported protocols are: minio://, s3://, http://, https://, file://",
+                    fssc.getJobFileUrl()), ex);
+        }
+
+        throw new UnsupportedOperationException(format("No supported job jar URI : '%s'. ", fssc.getJobFileUrl()));
     }
 
 }

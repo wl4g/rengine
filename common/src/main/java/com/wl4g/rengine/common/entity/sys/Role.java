@@ -18,6 +18,9 @@ package com.wl4g.rengine.common.entity.sys;
 import java.util.List;
 import java.util.Objects;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 import com.fasterxml.jackson.annotation.JsonView;
 import com.wl4g.rengine.common.entity.BaseEntity;
 import com.wl4g.rengine.common.entity.Markers;
@@ -43,8 +46,8 @@ import lombok.experimental.SuperBuilder;
 public class Role extends BaseEntity {
     private static final long serialVersionUID = 381411777614066880L;
 
-    private String roleCode;
-    private Integer type;
+    private @NotNull Integer type;
+    private @NotBlank String roleCode;
 
     // The temporary wrap fields.
 

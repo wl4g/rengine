@@ -10,4 +10,4 @@
 com.wl4g.rengine.controller.job.MasterGlobalController
 com.wl4g.rengine.controller.job.StandardExecutionController
 com.wl4g.rengine.controller.job.KafkaSubscribeController
-#com.wl4g.rengine.controller.job.FlinkSubmitController
+com.wl4g.rengine.controller.job.FlinkSubmitController

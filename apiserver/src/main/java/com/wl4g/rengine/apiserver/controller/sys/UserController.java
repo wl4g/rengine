@@ -148,7 +148,7 @@ public class UserController {
     @Operation(description = "Query roles by userId.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "roles" }, produces = "application/json", method = { GET })
-    @PreAuthorize("hasPermission(#model,'arn:sys:role:users:write:v1')")
+    @PreAuthorize("hasPermission(#model,'arn:sys:user:role:read:v1')")
     public RespBase<List<Role>> roles(@RequestParam("userId") List<Long> userIds) {
         log.debug("called: userIds={}", userIds);
         return RespBase.<List<Role>> create().withData(userService.findRolesByUserIds(userIds));
@@ -158,7 +158,7 @@ public class UserController {
     @Operation(description = "Assign roles by userId.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "assign/roles" }, produces = "application/json", method = { POST })
-    @PreAuthorize("hasPermission(#model,'arn:sys:user:roles:write:v1')")
+    @PreAuthorize("hasPermission(#model,'arn:sys:user:role:write:v1')")
     public RespBase<List<Long>> assignRoles(@Validated @RequestBody UserAssignRole model) {
         log.debug("called: model={}", model);
         return RespBase.<List<Long>> create().withData(userService.assignRoles(model));

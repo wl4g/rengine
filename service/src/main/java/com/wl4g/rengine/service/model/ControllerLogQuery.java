@@ -46,7 +46,7 @@ import lombok.experimental.SuperBuilder;
 public class ControllerLogQuery extends BaseQuery<ControllerLog> {
     @Schema(implementation = ControllerType.class)
     private @Nullable @EnumValue(enumCls = ControllerType.class) String type;
-    private @Nullable List<Long> scheduleIds;
+    private @Nullable List<Long> controllerIds;
     private @Nullable List<Long> controllerLogIds;
 
     // Notice: The disable reading and writing of the name field in the swagger

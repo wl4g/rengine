@@ -35,6 +35,7 @@ import com.wl4g.rengine.service.config.RengineServiceProperties;
 import com.wl4g.rengine.service.minio.MinioClientManager;
 import com.wl4g.rengine.service.model.BaseDelete;
 import com.wl4g.rengine.service.mongo.GlobalMongoSequenceService;
+import com.wl4g.rengine.service.security.user.AuthenticationService;
 
 /**
  * {@link BasicServiceImpl}
@@ -57,6 +58,8 @@ public abstract class BasicServiceImpl {
     protected @Autowired GlobalMongoSequenceService mongoSequenceService;
 
     protected @Autowired(required = false) MinioClientManager minioManager;
+
+    protected @Autowired(required = false) AuthenticationService authenticationService;
 
     protected long doDeleteGracefully(@NotNull BaseDelete model, @NotNull MongoCollectionDefinition collection) {
         notNullOf(model, "delete");

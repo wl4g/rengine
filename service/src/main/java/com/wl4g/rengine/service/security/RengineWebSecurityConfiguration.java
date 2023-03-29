@@ -25,6 +25,7 @@ import static java.lang.String.format;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.security.ConditionalOnDefaultWebSecurity;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -33,6 +34,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -67,6 +69,7 @@ import com.wl4g.rengine.service.security.user.UsernamePasswordAuthenticationProv
  */
 @Configuration
 @ConditionalOnDefaultWebSecurity
+@ConditionalOnClass({ WebSecurityCustomizer.class, GlobalMethodSecurityConfiguration.class })
 @EnableWebSecurity
 public class RengineWebSecurityConfiguration implements WebSecurityCustomizer {
 

@@ -176,7 +176,7 @@ public abstract class TestDefaultBaseSetup {
                 return new ScriptLogConfig() {
                     @Override
                     public @NotBlank String baseDir() {
-                        return RengineConstants.DEFAULT_EXECUTOR_SCRIPT_LOG_BASE_DIR;
+                        return RengineConstants.DEFAULT_EXECUTOR_SCRIPT_LOG_DIR;
                     }
 
                     @Override
