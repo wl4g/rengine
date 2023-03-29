@@ -12,7 +12,9 @@
 ##
 quarkus:
   application:
-    name: rengine-executor
+    ## see:./script/executor-env.sh#L41
+    ## see:../../../pom.xml#L67
+    name: executor
   banner:
     enabled: true
     path: META-INF/banner.txt
@@ -90,6 +92,7 @@ quarkus:
     file:
       enable: true
       format: '%d{yyyy-dd-mm HH:mm:ss} %-5p [%c{2.}] (%t) %s%e%n'
+      ## see: script/executor-env.sh#L71
       path: /var/log/${quarkus.application.name}/${quarkus.application.name}.log
       async: false
         #queue-length: 128

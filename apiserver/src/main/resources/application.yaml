@@ -12,7 +12,9 @@
 #
 
 spring:
-  application.name: rengine-apiserver
+  ## see:./script/apiserver-env.sh#L41
+  ## see:../../../pom.xml#L68
+  application.name: apiserver
   profiles:
     ## devtool,base,mongo,redis,arthas,arthas-override,telemetry,telemetry-override,swagger,minio,session,security
     include: base,mongo,redis,arthas,arthas-override,telemetry,telemetry-override,swagger,minio,session,security

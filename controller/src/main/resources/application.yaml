@@ -12,7 +12,9 @@
 #
 
 spring:
-  application.name: rengine-controller
+  ## see:./script/controller-env.sh#L41
+  ## see:../../../pom.xml#L68
+  application.name: controller
   profiles:
     include: base,arthas,arthas-override,telemetry,telemetry-override,mongo,redis,controller
     active: dev

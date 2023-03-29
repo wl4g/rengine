@@ -13,7 +13,7 @@
 
 spring:
   banner:
-      location: classpath:META-INF/banner.txt
+    location: classpath:META-INF/banner.txt
   main:
     allow-circular-references: true
   jackson:
@@ -86,10 +86,10 @@ server: ## see:org.springframework.boot.autoconfigure.web.ServerProperties
       cookie:
         name: __r_sid
   tomcat: # see: org.springframework.boot.autoconfigure.web.ServerProperties.Tomcat
-    basedir: /tmp/${spring.application.name}
+    basedir: /tmp/${spring.application.name}/
     accesslog:
       enabled: false
-      directory: ${server.tomcat.basedir}/../log/${spring.application.name}/ # Directory in which log files are created. Can be absolute or relative to the Tomcat base dir.
+      directory: ${server.tomcat.basedir}/log/${spring.application.name}/ # Directory in which log files are created. Can be absolute or relative to the Tomcat base dir.
       requestAttributesEnabled: false # Set request attributes for the IP address, Hostname, protocol, and port used for the request.
     backgroundProcessorDelay: 1000 # default: 10s
     thread:
