@@ -35,7 +35,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
-import com.wl4g.rengine.common.entity.ControllerSchedule;
+import com.wl4g.rengine.common.entity.Controller;
 import com.wl4g.rengine.service.ControllerScheduleService;
 import com.wl4g.rengine.service.model.ControllerScheduleDelete;
 import com.wl4g.rengine.service.model.ControllerScheduleDeleteResult;
@@ -53,28 +53,28 @@ import com.wl4g.rengine.service.model.ControllerScheduleSaveResult;
 public class ControllerScheduleServiceImpl extends BasicServiceImpl implements ControllerScheduleService {
 
     @Override
-    public PageHolder<ControllerSchedule> query(ControllerScheduleQuery model) {
+    public PageHolder<Controller> query(ControllerScheduleQuery model) {
         final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getScheduleId()),
                 isCriteria("details.type", model.getType())))
                         .with(PageRequest.of(model.getPageNum(), model.getPageSize(), defaultSort()));
 
-        final List<ControllerSchedule> triggeres = mongoTemplate.find(query, ControllerSchedule.class,
+        final List<Controller> triggeres = mongoTemplate.find(query, Controller.class,
                 RE_CONTROLLER_SCHEDULE.getName());
 
-        return new PageHolder<ControllerSchedule>(model.getPageNum(), model.getPageSize())
+        return new PageHolder<Controller>(model.getPageNum(), model.getPageSize())
                 .withTotal(mongoTemplate.count(query, RE_CONTROLLER_SCHEDULE.getName()))
                 .withRecords(triggeres);
     }
 
     @Override
-    public List<ControllerSchedule> findWithSharding(
+    public List<Controller> findWithSharding(
             final @NotNull ControllerScheduleQuery model,
             final @NotNull Integer divisor,
             final @NotNull Integer remainder) {
         final Query query = new Query(andCriteria(baseCriteria(model), isIdCriteria(model.getScheduleId()),
                 modIdCriteria(divisor, remainder), isCriteria("details.type", model.getType()))).with(defaultSort());
 
-        final List<ControllerSchedule> schedules = mongoTemplate.find(query, ControllerSchedule.class,
+        final List<Controller> schedules = mongoTemplate.find(query, Controller.class,
                 RE_CONTROLLER_SCHEDULE.getName());
         Collections.sort(schedules, (o1, o2) -> (o2.getUpdateDate().getTime() - o1.getUpdateDate().getTime()) > 0 ? 1 : -1);
 
@@ -82,8 +82,8 @@ public class ControllerScheduleServiceImpl extends BasicServiceImpl implements C
     }
 
     @Override
-    public ControllerScheduleSaveResult save(ControllerSchedule model) {
-        ControllerSchedule trigger = model;
+    public ControllerScheduleSaveResult save(Controller model) {
+        Controller trigger = model;
         notNullOf(trigger, "trigger");
 
         if (isNull(trigger.getId())) {
@@ -92,7 +92,7 @@ public class ControllerScheduleServiceImpl extends BasicServiceImpl implements C
             trigger.preUpdate();
         }
 
-        ControllerSchedule saved = mongoTemplate.save(trigger, RE_CONTROLLER_SCHEDULE.getName());
+        Controller saved = mongoTemplate.save(trigger, RE_CONTROLLER_SCHEDULE.getName());
         return ControllerScheduleSaveResult.builder().id(saved.getId()).build();
     }
 

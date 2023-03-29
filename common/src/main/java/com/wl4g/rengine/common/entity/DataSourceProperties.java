@@ -372,7 +372,7 @@ public class DataSourceProperties extends BaseEntity {
      * Here is the details configuration of kafka producer see
      * {@link org.apache.kafka.clients.producer.ProducerConfig#CONFIG}, and the
      * details configuration of kafka consumer see
-     * {@link com.wl4g.rengine.common.entity.ControllerSchedule.KafkaExecutionScheduleConfig}
+     * {@link com.wl4g.rengine.common.entity.Controller.KafkaSubscribeExecutionConfig}
      */
     @Getter
     @Setter

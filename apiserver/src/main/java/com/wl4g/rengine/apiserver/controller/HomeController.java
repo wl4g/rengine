@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.common.entity.ControllerSchedule.RunState;
+import com.wl4g.rengine.common.entity.Controller.RunState;
 import com.wl4g.rengine.service.ControllerLogService;
 import com.wl4g.rengine.service.ControllerScheduleService;
 import com.wl4g.rengine.service.model.ControllerLogQuery;

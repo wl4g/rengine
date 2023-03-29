@@ -31,7 +31,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.wl4g.infra.common.validation.EnumValue;
-import com.wl4g.rengine.common.entity.ControllerSchedule.ScheduleType;
+import com.wl4g.rengine.common.entity.Controller.ControllerType;
 import com.wl4g.rengine.common.model.WorkflowExecuteResult.ResultDescription;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -72,7 +72,7 @@ public class ControllerLog extends BaseEntity {
 
     @Schema(oneOf = { ExecutionControllerLog.class, KafkaSubscribeControllerLog.class }, discriminatorProperty = "type")
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", visible = true)
-    @JsonSubTypes({ @Type(value = ExecutionControllerLog.class, name = "GENERIC_EXECUTION"),
+    @JsonSubTypes({ @Type(value = ExecutionControllerLog.class, name = "STANDARD_EXECUTION"),
             @Type(value = KafkaSubscribeControllerLog.class, name = "KAFKA_SUBSCRIBER") })
     @Getter
     @Setter
@@ -80,10 +80,10 @@ public class ControllerLog extends BaseEntity {
     @ToString(callSuper = true)
     @NoArgsConstructor
     public static abstract class LogDetailBase<T extends LogDetailBase<T>> {
-        @Schema(name = "type", implementation = ScheduleType.class)
+        @Schema(name = "type", implementation = ControllerType.class)
         @JsonProperty(value = "type", access = Access.WRITE_ONLY)
         @NotNull
-        private @NotBlank @EnumValue(enumCls = ScheduleType.class) String type;
+        private @NotBlank @EnumValue(enumCls = ControllerType.class) String type;
     }
 
     @Getter

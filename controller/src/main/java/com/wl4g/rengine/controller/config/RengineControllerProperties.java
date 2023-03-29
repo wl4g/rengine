@@ -40,7 +40,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
-import com.wl4g.rengine.controller.job.AbstractJobExecutor.ScheduleJobType;
+import com.wl4g.rengine.controller.job.AbstractJobExecutor.ControllerJobType;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -70,8 +70,7 @@ public class RengineControllerProperties implements InitializingBean {
     private GlobalEngineScheduleControllerProperties controller = new GlobalEngineScheduleControllerProperties();
     private EnginePurgerProperties purger = new EnginePurgerProperties();
     private EngineClientSchedulerProperties client = new EngineClientSchedulerProperties();
-    // private EngineFlinkSchedulerProperties flink = new
-    // EngineFlinkSchedulerProperties();
+    private EngineFlinkSchedulerProperties flink = new EngineFlinkSchedulerProperties();
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -289,7 +288,7 @@ public class RengineControllerProperties implements InitializingBean {
         public JobConfiguration toJobConfiguration(final String jobName) {
             hasTextOf(jobName, "jobName");
             final JobConfiguration jobConfig = JobConfiguration.builder()
-                    .jobType(ScheduleJobType.GLOBAL_BOOTSTRAPER)
+                    .jobType(ControllerJobType.GLOBAL_BOOTSTRAPER)
                     .jobName(jobName)
                     .disabled(nonNull(disabled) ? disabled : false)
                     .overwrite(nonNull(overwrite) ? overwrite : true)

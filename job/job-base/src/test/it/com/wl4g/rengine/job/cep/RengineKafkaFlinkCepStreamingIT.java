@@ -329,8 +329,8 @@ public class RengineKafkaFlinkCepStreamingIT {
             "--alertTopic", IT_MOCK_ALERTS_TOPIC,
             //"--fromOffsetTime", "1",
             "--deserializerClass", "com.wl4g.rengine.job.kafka.OtlpLogKafkaDeserializationSchema",
-            //"--keyByExpression", "type", // grouping by logs event type.(default)
-            "--keyByExpression", "body.service", // grouping by logs application name.
+            //"--keyByExprPath", "type", // grouping by logs event type.(default)
+            "--keyByExprPath", "body.service", // grouping by logs application name.
             "--cepPatterns", Encodes.encodeBase64(PATTERN_ARRAY_JSON_1)
             };
     // @formatter:on

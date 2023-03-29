@@ -246,18 +246,18 @@ public class LifecycleExecutionService {
 
                 result.setScenesCode(scenesCode);
                 return result;
-            } catch (Throwable e) {
+            } catch (Throwable ex) {
                 final String errmsg = format(
                         "Failed to execution %s engine of requestId: '%s', clientId: '%s', workflowId: '%s', scenesCode: '%s'. reason: %s",
                         engine.name(), workflowExecuteRequest.getRequestId(), workflowExecuteRequest.getClientId(),
-                        workflow.getId(), scenesCode, getRootCauseMessage(e));
-                log.error(errmsg, e);
+                        workflow.getId(), scenesCode, getRootCauseMessage(ex));
+                log.error(errmsg, ex);
 
                 // Buried-point: failed workflowExecuteRequest.
                 meterService.counter(execution_failure.getName(), execution_failure.getHelp(), MetricsTag.ENGINE, engine.name())
                         .increment();
 
-                throw new RengineException(errmsg, e);
+                throw new RengineException(errmsg, ex);
             } finally {
                 latch.countDown();
             }

@@ -54,12 +54,12 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 
 import com.wl4g.infra.common.collection.CollectionUtils2;
-import com.wl4g.rengine.common.entity.ControllerSchedule;
+import com.wl4g.rengine.common.entity.Controller;
 import com.wl4g.rengine.controller.config.RengineControllerProperties;
 import com.wl4g.rengine.controller.exception.RengineControllerException;
 import com.wl4g.rengine.controller.job.AbstractJobExecutor;
-import com.wl4g.rengine.controller.job.AbstractJobExecutor.ScheduleJobType;
-import com.wl4g.rengine.controller.job.GlobalEngineMasterController;
+import com.wl4g.rengine.controller.job.AbstractJobExecutor.ControllerJobType;
+import com.wl4g.rengine.controller.job.MasterGlobalController;
 import com.wl4g.rengine.controller.lifecycle.ElasticJobBootstrapBuilder.JobParameter;
 
 import lombok.CustomLog;
@@ -77,7 +77,7 @@ public class GlobalControllerJobManager implements ApplicationRunner, Closeable 
     final RengineControllerProperties config;
     final List<TracingConfiguration<?>> tracingConfigurations;
     final CoordinatorRegistryCenter regCenter;
-    final ScheduleJobBootstrap controllerBootstrap;
+    final ScheduleJobBootstrap masterControllerBootstrap;
     final Map<Long, JobBootstrap> bootstrapRegistry;
     final Map<Long, InterProcessSemaphoreMutex> scheduleMutexLocksRegistry;
 
@@ -88,8 +88,8 @@ public class GlobalControllerJobManager implements ApplicationRunner, Closeable 
         this.tracingConfigurations = notNullOf(tracingConfigurations, "tracingConfigurations");
         this.regCenter = notNullOf(registryCenter, "registryCenter");
         final JobConfiguration jobConfig = config.getController()
-                .toJobConfiguration(GlobalEngineMasterController.class.getSimpleName());
-        this.controllerBootstrap = createJobBootstrap(jobConfig);
+                .toJobConfiguration(MasterGlobalController.class.getSimpleName());
+        this.masterControllerBootstrap = createJobBootstrap(jobConfig);
         this.bootstrapRegistry = new ConcurrentHashMap<>(16);
         this.scheduleMutexLocksRegistry = new ConcurrentHashMap<>(16);
     }
@@ -107,12 +107,12 @@ public class GlobalControllerJobManager implements ApplicationRunner, Closeable 
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        startController();
+        startMasterController();
     }
 
-    private void startController() throws Exception {
+    private void startMasterController() throws Exception {
         log.info("Scheduling for controller job ...");
-        controllerBootstrap.schedule();
+        masterControllerBootstrap.schedule();
     }
 
     public boolean exists(Long scheduleId) {
@@ -127,9 +127,9 @@ public class GlobalControllerJobManager implements ApplicationRunner, Closeable 
     @SuppressWarnings("unchecked")
     public <T extends JobBootstrap> T add(
             @NotNull InterProcessSemaphoreMutex lock,
-            @NotNull ScheduleJobType jobType,
+            @NotNull ControllerJobType jobType,
             @NotBlank String jobName,
-            @NotNull ControllerSchedule schedule,
+            @NotNull Controller schedule,
             @NotNull JobParameter jobParameter) throws Exception {
         notNullOf(lock, "lock");
         notNullOf(jobType, "jobType");

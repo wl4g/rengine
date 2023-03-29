@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
 
-import com.wl4g.rengine.controller.job.AbstractJobExecutor.ScheduleJobType;
+import com.wl4g.rengine.controller.job.AbstractJobExecutor.ControllerJobType;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -47,7 +47,7 @@ public final class JobConfiguration {
     //
     // [Begin] ADD FEATURES.
     //
-    ScheduleJobType jobType;
+    ControllerJobType jobType;
 
     // When setup true, the shardingTotalCount will be ignored, and the will
     // be automatically allocated according to the number of cluster nodes

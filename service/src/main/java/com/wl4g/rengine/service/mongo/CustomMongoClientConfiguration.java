@@ -216,18 +216,18 @@ public class CustomMongoClientConfiguration extends AbstractMongoClientConfigura
     //}
     //
     //@WritingConverter
-    //static class ControllerScheduleToDocumentConverter implements Converter<ControllerSchedule, Document> {
+    //static class ControllerScheduleToDocumentConverter implements Converter<Controller, Document> {
     //    @Override
-    //    public Document convert(final ControllerSchedule source) {
+    //    public Document convert(final Controller source) {
     //        return BsonEntitySerializers.toDocument(source);
     //    }
     //}
     //
     //@ReadingConverter
-    //static class DocumentToControllerScheduleConverter implements Converter<Document, ControllerSchedule> {
+    //static class DocumentToControllerScheduleConverter implements Converter<Document, Controller> {
     //    @Override
-    //    public ControllerSchedule convert(Document source) {
-    //        return BsonEntitySerializers.fromDocument(source, ControllerSchedule.class);
+    //    public Controller convert(Document source) {
+    //        return BsonEntitySerializers.fromDocument(source, Controller.class);
     //    }
     //}
     //// @formatter:on

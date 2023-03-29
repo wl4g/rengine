@@ -42,10 +42,10 @@ import org.apache.shardingsphere.elasticjob.tracing.api.TracingConfiguration;
 
 import com.google.common.base.Preconditions;
 import com.wl4g.infra.common.lang.tuples.Tuple2;
-import com.wl4g.rengine.common.entity.ControllerSchedule;
-import com.wl4g.rengine.common.entity.ControllerSchedule.GenericExecutionScheduleConfig;
+import com.wl4g.rengine.common.entity.Controller;
+import com.wl4g.rengine.common.entity.Controller.StandardExecutionConfig;
 import com.wl4g.rengine.controller.config.RengineControllerProperties;
-import com.wl4g.rengine.controller.job.AbstractJobExecutor.ScheduleJobType;
+import com.wl4g.rengine.controller.job.AbstractJobExecutor.ControllerJobType;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -137,17 +137,17 @@ public class ElasticJobBootstrapBuilder {
     }
 
     public static JobConfiguration newDefaultJobConfig(
-            @NotNull ScheduleJobType jobType,
+            @NotNull ControllerJobType jobType,
             @NotBlank String jobName,
-            @NotNull ControllerSchedule schedule,
+            @NotNull Controller schedule,
             @NotNull JobParameter jobParameter) {
         hasTextOf(jobName, "jobName");
         notNullOf(schedule, "trigger");
         notNullOf(jobParameter, "jobParameter");
 
         String cron = null; // OneOffJobBootstrap
-        if (schedule.getDetails() instanceof GenericExecutionScheduleConfig) { // ScheduleJobBootstrap
-            cron = ((GenericExecutionScheduleConfig) schedule.getDetails()).getCron();
+        if (schedule.getDetails() instanceof StandardExecutionConfig) { // ScheduleJobBootstrap
+            cron = ((StandardExecutionConfig) schedule.getDetails()).getCron();
         }
         return JobConfiguration.builder()
                 .jobType(jobType)

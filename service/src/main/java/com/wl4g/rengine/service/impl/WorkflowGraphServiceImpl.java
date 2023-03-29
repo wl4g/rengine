@@ -16,6 +16,8 @@
 package com.wl4g.rengine.service.impl;
 
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
+import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_BASE;
+import static com.wl4g.rengine.common.constants.RengineConstants.API_EXECUTOR_EXECUTE_INTERNAL_WORKFLOW;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.RE_WORKFLOW_GRAPHS;
 import static com.wl4g.rengine.service.mongo.QueryHolder.DEFAULT_FIELD_REVISION;
 import static com.wl4g.rengine.service.mongo.QueryHolder.DEFAULT_FIELD_UPDATE_DATE;
@@ -38,13 +40,17 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
+import com.wl4g.infra.common.collection.multimap.LinkedMultiValueMap;
+import com.wl4g.infra.common.collection.multimap.MultiValueMap;
 import com.wl4g.infra.common.io.FileIOUtils;
 import com.wl4g.infra.common.io.FileIOUtils.ReadTailFrame;
 import com.wl4g.infra.common.reflect.ParameterizedTypeReference;
+import com.wl4g.infra.common.remoting.HttpEntity;
+import com.wl4g.infra.common.remoting.HttpResponseEntity;
+import com.wl4g.infra.common.remoting.RestClient;
+import com.wl4g.infra.common.remoting.uri.UriComponentsBuilder;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.common.web.rest.RespBase.RetCode;
-import com.wl4g.rengine.client.core.RengineClient;
-import com.wl4g.rengine.client.core.config.ClientConfig;
 import com.wl4g.rengine.common.entity.graph.WorkflowGraph;
 import com.wl4g.rengine.common.model.WorkflowExecuteRequest;
 import com.wl4g.rengine.common.model.WorkflowExecuteResult;
@@ -58,6 +64,7 @@ import com.wl4g.rengine.service.model.WorkflowGraphQuery;
 import com.wl4g.rengine.service.model.WorkflowGraphResultSave;
 import com.wl4g.rengine.service.model.WorkflowGraphSave;
 
+import io.netty.handler.codec.http.HttpMethod;
 import lombok.CustomLog;
 
 /**
@@ -184,25 +191,49 @@ public class WorkflowGraphServiceImpl extends BasicServiceImpl implements Workfl
 
     @Override
     public RespBase<WorkflowExecuteResult> execute(@NotNull WorkflowExecuteRequest model) {
-        final RespBase<WorkflowExecuteResult> resp = RespBase.create();
         notNullOf(model, "executeRequest");
         model.validate();
 
-        log.info("Executing for {}, {}", config.getExecutorEndpoint(), model);
-        try {
-            final WorkflowExecuteResult result = RengineClient.builder()
-                    .config(ClientConfig.builder()
-                            .endpoint(config.getExecutorEndpoint())
-                            .clientId(model.getClientId())
-                            .clientSecret(model.getClientSecret())
-                            .defaultTimeout(model.getTimeout())
-                            .defaultBestEffort(model.getBestEffort())
-                            .build())
-                    .build()
-                    .execute(model);
+        //// @formatter:off
+        //log.info("Executing for {}, {}", config.getExecutorEndpoint(), model);
+        //try {
+        //    final WorkflowExecuteResult result = RengineClient.builder()
+        //            .config(ClientConfig.builder()
+        //                    .endpoint(config.getExecutorEndpoint())
+        //                    .clientId(model.getClientId())
+        //                    .clientSecret(model.getClientSecret())
+        //                    .defaultTimeout(model.getTimeout())
+        //                    .defaultBestEffort(model.getBestEffort())
+        //                    .build())
+        //            .build()
+        //            .execute(model);
+        //
+        //    log.info("Executed the result : {}", result);
+        //    resp.withCode(RetCode.OK).withData(result);
+        //
+        //} catch (Throwable ex) {
+        //    log.error("Failed to execute workflow graph.", ex);
+        //    resp.withCode(RetCode.SYS_ERR).withMessage(ex.getMessage());
+        //}
+        //// @formatter:on
 
-            log.info("Executed the result : {}", result);
-            resp.withCode(RetCode.OK).withData(result);
+        log.info("Executing for {}, {}", config.getExecutorEndpoint(), model);
+        final RestClient restClient = new RestClient(false, 6_000, model.getTimeout().intValue(), 65535);
+
+        final MultiValueMap<String, String> headers = new LinkedMultiValueMap<>(2);
+        headers.add("Content-Type", "application/json");
+
+        final RespBase<WorkflowExecuteResult> resp = RespBase.create();
+        try {
+            final HttpResponseEntity<RespBase<WorkflowExecuteResult>> result = restClient
+                    .exchange(UriComponentsBuilder.fromUri(config.getExecutorEndpoint())
+                            .path(API_EXECUTOR_EXECUTE_BASE)
+                            .path(API_EXECUTOR_EXECUTE_INTERNAL_WORKFLOW)
+                            .build()
+                            .toUri(), HttpMethod.POST, new HttpEntity<>(model, headers), WORKFLOW_EXECUTE_RESULT_TYPE);
+
+            log.info("Executed the result : {}", resp);
+            resp.withCode(result.getBody().getCode()).withData(result.getBody().getData());
 
         } catch (Throwable ex) {
             log.error("Failed to execute workflow graph.", ex);

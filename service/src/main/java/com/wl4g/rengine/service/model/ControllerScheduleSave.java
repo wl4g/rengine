@@ -15,7 +15,7 @@
  */
 package com.wl4g.rengine.service.model;
 
-import com.wl4g.rengine.common.entity.ControllerSchedule;
+import com.wl4g.rengine.common.entity.Controller;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,6 +35,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class ControllerScheduleSave extends ControllerSchedule {
+public class ControllerScheduleSave extends Controller {
     private static final long serialVersionUID = 1L;
 }

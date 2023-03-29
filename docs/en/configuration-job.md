@@ -26,7 +26,7 @@
 |    --restartAttempts <default=3>                                                                | Set the maximum number of failed restart attempts. default is: 3
 |    --restartDelaySeconds <default=15>                                                           | Set the maximum number of failed interval between each restart. default is: 15
 | -T,--eventTopicPattern <default=rengine_events>                                                 | Topic pattern for consuming events from MQ.
-| -K,--keyByExpression <default=.source.principals[0]>                                            | The jq expression to extract the grouping key, it extraction from the rengine event object.
+| -K,--keyByExprPath <default=.source.principals[0]>                                            | The jq expression to extract the grouping key, it extraction from the rengine event object.
 
 ## Flink consuming kafka with CEP
 

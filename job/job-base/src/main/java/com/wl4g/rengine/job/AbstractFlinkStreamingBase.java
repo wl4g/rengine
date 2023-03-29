@@ -71,12 +71,12 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
     private String groupId;
     private Long fromOffsetTime;
     private String deserializerClass;
-    private String keyByExpression;
+    private String keyByExprPath;
 
     // FLINK basic options.
     private RuntimeExecutionMode runtimeMode;
-    private int restartAttempts;
-    private int restartDelaySeconds;
+    private Integer restartAttempts;
+    private Integer restartDelaySeconds;
 
     // FLINK Checkpoint options.
     private String checkpointDir;
@@ -117,7 +117,7 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
                         "Start consumption from the first record with a timestamp greater than or equal to a certain timestamp. if <=0, it will not be setup and keep the default behavior.")
                 .option("D", "deserializerClass", "com.wl4g.rengine.job.kafka.RengineEventKafkaDeserializationSchema",
                         "Deserializer class for Flink-streaming to consuming from MQ.")
-                .option("K", "keyByExpression", ".source.principals[0]",
+                .option("K", "keyByExprPath", ".source.principals[0]",
                         "The jq expression to extract the grouping key, it extraction from the rengine event object.")
                 // FLINK basic options.
                 .option("R", "runtimeMode", RuntimeExecutionMode.STREAMING.name(),
@@ -168,7 +168,7 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
         this.groupId = line.get("groupId");
         this.fromOffsetTime = line.getLong("fromOffsetTime");
         this.deserializerClass = line.get("deserializerClass");
-        this.keyByExpression = line.get("keyByExpression");
+        this.keyByExprPath = line.get("keyByExprPath");
         // FLINK Basic options.
         this.runtimeMode = line.getEnum("runtimeMode", RuntimeExecutionMode.class);
         this.restartAttempts = line.getInteger("restartAttempts");
@@ -216,7 +216,7 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
      * @return
      */
     protected DataStream<?> customStream(DataStream<RengineEvent> dataStreamSource) {
-        final String keyByExpr = keyByExpression;
+        final String keyByExpr = keyByExprPath;
         return dataStreamSource.keyBy(event -> {
             final String keyBy = event.atAsText(keyByExpr);
             return isBlank(keyBy) ? event.getType() : keyBy;

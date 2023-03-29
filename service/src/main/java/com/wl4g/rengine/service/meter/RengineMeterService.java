@@ -42,15 +42,15 @@ public class RengineMeterService extends PrometheusMeterFacade {
     @AllArgsConstructor
     public static enum MetricsName {
 
-        // Global schedule controller metrics.
+        // Global master controller metrics.
 
-        global_schedule_controller("global_schedule_controller_total", "The stats of schedule controller total"),
+        global_master_controller("global_master_controller_total", "The stats of schedule controller total"),
 
-        global_schedule_controller_success("global_schedule_controller_success", "The stats of schedule controller success"),
+        global_master_controller_success("global_master_controller_success", "The stats of schedule controller success"),
 
-        global_schedule_controller_failure("global_schedule_controller_failure", "The stats of schedule controller failure"),
+        global_master_controller_failure("global_master_controller_failure", "The stats of schedule controller failure"),
 
-        global_schedule_controller_time("global_schedule_controller_time", "The stats of schedule controller time");
+        global_master_controller_time("global_master_controller_time", "The stats of schedule controller time");
 
         private final String name;
         private final String help;

@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.common.entity.ControllerSchedule;
+import com.wl4g.rengine.common.entity.Controller;
 import com.wl4g.rengine.service.ControllerScheduleService;
 import com.wl4g.rengine.service.model.ControllerScheduleDelete;
 import com.wl4g.rengine.service.model.ControllerScheduleDeleteResult;
@@ -43,37 +43,37 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * {@link ControllerScheduleController}
+ * {@link ControllerController}
  * 
  * @author James Wong
  * @version 2022-08-28
  * @since v1.0.0
  */
-@Tag(name = "ControllerScheduleAPI", description = "The Controller Schedule management API")
+@Tag(name = "ControllerScheduleAPI", description = "The Controller management API")
 @Slf4j
 @RestController
-@RequestMapping("/v1/controllerscheduler")
-public class ControllerScheduleController {
+@RequestMapping("/v1/controller")
+public class ControllerController {
 
     private @Autowired ControllerScheduleService controllerScheduleService;
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Query schedule triggers.")
+    @Operation(description = "Query controllers.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "query" }, produces = "application/json", method = { GET })
-    @PreAuthorize("hasPermission(#model,'arn:rengine:controllerschedule:read:v1')")
-    public RespBase<PageHolder<ControllerSchedule>> query(@Validated ControllerScheduleQuery model) {
+    @PreAuthorize("hasPermission(#model,'arn:rengine:controller:read:v1')")
+    public RespBase<PageHolder<Controller>> query(@Validated ControllerScheduleQuery model) {
         log.debug("called: model={}", model);
-        RespBase<PageHolder<ControllerSchedule>> resp = RespBase.create();
+        RespBase<PageHolder<Controller>> resp = RespBase.create();
         resp.setData(controllerScheduleService.query(model));
         return resp;
     }
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Save schedule trigger.")
+    @Operation(description = "Save controllers.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "save" }, consumes = "application/json", produces = "application/json", method = { POST })
-    @PreAuthorize("hasPermission(#model,'arn:rengine:controllerschedule:write:v1')")
+    @PreAuthorize("hasPermission(#model,'arn:rengine:controller:write:v1')")
     public RespBase<ControllerScheduleSaveResult> save(@Validated @RequestBody ControllerScheduleSave model) {
         log.debug("called: model={}", model);
         RespBase<ControllerScheduleSaveResult> resp = RespBase.create();
@@ -82,10 +82,10 @@ public class ControllerScheduleController {
     }
 
     // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Delete schedule trigger.")
+    @Operation(description = "Delete controllers.")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "delete" }, produces = "application/json", method = { DELETE, POST })
-    @PreAuthorize("hasPermission(#model,'arn:rengine:controllerschedule:delete:v1')")
+    @PreAuthorize("hasPermission(#model,'arn:rengine:controller:delete:v1')")
     public RespBase<ControllerScheduleDeleteResult> delete(@Validated @RequestBody ControllerScheduleDelete model) {
         log.debug("called: model={}", model);
         RespBase<ControllerScheduleDeleteResult> resp = RespBase.create();

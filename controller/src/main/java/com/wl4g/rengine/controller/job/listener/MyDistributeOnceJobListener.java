@@ -18,7 +18,7 @@
 //import org.apache.shardingsphere.elasticjob.infra.listener.ShardingContexts;
 //import org.apache.shardingsphere.elasticjob.lite.api.listener.AbstractDistributeOnceElasticJobListener;
 //
-//import com.wl4g.rengine.controller.job.AbstractJobExecutor.ScheduleJobType;
+//import com.wl4g.rengine.controller.job.AbstractJobExecutor.ControllerType;
 //
 ///**
 // * {@link MyDistributeOnceJobListener}
@@ -36,7 +36,7 @@
 //
 //    @Override
 //    public String getType() {
-//        return ScheduleJobType.GLOBAL_BOOTSTRAPER.name();
+//        return ControllerType.GLOBAL_BOOTSTRAPER.name();
 //    }
 //
 //    @Override

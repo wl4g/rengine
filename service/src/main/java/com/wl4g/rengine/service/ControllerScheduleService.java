@@ -25,7 +25,7 @@ import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.collection.CollectionUtils2;
-import com.wl4g.rengine.common.entity.ControllerSchedule;
+import com.wl4g.rengine.common.entity.Controller;
 import com.wl4g.rengine.service.model.ControllerScheduleDelete;
 import com.wl4g.rengine.service.model.ControllerScheduleDeleteResult;
 import com.wl4g.rengine.service.model.ControllerScheduleQuery;
@@ -40,23 +40,23 @@ import com.wl4g.rengine.service.model.ControllerScheduleSaveResult;
  */
 public interface ControllerScheduleService {
 
-    default ControllerSchedule get(Long scheduleId) {
+    default Controller get(Long scheduleId) {
         notNullOf(scheduleId, "scheduleId");
-        final PageHolder<ControllerSchedule> result = query(ControllerScheduleQuery.builder().scheduleId(scheduleId).build());
+        final PageHolder<Controller> result = query(ControllerScheduleQuery.builder().scheduleId(scheduleId).build());
         if (isNull(result) || CollectionUtils2.isEmpty(result.getRecords())) {
             throw new IllegalArgumentException(format("No found schedule trigger by %s", scheduleId));
         }
         return result.getRecords().get(0);
     }
 
-    PageHolder<ControllerSchedule> query(@NotNull ControllerScheduleQuery model);
+    PageHolder<Controller> query(@NotNull ControllerScheduleQuery model);
 
-    List<ControllerSchedule> findWithSharding(
+    List<Controller> findWithSharding(
             @NotNull ControllerScheduleQuery model,
             @NotNull Integer divisor,
             @NotNull Integer remainder);
 
-    ControllerScheduleSaveResult save(@NotNull ControllerSchedule model);
+    ControllerScheduleSaveResult save(@NotNull Controller model);
 
     ControllerScheduleDeleteResult delete(@NotNull ControllerScheduleDelete model);
 

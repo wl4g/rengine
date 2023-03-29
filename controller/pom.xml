@@ -50,6 +50,7 @@
     </developers>
     <properties>
         <elastic-logback.version>1.5.0</elastic-logback.version>
+        <nextbreakpoint.flinkclient.version>1.0.4</nextbreakpoint.flinkclient.version>
         <bootstrap-classname>com.wl4g.RengineController</bootstrap-classname>
         <final.name>controller</final.name>
         <image.name>wl4g/rengine-${final.name}</image.name>
@@ -118,6 +119,12 @@
             <artifactId>spring-boot-devtools</artifactId>
             <scope>test</scope>
             <optional>true</optional>
+        </dependency>
+        <!-- Flink -->
+        <dependency>
+            <groupId>com.nextbreakpoint</groupId>
+            <artifactId>com.nextbreakpoint.flinkclient</artifactId>
+            <version>${nextbreakpoint.flinkclient.version}</version>
         </dependency>
         <!-- Tests -->
         <dependency>

@@ -217,10 +217,10 @@ public class ReactiveEngineExecutionServiceImpl implements EngineExecutionServic
                     resp.setStatus(WorkflowExecuteResult.STATUS_PART_SUCCESS);
                 }
                 resp.setData(result);
-            } catch (Throwable e) {
-                final String errmsg = format("Could not to execution evaluate of requestId: '%s', reason: %s",
-                        executeRequest.getRequestId(), getRootCausesString(e, true));
-                log.error(errmsg, e);
+            } catch (Throwable ex) {
+                final String errmsg = format("Could not to execution workflow graph of requestId: '%s', reason: %s",
+                        executeRequest.getRequestId(), getRootCausesString(ex, true));
+                log.error(errmsg, ex);
                 resp.withCode(RetCode.SYS_ERR).withMessage(errmsg);
             }
             return Uni.createFrom().item(() -> resp);

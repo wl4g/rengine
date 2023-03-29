@@ -185,7 +185,7 @@ public abstract class RengineConstants extends EnvironmentUtil {
 
         RE_DATASOURCES("re_datasources", true),
 
-        RE_CONTROLLER_SCHEDULE("re_controller_schedules", true),
+        RE_CONTROLLER_SCHEDULE("re_controllers", true),
 
         RE_CONTROLLER_LOG("re_controller_logs", true);
 

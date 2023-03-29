@@ -129,7 +129,8 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
             return ResultDescription.builder()
                     .success(false)
                     // Only the outermost reason is returned.
-                    .reason(format("Failed to execution workflow graph of reason: %s", ex.getMessage()))
+                    .reason(format("Failed to execution workflow graph of '%s', reason: %s", workflowGraph.getId(),
+                            ex.getMessage()))
                     .build();
         }
     }

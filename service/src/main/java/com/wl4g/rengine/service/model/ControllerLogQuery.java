@@ -22,7 +22,7 @@ import javax.annotation.Nullable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wl4g.infra.common.validation.EnumValue;
 import com.wl4g.rengine.common.entity.ControllerLog;
-import com.wl4g.rengine.common.entity.ControllerSchedule.ScheduleType;
+import com.wl4g.rengine.common.entity.Controller.ControllerType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -44,8 +44,8 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 @NoArgsConstructor
 public class ControllerLogQuery extends BaseQuery<ControllerLog> {
-    @Schema(implementation = ScheduleType.class)
-    private @Nullable @EnumValue(enumCls = ScheduleType.class) String type;
+    @Schema(implementation = ControllerType.class)
+    private @Nullable @EnumValue(enumCls = ControllerType.class) String type;
     private @Nullable List<Long> scheduleIds;
     private @Nullable List<Long> controllerLogIds;
 

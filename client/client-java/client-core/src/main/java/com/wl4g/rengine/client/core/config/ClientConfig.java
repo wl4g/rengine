@@ -22,7 +22,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.wl4g.infra.common.minio.OkHttpClientConfig;
-import com.wl4g.rengine.common.entity.ControllerSchedule.GenericExecutionScheduleConfig;
+import com.wl4g.rengine.common.entity.Controller.StandardExecutionConfig;
 import com.wl4g.rengine.common.model.ExecuteRequest;
 
 import lombok.Builder.Default;
@@ -33,7 +33,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * {@link GenericExecutionScheduleConfig}
+ * {@link StandardExecutionConfig}
  * 
  * @author James Wong
  * @version 2022-10-17

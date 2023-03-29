@@ -41,9 +41,9 @@ import org.apache.shardingsphere.elasticjob.reg.base.CoordinatorRegistryCenter;
 import com.wl4g.infra.context.utils.SpringContextHolder;
 import com.wl4g.rengine.client.core.RengineClient;
 import com.wl4g.rengine.common.entity.ControllerLog;
-import com.wl4g.rengine.common.entity.ControllerSchedule;
-import com.wl4g.rengine.common.entity.ControllerSchedule.RunState;
-import com.wl4g.rengine.common.entity.ControllerSchedule.ScheduleType;
+import com.wl4g.rengine.common.entity.Controller;
+import com.wl4g.rengine.common.entity.Controller.RunState;
+import com.wl4g.rengine.common.entity.Controller.ControllerType;
 import com.wl4g.rengine.controller.config.RengineControllerProperties;
 import com.wl4g.rengine.controller.lifecycle.GlobalControllerJobManager;
 import com.wl4g.rengine.service.ControllerLogService;
@@ -221,9 +221,9 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor, Close
         return shardingTotalCount;
     }
 
-    protected ControllerSchedule updateTriggerRunState(final @NotNull Long scheduleId, final @NotNull RunState runState) {
+    protected Controller updateControllerRunState(final @NotNull Long scheduleId, final @NotNull RunState runState) {
         notNullOf(runState, "runState");
-        ControllerSchedule trigger = null;
+        Controller trigger = null;
         ControllerScheduleSaveResult result = null;
         try {
             trigger = getControllerScheduleService().get(notNullOf(scheduleId, "scheduleId"));
@@ -239,7 +239,7 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor, Close
         return trigger;
     }
 
-    protected ControllerLog upsertSchedulingLog(
+    protected ControllerLog upsertControllerLog(
             final @NotNull Long scheduleId,
             final Long controllerLogId,
             final boolean updateStatupTime,
@@ -289,28 +289,28 @@ public abstract class AbstractJobExecutor implements TypedJobItemExecutor, Close
     @Getter
     @ToString
     @AllArgsConstructor
-    public static enum ScheduleJobType {
+    public static enum ControllerJobType {
         GLOBAL_BOOTSTRAPER(null),
 
-        GENERIC_EXECUTION(ScheduleType.GENERIC_EXECUTION),
+        STANDARD_EXECUTION(ControllerType.STANDARD_EXECUTION),
 
-        KAFKA_SUBSCRIBER(ScheduleType.KAFKA_SUBSCRIBER);
+        KAFKA_SUBSCRIBER(ControllerType.KAFKA_SUBSCRIBER),
 
-        // FLINK_SUBMITTER(ScheduleType.FLINK_SUBMITTER)
+        FLINK_SUBMITTER(ControllerType.FLINK_SUBMITTER);
 
-        private final ScheduleType scheduleType;
+        private final ControllerType controllerType;
 
-        public static ScheduleJobType get(ScheduleType scheduleType) {
-            final ScheduleJobType type = safeGet(scheduleType);
+        public static ControllerJobType get(ControllerType controllerType) {
+            final ControllerJobType type = safeGet(controllerType);
             if (isNull(type)) {
-                throw new IllegalStateException(format("Unsupported schedule type of %s", scheduleType));
+                throw new IllegalStateException(format("Unsupported schedule type of %s", controllerType));
             }
             return type;
         }
 
-        public static ScheduleJobType safeGet(ScheduleType scheduleType) {
-            for (ScheduleJobType t : values()) {
-                if (t.getScheduleType() == scheduleType) {
+        public static ControllerJobType safeGet(ControllerType controllerType) {
+            for (ControllerJobType t : values()) {
+                if (t.getControllerType() == controllerType) {
                     return t;
                 }
             }

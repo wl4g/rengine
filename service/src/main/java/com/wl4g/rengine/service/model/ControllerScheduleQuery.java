@@ -18,8 +18,8 @@ package com.wl4g.rengine.service.model;
 import javax.annotation.Nullable;
 
 import com.wl4g.infra.common.validation.EnumValue;
-import com.wl4g.rengine.common.entity.ControllerSchedule;
-import com.wl4g.rengine.common.entity.ControllerSchedule.ScheduleType;
+import com.wl4g.rengine.common.entity.Controller;
+import com.wl4g.rengine.common.entity.Controller.ControllerType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -40,9 +40,9 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class ControllerScheduleQuery extends BaseQuery<ControllerSchedule> {
-    @Schema(implementation = ScheduleType.class)
-    private @Nullable @EnumValue(enumCls = ScheduleType.class) String type;
+public class ControllerScheduleQuery extends BaseQuery<Controller> {
+    @Schema(implementation = ControllerType.class)
+    private @Nullable @EnumValue(enumCls = ControllerType.class) String type;
     private @Nullable Long scheduleId;
 
 }

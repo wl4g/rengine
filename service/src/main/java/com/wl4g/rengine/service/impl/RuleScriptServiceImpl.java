@@ -205,7 +205,7 @@ public class RuleScriptServiceImpl extends BasicServiceImpl implements RuleScrip
                             .toUri(), HttpMethod.POST, new HttpEntity<>(model, headers), RULE_EXECUTE_RESULT_TYPE);
 
             log.info("Executed the result : {}", resp);
-            resp.withCode(RetCode.OK).withData(result.getBody().getData());
+            resp.withCode(result.getBody().getCode()).withData(result.getBody().getData());
 
         } catch (Throwable ex) {
             log.error("Failed to execute rule script.", ex);
