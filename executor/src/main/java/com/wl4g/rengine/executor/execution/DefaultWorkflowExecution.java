@@ -72,10 +72,10 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
     @Inject
     GraalPythonScriptEngine graalPythonScriptEngine;
 
-    // @Inject
+    @Inject
     GraalRScriptEngine graalRScriptEngine;
 
-    // @Inject
+    @Inject
     GraalRubyScriptEngine graalRubyScriptEngine;
 
     @Override
@@ -139,16 +139,16 @@ public class DefaultWorkflowExecution implements WorkflowExecution {
         switch (engine) {
         // case GROOVY:
         // return groovyScriptEngine;
-        case PYTHON:
-            return graalPythonScriptEngine;
         case JS:
             return graalJSScriptEngine;
+        case PYTHON:
+            return graalPythonScriptEngine;
         case R:
             return graalRScriptEngine;
         case RUBY:
             return graalRubyScriptEngine;
         default:
-            throw new Error(format("No support rule engine '%s'", engine));
+            throw new Error(format("No support script engine '%s'", engine));
         }
     }
 

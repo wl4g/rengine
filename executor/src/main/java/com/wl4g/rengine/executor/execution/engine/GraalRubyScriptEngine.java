@@ -9,25 +9,32 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ALL_OR KIND, either express or implied.
+ * WITHOUT WArubyrubyANTIES Oruby CONDITIONS OF ALL_Oruby KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 package com.wl4g.rengine.executor.execution.engine;
 
-import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager;
+import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_SCRIPT_CACHE_DIR;
 
+import javax.inject.Singleton;
+
+import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager;
+import com.wl4g.rengine.common.exception.ExecutionScriptException;
+
+import lombok.CustomLog;
 import lombok.Getter;
 
 /**
- * {@link GraalRubyScriptEngine}
+ * {@link GraalrubyubyScriptEngine}
  * 
  * @author James Wong
  * @version 2022-09-22
  * @since v1.0.0
  */
 @Getter
-// @Singleton
+@CustomLog
+@Singleton
 public class GraalRubyScriptEngine extends GraalBaseScriptEngine {
 
     @Override
@@ -38,7 +45,25 @@ public class GraalRubyScriptEngine extends GraalBaseScriptEngine {
     // see:https://www.graalvm.org/22.2/reference-manual/ruby/Interoperability/
     @Override
     protected GraalPolyglotManager createGraalPolyglotManager() {
-        throw new UnsupportedOperationException();
+        try {
+            log.info("Initialzing graal ruby script engine ...");
+            /**
+             * TODO </br>
+             * The best way is to let the rengine executor write to OSS in real
+             * time, but unfortunately MinIO/S3 does not support append writing
+             * (although it supports object merging, but it is still difficult
+             * to achieve), unless you use Alibaba Cloud OSS (supports real-time
+             * append writing), but this not a neutral approach. Therefore, at
+             * present, only direct reading and writing of disks is realized,
+             * and then shared mounts such as juiceFS, s3fs-fuse, ossfs, etc.
+             * can be used to realize clustering. see to:
+             * {@link com.wl4g.rengine.service.impl.ScheduleJobLogServiceImpl#logfile}
+             */
+            return GraalPolyglotManager.newDefaultForRuby(DEFAULT_EXECUTOR_SCRIPT_CACHE_DIR, createDefaultStdout(),
+                    createDefaultStderr());
+        } catch (Throwable ex) {
+            throw new ExecutionScriptException("Failed to init graal ruby script engine.", ex);
+        }
     }
 
 }

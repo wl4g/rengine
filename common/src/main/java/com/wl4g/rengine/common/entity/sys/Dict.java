@@ -20,6 +20,7 @@ import static java.lang.String.valueOf;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wl4g.rengine.common.entity.BaseEntity;
@@ -45,7 +46,7 @@ import lombok.experimental.SuperBuilder;
 public class Dict extends BaseEntity {
     private static final long serialVersionUID = -5762348176963349685L;
 
-    private @NotBlank DictType type;
+    private @NotNull DictType type;
     private @NotBlank String key;
     private @NotBlank String value;
     private @Nullable Integer sort;
@@ -93,5 +94,29 @@ public class Dict extends BaseEntity {
 
         OTHER_TYPE;
     }
+
+    // @formatter:off
+    //@Getter
+    //@Setter
+    //@SuperBuilder
+    //@ToString(callSuper = true)
+    //@NoArgsConstructor
+    //public static class DynamicFormOption {
+    //    private @NotBlank FormOptionType type;
+    //    private @NotBlank String nameEn;
+    //    private @Nullable String nameZh;
+    //    private @Nullable String defaultValue;
+    //    private @NotNull @Default Boolean required = true;
+    //    private @Nullable Double maxValue;
+    //    private @Nullable Double minValue;
+    //    private @Nullable String regex;
+    //    private @Nullable String help;
+    //    private @Nullable String unit;
+    //
+    //    public static enum FormOptionType {
+    //        INT, INT32, INT64, LONG, FLOAT, FLOAT32, FLOAT64, DOUBLE, NUMBER, BOOLEAN, BOOL, STRING, ARRAY, OBJECT, MAP
+    //    }
+    //}
+    //// @formatter:on
 
 }

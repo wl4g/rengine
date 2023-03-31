@@ -34,11 +34,16 @@ import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -53,6 +58,7 @@ import org.graalvm.polyglot.Value;
 
 import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager;
 import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager.ContextWrapper;
+import com.wl4g.infra.common.io.FileIOUtils;
 import com.wl4g.infra.common.graalvm.polyglot.JdkLoggingOutputStream;
 import com.wl4g.infra.common.lang.StringUtils2;
 import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
@@ -61,6 +67,7 @@ import com.wl4g.rengine.common.exception.EvaluationException;
 import com.wl4g.rengine.common.graph.ExecutionGraphContext;
 import com.wl4g.rengine.common.graph.ExecutionGraphParameter;
 import com.wl4g.rengine.executor.execution.EngineConfig;
+import com.wl4g.rengine.executor.execution.EngineConfig.ScriptLogConfig;
 import com.wl4g.rengine.executor.execution.sdk.ScriptContext;
 import com.wl4g.rengine.executor.execution.sdk.ScriptExecutor;
 import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
@@ -99,6 +106,31 @@ public abstract class GraalBaseScriptEngine extends AbstractScriptEngine {
     protected abstract String getPermittedLanguages();
 
     protected abstract GraalPolyglotManager createGraalPolyglotManager();
+
+    protected Function<Map<String, Object>, OutputStream> createDefaultStdout() {
+        final ScriptLogConfig scriptLogConfig = engineConfig.log();
+        return metadata -> {
+            String filePattern = buildScriptLogFilePattern(scriptLogConfig.baseDir(), metadata, false);
+            // Make sure to generate a log file during
+            // initialization to solve the problem that there is no
+            // output but an error is thrown when the script is
+            // executed. At this time, the logtail loading log
+            // interface will report an error that does not exist.
+            FileIOUtils.ensureFile(new File(filePattern));
+            return new JdkLoggingOutputStream(filePattern, Level.INFO, scriptLogConfig.fileMaxSize(),
+                    scriptLogConfig.fileMaxCount(), scriptLogConfig.enableConsole(), false);
+        };
+    }
+
+    protected Function<Map<String, Object>, OutputStream> createDefaultStderr() {
+        final ScriptLogConfig scriptLogConfig = engineConfig.log();
+        return metadata -> {
+            String filePattern = buildScriptLogFilePattern(scriptLogConfig.baseDir(), metadata, true);
+            FileIOUtils.ensureFile(new File(filePattern));
+            return new JdkLoggingOutputStream(filePattern, Level.WARNING, scriptLogConfig.fileMaxSize(),
+                    scriptLogConfig.fileMaxCount(), scriptLogConfig.enableConsole(), true);
+        };
+    }
 
     @PreDestroy
     protected void destroy() {
@@ -248,6 +280,6 @@ public abstract class GraalBaseScriptEngine extends AbstractScriptEngine {
      *   ... 5 more
      * </pre>
      */
-    public static final String DEFAULT_SCRIPT_ERRMSG_REGEX = "Caused by:(.+)|at <(js|python|py|r|ruby)>(\\s|\\.)([a-zA-Z0-9]+)\\((.+)\\)";
+    public static final String DEFAULT_SCRIPT_ERRMSG_REGEX = "Caused by:(.+)|at <(js|python|py|r|ruby|go|wasm)>(\\s|\\.)([a-zA-Z0-9]+)\\((.+)\\)";
 
 }
