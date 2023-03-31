@@ -17,6 +17,7 @@ package com.wl4g.rengine.executor.execution;
 
 import static com.wl4g.rengine.common.constants.RengineConstants.CONF_PREFIX_EXECUTOR;
 import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_SCRIPT_LOG_DIR;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -86,7 +87,7 @@ public interface EngineConfig {
     SdkExecutorConfig executor();
 
     public static interface ScriptLogConfig {
-        @WithDefault(DEFAULT_EXECUTOR_SCRIPT_LOG_DIR)
+        // @WithDefault(DEFAULT_EXECUTOR_SCRIPT_LOG_DIR)
         @NotBlank
         String baseDir();
 
@@ -111,6 +112,10 @@ public interface EngineConfig {
         // @WithDefault(DEFAULT_SCRIPT_LOG_UPLOADER_CRON)
         // @NotBlank
         // String uploaderCron();
+
+        public static String getBaseDirWithDefault(ScriptLogConfig config) {
+            return isBlank(config.baseDir()) ? DEFAULT_EXECUTOR_SCRIPT_LOG_DIR : config.baseDir();
+        }
 
         public static final boolean DEFAULT_SCRIPT_LOG_ENABLE_CONSOLE = true;
         public static final boolean DEFAULT_SCRIPT_EXTRACT_STACK_CAUSES_AS_LOG = true;

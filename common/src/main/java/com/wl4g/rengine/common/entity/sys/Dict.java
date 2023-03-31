@@ -86,11 +86,13 @@ public class Dict extends BaseEntity {
 
         MENU_CLASSIFY_TYPE,
 
-        API_CONFIG_DEFINITION,
-
         ENGINE_TYPE,
 
         EXECUTOR_CUSTOM_RESP_TPL,
+
+        DATASOURCE_API_CONFIG_SCHEMA,
+
+        CONTROLLER_API_CONFIG_SCHEMA,
 
         OTHER_TYPE;
     }

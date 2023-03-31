@@ -24,6 +24,7 @@ import static com.wl4g.infra.common.lang.Exceptions.getStackTraceAsString;
 import static com.wl4g.infra.common.lang.FastTimeClock.currentTimeMillis;
 import static com.wl4g.infra.common.lang.StringUtils2.getFilename;
 import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_MAIN_FUNCTION;
+import static com.wl4g.rengine.executor.execution.EngineConfig.ScriptLogConfig.getBaseDirWithDefault;
 import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsName.execution_time;
 import static java.lang.String.format;
 import static java.util.Collections.singletonMap;
@@ -37,6 +38,8 @@ import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -55,13 +58,15 @@ import javax.validation.constraints.NotNull;
 import org.graalvm.polyglot.PolyglotException;
 import org.graalvm.polyglot.Source;
 import org.graalvm.polyglot.Value;
+import org.graalvm.polyglot.io.FileSystem;
 
 import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager;
 import com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager.ContextWrapper;
-import com.wl4g.infra.common.io.FileIOUtils;
 import com.wl4g.infra.common.graalvm.polyglot.JdkLoggingOutputStream;
+import com.wl4g.infra.common.io.FileIOUtils;
 import com.wl4g.infra.common.lang.StringUtils2;
 import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
+import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
 import com.wl4g.rengine.common.exception.EvaluationException;
 import com.wl4g.rengine.common.graph.ExecutionGraphContext;
@@ -71,6 +76,7 @@ import com.wl4g.rengine.executor.execution.EngineConfig.ScriptLogConfig;
 import com.wl4g.rengine.executor.execution.sdk.ScriptContext;
 import com.wl4g.rengine.executor.execution.sdk.ScriptExecutor;
 import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
+import com.wl4g.rengine.executor.graal.CustomNIOFileSystem;
 import com.wl4g.rengine.executor.meter.RengineExecutorMeterService;
 import com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsTag;
 import com.wl4g.rengine.executor.minio.MinioManager.ObjectResource;
@@ -107,10 +113,21 @@ public abstract class GraalBaseScriptEngine extends AbstractScriptEngine {
 
     protected abstract GraalPolyglotManager createGraalPolyglotManager();
 
+    protected FileSystem getSandboxPolyglotFileSystem() {
+        final Path rootDir = Path.of(RengineConstants.DEFAULT_EXECUTOR_SCRIPT_ROOTFS_DIR);
+        try {
+            FileIOUtils.forceMkdir(rootDir.toFile());
+            final java.nio.file.FileSystem fileSystem = FileSystems.newFileSystem(rootDir, null);
+            return new CustomNIOFileSystem(fileSystem.provider());
+        } catch (Throwable ex) {
+            throw new IllegalStateException(format("Could't to obtain sandbox polyglot FileSystem of rootDir : %s", rootDir), ex);
+        }
+    }
+
     protected Function<Map<String, Object>, OutputStream> createDefaultStdout() {
         final ScriptLogConfig scriptLogConfig = engineConfig.log();
         return metadata -> {
-            String filePattern = buildScriptLogFilePattern(scriptLogConfig.baseDir(), metadata, false);
+            String filePattern = buildScriptLogFilePattern(getBaseDirWithDefault(scriptLogConfig), metadata, false);
             // Make sure to generate a log file during
             // initialization to solve the problem that there is no
             // output but an error is thrown when the script is
@@ -118,17 +135,19 @@ public abstract class GraalBaseScriptEngine extends AbstractScriptEngine {
             // interface will report an error that does not exist.
             FileIOUtils.ensureFile(new File(filePattern));
             return new JdkLoggingOutputStream(filePattern, Level.INFO, scriptLogConfig.fileMaxSize(),
-                    scriptLogConfig.fileMaxCount(), scriptLogConfig.enableConsole(), false);
+                    scriptLogConfig.fileMaxCount(), scriptLogConfig.enableConsole(), false,
+                    JdkLoggingOutputStream.DEFAULT_FORMATTER);
         };
     }
 
     protected Function<Map<String, Object>, OutputStream> createDefaultStderr() {
         final ScriptLogConfig scriptLogConfig = engineConfig.log();
         return metadata -> {
-            String filePattern = buildScriptLogFilePattern(scriptLogConfig.baseDir(), metadata, true);
+            String filePattern = buildScriptLogFilePattern(getBaseDirWithDefault(scriptLogConfig), metadata, true);
             FileIOUtils.ensureFile(new File(filePattern));
             return new JdkLoggingOutputStream(filePattern, Level.WARNING, scriptLogConfig.fileMaxSize(),
-                    scriptLogConfig.fileMaxCount(), scriptLogConfig.enableConsole(), true);
+                    scriptLogConfig.fileMaxCount(), scriptLogConfig.enableConsole(), true,
+                    JdkLoggingOutputStream.DEFAULT_FORMATTER);
         };
     }
 
