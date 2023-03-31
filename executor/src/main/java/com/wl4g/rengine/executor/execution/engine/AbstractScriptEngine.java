@@ -64,6 +64,7 @@ import com.wl4g.rengine.executor.execution.sdk.tools.AES;
 import com.wl4g.rengine.executor.execution.sdk.tools.Assert;
 import com.wl4g.rengine.executor.execution.sdk.tools.Coding;
 import com.wl4g.rengine.executor.execution.sdk.tools.DateHolder;
+import com.wl4g.rengine.executor.execution.sdk.tools.Files;
 import com.wl4g.rengine.executor.execution.sdk.tools.Hashing;
 import com.wl4g.rengine.executor.execution.sdk.tools.JSON;
 import com.wl4g.rengine.executor.execution.sdk.tools.PrometheusParser;
@@ -242,6 +243,7 @@ public abstract class AbstractScriptEngine implements IScriptEngine {
         bindingMembers.put(PrometheusParser.class.getSimpleName(), PrometheusParser.DEFAULT);
         bindingMembers.put(RandomHolder.class.getSimpleName(), RandomHolder.DEFAULT);
         bindingMembers.put(UUID.class.getSimpleName(), UUID.DEFAULT);
+        bindingMembers.put(Files.class.getSimpleName(), Files.DEFAULT);
         REGISTER_MEMBERS = unmodifiableMap(bindingMembers);
     }
 

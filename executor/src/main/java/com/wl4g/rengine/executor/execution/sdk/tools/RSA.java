@@ -28,9 +28,6 @@ import com.wl4g.infra.common.codec.CodecSource;
 import com.wl4g.infra.common.crypto.asymmetric.RSACryptor;
 import com.wl4g.infra.common.crypto.asymmetric.spec.RSAKeyPairSpec;
 
-import lombok.Getter;
-import lombok.ToString;
-
 /**
  * {@link RSA}
  * 
@@ -46,18 +43,18 @@ public class RSA {
 
     public @HostAccess.Export String encryptToBase64(
             final boolean isPrivateKey,
-            final @NotBlank String base64Key,
+            final @NotBlank String publicOrPrivateBase64Key,
             final String plaintext) {
-        hasTextOf(base64Key, "base64Key");
+        hasTextOf(publicOrPrivateBase64Key, "publicOrPrivateBase64Key");
         if (isNull(plaintext)) {
             return null;
         }
         final RSACryptor rsa = new RSACryptor();
         KeySpec key = null;
         if (isPrivateKey) {
-            key = rsa.generateKeySpec(CodecSource.fromBase64(base64Key).getBytes());
+            key = rsa.generateKeySpec(CodecSource.fromBase64(publicOrPrivateBase64Key).getBytes());
         } else {
-            key = rsa.generatePubKeySpec(CodecSource.fromBase64(base64Key).getBytes());
+            key = rsa.generatePubKeySpec(CodecSource.fromBase64(publicOrPrivateBase64Key).getBytes());
         }
         return rsa.encrypt(key, new CodecSource(plaintext)).toBase64();
     }
@@ -85,8 +82,6 @@ public class RSA {
         return new RsaKeyPair(keyPair.getPubBase64String(), keyPair.getBase64String());
     }
 
-    @Getter
-    @ToString
     public static class RsaKeyPair {
         private final String publicKey;
         private final String privateKey;
@@ -95,6 +90,20 @@ public class RSA {
             this.publicKey = hasTextOf(publicKey, "publicKey");
             this.privateKey = hasTextOf(privateKey, "privateKey");
         }
+
+        public @HostAccess.Export String getPublicKey() {
+            return publicKey;
+        }
+
+        public @HostAccess.Export String getPrivateKey() {
+            return privateKey;
+        }
+
+        @Override
+        public @HostAccess.Export String toString() {
+            return "RsaKeyPair [publicKey=" + publicKey + ", privateKey=" + privateKey + "]";
+        }
+
     }
 
 }

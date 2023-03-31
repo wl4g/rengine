@@ -61,6 +61,9 @@ function process(context) {
     // for sdk case18:
     //testSdkForExecutorTasks(context);
 
+    // for sdk case19:
+    const filesResult = testSdkForFiles(context);
+
     return new ScriptResult(true)
         //.addValue("httpResult", httpResult)
         //.addValue("processResult", processResult)
@@ -78,7 +81,8 @@ function process(context) {
         .addValue("aesResult", aesResult)
         .addValue("rsaResult", rsaResult)
         .addValue("randomHolderResult", randomHolderResult)
-        .addValue("uuidResult", uuidResult);
+        .addValue("uuidResult", uuidResult)
+        .addValue("filesResult", filesResult);
 }
 
 function testSdkForHttpClient(context) {
@@ -379,10 +383,25 @@ function testSdkForRandomHolder(context) {
 function testSdkForUUID(context) {
     try {
         const uuidResult = UUID.randomUUID();
-        console.info("randomUUID: " + uuidResult.toString());
-        return uuidResult.toString();
+        console.info("randomUUID: " + uuidResult);
+        return uuidResult;
     } catch(e) {
         console.error("UUID >>>", e);
+        throw e;
+    }
+}
+
+function testSdkForFiles(context) {
+    try {
+        Files.writeFromString("/1.txt", "abcdefghijklmnopqrstyvwxyz");
+        Files.mkdirs("/dir1");
+        const listResult = Files.listFiles("/");
+        console.info("listResult: " + listResult);
+        var result = Files.readToString("/1.txt");
+        console.info(result);
+        return result;
+    } catch(e) {
+        console.error("Files >>>", e);
         throw e;
     }
 }

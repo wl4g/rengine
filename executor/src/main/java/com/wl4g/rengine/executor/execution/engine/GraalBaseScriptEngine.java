@@ -24,6 +24,7 @@ import static com.wl4g.infra.common.lang.Exceptions.getStackTraceAsString;
 import static com.wl4g.infra.common.lang.FastTimeClock.currentTimeMillis;
 import static com.wl4g.infra.common.lang.StringUtils2.getFilename;
 import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_MAIN_FUNCTION;
+import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_EXECUTOR_SCRIPT_WORKING_DIR;
 import static com.wl4g.rengine.executor.execution.EngineConfig.ScriptLogConfig.getBaseDirWithDefault;
 import static com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsName.execution_time;
 import static java.lang.String.format;
@@ -38,8 +39,6 @@ import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +65,6 @@ import com.wl4g.infra.common.graalvm.polyglot.JdkLoggingOutputStream;
 import com.wl4g.infra.common.io.FileIOUtils;
 import com.wl4g.infra.common.lang.StringUtils2;
 import com.wl4g.infra.common.task.SafeScheduledTaskPoolExecutor;
-import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.common.entity.Rule.RuleWrapper;
 import com.wl4g.rengine.common.exception.EvaluationException;
 import com.wl4g.rengine.common.graph.ExecutionGraphContext;
@@ -76,7 +74,6 @@ import com.wl4g.rengine.executor.execution.EngineConfig.ScriptLogConfig;
 import com.wl4g.rengine.executor.execution.sdk.ScriptContext;
 import com.wl4g.rengine.executor.execution.sdk.ScriptExecutor;
 import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
-import com.wl4g.rengine.executor.graal.CustomNIOFileSystem;
 import com.wl4g.rengine.executor.meter.RengineExecutorMeterService;
 import com.wl4g.rengine.executor.meter.RengineExecutorMeterService.MetricsTag;
 import com.wl4g.rengine.executor.minio.MinioManager.ObjectResource;
@@ -106,23 +103,20 @@ public abstract class GraalBaseScriptEngine extends AbstractScriptEngine {
     @Override
     protected void init() {
         super.init();
+
+        // see:com.wl4g.infra.common.graalvm.polyglot.GraalPolyglotManager#newDefaultFor()
+        System.setProperty("graal.polyglot.currentWorkingDir", DEFAULT_EXECUTOR_SCRIPT_WORKING_DIR);
+        System.setProperty("graal.polyglot.allowAllAccess", "false");
+        System.setProperty("graal.polyglot.allowIO", "true");
+        System.setProperty("graal.polyglot.allowNativeAccess", "false");
+        System.setProperty("graal.polyglot.allowHostClassLoading", "false");
+
         this.graalPolyglotManager = notNullOf(createGraalPolyglotManager(), "graalPolyglotManager");
     }
 
     protected abstract String getPermittedLanguages();
 
     protected abstract GraalPolyglotManager createGraalPolyglotManager();
-
-    protected FileSystem getSandboxPolyglotFileSystem() {
-        final Path rootDir = Path.of(RengineConstants.DEFAULT_EXECUTOR_SCRIPT_ROOTFS_DIR);
-        try {
-            FileIOUtils.forceMkdir(rootDir.toFile());
-            final java.nio.file.FileSystem fileSystem = FileSystems.newFileSystem(rootDir, null);
-            return new CustomNIOFileSystem(fileSystem.provider());
-        } catch (Throwable ex) {
-            throw new IllegalStateException(format("Could't to obtain sandbox polyglot FileSystem of rootDir : %s", rootDir), ex);
-        }
-    }
 
     protected Function<Map<String, Object>, OutputStream> createDefaultStdout() {
         final ScriptLogConfig scriptLogConfig = engineConfig.log();
@@ -224,7 +218,7 @@ public abstract class GraalBaseScriptEngine extends AbstractScriptEngine {
             try {
                 graalContext.close();
             } catch (Throwable ex) {
-                throw new IllegalStateException(format("Failed to closing context wrapper for %s", workflowId), ex);
+                throw new IllegalStateException(format("Failed to closing graal context of '%s'", workflowId), ex);
             }
         }
     }
@@ -273,6 +267,27 @@ public abstract class GraalBaseScriptEngine extends AbstractScriptEngine {
             final @NotNull SafeScheduledTaskPoolExecutor executor) {
         return new ScriptExecutor(parameter.getWorkflowId(), executor, graalPolyglotManager);
     }
+
+    // see:https://github.com/oracle/graaljs/issues/250
+    public static FileSystem getSharedSandboxPolyglotFileSystem() {
+        // TODO
+        //// @formatter:off
+        //if (isNull(sharedSandboxPolyglotFileSystem)) {
+        //    synchronized (GraalBaseScriptEngine.class) {
+        //        if (isNull(sharedSandboxPolyglotFileSystem)) {
+        //             sharedSandboxPolyglotFileSystem = new SandboxNIOFileSystem(DEFAULT_EXECUTOR_SCRIPT_ROOTFS_DIR);
+        //        }
+        //    }
+        //}
+        //return sharedSandboxPolyglotFileSystem;
+        //// @formatter:on
+        return null;
+    }
+
+    //// @formatter:off
+    // public static final String DEFAULT_EXECUTOR_SCRIPT_ROOTFS_DIR = getStringProperty("script.rootfs.dir", JAVA_IO_TMPDIR + "/__rengine_script_rootfs");
+    // private static FileSystem sharedSandboxPolyglotFileSystem;
+    //// @formatter:on
 
     /**
      * for example:

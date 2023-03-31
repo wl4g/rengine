@@ -58,7 +58,7 @@ public class GraalRScriptEngine extends GraalBaseScriptEngine {
              * can be used to realize clustering. see to:
              * {@link com.wl4g.rengine.service.impl.ScheduleJobLogServiceImpl#logfile}
              */
-            return GraalPolyglotManager.newDefaultForR(DEFAULT_EXECUTOR_SCRIPT_CACHE_DIR, getSandboxPolyglotFileSystem(),
+            return GraalPolyglotManager.newDefaultForR(DEFAULT_EXECUTOR_SCRIPT_CACHE_DIR, getSharedSandboxPolyglotFileSystem(),
                     createDefaultStdout(), createDefaultStderr());
         } catch (Throwable ex) {
             throw new ExecutionScriptException("Failed to init graal R script engine.", ex);

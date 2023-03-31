@@ -20,7 +20,8 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
 
-import java.io.File;
+import java.nio.file.FileSystems;
+import java.nio.file.Paths;
 import java.util.Collections;
 
 import org.graalvm.polyglot.Source;
@@ -150,24 +151,39 @@ public class GraalJSScriptEngineTests {
 
     @Test
     public void testInvokeSimpleFile() throws Exception {
-        try (ContextWrapper graalContext = engine.getGraalPolyglotManager()
-                .getContext(singletonMap(KEY_WORKFLOW_ID, 101001010L));) {
+        try {
+            try (ContextWrapper graalContext = engine.getGraalPolyglotManager()
+                    .getContext(singletonMap(KEY_WORKFLOW_ID, 101001010L));) {
+
+                // Notice:System.setProperty("graal.polyglot.allowAllAccess","false");
+                // System.setProperty("graal.polyglot.allowHostClassLoading","false");
+
             // @formatter:off
             final String script = "function testFile(path){"
                     + "console.info(\"The path is:\", path);"
-//                    + "var file = new File(path);"
+//                    + "var Files = Java.type('java.io.File');"
+                    + "var file = new java.io.File(path);"
                     + "console.info(file.list());"
-                    + "return name;"
+                    + "return path;"
                     + "}";
             // @formatter:on
 
-            graalContext.eval(Source.newBuilder("js", script, "test.js").build());
-            final Value bindings = graalContext.getBindings("js");
-            bindings.putMember("file", new File("/tmp"));
-            final Value testFunction = bindings.getMember("testFile");
-            final Value result = testFunction.execute("/tmp");
-            System.out.println("result: " + result);
+                graalContext.eval(Source.newBuilder("js", script, "test.js").build());
+                final Value bindings = graalContext.getBindings("js");
+                // bindings.putMember("rootFile", new Files("/"));
+                final Value testFunction = bindings.getMember("testFile");
+                final Value result = testFunction.execute("/");
+                System.out.println("result: " + result);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
+
+    @Test
+    public void testRootedFileSystem() throws Exception {
+        final var rootedFS = FileSystems.newFileSystem(Paths.get("/tmp"), GraalJSScriptEngineTests.class.getClassLoader());
+        System.out.println(asList(rootedFS.getPath("/").toFile().list()));
     }
 
 }

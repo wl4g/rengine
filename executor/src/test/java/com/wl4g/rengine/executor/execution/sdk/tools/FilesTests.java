@@ -15,23 +15,42 @@
  */
 package com.wl4g.rengine.executor.execution.sdk.tools;
 
-import org.graalvm.polyglot.HostAccess;
+import org.junit.Test;
 
 /**
- * {@link UUID}
+ * {@link FilesTests}
  * 
  * @author James Wong
- * @version 2022-12-25
+ * @version 2023-04-01
  * @since v1.0.0
  */
-public class UUID {
-    public static final UUID DEFAULT = new UUID();
+public class FilesTests {
 
-    private UUID() {
+    @Test
+    public void testCreateFile() {
+        Files.DEFAULT.createFile("/1.txt");
     }
 
-    public @HostAccess.Export String randomUUID() {
-        return java.util.UUID.randomUUID().toString();
+    @Test
+    public void testMkdirs() {
+        Files.DEFAULT.mkdirs("/dir1");
+    }
+
+    @Test
+    public void testListFiles() {
+        var result = Files.DEFAULT.listFiles("/");
+        System.out.println(result);
+    }
+
+    @Test
+    public void testWriteFromString() {
+        Files.DEFAULT.writeFromString("/1.txt", "abcdefghijklmnopqrstyvwxyz");
+    }
+
+    @Test
+    public void testReadToString() {
+        var result = Files.DEFAULT.readToString("/1.txt");
+        System.out.println(result);
     }
 
 }

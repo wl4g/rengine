@@ -131,7 +131,7 @@
 //                log.info("Scan script log dir for workflowId: {}", workflowId);
 //
 //                getAllLogFilenames(engineConfig.log().baseDir(), workflowId, true).parallelStream()
-//                        .map(f -> new File(f))
+//                        .map(f -> new Files(f))
 //                        // TODO
 //                        // 1) S3/minio limit min size for 5MB.
 //                        // 2) Must check that the log file was generated

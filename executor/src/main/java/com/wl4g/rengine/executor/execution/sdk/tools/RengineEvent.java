@@ -87,7 +87,6 @@ public class RengineEvent extends EventObject {
         return attributes;
     }
 
-    @ToString
     @SuperBuilder
     @NoArgsConstructor
     public static class EventSource implements Serializable {
@@ -107,6 +106,12 @@ public class RengineEvent extends EventObject {
         public @HostAccess.Export EventLocation getLocation() {
             return location;
         }
+
+        @Override
+        public @HostAccess.Export String toString() {
+            return "EventSource [time=" + time + ", principals=" + principals + ", location=" + location + "]";
+        }
+
     }
 
     @ToString
