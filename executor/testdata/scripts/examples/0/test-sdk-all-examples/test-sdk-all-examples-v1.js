@@ -91,14 +91,20 @@ function process(context) {
 
 function testSdkForS3Client(context) {
     try {
+        Files.writeFromString("/foobar.txt", "abcdefghijklmnopqrstyvwxyz0123456789");
+
         //const s3Service = new ScriptS3Client(endpoint, defaultRegion, defaultBucket, accessKey, accessSecret);
         const s3Service = context.getDataService().getDefaultS3Client();
-        var uploadResult = s3Service.uploadObject("test1/1.txt", "/tmp/1.txt");
-        console.log(uploadResult);
-        var statResult = s3Service.statObject("test1/1.txt");
+
+        const uploadResult = s3Service.uploadObject("test1/foobar.txt", "/foobar.txt");
+        console.info("uploadResult:", uploadResult);
+
+        const statResult = s3Service.statObject("test1/foobar.txt");
         console.info("statResult:", statResult);
-        var getObjectAsStringResult = s3Service.getObjectAsString("test1/1.txt");
+
+        const getObjectAsStringResult = s3Service.getObjectAsString("test1/foobar.txt");
         console.info("getObjectAsStringResult:", getObjectAsStringResult);
+
         return getObjectAsStringResult;
     } catch(e) {
         console.error("ScriptS3Client >>>", e);
