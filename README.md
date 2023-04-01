@@ -50,11 +50,11 @@ Unified and flexible rules engine platform, naturally suitable for scenarios whe
 
 - Support online coding development rules models, and upload the custom dependency script libraries.
 
-- Support [Executor](docs/en/devel-executor.md) run by native mode running. see: [native-image](https://www.graalvm.org/22.1/docs/getting-started/#native-image)
+- Support [Executor](docs/en/devel-executor.md) run by native mode running, Get a hundred times faster startup time (milliseconds) than the traditional JVM, which supports elastic and fast startup under the faas/serverless architecture very well. see: [native-image](https://www.graalvm.org/22.1/docs/getting-started/#native-image)
 
-- Support [Executor](docs/en/devel-executor.md) built-in multi SDKs(eg: **tools/common/datasource/notifier**), such as datasource sdk, which can be connected to multiple data-source instances by configuration.
+- Support [Executor](docs/en/devel-executor.md) built-in multi SDKs(eg: **common,tools,datasource,notifier**), such as datasource sdk, which can be connected to multiple data-source instances by configuration. More built-in script SDKs to see: [devel-executor-scriptsdk.md](docs/en/devel-executor-scriptsdk.md)
 
-- Support [Executor](docs/en/devel-executor.md) [Js(graal.js)](https://www.graalvm.org/22.2/reference-manual/js/FAQ/#what-is-the-difference-between-running-graalvms-javascript-in-native-image-compared-to-the-jvm)(**default**), [Python](https://www.graalvm.org/22.2/reference-manual/python/Interoperability/)(**beta**), [Groovy](http://groovy-lang.org/differences.html#_default_imports)(**planning**), etc. Executor supports the unified orchestration and execution of multiple scripting language engines. This is an epoch-making technological revolution, thanks to the powerful multi language runtime of graal.
+- Support [Executor](docs/en/devel-executor.md) [JS(graal.js)](https://www.graalvm.org/22.2/reference-manual/js/FAQ/#what-is-the-difference-between-running-graalvms-javascript-in-native-image-compared-to-the-jvm)(**default**), [Python](https://www.graalvm.org/22.2/reference-manual/python/Interoperability/)(**beta**), [R](https://www.graalvm.org/22.2/reference-manual/r/Interoperability/)(**beta**), [Ruby](https://www.graalvm.org/22.2/reference-manual/ruby/Interoperability/)(**beta**), [Groovy](http://groovy-lang.org/differences.html#_default_imports)(**planning**), etc. Executor supports the unified orchestration and execution of multiple scripting language engines. This is an epoch-making technological revolution, thanks to the powerful multi language runtime of graal.
 
 - Support [Controller](docs/en/devel-controller.md) actively scheduling invoke workflow graph.
 
@@ -63,6 +63,8 @@ Unified and flexible rules engine platform, naturally suitable for scenarios whe
 - Support [Job](docs/en/devel-job.md) large-scale MMP parallel real-time state recognition based on Flink CEP.
 
 - Support [ApiServer](docs/en/devel-apiserver.md) static password login and standard OAuth2/OIDC authentication (the configure multiple), such as [keycloak](https://www.keycloak.org/), [github](https://github.com/), etc.
+
+- Support the multi-tenancy of based on kubernetes operator (resource shared and isolation), see: [rengine-operator](../../../rengine-operator) (**progressing**).
 
 - Support automatic analysis of hit rate reports (**progressing**).
 

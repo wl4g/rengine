@@ -73,7 +73,7 @@ import lombok.AllArgsConstructor;
 public class RuleScriptParserTests {
 
     @Test
-    public void testParse() {
+    public void testSimpleJsParse() {
         final List<ScriptInfo> scripts = new ArrayList<>();
 
         // @formatter:off
@@ -153,7 +153,7 @@ public class RuleScriptParserTests {
 
     @SuppressWarnings("deprecation")
     @Test
-    public void generateSystemWithJsSDKAst() {
+    public void generateBuiltScriptSDKAst() {
         final String classDirs = USER_DIR + "/../executor/target/classes";
         final String classPackages = "com.wl4g.rengine.executor.execution.sdk";
         final boolean onlyPublicMethods = true;
