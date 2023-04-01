@@ -65,32 +65,33 @@ public class Files {
         hasTextOf(path, "path");
         notNullOf(filter, "filter");
         try {
-            return safeArrayToList(new File(wrapInSandboxChrootDir(path)).listFiles(f -> nonNull(f) && filter.apply(f.getName())))
-                    .stream()
-                    .map(f -> {
-                        String filepath = f.getAbsolutePath();
-                        final int index = filepath.indexOf(DEFAULT_EXECUTOR_SCRIPT_ROOTFS_DIR);
-                        if (index >= 0) {
-                            filepath = filepath.substring(index + DEFAULT_EXECUTOR_SCRIPT_ROOTFS_DIR.length());
-                        }
-                        return FileInfo.builder()
-                                .path(filepath)
-                                .isDir(f.isDirectory())
-                                .isFile(f.isFile())
-                                .isHidden(f.isHidden())
-                                .name(f.getName())
-                                .build();
-                    })
+            return safeArrayToList(new File(wrapChrootDir(path)).listFiles(f -> nonNull(f) && filter.apply(f.getName()))).stream()
+                    .map(f -> FileInfo.builder()
+                            .path(unwrapChrootDir(f))
+                            .isDir(f.isDirectory())
+                            .isFile(f.isFile())
+                            .isHidden(f.isHidden())
+                            .name(f.getName())
+                            .build())
                     .collect(toList());
         } catch (Throwable ex) {
             throw new RengineException(format("Failed to list files of '%s'", path), ex);
         }
     }
 
+    public @HostAccess.Export void forceDelete(@NotBlank String path) {
+        hasTextOf(path, "path");
+        try {
+            FileIOUtils.forceDelete(new File(wrapChrootDir(path)));
+        } catch (Throwable ex) {
+            throw new RengineException(format("Failed to delete directory '%s'", path), ex);
+        }
+    }
+
     public @HostAccess.Export void createFile(@NotBlank String path) {
         hasTextOf(path, "path");
         try {
-            FileIOUtils.ensureFile(new File(wrapInSandboxChrootDir(path)));
+            FileIOUtils.ensureFile(new File(wrapChrootDir(path)));
         } catch (Throwable ex) {
             throw new RengineException(format("Failed to create file '%s'", path), ex);
         }
@@ -103,7 +104,7 @@ public class Files {
     public @HostAccess.Export void mkdirs(@NotBlank String path, @Nullable String childDir) {
         hasTextOf(path, "path");
         try {
-            FileIOUtils.ensureDir(wrapInSandboxChrootDir(path), childDir);
+            FileIOUtils.ensureDir(wrapChrootDir(path), childDir);
         } catch (Throwable ex) {
             throw new RengineException(format("Failed to mkdir directory '%s'", path), ex);
         }
@@ -112,7 +113,7 @@ public class Files {
     public @HostAccess.Export String readToString(@NotBlank String path) {
         hasTextOf(path, "path");
         try {
-            return FileIOUtils.readFileToString(new File(wrapInSandboxChrootDir(path)), UTF_8);
+            return FileIOUtils.readFileToString(new File(wrapChrootDir(path)), UTF_8);
         } catch (Throwable ex) {
             throw new RengineException(format("Failed to read file to string of '%s'", path), ex);
         }
@@ -121,7 +122,7 @@ public class Files {
     public @HostAccess.Export byte[] readToByteArray(@NotBlank String path) {
         hasTextOf(path, "path");
         try {
-            return FileIOUtils.readFileToByteArray(new File(wrapInSandboxChrootDir(path)));
+            return FileIOUtils.readFileToByteArray(new File(wrapChrootDir(path)));
         } catch (Throwable ex) {
             throw new RengineException(format("Failed to read file to byte array of '%s'", path), ex);
         }
@@ -130,7 +131,7 @@ public class Files {
     public @HostAccess.Export List<String> readLines(@NotBlank String path) {
         hasTextOf(path, "path");
         try {
-            return FileIOUtils.readLines(new File(wrapInSandboxChrootDir(path)), UTF_8);
+            return FileIOUtils.readLines(new File(wrapChrootDir(path)), UTF_8);
         } catch (Throwable ex) {
             throw new RengineException(format("Failed to read file to string lines of '%s'", path), ex);
         }
@@ -146,7 +147,7 @@ public class Files {
         isTrueOf(aboutLimit >= -1, "aboutLimit >= 0");
         notNullOf(stopper, "stopper");
         try {
-            return FileIOUtils.seekReadLines(wrapInSandboxChrootDir(path), startPos, aboutLimit, stopper);
+            return FileIOUtils.seekReadLines(wrapChrootDir(path), startPos, aboutLimit, stopper);
         } catch (Throwable ex) {
             throw new RengineException(format("Failed to seek read file to string lines of '%s'", path), ex);
         }
@@ -159,7 +160,7 @@ public class Files {
     public @HostAccess.Export void writeFromString(@NotBlank String path, @Nullable String data, boolean append) {
         hasTextOf(path, "path");
         try {
-            FileIOUtils.writeFile(new File(wrapInSandboxChrootDir(path)), data, append);
+            FileIOUtils.writeFile(new File(wrapChrootDir(path)), data, append);
         } catch (Throwable ex) {
             throw new RengineException(format("Failed to write byte array to file '%s'", path), ex);
         }
@@ -172,15 +173,37 @@ public class Files {
     public @HostAccess.Export void writeFromByteArray(@NotBlank String path, @Nullable byte[] data, boolean append) {
         hasTextOf(path, "path");
         try {
-            FileIOUtils.writeFile(new File(wrapInSandboxChrootDir(path)), data, append);
+            FileIOUtils.writeFile(new File(wrapChrootDir(path)), data, append);
         } catch (Throwable ex) {
             throw new RengineException(format("Failed to write byte array to file '%s'", path), ex);
         }
     }
 
-    private final String wrapInSandboxChrootDir(String path) {
+    /**
+     * Wrap sandbox file path with chroot dir.
+     * 
+     * @param path
+     * @return
+     */
+    public static final String wrapChrootDir(@NotBlank String path) {
         hasTextOf(path, "path");
         return DEFAULT_EXECUTOR_SCRIPT_ROOTFS_DIR.concat("/").concat(path);
+    }
+
+    /**
+     * Unwap sandbox file path with chroot dir.
+     * 
+     * @param file
+     * @return
+     */
+    public static final String unwrapChrootDir(@NotNull File file) {
+        notNullOf(file, "file");
+        String filepath = file.getAbsolutePath();
+        final int index = filepath.indexOf(DEFAULT_EXECUTOR_SCRIPT_ROOTFS_DIR);
+        if (index >= 0) {
+            filepath = filepath.substring(index + DEFAULT_EXECUTOR_SCRIPT_ROOTFS_DIR.length());
+        }
+        return filepath;
     }
 
     @Setter

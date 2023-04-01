@@ -53,4 +53,10 @@ public class FilesTests {
         System.out.println(result);
     }
 
+    @Test
+    public void testForceDelete() {
+        Files.DEFAULT.forceDelete("/1.txt");
+        Files.DEFAULT.forceDelete("/dir1");
+    }
+
 }

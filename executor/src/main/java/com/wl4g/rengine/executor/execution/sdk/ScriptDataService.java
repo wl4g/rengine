@@ -39,18 +39,21 @@ import lombok.ToString;
  */
 @ToString
 public class ScriptDataService {
+    final ScriptS3Client defaultS3Client;
     final ScriptHttpClient defaultHttpClient;
     final ScriptSSHClient defaultSSHClient;
     final ScriptTCPClient defaultTCPClient;
     final ScriptProcessClient defaultProcessClient;
     final ScriptRedisLockClient defaultRedisLockClient;
+
     final GlobalDataSourceManager globalDataSourceManager;
     final GlobalMessageNotifierManager globalMessageNotifierManager;
 
-    public ScriptDataService(ScriptHttpClient defaultHttpClient, ScriptSSHClient defaultSSHClient,
+    public ScriptDataService(ScriptS3Client defaultS3Client, ScriptHttpClient defaultHttpClient, ScriptSSHClient defaultSSHClient,
             ScriptTCPClient defaultTCPClient, ScriptProcessClient defaultProcessClient,
             ScriptRedisLockClient defaultRedisLockClient, GlobalDataSourceManager globalDataSourceManager,
             GlobalMessageNotifierManager globalMessageNotifierManager) {
+        this.defaultS3Client = notNullOf(defaultS3Client, "defaultS3Client");
         this.defaultHttpClient = notNullOf(defaultHttpClient, "defaultHttpClient");
         this.defaultSSHClient = notNullOf(defaultSSHClient, "defaultSSHClient");
         this.defaultTCPClient = notNullOf(defaultTCPClient, "defaultTCPClient");
@@ -61,6 +64,10 @@ public class ScriptDataService {
     }
 
     // --- SDK Utility Clients. ----
+
+    public @HostAccess.Export ScriptS3Client getDefaultS3Client() {
+        return defaultS3Client;
+    }
 
     public @HostAccess.Export ScriptHttpClient getDefaultHttpClient() {
         return defaultHttpClient;

@@ -126,13 +126,15 @@ public abstract class RengineConstants extends EnvironmentUtil {
     public static final String DEFAULT_EXECUTOR_MAIN_FUNCTION = "process";
 
     public static final String DEFAULT_EXECUTOR_SCRIPT_ROOTFS_DIR = getStringProperty("script.rootfs.dir",
-            JAVA_IO_TMPDIR + "/__rengine_script_rootfs");
+            JAVA_IO_TMPDIR.concat("/__rengine_script_rootfs"));
+    public static final String DEFAULT_EXECUTOR_SCRIPT_S3_OBJECT_PREFIX = getStringProperty("script.s3.object.prefix",
+            "__root_files");
     public static final String DEFAULT_EXECUTOR_SCRIPT_WORKING_DIR = getStringProperty("script.working.dir",
-            JAVA_IO_TMPDIR + "/__rengine_script_works");
+            JAVA_IO_TMPDIR.concat("/__rengine_script_works"));
     public static final String DEFAULT_EXECUTOR_SCRIPT_CACHE_DIR = getStringProperty("script.cache.dir",
-            JAVA_IO_TMPDIR + "/__rengine_script_caches");
+            JAVA_IO_TMPDIR.concat("/__rengine_script_caches"));
     public static final String DEFAULT_EXECUTOR_SCRIPT_LOG_DIR = getStringProperty("script.log.dir",
-            JAVA_IO_TMPDIR + "/__rengine_script_log");
+            JAVA_IO_TMPDIR.concat("/__rengine_script_log"));
 
     public static final String DEFAULT_EXECUTOR_LOGGING_PREFIX = "log";
     public static final int DEFAULT_EXECUTOR_S3_OBJECT_READ_BUFFER = getIntProperty("EXECUTOR_S3_OBJECT_READ_BUFFER", 4 * 1024);

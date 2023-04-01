@@ -56,6 +56,7 @@ import com.wl4g.rengine.executor.execution.sdk.ScriptHttpClient;
 import com.wl4g.rengine.executor.execution.sdk.ScriptProcessClient;
 import com.wl4g.rengine.executor.execution.sdk.ScriptRedisLockClient;
 import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
+import com.wl4g.rengine.executor.execution.sdk.ScriptS3Client;
 import com.wl4g.rengine.executor.execution.sdk.ScriptSSHClient;
 import com.wl4g.rengine.executor.execution.sdk.ScriptTCPClient;
 import com.wl4g.rengine.executor.execution.sdk.datasource.GlobalDataSourceManager;
@@ -116,6 +117,7 @@ public abstract class AbstractScriptEngine implements IScriptEngine {
     @Inject
     GlobalSdkExecutorManager globalSdkExecutorManager;
 
+    ScriptS3Client defaultS3Client;
     ScriptHttpClient defaultHttpClient;
     ScriptSSHClient defaultSSHClient;
     ScriptTCPClient defaultTCPClient;
@@ -123,6 +125,8 @@ public abstract class AbstractScriptEngine implements IScriptEngine {
     ScriptRedisLockClient defaultRedisLockClient;
 
     protected void init() {
+        this.defaultS3Client = new ScriptS3Client(minioConfig.endpoint(), minioConfig.region(), minioConfig.bucket(),
+                minioConfig.tenantAccessKey(), minioConfig.tenantSecretKey());
         this.defaultHttpClient = new ScriptHttpClient();
         this.defaultSSHClient = new ScriptSSHClient();
         this.defaultTCPClient = new ScriptTCPClient();
@@ -170,8 +174,9 @@ public abstract class AbstractScriptEngine implements IScriptEngine {
     protected ScriptContext newScriptContext(final @NotNull ExecutionGraphContext graphContext) {
         notNullOf(graphContext, "graphContext");
 
-        final ScriptDataService dataService = new ScriptDataService(defaultHttpClient, defaultSSHClient, defaultTCPClient,
-                defaultProcessClient, defaultRedisLockClient, globalDataSourceManager, globalMessageNotifierManager);
+        final ScriptDataService dataService = new ScriptDataService(defaultS3Client, defaultHttpClient, defaultSSHClient,
+                defaultTCPClient, defaultProcessClient, defaultRedisLockClient, globalDataSourceManager,
+                globalMessageNotifierManager);
 
         final ExecutionGraphParameter parameter = graphContext.getParameter();
 

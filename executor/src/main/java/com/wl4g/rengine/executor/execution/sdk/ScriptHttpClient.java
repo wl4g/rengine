@@ -29,6 +29,9 @@ import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -42,10 +45,16 @@ import javax.validation.constraints.NotNull;
 import org.graalvm.polyglot.HostAccess;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.wl4g.infra.common.collection.multimap.LinkedMultiValueMap;
+import com.wl4g.infra.common.collection.multimap.MultiValueMap;
+import com.wl4g.infra.common.io.ByteStreamUtils;
 import com.wl4g.infra.common.remoting.HttpEntity;
 import com.wl4g.infra.common.remoting.HttpResponseEntity;
 import com.wl4g.infra.common.remoting.RestClient;
 import com.wl4g.infra.common.remoting.standard.HttpHeaders;
+import com.wl4g.infra.common.remoting.standard.HttpMediaType;
+import com.wl4g.infra.common.resource.FileStreamResource;
+import com.wl4g.rengine.executor.execution.sdk.tools.Files;
 import com.wl4g.rengine.executor.meter.MeterUtil;
 
 import io.netty.handler.codec.http.HttpMethod;
@@ -65,6 +74,8 @@ public class ScriptHttpClient {
     final static String METHOD_GET_FOR_JSON = "getForJson";
     final static String METHOD_POST_FOR_JSON = "postForJson";
     final static String METHOD_EXCHANGE = "exchange";
+    final static String METHOD_DOWNLOAD = "download";
+    final static String METHOD_UPLOAD = "upload";
 
     final RestClient restClient;
 
@@ -103,7 +114,7 @@ public class ScriptHttpClient {
                     () -> restClient.getForObject(url, String.class));
             MeterUtil.counter(execution_sdk_client_success, ScriptHttpClient.class, METHOD_GET_FOR_TEXT);
             return result;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             MeterUtil.counter(execution_sdk_client_failure, ScriptHttpClient.class, METHOD_GET_FOR_TEXT);
             throw e;
         }
@@ -119,7 +130,7 @@ public class ScriptHttpClient {
                     () -> restClient.postForObject(url, request, String.class));
             MeterUtil.counter(execution_sdk_client_success, ScriptHttpClient.class, METHOD_POST_FOR_TEXT);
             return result;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             MeterUtil.counter(execution_sdk_client_failure, ScriptHttpClient.class, METHOD_POST_FOR_TEXT);
             throw e;
         }
@@ -134,7 +145,7 @@ public class ScriptHttpClient {
                     () -> restClient.getForObject(url, JsonNode.class));
             MeterUtil.counter(execution_sdk_client_success, ScriptHttpClient.class, METHOD_GET_FOR_JSON);
             return result;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             MeterUtil.counter(execution_sdk_client_failure, ScriptHttpClient.class, METHOD_GET_FOR_JSON);
             throw e;
         }
@@ -150,7 +161,7 @@ public class ScriptHttpClient {
                     () -> restClient.postForObject(url, request, JsonNode.class));
             MeterUtil.counter(execution_sdk_client_success, ScriptHttpClient.class, METHOD_POST_FOR_JSON);
             return result;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             MeterUtil.counter(execution_sdk_client_failure, ScriptHttpClient.class, METHOD_POST_FOR_JSON);
             throw e;
         }
@@ -170,7 +181,7 @@ public class ScriptHttpClient {
                     () -> restClient.postForObject(url, request, JsonNode.class));
             MeterUtil.counter(execution_sdk_client_success, ScriptHttpClient.class, METHOD_POST_FOR_JSON);
             return result;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             MeterUtil.counter(execution_sdk_client_failure, ScriptHttpClient.class, METHOD_POST_FOR_JSON);
             throw e;
         }
@@ -213,8 +224,59 @@ public class ScriptHttpClient {
 
             MeterUtil.counter(execution_sdk_client_success, ScriptHttpClient.class, METHOD_EXCHANGE);
             return result;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             MeterUtil.counter(execution_sdk_client_failure, ScriptHttpClient.class, METHOD_EXCHANGE);
+            throw e;
+        }
+    }
+
+    public @HostAccess.Export String download(final @NotBlank String url, final @NotBlank String downloadFile) {
+        hasTextOf(url, "url");
+        hasTextOf(downloadFile, "downloadFile");
+        MeterUtil.counter(execution_sdk_client_total, ScriptHttpClient.class, METHOD_DOWNLOAD);
+
+        try {
+            final File download = MeterUtil.timer(execution_sdk_client_time, ScriptHttpClient.class, METHOD_DOWNLOAD, () -> {
+                return restClient.execute(url, HttpMethod.GET, null, response -> {
+                    // TODO using config virtual tmp dir
+                    File tmpfile = File.createTempFile("download", Files.wrapChrootDir(downloadFile));
+                    try (InputStream in = response.getBody(); FileOutputStream out = new FileOutputStream(tmpfile);) {
+                        ByteStreamUtils.copy(in, out);
+                    }
+                    return tmpfile;
+                });
+            });
+            MeterUtil.counter(execution_sdk_client_success, ScriptHttpClient.class, METHOD_DOWNLOAD);
+            return Files.unwrapChrootDir(download);
+        } catch (Throwable e) {
+            MeterUtil.counter(execution_sdk_client_failure, ScriptHttpClient.class, METHOD_DOWNLOAD);
+            throw e;
+        }
+    }
+
+    public @HostAccess.Export String upload(
+            final @NotBlank String url,
+            final @NotBlank String filename,
+            final @NotBlank String uploadFile) {
+        hasTextOf(url, "url");
+        hasTextOf(filename, "filename");
+        hasTextOf(uploadFile, "uploadFile");
+        MeterUtil.counter(execution_sdk_client_total, ScriptHttpClient.class, METHOD_UPLOAD);
+
+        try {
+            final String result = MeterUtil.timer(execution_sdk_client_time, ScriptHttpClient.class, METHOD_UPLOAD, () -> {
+                final HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(HttpMediaType.MULTIPART_FORM_DATA);
+                final MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+                body.add(filename, new FileStreamResource(Files.wrapChrootDir(uploadFile)));
+                final HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+                final HttpResponseEntity<String> response = restClient.postForEntity(url, requestEntity, String.class);
+                return response.getBody();
+            });
+            MeterUtil.counter(execution_sdk_client_success, ScriptHttpClient.class, METHOD_UPLOAD);
+            return result;
+        } catch (Throwable e) {
+            MeterUtil.counter(execution_sdk_client_failure, ScriptHttpClient.class, METHOD_UPLOAD);
             throw e;
         }
     }

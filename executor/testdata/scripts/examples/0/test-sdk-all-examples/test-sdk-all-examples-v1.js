@@ -8,63 +8,67 @@ function process(context) {
     console.info("context.getAttributes()['objId']:", context.getAttributes()["objId"]);
 
     // for sdk case1:
+    const s3Result = testSdkForS3Client(context);
+
+    // for sdk case2:
 //    const httpResult = testSdkForHttpClient(context);
 //
-//    // for sdk case2:
+//    // for sdk case3:
 //    const processResult = testSdkForProcessClient(context);
 //
-//    // for sdk case3:
+//    // for sdk case4:
 //    const sshResult = testSdkForSSHClient(context);
 //
-//    // for sdk case4:
+//    // for sdk case5:
 //    const lockResult = testSdkForRedisLockClient(context);
 //
-//    // for sdk case5:
+//    // for sdk case6:
 //    const mongoResult = testSdkForMongoSourceFacade(context);
 //
-//    // for sdk case6:
+//    // for sdk case7:
 //    const jdbcResult = testSdkForJdbcSourceFacade(context);
 //
-//    // for sdk case7:
+//    // for sdk case8:
 //    const redisResult = testSdkForRedisSourceFacade(context);
 //
-//    // for sdk case8:
+//    // for sdk case9:
 //    const kafkaResult = testSdkForKafkaSourceFacade(context);
 //
-//    // for sdk case9:
+//    // for sdk case10:
 //    const dingtalkResult = testSdkForDingtalkNotifier(context);
 
-    // for sdk case10:
+    // for sdk case11:
     //const emailResult = testSdkForEmailNotifier(context);
 
-    // for sdk case11:
+    // for sdk case12:
     const dateHolderResult = testSdkForDateHolder(context);
 
-    // for sdk case12:
+    // for sdk case13:
     const codingResult = testSdkForCoding(context);
 
-    // for sdk case13:
+    // for sdk case14:
     const hashingResult = testSdkForHashing(context);
 
-    // for sdk case14:
+    // for sdk case15:
     const aesResult = testSdkForAES(context);
 
-    // for sdk case15:
+    // for sdk case16:
     const rsaResult = testSdkForRSA(context);
 
-    // for sdk case16:
+    // for sdk case17:
     const randomHolderResult = testSdkForRandomHolder(context);
 
-    // for sdk case17:
+    // for sdk case18:
     const uuidResult = testSdkForUUID(context);
 
-    // for sdk case18:
+    // for sdk case19:
     //testSdkForExecutorTasks(context);
 
-    // for sdk case19:
+    // for sdk case20:
     const filesResult = testSdkForFiles(context);
 
     return new ScriptResult(true)
+        .addValue("s3Result", s3Result)
         //.addValue("httpResult", httpResult)
         //.addValue("processResult", processResult)
         //.addValue("sshResult", sshResult)
@@ -83,6 +87,23 @@ function process(context) {
         .addValue("randomHolderResult", randomHolderResult)
         .addValue("uuidResult", uuidResult)
         .addValue("filesResult", filesResult);
+}
+
+function testSdkForS3Client(context) {
+    try {
+        //const s3Service = new ScriptS3Client(endpoint, defaultRegion, defaultBucket, accessKey, accessSecret);
+        const s3Service = context.getDataService().getDefaultS3Client();
+        var uploadResult = s3Service.uploadObject("test1/1.txt", "/tmp/1.txt");
+        console.log(uploadResult);
+        var statResult = s3Service.statObject("test1/1.txt");
+        console.info("statResult:", statResult);
+        var getObjectAsStringResult = s3Service.getObjectAsString("test1/1.txt");
+        console.info("getObjectAsStringResult:", getObjectAsStringResult);
+        return getObjectAsStringResult;
+    } catch(e) {
+        console.error("ScriptS3Client >>>", e);
+        throw e;
+    }
 }
 
 function testSdkForHttpClient(context) {
