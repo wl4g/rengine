@@ -44,6 +44,7 @@ import javax.validation.constraints.NotNull;
 import org.graalvm.polyglot.HostAccess;
 
 import com.wl4g.rengine.common.exception.RengineException;
+import com.wl4g.rengine.executor.execution.sdk.tools.Files;
 import com.wl4g.rengine.executor.meter.MeterUtil;
 
 import io.minio.DownloadObjectArgs;
@@ -140,7 +141,7 @@ public class ScriptS3Client {
                         .bucket(isBlank(bucket) ? defaultBucket : bucket)
                         .object(wrapChrootPrefix(objectPrefix))
                         // .ssec(ssec)
-                        .filename(downloadFile)
+                        .filename(Files.wrapChrootDir(downloadFile))
                         .build());
                 return null;
             });
@@ -174,7 +175,7 @@ public class ScriptS3Client {
                                 .object(wrapChrootPrefix(objectPrefix))
                                 // see:io.minio.PutObjectBaseArgs.Builder#validateSizes
                                 // see:io.minio.ObjectWriteArgs.MAX_PART_SIZE
-                                .filename(uploadFile)
+                                .filename(Files.wrapChrootDir(uploadFile))
                                 .build());
                     });
             MeterUtil.counter(execution_sdk_client_success, ScriptS3Client.class, METHOD_UPLOAD_OBJECT);
