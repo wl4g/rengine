@@ -47,7 +47,7 @@ import org.apache.shardingsphere.elasticjob.api.ShardingContext;
 import org.apache.shardingsphere.elasticjob.executor.JobFacade;
 
 import com.nextbreakpoint.flinkclient.api.ApiClient;
-import com.nextbreakpoint.flinkclient.api.FlinkApi;
+import com.nextbreakpoint.flinkclient.api.DefaultApi;
 import com.nextbreakpoint.flinkclient.model.JarFileInfo;
 import com.nextbreakpoint.flinkclient.model.JarListInfo;
 import com.nextbreakpoint.flinkclient.model.JarRunResponseBody;
@@ -84,7 +84,8 @@ import lombok.Getter;
  * @author James Wong
  * @version 2023-01-11
  * @since v1.0.0
- * @see https://nightlies.apache.org/flink/flink-docs-release-1.17/docs/ops/rest_api/
+ * @see https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/ops/rest_api/#jobmanager
+ * @see https://nightlies.apache.org/flink/flink-docs-release-1.15/generated/rest_v1_dispatcher.yml
  * @see https://github1s.com/apache/flink/blob/release-1.14/flink-runtime/src/main/java/org/apache/flink/runtime/rest/RestServerEndpoint.java
  * @see https://github1s.com/wl4g-collect/flink-client/blob/master/src/test/java/com/nextbreakpoint/FlinkClientIT.java#L88-L89
  * @see https://mvnrepository.com/artifact/com.nextbreakpoint/com.nextbreakpoint.flinkclient
@@ -93,14 +94,14 @@ import lombok.Getter;
 @CustomLog
 public class FlinkSubmitController extends AbstractJobExecutor {
 
-    private FlinkApi flinkApi;
+    private DefaultApi flinkApi;
 
     @Override
     public String getType() {
         return ControllerJobType.FLINK_SUBMITTER.name();
     }
 
-    protected FlinkApi getFlinkApi() {
+    protected DefaultApi getDefaultApi() {
         if (isNull(flinkApi)) {
             synchronized (this) {
                 if (isNull(flinkApi)) {
@@ -145,7 +146,7 @@ public class FlinkSubmitController extends AbstractJobExecutor {
                     if (!isBlank(flinkConfig.getAccessToken())) {
                         apiClient.setAccessToken(flinkConfig.getAccessToken());
                     }
-                    this.flinkApi = new FlinkApi(apiClient);
+                    this.flinkApi = new DefaultApi(apiClient);
                     log.info("Initialized flinkApi of : {}", flinkConfig);
                 }
             }
@@ -177,16 +178,15 @@ public class FlinkSubmitController extends AbstractJobExecutor {
         try {
             log.info("Execution scheduling for : {}", controller);
 
-            final JobIdsWithStatusOverview allJobInfo = getFlinkApi().getJobs();
+            final JobIdsWithStatusOverview allJobInfo = getDefaultApi().jobsGet();
             log.info("Found all flink job info : {}", allJobInfo);
 
             // Check for already job?
             if (nonNull(allJobInfo)) {
                 final List<JobDetailsInfo> existingJobDetailsList = safeList(allJobInfo.getJobs()).parallelStream().map(job -> {
                     try {
-                        final JobDetailsInfo jobDetails = getFlinkApi().getJobDetails(job.getId());
-                        if (nonNull(jobDetails) && nonNull(jobDetails.getPlan())
-                                && eqIgnCase(jobDetails.getPlan().getName(), fssc.getJobArgs().getJobName())
+                        final JobDetailsInfo jobDetails = getDefaultApi().jobsJobidGet(job.getId());
+                        if (nonNull(jobDetails) && eqIgnCase(jobDetails.getName(), fssc.getJobArgs().getJobName())
                                 && isExistingJob(jobDetails)) {
                             return jobDetails;
                         }
@@ -204,12 +204,13 @@ public class FlinkSubmitController extends AbstractJobExecutor {
             // e.g: jobinfra/rengine-job-base-1.0.0.jar
             // e.g: jobinfra/rengine-job-base-1.0.0-jar-with-dependencies.jar
             final File jobJarFile = obtainFlinkJobJarFile(fssc);
-            final JarUploadResponseBody upload = getFlinkApi().uploadJar(jobJarFile);
+            // see:com.nextbreakpoint.flinkclient.api.ApiClient#serialize()
+            final JarUploadResponseBody upload = getDefaultApi().jarsUploadPost(jobJarFile);
             if (isNull(upload)) {
                 throw new IllegalStateException(format("Failed to upload jars for : %s", fssc.getJobJarUrls()));
             }
 
-            final JarListInfo jarsInfo = getFlinkApi().listJars();
+            final JarListInfo jarsInfo = getDefaultApi().jarsGet();
             if (isNull(jarsInfo)) {
                 throw new IllegalStateException(format("Unable to get flink upload jars."));
             }
@@ -265,10 +266,10 @@ public class FlinkSubmitController extends AbstractJobExecutor {
                     .collect(joining(","));
 
             log.info("Run flink job args line : {}", jobArgsLine);
-            final JarRunResponseBody response = getFlinkApi().runJar(jar.getId(), true, null, null, jobArgsLine,
+            final JarRunResponseBody response = getDefaultApi().jarsJaridRunPost(jar.getId(), null, true, null, null, jobArgsLine,
                     jobArgsConfig.getEntryClass(), jobArgsConfig.getParallelis());
 
-            final JobDetailsInfo jobDetails = getFlinkApi().getJobDetails(response.getJobid());
+            final JobDetailsInfo jobDetails = getDefaultApi().jobsJobidGet(response.getJobid());
             if (isExistingJob(jobDetails)) {
                 // TODO
                 updateControllerRunState(controllerId, RunState.SUCCESS);
@@ -361,7 +362,7 @@ public class FlinkSubmitController extends AbstractJobExecutor {
     }
 
     protected boolean isExistingJob(JobDetailsInfo jobDetails) {
-        return jobDetails.getState() == StateEnum.CREATED || jobDetails.getState() == StateEnum.SUSPENDING
+        return jobDetails.getState() == StateEnum.CREATED || jobDetails.getState() == StateEnum.INITIALIZING
                 || jobDetails.getState() == StateEnum.RECONCILING || jobDetails.getState() == StateEnum.RESTARTING
                 || jobDetails.getState() == StateEnum.CANCELLING || jobDetails.getState() == StateEnum.FAILING
                 || jobDetails.getState() == StateEnum.RUNNING;
