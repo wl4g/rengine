@@ -32,6 +32,7 @@ import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.junit.Test;
 
+import com.wl4g.infra.common.codec.Encodes;
 import com.wl4g.infra.common.lang.tuples.Tuple2;
 import com.wl4g.infra.common.lang.tuples.Tuple3;
 import com.wl4g.rengine.common.event.RengineEvent;
@@ -48,6 +49,8 @@ public class RengineKafkaFlinkCepStreamingTests {
 
     @Test
     public void testSimplePatternCEP() throws Exception {
+        System.out.println("PATTERN_JSON_1 : " + Encodes.encodeBase64("[" + PATTERN_JSON_1 + "]"));
+
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
         DataStream<RengineEvent> input = env.fromElements(
@@ -86,6 +89,8 @@ public class RengineKafkaFlinkCepStreamingTests {
 
     @Test
     public void testErrorLogsPatternCEP() throws Exception {
+        System.out.println("PATTERN_JSON_2 : " + Encodes.encodeBase64("[" + PATTERN_JSON_2 + "]"));
+
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
         DataStream<RengineEvent> input = env.fromElements(

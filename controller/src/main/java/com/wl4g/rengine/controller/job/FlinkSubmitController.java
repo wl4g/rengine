@@ -17,7 +17,7 @@ package com.wl4g.rengine.controller.job;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
-import static com.wl4g.infra.common.lang.StringUtils2.getFilenameExtension;
+import static com.wl4g.infra.common.lang.StringUtils2.eqIgnCase;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_CONTROLLER_JAR_TMP_DIR;
 import static java.lang.String.format;
@@ -26,6 +26,7 @@ import static java.lang.System.currentTimeMillis;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.equalsAnyIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.startsWith;
@@ -36,6 +37,7 @@ import java.net.URI;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.validation.constraints.NotNull;
@@ -54,9 +56,12 @@ import com.nextbreakpoint.flinkclient.model.JobDetailsInfo;
 import com.nextbreakpoint.flinkclient.model.JobDetailsInfo.StateEnum;
 import com.nextbreakpoint.flinkclient.model.JobIdsWithStatusOverview;
 import com.squareup.okhttp.OkHttpClient;
+import com.wl4g.infra.common.codec.Encodes;
+import com.wl4g.infra.common.io.FileIOUtils;
 import com.wl4g.infra.common.lang.Assert2;
 import com.wl4g.infra.common.lang.StringUtils2;
 import com.wl4g.rengine.common.entity.Controller;
+import com.wl4g.rengine.common.entity.Controller.ControllerType;
 import com.wl4g.rengine.common.entity.Controller.FlinkSubmitExecutionConfig;
 import com.wl4g.rengine.common.entity.Controller.FlinkSubmitExecutionConfig.FlinkJobArgs;
 import com.wl4g.rengine.common.entity.Controller.RunState;
@@ -99,26 +104,47 @@ public class FlinkSubmitController extends AbstractJobExecutor {
         if (isNull(flinkApi)) {
             synchronized (this) {
                 if (isNull(flinkApi)) {
-                    final EngineFlinkSchedulerProperties flinkConfig = getConfig().getFlink();
+                    final EngineFlinkSchedulerProperties flinkConfig = getConfig().getFlink().validate();
                     final ApiClient apiClient = new ApiClient();
+                    if (nonNull(flinkConfig.getDebugging())) {
+                        apiClient.setDebugging(flinkConfig.getDebugging());
+                    }
                     apiClient.setBasePath(flinkConfig.getEndpoint());
                     apiClient.setHttpClient(new OkHttpClient());
-                    apiClient.setUserAgent(FlinkSubmitController.class.getSimpleName().concat("/1.0/java"));
-                    apiClient.setConnectTimeout(5);
-                    apiClient.setReadTimeout(10);
+                    apiClient.setUserAgent(FlinkSubmitController.class.getSimpleName()
+                            .concat(format("/%s/java", FlinkSubmitController.class.getPackage().getImplementationVersion())));
+                    if (nonNull(flinkConfig.getConnTimeout())) {
+                        apiClient.setConnectTimeout(flinkConfig.getConnTimeout());
+                    }
+                    if (nonNull(flinkConfig.getReadTimeout())) {
+                        apiClient.setReadTimeout(flinkConfig.getReadTimeout());
+                    }
                     // for upload jars
-                    apiClient.setWriteTimeout(300);
-                    apiClient.setVerifyingSsl(flinkConfig.getVerifyingSsl());
-                    apiClient.setSslCaCert(flinkConfig.getSslCaCert());
-                    apiClient.setDebugging(flinkConfig.getDebugging());
+                    if (nonNull(flinkConfig.getWriteTimeout())) {
+                        apiClient.setWriteTimeout(flinkConfig.getWriteTimeout());
+                    }
+                    if (nonNull(flinkConfig.getVerifyingSsl())) {
+                        apiClient.setVerifyingSsl(flinkConfig.getVerifyingSsl());
+                    }
+                    if (nonNull(flinkConfig.getSslCaCert())) {
+                        apiClient.setSslCaCert(flinkConfig.getSslCaCert());
+                    }
                     // for basic auth
-                    apiClient.setUsername(flinkConfig.getUsername());
-                    apiClient.setPassword(flinkConfig.getPassword());
+                    if (!isBlank(flinkConfig.getUsername()) && !isBlank(flinkConfig.getPassword())) {
+                        apiClient.setUsername(flinkConfig.getUsername());
+                        apiClient.setPassword(flinkConfig.getPassword());
+                    }
                     // for api auth
-                    apiClient.setApiKey(flinkConfig.getApiKey());
-                    apiClient.setApiKeyPrefix(flinkConfig.getApiKeyPrefix());
+                    if (!isBlank(flinkConfig.getApiKey())) {
+                        apiClient.setApiKey(flinkConfig.getApiKey());
+                    }
+                    if (!isBlank(flinkConfig.getApiKeyPrefix())) {
+                        apiClient.setApiKeyPrefix(flinkConfig.getApiKeyPrefix());
+                    }
                     // for oauth auth
-                    apiClient.setAccessToken(flinkConfig.getAccessToken());
+                    if (!isBlank(flinkConfig.getAccessToken())) {
+                        apiClient.setAccessToken(flinkConfig.getAccessToken());
+                    }
                     this.flinkApi = new FlinkApi(apiClient);
                     log.info("Initialized flinkApi of : {}", flinkConfig);
                 }
@@ -154,15 +180,33 @@ public class FlinkSubmitController extends AbstractJobExecutor {
             final JobIdsWithStatusOverview allJobInfo = getFlinkApi().getJobs();
             log.info("Found all flink job info : {}", allJobInfo);
 
+            // Check for already job?
             if (nonNull(allJobInfo)) {
-                safeList(allJobInfo.getJobs());
+                final List<JobDetailsInfo> existingJobDetailsList = safeList(allJobInfo.getJobs()).parallelStream().map(job -> {
+                    try {
+                        final JobDetailsInfo jobDetails = getFlinkApi().getJobDetails(job.getId());
+                        if (nonNull(jobDetails) && nonNull(jobDetails.getPlan())
+                                && eqIgnCase(jobDetails.getPlan().getName(), fssc.getJobArgs().getJobName())
+                                && isExistingJob(jobDetails)) {
+                            return jobDetails;
+                        }
+                        return null;
+                    } catch (Throwable ex) {
+                        throw new IllegalStateException(ex);
+                    }
+                }).filter(jd -> nonNull(jd)).collect(toList());
+                if (!existingJobDetailsList.isEmpty()) {
+                    log.info("The flink jobs is already running.", existingJobDetailsList);
+                    return;
+                }
             }
 
             // e.g: jobinfra/rengine-job-base-1.0.0.jar
             // e.g: jobinfra/rengine-job-base-1.0.0-jar-with-dependencies.jar
-            final JarUploadResponseBody upload = getFlinkApi().uploadJar(obtainFlinkJobJarFile(fssc));
+            final File jobJarFile = obtainFlinkJobJarFile(fssc);
+            final JarUploadResponseBody upload = getFlinkApi().uploadJar(jobJarFile);
             if (isNull(upload)) {
-                throw new IllegalStateException(format("Failed to upload jar for : %s", fssc.getJobFileUrl()));
+                throw new IllegalStateException(format("Failed to upload jars for : %s", fssc.getJobJarUrls()));
             }
 
             final JarListInfo jarsInfo = getFlinkApi().listJars();
@@ -208,7 +252,7 @@ public class FlinkSubmitController extends AbstractJobExecutor {
             // FLINK ControllerLog options.
             jobArgs.put("jobName", jobArgsConfig.getJobName());
             // FLINK CEP job options.
-            jobArgs.put("cepPatterns", "TODO"); // TODO
+            jobArgs.put("cepPatterns", Encodes.encodeBase64(jobArgsConfig.getCepPatterns()));
             jobArgs.put("inProcessingTime", jobArgsConfig.getInProcessingTime());
             jobArgs.put("alertTopic", jobArgsConfig.getAlertTopic());
             // FLINK CEP job with kafka options.
@@ -225,11 +269,10 @@ public class FlinkSubmitController extends AbstractJobExecutor {
                     jobArgsConfig.getEntryClass(), jobArgsConfig.getParallelis());
 
             final JobDetailsInfo jobDetails = getFlinkApi().getJobDetails(response.getJobid());
-            // TODO
-            if (jobDetails.getState() == StateEnum.RUNNING) {
+            if (isExistingJob(jobDetails)) {
+                // TODO
+                updateControllerRunState(controllerId, RunState.SUCCESS);
             }
-
-            updateControllerRunState(controllerId, RunState.SUCCESS);
 
             upsertControllerLog(controllerId, controllerLog.getId(), false, true, true, _jobLog -> {
                 _jobLog.setDetails(FlinkSubmitControllerLog.builder()
@@ -264,32 +307,38 @@ public class FlinkSubmitController extends AbstractJobExecutor {
     }
 
     protected File obtainFlinkJobJarFile(FlinkSubmitExecutionConfig fssc) {
-        final URI jarUri = URI.create(fssc.getJobFileUrl());
-        final String scheme = isBlank(jarUri.getScheme()) ? "file://" : jarUri.getScheme();
+        // TODO multi job jars with dependencies
+        final String firstJarUrl = fssc.getJobJarUrls().get(0);
+
+        final URI jarUri = URI.create(firstJarUrl);
+        final String scheme = isBlank(jarUri.getScheme()) ? "file" : jarUri.getScheme();
         final String resourcePath = jarUri.getRawPath();
         Assert2.isTrue(resourcePath.contains("/"), "invalid resourcePath %s, missing is '/'", resourcePath);
         final String localTmpPath = DEFAULT_CONTROLLER_JAR_TMP_DIR.concat("/")
                 .concat(resourcePath.substring(resourcePath.lastIndexOf("/")))
                 .concat("-")
-                .concat(valueOf(currentTimeMillis()))
-                .concat(getFilenameExtension(resourcePath));
+                .concat(valueOf(currentTimeMillis()));
 
         try {
-            if (equalsAnyIgnoreCase(scheme, "file://")) {
-                return new File(fssc.getJobFileUrl());
-            } else if (equalsAnyIgnoreCase(scheme, "http://", "https://")) {
+            FileIOUtils.forceMkdirParent(new File(localTmpPath));
+
+            if (equalsAnyIgnoreCase(scheme, "file")) {
+                return new File(firstJarUrl);
+            } else if (equalsAnyIgnoreCase(scheme, "http", "https")) {
                 log.info("Downloading flink job jar file to '{}' from remote : '%s'", localTmpPath, resourcePath);
 
                 try (ReadableByteChannel channel = Channels.newChannel(jarUri.toURL().openStream());
                         FileOutputStream fos = new FileOutputStream(localTmpPath, false);) {
                     fos.getChannel().transferFrom(channel, 0, Long.MAX_VALUE);
                 }
-            } else if (equalsAnyIgnoreCase(scheme, "minio://", "s3://")) {
+            }
+            // Similar to the ossref protocol of Alibaba EMR.
+            else if (equalsAnyIgnoreCase(scheme, "minio", "s3ref")) {
                 final MinioClientProperties config = getMinioManager().getConfig();
 
                 // The S3 specification must not prefix is '/'.
                 final String objectPrefix = startsWith(resourcePath, "/") ? resourcePath.substring(1) : resourcePath;
-                log.info("Downloading flink job jar file to '{}' from S3 : '%s'", localTmpPath, objectPrefix);
+                log.info("Downloading flink job jar file to '{}' from s3ref : '%s'", localTmpPath, objectPrefix);
 
                 getMinioManager().getMinioClient()
                         .downloadObject(DownloadObjectArgs.builder()
@@ -301,13 +350,29 @@ public class FlinkSubmitController extends AbstractJobExecutor {
             }
             log.info("Downloaded flink job jar file '{}', length: {}", localTmpPath, new File(localTmpPath).length());
 
+            return new File(localTmpPath);
         } catch (Throwable ex) {
             log.error(format(
-                    "Failed to obtain flink job jar file : '%s', The currently only supported protocols are: minio://, s3://, http://, https://, file://",
-                    fssc.getJobFileUrl()), ex);
+                    "Failed to obtain flink job jar file : '%s', The currently only supported protocols are: minio://, s3ref://, http://, https://, file://",
+                    fssc.getJobJarUrls()), ex);
         }
 
-        throw new UnsupportedOperationException(format("No supported job jar URI : '%s'. ", fssc.getJobFileUrl()));
+        throw new UnsupportedOperationException(format("No supported job jar URIs : '%s'. ", fssc.getJobJarUrls()));
+    }
+
+    protected boolean isExistingJob(JobDetailsInfo jobDetails) {
+        return jobDetails.getState() == StateEnum.CREATED || jobDetails.getState() == StateEnum.SUSPENDING
+                || jobDetails.getState() == StateEnum.RECONCILING || jobDetails.getState() == StateEnum.RESTARTING
+                || jobDetails.getState() == StateEnum.CANCELLING || jobDetails.getState() == StateEnum.FAILING
+                || jobDetails.getState() == StateEnum.RUNNING;
+    }
+
+    @Override
+    protected ControllerLog newDefaultControllerLog(Long controllerId) {
+        return ControllerLog.builder()
+                .controllerId(controllerId)
+                .details(FlinkSubmitControllerLog.builder().type(ControllerType.FLINK_SUBMITTER.name()).build())
+                .build();
     }
 
 }

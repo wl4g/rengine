@@ -35,6 +35,7 @@ import java.util.Map;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -467,10 +468,12 @@ public class Controller extends BaseEntity {
     @ToString
     @NoArgsConstructor
     public static class FlinkSubmitExecutionConfig extends ScheduleDetailBase<FlinkSubmitExecutionConfig> {
-        private String jobFileUrl; // e.g:"xx/rengine-job-base-1.0.0.jar"
-        private FlinkJobArgs jobArgs;
+        private @NotEmpty List<String> jobJarUrls; // e.g:"xx/rengine-job-base-1.0.0.jar"
+        private @NotNull FlinkJobArgs jobArgs;
 
         public FlinkSubmitExecutionConfig validate() {
+            notEmptyOf(jobJarUrls, "jobJarUrls");
+            notNullOf(jobArgs, "jobArgs");
             return this;
         }
 
@@ -513,7 +516,7 @@ public class Controller extends BaseEntity {
             private Boolean forceUsePrintSink;
 
             // FLINK ControllerLog options.
-            private String jobName;
+            private @NotBlank @Default String jobName = "RengineKafkaFlinkCepStreamingJob";
 
             // FLINK CEP job options.
             private @NotBlank String cepPatterns; // IMPORTMENT!!!

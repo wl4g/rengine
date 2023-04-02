@@ -17,6 +17,7 @@ package com.wl4g.rengine.controller.config;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
+import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.rengine.common.constants.RengineConstants.TenantedHolder.getSlashKey;
 import static com.wl4g.rengine.controller.util.Environments.resolveString;
 import static java.util.Objects.nonNull;
@@ -35,6 +36,7 @@ import javax.net.ssl.KeyManager;
 import javax.validation.Validator;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
 import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperConfiguration;
@@ -342,17 +344,29 @@ public class RengineControllerProperties implements InitializingBean {
     @Setter
     @ToString
     public static class EngineFlinkSchedulerProperties {
-        private String endpoint = "http://localhost:8081";
-        private Boolean debugging = false;
-        private Boolean verifyingSsl = false;
-        private InputStream sslCaCert;
-        private KeyManager[] keyManagers;
+        private @NotBlank String endpoint = "http://localhost:8081";
+        private @NotNull Boolean debugging = false;
+        private @NotNull Boolean verifyingSsl = false;
+        private @NotNull Integer connTimeout = 6_000;
+        private @NotNull Integer readTimeout = 10_000;
+        private @NotNull Integer writeTimeout = 900_000;
+        private @Nullable InputStream sslCaCert;
+        private @Nullable KeyManager[] keyManagers;
+        private @Nullable String username;
+        private @Nullable String password;
+        private @Nullable String apiKey;
+        private @Nullable String apiKeyPrefix;
+        private @Nullable String accessToken;
 
-        private String username;
-        private String password;
-        private String apiKey;
-        private String apiKeyPrefix;
-        private String accessToken;
+        public EngineFlinkSchedulerProperties validate() {
+            hasTextOf(endpoint, "endpoint");
+            notNullOf(debugging, "debugging");
+            notNullOf(verifyingSsl, "verifyingSsl");
+            notNullOf(connTimeout, "connTimeout");
+            notNullOf(readTimeout, "readTimeout");
+            notNullOf(writeTimeout, "writeTimeout");
+            return this;
+        }
     }
 
 }
