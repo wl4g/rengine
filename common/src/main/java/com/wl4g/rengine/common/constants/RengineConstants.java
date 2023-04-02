@@ -15,8 +15,10 @@
  */
 package com.wl4g.rengine.common.constants;
 
+import static com.wl4g.infra.common.collection.CollectionUtils2.safeArrayToList;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static java.lang.String.format;
+import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.equalsAnyIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.join;
@@ -89,14 +91,17 @@ public abstract class RengineConstants extends EnvironmentUtil {
     // processing.
     public static final String API_V1_KUBERNETES_OPERATOR_BASE_URI = "/_/v1/operator";
 
+    public static final List<String> USER_SUPER_ADMINISTRATORS = unmodifiableList(
+            safeArrayToList(split(getProperty("apiserver.user.super.administrators", "root"), ",")));
+
     // ----------------------------------------------------------------------------
     // ----- Rengine Controller constants. -----
     // ----------------------------------------------------------------------------
 
     public static final String CONF_PREFIX_CONTROLLER = CONF_PREFIX + ".controller";
 
-    public static final String DEFAULT_CONTROLLER_JAR_TMP_DIR = getStringProperty("script.log.dir",
-            JAVA_IO_TMPDIR + "/__rengine_jars");
+    public static final String DEFAULT_CONTROLLER_JAR_TMP_DIR = getStringProperty("controller.tmp.dir",
+            JAVA_IO_TMPDIR + "/__rengine_tmp");
 
     //
     // ----- Rengine Executor constants. -----
@@ -125,20 +130,20 @@ public abstract class RengineConstants extends EnvironmentUtil {
     // Notice: The handcode entrypoint function is 'process'
     public static final String DEFAULT_EXECUTOR_MAIN_FUNCTION = "process";
 
-    public static final String DEFAULT_EXECUTOR_SCRIPT_ROOTFS_DIR = getStringProperty("script.rootfs.dir",
+    public static final String DEFAULT_EXECUTOR_SCRIPT_ROOTFS_DIR = getStringProperty("executor.script.rootfs.dir",
             JAVA_IO_TMPDIR.concat("/__rengine_script_rootfs"));
-    public static final String DEFAULT_EXECUTOR_SCRIPT_S3_OBJECT_PREFIX = getStringProperty("script.s3.object.prefix",
+    public static final String DEFAULT_EXECUTOR_SCRIPT_S3_OBJECT_PREFIX = getStringProperty("executor.script.s3.object.prefix",
             "__root_files");
-    public static final String DEFAULT_EXECUTOR_SCRIPT_WORKING_DIR = getStringProperty("script.working.dir",
+    public static final String DEFAULT_EXECUTOR_SCRIPT_WORKING_DIR = getStringProperty("executor.script.working.dir",
             JAVA_IO_TMPDIR.concat("/__rengine_script_works"));
-    public static final String DEFAULT_EXECUTOR_SCRIPT_CACHE_DIR = getStringProperty("script.cache.dir",
+    public static final String DEFAULT_EXECUTOR_SCRIPT_CACHE_DIR = getStringProperty("executor.script.cache.dir",
             JAVA_IO_TMPDIR.concat("/__rengine_script_caches"));
-    public static final String DEFAULT_EXECUTOR_SCRIPT_LOG_DIR = getStringProperty("script.log.dir",
+    public static final String DEFAULT_EXECUTOR_SCRIPT_LOG_DIR = getStringProperty("executor.script.log.dir",
             JAVA_IO_TMPDIR.concat("/__rengine_script_log"));
 
     public static final String DEFAULT_EXECUTOR_LOGGING_PREFIX = "log";
-    public static final int DEFAULT_EXECUTOR_S3_OBJECT_READ_BUFFER = getIntProperty("EXECUTOR_S3_OBJECT_READ_BUFFER", 4 * 1024);
-    public static final int DEFAULT_EXECUTOR_S3_OBJECT_MAX_LIMIT = getIntProperty("EXECUTOR_S3_OBJECT_MAX_LIMIT",
+    public static final int DEFAULT_EXECUTOR_S3_OBJECT_READ_BUFFER = getIntProperty("executor.s3.object.read.buffer", 4 * 1024);
+    public static final int DEFAULT_EXECUTOR_S3_OBJECT_MAX_LIMIT = getIntProperty("executor.s3.object.max.limit",
             10 * 1024 * 1024);
 
     // ----------------------------------------------------------------------------

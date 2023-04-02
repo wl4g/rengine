@@ -150,7 +150,7 @@ public class GraalJSScriptEngineTests {
     }
 
     @Test
-    public void testInvokeSimpleFile() throws Exception {
+    public void testSimpleUseJavaFile() throws Exception {
         try {
             try (ContextWrapper graalContext = engine.getGraalPolyglotManager()
                     .getContext(singletonMap(KEY_WORKFLOW_ID, 101001010L));) {

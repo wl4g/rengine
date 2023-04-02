@@ -79,7 +79,7 @@ public final class MongoUserDetailsManager implements UserDetailsManager, UserDe
             authorities.add(auth.getAuthority());
         }
 
-        Document document = BsonEntitySerializers.toDocument(toEntityUser(user));
+        final Document document = BsonEntitySerializers.toDocument(toEntityUser(user));
 
         // Check for already
         if (userExists(user.getUsername())) {

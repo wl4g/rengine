@@ -62,7 +62,7 @@ public class User extends BaseEntity {
     private Date birthdate;
     private String picture;
     private String zoneinfo;
-    private @NotBlank String username; // or email
+    private @NotBlank String username; // or email?
     private String password;
     private boolean accountNonExpired;
     private boolean accountNonLocked;

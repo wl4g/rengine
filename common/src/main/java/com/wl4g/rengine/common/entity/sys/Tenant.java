@@ -15,6 +15,12 @@
  */
 package com.wl4g.rengine.common.entity.sys;
 
+import static java.util.Arrays.asList;
+
+import java.util.List;
+
+import javax.annotation.Nullable;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wl4g.rengine.common.entity.BaseEntity;
 import com.wl4g.rengine.common.entity.quota.ResourceQuota;
@@ -64,9 +70,52 @@ public class Tenant extends BaseEntity {
     @ToString(callSuper = true)
     @NoArgsConstructor
     public static class ServiceSettings {
-        private @Default Boolean useSharedDefaultMongo = true;
-        private @Default Boolean useSharedDefaultRedis = true;
-        private @Default Boolean useSharedDefaultMinIO = true;
+        private MongoServiceSettings mongo;
+        private RedisServiceSettings redis;
+        private MinIOServiceSettings minio;
+    }
+
+    @Getter
+    @Setter
+    @SuperBuilder
+    @ToString(callSuper = true)
+    @NoArgsConstructor
+    public static class MongoServiceSettings {
+        private @Default Boolean enable = true;
+        private @Nullable @Default String sharedMongoConnectionString = "mongodb://localhost:27017";
+    }
+
+    @Getter
+    @Setter
+    @SuperBuilder
+    @ToString(callSuper = true)
+    @NoArgsConstructor
+    public static class RedisServiceSettings {
+        private @Default Boolean enable = true;
+        private @Nullable @Default List<String> sharedRedisNodes = asList("localhost:6379", "localhost:6380", "localhost:6381",
+                "localhost:7379", "localhost:7380", "localhost:7381");
+        private @Nullable @Default String username = "";
+        private @Nullable @Default String password = "123456";
+        private @Nullable @Default Integer timeout = 10_000;
+        private @Nullable @Default Integer maxPoolSize = 512;
+        private @Nullable @Default Integer reconnectAttempts = 0;
+    }
+
+    @Getter
+    @Setter
+    @SuperBuilder
+    @ToString(callSuper = true)
+    @NoArgsConstructor
+    public static class MinIOServiceSettings {
+        private @Default Boolean enable = true;
+        private @Nullable @Default String endpoint = "http://localhost:9000";
+        private @Nullable @Default String defaultRegion = "us-east-1";
+        private @Nullable @Default String defaultBucket = "rengine";
+        private @Nullable @Default String accessKey = "rengine";
+        private @Nullable @Default String accessSecret = "123456";
+        private @Nullable @Default Integer clientConnectTimeout = 10_000;
+        private @Nullable @Default Integer clientReadTimeout = 10_000;
+        private @Nullable @Default Integer clientWriteTimeout = 10_000;
     }
 
 }

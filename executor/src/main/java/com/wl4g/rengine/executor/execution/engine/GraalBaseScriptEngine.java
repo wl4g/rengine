@@ -166,19 +166,25 @@ public abstract class GraalBaseScriptEngine extends AbstractScriptEngine {
         final String permittedLanguages = getPermittedLanguages();
         log.debug("Executing {} script for workflowId: {} ...", permittedLanguages, workflowId);
 
+        long begin = currentTimeMillis();
         // see:https://github.com/oracle/graaljs/blob/vm-ee-22.1.0/graal-js/src/com.oracle.truffle.js.test.threading/src/com/oracle/truffle/js/test/threading/AsyncTaskTests.java#L283
         final ContextWrapper graalContext = graalPolyglotManager.getContext(singletonMap(KEY_WORKFLOW_ID, workflowId));
         try {
             // Build script context.
             final ScriptContext scriptContext = newScriptContext(graphContext);
 
-            // Load all scripts dependencies.
+            // Load scripts lib dependencies.
+            begin = currentTimeMillis();
             final List<ObjectResource> scripts = safeList(loadScriptResources(workflowId, rule, usingCache));
+            log.trace("Loaded {} script lib dependendcies. cost: {}ms", permittedLanguages, (currentTimeMillis() - begin));
+
             for (ObjectResource script : scripts) {
                 isTrue(!script.isBinary(), "invalid %s script dependency lib type", permittedLanguages);
                 log.debug("Evaling {} script dependency: {}", permittedLanguages, script.getObjectPrefix());
 
                 final String scriptName = StringUtils2.getFilename(script.getObjectPrefix()).concat("@").concat(workflowId + "");
+
+                begin = currentTimeMillis();
                 try {
                     // merge script library with dependency.
                     graalContext.eval(Source.newBuilder(permittedLanguages, script.readToString(), scriptName).build());
@@ -188,10 +194,13 @@ public abstract class GraalBaseScriptEngine extends AbstractScriptEngine {
                                     workflowId),
                             e);
                 }
+                log.trace("Eval {} script for {}. cost: {}ms", permittedLanguages, scriptName, (currentTimeMillis() - begin));
             }
 
+            begin = currentTimeMillis();
             final Value bindings = graalContext.getBindings(permittedLanguages);
-            log.trace("Binding {} script members ...", permittedLanguages);
+            log.trace("Bind {} script members. cost: {}ms", permittedLanguages, (currentTimeMillis() - begin));
+
             bindingMembers(scriptContext, bindings);
 
             final Value mainFunction = bindings.getMember(DEFAULT_EXECUTOR_MAIN_FUNCTION);
@@ -202,7 +211,7 @@ public abstract class GraalBaseScriptEngine extends AbstractScriptEngine {
                     RengineExecutorMeterService.DEFAULT_PERCENTILES, MetricsTag.CLIENT_ID, clientId, MetricsTag.ENGINE,
                     rule.getEngine().name(), MetricsTag.LIBRARY, scriptFileNames.toString());
 
-            final long begin = currentTimeMillis();
+            begin = currentTimeMillis();
             final Value result = mainFunction.execute(scriptContext);
             final long costTime = currentTimeMillis() - begin;
             executeTimer.record(costTime, MILLISECONDS);
@@ -210,8 +219,9 @@ public abstract class GraalBaseScriptEngine extends AbstractScriptEngine {
             log.debug("Executed for workflowId: {}, cost: {}ms, result: {}", workflowId, costTime, result);
             return result.as(ScriptResult.class);
         } catch (Throwable ex) {
-            // Gets current graal context stderr.
+            // log current graal context execute stderr.
             logScriptErrorMessage(ex, (JdkLoggingOutputStream) graalContext.getStderr());
+
             throw new EvaluationException(traceId, clientId, workflowId,
                     format("Failed to execute %s script", permittedLanguages), ex);
         } finally {

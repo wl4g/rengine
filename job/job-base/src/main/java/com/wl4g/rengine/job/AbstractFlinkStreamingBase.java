@@ -38,6 +38,7 @@ import org.apache.flink.api.common.time.Time;
 import org.apache.flink.api.connector.sink.Sink;
 import org.apache.flink.api.connector.source.Source;
 import org.apache.flink.api.connector.source.SourceSplit;
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.runtime.state.hashmap.HashMapStateBackend;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -77,6 +78,7 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
     private RuntimeExecutionMode runtimeMode;
     private Integer restartAttempts;
     private Integer restartDelaySeconds;
+    private String pipelineJars;
 
     // FLINK Checkpoint options.
     private String checkpointDir;
@@ -125,6 +127,8 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
                 .longOption("restartAttempts", "3", "Set the maximum number of failed restart attempts. default is: 3")
                 .longOption("restartDelaySeconds", "15",
                         "Set the maximum number of failed interval between each restart. default is: 15")
+                .longOption("pipelineJars", null,
+                        "A semicolon-separated list of the jars to package with the job jars to be sent to the cluster. These have to be valid paths. see:https://nightlies.apache.org/flink/flink-docs-release-1.14/docs/deployment/config/#pipeline-jars")
                 // FLINK Checkpoint options.
                 .longOption("checkpointDir", (isJvmInDebugging ? "file" : "hdfs") + ":///tmp/flink-checkpoint",
                         "Checkpoint execution interval millis, only valid when checkpointMode is sets.")
@@ -173,6 +177,7 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
         this.runtimeMode = line.getEnum("runtimeMode", RuntimeExecutionMode.class);
         this.restartAttempts = line.getInteger("restartAttempts");
         this.restartDelaySeconds = line.getInteger("restartDelaySeconds");
+        this.pipelineJars = line.get("pipelineJars");
         // FLINK Checkpoint options.
         this.checkpointDir = line.get("checkpointDir");
         this.checkpointMode = line.getEnum("checkpointMode", CheckpointingMode.class);
@@ -252,7 +257,15 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
                 .collect(toMap(e -> valueOf(e.getKey()), e -> valueOf(e.getValue())));
         customProps(props);
 
-        final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        final Configuration config = new Configuration();
+        // see:https://nightlies.apache.org/flink/flink-docs-master/docs/dev/python/dependency_management/#jar-dependencies
+        // see:https://nightlies.apache.org/flink/flink-docs-release-1.14/docs/deployment/config/#pipeline-jars
+        // eg:pipeline.jars=file:///my/jar/path/connector.jar;file:///my/jar/path/udf.jar
+        if (!isBlank(pipelineJars)) {
+            config.setString("pipeline.jars", pipelineJars);
+        }
+
+        final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment(config);
         env.setRuntimeMode(runtimeMode);
         env.setRestartStrategy(fixedDelayRestart(restartAttempts, Time.of(restartDelaySeconds, TimeUnit.SECONDS)));
         final CheckpointConfig checkpointConfig = env.getCheckpointConfig();

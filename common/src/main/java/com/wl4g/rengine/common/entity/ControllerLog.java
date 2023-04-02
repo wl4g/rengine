@@ -71,10 +71,12 @@ public class ControllerLog extends BaseEntity {
     @NotNull
     LogDetailBase<?> details;
 
-    @Schema(oneOf = { ExecutionControllerLog.class, KafkaSubscribeControllerLog.class }, discriminatorProperty = "type")
+    @Schema(oneOf = { ExecutionControllerLog.class, KafkaSubscribeControllerLog.class, FlinkSubmitControllerLog.class },
+            discriminatorProperty = "type")
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", visible = true)
     @JsonSubTypes({ @Type(value = ExecutionControllerLog.class, name = "STANDARD_EXECUTION"),
-            @Type(value = KafkaSubscribeControllerLog.class, name = "KAFKA_SUBSCRIBER") })
+            @Type(value = KafkaSubscribeControllerLog.class, name = "KAFKA_SUBSCRIBER"),
+            @Type(value = FlinkSubmitControllerLog.class, name = "FLINK_SUBMITTER") })
     @Getter
     @Setter
     @SuperBuilder

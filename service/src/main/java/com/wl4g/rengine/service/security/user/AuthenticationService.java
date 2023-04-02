@@ -19,8 +19,10 @@ import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_MENUS;
+import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_ROLES;
 import static com.wl4g.rengine.common.constants.RengineConstants.MongoCollectionDefinition.SYS_USERS;
 import static com.wl4g.rengine.common.util.BsonAggregateFilters.USER_MENU_LOOKUP_FILTERS;
+import static com.wl4g.rengine.common.util.BsonAggregateFilters.USER_ROLE_LOOKUP_FILTERS;
 import static com.wl4g.rengine.common.util.BsonAggregateFilters.USER_ROLE_MENU_LOOKUP_FILTERS;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
@@ -40,7 +42,6 @@ import java.util.Map;
 import javax.validation.constraints.NotBlank;
 
 import org.apache.commons.collections.IteratorUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -49,7 +50,6 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -66,7 +66,9 @@ import com.wl4g.infra.common.codec.CodecSource;
 import com.wl4g.infra.common.crypto.asymmetric.RSACryptor;
 import com.wl4g.infra.common.crypto.asymmetric.spec.KeyPairSpec;
 import com.wl4g.infra.common.serialize.ProtostuffUtils;
+import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.common.entity.sys.Menu;
+import com.wl4g.rengine.common.entity.sys.Role;
 import com.wl4g.rengine.common.entity.sys.User;
 import com.wl4g.rengine.common.util.BsonEntitySerializers;
 import com.wl4g.rengine.service.model.BaseQuery;
@@ -96,6 +98,7 @@ public class AuthenticationService {
     private final RengineWebSecurityProperties config;
     private final RedisTemplate<String, byte[]> redisTemplate;
     private final MongoCollection<Document> userCollection;
+    private final MongoCollection<Document> roleCollection;
     private final MongoCollection<Document> menuCollection;
 
     public AuthenticationService(RengineWebSecurityProperties config, RedisTemplate<String, byte[]> redisTemplate,
@@ -104,6 +107,7 @@ public class AuthenticationService {
         this.redisTemplate = notNullOf(redisTemplate, "redisTemplate");
         notNullOf(mongoTemplate, "mongoTemplate");
         this.userCollection = mongoTemplate.getDb().getCollection(SYS_USERS.getName());
+        this.roleCollection = mongoTemplate.getDb().getCollection(SYS_ROLES.getName());
         this.menuCollection = mongoTemplate.getDb().getCollection(SYS_MENUS.getName());
     }
 
@@ -216,18 +220,18 @@ public class AuthenticationService {
                             .country(oidcAddress.getCountry())
                             .build());
                 }
-                makeAuthorities(authentication, info, oauth2Principal.getAuthorities());
+                setupAuthoritiesInfo(authentication, info, oauth2Principal.getAuthorities());
             }
             if (principal instanceof UserDetails) {
                 final UserDetails userDetails = (UserDetails) principal;
-                makeAuthorities(authentication, info, userDetails.getAuthorities());
+                setupAuthoritiesInfo(authentication, info, userDetails.getAuthorities());
             }
         }
 
         return info;
     }
 
-    private void makeAuthorities(
+    private void setupAuthoritiesInfo(
             Authentication authentication,
             UserAuthInfo info,
             Collection<? extends GrantedAuthority> authorities) {
@@ -235,30 +239,45 @@ public class AuthenticationService {
         info.getAuthorities().setIsSuperAdministrator(isDefaultSuperAdministrator(authentication.getName()));
 
         // Add roles and permissions.
-        for (GrantedAuthority auth : safeList(authorities)) {
-            if (auth instanceof SimpleGrantedAuthority) {
-                info.getAuthorities().getRoles().add(auth.getAuthority());
-            }
-            // if (auth instanceof SimplePermissionGrantedAuthority) {
-            // info.getAuthorities().getPermissions().add(auth.getAuthority());
-            // }
-        }
+        // @formatter:off
+        // for (GrantedAuthority auth : safeList(authorities)) {
+        //     if (auth instanceof SimpleGrantedAuthority) {
+        //         info.getAuthorities().getRoles().add(auth.getAuthority());
+        //     }
+        //     if (auth instanceof SimplePermissionGrantedAuthority) {
+        //         info.getAuthorities().getPermissions().add(auth.getAuthority());
+        //     }
+        // }
+        // @formatter:on
 
         // Add menus by user.
-        //// @formatter:off
-        //final User user = loadUserRoleMenusByUsername(authentication.getName());
+        // @formatter:off
+        //final User user = findUserRoleMenusByUsername(authentication.getName());
         //final List<Menu> menus = safeList(user.getUserRoles()).stream()
         //        .flatMap(ur -> safeList(ur.getRoles()).stream())
         //        .flatMap(r -> safeList(r.getMenuRoles()).stream())
         //        .flatMap(mr -> safeList(mr.getMenus()).stream())
         //        .distinct()
         //        .collect(toSet());
-        //// @formatter:on
+        // @formatter:on
 
+        // Add roles by user.
+        final List<Role> roles = loadRolesByUsername(authentication.getName());
+        info.getAuthorities()
+                .setRoles(safeList(roles).stream()
+                        .map(r -> UserRoleInfo.builder()
+                                .id(r.getId())
+                                .nameEn(r.getNameEn())
+                                .nameZh(r.getNameZh())
+                                .type(r.getType())
+                                .roleCode(r.getRoleCode())
+                                .build())
+                        .collect(toList()));
+
+        // Add menus by user.
         final List<Menu> menus = loadMenusByUsername(authentication.getName());
         info.getAuthorities()
-                .getMenus()
-                .addAll(safeList(menus).stream()
+                .setMenus(safeList(menus).stream()
                         .map(m -> UserMenuInfo.builder()
                                 .id(m.getId())
                                 .nameEn(m.getNameEn())
@@ -278,7 +297,6 @@ public class AuthenticationService {
                         .collect(toList()));
     }
 
-    // @formatter:off
     // 深度嵌套子查询根据 username 查询 user 下 roles 及 menus.
     public User findUserRoleMenusByUsername(@NotBlank String username) {
         hasTextOf(username, "username");
@@ -300,8 +318,48 @@ public class AuthenticationService {
             return user;
         }
     }
-    // @formatter:on
 
+    // 连接查询根据 username (普通用户)查询 user 下的 roles.
+    private List<Role> loadRolesByUsername(@NotBlank String username) {
+        List<Role> roles = null;
+        if (isDefaultSuperAdministrator(username)) {
+            // Has all roles.
+            roles = findRolesByUsernameWithSuperAdmin(username);
+        } else {
+            roles = findRolesByUsername(username);
+        }
+        return roles;
+    }
+
+    // 连接查询根据 username (普通用户)查询 user 下的 roles.
+    @SuppressWarnings("unchecked")
+    public List<Role> findRolesByUsername(@NotBlank String username) {
+        hasTextOf(username, "username");
+
+        final var aggregates = new ArrayList<Bson>(2);
+        aggregates.add(Aggregates.match(Filters.eq("username", username)));
+        USER_ROLE_LOOKUP_FILTERS.stream().forEach(rs -> aggregates.add(rs.asDocument()));
+
+        try (var cursor = userCollection.aggregate(aggregates)
+                .map(roleDoc -> BsonEntitySerializers.fromDocument(roleDoc, Role.class))
+                .cursor();) {
+            return IteratorUtils.toList(cursor);
+        }
+    }
+
+    // 连接查询根据 username (超级管理员用户)查询 user 下的 roles.
+    @SuppressWarnings("unchecked")
+    private List<Role> findRolesByUsernameWithSuperAdmin(@NotBlank String username) {
+        hasTextOf(username, "username");
+        try (var cursor = roleCollection
+                .find(QueryHolder.baseCriteria(BaseQuery.<Menu> builder().enable(true).build()).getCriteriaObject())
+                .map(roleDoc -> BsonEntitySerializers.fromDocument(roleDoc, Role.class))
+                .cursor();) {
+            return IteratorUtils.toList(cursor);
+        }
+    }
+
+    // 连接查询根据 username (普通用户)查询 user 下的 roles.
     public List<Menu> loadMenusByUsername(@NotBlank String username) {
         List<Menu> menus = null;
         if (isDefaultSuperAdministrator(username)) {
@@ -313,9 +371,9 @@ public class AuthenticationService {
         return menus;
     }
 
-    // 普通用户连接查询根据 username 查询 user 下的 roles 下的 menus.
+    // 连接查询根据 username (普通用户)查询 user 下的 roles 下的 menus.
     @SuppressWarnings("unchecked")
-    public List<Menu> findMenusByUsername(@NotBlank String username) {
+    private List<Menu> findMenusByUsername(@NotBlank String username) {
         hasTextOf(username, "username");
 
         final var aggregates = new ArrayList<Bson>(2);
@@ -329,9 +387,9 @@ public class AuthenticationService {
         }
     }
 
-    // 超级管理员用户连接查询根据 username 查询 user 下的 roles 下的 menus.
+    // 连接查询根据 username (超级管理员用户)查询 user 下的 roles 下的 menus.
     @SuppressWarnings("unchecked")
-    public List<Menu> findMenusByUsernameWithSuperAdmin(@NotBlank String username) {
+    private List<Menu> findMenusByUsernameWithSuperAdmin(@NotBlank String username) {
         hasTextOf(username, "username");
         try (var cursor = menuCollection
                 .find(QueryHolder.baseCriteria(BaseQuery.<Menu> builder().enable(true).build()).getCriteriaObject())
@@ -342,7 +400,7 @@ public class AuthenticationService {
     }
 
     public static boolean isDefaultSuperAdministrator(String username) {
-        return StringUtils.equals(username, "root");
+        return RengineConstants.USER_SUPER_ADMINISTRATORS.contains(username);
     }
 
     @Getter
@@ -370,9 +428,21 @@ public class AuthenticationService {
     @NoArgsConstructor
     public static class UserAuthorityInfo {
         private @Default Boolean isSuperAdministrator = false;
-        private @Default List<String> roles = new ArrayList<>();
-        private @Default List<String> permissions = new ArrayList<>();
+        private @Default List<UserRoleInfo> roles = new ArrayList<>();
         private @Default List<UserMenuInfo> menus = new ArrayList<>();
+    }
+
+    @Getter
+    @Setter
+    @SuperBuilder
+    @ToString(callSuper = true)
+    @NoArgsConstructor
+    public static class UserRoleInfo {
+        private Long id;
+        private String nameEn;
+        private String nameZh;
+        private Integer type;
+        private @NotBlank String roleCode;
     }
 
     @Getter
@@ -461,5 +531,4 @@ public class AuthenticationService {
     }
 
     public static final String DEFAULT_EXTRA_AUTHORITY_ATTRIBUTE = "extra_authorities";
-
 }

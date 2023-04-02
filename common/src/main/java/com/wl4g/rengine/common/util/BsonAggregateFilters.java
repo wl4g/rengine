@@ -152,7 +152,7 @@ public abstract class BsonAggregateFilters {
     // @formatter:on
 
     // Lookup for users by role filters.
-    // 连接查询根据 roleCode 查询 role 下的 users.
+    // 连接查询根据 roleId,roleCode 查询 role 下的 users.
     // @formatter:off
     public static final BsonArray ROLE_USER_LOOKUP_FILTERS = BsonArray.parse("["
             //+ "{ $match: { \"roleCode\": { $in: [\"r:admin\"] } } },"
@@ -185,7 +185,7 @@ public abstract class BsonAggregateFilters {
     // @formatter:on
 
     // Lookup for menus by role filters.
-    // 连接查询根据 roleCode 查询 role 下的 menus.
+    // 连接查询根据 roleId,roleCode 查询 role 下的 menus.
     // @formatter:off
     public static final BsonArray ROLE_MENU_LOOKUP_FILTERS = BsonArray.parse("["
             //+ "{ $match: { \"roleCode\": { $in: [\"r:admin\"] } } },"

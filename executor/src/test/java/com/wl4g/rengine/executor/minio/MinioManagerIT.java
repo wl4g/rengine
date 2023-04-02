@@ -17,15 +17,11 @@ package com.wl4g.rengine.executor.minio;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.Proxy.Type;
-import java.time.Duration;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 import org.junit.Test;
 
 import com.wl4g.rengine.common.entity.sys.UploadObject.UploadType;
+import com.wl4g.rengine.executor.util.TestDefaultMinIOSetup;
 
 /**
  * {@link MinioManagerIT}
@@ -38,84 +34,14 @@ public class MinioManagerIT {
 
     @Test
     public void testDetermineLocalFile() throws IOException {
-        File localFile = MinioManager.determineLocalFile(UploadType.LIBJS,
-                "/rengine/library/js/commons-lang-3.0.0.js", 101001001L);
+        File localFile = MinioManager.determineLocalFile(UploadType.LIBJS, "/rengine/library/js/commons-lang-3.0.0.js",
+                101001001L);
         System.out.println(localFile);
     }
 
     public static MinioManager createDefaultMinioManager() {
         MinioManager minioManager = new MinioManager();
-        minioManager.config = new MinioConfig() {
-
-            @Override
-            public @NotBlank String tenantSecretKey() {
-                return "rengine";
-            }
-
-            @Override
-            public @NotBlank String tenantAccessKey() {
-                return "12345678";
-            }
-
-            @Override
-            public @NotBlank String region() {
-                return "us-east-1";
-            }
-
-            @Override
-            public @NotNull IOkHttpClientConfig httpClient() {
-                return new IOkHttpClientConfig() {
-
-                    @Override
-                    public Duration writeTimeout() {
-                        return Duration.ofSeconds(5);
-                    }
-
-                    @Override
-                    public Duration readTimeout() {
-                        return Duration.ofSeconds(30);
-                    }
-
-                    @Override
-                    public Duration connectTimeout() {
-                        return Duration.ofSeconds(3);
-                    }
-
-                    @Override
-                    public IProxy proxy() {
-                        return new IProxy() {
-
-                            @Override
-                            public Type type() {
-                                return Type.DIRECT;
-                            }
-
-                            @Override
-                            public int port() {
-                                return 0;
-                            }
-
-                            @Override
-                            public String address() {
-                                return null;
-                            }
-                        };
-                    }
-
-                };
-            }
-
-            @Override
-            public @NotBlank String endpoint() {
-                return "http://localhost:9000";
-            }
-
-            @Override
-            public @NotBlank String bucket() {
-                return "rengine";
-            }
-        };
-
+        minioManager.config = TestDefaultMinIOSetup.buildMinioConfigDefault();
         minioManager.onStart(null);
         return minioManager;
     }

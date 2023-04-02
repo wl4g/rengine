@@ -149,7 +149,7 @@ public class UserController {
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
     @RequestMapping(path = { "roles" }, produces = "application/json", method = { GET })
     @PreAuthorize("hasPermission(#model,'arn:sys:user:role:read:v1')")
-    public RespBase<List<Role>> roles(@RequestParam("userId") List<Long> userIds) {
+    public RespBase<List<Role>> roles(@RequestParam("userIds") List<Long> userIds) {
         log.debug("called: userIds={}", userIds);
         return RespBase.<List<Role>> create().withData(userService.findRolesByUserIds(userIds));
     }
