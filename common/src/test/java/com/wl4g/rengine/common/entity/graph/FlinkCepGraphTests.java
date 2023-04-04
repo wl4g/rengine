@@ -53,7 +53,7 @@ public class FlinkCepGraphTests {
     @Test
     public void testCepPatternSerialize() throws Exception {
         final FlinkCepGraph flinkCepGraph = FlinkCepGraph.builder()
-                .name("end")
+                .name("root")
                 .engine(WorkflowEngine.FLINK_CEP_GRAPH.name())
                 .quantifier(Quantifier.builder()
                         .consumingStrategy(ConsumingStrategy.SKIP_TILL_NEXT)
@@ -138,7 +138,7 @@ public class FlinkCepGraphTests {
         // @formatter:off
         final String patternJson = "{"
                 + "    \"engine\": \"FLINK_CEP_GRAPH\","
-                + "    \"name\": \"end\","
+                + "    \"name\": \"root\","
                 + "    \"quantifier\": {"
                 + "        \"consumingStrategy\": \"SKIP_TILL_NEXT\","
                 + "        \"times\": {"

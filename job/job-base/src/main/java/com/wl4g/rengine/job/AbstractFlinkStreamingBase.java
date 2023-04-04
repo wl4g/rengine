@@ -165,7 +165,7 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
      * @throws ParseException
      */
     protected AbstractFlinkStreamingBase parse(String[] args) throws ParseException {
-        this.line = builder.width(150).helpIfEmpty(args).build(args);
+        this.line = builder.width(150).helpIfEmpty(args, false).build(args);
         // KAFKA options.
         this.brokers = line.get("brokers");
         this.eventTopicPattern = line.get("eventTopicPattern");

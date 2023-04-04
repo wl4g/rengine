@@ -16,11 +16,13 @@
 package com.wl4g.rengine.controller.job;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
+import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.lang.StringUtils2.eqIgnCase;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
 import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_CONTROLLER_JAR_TMP_DIR;
 import static java.lang.String.format;
+import static java.util.Collections.singletonList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.joining;
@@ -38,6 +40,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -269,32 +272,36 @@ public class FlinkSubmitController extends AbstractJobExecutor {
 
     protected List<JarFileInfo> uploadJars(FlinkSubmitExecutionConfig fssc) {
         try {
+            final JarListInfo existingJars = getDefaultApi().jarsGet();
             // e.g: jobinfra/rengine-job-base-1.0.0.jar
             // e.g: jobinfra/rengine-job-base-1.0.0-jar-with-dependencies.jar
-            final var uploads = safeList(fssc.getJobJarUrls()).parallelStream().map(jarUrl -> {
+            final var uploadFilenames = safeList(fssc.getJobJarUrls()).parallelStream().map(jarUrl -> {
                 final File jarFile = obtainFlinkJobJarFile(jarUrl);
                 try {
+                    // Ignore if already uploaded.
+                    if (matchJars(jarFile.getAbsolutePath(), existingJars.getFiles())) {
+                        return jarFile.getAbsolutePath();
+                    }
                     // see:com.nextbreakpoint.flinkclient1_15.api.ApiClient#serialize()
                     JarUploadResponseBody upload = getDefaultApi().jarsUploadPost(jarFile);
                     if (isNull(upload)) {
                         throw new IllegalStateException(format("Failed to upload jars for : %s", jarFile));
                     }
-                    return upload;
+                    return upload.getFilename();
                 } catch (ApiException ex) {
                     throw new IllegalArgumentException(ex);
                 }
             }).collect(toList());
 
-            final JarListInfo allJars = getDefaultApi().jarsGet();
-            if (isNull(allJars)) {
+            final JarListInfo currentJars = getDefaultApi().jarsGet();
+            if (isNull(currentJars)) {
                 throw new IllegalStateException(format("Unable to get flink upload jars."));
             }
-            final List<JarFileInfo> jars = safeList(allJars.getFiles()).stream()
-                    .filter(j -> matchJars(uploads, j))
+            final List<JarFileInfo> jars = safeList(currentJars.getFiles()).stream()
+                    .filter(j -> matchUploads(uploadFilenames, j))
                     .collect(toList());
-
             if (jars.isEmpty()) {
-                throw new IllegalStateException(format("Could't find jar of flink uploads : {}", uploads));
+                throw new IllegalStateException(format("Could't find jar of flink uploads : {}", uploadFilenames));
             }
             return jars;
         } catch (Throwable ex) {
@@ -366,15 +373,18 @@ public class FlinkSubmitController extends AbstractJobExecutor {
                 || jobDetails.getState() == StateEnum.RUNNING;
     }
 
-    protected boolean matchJars(List<JarUploadResponseBody> uploads, JarFileInfo jar) {
+    protected boolean matchUploads(List<String> uploadFilenames, JarFileInfo jar) {
+        return safeList(uploadFilenames).stream().anyMatch(uploadFilename -> matchJars(uploadFilename, singletonList(jar)));
+    }
+
+    protected boolean matchJars(String uploadFilename, @Nullable List<JarFileInfo> jars) {
+        hasTextOf(uploadFilename, "uploadFilename");
         // for example:
         // upload.filename=/tmp/flink-web-04861467-bc42-4f0e-aa0b-7530040ae21d/flink-web-upload/41bf260e-9132-4f97-b9ec-1998f4ebc6d5_rengine-job-base-1.0.0.jar
         // jar.id=41bf260e-9132-4f97-b9ec-1998f4ebc6d5_rengine-job-base-1.0.0.jar
         // jar.name=rengine-job-base-1.0.0.jar
-        return safeList(uploads).stream().anyMatch(upload -> {
-            final String uploadName = upload.getFilename().substring(upload.getFilename().lastIndexOf("/"));
-            return StringUtils2.equals(uploadName, jar.getId().concat("_").concat(jar.getName()));
-        });
+        final String uploadName = uploadFilename.substring(uploadFilename.lastIndexOf("/") + 1);
+        return safeList(jars).stream().anyMatch(jar -> StringUtils2.equals(uploadName, jar.getId()));
     }
 
     protected Map<String, Object> buildFlinkJobArgs(FlinkSubmitExecutionConfig fssc) {

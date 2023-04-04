@@ -55,6 +55,12 @@
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-proto</artifactId>
         </dependency>
+        <!-- FLINK yarn -->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-yarn${suffix-scala.version}</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
         <!-- FLINK streaming -->
         <dependency>
             <groupId>org.apache.flink</groupId>

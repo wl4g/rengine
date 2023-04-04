@@ -32,6 +32,7 @@ import static org.apache.commons.lang3.StringUtils.replace;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -495,6 +496,8 @@ public class Controller extends BaseEntity {
             private @Default String runtimeMode = "STREAMING";
             private @Default Integer restartAttempts = 3;
             private @Default Integer restartDelaySeconds = 15;
+            // see:https://nightlies.apache.org/flink/flink-docs-release-1.14/docs/deployment/config/#pipeline-jars
+            private @Nullable String pipelineJars;
 
             // FLINK Checkpoint options.
             private @NotBlank @Default String checkpointDir = "file:///tmp/flink-checkpoint";
