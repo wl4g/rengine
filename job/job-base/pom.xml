@@ -61,6 +61,12 @@
             <artifactId>flink-yarn${suffix-scala.version}</artifactId>
             <version>${flink.version}</version>
         </dependency>
+        <!-- FLINK kubernetes -->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-kubernetes${suffix-scala.version}</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
         <!-- FLINK streaming -->
         <dependency>
             <groupId>org.apache.flink</groupId>

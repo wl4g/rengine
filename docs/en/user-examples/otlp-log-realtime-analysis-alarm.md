@@ -3,87 +3,139 @@
 - Preparing CEP pattern json (example)
 
 ```json
-cat << EOF > /tmp/cep-pattern-for-log-error.json
+cat << EOF > /tmp/cep-pattern-for-log-alarm.json
+[
 {
-    "name": "end",
+    "engine": "FLINK_CEP_GRAPH",
+    "name": "root",
     "quantifier": {
         "consumingStrategy": "SKIP_TILL_NEXT",
-        "properties": ["SINGLE"],
-        "times": null,
-        "untilCondition": null
+        "times": {
+            "from": 1,
+            "to": 3,
+            "windowTime": {
+                "unit": "MINUTES",
+                "size": 5
+            }
+        },
+        "untilCondition": null,
+        "details": ["SINGLE"]
     },
     "condition": null,
     "nodes": [{
-        "name": "end",
+        "name": "start",
         "quantifier": {
             "consumingStrategy": "SKIP_TILL_NEXT",
-            "properties": ["SINGLE"],
             "times": null,
-            "untilCondition": null
+            "untilCondition": null,
+            "details": ["SINGLE"]
         },
         "condition": {
-            "expression": "type == login_success",
-            "type": "AVIATOR"
+            "type": "CLASS",
+            "className": "org.apache.flink.cep.pattern.conditions.RichAndCondition",
+            "nestedConditions": null,
+            "subClassName": null
         },
-        "type": "ATOMIC"
+        "type": "ATOMIC",
+        "attributes": {
+            "top": "10px"
+        }
     }, {
         "name": "middle",
         "quantifier": {
             "consumingStrategy": "SKIP_TILL_NEXT",
-            "properties": ["SINGLE"],
             "times": null,
-            "untilCondition": null
+            "untilCondition": null,
+            "details": ["SINGLE"]
         },
         "condition": {
-            "nestedConditions": [{
-                "className": "org.apache.flink.cep.pattern.conditions.SubtypeCondition",
-                "subClassName": "com.wl4g.rengine.common.event.RengineEvent",
-                "type": "CLASS"
-            }, {
-                "expression": "type == login_tail",
-                "type": "AVIATOR"
-            }],
             "type": "CLASS",
-            "className": "org.apache.flink.cep.pattern.conditions.RichAndCondition"
+            "className": "org.apache.flink.cep.pattern.conditions.RichAndCondition",
+            "nestedConditions": [{
+                "type": "CLASS",
+                "className": "org.apache.flink.cep.pattern.conditions.SubtypeCondition",
+                "nestedConditions": null,
+                "subClassName": "com.wl4g.rengine.common.event.RengineEvent"
+            }, {
+                "type": "AVIATOR",
+                "expression": "body.level=='ERROR'||body.level=='FATAL'"
+            }],
+            "subClassName": null
         },
-        "type": "ATOMIC"
+        "type": "ATOMIC",
+        "attributes": {
+            "top": "20px"
+        }
     }, {
-        "name": "start",
+        "name": "end",
         "quantifier": {
             "consumingStrategy": "SKIP_TILL_NEXT",
-            "properties": ["SINGLE"],
             "times": null,
-            "untilCondition": null
+            "untilCondition": null,
+            "details": ["SINGLE"]
         },
         "condition": {
-            "expression": "type == login_tail",
-            "type": "AVIATOR"
+            "type": "AVIATOR",
+            "expression": "body.level=='ERROR'||body.level=='FATAL'"
         },
-        "type": "ATOMIC"
+        "type": "ATOMIC",
+        "attributes": {
+            "top": "10px"
+        }
     }],
     "edges": [{
-        "source": "middle",
-        "target": "end",
-        "type": "SKIP_TILL_ANY"
-    }, {
         "source": "start",
         "target": "middle",
-        "type": "SKIP_TILL_ANY"
+        "type": "SKIP_TILL_NEXT",
+        "attributes": {}
+    }, {
+        "source": "middle",
+        "target": "end",
+        "type": "SKIP_TILL_NEXT",
+        "attributes": {}
     }],
-    "window": null,
+    "window": {
+        "type": "PREVIOUS_AND_CURRENT",
+        "time": {
+            "unit": "MINUTES",
+            "size": 5
+        }
+    },
     "afterMatchStrategy": {
-        "type": "NO_SKIP",
+        "type": "SKIP_PAST_LAST_EVENT",
         "patternName": null
     },
     "type": "COMPOSITE",
     "version": 1
 }
+]
 EOF
 ```
 
-- Start CEP job
+- Startup CEP job
 
 ```bash
+export JAVA_HOME=/usr/local/jdk-11.0.10/
+export JOB_CLASSPATH="job/job-base/target/rengine-job-base-1.0.0-jar-with-dependencies.jar"
 
+# Print job-args help
+$JAVA_HOME/bin/java -cp $JOB_CLASSPATH com.wl4g.rengine.job.cep.RengineKafkaFlinkCepStreaming \
+--groupId rengine_test \
+--cepPatterns $(cat /tmp/cep-pattern-for-log-alarm.json | base64 -w 0)
 ```
 
+- Startup with flink cli
+
+```bash
+$JAVA_HOME/bin/java -cp $JOB_CLASSPATH org.apache.flink.client.cli.CliFrontend --help
+```
+
+- Startup with flink k8s cli.
+  - [flink native kubernetes docs](https://nightlies.apache.org/flink/flink-docs-master/docs/deployment/resource-providers/native_kubernetes/)
+  - [KubernetesSessionCliTest.java](https://github1s.com/apache/flink/blob/release-1.14/flink-kubernetes/src/test/java/org/apache/flink/kubernetes/cli/KubernetesSessionCliTest.java)
+
+```basj
+$JAVA_HOME/bin/java -cp $JOB_CLASSPATH org.apache.flink.kubernetes.cli.KubernetesSessionCli \
+--target kubernetes-session \
+-Dkubernetes.cluster-id=rengine-base-job-1
+```
