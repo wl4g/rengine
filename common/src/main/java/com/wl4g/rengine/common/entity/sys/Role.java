@@ -21,9 +21,7 @@ import java.util.Objects;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.wl4g.rengine.common.entity.BaseEntity;
-import com.wl4g.rengine.common.entity.Markers;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -50,13 +48,8 @@ public class Role extends BaseEntity {
     private @NotBlank String roleCode;
 
     // The temporary wrap fields.
-
     private List<User> users;
     private List<Menu> menus;
-
-    // TODO remove?
-    private @JsonView(Markers.InternalMarker.class) List<UserRole> userRoles;
-    private @JsonView(Markers.InternalMarker.class) List<MenuRole> menuRoles;
 
     @Override
     public boolean equals(Object o) {

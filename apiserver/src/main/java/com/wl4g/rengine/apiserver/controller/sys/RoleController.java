@@ -26,14 +26,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
-import com.wl4g.rengine.common.entity.sys.Menu;
 import com.wl4g.rengine.common.entity.sys.Role;
-import com.wl4g.rengine.common.entity.sys.User;
 import com.wl4g.rengine.service.RoleService;
 import com.wl4g.rengine.service.model.sys.RoleAssignMenu;
 import com.wl4g.rengine.service.model.sys.RoleAssignUser;
@@ -100,25 +97,29 @@ public class RoleController {
         return resp;
     }
 
-    // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Find users by roleIds.")
-    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
-    @RequestMapping(path = { "users" }, produces = "application/json", method = { GET })
-    @PreAuthorize("hasPermission(#model,'arn:sys:role:user:read:v1')")
-    public RespBase<List<User>> users(@RequestParam("roleIds") List<Long> roleIds) {
-        log.debug("called: roleIds={}", roleIds);
-        return RespBase.<List<User>> create().withData(roleService.findUsersByRoleIds(roleIds));
-    }
+    //// @formatter:off
+    //// @SecurityRequirement(name = "default_oauth")
+    //@Operation(description = "Find users by roleIds.")
+    //@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
+    //@RequestMapping(path = { "users" }, produces = "application/json", method = { GET })
+    //@PreAuthorize("hasPermission(#model,'arn:sys:role:user:read:v1')")
+    //public RespBase<List<User>> users(@RequestParam("roleIds") List<Long> roleIds) {
+    //    log.debug("called: roleIds={}", roleIds);
+    //    return RespBase.<List<User>> create().withData(roleService.findUsersByRoleIds(roleIds));
+    //}
+    //// @formatter:on
 
-    // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Find menus by roleIds.")
-    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
-    @RequestMapping(path = { "menus" }, produces = "application/json", method = { GET })
-    @PreAuthorize("hasPermission(#model,'arn:sys:role:menu:read:v1')")
-    public RespBase<List<Menu>> menus(@RequestParam("roleIds") List<Long> roleIds) {
-        log.debug("called: roleIds={}", roleIds);
-        return RespBase.<List<Menu>> create().withData(roleService.findMenusByRoleIds(roleIds));
-    }
+    //// @formatter:off
+    //// @SecurityRequirement(name = "default_oauth")
+    //@Operation(description = "Find menus by roleIds.")
+    //@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
+    //@RequestMapping(path = { "menus" }, produces = "application/json", method = { GET })
+    //@PreAuthorize("hasPermission(#model,'arn:sys:role:menu:read:v1')")
+    //public RespBase<List<Menu>> menus(@RequestParam("roleIds") List<Long> roleIds) {
+    //    log.debug("called: roleIds={}", roleIds);
+    //    return RespBase.<List<Menu>> create().withData(roleService.findMenusByRoleIds(roleIds));
+    //}
+    //// @formatter:on
 
     // @SecurityRequirement(name = "default_oauth")
     @Operation(description = "Assign users by roleId.")

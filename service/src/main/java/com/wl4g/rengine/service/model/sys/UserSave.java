@@ -20,7 +20,6 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wl4g.rengine.common.entity.sys.Role;
 import com.wl4g.rengine.common.entity.sys.User;
-import com.wl4g.rengine.common.entity.sys.UserRole;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -57,19 +56,6 @@ public class UserSave extends User {
     @JsonIgnore
     public void setRoles(List<Role> roles) {
         super.setRoles(roles);
-    }
-
-    @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
-    @JsonIgnore
-    @Override
-    public List<UserRole> getUserRoles() {
-        return null;
-    }
-
-    @Schema(hidden = true, accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE)
-    @JsonIgnore
-    public void setUserRoles(List<UserRole> userRoles) {
-        super.setUserRoles(userRoles);
     }
 
 }

@@ -25,6 +25,7 @@ import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
+import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toList;
@@ -47,6 +48,7 @@ import com.wl4g.infra.common.lang.Assert2;
 import com.wl4g.rengine.common.entity.sys.Role;
 import com.wl4g.rengine.common.entity.sys.User;
 import com.wl4g.rengine.common.entity.sys.UserRole;
+import com.wl4g.rengine.common.exception.RengineException;
 import com.wl4g.rengine.common.util.BsonEntitySerializers;
 import com.wl4g.rengine.service.UserService;
 import com.wl4g.rengine.service.impl.BasicServiceImpl;
@@ -56,6 +58,7 @@ import com.wl4g.rengine.service.model.sys.UserDeleteResult;
 import com.wl4g.rengine.service.model.sys.UserQuery;
 import com.wl4g.rengine.service.model.sys.UserSave;
 import com.wl4g.rengine.service.model.sys.UserSaveResult;
+import com.wl4g.rengine.service.security.user.AuthenticationService;
 import com.wl4g.rengine.service.security.user.AuthenticationService.UserAuthInfo;
 
 /**
@@ -89,6 +92,10 @@ public class UserServiceImpl extends BasicServiceImpl implements UserService {
         notNullOf(user, "user");
 
         if (isNull(user.getId())) {
+            // Check for is add super administrators?
+            if (AuthenticationService.isDefaultSuperAdministrator(model.getUsername())) {
+                throw new RengineException(format("Denied to super administrator users"));
+            }
             user.preInsert();
         } else {
             user.preUpdate();

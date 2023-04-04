@@ -298,7 +298,7 @@ public class AuthenticationService {
     }
 
     // 深度嵌套子查询根据 username 查询 user 下 roles 及 menus.
-    public User findUserRoleMenusByUsername(@NotBlank String username) {
+    public User findUserRolesMenusByUsername(@NotBlank String username) {
         hasTextOf(username, "username");
 
         final var aggregates = new ArrayList<Bson>(2);

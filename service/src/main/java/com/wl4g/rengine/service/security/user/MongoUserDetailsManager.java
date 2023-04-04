@@ -34,9 +34,7 @@ import org.springframework.util.Assert;
 import com.mongodb.BasicDBObject;
 import com.wl4g.infra.common.bean.BaseBean;
 import com.wl4g.rengine.common.entity.sys.Menu;
-import com.wl4g.rengine.common.entity.sys.MenuRole;
 import com.wl4g.rengine.common.entity.sys.Role;
-import com.wl4g.rengine.common.entity.sys.UserRole;
 import com.wl4g.rengine.common.exception.RengineException;
 import com.wl4g.rengine.common.util.BsonEntitySerializers;
 import com.wl4g.rengine.service.security.RengineWebSecurityProperties;
@@ -152,7 +150,7 @@ public final class MongoUserDetailsManager implements UserDetailsManager, UserDe
     // see:org.springframework.security.access.expression.SecurityExpressionRoot#getAuthoritySet
     @Override
     public UserDetails loadUserByUsername(@NotBlank String username) throws UsernameNotFoundException {
-        return fromEntityUser(authenticationService.findUserRoleMenusByUsername(username));
+        return fromEntityUser(authenticationService.findUserRolesMenusByUsername(username));
     }
 
     @Override
@@ -201,15 +199,11 @@ public final class MongoUserDetailsManager implements UserDetailsManager, UserDe
         // authories.
         final var allRoleGrantedAuthorities = new HashSet<GrantedAuthority>(4);
         final var allPermissionGrantedAuthorities = new HashSet<GrantedAuthority>(16);
-        for (UserRole userRole : safeList(user.getUserRoles())) {
-            for (Role role : safeList(userRole.getRoles())) {
-                allRoleGrantedAuthorities.add(new SimpleGrantedAuthority(role.getRoleCode()));
-                for (MenuRole menuRole : safeList(role.getMenuRoles())) {
-                    for (Menu menu : safeList(menuRole.getMenus())) {
-                        for (String permission : safeList(menu.getPermissions())) {
-                            allPermissionGrantedAuthorities.add(new SimplePermissionGrantedAuthority(permission));
-                        }
-                    }
+        for (Role role : safeList(user.getRoles())) {
+            allRoleGrantedAuthorities.add(new SimpleGrantedAuthority(role.getRoleCode()));
+            for (Menu menu : safeList(role.getMenus())) {
+                for (String permission : safeList(menu.getPermissions())) {
+                    allPermissionGrantedAuthorities.add(new SimplePermissionGrantedAuthority(permission));
                 }
             }
         }

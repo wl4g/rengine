@@ -38,7 +38,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.wl4g.infra.common.bean.page.PageHolder;
 import com.wl4g.infra.common.web.rest.RespBase;
 import com.wl4g.infra.common.web.rest.RespBase.RetCode;
-import com.wl4g.rengine.common.entity.sys.Role;
 import com.wl4g.rengine.common.entity.sys.User;
 import com.wl4g.rengine.service.UserService;
 import com.wl4g.rengine.service.model.sys.UserAssignRole;
@@ -144,15 +143,17 @@ public class UserController {
                 .withData(userService.currentUserInfo());
     }
 
-    // @SecurityRequirement(name = "default_oauth")
-    @Operation(description = "Query roles by userId.")
-    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
-    @RequestMapping(path = { "roles" }, produces = "application/json", method = { GET })
-    @PreAuthorize("hasPermission(#model,'arn:sys:user:role:read:v1')")
-    public RespBase<List<Role>> roles(@RequestParam("userIds") List<Long> userIds) {
-        log.debug("called: userIds={}", userIds);
-        return RespBase.<List<Role>> create().withData(userService.findRolesByUserIds(userIds));
-    }
+    //// @formatter:off
+    //// @SecurityRequirement(name = "default_oauth")
+    //@Operation(description = "Query roles by userId.")
+    //@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "successful") })
+    //@RequestMapping(path = { "roles" }, produces = "application/json", method = { GET })
+    //@PreAuthorize("hasPermission(#model,'arn:sys:user:role:read:v1')")
+    //public RespBase<List<Role>> roles(@RequestParam("userIds") List<Long> userIds) {
+    //    log.debug("called: userIds={}", userIds);
+    //    return RespBase.<List<Role>> create().withData(userService.findRolesByUserIds(userIds));
+    //}
+    //// @formatter:on
 
     // @SecurityRequirement(name = "default_oauth")
     @Operation(description = "Assign roles by userId.")
