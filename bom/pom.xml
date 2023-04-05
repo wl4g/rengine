@@ -220,11 +220,6 @@
                 <artifactId>rengine-job</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.wl4g</groupId>
-                <artifactId>rengine-job-core</artifactId>
-                <version>${project.parent.version}</version>
-            </dependency>
             <!-- Spring Boot -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>

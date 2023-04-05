@@ -26,9 +26,11 @@ import static com.wl4g.rengine.service.mongo.QueryHolder.andCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.baseCriteria;
 import static com.wl4g.rengine.service.mongo.QueryHolder.defaultSort;
 import static com.wl4g.rengine.service.mongo.QueryHolder.isIdCriteria;
+import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -162,6 +164,16 @@ public class RoleServiceImpl extends BasicServiceImpl implements RoleService {
         notNullOf(model, "model");
         notNullOf(model.getRoleId(), "model.roleId");
         Assert2.notEmpty(model.getMenuIds(), "model.menuIds");
+
+        // Security check whether the currently assigned menu is less than or
+        // equal to the scope of permissions owned by the current user.
+        final var currentUserInfo = authenticationService.currentUserInfo();
+        final var currentUserMenuIds = safeList(currentUserInfo.getAuthorities().getMenus()).stream()
+                .map(m -> m.getId())
+                .collect(toSet());
+        if (!model.getMenuIds().stream().allMatch(mid -> currentUserMenuIds.contains(mid))) {
+            throw new SecurityException(format("Access beyond privilege escalation"));
+        }
 
         return model.getMenuIds().parallelStream().map(menuId -> {
             final MenuRole menuRole = MenuRole.builder().roleId(model.getRoleId()).menuId(menuId).build();

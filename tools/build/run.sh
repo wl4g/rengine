@@ -65,12 +65,14 @@ Usage: ./$(basename $0) [OPTIONS] [arg1] [arg2] ...
     build-image                         Build component images.
                 -a,--apiserver          Build image for apiserver.
                 -c,--controller         Build image for controller.
+                -j,--job                Build image for job.
                 -e,--executor           Build image for executor.
                 -E,--executor-native    Build image for executor (native).
                 -A,--all                Build image for all components.
     push-image                          Push component images.
                 -a,--apiserver          Push image for apiserver.
                 -c,--controller         Push image for controller.
+                -j,--job                Push image for job.
                 -e,--executor           Push image for executor.
                 -E,--executor-native    Push image for executor (native).
                 -A,--all                Push image for all components.
@@ -208,6 +210,10 @@ case $1 in
         do_build_maven "-T 4C clean install"
         do_build_maven "package -f controller/pom.xml -Pbuild:tar:docker"
         ;;
+      -j|--job)
+        do_build_maven "-T 4C clean install"
+        do_build_maven "package -f job/pom.xml -Pbuild:jar:docker"
+        ;;
       -e|--executor)
         do_build_maven "-T 4C clean install"
         do_build_maven "package -f executor/pom.xml -Pbuild:tar:docker"
@@ -220,6 +226,7 @@ case $1 in
         do_build_maven "-T 4C clean install"
         do_build_maven "package -f apiserver/pom.xml -Pbuild:tar:docker"
         do_build_maven "package -f controller/pom.xml -Pbuild:tar:docker"
+        do_build_maven "package -f job/pom.xml -Pbuild:jar:docker"
         do_build_maven "package -f executor/pom.xml -Pbuild:tar:docker"
         do_build_maven "package -f executor/pom.xml -Pnative -Dquarkus.native.container-build=true -Dquarkus.native.container-runtime=docker"
         ;;
@@ -236,6 +243,9 @@ case $1 in
       -c|--controller)
         do_push_image "rengine-controller" "$POM_VERSION" "$3"
         ;;
+      -j|--job)
+        do_push_image "rengine-job" "$POM_VERSION" "$3"
+        ;;
       -e|--executor)
         do_push_image "rengine-executor" "$POM_VERSION" "$3"
         ;;
@@ -245,6 +255,7 @@ case $1 in
       -A|--all)
         do_push_image "rengine-apiserver" "$POM_VERSION" "$3"
         do_push_image "rengine-controller" "$POM_VERSION" "$3"
+        do_push_image "rengine-job" "$POM_VERSION" "$3"
         do_push_image "rengine-executor" "$POM_VERSION" "$3"
         do_push_image "rengine-executor-native" "$POM_VERSION" "$3"
         ;;
@@ -256,6 +267,7 @@ case $1 in
     do_build_maven "-T 4C clean install"
     do_build_maven "package -f apiserver/pom.xml -Pbuild:tar:docker" &
     do_build_maven "package -f controller/pom.xml -Pbuild:tar:docker" &
+    do_build_maven "package -f job/pom.xml -Pbuild:jar:docker" &
     do_build_maven "package -f executor/pom.xml -Pbuild:tar:docker" &
     wait
     do_build_maven "package -f executor/pom.xml -Pnative -Dquarkus.native.container-build=true -Dquarkus.native.container-runtime=docker"
@@ -265,6 +277,7 @@ case $1 in
     POM_VERSION=${POM_VERSION:-$(print_pom_version)}
     do_push_image "rengine-apiserver" "$POM_VERSION"
     do_push_image "rengine-controller" "$POM_VERSION"
+    do_push_image "rengine-job" "$POM_VERSION"
     do_push_image "rengine-executor" "$POM_VERSION"
     do_push_image "rengine-executor-native" "$POM_VERSION"
     ;;
