@@ -378,28 +378,39 @@ case $1 in
         do_push_image "rengine-executor-native" "$POM_VERSION" "$3"
         ;;
       -A|--all)
-        do_push_image "rengine-apiserver" "$POM_VERSION" "$3"
-        do_push_image "rengine-controller" "$POM_VERSION" "$3"
-        do_push_image "rengine-job" "$POM_VERSION" "$3"
-        do_push_image "rengine-executor" "$POM_VERSION" "$3"
-        do_push_image "rengine-executor-native" "$POM_VERSION" "$3"
+        do_push_image "rengine-apiserver" "$POM_VERSION" "$3" &
+        do_push_image "rengine-controller" "$POM_VERSION" "$3" &
+        do_push_image "rengine-job" "$POM_VERSION" "$3" &
+        do_push_image "rengine-executor" "$POM_VERSION" "$3" &
+        do_push_image "rengine-executor-native" "$POM_VERSION" "$3" &
+        wait
         ;;
       *)
         usages; exit 1
     esac
     ;;
   all)
+    POM_VERSION=${POM_VERSION:-$(print_pom_version)}
+
     do_build_maven "-T 4C clean install"
+    do_build_deploy
+
     do_build_maven "package -f ${BASE_DIR}/apiserver/pom.xml -Pbuild:tar:docker" &
     do_build_maven "package -f ${BASE_DIR}/controller/pom.xml -Pbuild:tar:docker" &
     do_build_maven "package -f ${BASE_DIR}/job/pom.xml -Pbuild:docker" &
-    do_build_maven "package -f ${BASE_DIR}/executor/pom.xml -Pbuild:tar:docker" &
+    docker build -t wl4g/rengine-executor:${POM_VERSION} -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkustar &
     wait
-    do_build_maven "package -f ${BASE_DIR}/executor/pom.xml -Pnative -Dquarkus.native.container-build=true -Dquarkus.native.container-runtime=docker"
 
-    do_build_deploy
+    ## Not enabled for now, because it usually fails due to insufficient resources on the build machine. To build a native image, you should use the '-E' option alone.
+    ${BASE_DIR}/mvnw package -f ${BASE_DIR}/executor/pom.xml \
+        -Dmaven.test.skip=true \
+        -DskipTests \
+        -Dnative \
+        -Dquarkus.native.container-build=true \
+        -Dquarkus.native.container-runtime=docker
 
-    POM_VERSION=${POM_VERSION:-$(print_pom_version)}
+    docker build -t wl4g/rengine-executor-native:${POM_VERSION} -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkusnative
+
     do_push_image "rengine-apiserver" "$POM_VERSION"
     do_push_image "rengine-controller" "$POM_VERSION"
     do_push_image "rengine-job" "$POM_VERSION"
