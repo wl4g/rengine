@@ -55,16 +55,7 @@
         <version>1.0.0</version>
     </parent>
     <modules>
-        <module>job-base</module>
-        <module>job-kafka-hbase</module>
-        <!--<module>job-kafka-elasticsearch</module>-->
-        <!--<module>job-kafka-hive</module>-->
-        <module>job-pulsar-hbase</module>
-        <!--<module>job-pulsar-elasticsearch</module>-->
-        <!--<module>job-pulsar-hive</module>-->
-        <module>job-rabbitmq-hbase</module>
-        <!--<module>job-rabbitmq-elasticsearch</module>-->
-        <!--<module>job-rabbitmq-hive</module>-->
+        <module>job-core</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

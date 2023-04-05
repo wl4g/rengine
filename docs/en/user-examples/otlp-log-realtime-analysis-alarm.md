@@ -131,11 +131,13 @@ $JAVA_HOME/bin/java -cp $JOB_CLASSPATH org.apache.flink.client.cli.CliFrontend -
 ```
 
 - Startup with flink k8s cli.
-  - [flink native kubernetes docs](https://nightlies.apache.org/flink/flink-docs-master/docs/deployment/resource-providers/native_kubernetes/)
+  - [flink native kubernetes docs](https://nightlies.apache.org/flink/flink-docs-release-1.14/zh/docs/deployment/resource-providers/native_kubernetes/#deployment-modes)
   - [KubernetesSessionCliTest.java](https://github1s.com/apache/flink/blob/release-1.14/flink-kubernetes/src/test/java/org/apache/flink/kubernetes/cli/KubernetesSessionCliTest.java)
 
 ```basj
-$JAVA_HOME/bin/java -cp $JOB_CLASSPATH org.apache.flink.kubernetes.cli.KubernetesSessionCli \
---target kubernetes-session \
--Dkubernetes.cluster-id=rengine-base-job-1
+$JAVA_HOME/bin/java -cp $JOB_CLASSPATH org.apache.flink.client.cli.CliFrontend run-application \
+--target kubernetes-application \
+-Dkubernetes.cluster-id=rengine-base-job-cluster-1 \
+-Dkubernetes.container.image=flink:1.14.4-scala_2.11-java11 \
+local://job/job-base/target/rengine-job-base-1.0.0-jar-with-dependencies.jar
 ```

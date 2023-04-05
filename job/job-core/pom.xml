@@ -1,0 +1,427 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>rengine-job-core</artifactId>
+    <packaging>jar</packaging>
+    <name>Rengine Job Core</name>
+    <url>http://rengine.wl4g.com</url>
+    <description>Rengine Job Analytic for Flink streaming</description>
+    <parent>
+        <groupId>com.wl4g</groupId>
+        <artifactId>rengine-job</artifactId>
+        <version>1.0.0</version>
+    </parent>
+    <properties>
+        <aviator.version>5.3.0</aviator.version>
+    </properties>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.wl4g</groupId>
+                <artifactId>rengine-bom</artifactId>
+                <version>${project.parent.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-table</artifactId>
+                <version>${flink.version}</version>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hbase</groupId>
+                <artifactId>hbase-client</artifactId>
+                <version>${hbase.version}</version>
+            </dependency>
+            <!-- <dependency> -->
+            <!-- <groupId>org.apache.hbase</groupId> -->
+            <!-- <artifactId>hbase-common</artifactId> -->
+            <!-- <version>${hbase.version}</version> -->
+            <!-- </dependency> -->
+        </dependencies>
+    </dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>com.wl4g</groupId>
+            <artifactId>rengine-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.wl4g</groupId>
+            <artifactId>infra-common</artifactId>
+        </dependency>
+        <!-- OTLP -->
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-proto</artifactId>
+        </dependency>
+        <!-- FLINK yarn -->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-yarn${suffix-scala.version}</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <!-- FLINK kubernetes -->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-kubernetes${suffix-scala.version}</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <!-- FLINK streaming -->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-streaming-java${suffix-scala.version}</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <!-- <dependency> -->
+        <!-- <groupId>org.apache.flink</groupId> -->
+        <!-- <artifactId>flink-streaming-scala${suffix-scala.version}</artifactId> -->
+        <!-- <version>${flink.version}</version> -->
+        <!-- </dependency> -->
+        <!-- FLINK Runtime -->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-clients${suffix-scala.version}</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-shaded-jackson</artifactId>
+            <version>${flink-shaded-jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-runtime</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-metrics-jmx</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <!-- recommends -->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-runtime-web${suffix-scala.version}</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <!-- FLINK tables -->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-common</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-api-java</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-api-java-bridge${suffix-scala.version}</artifactId>
+            <version>${flink.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-planner${suffix-scala.version}</artifactId>
+            <version>${flink.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-runtime${suffix-scala.version}</artifactId>
+            <version>${flink.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- <dependency> -->
+        <!-- <groupId>org.apache.flink</groupId> -->
+        <!-- <artifactId>flink-table-uber${suffix-scala.version}</artifactId> -->
+        <!-- <version>${flink.version}</version> -->
+        <!-- <scope>provided</scope> -->
+        <!-- </dependency> -->
+        <!-- <dependency> -->
+        <!--     <groupId>org.apache.flink</groupId> -->
+        <!--     <artifactId>flink-table-planner-loader${suffix-scala.version}</artifactId> -->
+        <!--     <version>${flink.version}</version> -->
+        <!--     <optional>true</optional> -->
+        <!-- </dependency> -->
+        <!-- <dependency> -->
+        <!-- <groupId>org.apache.flink</groupId> -->
+        <!-- <artifactId>flink-table-api-scala${suffix-scala.version}</artifactId> -->
+        <!-- <version>${flink.version}</version> -->
+        <!-- </dependency> -->
+        <!-- <dependency> -->
+        <!-- <groupId>org.apache.flink</groupId> -->
+        <!-- <artifactId>flink-table-api-scala-bridge${suffix-scala.version}</artifactId> -->
+        <!-- <version>${flink.version}</version> -->
+        <!-- <scope>provided</scope> -->
+        <!-- </dependency> -->
+        <!-- FLINK CEP -->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-cep${suffix-scala.version}</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <!-- <dependency> -->
+        <!-- <groupId>org.apache.flink</groupId> -->
+        <!-- <artifactId>flink-cep-scala${suffix-scala.version}</artifactId> -->
+        <!-- <version>${flink.version}</version> -->
+        <!-- <scope>provided</scope> -->
+        <!-- </dependency> -->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-sql-client${suffix-scala.version}</artifactId>
+            <version>${flink.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-code-splitter</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-sql-parser</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-sql-parser-hive</artifactId>
+            <version>${flink.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <!-- FLINK connector's (Optional of children modules components) -->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-kafka${suffix-scala.version}</artifactId>
+            <version>${flink.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-pulsar${suffix-scala.version}</artifactId>
+            <version>${flink.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-rabbitmq${suffix-scala.version}</artifactId>
+            <version>${flink.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-hbase-2.2${suffix-scala.version}</artifactId>
+            <version>${flink.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-elasticsearch7${suffix-scala.version}</artifactId>
+            <version>${flink.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-hive${suffix-scala.version}</artifactId>
+            <version>${flink.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <!-- FLINK ML -->
+        <!-- <dependency> -->
+        <!--     <groupId>org.apache.flink</groupId> -->
+        <!--     <artifactId>flink-ml-uber${suffix-scala.version}</artifactId> -->
+        <!--     <version>${flink-ml.version}</version> -->
+        <!--     <optional>true</optional> -->
+        <!-- </dependency> -->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-ml-core${suffix-scala.version}</artifactId>
+            <version>${flink-ml.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-ml-iteration${suffix-scala.version}</artifactId>
+            <version>${flink-ml.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-ml-lib${suffix-scala.version}</artifactId>
+            <version>${flink-ml.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <!-- FLINK STATEFUN -->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>statefun-flink-core</artifactId>
+            <version>${flink-statefun.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-test-utils${suffix-scala.version}</artifactId>
+            <version>${flink.version}</version>
+            <scope>test</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-test-utils-junit</artifactId>
+            <version>${flink.version}</version>
+            <scope>test</scope>
+            <optional>true</optional>
+        </dependency>
+        <!-- HDFS -->
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-hdfs</artifactId>
+            <version>${hadoop.version}</version>
+            <!-- conflict flink hdfs -->
+            <exclusions>
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-client</artifactId>
+            <version>${hadoop.version}</version>
+        </dependency>
+        <!-- Aviator -->
+        <dependency>
+            <groupId>com.googlecode.aviator</groupId>
+            <artifactId>aviator</artifactId>
+            <version>${aviator.version}</version>
+        </dependency>
+        <!-- <dependency> -->
+        <!--     <groupId>jdk.tools</groupId> -->
+        <!--     <artifactId>jdk.tools</artifactId> -->
+        <!--     <version>${java.version}</version> -->
+        <!--     <scope>system</scope> -->
+        <!--     <systemPath>${JAVA_HOME}/lib/tools.jar</systemPath> -->
+        <!-- </dependency> -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>kafka</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**.*</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**.*</include>
+                </includes>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <useFile>false</useFile>
+                    <disableXmlReport>true</disableXmlReport>
+                    <!-- If you have classpath issue like NoDefClassError,... -->
+                    <!-- useManifestOnlyJar>false</useManifestOnlyJar -->
+                    <includes>
+                        <include>**/*Test.*</include>
+                        <include>**/*Suite.*</include>
+                    </includes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>integration-test</id>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <phase>integration-test</phase>
+                        <configuration>
+                            <excludes>
+                                <exclude>none</exclude>
+                            </excludes>
+                            <includes>
+                                <include>**/*IT.java</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <!-- see:https://maven.apache.org/plugins/maven-deploy-plugin/deploy-mojo.html#parameter-details -->
+                    <skip>releases</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Java-Version>${java.version}</Java-Version>
+                            <Implementation-Version>${project.version}</Implementation-Version>
+                        </manifestEntries>
+                    </archive>
+                    <descriptors>
+                        <descriptor>src/main/assembly/package.xml</descriptor>
+                    </descriptors>
+                    <!-- <descriptorRefs> -->
+                    <!-- <descriptorRef>jar-with-dependencies</descriptorRef> -->
+                    <!-- </descriptorRefs> -->
+                    <!-- <appendAssemblyId>false</appendAssemblyId> -->
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

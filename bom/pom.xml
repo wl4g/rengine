@@ -222,52 +222,7 @@
             </dependency>
             <dependency>
                 <groupId>com.wl4g</groupId>
-                <artifactId>rengine-job-base</artifactId>
-                <version>${project.parent.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wl4g</groupId>
-                <artifactId>rengine-job-kafka-elasticsearch</artifactId>
-                <version>${project.parent.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wl4g</groupId>
-                <artifactId>rengine-job-kafka-hbase</artifactId>
-                <version>${project.parent.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wl4g</groupId>
-                <artifactId>rengine-job-kafka-hive</artifactId>
-                <version>${project.parent.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wl4g</groupId>
-                <artifactId>rengine-job-pulsar-elasticsearch</artifactId>
-                <version>${project.parent.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wl4g</groupId>
-                <artifactId>rengine-job-pulsar-hbase</artifactId>
-                <version>${project.parent.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wl4g</groupId>
-                <artifactId>rengine-job-pulsar-hive</artifactId>
-                <version>${project.parent.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wl4g</groupId>
-                <artifactId>rengine-job-rabbitmq-elasticsearch</artifactId>
-                <version>${project.parent.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wl4g</groupId>
-                <artifactId>rengine-job-rabbitmq-hbase</artifactId>
-                <version>${project.parent.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wl4g</groupId>
-                <artifactId>rengine-job-rabbitmq-hive</artifactId>
+                <artifactId>rengine-job-core</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
             <!-- Spring Boot -->
