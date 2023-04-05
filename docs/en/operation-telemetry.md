@@ -3,7 +3,9 @@
 - Get health
 
 ```bash
-curl -v localhost:28001/actuator/health
+curl -v localhost:10108/actuator/health # rengine apiserver
+curl -v localhost:10109/actuator/health # rengine controller
+curl -v localhost:28002/metrics # rengine executor
 ```
 
 - Get metrics

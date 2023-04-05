@@ -62,6 +62,7 @@ import lombok.extern.slf4j.Slf4j;
  * @version 2022-06-07 v3.0.0
  * @since v1.0.0
  */
+@SuppressWarnings("deprecation")
 @Getter
 @Slf4j
 public abstract class AbstractFlinkStreamingBase implements Runnable {

@@ -200,41 +200,44 @@
 ##        --name=${appName} ${appName}:latest
 ##
 
+##
+## ----- Preparing stage -----
+##
+FROM alpine:latest AS wl4g_copy_layer
+
+##
+## ----- Define the immutable properties. -----
+##
+#ARG APP_NAME
+#ARG APP_VERSION
+#ENV APP_NAME "${APP_NAME}"
+#ENV APP_VERSION "${APP_VERSION}"
+#ENV APP_BIN_NAME "${APP_NAME}-${APP_VERSION}-bin"
+#
+#COPY target/${APP_BIN_NAME}.tar /app.tar
+
+##
+## ----- Make stage -----
+##
 ## see:https://docs.docker.com/develop/develop-images/multistage-build/
 ## see:https://blogs.wl4g.com/archives/2969
 ## see:https://github.com/docker-library/openjdk/issues/440#issuecomment-733718821
-## see:
-FROM adoptopenjdk/openjdk11:jre-11.0.9_11.1-alpine AS wl4g_java_base
+FROM adoptopenjdk/openjdk11:jre-11.0.9_11.1-alpine
 LABEL maintainer="James Wong<jameswong1376@gmail.com>"
 
-#WORKDIR /tmp/build/base/
-
-ARG ADD_LIBRARY # Optional
-## Spaces are automatically recognized as '+' characters, so they need to be restore to spaces before use.
-ENV ADD_LIBRARY "${ADD_LIBRARY}"
-
-RUN echo "http://mirrors.aliyun.com/alpine/v3.9/main" > /etc/apk/repositories \
-&& echo "http://mirrors.aliyun.com/alpine/v3.9/community" >> /etc/apk/repositories \
-&& apk update upgrade \
-&& apk add --no-cache procps unzip curl bash tini tzdata $(echo $ADD_LIBRARY|sed 's/+/ /g') \
-&& ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-&& echo "Asia/Shanghai" > /etc/timezone
-
-FROM wl4g_java_base
-LABEL maintainer="James Wong<jameswong1376@gmail.com>"
-
-## see:https://docs.docker.com/develop/develop-images/multistage-build/
-#WORKDIR /tmp/build/app/
-#COPY --from=wl4g_java_base /tmp/build/base/myexe /bin/myexe
-
 ##
-## Define the immutable properties.
+## ----- Define the immutable properties. -----
 ##
+ARG DL_URI
 ARG APP_NAME
+ARG ADD_LIBRARY # Optional
 ARG APP_VERSION
 ARG APP_MAINCLASS
 ARG APP_EXT_CLASSPATH # Optional
+ENV DL_URI "${DL_URI}"
 ENV APP_NAME "${APP_NAME}"
+## Spaces are automatically recognized as '+' characters, so they need to be restore to spaces before use.
+ENV ADD_LIBRARY "${ADD_LIBRARY}"
 ENV APP_VERSION "${APP_VERSION}"
 ENV APP_MAINCLASS "${APP_MAINCLASS}"
 ENV APP_EXT_CLASSPATH "${APP_EXT_CLASSPATH}"
@@ -246,17 +249,33 @@ ENV APP_DATA "${APP_HOME}/data"
 #ENV APP_LOG "${APP_HOME}/log"
 ENV APP_LOG "/var/log/${APP_NAME}"
 
-##
-## Installation APP files.
-##
-COPY target/${APP_BIN_NAME}.tar /tmp/${APP_BIN_NAME}.tar
+#WORKDIR /build_base
 
-RUN mkdir -p ${APP_HOME} ${APP_DATA} ${APP_LOG} /etc/${APP_NAME}/ && ln -snf ${APP_HOME} ${APP_HOME_LINK} \
-&& tar -xf /tmp/${APP_BIN_NAME}.tar --strip-components=1 -C ${APP_HOME} \
-&& rm -rf /tmp/${APP_BIN_NAME}.tar \
+## see:https://docs.docker.com/develop/develop-images/multistage-build/
+## 
+#COPY --from=wl4g_copy_layer /app.tar /${APP_BIN_NAME}.tar
+
+##
+## ----- Make app home,user and docker-entrypoint.sh -----
+##
+## Using root-less run container. see:https://docs.docker.com/engine/security/rootless/
+## see:https://stackoverflow.com/questions/49955097/how-do-i-add-a-user-when-im-using-alpine-as-a-base-image
+RUN echo "http://mirrors.aliyun.com/alpine/v3.12/main" > /etc/apk/repositories \
+&& echo "http://mirrors.aliyun.com/alpine/v3.12/community" >> /etc/apk/repositories \
+&& apk update upgrade \
+&& apk add --no-cache procps curl bash tini tzdata $(echo $ADD_LIBRARY|sed 's/+/ /g') \
+&& ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+&& echo "Asia/Shanghai" > /etc/timezone \
+&& curl -o /${APP_BIN_NAME}.tar ${DL_URI} \
+&& adduser ${APP_NAME} --disabled-password \
+&& mkdir -p ${APP_HOME} ${APP_DATA} ${APP_LOG} /etc/${APP_NAME}/ && ln -snf ${APP_HOME} ${APP_HOME_LINK} \
+&& tar -xf /${APP_BIN_NAME}.tar --strip-components=1 -C ${APP_HOME} \
+&& rm -rf /${APP_BIN_NAME}.tar \
 \
 ## Make control script.
-&& touch /docker-entrypoint.sh && chmod +x /docker-entrypoint.sh \
+&& touch /docker-entrypoint.sh \
+&& chown -R ${APP_NAME}:${APP_NAME} ${APP_HOME_PARENT} ${APP_DATA} ${APP_LOG} /etc/${APP_NAME} /docker-entrypoint.sh \
+&& chmod 755 ${APP_HOME_PARENT} /etc/${APP_NAME} /docker-entrypoint.sh \
 && echo -e "#!/bin/bash" >>/docker-entrypoint.sh \
 && echo -e "\
 \
@@ -313,17 +332,13 @@ exec \${CMD_EXEC}\n\
 echo \"Started \${APP_NAME}:\${APP_VERSION}(\${APP_ACTIVE}) on \${APP_PORT}\"\n" >>/docker-entrypoint.sh
 
 ##
-## Using root-less run container. see:https://docs.docker.com/engine/security/rootless/
-## see:https://stackoverflow.com/questions/49955097/how-do-i-add-a-user-when-im-using-alpine-as-a-base-image
+## ----- Using unroot user -----
 ##
-RUN adduser ${APP_NAME} --disabled-password \
-&& chown -R ${APP_NAME}:${APP_NAME} ${APP_HOME_PARENT} ${APP_DATA} ${APP_LOG} /etc/${APP_NAME} /docker-entrypoint.sh \
-&& chmod -R 755 ${APP_HOME_PARENT} /etc/${APP_NAME} /docker-entrypoint.sh
 USER ${APP_NAME}
 
 ##
-## [BUGFIX]: Notice that if you use bash or sh to start the program, graceful 
-## termination cannot be achieved under Kubernetes.
+## ----- [BUGFIX]: Notice that if you use bash or sh to start the program, graceful 
+## termination cannot be achieved under Kubernetes. -----
 ##
 #CMD ["/bin/bash", "-c", "/docker-entrypoint.sh"]
 ##

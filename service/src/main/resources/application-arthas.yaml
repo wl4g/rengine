@@ -13,7 +13,9 @@
 
 ## see:https://arthas.aliyun.com/doc/spring-boot-starter.html
 ## see:com.taobao.arthas:arthas-spring-boot-starter(com.alibaba.arthas.spring.ArthasProperties)
+spring.arthas.enabled: true ## Default by true
 arthas:
+  enabled: true ## Default by true
   agent-id: renginemanagervfu6y
   telnet-port: 3658
   http-port: 8563
@@ -21,3 +23,4 @@ arthas:
   session-timeout: 1800
   #username: admin
   #password: admin
+  slientInit: true ## Default by false

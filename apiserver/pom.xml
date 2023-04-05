@@ -533,6 +533,7 @@
                             <tag>${project.version}</tag>
                             <readTimeoutMillis>60000</readTimeoutMillis>
                             <connectTimeoutMillis>20000</connectTimeoutMillis>
+                            <!-- <squash>true</squash>-->
                             <buildArgs>
                                 <!-- Addidtion librarys. -->
                                 <!-- <ADD_LIBRARY></ADD_LIBRARY> -->

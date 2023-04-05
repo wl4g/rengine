@@ -17,6 +17,7 @@ MAVEN_USERNAME=${MAVEN_USERNAME:-}
 MAVEN_PASSWORD=${MAVEN_PASSWORD:-}
 DOCKERHUB_USERNAME=${DOCKERHUB_USERNAME:-}
 DOCKERHUB_TOKEN=${DOCKERHUB_TOKEN:-}
+LOCAL_IP="$(ip a | grep -E '^[0-9]+: (em|eno|enp|ens|eth|wlp)+[0-9]' -A2 | grep inet | awk -F ' ' '{print $2}' | cut -f1 -d/ | xargs echo)"
 
 # eg1: log "error" "Failed to xxx"
 # eg2: log "xxx complete!"
@@ -44,7 +45,7 @@ function logErr() {
   log "\033[31mERROR\033[0m" "$@"
 }
 
-function usages(){
+function usages() {
     echo $"
 # for examples
 export JAVA_HOME=/usr/local/jdk-11.0.10/ # Recommands
@@ -64,11 +65,17 @@ Usage: ./$(basename $0) [OPTIONS] [arg1] [arg2] ...
     build-deploy                        Build and deploy to Maven central.
     build-image                         Build component images.
                 -a,--apiserver          Build image for apiserver.
+                   --skip-build         Skip recompile build before building image.
                 -c,--controller         Build image for controller.
+                   --skip-build         Skip recompile build before building image.
                 -j,--job                Build image for job.
+                   --skip-build         Skip recompile build before building image.
                 -e,--executor           Build image for executor.
+                   --skip-build         Skip recompile build before building image.
                 -E,--executor-native    Build image for executor (native).
+                   --skip-build         Skip recompile build before building image.
                 -A,--all                Build image for all components.
+                   --skip-build         Skip recompile build before building image.
     push-image                          Push component images.
                 -a,--apiserver          Push image for apiserver.
                 -c,--controller         Push image for controller.
@@ -78,6 +85,24 @@ Usage: ./$(basename $0) [OPTIONS] [arg1] [arg2] ...
                 -A,--all                Push image for all components.
     all                                 Build with Maven and push images for all components.
 "
+}
+
+function check_for_java_version() {
+    # Which java to use
+    export JAVA=$([ -z "$JAVA_HOME" ] && echo "java" || echo "$JAVA_HOME/bin/java")
+
+    # the first segment of the version number, which is '1' for releases before Java 9
+    # it then becomes '9', '10' etc.
+    # e.g: openjdk version "11.0.10" 2021-01-19
+    export JAVA_MAJOR_VERSION=$([ -z "$JAVA_MAJOR_VERSION" ] && echo $($JAVA -version 2>&1 | sed -E -n 's/.* version \"(.+)\.(.+)\.(.+)".*/\1/p') || echo "$JAVA_MAJOR_VERSION")
+    export JAVA_MINOR_VERSION=$([ -z "$JAVA_MINOR_VERSION" ] && echo $($JAVA -version 2>&1 | sed -E -n 's/.* version \"(.+)\.(.+)\.(.+)".*/\2/p') || echo "$JAVA_MINOR_VERSION")
+    export JAVA_PATCH_VERSION=$([ -z "$JAVA_PATCH_VERSION" ] && echo $($JAVA -version 2>&1 | sed -E -n 's/.* version \"(.+)\.(.+)\.(.+)".*/\3/p') || echo "$JAVA_PATCH_VERSION")
+
+    if [[ ! "$JAVA_MAJOR_VERSION" -ge 11 ]] ; then
+        log "No supported JAVA version, major version must >= 11"; exit 1
+    else
+        log "Using JAVA for $JAVA"
+    fi
 }
 
 function print_pom_version() {
@@ -92,6 +117,7 @@ function print_pom_version() {
 function do_build_maven() {
     local build_opts=$1
     logDebug "Building for $build_opts ..."
+
     [ -z "$MAVEN_OPTS" ] && MAVEN_OPTS=$DEFAULT_MAVEN_OPTS
     $BASE_DIR/mvnw \
     $MAVEN_CLI_OPTS \
@@ -169,24 +195,61 @@ function do_build_deploy() {
     do_build_maven "--settings $BASE_DIR/.github/mvn-settings.xml -T 4C deploy -Prelease"
 }
 
+function do_dl_serve_start() {
+  do_dl_serve_stop
+  set +e
+  nohup python3 -m http.server --directory ${BASE_DIR} 13337 >/dev/null 2>&1 &
+  [ $? -ne 0 ] && echo "Could't to start local DL serve." && exit -1 || echo
+  set -e
+}
+
+function do_dl_serve_stop() {
+  set +e
+  ps -ef | grep python3 | grep ${BASE_DIR} | grep 13337 | cut -c 9-16 | xargs kill -9 >/dev/null 2>&1
+  #[ $? -ne 0 ] && echo "Failed to stop local DL serve." || echo
+  set -e
+}
+
+function do_build_image_with_springboot() {
+  local app_name=$1
+  local app_version=$2
+  local app_mainclass=$3
+  local build_file=$4
+  local assets_file=$5
+  echo "Docker building for $app_name:$app_version ..."
+  docker build -t wl4g/rengine-${app_name}:${app_version} -f $BASE_DIR/tools/build/docker/$build_file \
+    --build-arg DL_URI="http://$LOCAL_IP:13337/${assets_file}" \
+    --build-arg APP_NAME=${app_name} \
+    --build-arg APP_VERSION=${app_version} \
+    --build-arg APP_MAINCLASS=${app_mainclass} .
+}
+
 function do_push_image() {
     local image_name="$1"
     local image_tag="$2"
     local image_registry="$3"
-    if [[ -z "$DOCKERHUB_USERNAME" || -z "$DOCKERHUB_TOKEN" ]]; then
-        logWarn "The environment variable DOCKERHUB_USERNAME or DOCKERHUB_TOKEN is missing."; exit 1
-    fi
+
     if [ -z "$image_registry" ]; then
         image_registry="docker.io"
     fi
-    logDebug "Login to $image_registry ..."
-    docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_TOKEN $image_registry
+    if [ "$(docker login >/dev/null 2>&1; echo $?)" -ne 0 ]; then
+        if [[ -z "$DOCKERHUB_USERNAME" || -z "$DOCKERHUB_TOKEN" ]]; then
+            logWarn "The environment variable DOCKERHUB_USERNAME or DOCKERHUB_TOKEN is missing."; exit 1
+        else
+            logDebug "Login to $image_registry ..."
+            docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_TOKEN $image_registry
+        fi
+    else
+        logDebug "Already login docker hub."
+    fi
+
     logDebug "Pushing image for $image_registry/$image_name:$image_tag ..."
     docker tag wl4g/$image_name:$image_tag $image_registry/wl4g/$image_name:$image_tag
     docker push $image_registry/wl4g/$image_name:$image_tag
 }
 
 # --- Main. ---
+check_for_java_version
 case $1 in
   version)
     print_pom_version
@@ -203,32 +266,94 @@ case $1 in
   build-image)
     case $2 in
       -a|--apiserver)
-        do_build_maven "-T 4C clean install"
-        do_build_maven "package -f apiserver/pom.xml -Pbuild:tar:docker"
+        ## First of all, it should be built in full to prevent the dependent modules from being updated.
+        if [ "$3" != "--skip-build" ]; then
+            do_build_maven "-T 4C clean install"
+        fi
+
+        ## Method 1:
+        ## Build the image directly using the maven plugin. (Notice: The image size is large, there is no way, because the COPY command must be executed only once)
+        #do_build_maven "package -f ${BASE_DIR}/apiserver/pom.xml -Pbuild:tar:docker"
+
+        ## Method 2:
+        ## Do not use the COPY command, open the local file service and use curl to download in the container to prevent new layers.
+        do_dl_serve_start
+        do_build_image_with_springboot apiserver $(print_pom_version) com.wl4g.RengineApiServer Dockerfile.springtar apiserver/target/apiserver-1.0.0-bin.tar
+        do_dl_serve_stop
         ;;
       -c|--controller)
-        do_build_maven "-T 4C clean install"
-        do_build_maven "package -f controller/pom.xml -Pbuild:tar:docker"
+        ## First of all, it should be built in full to prevent the dependent modules from being updated.
+        if [ "$3" != "--skip-build" ]; then
+            do_build_maven "-T 4C clean install"
+        fi
+
+        ## Method 1:
+        ## Build the image directly using the maven plugin. (Notice: The image size is large, there is no way, because the COPY command must be executed only once)
+        #do_build_maven "package -f ${BASE_DIR}/controller/pom.xml -Pbuild:tar:docker"
+
+        ## Method 2:
+        ## Do not use the COPY command, open the local file service and use curl to download in the container to prevent new layers.
+        do_dl_serve_start
+        do_build_image_with_springboot controller $(print_pom_version) com.wl4g.RengineController Dockerfile.springtar controller/target/controller-1.0.0-bin.tar
+        do_dl_serve_stop
         ;;
       -j|--job)
-        do_build_maven "-T 4C clean install"
-        do_build_maven "package -f job/pom.xml -Pbuild:jar:docker"
+        if [ "$3" != "--skip-build" ]; then
+            do_build_maven "-T 4C clean install"
+        fi
+        do_build_maven "package -f ${BASE_DIR}/job/pom.xml -Pbuild:docker"
         ;;
       -e|--executor)
-        do_build_maven "-T 4C clean install"
-        do_build_maven "package -f executor/pom.xml -Pbuild:tar:docker"
+        ## First of all, it should be built in full to prevent the dependent modules from being updated.
+        if [ "$3" != "--skip-build" ]; then
+            do_build_maven "-T 4C clean install"
+        fi
+
+        docker build -t wl4g/rengine-executor:$(print_pom_version) -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkustar .
         ;;
       -E|--executor-native)
-        do_build_maven "-T 4C clean install"
-        do_build_maven "package -f executor/pom.xml -Pnative -Dquarkus.native.container-build=true -Dquarkus.native.container-runtime=docker"
+        ## First of all, it should be built in full to prevent the dependent modules from being updated.
+        if [ "$3" != "--skip-build" ]; then
+            do_build_maven "-T 4C clean install"
+        fi
+
+        if [ ! -f "${BASE_DIR}/executor/target/executor-native" ]; then
+            log "Building executor native image ..."
+            ${BASE_DIR}/mvnw package -f ${BASE_DIR}/executor/pom.xml \
+                -Dmaven.test.skip=true \
+                -DskipTests \
+                -Dnative \
+                -Dquarkus.native.container-build=true \
+                -Dquarkus.native.container-runtime=docker
+        fi
+
+        log "Building executor native docker image ..."
+        cd ${BASE_DIR}/executor
+        docker build -t wl4g/rengine-executor-native:$(print_pom_version) -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkusnative .
+        cd ..
         ;;
       -A|--all)
-        do_build_maven "-T 4C clean install"
-        do_build_maven "package -f apiserver/pom.xml -Pbuild:tar:docker"
-        do_build_maven "package -f controller/pom.xml -Pbuild:tar:docker"
-        do_build_maven "package -f job/pom.xml -Pbuild:jar:docker"
-        do_build_maven "package -f executor/pom.xml -Pbuild:tar:docker"
-        do_build_maven "package -f executor/pom.xml -Pnative -Dquarkus.native.container-build=true -Dquarkus.native.container-runtime=docker"
+        POM_VERSION=${POM_VERSION:-$(print_pom_version)}
+        if [ "$3" != "--skip-build" ]; then
+            do_build_maven "-T 4C clean install"
+        fi
+
+        do_dl_serve_start
+        do_build_image_with_springboot apiserver ${POM_VERSION} com.wl4g.RengineApiServer Dockerfile.springtar apiserver/target/apiserver-1.0.0-bin.tar
+        do_build_image_with_springboot controller ${POM_VERSION} com.wl4g.RengineController Dockerfile.springtar controller/target/controller-1.0.0-bin.tar
+        do_build_maven "package -f ${BASE_DIR}/job/pom.xml -Pbuild:docker"
+        do_dl_serve_stop
+
+        docker build -t wl4g/rengine-executor:${POM_VERSION} -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkustar
+
+        ## Not enabled for now, because it usually fails due to insufficient resources on the build machine. To build a native image, you should use the '-E' option alone.
+        #${BASE_DIR}/mvnw package -f ${BASE_DIR}/executor/pom.xml \
+        #    -Dmaven.test.skip=true \
+        #    -DskipTests \
+        #    -Dnative \
+        #    -Dquarkus.native.container-build=true \
+        #    -Dquarkus.native.container-runtime=docker
+        #docker build -t wl4g/rengine-executor-native:${POM_VERSION} -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkusnative
         ;;
       *)
         usages; exit 1
@@ -265,12 +390,12 @@ case $1 in
     ;;
   all)
     do_build_maven "-T 4C clean install"
-    do_build_maven "package -f apiserver/pom.xml -Pbuild:tar:docker" &
-    do_build_maven "package -f controller/pom.xml -Pbuild:tar:docker" &
-    do_build_maven "package -f job/pom.xml -Pbuild:jar:docker" &
-    do_build_maven "package -f executor/pom.xml -Pbuild:tar:docker" &
+    do_build_maven "package -f ${BASE_DIR}/apiserver/pom.xml -Pbuild:tar:docker" &
+    do_build_maven "package -f ${BASE_DIR}/controller/pom.xml -Pbuild:tar:docker" &
+    do_build_maven "package -f ${BASE_DIR}/job/pom.xml -Pbuild:docker" &
+    do_build_maven "package -f ${BASE_DIR}/executor/pom.xml -Pbuild:tar:docker" &
     wait
-    do_build_maven "package -f executor/pom.xml -Pnative -Dquarkus.native.container-build=true -Dquarkus.native.container-runtime=docker"
+    do_build_maven "package -f ${BASE_DIR}/executor/pom.xml -Pnative -Dquarkus.native.container-build=true -Dquarkus.native.container-runtime=docker"
 
     do_build_deploy
 

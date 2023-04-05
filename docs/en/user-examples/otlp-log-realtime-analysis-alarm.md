@@ -1,6 +1,6 @@
 # Massive log collection based on OTEL(otlp) standard protocol, real-time abnormal analysis and alarm.
 
-- Preparing CEP pattern json (example)
+## Preparing CEP pattern json (example)
 
 ```json
 cat << EOF > /tmp/cep-pattern-for-log-alarm.json
@@ -112,29 +112,39 @@ cat << EOF > /tmp/cep-pattern-for-log-alarm.json
 EOF
 ```
 
-- Startup CEP job
+## Start job for Docker
+
+```bash
+docker run \
+--rm \
+--security-opt=seccomp:unconfined \
+wl4g/rengine-job:1.0.0 \
+flink run-application \
+--target kubernetes-application \
+-Dkubernetes.cluster-id=rengine-job-1 \
+-Dkubernetes.container.image=wl4g/rengine-job:1.0.0 \
+local:///opt/flink/usrlib/rengine-job-1.0.0.jar,local:///opt/flink/usrlib/rengine-job-1.0.0-jar-with-dependencies.jar
+```
+
+## Start job for JVM
+
+- Print help
 
 ```bash
 export JAVA_HOME=/usr/local/jdk-11.0.10/
 export JOB_CLASSPATH="job/job-base/target/rengine-job-base-1.0.0-jar-with-dependencies.jar"
 
-# Print job-args help
 $JAVA_HOME/bin/java -cp $JOB_CLASSPATH com.wl4g.rengine.job.cep.RengineKafkaFlinkCepStreaming \
 --groupId rengine_test \
 --cepPatterns $(cat /tmp/cep-pattern-for-log-alarm.json | base64 -w 0)
 ```
 
-- Startup with flink cli
-
-```bash
-$JAVA_HOME/bin/java -cp $JOB_CLASSPATH org.apache.flink.client.cli.CliFrontend --help
-```
-
-- Startup with flink k8s cli.
-  - [flink native kubernetes docs](https://nightlies.apache.org/flink/flink-docs-release-1.14/zh/docs/deployment/resource-providers/native_kubernetes/#deployment-modes)
+- using flink k8s cli.
+  - [flink for docker doc](https://nightlies.apache.org/flink/flink-docs-release-1.14/zh/docs/deployment/resource-providers/standalone/docker/#application-mode-on-docker)
+  - [flink native kubernetes doc](https://nightlies.apache.org/flink/flink-docs-release-1.14/zh/docs/deployment/resource-providers/native_kubernetes/#deployment-modes)
   - [KubernetesSessionCliTest.java](https://github1s.com/apache/flink/blob/release-1.14/flink-kubernetes/src/test/java/org/apache/flink/kubernetes/cli/KubernetesSessionCliTest.java)
 
-```basj
+```bash
 $JAVA_HOME/bin/java -cp $JOB_CLASSPATH org.apache.flink.client.cli.CliFrontend run-application \
 --target kubernetes-application \
 -Dkubernetes.cluster-id=rengine-base-job-cluster-1 \

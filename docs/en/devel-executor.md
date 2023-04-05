@@ -77,6 +77,7 @@ curl -v localhost:28002/healthz
 curl -v localhost:28002/healthz/live
 curl -v localhost:28002/healthz/ready
 curl -v localhost:28002/healthz/started
+curl -v localhost:28002/q/dev # dev UI
 ```
 
 - Metrics
