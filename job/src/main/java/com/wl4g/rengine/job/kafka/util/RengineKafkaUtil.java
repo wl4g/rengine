@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 
 import javax.validation.constraints.NotNull;
 
-import org.apache.flink.api.connector.sink.Sink;
+import org.apache.flink.api.connector.sink2.Sink;
 import org.apache.flink.api.connector.source.Source;
 import org.apache.flink.api.connector.source.SourceSplit;
 import org.apache.flink.connector.kafka.sink.KafkaSink;
@@ -47,7 +47,6 @@ import com.wl4g.rengine.job.pulsar.util.RenginePulsarUtil;
  * @version 2022-06-07 v3.0.0
  * @since v1.0.0
  */
-@SuppressWarnings("deprecation")
 public abstract class RengineKafkaUtil {
 
     /**
@@ -107,8 +106,8 @@ public abstract class RengineKafkaUtil {
                 .build();
     }
 
-    public static <I, C, W, G> Sink<I, C, W, G> createKafkaSink(@NotNull AbstractFlinkStreamingBase streaming) {
-        // TODO add producer config item.
+    public static <I> Sink<I> createKafkaSink(@NotNull AbstractFlinkStreamingBase streaming) {
+        // TODO add other producer config item.
         return createKafkaSink(new Properties() {
             private static final long serialVersionUID = 9134914495692091519L;
             {
@@ -118,12 +117,10 @@ public abstract class RengineKafkaUtil {
     }
 
     @SuppressWarnings("unchecked")
-    public static <I, C, W, G> Sink<I, C, W, G> createKafkaSink(
-            @NotNull Properties props,
-            @NotNull AbstractFlinkStreamingBase streaming) {
+    public static <I> Sink<I> createKafkaSink(@NotNull Properties props, @NotNull AbstractFlinkStreamingBase streaming) {
         notNullOf(props, "props");
         notNullOf(streaming, "streaming");
-        return (Sink<I, C, W, G>) KafkaSink.<RengineEvent> builder()
+        return (Sink<I>) KafkaSink.<RengineEvent> builder()
                 .setBootstrapServers(streaming.getBrokers())
                 .setRecordSerializer(new RengineEventKafkaSerializationSchema(streaming))
                 .setKafkaProducerConfig(props)

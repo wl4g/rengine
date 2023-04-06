@@ -16,8 +16,8 @@
 ## see:https://hub.docker.com/_/flink/tags?page=1&name=1.16.
 ##
 
-## 1.14.4-scala_2.11-java11,1.14.4-scala_2.12-java11,flink:1.15.3-scala_2.12-java11,flink:1.16.1-scala_2.12-java11
-FROM flink:1.16.1-scala_2.12-java11
+## 1.14.4-scala_2.11-java11,1.14.4-scala_2.12-java11,flink:1.15.4-scala_2.12-java11,flink:1.16.1-scala_2.12-java11
+FROM flink:1.15.4-scala_2.12-java11
 LABEL maintainer="James Wong<jameswong1376@gmail.com>"
 
 ARG JOB_VERSION

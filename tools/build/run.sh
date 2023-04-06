@@ -11,6 +11,10 @@
 set -e
 
 BASE_DIR="$(cd "`dirname $0`"/../..; pwd)"
+# If run.sh is a soft link, it is considered to be $PROJECT_HOME/run.sh, no need to call back the path.
+if [ -L "`dirname $0`/run.sh" ]; then
+  BASE_DIR="$(cd "`dirname $0`"; pwd)"
+fi
 DEFAULT_MAVEN_OPTS=${MAVEN_OPTS:-"-Xss64m -Xms1g -Xmx12g -XX:ReservedCodeCacheSize=1g -Dorg.slf4j.simpleLogger.defaultLogLevel=WARN"}
 MAVEN_CLI_OPTS=${MAVEN_CLI_OPTS:-} # --no-transfer-progress
 MAVEN_USERNAME=${MAVEN_USERNAME:-}
@@ -50,40 +54,41 @@ function usages() {
 # for examples
 export JAVA_HOME=/usr/local/jdk-11.0.10/ # Recommands
 export MAVEN_OPTS='-Xss64m -Xms1g -Xmx12g -XX:ReservedCodeCacheSize=1g -Dorg.slf4j.simpleLogger.defaultLogLevel=WARN' # Optional
-# Required (If needed)
+# requirements (if necessary)
 export MAVEN_USERNAME='myuser'
 export MAVEN_PASSWORD='abc'
 export MAVEN_GPG_PRIVATE_KEY='-----BEGIN PGP PRIVATE KEY BLOCK-----\n...'
 export MAVEN_GPG_PASSPHRASE='abc'
+export DOCKERHUB_REGISTRY='docker.io/wl4g' # eg: docker.io/wl4g(default), ghcr.io/wl4g, registry.cn-shenzhen.aliyuncs.com/wl4g, ccr.ccs.tencentyun.com/wl4g
 export DOCKERHUB_USERNAME='myuser'
 export DOCKERHUB_TOKEN='abc'
 
 Usage: ./$(basename $0) [OPTIONS] [arg1] [arg2] ...
-    version                             Print maven project POM version.
-    gpg-verify                          Verifying for GPG.
-    build-maven                         Build with Maven.
-    build-deploy                        Build and deploy to Maven central.
-    build-image                         Build component images.
-                -a,--apiserver          Build image for apiserver.
-                   --skip-build         Skip recompile build before building image.
-                -c,--controller         Build image for controller.
-                   --skip-build         Skip recompile build before building image.
-                -j,--job                Build image for job.
-                   --skip-build         Skip recompile build before building image.
-                -e,--executor           Build image for executor.
-                   --skip-build         Skip recompile build before building image.
-                -E,--executor-native    Build image for executor (native).
-                   --skip-build         Skip recompile build before building image.
-                -A,--all                Build image for all components.
-                   --skip-build         Skip recompile build before building image.
-    push-image                          Push component images.
-                -a,--apiserver          Push image for apiserver.
-                -c,--controller         Push image for controller.
-                -j,--job                Push image for job.
-                -e,--executor           Push image for executor.
-                -E,--executor-native    Push image for executor (native).
-                -A,--all                Push image for all components.
-    all                                 Build with Maven and push images for all components.
+    version                                     Print maven project POM version.
+    gpg-verify                                  Verifying for GPG.
+    build-maven                                 Build with Maven.
+    build-deploy                                Build and deploy to Maven central.
+    build-image                                 Build component images.
+                -a,--apiserver                  Build image for apiserver.
+                   --skip-build                 Skip recompile build before building image.
+                -c,--controller                 Build image for controller.
+                   --skip-build                 Skip recompile build before building image.
+                -j,--job                        Build image for job.
+                   --skip-build                 Skip recompile build before building image.
+                -e,--executor                   Build image for executor.
+                   --skip-build                 Skip recompile build before building image.
+                -E,--executor-native            Build image for executor (native).
+                   --skip-build                 Skip recompile build before building image.
+                -A,--all                        Build image for all components.
+                   --skip-build                 Skip recompile build before building image.
+    push-image                                  Push component images.
+                -a,--apiserver                  Push image for apiserver.
+                -c,--controller                 Push image for controller.
+                -j,--job                        Push image for job.
+                -e,--executor                   Push image for executor.
+                -E,--executor-native            Push image for executor (native).
+                -A,--all                        Push image for all components.
+    all                                         Build with Maven and push images for all components.
 "
 }
 
@@ -225,12 +230,12 @@ function do_build_image_with_springboot() {
 }
 
 function do_push_image() {
-    local image_name="$1"
-    local image_tag="$2"
-    local image_registry="$3"
+    local image_registry="$DOCKERHUB_REGISTRY"
+    local image_name="$2"
+    local image_tag="$3"
 
     if [ -z "$image_registry" ]; then
-        image_registry="docker.io"
+        image_registry="docker.io/wl4g"
     fi
     if [ "$(docker login >/dev/null 2>&1; echo $?)" -ne 0 ]; then
         if [[ -z "$DOCKERHUB_USERNAME" || -z "$DOCKERHUB_TOKEN" ]]; then
@@ -243,9 +248,9 @@ function do_push_image() {
         logDebug "Already login docker hub."
     fi
 
-    logDebug "Pushing image for $image_registry/$image_name:$image_tag ..."
+    logDebug "Pushing image to $image_registry/$image_name:$image_tag ..."
     docker tag wl4g/$image_name:$image_tag $image_registry/wl4g/$image_name:$image_tag
-    docker push $image_registry/wl4g/$image_name:$image_tag
+    docker push $image_registry/$image_name:$image_tag
 }
 
 # --- Main. ---
@@ -363,26 +368,26 @@ case $1 in
     POM_VERSION=${POM_VERSION:-$(print_pom_version)}
     case $2 in
       -a|--apiserver)
-        do_push_image "rengine-apiserver" "$POM_VERSION" "$3"
+        do_push_image "$3" "rengine-apiserver" "$POM_VERSION"
         ;;
       -c|--controller)
-        do_push_image "rengine-controller" "$POM_VERSION" "$3"
+        do_push_image "$3" "rengine-controller" "$POM_VERSION"
         ;;
       -j|--job)
-        do_push_image "rengine-job" "$POM_VERSION" "$3"
+        do_push_image "$3" "rengine-job" "$POM_VERSION"
         ;;
       -e|--executor)
-        do_push_image "rengine-executor" "$POM_VERSION" "$3"
+        do_push_image "$3" "rengine-executor" "$POM_VERSION"
         ;;
       -E|--executor-native)
-        do_push_image "rengine-executor-native" "$POM_VERSION" "$3"
+        do_push_image "$3" "rengine-executor-native" "$POM_VERSION"
         ;;
       -A|--all)
-        do_push_image "rengine-apiserver" "$POM_VERSION" "$3" &
-        do_push_image "rengine-controller" "$POM_VERSION" "$3" &
-        do_push_image "rengine-job" "$POM_VERSION" "$3" &
-        do_push_image "rengine-executor" "$POM_VERSION" "$3" &
-        do_push_image "rengine-executor-native" "$POM_VERSION" "$3" &
+        do_push_image "$3" "rengine-apiserver" "$POM_VERSION" &
+        do_push_image "$3" "rengine-controller" "$POM_VERSION" &
+        do_push_image "$3" "rengine-job" "$POM_VERSION" &
+        do_push_image "$3" "rengine-executor" "$POM_VERSION" &
+        do_push_image "$3" "rengine-executor-native" "$POM_VERSION" &
         wait
         ;;
       *)
@@ -411,11 +416,11 @@ case $1 in
 
     docker build -t wl4g/rengine-executor-native:${POM_VERSION} -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkusnative
 
-    do_push_image "rengine-apiserver" "$POM_VERSION"
-    do_push_image "rengine-controller" "$POM_VERSION"
-    do_push_image "rengine-job" "$POM_VERSION"
-    do_push_image "rengine-executor" "$POM_VERSION"
-    do_push_image "rengine-executor-native" "$POM_VERSION"
+    do_push_image "$2" "rengine-apiserver" "$POM_VERSION"
+    do_push_image "$2" "rengine-controller" "$POM_VERSION"
+    do_push_image "$2" "rengine-job" "$POM_VERSION"
+    do_push_image "$2" "rengine-executor" "$POM_VERSION"
+    do_push_image "$2" "rengine-executor-native" "$POM_VERSION"
     ;;
   *)
     usages; exit 1

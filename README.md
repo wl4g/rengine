@@ -42,7 +42,7 @@ Unified and flexible rules engine platform, naturally suitable for scenarios whe
 
 - Kubernetes 1.21 + (If the needs deploy to kubernetes)
 
-- Flink 1.14.4 + (If the need to run the Flink CEP job to process massive events)
+- Flink 1.15.x + (If the need to run the Flink CEP job to process massive events)
 
 - HBase 2.2.x + (Optional, If the needs to store raw events so that can trace back.)
 

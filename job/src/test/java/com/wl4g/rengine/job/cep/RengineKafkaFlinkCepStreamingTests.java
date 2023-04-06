@@ -39,7 +39,7 @@ import com.wl4g.rengine.common.event.RengineEvent;
 
 /**
  * Refer to {@link com.wl4g.rengine.job.cep.pattern.PatternTests} and
- * {@link com.wl4g.rengine.job.cep.RengineKafkaFlinkCepStreamingIT}
+ * {@link com.wl4g.rengine.job.kafka.RengineKafkaFlinkCepStreamingIT}
  * 
  * @author James Wong
  * @version 2023-03-16

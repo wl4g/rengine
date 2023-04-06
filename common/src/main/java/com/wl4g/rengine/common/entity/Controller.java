@@ -460,8 +460,8 @@ public class Controller extends BaseEntity {
 
     /**
      * @see {@link com.wl4g.rengine.job.AbstractFlinkStreamingBase}
-     * @see {@link com.wl4g.rengine.job.cep.AbstractFlinkCepStreamingBase}
-     * @see {@link com.wl4g.rengine.job.cep.RengineKafkaFlinkCepStreaming}
+     * @see {@link com.wl4g.rengine.job.AbstractFlinkCepStreamingBase}
+     * @see {@link com.wl4g.rengine.job.kafka.RengineKafkaFlinkCepStreaming}
      */
     @Getter
     @Setter
@@ -531,7 +531,7 @@ public class Controller extends BaseEntity {
             private String partitionDiscoveryIntervalMs;
 
             // FLINK job manifests.
-            private @NotBlank @Default String entryClass = "com.wl4g.rengine.job.cep.RengineKafkaFlinkCepStreaming";
+            private @NotBlank @Default String entryClass = "com.wl4g.rengine.job.kafka.RengineKafkaFlinkCepStreaming";
         }
 
     }

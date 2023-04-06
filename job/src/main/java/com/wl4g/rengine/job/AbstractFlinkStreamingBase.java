@@ -35,7 +35,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.common.RuntimeExecutionMode;
 import org.apache.flink.api.common.time.Time;
-import org.apache.flink.api.connector.sink.Sink;
+import org.apache.flink.api.connector.sink2.Sink;
 import org.apache.flink.api.connector.source.Source;
 import org.apache.flink.api.connector.source.SourceSplit;
 import org.apache.flink.configuration.Configuration;
@@ -62,7 +62,6 @@ import lombok.extern.slf4j.Slf4j;
  * @version 2022-06-07 v3.0.0
  * @since v1.0.0
  */
-@SuppressWarnings("deprecation")
 @Getter
 @Slf4j
 public abstract class AbstractFlinkStreamingBase implements Runnable {
@@ -118,7 +117,7 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
                 .mustOption("G", "groupId", "Flink source consumer group id.")
                 .option("O", "fromOffsetTime", "-1",
                         "Start consumption from the first record with a timestamp greater than or equal to a certain timestamp. if <=0, it will not be setup and keep the default behavior.")
-                .option("D", "deserializerClass", "com.wl4g.rengine.job.kafka.RengineEventKafkaDeserializationSchema",
+                .option("D", "deserializerClass", "com.wl4g.rengine.job.kafka.schema.RengineEventKafkaDeserializationSchema",
                         "Deserializer class for Flink-streaming to consuming from MQ.")
                 .option("K", "keyByExprPath", ".source.principals[0]",
                         "The jq expression to extract the grouping key, it extraction from the rengine event object.")

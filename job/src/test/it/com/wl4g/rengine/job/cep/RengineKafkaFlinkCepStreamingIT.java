@@ -55,7 +55,7 @@ import io.opentelemetry.proto.logs.v1.LogRecord;
 import io.opentelemetry.proto.logs.v1.ResourceLogs;
 
 /**
- * Refer to {@link com.wl4g.rengine.job.cep.RengineKafkaFlinkCepStreamingTests}
+ * Refer to {@link com.wl4g.rengine.job.kafka.RengineKafkaFlinkCepStreamingTests}
  * 
  * @author James Wong
  * @version 2023-03-12
@@ -270,7 +270,14 @@ public class RengineKafkaFlinkCepStreamingIT {
             + "        \"name\": \"middle\","
             + "        \"quantifier\": {"
             + "            \"consumingStrategy\": \"SKIP_TILL_NEXT\","
-            + "            \"times\": null,"
+            + "        \"times\": {"
+            + "             \"from\": 1,"
+            + "             \"to\": 3,"
+            + "             \"windowTime\": {"
+            + "                 \"unit\": \"MINUTES\","
+            + "                 \"size\": 5"
+            + "             }"
+            + "         },"
             + "            \"untilCondition\": null,"
             + "            \"properties\": [\"SINGLE\"]"
             + "        },"

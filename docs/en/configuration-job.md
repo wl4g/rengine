@@ -12,7 +12,7 @@
 |    --checkpointMinPauseBetween <default=null>                                                   | The minimum time interval between two checkpoints.
 |    --checkpointMode <default=AT_LEAST_ONCE>                                                     | Sets the checkpoint mode, the default is null means not enabled. options: [EXACTLY_ONCE, AT_LEAST_ONCE]
 |    --checkpointTimeout <default=null>                                                           | Checkpoint timeout millis.
-| -D,--deserializerClass <default=com.wl4g.rengine.job.kafka.RengineEventKafkaDeserializationSchema>   | Deserializer class for Flink-streaming to consuming from MQ.
+| -D,--deserializerClass <default=com.wl4g.rengine.job.kafka.schema.RengineEventKafkaDeserializationSchema>   | Deserializer class for Flink-streaming to consuming from MQ.
 |    --externalizedCheckpointCleanup <default=null>                                               | The program is closed, an extra checkpoint is triggered.
 | -F,--forceUsePrintSink <default=false>                                                          | Force override set to stdout print sink function.
 | -G,--groupId <required>                                                                         | Flink source consumer group id.
@@ -38,7 +38,7 @@ export JAVA_HOME=/usr/local/jdk-11.0.10
 $JAVA_HOME/bin/java -cp \
 job/job-base/target/rengine-job-base-1.0.0.jar:\
 job/job-base/target/rengine-job-base-1.0.0-jar-with-dependencies.jar \
-com.wl4g.rengine.job.cep.RengineKafkaFlinkCepStreaming
+com.wl4g.rengine.job.kafka.RengineKafkaFlinkCepStreaming
 ```
 
 - Extra configurations
