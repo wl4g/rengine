@@ -18,7 +18,6 @@ package com.wl4g.rengine.common.event;
 import static com.wl4g.infra.common.lang.Assert2.hasTextOf;
 import static com.wl4g.infra.common.lang.Assert2.isTrue;
 import static com.wl4g.infra.common.lang.Assert2.isTrueOf;
-import static com.wl4g.infra.common.lang.Assert2.notEmptyOf;
 import static com.wl4g.infra.common.lang.Assert2.notNullOf;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseFromNode;
 import static com.wl4g.infra.common.serialize.JacksonUtils.parseJSON;
@@ -43,7 +42,6 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -239,33 +237,34 @@ public class RengineEvent extends EventObject {
     }
 
     public static RengineEvent validate(RengineEvent event) {
-        // Basic validate.
-        validateForEventType(event.getId());
+        // Validate for basic.
         validateForEventType(event.getType());
         notNullOf(event.getObservedTime(), "observedTime");
         isTrueOf(event.getObservedTime() > 0, "Must observedTime > 0");
 
-        // Source validate.
+        // Validate for source.
         final EventSource source = (EventSource) event.getSource();
         isTrueOf(nonNull(source.getTime()) && source.getTime() > 0, "sourceTime > 0");
-        notEmptyOf(source.getPrincipals(), "principals");
+        // notEmptyOf(source.getPrincipals(), "principals");
 
-        // Location validate.
+        // Validate for location.
         final EventLocation location = source.getLocation();
-        if (!isBlank(location.getCountry())) {
-            isTrue(Pattern.matches(EVENT_LOCATION_COUNTRY_REGEX, location.getCountry()),
-                    "Invalid event location country '%s' does not satisfy the regex: %s", location.getCountry(),
-                    EVENT_LOCATION_COUNTRY_REGEX);
-        }
-        if (!isBlank(location.getRegion())) {
-            isTrue(Pattern.matches(EVENT_LOCATION_REGION_REGEX, location.getRegion()),
-                    "Invalid event location region '%s' does not satisfy the regex: %s", location.getRegion(),
-                    EVENT_LOCATION_REGION_REGEX);
-        }
-        if (!isBlank(location.getCity())) {
-            isTrue(Pattern.matches(EVENT_LOCATION_CITY_REGEX, location.getCity()),
-                    "Invalid event location city '%s' does not satisfy the regex: %s", location.getCity(),
-                    EVENT_LOCATION_CITY_REGEX);
+        if (nonNull(location)) {
+            if (!isBlank(location.getCountry())) {
+                isTrue(Pattern.matches(EVENT_LOCATION_COUNTRY_REGEX, location.getCountry()),
+                        "Invalid event location country '%s' does not satisfy the regex: %s", location.getCountry(),
+                        EVENT_LOCATION_COUNTRY_REGEX);
+            }
+            if (!isBlank(location.getRegion())) {
+                isTrue(Pattern.matches(EVENT_LOCATION_REGION_REGEX, location.getRegion()),
+                        "Invalid event location region '%s' does not satisfy the regex: %s", location.getRegion(),
+                        EVENT_LOCATION_REGION_REGEX);
+            }
+            if (!isBlank(location.getCity())) {
+                isTrue(Pattern.matches(EVENT_LOCATION_CITY_REGEX, location.getCity()),
+                        "Invalid event location city '%s' does not satisfy the regex: %s", location.getCity(),
+                        EVENT_LOCATION_CITY_REGEX);
+            }
         }
 
         return event;
@@ -283,7 +282,7 @@ public class RengineEvent extends EventObject {
     public static class EventSource implements Serializable {
         private static final long serialVersionUID = -4689601246194850124L;
         private @NotNull @Min(-1) Long time;
-        private @NotEmpty List<String> principals;
+        private @Nullable List<String> principals;
         private @Nullable EventLocation location;
     }
 
@@ -393,10 +392,9 @@ public class RengineEvent extends EventObject {
         static String buildDefaultEventId(@NotBlank String eventType, @NotNull Long observedTime, @Nullable EventSource source) {
             hasTextOf(eventType, "eventType");
             isTrueOf(nonNull(observedTime) && observedTime > 0, "observedTime > 0");
-            // notNullOf(source, "source");
 
             // @formatter:off
-            //final String firstPrincipal = nonNull(source) ? safeList(source.getPrincipals()).stream().findFirst().orElse(null) : null;
+            //final String firstPrincipal = nonNull(source) ? safeList(source.getPrincipals()).stream().findFirst().orElse("") : "";
             // @formatter:on
 
             return format("%s@%s", observedTime, eventType);
@@ -408,7 +406,7 @@ public class RengineEvent extends EventObject {
      * be too long.
      * 
      * @see {@link https://github.com/apache/hbase/blob/rel/2.1.2/hbase-common/src/main/java/org/apache/hadoop/hbase/HConstants.java#L599}
-     * @see {@link com.wl4g.rengine.job.analytic.core.hbase.EventToMutationConverter#generateRowkey()}
+     * @see {@link com.wl4g.rengine.job.hbase.EventToMutationConverter#generateRowkey()}
      */
     public static final String EVENT_TYPE_REGEX = "^([@a-zA-Z0-9_-]){1,16}$";
     public static final String EVENT_PRINCIPAL_REGEX = "^[@a-zA-Z0-9._-]{1,24}$";

@@ -80,7 +80,7 @@ Unified and flexible rules engine platform, naturally suitable for scenarios whe
 
 - [Configuration for client](./docs/en/configuration-client.md)
 
-- [Configuration for apiServer](./docs/en/configuration-apiserver.md)
+- [Configuration for apiserver](./docs/en/configuration-apiserver.md)
 
 - [Configuration for controller](./docs/en/configuration-controller.md)
 

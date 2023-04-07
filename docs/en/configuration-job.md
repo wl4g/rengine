@@ -26,7 +26,7 @@
 |    --restartAttempts <default=3>                                                                | Set the maximum number of failed restart attempts. default is: 3
 |    --restartDelaySeconds <default=15>                                                           | Set the maximum number of failed interval between each restart. default is: 15
 |    --pipelineJars                                                                               | A semicolon-separated list of the jars to package with the job jars to be sent to the cluster. These have to be valid paths. see:https://nightlies.apache.org/flink/flink-docs-release-1.14/docs/deployment/config/#pipeline-jars
-| -T,--eventTopicPattern <default=rengine_events>                                                 | Topic pattern for consuming events from MQ.
+| -T,--eventTopic <default=rengine_event>                                                 | Topic pattern for consuming events from MQ.
 | -K,--keyByExprPath <default=.source.principals[0]>                                            | The jq expression to extract the grouping key, it extraction from the rengine event object.
 
 ## Flink consuming kafka with CEP

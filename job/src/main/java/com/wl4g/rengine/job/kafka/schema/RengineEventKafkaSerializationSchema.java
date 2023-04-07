@@ -47,22 +47,22 @@ import lombok.extern.slf4j.Slf4j;
 public class RengineEventKafkaSerializationSchema implements KafkaRecordSerializationSchema<RengineEvent> {
     private static final long serialVersionUID = -3765473115594331694L;
 
-    private final String alertsTopic;
+    private final String alertTopic;
 
     public RengineEventKafkaSerializationSchema(@NotNull AbstractFlinkStreamingBase streaming) {
         notNullOf(streaming, "streaming");
         isInstanceOf(AbstractFlinkCepStreamingBase.class, streaming);
         final AbstractFlinkCepStreamingBase cepStreaming = (AbstractFlinkCepStreamingBase) streaming;
-        this.alertsTopic = hasTextOf(cepStreaming.getAlertTopic(), "alertsTopic");
+        this.alertTopic = hasTextOf(cepStreaming.getAlertTopic(), "alertTopic");
     }
 
     @Override
     public ProducerRecord<byte[], byte[]> serialize(RengineEvent event, KafkaSinkContext context, Long timestamp) {
         if (nonNull(event)) {
             try {
-                return new ProducerRecord<>(alertsTopic, toJSONString(event).getBytes(UTF_8));
+                return new ProducerRecord<>(alertTopic, toJSONString(event).getBytes(UTF_8));
             } catch (Throwable ex) {
-                log.warn(format("Unable to serialze event, -> %s", event), ex);
+                log.warn(format("Unable to serialze event. -> %s", event), ex);
             }
         }
         return null;

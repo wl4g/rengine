@@ -73,7 +73,7 @@ public class OtlpLogKafkaDeserializationSchema implements KafkaRecordDeserializa
 
     public OtlpLogKafkaDeserializationSchema(@NotNull AbstractFlinkStreamingBase streaming) {
         // TODO using config?
-        this(streaming.getJobName().concat("_OTLP_LOG"), DEFAULT_TIME_FIELD_NAMES, DEFAULT_PRINCIPAL_FIELD_NAMES);
+        this("RENGINE_OTLP_LOG", DEFAULT_TIME_FIELD_NAMES, DEFAULT_PRINCIPAL_FIELD_NAMES);
     }
 
     public OtlpLogKafkaDeserializationSchema(@NotBlank String eventType, @NotEmpty List<String> timeFieldNames,
@@ -146,7 +146,8 @@ public class OtlpLogKafkaDeserializationSchema implements KafkaRecordDeserializa
                                             .build())
                                     .body(body)
                                     .labels(labels)
-                                    .build());
+                                    .build()
+                                    .validate());
                         }
                     }
                 }

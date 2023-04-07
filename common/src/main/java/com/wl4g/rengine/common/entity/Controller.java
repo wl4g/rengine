@@ -486,7 +486,7 @@ public class Controller extends BaseEntity {
         public static class FlinkJobArgs {
             // Flink source MQ (kafka/pulsar/rabbitmq/...) options.
             private String brokers;
-            private @NotBlank @Default String eventTopicPattern = "rengine_event";
+            private @NotBlank @Default String eventTopic = "rengine_event";
             private @NotBlank @Default String groupId = "rengine_job_default";
             private Long fromOffsetTime;
             private @NotBlank @Default String deserializerClass = "com.wl4g.rengine.job.kafka.OtlpLogKafkaDeserializationSchema";

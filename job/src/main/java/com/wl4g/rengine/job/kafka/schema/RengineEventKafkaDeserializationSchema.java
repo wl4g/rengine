@@ -49,7 +49,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RengineEventKafkaDeserializationSchema implements KafkaRecordDeserializationSchema<RengineEvent> {
     private static final long serialVersionUID = -3765473065594331694L;
 
-    private transient Deserializer<String> deserializer = new StringDeserializer();
+    private static transient Deserializer<String> deserializer;
 
     public RengineEventKafkaDeserializationSchema(@NotNull AbstractFlinkStreamingBase streaming) {
     }
@@ -57,14 +57,16 @@ public class RengineEventKafkaDeserializationSchema implements KafkaRecordDeseri
     @Override
     public void deserialize(ConsumerRecord<byte[], byte[]> record, Collector<RengineEvent> out) throws IOException {
         if (isNull(deserializer)) {
-            this.deserializer = new StringDeserializer();
+            deserializer = new StringDeserializer();
         }
         if (nonNull(record.value())) {
-            String json = deserializer.deserialize(record.topic(), record.value());
+            final String json = deserializer.deserialize(record.topic(), record.value());
             try {
                 out.collect(parseJSON(json, RengineEvent.class).validate());
             } catch (Throwable ex) {
-                log.warn(format("Unable to parse event json. - %s", json), ex);
+                final String errmsg = format("Unable to parse event json. - %s", json);
+                log.warn(errmsg, ex);
+                throw new IllegalArgumentException(errmsg, ex);
             }
         }
     }

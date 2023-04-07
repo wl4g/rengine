@@ -55,7 +55,8 @@ import io.opentelemetry.proto.logs.v1.LogRecord;
 import io.opentelemetry.proto.logs.v1.ResourceLogs;
 
 /**
- * Refer to {@link com.wl4g.rengine.job.kafka.RengineKafkaFlinkCepStreamingTests}
+ * Refer to
+ * {@link com.wl4g.rengine.job.kafka.RengineKafkaFlinkCepStreamingTests}
  * 
  * @author James Wong
  * @version 2023-03-12
@@ -66,7 +67,7 @@ public class RengineKafkaFlinkCepStreamingIT {
     static final String IT_MOCK_KAFKA_BROKERS = getProperty("IT_KAFKA_BROKERS", "localhost:9092");
     // static final int IT_MOCK_SUFFIX = RandomUtils.nextInt(1, 10000);
     static final int IT_MOCK_SUFFIX = 0;
-    static final String IT_MOCK_EVENT_TOPIC = getProperty("IT_MOCK_EVENT_TOPIC_PREFIX", "test_wl4g_rengine_otlp_logs") + "_"
+    static final String IT_MOCK_EVENT_TOPIC = getProperty("IT_MOCK_EVENT_TOPIC_PREFIX", "test_wl4g_rengine_otlp_log") + "_"
             + IT_MOCK_SUFFIX;
     static final String IT_MOCK_ALERTS_TOPIC = getProperty("IT_MOCK_ALERTS_TOPIC_PREFIX", "test_wl4g_rengine_alert") + "_"
             + IT_MOCK_SUFFIX;
@@ -332,14 +333,14 @@ public class RengineKafkaFlinkCepStreamingIT {
     static final String[] DEFAULT_ARGS = {
             "--checkpointDir", "file:///tmp/flink-checkpoint",
             "--groupId", "rengine_test_" + RandomUtils.nextInt(),
-            "--eventTopicPattern", IT_MOCK_EVENT_TOPIC,
+            "--eventTopic", IT_MOCK_EVENT_TOPIC,
             "--inProcessingTime", "true",
-            "--alertTopic", IT_MOCK_ALERTS_TOPIC,
             //"--fromOffsetTime", "1",
             "--deserializerClass", "com.wl4g.rengine.job.kafka.schema.OtlpLogKafkaDeserializationSchema",
             //"--keyByExprPath", "type", // grouping by logs event type.(default)
             "--keyByExprPath", "body.service", // grouping by logs application name.
-            "--cepPatterns", Encodes.encodeBase64(PATTERN_ARRAY_JSON_1)
+            "--cepPatterns", Encodes.encodeBase64(PATTERN_ARRAY_JSON_1),
+            "--alertTopic", IT_MOCK_ALERTS_TOPIC
             };
     // @formatter:on
 

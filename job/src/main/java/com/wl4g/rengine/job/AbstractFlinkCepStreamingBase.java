@@ -70,7 +70,7 @@ public abstract class AbstractFlinkCepStreamingBase extends AbstractFlinkStreami
         this.builder.mustOption("P", "cepPatterns", "he cep patterns array json with base64 encode.")
                 .longOption("inProcessingTime", "false",
                         "Use the pattern stream for processing time, event source time will be ignored.")
-                .longOption("alertTopic", "rengine_alerts",
+                .longOption("alertTopic", "rengine_alert",
                         "Topic for producer the alerts message of Flink CEP match generated.");
     }
 

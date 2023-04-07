@@ -393,7 +393,7 @@ public class FlinkSubmitController extends AbstractJobExecutor {
         final Map<String, Object> jobArgs = new LinkedHashMap<>(36);
         // Flink source MQ (kafka/pulsar/rabbitmq/...) options.
         jobArgs.put("brokers", jobArgsConfig.getBrokers());
-        jobArgs.put("eventTopicPattern", jobArgsConfig.getEventTopicPattern());
+        jobArgs.put("eventTopic", jobArgsConfig.getEventTopic());
         jobArgs.put("groupId", jobArgsConfig.getGroupId());
         jobArgs.put("fromOffsetTime", jobArgsConfig.getFromOffsetTime());
         jobArgs.put("deserializerClass", jobArgsConfig.getDeserializerClass());

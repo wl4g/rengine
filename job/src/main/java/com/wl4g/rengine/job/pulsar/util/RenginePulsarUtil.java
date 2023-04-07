@@ -45,7 +45,7 @@ public abstract class RenginePulsarUtil {
         PulsarSource<RengineEvent> source = PulsarSource.<RengineEvent> builder()
                 .setServiceUrl(program.getBrokers())
                 // .setGroupId(program.getGroupId())
-                .setTopicPattern(Pattern.compile(program.getEventTopicPattern()))
+                .setTopicPattern(Pattern.compile(program.getEventTopic()))
                 // TODO
                 // .setStartingOffsets(offsets)
                 // .setClientIdPrefix(program.getJobName())

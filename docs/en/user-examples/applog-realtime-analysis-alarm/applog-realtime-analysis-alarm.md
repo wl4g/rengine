@@ -32,10 +32,10 @@ cat << EOF > /tmp/cep-pattern-for-log-alarm.json
         },
         "condition": {
             "nestedConditions": [{
-                "expression": "body.logRecord.item2 == 'ERROR'",
+                "expression": "body.level == 'ERROR'",
                 "type": "AVIATOR"
             }, {
-                "expression": "body.logRecord.item2 == 'FATAL'",
+                "expression": "body.level == 'FATAL'",
                 "type": "AVIATOR"
             }],
             "type": "CLASS",
@@ -54,7 +54,7 @@ cat << EOF > /tmp/cep-pattern-for-log-alarm.json
             "properties": ["SINGLE"]
         },
         "condition": {
-            "expression": "body.logRecord.item2 == 'TRACE' || body.logRecord.item2 == 'DEBUG' || body.logRecord.item2 == 'INFO' || body.logRecord.item2 == 'WARN'",
+            "expression": "body.level == 'TRACE' || body.level == 'DEBUG' || body.level == 'INFO' || body.level == 'WARN'",
             "type": "AVIATOR"
         },
         "attributes": {
@@ -101,8 +101,13 @@ docker run \
   wl4g/rengine-job:1.0.0 standalone-job \
   --job-classname com.wl4g.rengine.job.kafka.RengineKafkaFlinkCepStreaming \
   --allowNonRestoredState \
-  --groupId rengine_test \
   --checkpointDir=file:///tmp/flinksavepoint \
+  --inProcessingTime true \
+  --parallelism 4 \
+  --groupId rengine_test \
+  --eventTopic rengine_applog \
+  --keyByExprPath body.service \
+  --alertTopic rengine_alert \
   --cepPatterns $(cat /tmp/cep-pattern-for-log-alarm.json | base64 -w 0)
 ```
 
@@ -123,25 +128,28 @@ docker run \
   -Dkubernetes.cluster-id=rengine-job-1 \
   -Dkubernetes.container.image=wl4g/rengine-job:1.0.0 \
   local:///opt/flink/usrlib/rengine-job-1.0.0-jar-with-dependencies.jar \
-  --groupId rengine_test \
   --checkpointDir=file:///tmp/flinksavepoint \
+  --inProcessingTime true \
+  --parallelism 4 \
+  --groupId rengine_test \
+  --eventTopic rengine_applog \
+  --keyByExprPath body.service \
+  --alertTopic rengine_alert \
   --cepPatterns $(cat /tmp/cep-pattern-for-log-alarm.json | base64 -w 0)
 ```
 
 ## Start job on VM
 
-- directly run main class
+- print help
 
 ```bash
 export JAVA_HOME=/usr/local/jdk-11.0.10/
 export JOB_CLASSPATH="job/target/rengine-job-1.0.0-jar-with-dependencies.jar"
 
-$JAVA_HOME/bin/java -cp $JOB_CLASSPATH com.wl4g.rengine.job.kafka.RengineKafkaFlinkCepStreaming \
-  --groupId rengine_test \
-  --cepPatterns $(cat /tmp/cep-pattern-for-log-alarm.json | base64 -w 0)
+$JAVA_HOME/bin/java -cp $JOB_CLASSPATH com.wl4g.rengine.job.kafka.RengineKafkaFlinkCepStreaming --help
 ```
 
-- using flink k8s cli.
+- using flink k8s cli
 
 ```bash
 $JAVA_HOME/bin/java -cp $JOB_CLASSPATH org.apache.flink.client.cli.CliFrontend run-application \
@@ -149,4 +157,26 @@ $JAVA_HOME/bin/java -cp $JOB_CLASSPATH org.apache.flink.client.cli.CliFrontend r
   -Dkubernetes.cluster-id=rengine-base-job-cluster-1 \
   -Dkubernetes.container.image=flink:1.14.4-scala_2.11-java11 \
   local://job/job-base/target/rengine-job-base-1.0.0-jar-with-dependencies.jar
+```
+
+## Tests for job
+
+- Mock for logs producer
+
+```bash
+IFS=$'\n'
+for line in `cat docs/en/user-examples/applog-realtime-analysis-alarm/applog-sample.log`; do
+    echo "Sending => $line"
+    echo "rengine_applog:$line" | docker exec -i kafka1 kafka-console-producer.sh \
+        --broker-list 127.0.0.1:9092 \
+        --topic rengine_applog \
+        --property parse.key=true \
+        --property key.separator=:
+done
+```
+
+- Mock for consumer
+
+```bash
+docker exec -it kafka1 kafka-console-consumer.sh --bootstrap-server 127.0.0.1:9092 --topic rengine_applog
 ```

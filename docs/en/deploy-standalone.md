@@ -28,7 +28,17 @@ wl4g/hbase:hbase-2.1.0-phoenix-5.1.1 \
 - Deploy standalone Kafka
 
 ```bash
-docker run -d --name kafka1 --network host -e ALLOW_PLAINTEXT_LISTENER=yes bitnami/kafka:2.2.0
+sudo mkdir -p /mnt/disk1/kafka-standalone/{data,conf}
+sudo chmod 777 -R /mnt/disk1/kafka-standalone
+
+docker run -d \
+--name kafka1 \
+--network host \
+--restart no \
+-p 9092:9092 \
+-e ALLOW_PLAINTEXT_LISTENER=yes \
+-v /mnt/disk1/log/kafka-standalone/data:/bitnami/kafka/data \
+bitnami/kafka:2.2.0
 ```
 
 - Deploy standalone Flink(optional, for session mode)
@@ -118,7 +128,7 @@ docker exec -it kafka1 kafka-topics.sh --zookeeper 127.0.0.1:2181 --create --top
 ```bash
 docker exec -it kafka1 kafka-console-producer.sh --broker-list 127.0.0.1:9092 --topic rengine_event --property parse.key=true --property key.separator=:
 
-rengine_event:{"source":{"time":1665847350487,"principals":["jameswong1234@gmail.com"],"location":{"ipAddress":"1.1.1.1","ipv6":false,"isp":null,"domain":null,"country":null,"region":null,"city":null,"latitude":null,"longitude":null,"timezone":null,"zipcode":"20500","elevation":null}},"type":"iot_temp_warn","observedTime":1665847350490,"body":"52","attributes":{}}
+rengine_event:{"source":{"time":1665847350487,"principals":["jameswong1234@gmail.com"],"location":{"ipAddress":"1.1.1.1","ipv6":false,"isp":null,"domain":null,"country":null,"region":null,"city":null,"latitude":null,"longitude":null,"timezone":null,"zipcode":"20500","elevation":null}},"type":"iot_temp_warn","observedTime":1665847350490,"body":{"temp":"52"},"attributes":{}}
 ```
 
 - Manual subscribe event from Kafka

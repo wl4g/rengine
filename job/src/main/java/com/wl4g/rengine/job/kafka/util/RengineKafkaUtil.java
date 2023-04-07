@@ -98,7 +98,7 @@ public abstract class RengineKafkaUtil {
         return (Source<T, S, E>) KafkaSource.<RengineEvent> builder()
                 .setBootstrapServers(streaming.getBrokers())
                 .setGroupId(streaming.getGroupId())
-                .setTopicPattern(Pattern.compile(streaming.getEventTopicPattern()))
+                .setTopicPattern(Pattern.compile(streaming.getEventTopic()))
                 .setStartingOffsets(offsets)
                 .setClientIdPrefix(streaming.getJobName())
                 .setProperties(_props)

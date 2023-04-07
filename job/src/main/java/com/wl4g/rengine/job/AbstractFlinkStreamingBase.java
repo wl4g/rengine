@@ -68,7 +68,7 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
 
     // Flink source MQ (kafka/pulsar/rabbitmq/...) options.
     private String brokers;
-    private String eventTopicPattern;
+    private String eventTopic;
     private String groupId;
     private Long fromOffsetTime;
     private String deserializerClass;
@@ -113,7 +113,7 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
         this.builder = CommandLineTool.builder()
                 // MQ(Kafka/Pulsar/Rabbitmq/...) options.
                 .option("B", "brokers", "localhost:9092", "Connect MQ brokers addresses. default is local kafka brokers")
-                .option("T", "eventTopicPattern", "rengine_events", "Topic pattern for consuming events from MQ.")
+                .option("T", "eventTopic", "rengine_event", "Topic pattern for consuming events from MQ.")
                 .mustOption("G", "groupId", "Flink source consumer group id.")
                 .option("O", "fromOffsetTime", "-1",
                         "Start consumption from the first record with a timestamp greater than or equal to a certain timestamp. if <=0, it will not be setup and keep the default behavior.")
@@ -165,10 +165,10 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
      * @throws ParseException
      */
     protected AbstractFlinkStreamingBase parse(String[] args) throws ParseException {
-        this.line = builder.width(150).helpIfEmpty(args, false).build(args);
+        this.line = builder.width(170).helpIfEmpty(args, true).build(args);
         // KAFKA options.
         this.brokers = line.get("brokers");
-        this.eventTopicPattern = line.get("eventTopicPattern");
+        this.eventTopic = line.get("eventTopic");
         this.groupId = line.get("groupId");
         this.fromOffsetTime = line.getLong("fromOffsetTime");
         this.deserializerClass = line.get("deserializerClass");
