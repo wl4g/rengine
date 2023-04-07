@@ -18,6 +18,8 @@
 
 package org.apache.flink.cep.dynamic.impl.json.spec;
 
+import java.lang.reflect.Constructor;
+
 import org.apache.flink.cep.nfa.aftermatch.AfterMatchSkipStrategy;
 import org.apache.flink.cep.pattern.Pattern;
 import org.apache.flink.cep.pattern.Quantifier.ConsumingStrategy;
@@ -25,7 +27,6 @@ import org.apache.flink.cep.pattern.Quantifier.QuantifierProperty;
 import org.apache.flink.cep.pattern.Quantifier.Times;
 import org.apache.flink.cep.pattern.conditions.IterativeCondition;
 import org.apache.flink.cep.pattern.conditions.RichOrCondition;
-
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -81,7 +82,8 @@ public class NodeSpec {
             // the larger graph
             return ((GraphSpec) this).toPattern(classLoader);
         }
-        Pattern<?, ?> pattern = new Pattern(this.getName(), previous, consumingStrategy, afterMatchSkipStrategy);
+        Pattern<?, ?> pattern = (Pattern<?, ?>) defaultPatternConstructor.newInstance(this.getName(), previous, consumingStrategy,
+                afterMatchSkipStrategy);
         final ConditionSpec conditionSpec = this.getCondition();
         if (conditionSpec != null) {
             IterativeCondition iterativeCondition = conditionSpec.toIterativeCondition(classLoader);
@@ -180,4 +182,17 @@ public class NodeSpec {
             return new NodeSpec(this.name, this.quantifier, this.condition);
         }
     }
+
+    public static final Constructor<?> defaultPatternConstructor;
+
+    static {
+        try {
+            defaultPatternConstructor = Pattern.class.getDeclaredConstructor(String.class, Pattern.class, ConsumingStrategy.class,
+                    AfterMatchSkipStrategy.class);
+            defaultPatternConstructor.setAccessible(true);
+        } catch (Throwable e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
 }

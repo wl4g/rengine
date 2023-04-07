@@ -42,7 +42,7 @@ Unified and flexible rules engine platform, naturally suitable for scenarios whe
 
 - Kubernetes 1.21 + (If the needs deploy to kubernetes)
 
-- Flink 1.15.x + (If the need to run the Flink CEP job to process massive events)
+- Flink 1.16.x + (If the need to run the Flink CEP job to process massive events. **Notice:** [Must >= 1.16+ can support window restrictions](https://github.com/apache/flink/blob/release-1.16/flink-libraries/flink-cep/src/main/java/org/apache/flink/cep/pattern/Quantifier.java#L193))
 
 - HBase 2.2.x + (Optional, If the needs to store raw events so that can trace back.)
 

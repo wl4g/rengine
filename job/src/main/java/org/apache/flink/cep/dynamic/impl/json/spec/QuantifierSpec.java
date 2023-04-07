@@ -54,4 +54,8 @@ public class QuantifierSpec {
     public ConditionSpec getUntilCondition() {
         return this.untilCondition;
     }
+
+
+    
+    
 }

@@ -19,78 +19,52 @@ cat << EOF > /tmp/cep-pattern-for-log-alarm.json
             }
         },
         "untilCondition": null,
-        "details": ["SINGLE"]
+        "properties": ["SINGLE"]
     },
     "condition": null,
     "nodes": [{
-        "name": "start",
-        "quantifier": {
-            "consumingStrategy": "SKIP_TILL_NEXT",
-            "times": null,
-            "untilCondition": null,
-            "details": ["SINGLE"]
-        },
-        "condition": {
-            "type": "CLASS",
-            "className": "org.apache.flink.cep.pattern.conditions.RichAndCondition",
-            "nestedConditions": null,
-            "subClassName": null
-        },
-        "type": "ATOMIC",
-        "attributes": {
-            "top": "10px"
-        }
-    }, {
         "name": "middle",
         "quantifier": {
             "consumingStrategy": "SKIP_TILL_NEXT",
             "times": null,
             "untilCondition": null,
-            "details": ["SINGLE"]
+            "properties": ["SINGLE"]
         },
         "condition": {
-            "type": "CLASS",
-            "className": "org.apache.flink.cep.pattern.conditions.RichAndCondition",
             "nestedConditions": [{
-                "type": "CLASS",
-                "className": "org.apache.flink.cep.pattern.conditions.SubtypeCondition",
-                "nestedConditions": null,
-                "subClassName": "com.wl4g.rengine.common.event.RengineEvent"
+                "expression": "body.logRecord.item2 == 'ERROR'",
+                "type": "AVIATOR"
             }, {
-                "type": "AVIATOR",
-                "expression": "body.level=='ERROR'||body.level=='FATAL'"
+                "expression": "body.logRecord.item2 == 'FATAL'",
+                "type": "AVIATOR"
             }],
-            "subClassName": null
+            "type": "CLASS",
+            "className": "org.apache.flink.cep.pattern.conditions.RichOrCondition"
         },
-        "type": "ATOMIC",
         "attributes": {
-            "top": "20px"
-        }
+            "top": "10px"
+        },
+        "type": "ATOMIC"
     }, {
-        "name": "end",
+        "name": "start",
         "quantifier": {
             "consumingStrategy": "SKIP_TILL_NEXT",
             "times": null,
             "untilCondition": null,
-            "details": ["SINGLE"]
+            "properties": ["SINGLE"]
         },
         "condition": {
-            "type": "AVIATOR",
-            "expression": "body.level=='ERROR'||body.level=='FATAL'"
+            "expression": "body.logRecord.item2 == 'TRACE' || body.logRecord.item2 == 'DEBUG' || body.logRecord.item2 == 'INFO' || body.logRecord.item2 == 'WARN'",
+            "type": "AVIATOR"
         },
-        "type": "ATOMIC",
         "attributes": {
-            "top": "10px"
-        }
+            "top": "20px"
+        },
+        "type": "ATOMIC"
     }],
     "edges": [{
         "source": "start",
         "target": "middle",
-        "type": "SKIP_TILL_NEXT",
-        "attributes": {}
-    }, {
-        "source": "middle",
-        "target": "end",
         "type": "SKIP_TILL_NEXT",
         "attributes": {}
     }],
@@ -102,7 +76,7 @@ cat << EOF > /tmp/cep-pattern-for-log-alarm.json
         }
     },
     "afterMatchStrategy": {
-        "type": "SKIP_PAST_LAST_EVENT",
+        "type": "NO_SKIP",
         "patternName": null
     },
     "type": "COMPOSITE",
@@ -117,17 +91,18 @@ EOF
 - [flink application-mode-on-docker](https://nightlies.apache.org/flink/flink-docs-release-1.14/zh/docs/deployment/resource-providers/standalone/docker/#application-mode-on-docker)
 
 ```bash
+# e.g: --fromSavepoint file:///tmp/flinksavepoint
 docker run \
-  --name=jobmanager \
+  --name=rengine_job_1 \
   --rm \
   --env FLINK_PROPERTIES="${FLINK_PROPERTIES}" \
   --network host \
   --security-opt=seccomp:unconfined \
   wl4g/rengine-job:1.0.0 standalone-job \
   --job-classname com.wl4g.rengine.job.kafka.RengineKafkaFlinkCepStreaming \
-  --fromSavepoint file:///tmp/flinksavepoint \
   --allowNonRestoredState \
   --groupId rengine_test \
+  --checkpointDir=file:///tmp/flinksavepoint \
   --cepPatterns $(cat /tmp/cep-pattern-for-log-alarm.json | base64 -w 0)
 ```
 
@@ -139,6 +114,7 @@ docker run \
 
 ```bash
 docker run \
+  --name=rengine_job_1 \
   --rm \
   --security-opt=seccomp:unconfined \
   wl4g/rengine-job:1.0.0 \
@@ -146,7 +122,10 @@ docker run \
   --target kubernetes-application \
   -Dkubernetes.cluster-id=rengine-job-1 \
   -Dkubernetes.container.image=wl4g/rengine-job:1.0.0 \
-  local:///opt/flink/usrlib/rengine-job-1.0.0-jar-with-dependencies.jar
+  local:///opt/flink/usrlib/rengine-job-1.0.0-jar-with-dependencies.jar \
+  --groupId rengine_test \
+  --checkpointDir=file:///tmp/flinksavepoint \
+  --cepPatterns $(cat /tmp/cep-pattern-for-log-alarm.json | base64 -w 0)
 ```
 
 ## Start job on VM

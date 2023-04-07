@@ -45,6 +45,7 @@ public class ClassConditionSpec extends ConditionSpec {
                 condition));
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public IterativeCondition<?> toIterativeCondition(ClassLoader classLoader) throws Exception {
         if (equalsAnyIgnoreCase(className, "null", null)) {

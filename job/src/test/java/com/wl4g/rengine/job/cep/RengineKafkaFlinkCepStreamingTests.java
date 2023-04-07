@@ -32,7 +32,6 @@ import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.junit.Test;
 
-import com.wl4g.infra.common.codec.Encodes;
 import com.wl4g.infra.common.lang.tuples.Tuple2;
 import com.wl4g.infra.common.lang.tuples.Tuple3;
 import com.wl4g.rengine.common.event.RengineEvent;
@@ -49,7 +48,7 @@ public class RengineKafkaFlinkCepStreamingTests {
 
     @Test
     public void testSimplePatternCEP() throws Exception {
-        System.out.println("PATTERN_JSON_1 : " + Encodes.encodeBase64("[" + PATTERN_JSON_1 + "]"));
+        System.out.println("SIMPLE_PATTERN_JSON : " + SIMPLE_PATTERN_JSON);
 
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
@@ -65,7 +64,7 @@ public class RengineKafkaFlinkCepStreamingTests {
                 RengineEvent.builder().id("8").type("end").body(singletonMap("price", 1d)).build());
 
         @SuppressWarnings("unchecked")
-        Pattern<RengineEvent, ?> pattern = (Pattern<RengineEvent, ?>) CepJsonUtils.toPattern(PATTERN_JSON_1);
+        Pattern<RengineEvent, ?> pattern = (Pattern<RengineEvent, ?>) CepJsonUtils.toPattern(SIMPLE_PATTERN_JSON);
 
         DataStream<String> resultDS = CEP.pattern(input, pattern).inProcessingTime().flatSelect((p, o) -> {
             StringBuilder builder = new StringBuilder();
@@ -89,7 +88,7 @@ public class RengineKafkaFlinkCepStreamingTests {
 
     @Test
     public void testErrorLogsPatternCEP() throws Exception {
-        System.out.println("PATTERN_JSON_2 : " + Encodes.encodeBase64("[" + PATTERN_JSON_2 + "]"));
+        System.out.println("LOG_ERROR_PATTERN_JSON : " + LOG_ERROR_PATTERN_JSON);
 
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
@@ -151,7 +150,7 @@ public class RengineKafkaFlinkCepStreamingTests {
                         .build());
 
         @SuppressWarnings("unchecked")
-        Pattern<RengineEvent, ?> pattern = (Pattern<RengineEvent, ?>) CepJsonUtils.toPattern(PATTERN_JSON_2);
+        Pattern<RengineEvent, ?> pattern = (Pattern<RengineEvent, ?>) CepJsonUtils.toPattern(LOG_ERROR_PATTERN_JSON);
 
         final KeyedStream<RengineEvent, String> keyedInput = input.keyBy(event -> {
             final String keyBy = event.atAsText("body.logRecord.item1");
@@ -173,9 +172,9 @@ public class RengineKafkaFlinkCepStreamingTests {
     }
 
     // @formatter:off
-    static final String PATTERN_JSON_1 = "{"
-            + "    \"name\": \"end\","
+    static final String SIMPLE_PATTERN_JSON = "{"
             + "    \"engine\": \"FLINK_CEP_GRAPH\","
+            + "    \"name\": \"root\","
             + "    \"quantifier\": {"
             + "        \"consumingStrategy\": \"SKIP_TILL_NEXT\","
             + "        \"times\": {"
@@ -272,19 +271,19 @@ public class RengineKafkaFlinkCepStreamingTests {
     // @formatter:on
 
     // @formatter:off
-    static final String PATTERN_JSON_2 = "{"
-            + "    \"name\": \"end\","
+    static final String LOG_ERROR_PATTERN_JSON = "{"
             + "    \"engine\": \"FLINK_CEP_GRAPH\","
+            + "    \"name\": \"root\","
             + "    \"quantifier\": {"
             + "        \"consumingStrategy\": \"SKIP_TILL_NEXT\","
             + "        \"times\": {"
-            + "             \"from\": 1,"
-            + "             \"to\": 3,"
-            + "             \"windowTime\": {"
-            + "                 \"unit\": \"MINUTES\","
-            + "                 \"size\": 5"
-            + "             }"
-            + "         },"
+            + "            \"from\": 1,"
+            + "            \"to\": 3,"
+            + "            \"windowTime\": {"
+            + "                \"unit\": \"MINUTES\","
+            + "                \"size\": 5"
+            + "            }"
+            + "        },"
             + "        \"untilCondition\": null,"
             + "        \"properties\": [\"SINGLE\"]"
             + "    },"
@@ -332,7 +331,8 @@ public class RengineKafkaFlinkCepStreamingTests {
             + "    \"edges\": [{"
             + "        \"source\": \"start\","
             + "        \"target\": \"middle\","
-            + "        \"type\": \"SKIP_TILL_NEXT\""
+            + "        \"type\": \"SKIP_TILL_NEXT\","
+            + "        \"attributes\": {}"
             + "    }],"
             + "    \"window\": {"
             + "        \"type\": \"PREVIOUS_AND_CURRENT\","

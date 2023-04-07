@@ -20,11 +20,13 @@ package org.apache.flink.cep.dynamic.impl.json.util;
 
 import org.apache.flink.cep.dynamic.impl.json.deserializer.ConditionSpecStdDeserializer;
 import org.apache.flink.cep.dynamic.impl.json.deserializer.NodeSpecStdDeserializer;
+import org.apache.flink.cep.dynamic.impl.json.deserializer.QuantifierTimesDeserializer;
 import org.apache.flink.cep.dynamic.impl.json.deserializer.TimeStdDeserializer;
 import org.apache.flink.cep.dynamic.impl.json.spec.ConditionSpec;
 import org.apache.flink.cep.dynamic.impl.json.spec.GraphSpec;
 import org.apache.flink.cep.dynamic.impl.json.spec.NodeSpec;
 import org.apache.flink.cep.pattern.Pattern;
+import org.apache.flink.cep.pattern.Quantifier;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.DeserializationFeature;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.module.SimpleModule;
@@ -45,6 +47,7 @@ public class CepJsonUtils {
     private static final ObjectMapper objectMapper = new ObjectMapper()
             .registerModule(new SimpleModule().addDeserializer(ConditionSpec.class, ConditionSpecStdDeserializer.INSTANCE)
                     .addDeserializer(Time.class, TimeStdDeserializer.INSTANCE)
+                    .addDeserializer(Quantifier.Times.class, QuantifierTimesDeserializer.INSTANCE)
                     .addDeserializer(NodeSpec.class, NodeSpecStdDeserializer.INSTANCE))
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
@@ -58,8 +61,7 @@ public class CepJsonUtils {
                 log.warn("The given userCodeClassLoader is null. Will try to use ContextClassLoader of current thread.");
                 return toPattern(jsonString);
             }
-            GraphSpec deserializedGraphSpec = objectMapper.readValue(jsonString, GraphSpec.class);
-            return deserializedGraphSpec.toPattern(userCodeClassLoader);
+            return toGraphSpec(jsonString).toPattern(userCodeClassLoader);
         } catch (Throwable ex) {
             throw new IllegalArgumentException(ex);
         }
@@ -83,8 +85,7 @@ public class CepJsonUtils {
 
     public static String toJson(Pattern<?, ?> pattern) {
         try {
-            GraphSpec graphSpec = GraphSpec.fromPattern(pattern);
-            return objectMapper.writeValueAsString(graphSpec);
+            return objectMapper.writeValueAsString(GraphSpec.fromPattern(pattern));
         } catch (Throwable ex) {
             throw new IllegalArgumentException(ex);
         }

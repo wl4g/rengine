@@ -250,8 +250,8 @@ public class RengineKafkaFlinkCepStreamingIT {
 
     // @formatter:off
     static final String PATTERN_ARRAY_JSON_1 = "[{"
-            + "    \"name\": \"end\","
             + "    \"engine\": \"FLINK_CEP_GRAPH\","
+            + "    \"name\": \"root\","
             + "    \"quantifier\": {"
             + "        \"consumingStrategy\": \"SKIP_TILL_NEXT\","
             + "        \"times\": {"

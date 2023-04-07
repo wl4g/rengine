@@ -64,82 +64,76 @@ public class CepJsonUtilsTests {
     @Test
     public void testPatternDeserialize() throws Throwable {
         // @formatter:off
-        final String patternJson1 = "{"
+        final String patternJson = "{"
+                + "    \"engine\": \"FLINK_CEP_GRAPH\","
                 + "    \"name\": \"root\","
                 + "    \"quantifier\": {"
                 + "        \"consumingStrategy\": \"SKIP_TILL_NEXT\","
-                + "        \"details\": [\"SINGLE\"],"
-                + "        \"times\": null,"
-                + "        \"untilCondition\": null"
+                + "        \"times\": {"
+                + "            \"from\": 1,"
+                + "            \"to\": 3,"
+                + "            \"windowTime\": {"
+                + "                \"unit\": \"MINUTES\","
+                + "                \"size\": 5"
+                + "            }"
+                + "        },"
+                + "        \"untilCondition\": null,"
+                + "        \"properties\": [\"SINGLE\"]"
                 + "    },"
                 + "    \"condition\": null,"
                 + "    \"nodes\": [{"
-                + "        \"name\": \"end\","
-                + "        \"quantifier\": {"
-                + "            \"consumingStrategy\": \"SKIP_TILL_NEXT\","
-                + "            \"details\": [\"SINGLE\"],"
-                + "            \"times\": null,"
-                + "            \"untilCondition\": null"
-                + "        },"
-                + "        \"condition\": {"
-                + "            \"className\": \"org.apache.flink.cep.dynamic.impl.json.util.CepJsonUtilsTests$EndCondition\","
-                + "            \"type\": \"CLASS\""
-                + "        },"
-                + "        \"type\": \"ATOMIC\","
-                + "        \"attributes\": {"
-                + "            \"top\": \"10px\""
-                + "        }"
-                + "    }, {"
                 + "        \"name\": \"middle\","
                 + "        \"quantifier\": {"
                 + "            \"consumingStrategy\": \"SKIP_TILL_NEXT\","
-                + "            \"details\": [\"SINGLE\"],"
                 + "            \"times\": null,"
-                + "            \"untilCondition\": null"
+                + "            \"untilCondition\": null,"
+                + "            \"properties\": [\"SINGLE\"]"
                 + "        },"
                 + "        \"condition\": {"
                 + "            \"nestedConditions\": [{"
-                + "                \"className\": \"com.wl4g.rengine.job.cep.pattern.conditions.SubtypeCondition\","
-                + "                \"subClassName\": \"com.wl4g.rengine.common.event.RengineEvent\","
-                + "                \"type\": \"CLASS\""
+                + "                \"expression\": \"body.logRecord.item2 == 'ERROR'\","
+                + "                \"type\": \"AVIATOR\""
                 + "            }, {"
-                + "                \"className\": \"org.apache.flink.cep.dynamic.impl.json.util.CepJsonUtilsTests$MiddleCondition\","
-                + "                \"type\": \"CLASS\""
+                + "                \"expression\": \"body.logRecord.item2 == 'FATAL'\","
+                + "                \"type\": \"AVIATOR\""
                 + "            }],"
                 + "            \"type\": \"CLASS\","
-                + "            \"className\": \"org.apache.flink.cep.pattern.conditions.RichAndCondition\""
+                + "            \"className\": \"org.apache.flink.cep.pattern.conditions.RichOrCondition\""
                 + "        },"
-                + "        \"type\": \"ATOMIC\","
                 + "        \"attributes\": {"
                 + "            \"top\": \"10px\""
-                + "        }"
+                + "        },"
+                + "        \"type\": \"ATOMIC\""
                 + "    }, {"
                 + "        \"name\": \"start\","
                 + "        \"quantifier\": {"
                 + "            \"consumingStrategy\": \"SKIP_TILL_NEXT\","
-                + "            \"details\": [\"SINGLE\"],"
                 + "            \"times\": null,"
-                + "            \"untilCondition\": null"
+                + "            \"untilCondition\": null,"
+                + "            \"properties\": [\"SINGLE\"]"
                 + "        },"
                 + "        \"condition\": {"
-                + "            \"expression\": \"action == 0\","
+                + "            \"expression\": \"body.logRecord.item2 == 'TRACE' || body.logRecord.item2 == 'DEBUG' || body.logRecord.item2 == 'INFO' || body.logRecord.item2 == 'WARN'\","
                 + "            \"type\": \"AVIATOR\""
                 + "        },"
-                + "        \"type\": \"ATOMIC\","
                 + "        \"attributes\": {"
-                + "            \"top\": \"10px\""
-                + "        }"
+                + "            \"top\": \"20px\""
+                + "        },"
+                + "        \"type\": \"ATOMIC\""
                 + "    }],"
                 + "    \"edges\": [{"
-                + "        \"source\": \"middle\","
-                + "        \"target\": \"end\","
-                + "        \"type\": \"SKIP_TILL_ANY\""
-                + "    }, {"
                 + "        \"source\": \"start\","
                 + "        \"target\": \"middle\","
-                + "        \"type\": \"SKIP_TILL_ANY\""
+                + "        \"type\": \"SKIP_TILL_NEXT\","
+                + "        \"attributes\": {}"
                 + "    }],"
-                + "    \"window\": null,"
+                + "    \"window\": {"
+                + "        \"type\": \"PREVIOUS_AND_CURRENT\","
+                + "        \"time\": {"
+                + "            \"unit\": \"MINUTES\","
+                + "            \"size\": 5"
+                + "        }"
+                + "    },"
                 + "    \"afterMatchStrategy\": {"
                 + "        \"type\": \"NO_SKIP\","
                 + "        \"patternName\": null"
@@ -148,79 +142,13 @@ public class CepJsonUtilsTests {
                 + "    \"version\": 1"
                 + "}";
         // @formatter:on
-        out.println("patternJson1 : " + patternJson1);
-
-        // @formatter:off
-        final String patternJson2 = "{"
-                + "    \"name\": \"end\","
-                + "    \"quantifier\": {"
-                + "        \"consumingStrategy\": \"SKIP_TILL_NEXT\","
-                + "        \"details\": [\"SINGLE\"],"
-                + "        \"times\": null,"
-                + "        \"untilCondition\": null"
-                + "    },"
-                + "    \"condition\": null,"
-                + "    \"nodes\": [{"
-                + "        \"name\": \"end\","
-                + "        \"quantifier\": {"
-                + "            \"consumingStrategy\": \"SKIP_TILL_NEXT\","
-                + "            \"details\": [\"SINGLE\"],"
-                + "            \"times\": null,"
-                + "            \"untilCondition\": null"
-                + "        },"
-                + "        \"condition\": {"
-                + "            \"className\": \"org.apache.flink.cep.dynamic.impl.json.util.CepJsonUtilsTests$EndCondition\","
-                + "            \"type\": \"CLASS\""
-                + "        },"
-                + "        \"type\": \"ATOMIC\""
-                + "    }, {"
-                + "        \"name\": \"start\","
-                + "        \"quantifier\": {"
-                + "            \"consumingStrategy\": \"SKIP_TILL_NEXT\","
-                + "            \"details\": [\"LOOPING\"],"
-                + "            \"times\": {"
-                + "                \"from\": 3,"
-                + "                \"to\": 3,"
-                + "                \"windowTime\": null"
-                + "            },"
-                + "            \"untilCondition\": null"
-                + "        },"
-                + "        \"condition\": {"
-                + "            \"expression\": \"action == 0\","
-                + "            \"type\": \"AVIATOR\""
-                + "        },"
-                + "        \"type\": \"ATOMIC\""
-                + "    }],"
-                + "    \"edges\": [{"
-                + "        \"source\": \"start\","
-                + "        \"target\": \"end\","
-                + "        \"type\": \"SKIP_TILL_NEXT\""
-                + "    }],"
-                + "    \"window\": null,"
-                + "    \"afterMatchStrategy\": {"
-                + "        \"type\": \"SKIP_PAST_LAST_EVENT\","
-                + "        \"patternName\": null"
-                + "    },"
-                + "    \"type\": \"COMPOSITE\","
-                + "    \"version\": 1"
-                + "}";
-        // @formatter:on
-        out.println("patternJson2 : " + patternJson2);
+        out.println("patternJson : " + patternJson);
 
         Throwable error = null;
         try {
-            final Pattern<?, ?> pattern1 = CepJsonUtils.toPattern(patternJson1);
+            final Pattern<?, ?> pattern1 = CepJsonUtils.toPattern(patternJson);
             out.println("pattern1 : " + pattern1);
             assert nonNull(pattern1);
-        } catch (Throwable ex) {
-            ex.printStackTrace();
-            error = ex;
-        }
-
-        try {
-            final Pattern<?, ?> pattern2 = CepJsonUtils.toPattern(patternJson2);
-            out.println("pattern2 : " + pattern2);
-            assert nonNull(pattern2);
         } catch (Throwable ex) {
             ex.printStackTrace();
             error = ex;
@@ -250,34 +178,5 @@ public class CepJsonUtilsTests {
             return value.getObservedTime() > 1677342912;
         }
     }
-
-    //// @formatter:off
-    ///** Exemplary event for usage in tests of CEP. */
-    //@Getter
-    //@Setter
-    //@ToString
-    //public static class MyEvent {
-    //    private final int id;
-    //    private final String name;
-    //
-    //    private final int productionId;
-    //    private final int action;
-    //    private final long eventTime;
-    //
-    //    public MyEvent(int id, String name, int action, int productionId, long timestamp) {
-    //        this.id = id;
-    //        this.name = name;
-    //        this.action = action;
-    //        this.productionId = productionId;
-    //        this.eventTime = timestamp;
-    //    }
-    //
-    //    public static MyEvent fromString(String eventStr) {
-    //        String[] split = eventStr.split(",");
-    //        return new MyEvent(Integer.parseInt(split[0]), split[1], Integer.parseInt(split[2]), Integer.parseInt(split[3]),
-    //                Long.parseLong(split[4]));
-    //    }
-    //}
-    //// @formatter:on
 
 }

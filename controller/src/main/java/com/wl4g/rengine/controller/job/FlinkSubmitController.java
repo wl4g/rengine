@@ -160,7 +160,7 @@ public class FlinkSubmitController extends AbstractJobExecutor {
     }
 
     /**
-     * {@link com.wl4g.rengine.job.kafka.RengineKafkaFlinkCepStreamingIT}
+     * {@link com.wl4g.rengine.job.cep.RengineKafkaFlinkCepStreamingIT}
      */
     @Override
     protected void execute(
