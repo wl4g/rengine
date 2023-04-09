@@ -15,13 +15,18 @@
 #
 ###
 FROM registry.access.redhat.com/ubi8/ubi-minimal:8.3
+LABEL maintainer="James Wong<jameswong1376@gmail.com>" description="Rengine is a cloud native, distributed, generic rule engine platform."
+
 WORKDIR /work/
+
 RUN chown 1001 /work \
     && chmod "g+rwX" /work \
     && chown 1001:root /work
+
 COPY --chown=1001:root target/executor-native /work/application
 
 EXPOSE 28002
+
 USER 1001
 
 CMD ["/work/application", "-Dquarkus.http.host=0.0.0.0"]

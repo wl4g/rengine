@@ -22,6 +22,7 @@
 #
 ###
 FROM registry.access.redhat.com/ubi8/ubi-minimal:8.3
+LABEL maintainer="James Wong<jameswong1376@gmail.com>" description="Rengine is a cloud native, distributed, generic rule engine platform."
 
 ARG JAVA_PACKAGE=java-11-openjdk-headless
 ARG RUN_JAVA_VERSION=1.3.8

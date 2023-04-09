@@ -79,7 +79,9 @@ Usage: ./$(basename $0) [OPTIONS] [arg1] [arg2] ...
                    --skip-build                 Skip recompile build before building image.
                 -E,--executor-native            Build image for executor (native).
                    --skip-build                 Skip recompile build before building image.
-                -A,--all                        Build image for all components.
+                -u,--ui                         Build image for UI.
+                   --skip-build                 Skip recompile build before building image.
+                -A,--all                        Build image for all components (but excludes the executor-native).
                    --skip-build                 Skip recompile build before building image.
     push-image                                  Push component images.
                 -a,--apiserver                  Push image for apiserver.
@@ -87,6 +89,7 @@ Usage: ./$(basename $0) [OPTIONS] [arg1] [arg2] ...
                 -j,--job                        Push image for job.
                 -e,--executor                   Push image for executor.
                 -E,--executor-native            Push image for executor (native).
+                -u,--ui                         Push image for UI.
                 -A,--all                        Push image for all components.
     all                                         Build with Maven and push images for all components.
 "
@@ -107,6 +110,22 @@ function check_for_java_version() {
         log "No supported JAVA version, major version must >= 11"; exit 1
     else
         log "Using JAVA for $JAVA"
+    fi
+}
+
+function check_for_npm_version() {
+    # Which npm to use
+    export NPM=$([ -z "$NODE_HOME" ] && echo "npm" || echo "$NODE_HOME/bin/npm")
+
+    # the first segment of the version number.
+    export NPM_MAJOR_VERSION=$([ -z "$NPM_MAJOR_VERSION" ] && echo $($NPM --version 2>&1 | sed -E -n 's/([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})/\1/p') || echo "$NPM_MAJOR_VERSION")
+    export NPM_MINOR_VERSION=$([ -z "$NPM_MINOR_VERSION" ] && echo $($NPM --version 2>&1 | sed -E -n 's/([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})/\2/p') || echo "$NPM_MINOR_VERSION")
+    export NPM_PATCH_VERSION=$([ -z "$NPM_PATCH_VERSION" ] && echo $($NPM --version 2>&1 | sed -E -n 's/([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})/\3/p') || echo "$NPM_PATCH_VERSION")
+
+    if [[ ! "$NPM_MAJOR_VERSION" -ge 6 ]] ; then
+        log "No supported NPM version, major version must >= 6"; exit 1
+    else
+        log "Using NPM for $NPM"
     fi
 }
 
@@ -135,6 +154,17 @@ function do_build_maven() {
     -Dgpg.skip \
     -B \
     $build_opts
+}
+
+function do_build_npm() {
+    check_for_npm_version
+
+    local project_dir=$1
+    logDebug "Building for $project_dir ..."
+
+    cd ${project_dir}
+    $NPM install && $NPM run build
+    cd -
 }
 
 function do_configure_gpg() {
@@ -231,6 +261,18 @@ function do_build_image_with_springboot() {
     --build-arg APP_MAINCLASS=${app_mainclass} .
 }
 
+function do_build_image_with_npm() {
+    local app_name=$1
+    local app_version=$2
+    local build_file=$3
+    echo "Docker building for $app_name:$app_version ..."
+
+    docker build -t wl4g/rengine-${app_name}:${app_version} -f $build_file \
+      --build-arg REPO_NAME=rengine-${app_name} \
+      --build-arg BUILD_TIME=$(date +'%Y%m%dT%H%M%S') \
+      --build-arg COMMIT_ID=$(git log | head -1 | awk -F ' ' '{print $2}' | cut -c 1-12) .
+}
+
 function do_push_image() {
     local image_registry="$DOCKERHUB_REGISTRY"
     local image_name="$2"
@@ -251,7 +293,7 @@ function do_push_image() {
     fi
 
     logDebug "Pushing image to $image_registry/$image_name:$image_tag ..."
-    docker tag wl4g/$image_name:$image_tag $image_registry/wl4g/$image_name:$image_tag
+    docker tag wl4g/$image_name:$image_tag $image_registry/$image_name:$image_tag
     docker push $image_registry/$image_name:$image_tag
 }
 
@@ -279,7 +321,7 @@ case $1 in
 
         ## Method 1:
         ## Build the image directly using the maven plugin. (Notice: The image size is large, there is no way, because the COPY command must be executed only once)
-        #do_build_maven "package -f ${BASE_DIR}/apiserver/pom.xml -Pbuild:tar:docker"
+        #do_build_maven "install -f ${BASE_DIR}/apiserver/pom.xml -Pbuild:tar:docker"
 
         ## Method 2:
         ## Do not use the COPY command, open the local file service and use curl to download in the container to prevent new layers.
@@ -295,7 +337,7 @@ case $1 in
 
         ## Method 1:
         ## Build the image directly using the maven plugin. (Notice: The image size is large, there is no way, because the COPY command must be executed only once)
-        #do_build_maven "package -f ${BASE_DIR}/controller/pom.xml -Pbuild:tar:docker"
+        #do_build_maven "install -f ${BASE_DIR}/controller/pom.xml -Pbuild:tar:docker"
 
         ## Method 2:
         ## Do not use the COPY command, open the local file service and use curl to download in the container to prevent new layers.
@@ -307,7 +349,7 @@ case $1 in
         if [ "$3" != "--skip-build" ]; then
             do_build_maven "-T 4C clean install"
         fi
-        do_build_maven "package -f ${BASE_DIR}/job/pom.xml -Pbuild:docker"
+        do_build_maven "install -f ${BASE_DIR}/job/pom.xml -Pbuild:docker"
         ;;
       -e|--executor)
         ## First of all, it should be built in full to prevent the dependent modules from being updated.
@@ -325,7 +367,7 @@ case $1 in
 
         if [ ! -f "${BASE_DIR}/executor/target/executor-native" ]; then
             log "Building executor native image ..."
-            ${BASE_DIR}/mvnw package -f ${BASE_DIR}/executor/pom.xml \
+            ${BASE_DIR}/mvnw install -f ${BASE_DIR}/executor/pom.xml \
                 -Dmaven.test.skip=true \
                 -DskipTests \
                 -Dnative \
@@ -338,28 +380,41 @@ case $1 in
         docker build -t wl4g/rengine-executor-native:$(print_pom_version) -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkusnative .
         cd ..
         ;;
+      -u|--ui)
+        ## First of all, it should be built in full to prevent the dependent modules from being updated.
+        if [ "$3" != "--skip-build" ]; then
+            do_build_npm "${BASE_DIR}/rengine-ui"
+        fi
+        do_build_image_with_npm ui $(print_pom_version) "${BASE_DIR}/rengine-ui/tools/build/docker/Dockerfile.vue"
+        ;;
       -A|--all)
         POM_VERSION=${POM_VERSION:-$(print_pom_version)}
         if [ "$3" != "--skip-build" ]; then
-            do_build_maven "-T 4C clean install"
+            do_build_maven "-T 4C clean install" &
+            do_build_npm "${BASE_DIR}/rengine-ui" &
+            wait
         fi
 
         do_dl_serve_start
-        do_build_image_with_springboot apiserver ${POM_VERSION} com.wl4g.RengineApiServer Dockerfile.springtar apiserver/target/apiserver-1.0.0-bin.tar
-        do_build_image_with_springboot controller ${POM_VERSION} com.wl4g.RengineController Dockerfile.springtar controller/target/controller-1.0.0-bin.tar
-        do_build_maven "package -f ${BASE_DIR}/job/pom.xml -Pbuild:docker"
+        do_build_image_with_springboot apiserver ${POM_VERSION} com.wl4g.RengineApiServer Dockerfile.springtar apiserver/target/apiserver-1.0.0-bin.tar &
+        do_build_image_with_springboot controller ${POM_VERSION} com.wl4g.RengineController Dockerfile.springtar controller/target/controller-1.0.0-bin.tar &
+        do_build_maven "install -f ${BASE_DIR}/job/pom.xml -Pbuild:docker" &
+        wait
         do_dl_serve_stop
 
         docker build -t wl4g/rengine-executor:${POM_VERSION} -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkustar
 
-        ## Not enabled for now, because it usually fails due to insufficient resources on the build machine. To build a native image, you should use the '-E' option alone.
-        #${BASE_DIR}/mvnw package -f ${BASE_DIR}/executor/pom.xml \
+        ### Not enabled for now, because it usually fails due to insufficient resources on the build machine. To build a native image, you should use the '-E' option alone.
+        #${BASE_DIR}/mvnw install -f ${BASE_DIR}/executor/pom.xml \
         #    -Dmaven.test.skip=true \
         #    -DskipTests \
         #    -Dnative \
         #    -Dquarkus.native.container-build=true \
         #    -Dquarkus.native.container-runtime=docker
+        #
         #docker build -t wl4g/rengine-executor-native:${POM_VERSION} -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkusnative
+
+        do_build_image_with_npm ui $(print_pom_version) "${BASE_DIR}/rengine-ui/tools/build/docker/Dockerfile.vue"
         ;;
       *)
         usages; exit 1
@@ -383,12 +438,16 @@ case $1 in
       -E|--executor-native)
         do_push_image "$3" "rengine-executor-native" "$POM_VERSION"
         ;;
+      -u|--ui)
+        do_push_image "$3" "rengine-ui" "$POM_VERSION"
+        ;; 
       -A|--all)
         do_push_image "$3" "rengine-apiserver" "$POM_VERSION" &
         do_push_image "$3" "rengine-controller" "$POM_VERSION" &
         do_push_image "$3" "rengine-job" "$POM_VERSION" &
         do_push_image "$3" "rengine-executor" "$POM_VERSION" &
         do_push_image "$3" "rengine-executor-native" "$POM_VERSION" &
+        do_push_image "$3" "rengine-ui" "$POM_VERSION" &
         wait
         ;;
       *)
@@ -397,31 +456,33 @@ case $1 in
     ;;
   all)
     POM_VERSION=${POM_VERSION:-$(print_pom_version)}
-
     do_build_maven "-T 4C clean install"
     do_build_deploy
 
-    do_build_maven "package -f ${BASE_DIR}/apiserver/pom.xml -Pbuild:tar:docker" &
-    do_build_maven "package -f ${BASE_DIR}/controller/pom.xml -Pbuild:tar:docker" &
-    do_build_maven "package -f ${BASE_DIR}/job/pom.xml -Pbuild:docker" &
+    do_build_maven "install -f ${BASE_DIR}/apiserver/pom.xml -Pbuild:tar:docker" &
+    do_build_maven "install -f ${BASE_DIR}/controller/pom.xml -Pbuild:tar:docker" &
+    do_build_maven "install -f ${BASE_DIR}/job/pom.xml -Pbuild:docker" &
     docker build -t wl4g/rengine-executor:${POM_VERSION} -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkustar &
     wait
 
-    ## Not enabled for now, because it usually fails due to insufficient resources on the build machine. To build a native image, you should use the '-E' option alone.
-    ${BASE_DIR}/mvnw package -f ${BASE_DIR}/executor/pom.xml \
-        -Dmaven.test.skip=true \
-        -DskipTests \
-        -Dnative \
-        -Dquarkus.native.container-build=true \
-        -Dquarkus.native.container-runtime=docker
+    ### Not enabled for now, because it usually fails due to insufficient resources on the build machine. To build a native image, you should use the '-E' option alone.
+    #${BASE_DIR}/mvnw install -f ${BASE_DIR}/executor/pom.xml \
+    #    -Dmaven.test.skip=true \
+    #    -DskipTests \
+    #    -Dnative \
+    #    -Dquarkus.native.container-build=true \
+    #    -Dquarkus.native.container-runtime=docker
+    #
+    #docker build -t wl4g/rengine-executor-native:${POM_VERSION} -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkusnative
 
-    docker build -t wl4g/rengine-executor-native:${POM_VERSION} -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkusnative
+    do_build_image_with_npm ui ${POM_VERSION} "${BASE_DIR}/rengine-ui/tools/build/docker/Dockerfile.vue"
 
     do_push_image "$2" "rengine-apiserver" "$POM_VERSION"
     do_push_image "$2" "rengine-controller" "$POM_VERSION"
     do_push_image "$2" "rengine-job" "$POM_VERSION"
     do_push_image "$2" "rengine-executor" "$POM_VERSION"
     do_push_image "$2" "rengine-executor-native" "$POM_VERSION"
+    do_push_image "$3" "rengine-ui" "$POM_VERSION"
     ;;
   *)
     usages; exit 1

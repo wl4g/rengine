@@ -203,7 +203,7 @@
 ##
 ## ----- Preparing stage -----
 ##
-FROM alpine:latest AS wl4g_copy_layer
+FROM alpine:latest AS wl4g_copy_base
 
 ##
 ## ----- Define the immutable properties. -----
@@ -226,12 +226,19 @@ FROM alpine:latest AS wl4g_copy_layer
 ## see:https://blogs.wl4g.com/archives/2969
 ## see:https://github.com/docker-library/openjdk/issues/440#issuecomment-733718821
 FROM adoptopenjdk/openjdk11:jre-11.0.9_11.1-alpine
-LABEL maintainer="James Wong<jameswong1376@gmail.com>"
 
 ##
 ## ----- Define the immutable properties. -----
 ##
+ARG REPO_NAME="rengine"
+ARG BUILD_TIME
+ARG COMMIT_ID
+ARG BRANCH
+ARG PR
+ARG TAG
+ARG BUILD_URL
 ARG DL_URI
+# App build args.
 ARG APP_NAME
 ARG ADD_LIBRARY # Optional
 ARG APP_VERSION
@@ -252,11 +259,21 @@ ENV APP_DATA "${APP_HOME}/data"
 #ENV APP_LOG "${APP_HOME}/log"
 ENV APP_LOG "/var/log/${APP_NAME}"
 
+LABEL maintainer="James Wong<jameswong1376@gmail.com>" \
+  description="Rengine is a cloud native, distributed, generic rule engine platform." \
+  repoName=${REPO_NAME} \
+  branch=${BRANCH} \
+  pr=${PR} \
+  tag=${TAG} \
+  commit=${COMMIT_ID} \
+  buildTime=${BUILD_TIME} \
+  buildURL=${BUILD_URL}
+
 #WORKDIR /build_base
 
 ## see:https://docs.docker.com/develop/develop-images/multistage-build/
 ## 
-#COPY --from=wl4g_copy_layer /app.tar /${APP_BIN_NAME}.tar
+#COPY --from=wl4g_copy_base /app.tar /${APP_BIN_NAME}.tar
 
 ##
 ## ----- Make app home,user and docker-entrypoint.sh -----

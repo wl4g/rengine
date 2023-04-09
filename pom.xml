@@ -6,7 +6,7 @@
     <version>1.0.0</version>
     <packaging>pom</packaging>
     <name>Rengine Parent</name>
-    <description>Rengine Parent.</description>
+    <description>Rengine is a cloud native, distributed, generic rule engine platform.</description>
     <organization>
         <name>wl4g</name>
         <url>https://rengine.wl4g.com</url>
@@ -389,4 +389,5 @@
             </distributionManagement>
         </profile>
     </profiles>
+    <url>https://github.com/wl4g/rengine</url>
 </project>
