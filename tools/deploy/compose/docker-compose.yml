@@ -9,16 +9,16 @@
 #
 
 version: "3"
+
 networks:
   rengine_net:
     name: rengine_net
     driver: bridge
+    ## see:https://docs.docker.com/compose/compose-file/06-networks/#external
     external: false
 
 services:
-
   ## ===================== MongoDB ======================
-
   mongodb:
     image: docker.io/bitnami/mongodb:4.4.6
     container_name: rengine_mongodb
@@ -38,7 +38,7 @@ services:
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
-      - mongodb_data:/bitnami/mongodb/data
+      - mongodb_data:/bitnami/mongodb/data:rw
 
   ## ======================= MinIO =======================
   # see:https://github.com/minio/minio/blob/master/docs/orchestration/docker-compose/docker-compose.yaml
@@ -55,7 +55,7 @@ services:
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
-      - minio_data:/data
+      - minio_data:/data:rw
     ports:
       - "9000:9000"
       - "9900:9900"
@@ -72,7 +72,7 @@ services:
     networks:
       - rengine_net
     volumes:
-      - redis-cluster_data-0:/bitnami/redis/data
+      - redis-cluster_data-0:/bitnami/redis/data:rw
   redis-node-1:
     image: docker.io/bitnami/redis-cluster:7.0
     container_name: rengine_redis_node_1
@@ -83,7 +83,7 @@ services:
     networks:
       - rengine_net
     volumes:
-      - redis-cluster_data-1:/bitnami/redis/data
+      - redis-cluster_data-1:/bitnami/redis/data:rw
   redis-node-2:
     image: docker.io/bitnami/redis-cluster:7.0
     container_name: rengine_redis_node_2
@@ -94,7 +94,7 @@ services:
     networks:
       - rengine_net
     volumes:
-      - redis-cluster_data-2:/bitnami/redis/data
+      - redis-cluster_data-2:/bitnami/redis/data:rw
   redis-node-3:
     image: docker.io/bitnami/redis-cluster:7.0
     container_name: rengine_redis_node_3
@@ -105,7 +105,7 @@ services:
     networks:
       - rengine_net
     volumes:
-      - redis-cluster_data-3:/bitnami/redis/data
+      - redis-cluster_data-3:/bitnami/redis/data:rw
   redis-node-4:
     image: docker.io/bitnami/redis-cluster:7.0
     container_name: rengine_redis_node_4
@@ -116,7 +116,7 @@ services:
     networks:
       - rengine_net
     volumes:
-      - redis-cluster_data-4:/bitnami/redis/data
+      - redis-cluster_data-4:/bitnami/redis/data:rw
   redis-node-5:
     image: docker.io/bitnami/redis-cluster:7.0
     container_name: rengine_redis_node_5
@@ -130,7 +130,7 @@ services:
     networks:
       - rengine_net
     volumes:
-      - redis-cluster_data-5:/bitnami/redis/data
+      - redis-cluster_data-5:/bitnami/redis/data:rw
     depends_on:
       - redis-node-0
       - redis-node-1
@@ -151,24 +151,27 @@ services:
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
-      - zookeeper_data:/opt/bitnami/zookeeper/data/
+      - zookeeper_data:/opt/bitnami/zookeeper/data:rw
 
   ## ======================= Kafka =======================
 
-  kafka:
+  kafka: ## see:https://raw.githubusercontent.com/bitnami/containers/main/bitnami/kafka/docker-compose.yml
     image: docker.io/bitnami/kafka:2.2.0
     container_name: rengine_kafka
     environment:
       - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
     restart: unless-stopped
     networks:
       - rengine_net
     depends_on:
       - zookeeper
+    ## see:https://hub.docker.com/r/bitnami/kafka/#Persisting_your_data
+    #user: 1001:1000
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
-      - kafka_data:/bitnami/kafka/data
+      #- kafka_data:/bitnami/kafka/data:rw
 
   ## ======================= HBase =======================
 
@@ -187,7 +190,24 @@ services:
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
-      - hbase_data:/tmp/
+      - hbase_data:/tmp:rw
+
+  ## =============== Rengine (UI) ================
+
+  #ui:
+  #  image: wl4g/rengine-ui:1.0.0
+  #  container_name: rengine_ui
+  #  #environment:
+  #  restart: unless-stopped
+  #  networks:
+  #    - rengine_net
+  #  links:
+  #    - apiserver
+  #  volumes:
+  #    - /etc/timezone:/etc/timezone:ro
+  #    - /etc/localtime:/etc/localtime:ro
+  #  ports:
+  #    - "8888:80"
 
   ## =============== Rengine (apiserver) ================
 
@@ -222,9 +242,9 @@ services:
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
-      - rengine_script_rootfs:/tmp/__rengine_script_rootfs
-      - rengine_script_works:/tmp/__rengine_script_works
-      - rengine_script_log:/tmp/__rengine_script_log
+      - rengine_script_rootfs:/tmp/__rengine_script_rootfs:rw
+      - rengine_script_works:/tmp/__rengine_script_works:rw
+      - rengine_script_log:/tmp/__rengine_script_log:rw
     ports:
       - "28001:28001"
       - "10108:10108"
@@ -234,7 +254,7 @@ services:
   controller:
     image: wl4g/rengine-controller:1.0.0
     container_name: rengine_controller
-    environment: # see:https://stackoverflow.com/questions/49767683/what-does-no-compatible-attachment-provider-is-available-mean
+    environment:
       - SPRING_ARTHAS_ENABLED=false
       - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/rengine
       - SPRING_REDIS_PASSWORD=bitnami
@@ -265,7 +285,7 @@ services:
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
-      - rengine_script_log:/tmp/__rengine_script_log
+      - rengine_script_log:/tmp/__rengine_script_log:rw
     ports:
       - "28003:28003"
       - "10109:10108"
@@ -299,7 +319,7 @@ services:
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
-      - rengine_script_log:/tmp/__rengine_script_log
+      - rengine_script_log:/tmp/__rengine_script_log:rw
     ports:
       - "28002:28002"
 
@@ -308,8 +328,23 @@ services:
   job:
     image: wl4g/rengine-job:1.0.0
     container_name: rengine_job
+    ## for example to: dcos/en/user-examples/applog-realtime-analysis-alarm/applog-realtime-analysis-alarm.md#Start_job_on_Docker
+    command: "standalone-job \
+      --job-classname com.wl4g.rengine.job.kafka.RengineKafkaFlinkCepStreaming \
+      --allowNonRestoredState \
+      --checkpointDir=file:///tmp/flinksavepoint \
+      --inProcessingTime true \
+      --parallelism 4 \
+      --brokers=kafka:9092 \
+      --groupId rengine_test \
+      --eventTopic rengine_applog \
+      --keyByExprPath body.service \
+      --alertTopic rengine_alert \
+      --cepPatterns Wwp7CiAgICAiZW5naW5lIjogIkZMSU5LX0NFUF9HUkFQSCIsCiAgICAibmFtZSI6ICJyb290IiwKICAgICJxdWFudGlmaWVyIjogewogICAgICAgICJjb25zdW1pbmdTdHJhdGVneSI6ICJTS0lQX1RJTExfTkVYVCIsCiAgICAgICAgInRpbWVzIjogewogICAgICAgICAgICAiZnJvbSI6IDEsCiAgICAgICAgICAgICJ0byI6IDMsCiAgICAgICAgICAgICJ3aW5kb3dUaW1lIjogewogICAgICAgICAgICAgICAgInVuaXQiOiAiTUlOVVRFUyIsCiAgICAgICAgICAgICAgICAic2l6ZSI6IDUKICAgICAgICAgICAgfQogICAgICAgIH0sCiAgICAgICAgInVudGlsQ29uZGl0aW9uIjogbnVsbCwKICAgICAgICAicHJvcGVydGllcyI6IFsiU0lOR0xFIl0KICAgIH0sCiAgICAiY29uZGl0aW9uIjogbnVsbCwKICAgICJub2RlcyI6IFt7CiAgICAgICAgIm5hbWUiOiAibWlkZGxlIiwKICAgICAgICAicXVhbnRpZmllciI6IHsKICAgICAgICAgICAgImNvbnN1bWluZ1N0cmF0ZWd5IjogIlNLSVBfVElMTF9ORVhUIiwKICAgICAgICAgICAgInRpbWVzIjogbnVsbCwKICAgICAgICAgICAgInVudGlsQ29uZGl0aW9uIjogbnVsbCwKICAgICAgICAgICAgInByb3BlcnRpZXMiOiBbIlNJTkdMRSJdCiAgICAgICAgfSwKICAgICAgICAiY29uZGl0aW9uIjogewogICAgICAgICAgICAibmVzdGVkQ29uZGl0aW9ucyI6IFt7CiAgICAgICAgICAgICAgICAiZXhwcmVzc2lvbiI6ICJib2R5LmxldmVsID09ICdFUlJPUiciLAogICAgICAgICAgICAgICAgInR5cGUiOiAiQVZJQVRPUiIKICAgICAgICAgICAgfSwgewogICAgICAgICAgICAgICAgImV4cHJlc3Npb24iOiAiYm9keS5sZXZlbCA9PSAnRkFUQUwnIiwKICAgICAgICAgICAgICAgICJ0eXBlIjogIkFWSUFUT1IiCiAgICAgICAgICAgIH1dLAogICAgICAgICAgICAidHlwZSI6ICJDTEFTUyIsCiAgICAgICAgICAgICJjbGFzc05hbWUiOiAib3JnLmFwYWNoZS5mbGluay5jZXAucGF0dGVybi5jb25kaXRpb25zLlJpY2hPckNvbmRpdGlvbiIKICAgICAgICB9LAogICAgICAgICJhdHRyaWJ1dGVzIjogewogICAgICAgICAgICAidG9wIjogIjEwcHgiCiAgICAgICAgfSwKICAgICAgICAidHlwZSI6ICJBVE9NSUMiCiAgICB9LCB7CiAgICAgICAgIm5hbWUiOiAic3RhcnQiLAogICAgICAgICJxdWFudGlmaWVyIjogewogICAgICAgICAgICAiY29uc3VtaW5nU3RyYXRlZ3kiOiAiU0tJUF9USUxMX05FWFQiLAogICAgICAgICAgICAidGltZXMiOiBudWxsLAogICAgICAgICAgICAidW50aWxDb25kaXRpb24iOiBudWxsLAogICAgICAgICAgICAicHJvcGVydGllcyI6IFsiU0lOR0xFIl0KICAgICAgICB9LAogICAgICAgICJjb25kaXRpb24iOiB7CiAgICAgICAgICAgICJleHByZXNzaW9uIjogImJvZHkubGV2ZWwgPT0gJ1RSQUNFJyB8fCBib2R5LmxldmVsID09ICdERUJVRycgfHwgYm9keS5sZXZlbCA9PSAnSU5GTycgfHwgYm9keS5sZXZlbCA9PSAnV0FSTiciLAogICAgICAgICAgICAidHlwZSI6ICJBVklBVE9SIgogICAgICAgIH0sCiAgICAgICAgImF0dHJpYnV0ZXMiOiB7CiAgICAgICAgICAgICJ0b3AiOiAiMjBweCIKICAgICAgICB9LAogICAgICAgICJ0eXBlIjogIkFUT01JQyIKICAgIH1dLAogICAgImVkZ2VzIjogW3sKICAgICAgICAic291cmNlIjogInN0YXJ0IiwKICAgICAgICAidGFyZ2V0IjogIm1pZGRsZSIsCiAgICAgICAgInR5cGUiOiAiU0tJUF9USUxMX05FWFQiLAogICAgICAgICJhdHRyaWJ1dGVzIjoge30KICAgIH1dLAogICAgIndpbmRvdyI6IHsKICAgICAgICAidHlwZSI6ICJQUkVWSU9VU19BTkRfQ1VSUkVOVCIsCiAgICAgICAgInRpbWUiOiB7CiAgICAgICAgICAgICJ1bml0IjogIk1JTlVURVMiLAogICAgICAgICAgICAic2l6ZSI6IDUKICAgICAgICB9CiAgICB9LAogICAgImFmdGVyTWF0Y2hTdHJhdGVneSI6IHsKICAgICAgICAidHlwZSI6ICJOT19TS0lQIiwKICAgICAgICAicGF0dGVybk5hbWUiOiBudWxsCiAgICB9LAogICAgInR5cGUiOiAiQ09NUE9TSVRFIiwKICAgICJ2ZXJzaW9uIjogMQp9Cl0K"
     #environment:
     restart: unless-stopped
+    security_opt:
+      - seccomp:unconfined
     networks:
       - rengine_net
     links:
@@ -324,30 +359,44 @@ services:
 
 volumes:
   mongodb_data:
+    name: rengine_mongodb_data
     driver: local
   minio_data:
+    name: rengine_minio_data
     driver: local
   redis-cluster_data-0:
+    name: rengine_redis_data_0
     driver: local
   redis-cluster_data-1:
+    name: rengine_redis_data_1
     driver: local
   redis-cluster_data-2:
+    name: rengine_redis_data_2
     driver: local
   redis-cluster_data-3:
+    name: rengine_redis_data_3
     driver: local
   redis-cluster_data-4:
+    name: rengine_redis_data_4
     driver: local
   redis-cluster_data-5:
+    name: rengine_redis_data_5
     driver: local
   zookeeper_data:
+    name: rengine_zookeeper_data
     driver: local
   kafka_data:
+    name: rengine_kafka_data
     driver: local
   hbase_data:
+    name: rengine_hbase_data
     driver: local
   rengine_script_rootfs:
+    name: rengine_script_rootfs
     driver: local
   rengine_script_works:
+    name: rengine_script_works
     driver: local
   rengine_script_log:
+    name: rengine_script_log
     driver: local

@@ -23,4 +23,6 @@ arthas:
   session-timeout: 1800
   #username: admin
   #password: admin
+  ## see:https://stackoverflow.com/questions/49767683/what-does-no-compatible-attachment-provider-is-available-mean
+  ## see:https://github.com/raphw/byte-buddy/issues/1148
   slientInit: true ## Default by false

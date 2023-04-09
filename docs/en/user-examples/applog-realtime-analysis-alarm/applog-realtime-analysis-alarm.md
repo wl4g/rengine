@@ -98,12 +98,14 @@ docker run \
   --env FLINK_PROPERTIES="${FLINK_PROPERTIES}" \
   --network host \
   --security-opt=seccomp:unconfined \
-  wl4g/rengine-job:1.0.0 standalone-job \
+  wl4g/rengine-job:1.0.0 \
+  standalone-job \
   --job-classname com.wl4g.rengine.job.kafka.RengineKafkaFlinkCepStreaming \
   --allowNonRestoredState \
   --checkpointDir=file:///tmp/flinksavepoint \
   --inProcessingTime true \
   --parallelism 4 \
+  --brokers=localhost:9092 \
   --groupId rengine_test \
   --eventTopic rengine_applog \
   --keyByExprPath body.service \

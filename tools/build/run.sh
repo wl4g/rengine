@@ -120,6 +120,8 @@ function print_pom_version() {
 }
 
 function do_build_maven() {
+    check_for_java_version
+
     local build_opts=$1
     logDebug "Building for $build_opts ..."
 
@@ -254,7 +256,6 @@ function do_push_image() {
 }
 
 # --- Main. ---
-check_for_java_version
 case $1 in
   version)
     print_pom_version

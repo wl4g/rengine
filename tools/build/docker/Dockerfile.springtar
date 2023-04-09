@@ -219,6 +219,9 @@ FROM alpine:latest AS wl4g_copy_layer
 ##
 ## ----- Make stage -----
 ##
+## see:https://stackoverflow.com/questions/49767683/what-does-no-compatible-attachment-provider-is-available-mean
+## see:https://github.com/raphw/byte-buddy/issues/1148
+##
 ## see:https://docs.docker.com/develop/develop-images/multistage-build/
 ## see:https://blogs.wl4g.com/archives/2969
 ## see:https://github.com/docker-library/openjdk/issues/440#issuecomment-733718821
