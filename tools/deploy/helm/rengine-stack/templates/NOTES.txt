@@ -1,7 +1,7 @@
-{{- $webApp := "rengine-manager" }}
+{{- $webApp := "rengine-apiserver" }}
 {{- $initUserName := "admin" }}
 
-{{- $springbootDemoBaselineTag := index .Values "rengine-manager" "image" "baselineTag" }}
+{{- $springbootDemoBaselineTag := index .Values "rengine-apiserver" "image" "baselineTag" }}
 
 {{- if eq (index .Values $webApp "governance" "provider") "Istio" }}
     {{- $domain := index .Values $webApp "governance" "istio" "ingress" "domain" }}
@@ -30,7 +30,7 @@
 + Here an example of what you should execution command-line on your next grayscale upgrade (canary):
 
     helm -n demo upgrade -i demo ./app-stack --set="\
-        rengine-manager.image.baselineTag={{ $springbootDemoBaselineTag }},\
-        rengine-manager.image.upgradeTag=latest,\
-        rengine-manager.governance.istio.ingress.http.canary.baseline.weight=80,\
-        rengine-manager.governance.istio.ingress.http.canary.upgrade.weight=20"
+        rengine-apiserver.image.baselineTag={{ $springbootDemoBaselineTag }},\
+        rengine-apiserver.image.upgradeTag=latest,\
+        rengine-apiserver.governance.istio.ingress.http.canary.baseline.weight=80,\
+        rengine-apiserver.governance.istio.ingress.http.canary.upgrade.weight=20"

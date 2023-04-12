@@ -227,10 +227,10 @@ governance:
           interval: 5m
           baseEjectionTime: 15m
       ## see:https://istio.io/v1.14/docs/reference/config/networking/virtual-service/#TCPRoute
-      #tcp:
-      #  enabled: false
-      #  frontPort: 1883
-      #  backendPort: 1883
+      tcp:
+        enabled: false
+        frontPort: 1883
+        backendPort: 1883
     ## The depends external bare metal or VM services.
     ## see:https://istio.io/v1.14/docs/reference/config/networking/workload-entry/
     ## see:https://developer.aliyun.com/article/772279

@@ -10,7 +10,7 @@
 # @see: https://helm.sh/zh/docs/topics/charts/
 #
 apiVersion: v2
-name: rengine-executor
+name: rengine-apiserver
 description: A Helm chart for Rengine Application Stack
 icon: https://raw.githubusercontent.com/wl4g/rengine/master/docs/shots/logo.png?token=GHSAT0AAAAAABWBQKN3QNYHECQ5LR4PCLKMYWGQIGA
 # A chart can be either an 'application' or a 'library' chart.

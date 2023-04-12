@@ -46,15 +46,15 @@ dependencies:
   - name: "rengine-apiserver"
     condition: rengine-apiserver.enabled
     repository: "file://charts/rengine-apiserver"
-    version: "~0.1.0"
+    version: "~1.0.0"
   - name: "rengine-executor"
     condition: rengine-executor.enabled
     repository: "file://charts/rengine-executor"
-    version: "~0.1.0"
+    version: "~1.0.0"
   - name: "rengine-controller"
     condition: rengine-controller.enabled
     repository: "file://charts/rengine-controller"
-    version: "~0.1.0"
+    version: "~1.0.0"
   - name: "jaeger"
     condition: global.components.jaeger.internal.enabled
     repository: "https://jaegertracing.github.io/helm-charts"
