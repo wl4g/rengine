@@ -55,6 +55,10 @@ dependencies:
     condition: rengine-controller.enabled
     repository: "file://charts/rengine-controller"
     version: "~1.0.0"
+  - name: "rengine-ui"
+    condition: rengine-ui.enabled
+    repository: "file://charts/rengine-ui"
+    version: "~1.0.0"
   - name: "jaeger"
     condition: global.components.jaeger.internal.enabled
     repository: "https://jaegertracing.github.io/helm-charts"
@@ -75,10 +79,10 @@ dependencies:
     condition: global.components.redis.internal.enabled
     repository: "https://charts.bitnami.com/bitnami"
     version: "~17.0.x"
-  - name: "mysql"
-    condition: global.components.mysql.internal.enabled
-    repository: "https://charts.bitnami.com/bitnami"
-    version: "~9.2.x"
+  #- name: "mysql"
+  #  condition: global.components.mysql.internal.enabled
+  #  repository: "https://charts.bitnami.com/bitnami"
+  #  version: "~9.2.x"
   - name: "mongodb"
     condition: global.components.mongodb.internal.enabled
     repository: "https://charts.bitnami.com/bitnami"

@@ -16,6 +16,7 @@
 package com.wl4g.rengine.job;
 
 import static com.wl4g.infra.common.lang.Assert2.notNull;
+import static com.wl4g.infra.common.lang.Exceptions.getRootCausesString;
 import static com.wl4g.infra.common.runtime.JvmRuntimeTool.isJvmInDebugging;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
@@ -28,6 +29,7 @@ import static org.apache.commons.lang3.StringUtils.startsWith;
 import static org.apache.flink.api.common.restartstrategy.RestartStrategies.fixedDelayRestart;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -340,9 +342,12 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
 
             log.info("Starting for : {} ...", jobName);
             handleJobExecutionResult(env.execute(jobName));
+            log.info("Started for : {}", jobName);
 
         } catch (Throwable ex) {
-            log.error("Failed to execute streaming job", ex);
+            final String errmsg = format("Failed to execute streaming job. - %s", getRootCausesString(ex));
+            log.error(errmsg);
+            System.err.println(format("%s - %s - %s", new Date(), getClass().getSimpleName(), errmsg));
             throw new IllegalStateException(ex);
         }
     }

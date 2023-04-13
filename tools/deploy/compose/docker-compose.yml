@@ -15,30 +15,62 @@ networks:
     name: rengine_net
     driver: bridge
     ## see:https://docs.docker.com/compose/compose-file/06-networks/#external
-    external: false
+    external: true
 
 services:
   ## ===================== MongoDB ======================
   mongodb:
     image: docker.io/bitnami/mongodb:4.4.6
+    command: ""
     container_name: rengine_mongodb
     environment:
       - BITNAMI_DEBUG=true
-      - MONGODB_REPLICA_SET_MODE=primary
       - ALLOW_EMPTY_PASSWORD=yes
+      - MONGODB_REPLICA_SET_MODE=primary
+      - MONGODB_PRIMARY_HOST=127.0.0.1:27017
       - MONGODB_SYSTEM_LOG_VERBOSITY=0
       - MONGODB_DISABLE_SYSTEM_LOG=no
       - MONGODB_DISABLE_JAVASCRIPT=no
       - MONGODB_ENABLE_JOURNAL=yes
       - MONGODB_ENABLE_IPV6=no
       - MONGODB_ENABLE_DIRECTORY_PER_DB=no
+      - MONGO_INITDB_DATABASE=rengine
     restart: unless-stopped
     networks:
       - rengine_net
+    ## see:docker run --rm d run --rm docker.io/bitnami/mongodb:4.4.6 cat /opt/bitnami/scripts/libmongodb.sh | grep MONGODB_INITSCRIPTS_DIR
+    ## see:https://docs.docker.com/compose/environment-variables/set-environment-variables/#cli
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
+      - ${BASE_DIR}/tools/db/rengine_init.js:/docker-entrypoint-initdb.d/rengine_init.js:ro
       - mongodb_data:/bitnami/mongodb/data:rw
+
+  ## ===================== MongoDB Manager ======================
+
+  ## see:https://github.com/mongo-express/mongo-express-docker/blob/master/docker-entrypoint.sh
+  mongodb_express:
+    image: docker.io/mongo-express:0.54.0
+    container_name: rengine_mongodb_express
+    depends_on:
+      - mongodb
+    ## see:docker run --rm d run --rm docker.io/mongo-express:0.54.0 cat /node_modules/mongo-express/config.js
+    environment:
+      - VCAP_APP_PORT=28081
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin
+      #- ME_CONFIG_MONGODB_URL=mongodb://mongodb:27017/rengine
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+      - ME_CONFIG_MONGODB_PORT=27017
+      #- ME_CONFIG_MONGODB_ADMINUSERNAME=mongodb
+      #- ME_CONFIG_MONGODB_ADMINPASSWORD=123456
+    restart: unless-stopped
+    networks:
+      - rengine_net
+    links:
+      - mongodb
+    ports:
+      - 28081:28081
 
   ## ======================= MinIO =======================
   # see:https://github.com/minio/minio/blob/master/docs/orchestration/docker-compose/docker-compose.yaml
@@ -173,6 +205,41 @@ services:
       - /etc/localtime:/etc/localtime:ro
       #- kafka_data:/bitnami/kafka/data:rw
 
+  ## ======================= Kafka Manager =======================
+
+  kafka_manager: ## see:https://blogs.wl4g.com/archives/1485
+    image: registry.cn-shenzhen.aliyuncs.com/wl4g/kafka-manager:v3.0.0.6-2
+    container_name: rengine_kafka_manager
+    environment:
+      - ZK_HOSTS=zookeeper:2181
+      - KAFKA_MANAGER_AUTH_ENABLED=true
+      - KAFKA_MANAGER_USERNAME=admin
+      - KAFKA_MANAGER_PASSWORD=admin
+      - KAFKA_MANAGER_LDAP_ENABLED=false
+      - KAFKA_MANAGER_LDAP_SERVER=ldap.example.com
+      - KAFKA_MANAGER_LDAP_PORT=636
+      - KAFKA_MANAGER_LDAP_USERNAME=cn=rouser,dc=example,dc=com
+      - KAFKA_MANAGER_LDAP_PASSWORD=rouserpassword
+      - KAFKA_MANAGER_LDAP_SEARCH_BASE_DN=ou=users,dc=example,dc=com
+      #- KAFKA_MANAGER_LDAP_SEARCH_FILTER=(&(objectClass=inetOrgPerson)(&(uid=\$capturedLogin\$)(|(memberof=cn=Operations,ou=Groups,dc=example,dc=com)(memberof=cn=Development,ou=Groups,dc=example,dc=com))))
+      - KAFKA_MANAGER_LDAP_CONNECTION_POOL_SIZE=10
+      - KAFKA_MANAGER_LDAP_SSL=false
+      - KAFKA_MANAGER_EXTRA_PLAY_OPTS=-Dhttp.port=9000 -Dhttps.port=9443
+      - APPLICATION_SECRET='abcdefghijklmnopqrstyvwxyz'
+      - JAVA_OPTS=-Djava.net.preferIPv4Stack=true -Xmx2G
+    restart: unless-stopped
+    networks:
+      - rengine_net
+    depends_on:
+      - zookeeper
+      - kafka
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 19443:9443
+      - 19000:9000
+
   ## ======================= HBase =======================
 
   hbase:
@@ -194,20 +261,20 @@ services:
 
   ## =============== Rengine (UI) ================
 
-  #ui:
-  #  image: wl4g/rengine-ui:1.0.0
-  #  container_name: rengine_ui
-  #  #environment:
-  #  restart: unless-stopped
-  #  networks:
-  #    - rengine_net
-  #  links:
-  #    - apiserver
-  #  volumes:
-  #    - /etc/timezone:/etc/timezone:ro
-  #    - /etc/localtime:/etc/localtime:ro
-  #  ports:
-  #    - "8888:80"
+  ui:
+    image: wl4g/rengine-ui:1.0.0
+    container_name: rengine_ui
+    #environment:
+    restart: unless-stopped
+    networks:
+      - rengine_net
+    links:
+      - apiserver
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "8888:80"
 
   ## =============== Rengine (apiserver) ================
 
@@ -325,37 +392,66 @@ services:
 
   ## =============== Rengine (job) ================
 
-  job:
+  job_jm_default:
     image: wl4g/rengine-job:1.0.0
-    container_name: rengine_job
+    container_name: rengine_job_jm_default
     ## for example to: dcos/en/user-examples/applog-realtime-analysis-alarm/applog-realtime-analysis-alarm.md#Start_job_on_Docker
     command: "standalone-job \
       --job-classname com.wl4g.rengine.job.kafka.RengineKafkaFlinkCepStreaming \
       --allowNonRestoredState \
       --checkpointDir=file:///tmp/flinksavepoint \
-      --inProcessingTime true \
-      --parallelism 4 \
+      --inProcessingTime=true \
+      --parallelism=4 \
       --brokers=kafka:9092 \
-      --groupId rengine_test \
-      --eventTopic rengine_applog \
-      --keyByExprPath body.service \
-      --alertTopic rengine_alert \
-      --cepPatterns Wwp7CiAgICAiZW5naW5lIjogIkZMSU5LX0NFUF9HUkFQSCIsCiAgICAibmFtZSI6ICJyb290IiwKICAgICJxdWFudGlmaWVyIjogewogICAgICAgICJjb25zdW1pbmdTdHJhdGVneSI6ICJTS0lQX1RJTExfTkVYVCIsCiAgICAgICAgInRpbWVzIjogewogICAgICAgICAgICAiZnJvbSI6IDEsCiAgICAgICAgICAgICJ0byI6IDMsCiAgICAgICAgICAgICJ3aW5kb3dUaW1lIjogewogICAgICAgICAgICAgICAgInVuaXQiOiAiTUlOVVRFUyIsCiAgICAgICAgICAgICAgICAic2l6ZSI6IDUKICAgICAgICAgICAgfQogICAgICAgIH0sCiAgICAgICAgInVudGlsQ29uZGl0aW9uIjogbnVsbCwKICAgICAgICAicHJvcGVydGllcyI6IFsiU0lOR0xFIl0KICAgIH0sCiAgICAiY29uZGl0aW9uIjogbnVsbCwKICAgICJub2RlcyI6IFt7CiAgICAgICAgIm5hbWUiOiAibWlkZGxlIiwKICAgICAgICAicXVhbnRpZmllciI6IHsKICAgICAgICAgICAgImNvbnN1bWluZ1N0cmF0ZWd5IjogIlNLSVBfVElMTF9ORVhUIiwKICAgICAgICAgICAgInRpbWVzIjogbnVsbCwKICAgICAgICAgICAgInVudGlsQ29uZGl0aW9uIjogbnVsbCwKICAgICAgICAgICAgInByb3BlcnRpZXMiOiBbIlNJTkdMRSJdCiAgICAgICAgfSwKICAgICAgICAiY29uZGl0aW9uIjogewogICAgICAgICAgICAibmVzdGVkQ29uZGl0aW9ucyI6IFt7CiAgICAgICAgICAgICAgICAiZXhwcmVzc2lvbiI6ICJib2R5LmxldmVsID09ICdFUlJPUiciLAogICAgICAgICAgICAgICAgInR5cGUiOiAiQVZJQVRPUiIKICAgICAgICAgICAgfSwgewogICAgICAgICAgICAgICAgImV4cHJlc3Npb24iOiAiYm9keS5sZXZlbCA9PSAnRkFUQUwnIiwKICAgICAgICAgICAgICAgICJ0eXBlIjogIkFWSUFUT1IiCiAgICAgICAgICAgIH1dLAogICAgICAgICAgICAidHlwZSI6ICJDTEFTUyIsCiAgICAgICAgICAgICJjbGFzc05hbWUiOiAib3JnLmFwYWNoZS5mbGluay5jZXAucGF0dGVybi5jb25kaXRpb25zLlJpY2hPckNvbmRpdGlvbiIKICAgICAgICB9LAogICAgICAgICJhdHRyaWJ1dGVzIjogewogICAgICAgICAgICAidG9wIjogIjEwcHgiCiAgICAgICAgfSwKICAgICAgICAidHlwZSI6ICJBVE9NSUMiCiAgICB9LCB7CiAgICAgICAgIm5hbWUiOiAic3RhcnQiLAogICAgICAgICJxdWFudGlmaWVyIjogewogICAgICAgICAgICAiY29uc3VtaW5nU3RyYXRlZ3kiOiAiU0tJUF9USUxMX05FWFQiLAogICAgICAgICAgICAidGltZXMiOiBudWxsLAogICAgICAgICAgICAidW50aWxDb25kaXRpb24iOiBudWxsLAogICAgICAgICAgICAicHJvcGVydGllcyI6IFsiU0lOR0xFIl0KICAgICAgICB9LAogICAgICAgICJjb25kaXRpb24iOiB7CiAgICAgICAgICAgICJleHByZXNzaW9uIjogImJvZHkubGV2ZWwgPT0gJ1RSQUNFJyB8fCBib2R5LmxldmVsID09ICdERUJVRycgfHwgYm9keS5sZXZlbCA9PSAnSU5GTycgfHwgYm9keS5sZXZlbCA9PSAnV0FSTiciLAogICAgICAgICAgICAidHlwZSI6ICJBVklBVE9SIgogICAgICAgIH0sCiAgICAgICAgImF0dHJpYnV0ZXMiOiB7CiAgICAgICAgICAgICJ0b3AiOiAiMjBweCIKICAgICAgICB9LAogICAgICAgICJ0eXBlIjogIkFUT01JQyIKICAgIH1dLAogICAgImVkZ2VzIjogW3sKICAgICAgICAic291cmNlIjogInN0YXJ0IiwKICAgICAgICAidGFyZ2V0IjogIm1pZGRsZSIsCiAgICAgICAgInR5cGUiOiAiU0tJUF9USUxMX05FWFQiLAogICAgICAgICJhdHRyaWJ1dGVzIjoge30KICAgIH1dLAogICAgIndpbmRvdyI6IHsKICAgICAgICAidHlwZSI6ICJQUkVWSU9VU19BTkRfQ1VSUkVOVCIsCiAgICAgICAgInRpbWUiOiB7CiAgICAgICAgICAgICJ1bml0IjogIk1JTlVURVMiLAogICAgICAgICAgICAic2l6ZSI6IDUKICAgICAgICB9CiAgICB9LAogICAgImFmdGVyTWF0Y2hTdHJhdGVneSI6IHsKICAgICAgICAidHlwZSI6ICJOT19TS0lQIiwKICAgICAgICAicGF0dGVybk5hbWUiOiBudWxsCiAgICB9LAogICAgInR5cGUiOiAiQ09NUE9TSVRFIiwKICAgICJ2ZXJzaW9uIjogMQp9Cl0K"
-    #environment:
+      --groupId=rengine_test \
+      --eventTopic=rengine_applog \
+      --keyByExprPath=body.service \
+      --alertTopic=rengine_alert \
+      --cepPatterns=Wwp7CiAgICAiZW5naW5lIjogIkZMSU5LX0NFUF9HUkFQSCIsCiAgICAibmFtZSI6ICJyb290IiwKICAgICJxdWFudGlmaWVyIjogewogICAgICAgICJjb25zdW1pbmdTdHJhdGVneSI6ICJTS0lQX1RJTExfTkVYVCIsCiAgICAgICAgInRpbWVzIjogewogICAgICAgICAgICAiZnJvbSI6IDEsCiAgICAgICAgICAgICJ0byI6IDMsCiAgICAgICAgICAgICJ3aW5kb3dUaW1lIjogewogICAgICAgICAgICAgICAgInVuaXQiOiAiTUlOVVRFUyIsCiAgICAgICAgICAgICAgICAic2l6ZSI6IDUKICAgICAgICAgICAgfQogICAgICAgIH0sCiAgICAgICAgInVudGlsQ29uZGl0aW9uIjogbnVsbCwKICAgICAgICAicHJvcGVydGllcyI6IFsiU0lOR0xFIl0KICAgIH0sCiAgICAiY29uZGl0aW9uIjogbnVsbCwKICAgICJub2RlcyI6IFt7CiAgICAgICAgIm5hbWUiOiAibWlkZGxlIiwKICAgICAgICAicXVhbnRpZmllciI6IHsKICAgICAgICAgICAgImNvbnN1bWluZ1N0cmF0ZWd5IjogIlNLSVBfVElMTF9ORVhUIiwKICAgICAgICAgICAgInRpbWVzIjogbnVsbCwKICAgICAgICAgICAgInVudGlsQ29uZGl0aW9uIjogbnVsbCwKICAgICAgICAgICAgInByb3BlcnRpZXMiOiBbIlNJTkdMRSJdCiAgICAgICAgfSwKICAgICAgICAiY29uZGl0aW9uIjogewogICAgICAgICAgICAibmVzdGVkQ29uZGl0aW9ucyI6IFt7CiAgICAgICAgICAgICAgICAiZXhwcmVzc2lvbiI6ICJib2R5LmxldmVsID09ICdFUlJPUiciLAogICAgICAgICAgICAgICAgInR5cGUiOiAiQVZJQVRPUiIKICAgICAgICAgICAgfSwgewogICAgICAgICAgICAgICAgImV4cHJlc3Npb24iOiAiYm9keS5sZXZlbCA9PSAnRkFUQUwnIiwKICAgICAgICAgICAgICAgICJ0eXBlIjogIkFWSUFUT1IiCiAgICAgICAgICAgIH1dLAogICAgICAgICAgICAidHlwZSI6ICJDTEFTUyIsCiAgICAgICAgICAgICJjbGFzc05hbWUiOiAib3JnLmFwYWNoZS5mbGluay5jZXAucGF0dGVybi5jb25kaXRpb25zLlJpY2hPckNvbmRpdGlvbiIKICAgICAgICB9LAogICAgICAgICJhdHRyaWJ1dGVzIjogewogICAgICAgICAgICAidG9wIjogIjEwcHgiCiAgICAgICAgfSwKICAgICAgICAidHlwZSI6ICJBVE9NSUMiCiAgICB9LCB7CiAgICAgICAgIm5hbWUiOiAic3RhcnQiLAogICAgICAgICJxdWFudGlmaWVyIjogewogICAgICAgICAgICAiY29uc3VtaW5nU3RyYXRlZ3kiOiAiU0tJUF9USUxMX05FWFQiLAogICAgICAgICAgICAidGltZXMiOiBudWxsLAogICAgICAgICAgICAidW50aWxDb25kaXRpb24iOiBudWxsLAogICAgICAgICAgICAicHJvcGVydGllcyI6IFsiU0lOR0xFIl0KICAgICAgICB9LAogICAgICAgICJjb25kaXRpb24iOiB7CiAgICAgICAgICAgICJleHByZXNzaW9uIjogImJvZHkubGV2ZWwgPT0gJ1RSQUNFJyB8fCBib2R5LmxldmVsID09ICdERUJVRycgfHwgYm9keS5sZXZlbCA9PSAnSU5GTycgfHwgYm9keS5sZXZlbCA9PSAnV0FSTiciLAogICAgICAgICAgICAidHlwZSI6ICJBVklBVE9SIgogICAgICAgIH0sCiAgICAgICAgImF0dHJpYnV0ZXMiOiB7CiAgICAgICAgICAgICJ0b3AiOiAiMjBweCIKICAgICAgICB9LAogICAgICAgICJ0eXBlIjogIkFUT01JQyIKICAgIH1dLAogICAgImVkZ2VzIjogW3sKICAgICAgICAic291cmNlIjogInN0YXJ0IiwKICAgICAgICAidGFyZ2V0IjogIm1pZGRsZSIsCiAgICAgICAgInR5cGUiOiAiU0tJUF9USUxMX05FWFQiLAogICAgICAgICJhdHRyaWJ1dGVzIjoge30KICAgIH1dLAogICAgIndpbmRvdyI6IHsKICAgICAgICAidHlwZSI6ICJQUkVWSU9VU19BTkRfQ1VSUkVOVCIsCiAgICAgICAgInRpbWUiOiB7CiAgICAgICAgICAgICJ1bml0IjogIk1JTlVURVMiLAogICAgICAgICAgICAic2l6ZSI6IDUKICAgICAgICB9CiAgICB9LAogICAgImFmdGVyTWF0Y2hTdHJhdGVneSI6IHsKICAgICAgICAidHlwZSI6ICJOT19TS0lQIiwKICAgICAgICAicGF0dGVybk5hbWUiOiBudWxsCiAgICB9LAogICAgInR5cGUiOiAiQ09NUE9TSVRFIiwKICAgICJ2ZXJzaW9uIjogMQp9Cl0K"
+    environment:
+      - 'FLINK_PROPERTIES=jobmanager.rpc.address: job_jm_default'
     restart: unless-stopped
     security_opt:
       - seccomp:unconfined
     networks:
       - rengine_net
-    links:
+    depends_on: # Links will be created automatically
       - zookeeper
       - kafka
+      #- job_tm_default
+    links:
       - hbase # for saving raw events history to HBase
+    #external_links:
+    #  - "rengine_net:job_tm_default"
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     ports:
       - "8081:8081"
+
+  job_tm_default:
+    image: wl4g/rengine-job:1.0.0
+    container_name: rengine_job_tm_default
+    ## for example to: dcos/en/user-examples/applog-realtime-analysis-alarm/applog-realtime-analysis-alarm.md#Start_job_on_Docker
+    command: "taskmanager"
+    ## see:docker run --rm flink:1.16.1-scala_2.12-java11 cat /docker-entrypoint.sh | grep FLINK_PROPERTIES
+    environment:
+      - 'FLINK_PROPERTIES=jobmanager.rpc.address: job_jm_default'
+    restart: unless-stopped
+    security_opt:
+      - seccomp:unconfined
+    networks:
+      - rengine_net
+    depends_on: # Links will be created automatically
+      - zookeeper
+      - kafka
+      - job_jm_default
+    links:
+      - hbase # for saving raw events history to HBase
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    #ports:
 
 volumes:
   mongodb_data:

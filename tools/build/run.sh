@@ -64,34 +64,37 @@ export DOCKERHUB_USERNAME='myuser'
 export DOCKERHUB_TOKEN='abc'
 
 Usage: ./$(basename $0) [OPTIONS] [arg1] [arg2] ...
-    version                                     Print maven project POM version.
-    gpg-verify                                  Verifying for GPG.
-    build-maven                                 Build with Maven.
-    build-deploy                                Build and deploy to Maven central.
-    build-image                                 Build component images.
-                -a,--apiserver                  Build image for apiserver.
-                   --skip-build                 Skip recompile build before building image.
-                -c,--controller                 Build image for controller.
-                   --skip-build                 Skip recompile build before building image.
-                -j,--job                        Build image for job.
-                   --skip-build                 Skip recompile build before building image.
-                -e,--executor                   Build image for executor.
-                   --skip-build                 Skip recompile build before building image.
-                -E,--executor-native            Build image for executor (native).
-                   --skip-build                 Skip recompile build before building image.
-                -u,--ui                         Build image for UI.
-                   --skip-build                 Skip recompile build before building image.
-                -A,--all                        Build image for all components (but excludes the executor-native).
-                   --skip-build                 Skip recompile build before building image.
-    push-image                                  Push component images.
-                -a,--apiserver                  Push image for apiserver.
-                -c,--controller                 Push image for controller.
-                -j,--job                        Push image for job.
-                -e,--executor                   Push image for executor.
-                -E,--executor-native            Push image for executor (native).
-                -u,--ui                         Push image for UI.
-                -A,--all                        Push image for all components.
-    all                                         Build with Maven and push images for all components.
+    version                                         Print maven project POM version.
+    gpg-verify                                      Verifying for GPG.
+    build-maven                                     Build with Maven.
+    build-deploy                                    Build and deploy to Maven central.
+    build-image                                     Build component images.
+                    -a,--apiserver                  Build image for apiserver.
+                       --skip-build                 Skip recompile build before building image.
+                    -c,--controller                 Build image for controller.
+                       --skip-build                 Skip recompile build before building image.
+                    -j,--job                        Build image for job.
+                       --skip-build                 Skip recompile build before building image.
+                    -e,--executor                   Build image for executor.
+                       --skip-build                 Skip recompile build before building image.
+                    -E,--executor-native            Build image for executor (native).
+                       --skip-build                 Skip recompile build before building image.
+                    -u,--ui                         Build image for UI.
+                       --skip-build                 Skip recompile build before building image.
+                    -A,--all                        Build image for all components (but excludes the executor-native).
+                       --skip-build                 Skip recompile build before building image.
+    push-image                                      Push component images.
+                    -a,--apiserver                  Push image for apiserver.
+                    -c,--controller                 Push image for controller.
+                    -j,--job                        Push image for job.
+                    -e,--executor                   Push image for executor.
+                    -E,--executor-native            Push image for executor (native).
+                    -u,--ui                         Push image for UI.
+                    -A,--all                        Push image for all components.
+    build-push                                      Build with Maven and push images for all components.
+    run-standalone                                  Run all services with docker standalone mode.
+                    -U,--up                         Startup to all services.
+                    -D,--down                       Shuwdown to all services.
 "
 }
 
@@ -454,7 +457,7 @@ case $1 in
         usages; exit 1
     esac
     ;;
-  all)
+  build-push)
     POM_VERSION=${POM_VERSION:-$(print_pom_version)}
     do_build_maven "-T 4C clean install"
     do_build_deploy
@@ -483,6 +486,19 @@ case $1 in
     do_push_image "$2" "rengine-executor" "$POM_VERSION"
     do_push_image "$2" "rengine-executor-native" "$POM_VERSION"
     do_push_image "$3" "rengine-ui" "$POM_VERSION"
+    ;;
+  run-standalone)
+    echo "BASE_DIR=${BASE_DIR}" > /tmp/.env
+    case $2 in
+      -U|--up)
+        docker-compose --env-file /tmp/.env -f ${BASE_DIR}/tools/deploy/compose/docker-compose.yml up -d
+        ;;
+      -D|--down)
+        docker-compose --env-file /tmp/.env -f ${BASE_DIR}/tools/deploy/compose/docker-compose.yml down
+        ;;
+      *)
+        usages; exit 1
+    esac
     ;;
   *)
     usages; exit 1

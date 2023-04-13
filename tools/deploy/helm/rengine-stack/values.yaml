@@ -18,7 +18,7 @@ rengine-apiserver:
   image:
     repository: wl4g/rengine-apiserver
     baselineTag: 1.0.0
-    upgradeTag: 1.0.1
+    upgradeTag: latest
 
   envConfigs: {}
 
@@ -29,21 +29,27 @@ rengine-apiserver:
   governance:
     istio:
       ingress:
-        ## see:https://istio.io/v1.14/docs/reference/config/networking/virtual-service/#HTTPRouteDestination
-        domain: wl4g.com ## Top level 1 domain.
+        customHosts:
+        - api.rengine.io
 
 rengine-controller:
   enabled: true
   image:
     repository: wl4g/rengine-controller
     baselineTag: 1.0.0
-    upgradeTag: 1.0.1
+    upgradeTag: latest
 
   envConfigs: {}
 
   agentConfigs: {}
 
   appConfigs: {}
+
+  governance:
+    istio:
+      ingress:
+        customHosts:
+        - controller.rengine.io
 
 rengine-executor:
   enabled: true
@@ -51,13 +57,38 @@ rengine-executor:
     #repository: wl4g/rengine-executor
     repository: wl4g/rengine-executor-native # Recommands
     baselineTag: 1.0.0
-    upgradeTag: 1.0.1
+    upgradeTag: latest
 
   envConfigs: {}
 
   agentConfigs: {}
 
   appConfigs: {}
+
+  governance:
+    istio:
+      ingress:
+        customHosts:
+        - executor.rengine.io
+
+rengine-ui:
+  enabled: true
+  image:
+    repository: wl4g/rengine-ui
+    baselineTag: 1.0.0
+    upgradeTag: latest
+
+  envConfigs: {}
+
+  agentConfigs: {}
+
+  appConfigs: {}
+
+  governance:
+    istio:
+      ingress:
+        customHosts:
+        - console.rengine.io
 
 ## ------------------------- Global Shared Components Configuration Examples. -------------------------
 global:
@@ -77,17 +108,18 @@ global:
     export SPRING_SLEUTH_OTEL_EXPORTER_JAEGER_ENDPOENT="http://jaeger-collector.jaeger.svc.cluster.local:14250"
 
     ## see:./service/src/main/resources/application-mongo.yaml
-    export SPRING_DATA_MONGODB_URI='mongodb://10.0.0.163:27017/rengine'
+    export SPRING_DATA_MONGODB_URI="mongodb://mongodb.svc.cluster.local:27017/rengine"
 
     ## see:./service/src/main/resources/application-redis.yaml
-    export SPRING_REDIS_CLUSTER_PASSWORD='zzx!@#$%'
-    #export SPRING_REDIS_CLUSTER_NODES="n0.redis.wl4g-cs.com:6379,n1.redis.wl4g-cs.com:6380,n2.redis.wl4g-cs.com:6381,n3.redis.wl4g-cs.com:7379,n4.redis.wl4g-cs.com:7380,n5.redis.wl4g-cs.com:7381"
+    #export SPRING_REDIS_CLUSTER_NODES="10.0.0.114:6379,10.0.0.114:6380,10.0.0.114:6381,10.0.0.114:7379,10.0.0.114:7380,10.0.0.114:7381"
     export SPRING_REDIS_CLUSTER_NODES="redis-0.redis.svc.cluster.local:6379,redis-1.redis.svc.cluster.local:6379,redis-2.redis.svc.cluster.local:6379,redis-3.redis.svc.cluster.local:6379,redis-4.redis.svc.cluster.local:6379,redis-5.redis.svc.cluster.local:6379"
+    export SPRING_REDIS_CLUSTER_PASSWORD='123456'
 
     ## see:./executor/src/main/resources/application.yaml and ./service/src/main/resources/application-minio.yaml
-    export MINIO_ENDPOINT='http://10.0.0.163:9000'
-    export MINIO_TENANTACCESSKEY='rengine'
-    export MINIO_TENANTSECRETKEY='12345678'
+    #export MINIO_ENDPOINT="http://10.0.0.114:9000"
+    export MINIO_ENDPOINT="http://minio.svc.cluster.local"
+    export MINIO_TENANT_ACCESSKEY="rengine"
+    export MINIO_TENANT_SECRETKEY="12345678"
 
     ## see:./executor/src/main/resources/application.yaml
     export QUARKUS_MONGODB_CONNECTION_STRING="${SPRING_DATA_MONGODB_URI}"
@@ -209,28 +241,28 @@ global:
 
     ## see:https://github.com/wl4g/shardingproxy
     ## see:https://bitnami.com/stack/mysql/helm
-    mysql:
-      internal:
-        enabled: false
-      external:
-        enabled: false
-        namespace:
-        serviceAccount:
-        labels:
-          classify: external-service
-          version: v1
-        instancePorts:
-        - protocol: TCP
-          targetPort: 3308 ## Native default: 3306
-        instanceAddresses:
-        - ip: 172.24.47.4
-          hosts:
-          - emr-master-1
-        - ip: 172.24.47.5
-          hosts:
-          - emr-master-2
-        location: MESH_EXTERNAL
-        resolution: NONE
+    #mysql:
+    #  internal:
+    #    enabled: false
+    #  external:
+    #    enabled: false
+    #    namespace:
+    #    serviceAccount:
+    #    labels:
+    #      classify: external-service
+    #      version: v1
+    #    instancePorts:
+    #    - protocol: TCP
+    #      targetPort: 3308 ## Native default: 3306
+    #    instanceAddresses:
+    #    - ip: 172.24.47.4
+    #      hosts:
+    #      - emr-master-1
+    #    - ip: 172.24.47.5
+    #      hosts:
+    #      - emr-master-2
+    #    location: MESH_EXTERNAL
+    #    resolution: NONE
 
     ## see:https://bitnami.com/stack/redis/helm
     redis:
@@ -328,148 +360,148 @@ global:
         location: MESH_EXTERNAL
         resolution: NONE
 
-    hmaster:
-      internal:
-        enabled: false
-      external:
-        enabled: false
-        namespace:
-        serviceAccount:
-        labels:
-          classify: external-service
-          version: v1
-        instancePorts:
-        - protocol: TCP
-          targetPort: 16000
-        - protocol: TCP
-          targetPort: 16010
-        instanceAddresses:
-        - ip: 172.24.47.4
-          hosts:
-          - emr-master-1
-        - ip: 172.24.47.5
-          hosts:
-          - emr-master-2
-        location: MESH_EXTERNAL
-        resolution: NONE
+    #hmaster:
+    #  internal:
+    #    enabled: false
+    #  external:
+    #    enabled: false
+    #    namespace:
+    #    serviceAccount:
+    #    labels:
+    #      classify: external-service
+    #      version: v1
+    #    instancePorts:
+    #    - protocol: TCP
+    #      targetPort: 16000
+    #    - protocol: TCP
+    #      targetPort: 16010
+    #    instanceAddresses:
+    #    - ip: 172.24.47.4
+    #      hosts:
+    #      - emr-master-1
+    #    - ip: 172.24.47.5
+    #      hosts:
+    #      - emr-master-2
+    #    location: MESH_EXTERNAL
+    #    resolution: NONE
 
-    hregionserver:
-      internal:
-        enabled: false
-      external:
-        enabled: false
-        namespace:
-        serviceAccount:
-        labels:
-          classify: external-service
-          version: v1
-        instancePorts:
-        - protocol: TCP
-          targetPort: 16020
-        - protocol: TCP
-          targetPort: 16030
-        instanceAddresses:
-        - ip: 172.24.47.6
-          hosts:
-          - emr-worker-1
-        - ip: 172.24.47.7
-          hosts:
-          - emr-worker-2
-        - ip: 172.24.47.8
-          hosts:
-          - emr-worker-3
-        location: MESH_EXTERNAL
-        resolution: NONE
+    #hregionserver:
+    #  internal:
+    #    enabled: false
+    #  external:
+    #    enabled: false
+    #    namespace:
+    #    serviceAccount:
+    #    labels:
+    #      classify: external-service
+    #      version: v1
+    #    instancePorts:
+    #    - protocol: TCP
+    #      targetPort: 16020
+    #    - protocol: TCP
+    #      targetPort: 16030
+    #    instanceAddresses:
+    #    - ip: 172.24.47.6
+    #      hosts:
+    #      - emr-worker-1
+    #    - ip: 172.24.47.7
+    #      hosts:
+    #      - emr-worker-2
+    #    - ip: 172.24.47.8
+    #      hosts:
+    #      - emr-worker-3
+    #    location: MESH_EXTERNAL
+    #    resolution: NONE
 
-    namenode:
-      internal:
-        enabled: false
-      external:
-        enabled: false
-        namespace:
-        serviceAccount:
-        labels:
-          classify: external-service
-          version: v1
-        instancePorts:
-        - protocol: TCP
-          targetPort: 9870
-        - protocol: TCP
-          targetPort: 8020
-        - protocol: TCP
-          targetPort: 8022
-        instanceAddresses:
-        - ip: 172.24.47.4
-          hosts:
-          - emr-master-1
-        - ip: 172.24.47.5
-          hosts:
-          - emr-master-2
-        location: MESH_EXTERNAL
-        resolution: NONE
+    #namenode:
+    #  internal:
+    #    enabled: false
+    #  external:
+    #    enabled: false
+    #    namespace:
+    #    serviceAccount:
+    #    labels:
+    #      classify: external-service
+    #      version: v1
+    #    instancePorts:
+    #    - protocol: TCP
+    #      targetPort: 9870
+    #    - protocol: TCP
+    #      targetPort: 8020
+    #    - protocol: TCP
+    #      targetPort: 8022
+    #    instanceAddresses:
+    #    - ip: 172.24.47.4
+    #      hosts:
+    #      - emr-master-1
+    #    - ip: 172.24.47.5
+    #      hosts:
+    #      - emr-master-2
+    #    location: MESH_EXTERNAL
+    #    resolution: NONE
 
-    nodemanager:
-      internal:
-        enabled: false
-      external:
-        enabled: false
-        namespace:
-        serviceAccount:
-        labels:
-          classify: external-service
-          version: v1
-        instancePorts:
-        - protocol: TCP
-          targetPort: 8040
-        - protocol: TCP
-          targetPort: 8041
-        - protocol: TCP
-          targetPort: 7337
-        - protocol: TCP
-          targetPort: 8042
-        - protocol: TCP
-          targetPort: 13562
-        instanceAddresses:
-        - ip: 172.24.47.6
-          hosts:
-          - emr-worker-1
-        - ip: 172.24.47.7
-          hosts:
-          - emr-worker-2
-        - ip: 172.24.47.8
-          hosts:
-          - emr-worker-3
-        location: MESH_EXTERNAL
-        resolution: NONE
+    #nodemanager:
+    #  internal:
+    #    enabled: false
+    #  external:
+    #    enabled: false
+    #    namespace:
+    #    serviceAccount:
+    #    labels:
+    #      classify: external-service
+    #      version: v1
+    #    instancePorts:
+    #    - protocol: TCP
+    #      targetPort: 8040
+    #    - protocol: TCP
+    #      targetPort: 8041
+    #    - protocol: TCP
+    #      targetPort: 7337
+    #    - protocol: TCP
+    #      targetPort: 8042
+    #    - protocol: TCP
+    #      targetPort: 13562
+    #    instanceAddresses:
+    #    - ip: 172.24.47.6
+    #      hosts:
+    #      - emr-worker-1
+    #    - ip: 172.24.47.7
+    #      hosts:
+    #      - emr-worker-2
+    #    - ip: 172.24.47.8
+    #      hosts:
+    #      - emr-worker-3
+    #    location: MESH_EXTERNAL
+    #    resolution: NONE
 
-    datanode:
-      internal:
-        enabled: false
-      external:
-        enabled: false
-        namespace:
-        serviceAccount:
-        labels:
-          classify: external-service
-          version: v1
-        instancePorts:
-        - protocol: TCP
-          targetPort: 9867
-        - protocol: TCP
-          targetPort: 9864
-        - protocol: TCP
-          targetPort: 9866
-        - protocol: TCP
-          targetPort: 32828
-        instanceAddresses:
-        - ip: 172.24.47.6
-          hosts:
-          - emr-worker-1
-        - ip: 172.24.47.7
-          hosts:
-          - emr-worker-2
-        - ip: 172.24.47.8
-          hosts:
-          - emr-worker-3
-        location: MESH_EXTERNAL
-        resolution: NONE
+    #datanode:
+    #  internal:
+    #    enabled: false
+    #  external:
+    #    enabled: false
+    #    namespace:
+    #    serviceAccount:
+    #    labels:
+    #      classify: external-service
+    #      version: v1
+    #    instancePorts:
+    #    - protocol: TCP
+    #      targetPort: 9867
+    #    - protocol: TCP
+    #      targetPort: 9864
+    #    - protocol: TCP
+    #      targetPort: 9866
+    #    - protocol: TCP
+    #      targetPort: 32828
+    #    instanceAddresses:
+    #    - ip: 172.24.47.6
+    #      hosts:
+    #      - emr-worker-1
+    #    - ip: 172.24.47.7
+    #      hosts:
+    #      - emr-worker-2
+    #    - ip: 172.24.47.8
+    #      hosts:
+    #      - emr-worker-3
+    #    location: MESH_EXTERNAL
+    #    resolution: NONE

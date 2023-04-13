@@ -8,6 +8,9 @@ dependencies:
 - name: rengine-controller
   repository: file://charts/rengine-controller
   version: 1.0.0
+- name: rengine-ui
+  repository: file://charts/rengine-ui
+  version: 1.0.0
 - name: jaeger
   repository: https://jaegertracing.github.io/helm-charts
   version: 0.57.1
@@ -23,9 +26,9 @@ dependencies:
 - name: redis
   repository: https://charts.bitnami.com/bitnami
   version: 17.0.11
-- name: mysql
-  repository: https://charts.bitnami.com/bitnami
-  version: 9.2.6
+#- name: mysql
+#  repository: https://charts.bitnami.com/bitnami
+#  version: 9.2.6
 - name: mongodb
   repository: https://charts.bitnami.com/bitnami
   version: 12.1.31

@@ -86,16 +86,26 @@ cat << EOF > /tmp/cep-pattern-for-log-alarm.json
 EOF
 ```
 
-## Start job on Docker
+## Deploy on Docker
 
 - [flink application-mode-on-docker](https://nightlies.apache.org/flink/flink-docs-release-1.14/zh/docs/deployment/resource-providers/standalone/docker/#application-mode-on-docker)
 
+- Environment
+
+```bash
+FLINK_PROPERTIES="jobmanager.rpc.address: 127.0.0.1"
+```
+
+- JobManager
+
 ```bash
 # e.g: --fromSavepoint file:///tmp/flinksavepoint
+# e.g: -e JVM_ARGS=" -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8000,suspend=n "
 docker run \
-  --name=rengine_job_1 \
+  --name=rengine_job_jm \
   --rm \
-  --env FLINK_PROPERTIES="${FLINK_PROPERTIES}" \
+  -e FLINK_PROPERTIES="${FLINK_PROPERTIES}" \
+  -v $(pwd)/job/src/main/resources/log4j.properties:/opt/flink/conf/log4j.properties \
   --network host \
   --security-opt=seccomp:unconfined \
   wl4g/rengine-job:1.0.0 \
@@ -103,17 +113,31 @@ docker run \
   --job-classname com.wl4g.rengine.job.kafka.RengineKafkaFlinkCepStreaming \
   --allowNonRestoredState \
   --checkpointDir=file:///tmp/flinksavepoint \
-  --inProcessingTime true \
-  --parallelism 4 \
+  --inProcessingTime=true \
+  --parallelism=4 \
   --brokers=localhost:9092 \
-  --groupId rengine_test \
-  --eventTopic rengine_applog \
-  --keyByExprPath body.service \
-  --alertTopic rengine_alert \
-  --cepPatterns $(cat /tmp/cep-pattern-for-log-alarm.json | base64 -w 0)
+  --groupId=rengine_test \
+  --eventTopic=rengine_applog \
+  --keyByExprPath=body.service \
+  --alertTopic=rengine_alert \
+  --cepPatterns=$(cat /tmp/cep-pattern-for-log-alarm.json | base64 -w 0)
 ```
 
-## Start job on Kubernetes
+- TaskManager
+
+```bash
+docker run \
+  --name=rengine_job_tm \
+  --rm \
+  -e FLINK_PROPERTIES="${FLINK_PROPERTIES}" \
+  -v $(pwd)/job/src/main/resources/log4j.properties:/opt/flink/conf/log4j.properties \
+  --network host \
+  --security-opt=seccomp:unconfined \
+  wl4g/rengine-job:1.0.0 \
+  taskmanager
+```
+
+## Deploy on Kubernetes
 
 - [flink native kubernetes deployment-modes](https://nightlies.apache.org/flink/flink-docs-release-1.14/zh/docs/deployment/resource-providers/native_kubernetes/#deployment-modes)
 
@@ -121,8 +145,11 @@ docker run \
 
 ```bash
 docker run \
-  --name=rengine_job_1 \
+  --name=rengine_job \
   --rm \
+  -e FLINK_PROPERTIES="${FLINK_PROPERTIES}" \
+  -e JVM_ARGS=" -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8000,suspend=n " \
+  -v $(pwd)/job/src/main/resources/log4j.properties:/opt/flink/conf/log4j.properties \
   --security-opt=seccomp:unconfined \
   wl4g/rengine-job:1.0.0 \
   flink run-application \
@@ -131,16 +158,16 @@ docker run \
   -Dkubernetes.container.image=wl4g/rengine-job:1.0.0 \
   local:///opt/flink/usrlib/rengine-job-1.0.0-jar-with-dependencies.jar \
   --checkpointDir=file:///tmp/flinksavepoint \
-  --inProcessingTime true \
-  --parallelism 4 \
-  --groupId rengine_test \
-  --eventTopic rengine_applog \
-  --keyByExprPath body.service \
-  --alertTopic rengine_alert \
-  --cepPatterns $(cat /tmp/cep-pattern-for-log-alarm.json | base64 -w 0)
+  --inProcessingTime=true \
+  --parallelism=4 \
+  --groupId=rengine_test \
+  --eventTopic=rengine_applog \
+  --keyByExprPath=body.service \
+  --alertTopic=rengine_alert \
+  --cepPatterns=$(cat /tmp/cep-pattern-for-log-alarm.json | base64 -w 0)
 ```
 
-## Start job on VM
+## Deploy on VM
 
 - print help
 
@@ -161,7 +188,7 @@ $JAVA_HOME/bin/java -cp $JOB_CLASSPATH org.apache.flink.client.cli.CliFrontend r
   local://job/job-base/target/rengine-job-base-1.0.0-jar-with-dependencies.jar
 ```
 
-## Tests for job
+## Generating testdata
 
 - Mock for logs producer
 
