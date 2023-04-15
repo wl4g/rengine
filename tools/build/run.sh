@@ -94,6 +94,7 @@ Usage: ./$(basename $0) [OPTIONS] [arg1] [arg2] ...
     build-push                                      Build with Maven and push images for all components.
     run-standalone                                  Run all services with docker standalone mode.
                     -U,--up                         Startup to all services.
+                       --prune-all-volumes          Remove all data volumes before per initial deploy. Note: be careful!
                     -D,--down                       Shuwdown to all services.
 "
 }
@@ -256,8 +257,9 @@ function do_build_image_with_springboot() {
   local app_mainclass=$3
   local build_file=$4
   local assets_file=$5
-  echo "Docker building for $app_name:$app_version ..."
-  docker build -t wl4g/rengine-${app_name}:${app_version} -f $BASE_DIR/tools/build/docker/$build_file \
+
+  log "Docker building for $app_name:$app_version ..."
+  docker build --no-cache -t wl4g/rengine-${app_name}:${app_version} -f $BASE_DIR/tools/build/docker/$build_file \
     --build-arg DL_URI="http://$LOCAL_IP:13337/${assets_file}" \
     --build-arg APP_NAME=${app_name} \
     --build-arg APP_VERSION=${app_version} \
@@ -268,7 +270,7 @@ function do_build_image_with_npm() {
     local app_name=$1
     local app_version=$2
     local build_file=$3
-    echo "Docker building for $app_name:$app_version ..."
+    log "Docker building for $app_name:$app_version ..."
 
     docker build -t wl4g/rengine-${app_name}:${app_version} -f $build_file \
       --build-arg REPO_NAME=rengine-${app_name} \
@@ -298,6 +300,52 @@ function do_push_image() {
     logDebug "Pushing image to $image_registry/$image_name:$image_tag ..."
     docker tag wl4g/$image_name:$image_tag $image_registry/$image_name:$image_tag
     docker push $image_registry/$image_name:$image_tag
+}
+
+function do_run_standalone() {
+    local compose_args="$1"
+    local prune_args="$2"
+    [ -z "$compose_args" ] && logErr "docker compose args is missing." && exit 1 || echo -n
+
+    local compose_cmd=$(which docker-compose)
+    [ -z "$compose_cmd" ] && logErr "The docker-compose not installed yet" && exit 1 || echo -n
+
+    ## Compose environment.
+    echo "BASE_DIR=${BASE_DIR}" > /tmp/.env
+
+    ## Compose file.
+    local compose_file="${BASE_DIR}/tools/deploy/compose/docker-compose.yml"
+    if [ ! -f "$compose_file" ]; then
+        local remote_compose_file="https://raw.githubusercontent.com/wl4g/rengine/master/tools/deploy/compose/docker-compose.yml"
+        log "Downloading compose file from $remote_compose_file ..."
+        curl -k -o $compose_file $remote_compose_file
+    fi
+
+    ## Destroy before the startup volumes.
+    if [[ "$compose_args" == up* && "$prune_args" == "--prune-all-volumes" ]]; then
+        ## Remove the volumes only if it is the first deploy.
+        if [ -z "$($compose_cmd -f $compose_file ls | grep rengine)" ]; then
+            log "Removing the all rengine volumes ..."
+            docker volume rm rengine_hbase_data
+            docker volume rm rengine_kafka_data
+            docker volume rm rengine_minio_data
+            docker volume rm rengine_mongodb_data
+            docker volume rm rengine_redis_data_0
+            docker volume rm rengine_redis_data_1
+            docker volume rm rengine_redis_data_2
+            docker volume rm rengine_redis_data_3
+            docker volume rm rengine_redis_data_4
+            docker volume rm rengine_redis_data_5
+            docker volume rm rengine_script_log
+            docker volume rm rengine_script_rootfs
+            docker volume rm rengine_script_works
+            docker volume rm rengine_zookeeper_data
+        else
+           logErr "Unable to remove data volumes, please shutdown all containers before!"
+           exit 1
+        fi
+    fi
+    $compose_cmd --env-file /tmp/.env -f ${compose_file} $compose_args
 }
 
 # --- Main. ---
@@ -488,13 +536,12 @@ case $1 in
     do_push_image "$3" "rengine-ui" "$POM_VERSION"
     ;;
   run-standalone)
-    echo "BASE_DIR=${BASE_DIR}" > /tmp/.env
     case $2 in
       -U|--up)
-        docker-compose --env-file /tmp/.env -f ${BASE_DIR}/tools/deploy/compose/docker-compose.yml up -d
+        do_run_standalone "up -d" "$3"
         ;;
       -D|--down)
-        docker-compose --env-file /tmp/.env -f ${BASE_DIR}/tools/deploy/compose/docker-compose.yml down
+        do_run_standalone "down"
         ;;
       *)
         usages; exit 1

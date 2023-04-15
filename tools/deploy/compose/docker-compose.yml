@@ -276,6 +276,27 @@ services:
     ports:
       - "8888:80"
 
+  ## =============== Rengine (apiserver) init ================
+
+  apiserver_init:
+    image: wl4g/rengine-apiserver:1.0.0
+    ## see:docker run --rm --entrypoint /bin/bash wl4g/rengine-apiserver:1.0.0 -c 'cd $APP_HOME && java -cp .:lib/* com.wl4g.rengine.service.minio.RengineMinioTool --help'
+    entrypoint: "/bin/bash"
+    command: "-c 'cd /opt/apps/ecm/apiserver-package/apiserver-1.0.0-bin && java -cp .:lib/* com.wl4g.rengine.service.minio.RengineMinioTool \
+      --endpoint=http://minio:9000 \
+      --region=us-east-1 \
+      --tenantBucket=rengine \
+      --adminAccessKey=minioadmin \
+      --adminSecretKey=minioadmin \
+      --tenantAccessKey=rengine \
+      --tenantSecretKey=12345678'"
+    container_name: rengine_apiserver_init
+    restart: "no"
+    networks:
+      - rengine_net
+    depends_on: # Links will be created automatically
+      - minio
+
   ## =============== Rengine (apiserver) ================
 
   apiserver:
@@ -291,6 +312,7 @@ services:
       - MINIO_BUCKET=rengine
       - MINIO_TENANT_ACCESS_KEY=rengine
       - MINIO_TENANT_SECRET_KEY=123456
+      - RENGINE_SERVICES_EXECUTOR_ENDPOINT=http://executor:28002
     restart: unless-stopped
     networks:
       - rengine_net
@@ -306,6 +328,7 @@ services:
       # for queries raw events from HBase
       #- zookeeper
       #- hbase
+      - apiserver_init
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro

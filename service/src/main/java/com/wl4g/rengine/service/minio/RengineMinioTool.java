@@ -26,6 +26,8 @@ import static com.wl4g.infra.common.minio.S3Policy.Action.ListBucketMultipartUpl
 import static com.wl4g.infra.common.minio.S3Policy.Action.ListMultipartUploadPartsAction;
 import static com.wl4g.infra.common.minio.S3Policy.Action.PutObjectAction;
 import static com.wl4g.infra.common.minio.S3Policy.Action.PutObjectLegalHoldAction;
+import static java.lang.String.format;
+import static java.lang.System.out;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
@@ -34,6 +36,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 import org.bouncycastle.crypto.InvalidCipherTextException;
 
@@ -70,22 +73,27 @@ public final class RengineMinioTool {
     public static final String DEFAULT_TENANT_BUCKET = DEFAULT_TENANT_ACCESSKEY;
 
     public static final String DEFAULT_TENANT_POLICY_NAME = DEFAULT_TENANT_ACCESSKEY + "_readwrite";
+    public static final List<S3Policy.Action> DEFAULT_TENANT_POLICY_ACTIONS = asList(CreateBucketAction, GetBucketLocationAction,
+            GetBucketPolicyStatusAction, ListBucketAction, ListAllMyBucketsAction, ListBucketMultipartUploadsAction,
+            ListMultipartUploadPartsAction, PutObjectAction, PutObjectLegalHoldAction, GetObjectAction, GetObjectLegalHoldAction);
 
     public static void main(String[] args) throws Exception {
         CommandLineFacade line = CommandLineTool.builder()
                 .option("e", "endpoint", DEFAULT_ENDPOINT, "MinIO server endpoint.")
                 .option("r", "region", DEFAULT_REGION, "MinIO server region.")
-                .option("BsonEntitySerializers", "adminAccessKey", DEFAULT_ADMIN_ACCESSKEY, "Admin clientId.")
-                .option("S", "adminSecretKey", DEFAULT_ADMIN_SECRETKEY, "Admin secretKey.")
-                .option("a", "tenantAccessKey", DEFAULT_TENANT_ACCESSKEY, "Tenant clientId.")
-                .option("s", "tenantSecretKey", DEFAULT_TENANT_SECRETKEY, "Tenant secretKey.")
+                .option("A", "adminAccessKey", DEFAULT_ADMIN_ACCESSKEY, "Admin access key.")
+                .option("S", "adminSecretKey", DEFAULT_ADMIN_SECRETKEY, "Admin secret key.")
+                .option("a", "tenantAccessKey", DEFAULT_TENANT_ACCESSKEY, "Tenant access key.")
+                .option("s", "tenantSecretKey", DEFAULT_TENANT_SECRETKEY, "Tenant secret key.")
                 .option("b", "tenantBucket", DEFAULT_TENANT_BUCKET, "Tenant bucket.")
                 .option("n", "policyName", DEFAULT_TENANT_POLICY_NAME, "Tenant policy name.")
-                .option("j", "policyJson", null, "Tenant policy json.")
+                .option("j", "policyJson", null,
+                        format("Tenant policy json. Defaults to access to <tenant bucket> only actions of : %s.",
+                                DEFAULT_TENANT_POLICY_ACTIONS))
                 .build(args);
         String endpoint = line.get("e");
         String region = line.get("r");
-        String adminAccessKey = line.get("BsonEntitySerializers");
+        String adminAccessKey = line.get("A");
         String adminSecretKey = line.get("S");
         String tenantAccessKey = line.get("a");
         String tenantSecretKey = line.get("s");
@@ -110,19 +118,19 @@ public final class RengineMinioTool {
                     .toString();
         }
 
-        System.out.println("Using configuration arguments:");
-        System.out.println("---------------------------------------");
-        System.out.println("         endpoint: " + endpoint);
-        System.out.println("           region: " + region);
-        System.out.println("   adminAccessKey: " + adminAccessKey);
-        System.out.println("   adminSecretKey: " + adminSecretKey);
-        System.out.println("  tenantAccessKey: " + tenantAccessKey);
-        System.out.println("  tenantSecretKey: " + tenantSecretKey);
-        System.out.println("     tenantBucket: " + tenantBucket);
-        System.out.println(" tenantPolicyName: " + tenantPolicyName);
-        System.out.println(" tenantPolicyJson: " + tenantPolicyJson);
-        System.out.println("---------------------------------------");
-        System.out.println("\nCall to MinIO Server ...\n");
+        out.println("Using configuration arguments:");
+        out.println("---------------------------------------");
+        out.println("         endpoint: " + endpoint);
+        out.println("           region: " + region);
+        out.println("   adminAccessKey: " + adminAccessKey);
+        out.println("   adminSecretKey: " + adminSecretKey);
+        out.println("  tenantAccessKey: " + tenantAccessKey);
+        out.println("  tenantSecretKey: " + tenantSecretKey);
+        out.println("     tenantBucket: " + tenantBucket);
+        out.println(" tenantPolicyName: " + tenantPolicyName);
+        out.println(" tenantPolicyJson: " + tenantPolicyJson);
+        out.println("---------------------------------------");
+        out.println("\nCall to MinIO Server ...\n");
 
         createTenantPolicy(endpoint, region, adminAccessKey, adminSecretKey, tenantPolicyName, tenantPolicyJson);
         createTenantUser(endpoint, region, adminAccessKey, adminSecretKey, tenantAccessKey, tenantSecretKey, tenantPolicyName);

@@ -203,7 +203,7 @@
 ##
 ## ----- Preparing stage -----
 ##
-FROM alpine:latest AS wl4g_copy_base
+#FROM alpine:latest AS wl4g_copy_base
 
 ##
 ## ----- Define the immutable properties. -----
