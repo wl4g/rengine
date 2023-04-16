@@ -10,7 +10,7 @@
 
 {{- $releaseNamespace := .Release.Namespace }}
 
-{{- range $name, $app := .Values.global.components }}
+{{- range $name, $app := .Values.global.componentServices }}
 {{- if $app.external.enabled }}
 ## see:https://developer.aliyun.com/article/772279
 ## see:https://istio.io/v1.14/zh/docs/tasks/traffic-management/egress/egress-control/#controlled-access-to-external-services

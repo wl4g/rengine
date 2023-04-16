@@ -10,15 +10,14 @@
 # This parent charts will override the value of child charts.
 # see:https://github.com/whmzsu/helm-doc-zh-cn/blob/master/chart_template_guide/subcharts_and_globals-zh_cn.md
 
-## ---------------------------------- Rengine Values Configuration. ----------------------------------
-
+## ---------------------------------------- APP Configuration. ----------------------------------------
 ## This is the spec definition of application instance deployed in Kubernetes.
 rengine-apiserver:
   enabled: true
   image:
     repository: wl4g/rengine-apiserver
     baselineTag: 1.0.0
-    upgradeTag: latest
+    #upgradeTag: latest
 
   envConfigs: {}
 
@@ -37,7 +36,7 @@ rengine-controller:
   image:
     repository: wl4g/rengine-controller
     baselineTag: 1.0.0
-    upgradeTag: latest
+    #upgradeTag: latest
 
   envConfigs: {}
 
@@ -57,7 +56,7 @@ rengine-executor:
     #repository: wl4g/rengine-executor
     repository: wl4g/rengine-executor-native # Recommands
     baselineTag: 1.0.0
-    upgradeTag: latest
+    #upgradeTag: latest
 
   envConfigs: {}
 
@@ -76,7 +75,7 @@ rengine-ui:
   image:
     repository: wl4g/rengine-ui
     baselineTag: 1.0.0
-    upgradeTag: latest
+    #upgradeTag: latest
 
   envConfigs: {}
 
@@ -90,48 +89,51 @@ rengine-ui:
         customHosts:
         - console.rengine.io
 
-## ------------------------- Global Shared Components Configuration Examples. -------------------------
 global:
-  ##
-  ## This is a script pre-start hook that is automatically executed before starting the container and
-  ## can be used to customize the pre-launch actions (such as setup environments, etc.)
-  ##
-  ## Tip: The advantage of the following pre-start hook script mechanism is that it is more flexible
-  ## than directly mounting the configuration through configmap+volume. For example, it cannot control
-  ## the order of exporting environment variables, that is, variable evaluation cannot be used,
-  ## such as export A=123; export B="${A}"
-  ##
-  preStartScript: |-
-    #!/bin/sh
-    ## see:./service/src/main/resources/application-telemetry.yaml
-    export SPRING_SLEUTH_OTEL_EXPORTER_OTLP_ENDPOENT="http://otlp-collector.otlp.svc.cluster.local:4317"
-    export SPRING_SLEUTH_OTEL_EXPORTER_JAEGER_ENDPOENT="http://jaeger-collector.jaeger.svc.cluster.local:14250"
+  ## ------------------------------- Common Configuration. ----------------------------------------------
+  commonConfigs:
+    ##
+    ## This is a script pre-start hook that is automatically executed before starting the container and
+    ## can be used to customize the pre-launch actions (such as setup environments, etc.)
+    ##
+    ## Tip: The advantage of the following pre-start hook script mechanism is that it is more flexible
+    ## than directly mounting the configuration through configmap+volume. For example, it cannot control
+    ## the order of exporting environment variables, that is, variable evaluation cannot be used,
+    ## such as export A=123; export B="${A}"
+    ##
+    preStartScript: |-
+      #!/bin/sh
+      ## see:./service/src/main/resources/application-telemetry.yaml
+      export SPRING_SLEUTH_OTEL_EXPORTER_OTLP_ENDPOENT="http://otlp-collector.otlp.svc.cluster.local:4317"
+      export SPRING_SLEUTH_OTEL_EXPORTER_JAEGER_ENDPOENT="http://jaeger-collector.jaeger.svc.cluster.local:14250"
 
-    ## see:./service/src/main/resources/application-mongo.yaml
-    export SPRING_DATA_MONGODB_URI="mongodb://mongodb.svc.cluster.local:27017/rengine"
+      ## see:./service/src/main/resources/application-mongo.yaml
+      export SPRING_DATA_MONGODB_URI="mongodb://rengine-mongodb:27017/rengine"
 
-    ## see:./service/src/main/resources/application-redis.yaml
-    #export SPRING_REDIS_CLUSTER_NODES="10.0.0.114:6379,10.0.0.114:6380,10.0.0.114:6381,10.0.0.114:7379,10.0.0.114:7380,10.0.0.114:7381"
-    export SPRING_REDIS_CLUSTER_NODES="redis-0.redis.svc.cluster.local:6379,redis-1.redis.svc.cluster.local:6379,redis-2.redis.svc.cluster.local:6379,redis-3.redis.svc.cluster.local:6379,redis-4.redis.svc.cluster.local:6379,redis-5.redis.svc.cluster.local:6379"
-    export SPRING_REDIS_CLUSTER_PASSWORD='123456'
+      ## see:./service/src/main/resources/application-redis.yaml
+      export SPRING_REDIS_CLUSTER_NODES="rengine-redis-cluster-0:6379,rengine-redis-cluster-1:6379,rengine-redis-cluster-2:6379,rengine-redis-cluster-3:6379,rengine-redis-cluster-4:6379,rengine-redis-cluster-5:6379"
+      export SPRING_REDIS_CLUSTER_PASSWORD='12345678'
 
-    ## see:./executor/src/main/resources/application.yaml and ./service/src/main/resources/application-minio.yaml
-    #export MINIO_ENDPOINT="http://10.0.0.114:9000"
-    export MINIO_ENDPOINT="http://minio.svc.cluster.local"
-    export MINIO_TENANT_ACCESSKEY="rengine"
-    export MINIO_TENANT_SECRETKEY="12345678"
+      ## see:./controller/src/main/resources/application-controller.yaml
+      export RENGINE_CONTROLLER_ZOOKEEPER_SERVER_LISTS="rengine-zookeeper:2181"
 
-    ## see:./executor/src/main/resources/application.yaml
-    export QUARKUS_MONGODB_CONNECTION_STRING="${SPRING_DATA_MONGODB_URI}"
-    export QUARKUS_REDIS_PASSWORD="${SPRING_REDIS_CLUSTER_PASSWORD}"
-    export QUARKUS_REDIS_HOSTS="$(echo $SPRING_REDIS_CLUSTER_NODES | sed 's#,#,redis://#g')"
+      ## see:./executor/src/main/resources/application.yaml and ./service/src/main/resources/application-minio.yaml
+      export MINIO_ENDPOINT="http://rengine-minio:9000"
+      export MINIO_TENANT_ACCESS_KEY="rengine"
+      export MINIO_TENANT_SECRET_KEY="12345678"
 
-  envConfigs: {}
+      ## see:./executor/src/main/resources/application.yaml
+      export QUARKUS_MONGODB_CONNECTION_STRING="${SPRING_DATA_MONGODB_URI}"
+      export QUARKUS_REDIS_PASSWORD="${SPRING_REDIS_CLUSTER_PASSWORD}"
+      export QUARKUS_REDIS_HOSTS="$(echo $SPRING_REDIS_CLUSTER_NODES | sed 's#,#,redis://#g')"
 
-  agentConfigs: {}
+    envConfigs: {}
 
-  appConfigs: {}
+    agentConfigs: {}
 
+    appConfigs: {}
+
+  ## ------------------------------- Component Configuration. ----------------------------------------------
   ##
   ## The following are the global public dependent components examples configuration, which support the internal
   ## components that are automatically deployed using the current charts, or the services deployed in the VM 
@@ -140,7 +142,7 @@ global:
   ## Notice: Automatic deployment is disabled by default for all components, you can partially enable it
   ## according to actual needs.
   ##
-  components:
+  componentServices:
     ## see:https://open-telemetry.github.io/opentelemetry-helm-charts
     otlp:
       internal:
@@ -166,7 +168,8 @@ global:
     ## see:https://jaegertracing.github.io/helm-charts/
     jaeger:
       internal:
-        enabled: false
+        enabled: true
+        # operatorEnabled: false
       external:
         enabled: false
         namespace:
@@ -188,7 +191,7 @@ global:
     ## see:https://bitnami.com/stack/zookeeper/helm
     zookeeper:
       internal:
-        enabled: false
+        enabled: true
       external:
         enabled: false
         namespace:
@@ -200,15 +203,15 @@ global:
         - protocol: TCP
           targetPort: 2181
         instanceAddresses:
-        - ip: 172.24.47.6
+        - ip: 172.24.47.1
           hosts:
-          - emr-worker-1
-        - ip: 172.24.47.7
+          - rengine-zookeeper-1
+        - ip: 172.24.47.2
           hosts:
-          - emr-worker-2
-        - ip: 172.24.47.8
+          - rengine-zookeeper-2
+        - ip: 172.24.47.3
           hosts:
-          - emr-worker-3
+          - rengine-zookeeper-3
         location: MESH_EXTERNAL
         resolution: NONE
 
@@ -227,15 +230,15 @@ global:
         - protocol: TCP
           targetPort: 9092
         instanceAddresses:
-        - ip: 172.24.47.6
+        - ip: 172.24.47.1
           hosts:
-          - emr-worker-1
-        - ip: 172.24.47.7
+          - rengine-kafka-1
+        - ip: 172.24.47.2
           hosts:
-          - emr-worker-2
-        - ip: 172.24.47.8
+          - rengine-kafka-2
+        - ip: 172.24.47.3
           hosts:
-          - emr-worker-3
+          - rengine-kafka-3
         location: MESH_EXTERNAL
         resolution: NONE
 
@@ -255,19 +258,50 @@ global:
     #    - protocol: TCP
     #      targetPort: 3308 ## Native default: 3306
     #    instanceAddresses:
-    #    - ip: 172.24.47.4
+    #    - ip: 172.24.47.1
     #      hosts:
-    #      - emr-master-1
-    #    - ip: 172.24.47.5
+    #      - rengine-mysql-1
+    #    - ip: 172.24.47.2
     #      hosts:
-    #      - emr-master-2
+    #      - rengine-mysql-2
+    #    - ip: 172.24.47.3
+    #      hosts:
+    #      - rengine-mysql-2
     #    location: MESH_EXTERNAL
     #    resolution: NONE
 
     ## see:https://bitnami.com/stack/redis/helm
-    redis:
+    # redis:
+    #   internal:
+    #     enabled: false
+    #   external:
+    #     enabled: false
+    #     namespace:
+    #     serviceAccount:
+    #     labels:
+    #       classify: external-service
+    #       version: v1
+    #     instancePorts:
+    #     - protocol: TCP
+    #       targetPort: 6379
+    #     - protocol: TCP
+    #       targetPort: 6380
+    #     - protocol: TCP
+    #       targetPort: 6381
+    #     instanceAddresses:
+    #     - ip: 172.24.47.1
+    #       hosts:
+    #       - rengine-redis-0
+    #     - ip: 172.24.47.2
+    #       hosts:
+    #       - rengine-redis-1
+    #     location: MESH_EXTERNAL
+    #     resolution: NONE
+
+    ## see:https://bitnami.com/stack/redis-cluster/helm
+    redis-cluster:
       internal:
-        enabled: false
+        enabled: true
       external:
         enabled: false
         namespace:
@@ -285,29 +319,29 @@ global:
         instanceAddresses:
         - ip: 172.24.47.1
           hosts:
-          - n0.redis.wl4g-cs.com
+          - rengine-redis-cluster-0
         - ip: 172.24.47.2
           hosts:
-          - n1.redis.wl4g-cs.com
+          - rengine-redis-cluster-1
         - ip: 172.24.47.3
           hosts:
-          - n2.redis.wl4g-cs.com
+          - rengine-redis-cluster-2
         - ip: 172.24.47.4
           hosts:
-          - n3.redis.wl4g-cs.com
+          - rengine-redis-cluster-3
         - ip: 172.24.47.5
           hosts:
-          - n4.redis.wl4g-cs.com
+          - rengine-redis-cluster-4
         - ip: 172.24.47.6
           hosts:
-          - n5.redis.wl4g-cs.com
+          - rengine-redis-cluster-5
         location: MESH_EXTERNAL
         resolution: NONE
 
     ## see:https://bitnami.com/stack/minio/helm
     minio:
       internal:
-        enabled: false
+        enabled: true
       external:
         enabled: false
         namespace:
@@ -323,18 +357,39 @@ global:
         instanceAddresses:
         - ip: 172.24.47.6
           hosts:
-          - emr-worker-1
+          - rengine-minio-1
         - ip: 172.24.47.7
           hosts:
-          - emr-worker-2
+          - rengine-minio-2
         - ip: 172.24.47.8
           hosts:
-          - emr-worker-3
+          - rengine-minio-3
         location: MESH_EXTERNAL
         resolution: NONE
 
     ## see:https://bitnami.com/stack/mongodb/helm
     mongodb:
+      internal:
+        enabled: true
+      external:
+        enabled: false
+        namespace:
+        serviceAccount:
+        labels:
+          classify: external-service
+          version: v1
+        instancePorts:
+        - protocol: TCP
+          targetPort: 27017
+        instanceAddresses:
+        - ip: 172.24.47.6
+          hosts:
+          - rengine-mongodb
+        location: MESH_EXTERNAL
+        resolution: NONE
+
+    ## see:https://bitnami.com/stack/mongodb-sharded/helm
+    mongodb-sharded:
       internal:
         enabled: false
       external:
@@ -350,13 +405,13 @@ global:
         instanceAddresses:
         - ip: 172.24.47.6
           hosts:
-          - emr-worker-1
+          - rengine-mongodb-1
         - ip: 172.24.47.7
           hosts:
-          - emr-worker-2
+          - rengine-mongodb-2
         - ip: 172.24.47.8
           hosts:
-          - emr-worker-3
+          - rengine-mongodb-3
         location: MESH_EXTERNAL
         resolution: NONE
 
@@ -505,3 +560,112 @@ global:
     #      - emr-worker-3
     #    location: MESH_EXTERNAL
     #    resolution: NONE
+
+## ------------------------------- (Internal) Jaeger Configuration. ----------------------------------
+## see:https://github.com/bitnami/charts/tree/main/bitnami/mongodb
+jaeger:
+  allInOne:
+    enabled: true
+  storage:
+    type: "" ## cassandra,elasticsearch
+  #   cassandra:
+  #     host: cassandra
+  #     port: 9042
+  #     tls:
+  #       enabled: false
+  #     user: admin
+  #     usePassword: true
+  #     password: 12345678
+  #   elasticsearch:
+  #     scheme: http
+  #     host: elasticsearch-master
+  #     port: 9200
+  #     user: elastic
+  #     usePassword: true
+  #     password: 12345678
+  #   kafka:
+  #     brokers:
+  #       - kafka:9092
+  #     topic: jaegerv1data
+  #     authentication: none
+
+## ------------------------------- (Internal) MongoDB Configuration. ----------------------------------
+## see:https://github.com/bitnami/charts/tree/main/bitnami/mongodb
+mongodb:
+  auth:
+    rootPassword: "12345678"
+
+## ------------------------------- (Internal) MongoDB sharded Configuration. ----------------------------------
+## see:https://github.com/bitnami/charts/tree/main/bitnami/mongodb
+mongodb-sharded:
+  diagnosticMode:
+    enabled: false
+  mongos:
+    replicaCount: 1
+  configsvr:
+    replicaCount: 1
+  shardsvr:
+    dataNode:
+      replicaCount: 1
+    arbiter:
+      replicaCount: 0
+  shards: 2
+  metrics:
+    enabled: true
+  auth:
+    enabled: true
+    rootUser: root
+    rootPassword: "12345678"
+
+## ------------------------------- (Internal) Redis Configuration. ----------------------------------
+## see:https://github.com/bitnami/charts/tree/main/bitnami/redis
+# redis:
+#   architecture: replication
+#   commonConfiguration: |-
+#     appendonly yes
+#     save ""
+#   auth:
+#     enabled: true
+#     sentinel: false
+#     rootPassword: "12345678"
+#   master:
+#     count: 1
+#     disableCommands: ["FLUSHDB","FLUSHALL"]
+#     configuration: ""
+#   replica:
+#     replicaCount: 1
+#     configuration: ""
+#   sentinel:
+#     enabled: false
+#   metrics:
+#     enabled: true
+
+## ------------------------------- (Internal) Redis Cluster Configuration. ----------------------------------
+## see:https://github.com/bitnami/charts/tree/main/bitnami/redis-cluster
+redis-cluster:
+  diagnosticMode:
+    enabled: false
+  password: "12345678"
+  redis:
+    useAOFPersistence: "yes"
+  cluster:
+    nodes: 6
+    replicas: 1
+    externalAccess:
+      enabled: false
+  metrics:
+    enabled: true
+
+## ------------------------------- (Internal) MinIO Configuration. ------------------------------------
+## see:https://github.com/bitnami/charts/tree/main/bitnami/minio
+minio:
+  auth:
+    rootPassword: "minioadmin"
+
+## ------------------------------- (Internal) Zookeeper Configuration. --------------------------------
+## see:https://github.com/bitnami/charts/tree/main/bitnami/zookeeper
+zookeeper:
+  replicaCount: 3
+  pdb:
+    minAvailable: 2
+    maxUnavailable: 1

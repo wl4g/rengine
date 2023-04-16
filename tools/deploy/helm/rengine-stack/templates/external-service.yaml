@@ -10,7 +10,7 @@
 
 {{- $releaseNamespace := .Release.Namespace }}
 
-{{- range $name, $app := .Values.global.components }}
+{{- range $name, $app := .Values.global.componentServices }}
 {{- if $app.external.enabled }}
 ---
 apiVersion: v1

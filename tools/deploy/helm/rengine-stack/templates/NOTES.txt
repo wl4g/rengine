@@ -1,5 +1,5 @@
 {{- $webApp := "rengine-apiserver" }}
-{{- $initUserName := "admin" }}
+{{- $initUserName := "root" }}
 
 {{- $apiserverBaselineTag := index .Values "rengine-apiserver" "image" "baselineTag" }}
 {{- $firstCustomHost := index .Values "rengine-apiserver" "governance" "istio" "ingress" "customHosts" 0 }}

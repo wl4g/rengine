@@ -60,39 +60,49 @@ dependencies:
     repository: "file://charts/rengine-ui"
     version: "~1.0.0"
   - name: "jaeger"
-    condition: global.components.jaeger.internal.enabled
+    condition: global.componentServices.jaeger.internal.enabled
     repository: "https://jaegertracing.github.io/helm-charts"
     version: "~0.57.1"
-  - name: "jaeger-operator"
-    condition: global.components.jaeger.internal.enabled
-    repository: "https://jaegertracing.github.io/helm-charts"
-    version: "~2.33.0"
+  # - name: "jaeger-operator"
+  #   condition: global.componentServices.jaeger.internal.operatorEnabled
+  #   repository: "https://jaegertracing.github.io/helm-charts"
+  #   version: "~2.33.0"
+  ## see:https://github.com/bitnami/charts/tree/main/bitnami/zookeeper
   - name: "zookeeper"
-    condition: global.components.zookeeper.internal.enabled
+    condition: global.componentServices.zookeeper.internal.enabled
     repository: "https://charts.bitnami.com/bitnami"
     version: "~10.0.2"
   - name: "kafka"
-    condition: global.components.kafka.internal.enabled
+    condition: global.componentServices.kafka.internal.enabled
     repository: "https://charts.bitnami.com/bitnami"
     version: "~18.0.3"
-  - name: "redis"
-    condition: global.components.redis.internal.enabled
+  # - name: "redis"
+  #   condition: global.componentServices.redis.internal.enabled
+  #   repository: "https://charts.bitnami.com/bitnami"
+  #   version: "~17.0.x"
+  - name: "redis-cluster"
+    condition: global.componentServices.redis-cluster.internal.enabled
     repository: "https://charts.bitnami.com/bitnami"
-    version: "~17.0.x"
+    version: "~8.4.3"
   #- name: "mysql"
-  #  condition: global.components.mysql.internal.enabled
+  #  condition: global.componentServices.mysql.internal.enabled
   #  repository: "https://charts.bitnami.com/bitnami"
   #  version: "~9.2.x"
   - name: "mongodb"
-    condition: global.components.mongodb.internal.enabled
+    condition: global.componentServices.mongodb.internal.enabled
     repository: "https://charts.bitnami.com/bitnami"
     version: "~12.1.27"
+  ## see:https://github.com/bitnami/containers/blob/main/bitnami/mongodb-sharded/docker-compose-multiple-shards.yml
+  - name: "mongodb-sharded"
+    condition: global.componentServices.mongodb-sharded.internal.enabled
+    repository: "https://charts.bitnami.com/bitnami"
+    version: "~6.3.3"
   - name: "minio"
-    condition: global.components.minio.internal.enabled
+    condition: global.componentServices.minio.internal.enabled
     repository: "https://charts.bitnami.com/bitnami"
     version: "~11.7.13"
   # - name: "vault"
-  #   condition: global.components.vault.disabled
+  #   condition: global.componentServices.vault.disabled
   #   repository: https://helm.releases.hashicorp.com
   #   version: "~0.6.0"
 

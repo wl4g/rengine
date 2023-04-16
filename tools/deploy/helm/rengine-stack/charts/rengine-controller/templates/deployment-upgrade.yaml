@@ -68,7 +68,7 @@ spec:
         app.kubernetes.io/canaryVersion: {{ .Values.image.upgradeTag | default .Chart.AppVersion }}
     spec:
       hostAliases:
-      {{- range $name, $app := .Values.global.components }}
+      {{- range $name, $app := .Values.global.componentServices }}
       {{- if $app.external.enabled }}
         {{- range $index, $addr := $app.external.instanceAddresses }}
         - ip: {{ $addr.ip }}
@@ -100,7 +100,7 @@ spec:
 
       volumes:
       ## PreStart script.
-      {{- if or (not (empty .Values.preStartScript)) (not (empty .Values.global.preStartScript)) }}
+      {{- if or (not (empty .Values.preStartScript)) (not (empty .Values.global.commonConfigs.preStartScript)) }}
       - name: pre-start-volume
         configMap:
           name: {{ template "app.name" . }}-prestart-configmap
@@ -108,14 +108,14 @@ spec:
           {{- if not (empty .Values.preStartScript)}}
           - key: pre-start.config
             path: pre-start
-          {{- else if not (empty .Values.global.preStartScript) }}
+          {{- else if not (empty .Values.global.commonConfigs.preStartScript) }}
           - key: pre-start.config
             path: pre-start
           {{- end}}
       {{- end}}
 
       ## Agent configuration.
-      {{- if or (not (empty .Values.agentConfigs)) (not (empty .Values.global.agentConfigs)) }}
+      {{- if or (not (empty .Values.agentConfigs)) (not (empty .Values.global.commonConfigs.agentConfigs)) }}
       - name: agentconfig-volume
         configMap:
           name: {{ template "app.name" . }}-agent-configmap
@@ -125,7 +125,7 @@ spec:
           - key: {{$key}}.config
             path: {{$key}}
             {{- end}}
-          {{- else if not (empty .Values.global.agentConfigs) }}
+          {{- else if not (empty .Values.global.commonConfigs.agentConfigs) }}
             {{- range $key, $value := .Values.agentConfigs}}
           - key: {{$key}}.config
             path: {{$key}}
@@ -135,7 +135,7 @@ spec:
 
       ## Application core configuration.
       ## see:https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#add-configmap-data-to-a-specific-path-in-the-volume
-      {{- if or (not (empty .Values.appConfigs)) (not (empty .Values.global.appConfigs)) }}
+      {{- if or (not (empty .Values.appConfigs)) (not (empty .Values.global.commonConfigs.appConfigs)) }}
       - name: appconfig-volume
         configMap:
           name: {{ template "app.name" . }}-app-configmap
@@ -145,7 +145,7 @@ spec:
           - key: {{$key}}.config
             path: {{$key}}
             {{- end}}
-          {{- else if not (empty .Values.global.appConfigs) }}
+          {{- else if not (empty .Values.global.commonConfigs.appConfigs) }}
             {{- range $key, $value := .Values.appConfigs}}
           - key: {{$key}}.config
             path: {{$key}}
@@ -204,18 +204,18 @@ spec:
 
           ## see:https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/
           envFrom:
-          {{- if or (not (empty .Values.envConfigs)) (not (empty .Values.global.envConfigs)) }}
+          {{- if or (not (empty .Values.envConfigs)) (not (empty .Values.global.commonConfigs.envConfigs)) }}
           - configMapRef:
               name: {{ template "app.name" . }}-env-configmap
           {{- end }}
 
           volumeMounts:
-          {{- if or (not (empty .Values.preStartScript)) (not (empty .Values.global.preStartScript)) }}
+          {{- if or (not (empty .Values.preStartScript)) (not (empty .Values.global.commonConfigs.preStartScript)) }}
           - name: pre-start-volume
             mountPath: /etc/{{ template "app.name" . }}/
           {{- end }}
 
-          {{- if or (not (empty .Values.appConfigs)) (not (empty .Values.global.appConfigs)) }}
+          {{- if or (not (empty .Values.appConfigs)) (not (empty .Values.global.commonConfigs.appConfigs)) }}
           ## see:https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#add-configmap-data-to-a-specific-path-in-the-volume
           - name: appconfig-volume
             mountPath: /opt/apps/ecm/{{ template "app.name" . }}-package/{{ template "app.name" . }}-current/conf/

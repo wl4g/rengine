@@ -19,6 +19,10 @@ networks:
 
 services:
   ## ===================== MongoDB ======================
+  ## see:https://github.com/bitnami/containers/blob/main/bitnami/mongodb/docker-compose.yml
+  ## see:https://github.com/bitnami/containers/blob/main/bitnami/mongodb/docker-compose-replicaset.yml
+  ## see:https://github.com/bitnami/containers/blob/main/bitnami/mongodb-sharded/docker-compose.yml
+  ## see:https://github.com/bitnami/containers/blob/main/bitnami/mongodb-sharded/docker-compose-multiple-shards.yml
   mongodb:
     image: docker.io/bitnami/mongodb:4.4.6
     command: ""
@@ -276,9 +280,9 @@ services:
     ports:
       - "8888:80"
 
-  ## =============== Rengine (apiserver) init ================
+  ## =============== Init (MinIO policy) ================
 
-  apiserver_init:
+  init_minio_policy:
     image: wl4g/rengine-apiserver:1.0.0
     ## see:docker run --rm --entrypoint /bin/bash wl4g/rengine-apiserver:1.0.0 -c 'cd $APP_HOME && java -cp .:lib/* com.wl4g.rengine.service.minio.RengineMinioTool --help'
     entrypoint: "/bin/bash"
@@ -290,7 +294,7 @@ services:
       --adminSecretKey=minioadmin \
       --tenantAccessKey=rengine \
       --tenantSecretKey=12345678'"
-    container_name: rengine_apiserver_init
+    container_name: rengine_init_minio_policy
     restart: "no"
     networks:
       - rengine_net
@@ -328,7 +332,7 @@ services:
       # for queries raw events from HBase
       #- zookeeper
       #- hbase
-      - apiserver_init
+      - init_minio_policy
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro

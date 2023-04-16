@@ -98,11 +98,11 @@ rengine-controller.governance.istio.ingress.http.canary.baseline.weight=80,\
 rengine-controller.governance.istio.ingress.http.canary.upgrade.weight=20,\
 rengine-executor.governance.istio.ingress.http.canary.baseline.weight=80,\
 rengine-executor.governance.istio.ingress.http.canary.upgrade.weight=20,\
-global.components.jaeger.internal.enabled=true,\
-global.components.redis.internal.enabled=true,\
-global.components.zookeeper.internal.enabled=true,\
-global.components.kafka.internal.enabled=true,\
-global.components.mysql.internal.enabled=true"
+componentServices.jaeger.internal.enabled=true,\
+componentServices.redis.internal.enabled=true,\
+componentServices.zookeeper.internal.enabled=true,\
+componentServices.kafka.internal.enabled=true,\
+componentServices.mysql.internal.enabled=true"
 ```
 
 + Step 5: After confirming that the upgrade is successful, use the new version as the benchmark, remove the old version, and switch all traffic to the new version
@@ -121,11 +121,11 @@ rengine-controller.governance.istio.ingress.http.canary.baseline.weight=100,\
 rengine-controller.governance.istio.ingress.http.canary.upgrade.weight=0,\
 rengine-executor.governance.istio.ingress.http.canary.baseline.weight=100,\
 rengine-executor.governance.istio.ingress.http.canary.upgrade.weight=0,\
-global.components.jaeger.internal.enabled=true,\
-global.components.redis.internal.enabled=true,\
-global.components.zookeeper.internal.enabled=true,\
-global.components.kafka.internal.enabled=true,\
-global.components.mysql.internal.enabled=true"
+componentServices.jaeger.internal.enabled=true,\
+componentServices.redis.internal.enabled=true,\
+componentServices.zookeeper.internal.enabled=true,\
+componentServices.kafka.internal.enabled=true,\
+componentServices.mysql.internal.enabled=true"
 ```
 
 ## 5. Rebuild dependents
@@ -254,153 +254,153 @@ The following table lists the configurable parameters of the SpringBoot APP(Reng
 | `<app>.governance.istio.egress[].location` | Mesh egess service entries location. | `MESH_EXTERNAL` |
 | `<app>.governance.istio.egress[].resolution` | Mesh egess service entries resolution. | `DNS` |
 | --- (Optional) Global Dependents Components. --- | | |
-| `global.preStartScript` | Container pre-start hook scripts. | `nil` |
-| `global.envConfigs` | Container start environments. | `{}` |
-| `global.agentConfigs` | JVM start agent config. | `{}` |
-| `global.appConfigs` | SpringBoot startup application configs. | `{}` |
-| `global.otlp.internal.enabled` | Enable internal service. | `false` |
-| `global.otlp.external.enabled` | Enable external service. | `false` |
-| `global.otlp.external.namespace` | External service namespace. | `nil` |
-| `global.otlp.external.serviceAccount` | External service serviceAccount. | `nil` |
-| `global.otlp.external.labels` | External service entries labels. | `classify=external-service, version=v1` |
-| `global.otlp.external.instancePorts[].protocol` | External service entries instance ports protocol. | `TCP` |
-| `global.otlp.external.instancePorts[].targetPort` | External service entries instance ports protocol. | `4318` |
-| `global.otlp.external.instanceAddresses[].ip` | External service entries instance IP. | `nil` |
-| `global.otlp.external.instanceAddresses[].hosts[]` | External service entries instance hosts. | `[]` |
-| `global.otlp.external.location` | Mesh egess service entries location. | `MESH_EXTERNAL` |
-| `global.otlp.external.resolution` | Mesh egess service entries resolution. | `NONE` |
-| `global.jaeger.internal.enabled` | Enable internal service. | `false` |
-| `global.jaeger.external.enabled` | Enable external service. | `false` |
-| `global.jaeger.external.namespace` | External service namespace. | `nil` |
-| `global.jaeger.external.serviceAccount` | External service serviceAccount. | `nil` |
-| `global.jaeger.external.labels` | External service entries labels. | `classify=external-service, version=v1` |
-| `global.jaeger.external.instancePorts[].protocol` | External service entries instance ports protocol. | `TCP` |
-| `global.jaeger.external.instancePorts[].targetPort` | External service entries instance ports protocol. | `14268` |
-| `global.jaeger.external.instanceAddresses[].ip` | External service entries instance IP. | `nil` |
-| `global.jaeger.external.instanceAddresses[].hosts[]` | External service entries instance hosts. | `[]` |
-| `global.jaeger.external.location` | Mesh egess service entries location. | `MESH_EXTERNAL` |
-| `global.jaeger.external.resolution` | Mesh egess service entries resolution. | `NONE` |
-| `global.zookeeper.internal.enabled` | Enable internal service. | `false` |
-| `global.zookeeper.external.enabled` | Enable external service. | `false` |
-| `global.zookeeper.external.namespace` | External service namespace. | `nil` |
-| `global.zookeeper.external.serviceAccount` | External service serviceAccount. | `nil` |
-| `global.zookeeper.external.labels` | External service entries labels. | `classify=external-service, version=v1` |
-| `global.zookeeper.external.instancePorts[].protocol` | External service entries instance ports protocol. | `TCP` |
-| `global.zookeeper.external.instancePorts[].targetPort` | External service entries instance ports protocol. | `2181` |
-| `global.zookeeper.external.instanceAddresses[].ip` | External service entries instance IP. | `nil` |
-| `global.zookeeper.external.instanceAddresses[].hosts[]` | External service entries instance hosts. | `[]` |
-| `global.zookeeper.external.location` | Mesh egess service entries location. | `MESH_EXTERNAL` |
-| `global.zookeeper.external.resolution` | Mesh egess service entries resolution. | `NONE` |
-| `global.kafka.internal.enabled` | Enable internal service. | `false` |
-| `global.kafka.external.enabled` | Enable external service. | `false` |
-| `global.kafka.external.namespace` | External service namespace. | `nil` |
-| `global.kafka.external.serviceAccount` | External service serviceAccount. | `nil` |
-| `global.kafka.external.labels` | External service entries labels. | `classify=external-service, version=v1` |
-| `global.kafka.external.instancePorts[].protocol` | External service entries instance ports protocol. | `TCP` |
-| `global.kafka.external.instancePorts[].targetPort` | External service entries instance ports protocol. | `9092` |
-| `global.kafka.external.instanceAddresses[].ip` | External service entries instance IP. | `nil` |
-| `global.kafka.external.instanceAddresses[].hosts[]` | External service entries instance hosts. | `[]` |
-| `global.kafka.external.location` | Mesh egess service entries location. | `MESH_EXTERNAL` |
-| `global.kafka.external.resolution` | Mesh egess service entries resolution. | `NONE` |
-| `global.mysql.internal.enabled` | Enable internal service. | `false` |
-| `global.mysql.external.enabled` | Enable external service. | `false` |
-| `global.mysql.external.namespace` | External service namespace. | `nil` |
-| `global.mysql.external.serviceAccount` | External service serviceAccount. | `nil` |
-| `global.mysql.external.labels` | External service entries labels. | `classify=external-service, version=v1` |
-| `global.mysql.external.instancePorts[].protocol` | External service entries instance ports protocol. | `TCP` |
-| `global.mysql.external.instancePorts[].targetPort` | External service entries instance ports protocol. | `3306` |
-| `global.mysql.external.instanceAddresses[].ip` | External service entries instance IP. | `nil` |
-| `global.mysql.external.instanceAddresses[].hosts[]` | External service entries instance hosts. | `[]` |
-| `global.mysql.external.location` | Mesh egess service entries location. | `MESH_EXTERNAL` |
-| `global.mysql.external.resolution` | Mesh egess service entries resolution. | `NONE` |
-| `global.redis.internal.enabled` | Enable internal service. | `false` |
-| `global.redis.external.enabled` | Enable external service. | `false` |
-| `global.redis.external.namespace` | External service namespace. | `nil` |
-| `global.redis.external.serviceAccount` | External service serviceAccount. | `nil` |
-| `global.redis.external.labels` | External service entries labels. | `classify=external-service, version=v1` |
-| `global.redis.external.instancePorts[].protocol` | External service entries instance ports protocol. | `TCP` |
-| `global.redis.external.instancePorts[].targetPort` | External service entries instance ports protocol. | `6379` |
-| `global.redis.external.instanceAddresses[].ip` | External service entries instance IP. | `nil` |
-| `global.redis.external.instanceAddresses[].hosts[]` | External service entries instance hosts. | `[]` |
-| `global.redis.external.location` | Mesh egess service entries location. | `MESH_EXTERNAL` |
-| `global.redis.external.resolution` | Mesh egess service entries resolution. | `NONE` |
-| `global.minio.internal.enabled` | Enable internal service. | `false` |
-| `global.minio.external.enabled` | Enable external service. | `false` |
-| `global.minio.external.namespace` | External service namespace. | `nil` |
-| `global.minio.external.serviceAccount` | External service serviceAccount. | `nil` |
-| `global.minio.external.labels` | External service entries labels. | `classify=external-service, version=v1` |
-| `global.minio.external.instancePorts[].protocol` | External service entries instance ports protocol. | `TCP` |
-| `global.minio.external.instancePorts[].targetPort` | External service entries instance ports protocol. | `9000,9090` |
-| `global.minio.external.instanceAddresses[].ip` | External service entries instance IP. | `nil` |
-| `global.minio.external.instanceAddresses[].hosts[]` | External service entries instance hosts. | `[]` |
-| `global.minio.external.location` | Mesh egess service entries location. | `MESH_EXTERNAL` |
-| `global.minio.external.resolution` | Mesh egess service entries resolution. | `NONE` |
-| `global.mongodb.internal.enabled` | Enable internal service. | `false` |
-| `global.mongodb.external.enabled` | Enable external service. | `false` |
-| `global.mongodb.external.namespace` | External service namespace. | `nil` |
-| `global.mongodb.external.serviceAccount` | External service serviceAccount. | `nil` |
-| `global.mongodb.external.labels` | External service entries labels. | `classify=external-service, version=v1` |
-| `global.mongodb.external.instancePorts[].protocol` | External service entries instance ports protocol. | `TCP` |
-| `global.mongodb.external.instancePorts[].targetPort` | External service entries instance ports protocol. | `27017` |
-| `global.mongodb.external.instanceAddresses[].ip` | External service entries instance IP. | `nil` |
-| `global.mongodb.external.instanceAddresses[].hosts[]` | External service entries instance hosts. | `[]` |
-| `global.mongodb.external.location` | Mesh egess service entries location. | `MESH_EXTERNAL` |
-| `global.mongodb.external.resolution` | Mesh egess service entries resolution. | `NONE` |
-| `global.hmaster.internal.enabled` | Enable internal service. | `false` |
-| `global.hmaster.external.enabled` | Enable external service. | `false` |
-| `global.hmaster.external.namespace` | External service namespace. | `nil` |
-| `global.hmaster.external.serviceAccount` | External service serviceAccount. | `nil` |
-| `global.hmaster.external.labels` | External service entries labels. | `classify=external-service, version=v1` |
-| `global.hmaster.external.instancePorts[].protocol` | External service entries instance ports protocol. | `TCP` |
-| `global.hmaster.external.instancePorts[].targetPort` | External service entries instance ports protocol. | `16000,16010` |
-| `global.hmaster.external.instanceAddresses[].ip` | External service entries instance IP. | `nil` |
-| `global.hmaster.external.instanceAddresses[].hosts[]` | External service entries instance hosts. | `[]` |
-| `global.hmaster.external.location` | Mesh egess service entries location. | `MESH_EXTERNAL` |
-| `global.hmaster.external.resolution` | Mesh egess service entries resolution. | `NONE` |
-| `global.hregionserver.internal.enabled` | Enable internal service. | `false` |
-| `global.hregionserver.external.enabled` | Enable external service. | `false` |
-| `global.hregionserver.external.namespace` | External service namespace. | `nil` |
-| `global.hregionserver.external.serviceAccount` | External service serviceAccount. | `nil` |
-| `global.hregionserver.external.labels` | External service entries labels. | `classify=external-service, version=v1` |
-| `global.hregionserver.external.instancePorts[].protocol` | External service entries instance ports protocol. | `TCP` |
-| `global.hregionserver.external.instancePorts[].targetPort` | External service entries instance ports protocol. | `16020,16030` |
-| `global.hregionserver.external.instanceAddresses[].ip` | External service entries instance IP. | `nil` |
-| `global.hregionserver.external.instanceAddresses[].hosts[]` | External service entries instance hosts. | `[]` |
-| `global.hregionserver.external.location` | Mesh egess service entries location. | `MESH_EXTERNAL` |
-| `global.hregionserver.external.resolution` | Mesh egess service entries resolution. | `NONE` |
-| `global.namenode.internal.enabled` | Enable internal service. | `false` |
-| `global.namenode.external.enabled` | Enable external service. | `false` |
-| `global.namenode.external.namespace` | External service namespace. | `nil` |
-| `global.namenode.external.serviceAccount` | External service serviceAccount. | `nil` |
-| `global.namenode.external.labels` | External service entries labels. | `classify=external-service, version=v1` |
-| `global.namenode.external.instancePorts[].protocol` | External service entries instance ports protocol. | `TCP` |
-| `global.namenode.external.instancePorts[].targetPort` | External service entries instance ports protocol. | `9870,8020,8088` |
-| `global.namenode.external.instanceAddresses[].ip` | External service entries instance IP. | `nil` |
-| `global.namenode.external.instanceAddresses[].hosts[]` | External service entries instance hosts. | `[]` |
-| `global.namenode.external.location` | Mesh egess service entries location. | `MESH_EXTERNAL` |
-| `global.namenode.external.resolution` | Mesh egess service entries resolution. | `NONE` |
-| `global.nodemanager.internal.enabled` | Enable internal service. | `false` |
-| `global.nodemanager.external.enabled` | Enable external service. | `false` |
-| `global.nodemanager.external.namespace` | External service namespace. | `nil` |
-| `global.nodemanager.external.serviceAccount` | External service serviceAccount. | `nil` |
-| `global.nodemanager.external.labels` | External service entries labels. | `classify=external-service, version=v1` |
-| `global.nodemanager.external.instancePorts[].protocol` | External service entries instance ports protocol. | `TCP` |
-| `global.nodemanager.external.instancePorts[].targetPort` | External service entries instance ports protocol. | `8040,8041,7337,8042,13562` |
-| `global.nodemanager.external.instanceAddresses[].ip` | External service entries instance IP. | `nil` |
-| `global.nodemanager.external.instanceAddresses[].hosts[]` | External service entries instance hosts. | `[]` |
-| `global.nodemanager.external.location` | Mesh egess service entries location. | `MESH_EXTERNAL` |
-| `global.nodemanager.external.resolution` | Mesh egess service entries resolution. | `NONE` |
-| `global.datanode.internal.enabled` | Enable internal service. | `false` |
-| `global.datanode.external.enabled` | Enable external service. | `false` |
-| `global.datanode.external.namespace` | External service namespace. | `nil` |
-| `global.datanode.external.serviceAccount` | External service serviceAccount. | `nil` |
-| `global.datanode.external.labels` | External service entries labels. | `classify=external-service, version=v1` |
-| `global.datanode.external.instancePorts[].protocol` | External service entries instance ports protocol. | `TCP` |
-| `global.datanode.external.instancePorts[].targetPort` | External service entries instance ports protocol. | `9867,9864,9866,32828` |
-| `global.datanode.external.instanceAddresses[].ip` | External service entries instance IP. | `nil` |
-| `global.datanode.external.instanceAddresses[].hosts[]` | External service entries instance hosts. | `[]` |
-| `global.datanode.external.location` | Mesh egess service entries location. | `MESH_EXTERNAL` |
-| `global.datanode.external.resolution` | Mesh egess service entries resolution. | `NONE` |
+| `global.commonConfigs.preStartScript` | Container pre-start hook scripts. | `nil` |
+| `global.commonConfigs.envConfigs` | Container start environments. | `{}` |
+| `global.commonConfigs.agentConfigs` | JVM start agent config. | `{}` |
+| `global.commonConfigs.appConfigs` | SpringBoot startup application configs. | `{}` |
+| `global.componentServices.otlp.internal.enabled` | Enable internal service. | `false` |
+| `global.componentServices.otlp.external.enabled` | Enable external service. | `false` |
+| `global.componentServices.otlp.external.namespace` | External service namespace. | `nil` |
+| `global.componentServices.otlp.external.serviceAccount` | External service serviceAccount. | `nil` |
+| `global.componentServices.otlp.external.labels` | External service entries labels. | `classify=external-service, version=v1` |
+| `global.componentServices.otlp.external.instancePorts[].protocol` | External service entries instance ports protocol. | `TCP` |
+| `global.componentServices.otlp.external.instancePorts[].targetPort` | External service entries instance ports protocol. | `4318` |
+| `global.componentServices.otlp.external.instanceAddresses[].ip` | External service entries instance IP. | `nil` |
+| `global.componentServices.otlp.external.instanceAddresses[].hosts[]` | External service entries instance hosts. | `[]` |
+| `global.componentServices.otlp.external.location` | Mesh egess service entries location. | `MESH_EXTERNAL` |
+| `global.componentServices.otlp.external.resolution` | Mesh egess service entries resolution. | `NONE` |
+| `global.componentServices.jaeger.internal.enabled` | Enable internal service. | `false` |
+| `global.componentServices.jaeger.external.enabled` | Enable external service. | `false` |
+| `global.componentServices.jaeger.external.namespace` | External service namespace. | `nil` |
+| `global.componentServices.jaeger.external.serviceAccount` | External service serviceAccount. | `nil` |
+| `global.componentServices.jaeger.external.labels` | External service entries labels. | `classify=external-service, version=v1` |
+| `global.componentServices.jaeger.external.instancePorts[].protocol` | External service entries instance ports protocol. | `TCP` |
+| `global.componentServices.jaeger.external.instancePorts[].targetPort` | External service entries instance ports protocol. | `14268` |
+| `global.componentServices.jaeger.external.instanceAddresses[].ip` | External service entries instance IP. | `nil` |
+| `global.componentServices.jaeger.external.instanceAddresses[].hosts[]` | External service entries instance hosts. | `[]` |
+| `global.componentServices.jaeger.external.location` | Mesh egess service entries location. | `MESH_EXTERNAL` |
+| `global.componentServices.jaeger.external.resolution` | Mesh egess service entries resolution. | `NONE` |
+| `global.componentServices.zookeeper.internal.enabled` | Enable internal service. | `false` |
+| `global.componentServices.zookeeper.external.enabled` | Enable external service. | `false` |
+| `global.componentServices.zookeeper.external.namespace` | External service namespace. | `nil` |
+| `global.componentServices.zookeeper.external.serviceAccount` | External service serviceAccount. | `nil` |
+| `global.componentServices.zookeeper.external.labels` | External service entries labels. | `classify=external-service, version=v1` |
+| `global.componentServices.zookeeper.external.instancePorts[].protocol` | External service entries instance ports protocol. | `TCP` |
+| `global.componentServices.zookeeper.external.instancePorts[].targetPort` | External service entries instance ports protocol. | `2181` |
+| `global.componentServices.zookeeper.external.instanceAddresses[].ip` | External service entries instance IP. | `nil` |
+| `global.componentServices.zookeeper.external.instanceAddresses[].hosts[]` | External service entries instance hosts. | `[]` |
+| `global.componentServices.zookeeper.external.location` | Mesh egess service entries location. | `MESH_EXTERNAL` |
+| `global.componentServices.zookeeper.external.resolution` | Mesh egess service entries resolution. | `NONE` |
+| `global.componentServices.kafka.internal.enabled` | Enable internal service. | `false` |
+| `global.componentServices.kafka.external.enabled` | Enable external service. | `false` |
+| `global.componentServices.kafka.external.namespace` | External service namespace. | `nil` |
+| `global.componentServices.kafka.external.serviceAccount` | External service serviceAccount. | `nil` |
+| `global.componentServices.kafka.external.labels` | External service entries labels. | `classify=external-service, version=v1` |
+| `global.componentServices.kafka.external.instancePorts[].protocol` | External service entries instance ports protocol. | `TCP` |
+| `global.componentServices.kafka.external.instancePorts[].targetPort` | External service entries instance ports protocol. | `9092` |
+| `global.componentServices.kafka.external.instanceAddresses[].ip` | External service entries instance IP. | `nil` |
+| `global.componentServices.kafka.external.instanceAddresses[].hosts[]` | External service entries instance hosts. | `[]` |
+| `global.componentServices.kafka.external.location` | Mesh egess service entries location. | `MESH_EXTERNAL` |
+| `global.componentServices.kafka.external.resolution` | Mesh egess service entries resolution. | `NONE` |
+| `global.componentServices.mysql.internal.enabled` | Enable internal service. | `false` |
+| `global.componentServices.mysql.external.enabled` | Enable external service. | `false` |
+| `global.componentServices.mysql.external.namespace` | External service namespace. | `nil` |
+| `global.componentServices.mysql.external.serviceAccount` | External service serviceAccount. | `nil` |
+| `global.componentServices.mysql.external.labels` | External service entries labels. | `classify=external-service, version=v1` |
+| `global.componentServices.mysql.external.instancePorts[].protocol` | External service entries instance ports protocol. | `TCP` |
+| `global.componentServices.mysql.external.instancePorts[].targetPort` | External service entries instance ports protocol. | `3306` |
+| `global.componentServices.mysql.external.instanceAddresses[].ip` | External service entries instance IP. | `nil` |
+| `global.componentServices.mysql.external.instanceAddresses[].hosts[]` | External service entries instance hosts. | `[]` |
+| `global.componentServices.mysql.external.location` | Mesh egess service entries location. | `MESH_EXTERNAL` |
+| `global.componentServices.mysql.external.resolution` | Mesh egess service entries resolution. | `NONE` |
+| `global.componentServices.redis.internal.enabled` | Enable internal service. | `false` |
+| `global.componentServices.redis.external.enabled` | Enable external service. | `false` |
+| `global.componentServices.redis.external.namespace` | External service namespace. | `nil` |
+| `global.componentServices.redis.external.serviceAccount` | External service serviceAccount. | `nil` |
+| `global.componentServices.redis.external.labels` | External service entries labels. | `classify=external-service, version=v1` |
+| `global.componentServices.redis.external.instancePorts[].protocol` | External service entries instance ports protocol. | `TCP` |
+| `global.componentServices.redis.external.instancePorts[].targetPort` | External service entries instance ports protocol. | `6379` |
+| `global.componentServices.redis.external.instanceAddresses[].ip` | External service entries instance IP. | `nil` |
+| `global.componentServices.redis.external.instanceAddresses[].hosts[]` | External service entries instance hosts. | `[]` |
+| `global.componentServices.redis.external.location` | Mesh egess service entries location. | `MESH_EXTERNAL` |
+| `global.componentServices.redis.external.resolution` | Mesh egess service entries resolution. | `NONE` |
+| `global.componentServices.minio.internal.enabled` | Enable internal service. | `false` |
+| `global.componentServices.minio.external.enabled` | Enable external service. | `false` |
+| `global.componentServices.minio.external.namespace` | External service namespace. | `nil` |
+| `global.componentServices.minio.external.serviceAccount` | External service serviceAccount. | `nil` |
+| `global.componentServices.minio.external.labels` | External service entries labels. | `classify=external-service, version=v1` |
+| `global.componentServices.minio.external.instancePorts[].protocol` | External service entries instance ports protocol. | `TCP` |
+| `global.componentServices.minio.external.instancePorts[].targetPort` | External service entries instance ports protocol. | `9000,9090` |
+| `global.componentServices.minio.external.instanceAddresses[].ip` | External service entries instance IP. | `nil` |
+| `global.componentServices.minio.external.instanceAddresses[].hosts[]` | External service entries instance hosts. | `[]` |
+| `global.componentServices.minio.external.location` | Mesh egess service entries location. | `MESH_EXTERNAL` |
+| `global.componentServices.minio.external.resolution` | Mesh egess service entries resolution. | `NONE` |
+| `global.componentServices.mongodb.internal.enabled` | Enable internal service. | `false` |
+| `global.componentServices.mongodb.external.enabled` | Enable external service. | `false` |
+| `global.componentServices.mongodb.external.namespace` | External service namespace. | `nil` |
+| `global.componentServices.mongodb.external.serviceAccount` | External service serviceAccount. | `nil` |
+| `global.componentServices.mongodb.external.labels` | External service entries labels. | `classify=external-service, version=v1` |
+| `global.componentServices.mongodb.external.instancePorts[].protocol` | External service entries instance ports protocol. | `TCP` |
+| `global.componentServices.mongodb.external.instancePorts[].targetPort` | External service entries instance ports protocol. | `27017` |
+| `global.componentServices.mongodb.external.instanceAddresses[].ip` | External service entries instance IP. | `nil` |
+| `global.componentServices.mongodb.external.instanceAddresses[].hosts[]` | External service entries instance hosts. | `[]` |
+| `global.componentServices.mongodb.external.location` | Mesh egess service entries location. | `MESH_EXTERNAL` |
+| `global.componentServices.mongodb.external.resolution` | Mesh egess service entries resolution. | `NONE` |
+| `global.componentServices.hmaster.internal.enabled` | Enable internal service. | `false` |
+| `global.componentServices.hmaster.external.enabled` | Enable external service. | `false` |
+| `global.componentServices.hmaster.external.namespace` | External service namespace. | `nil` |
+| `global.componentServices.hmaster.external.serviceAccount` | External service serviceAccount. | `nil` |
+| `global.componentServices.hmaster.external.labels` | External service entries labels. | `classify=external-service, version=v1` |
+| `global.componentServices.hmaster.external.instancePorts[].protocol` | External service entries instance ports protocol. | `TCP` |
+| `global.componentServices.hmaster.external.instancePorts[].targetPort` | External service entries instance ports protocol. | `16000,16010` |
+| `global.componentServices.hmaster.external.instanceAddresses[].ip` | External service entries instance IP. | `nil` |
+| `global.componentServices.hmaster.external.instanceAddresses[].hosts[]` | External service entries instance hosts. | `[]` |
+| `global.componentServices.hmaster.external.location` | Mesh egess service entries location. | `MESH_EXTERNAL` |
+| `global.componentServices.hmaster.external.resolution` | Mesh egess service entries resolution. | `NONE` |
+| `global.componentServices.hregionserver.internal.enabled` | Enable internal service. | `false` |
+| `global.componentServices.hregionserver.external.enabled` | Enable external service. | `false` |
+| `global.componentServices.hregionserver.external.namespace` | External service namespace. | `nil` |
+| `global.componentServices.hregionserver.external.serviceAccount` | External service serviceAccount. | `nil` |
+| `global.componentServices.hregionserver.external.labels` | External service entries labels. | `classify=external-service, version=v1` |
+| `global.componentServices.hregionserver.external.instancePorts[].protocol` | External service entries instance ports protocol. | `TCP` |
+| `global.componentServices.hregionserver.external.instancePorts[].targetPort` | External service entries instance ports protocol. | `16020,16030` |
+| `global.componentServices.hregionserver.external.instanceAddresses[].ip` | External service entries instance IP. | `nil` |
+| `global.componentServices.hregionserver.external.instanceAddresses[].hosts[]` | External service entries instance hosts. | `[]` |
+| `global.componentServices.hregionserver.external.location` | Mesh egess service entries location. | `MESH_EXTERNAL` |
+| `global.componentServices.hregionserver.external.resolution` | Mesh egess service entries resolution. | `NONE` |
+| `global.componentServices.namenode.internal.enabled` | Enable internal service. | `false` |
+| `global.componentServices.namenode.external.enabled` | Enable external service. | `false` |
+| `global.componentServices.namenode.external.namespace` | External service namespace. | `nil` |
+| `global.componentServices.namenode.external.serviceAccount` | External service serviceAccount. | `nil` |
+| `global.componentServices.namenode.external.labels` | External service entries labels. | `classify=external-service, version=v1` |
+| `global.componentServices.namenode.external.instancePorts[].protocol` | External service entries instance ports protocol. | `TCP` |
+| `global.componentServices.namenode.external.instancePorts[].targetPort` | External service entries instance ports protocol. | `9870,8020,8088` |
+| `global.componentServices.namenode.external.instanceAddresses[].ip` | External service entries instance IP. | `nil` |
+| `global.componentServices.namenode.external.instanceAddresses[].hosts[]` | External service entries instance hosts. | `[]` |
+| `global.componentServices.namenode.external.location` | Mesh egess service entries location. | `MESH_EXTERNAL` |
+| `global.componentServices.namenode.external.resolution` | Mesh egess service entries resolution. | `NONE` |
+| `global.componentServices.nodemanager.internal.enabled` | Enable internal service. | `false` |
+| `global.componentServices.nodemanager.external.enabled` | Enable external service. | `false` |
+| `global.componentServices.nodemanager.external.namespace` | External service namespace. | `nil` |
+| `global.componentServices.nodemanager.external.serviceAccount` | External service serviceAccount. | `nil` |
+| `global.componentServices.nodemanager.external.labels` | External service entries labels. | `classify=external-service, version=v1` |
+| `global.componentServices.nodemanager.external.instancePorts[].protocol` | External service entries instance ports protocol. | `TCP` |
+| `global.componentServices.nodemanager.external.instancePorts[].targetPort` | External service entries instance ports protocol. | `8040,8041,7337,8042,13562` |
+| `global.componentServices.nodemanager.external.instanceAddresses[].ip` | External service entries instance IP. | `nil` |
+| `global.componentServices.nodemanager.external.instanceAddresses[].hosts[]` | External service entries instance hosts. | `[]` |
+| `global.componentServices.nodemanager.external.location` | Mesh egess service entries location. | `MESH_EXTERNAL` |
+| `global.componentServices.nodemanager.external.resolution` | Mesh egess service entries resolution. | `NONE` |
+| `global.componentServices.datanode.internal.enabled` | Enable internal service. | `false` |
+| `global.componentServices.datanode.external.enabled` | Enable external service. | `false` |
+| `global.componentServices.datanode.external.namespace` | External service namespace. | `nil` |
+| `global.componentServices.datanode.external.serviceAccount` | External service serviceAccount. | `nil` |
+| `global.componentServices.datanode.external.labels` | External service entries labels. | `classify=external-service, version=v1` |
+| `global.componentServices.datanode.external.instancePorts[].protocol` | External service entries instance ports protocol. | `TCP` |
+| `global.componentServices.datanode.external.instancePorts[].targetPort` | External service entries instance ports protocol. | `9867,9864,9866,32828` |
+| `global.componentServices.datanode.external.instanceAddresses[].ip` | External service entries instance IP. | `nil` |
+| `global.componentServices.datanode.external.instanceAddresses[].hosts[]` | External service entries instance hosts. | `[]` |
+| `global.componentServices.datanode.external.location` | Mesh egess service entries location. | `MESH_EXTERNAL` |
+| `global.componentServices.datanode.external.resolution` | Mesh egess service entries resolution. | `NONE` |
 
 ## 8. FAQ
 

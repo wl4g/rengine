@@ -8,7 +8,7 @@
 # limitations under the License.
 #
 
-{{- if or (not (empty .Values.envConfigs)) (not (empty .Values.global.envConfigs)) }}
+{{- if or (not (empty .Values.envConfigs)) (not (empty .Values.global.commonConfigs.envConfigs)) }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -26,15 +26,15 @@ data:
   {{ $key | nindent 2 }}.config: |-
     {{ $value | nindent 4 }}
   {{- end}}
-{{- else if not (empty .Values.global.envConfigs) }}
-  {{- range $key, $value := .Values.global.envConfigs }}
+{{- else if not (empty .Values.global.commonConfigs.envConfigs) }}
+  {{- range $key, $value := .Values.global.commonConfigs.envConfigs }}
   {{ $key | nindent 2 }}.config: |-
     {{ $value | nindent 4 }}
   {{- end}}
 {{- end}}
 {{- end}}
 
-{{- if or (not (empty .Values.preStartScript)) (not (empty .Values.global.preStartScript)) }}
+{{- if or (not (empty .Values.preStartScript)) (not (empty .Values.global.commonConfigs.preStartScript)) }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -50,13 +50,13 @@ data:
 {{- if not (empty .Values.preStartScript) }}
   pre-start.config: |-
     {{ .Values.preStartScript | nindent 4 }}
-{{- else if not (empty .Values.global.preStartScript) }}
+{{- else if not (empty .Values.global.commonConfigs.preStartScript) }}
   pre-start.config: |-
-    {{ .Values.global.preStartScript | nindent 4 }}
+    {{ .Values.global.commonConfigs.preStartScript | nindent 4 }}
 {{- end}}
 {{- end}}
 
-{{- if or (not (empty .Values.agentConfigs)) (not (empty .Values.global.agentConfigs)) }}
+{{- if or (not (empty .Values.agentConfigs)) (not (empty .Values.global.commonConfigs.agentConfigs)) }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -74,15 +74,15 @@ data:
   {{ $key | nindent 2 }}.config: |-
     {{ $value | nindent 4 }}
   {{- end}}
-{{- else if not (empty .Values.global.agentConfigs) }}
-  {{- range $key, $value := .Values.global.agentConfigs}}
+{{- else if not (empty .Values.global.commonConfigs.agentConfigs) }}
+  {{- range $key, $value := .Values.global.commonConfigs.agentConfigs}}
   {{ $key | nindent 2 }}.config: |-
     {{ $value | nindent 4 }}
   {{- end}}
 {{- end}}
 {{- end}}
 
-{{- if or (not (empty .Values.appConfigs)) (not (empty .Values.global.appConfigs)) }}
+{{- if or (not (empty .Values.appConfigs)) (not (empty .Values.global.commonConfigs.appConfigs)) }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -100,8 +100,8 @@ data:
   {{ $key | nindent 2 }}.config: |-
     {{ $value | nindent 4 }}
   {{- end}}
-{{- else if not (empty .Values.global.appConfigs) }}
-  {{- range $key, $value := .Values.global.appConfigs}}
+{{- else if not (empty .Values.global.commonConfigs.appConfigs) }}
+  {{- range $key, $value := .Values.global.commonConfigs.appConfigs}}
   {{ $key | nindent 2 }}.config: |-
     {{ $value | nindent 4 }}
   {{- end}}
