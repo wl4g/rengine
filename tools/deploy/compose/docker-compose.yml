@@ -216,16 +216,16 @@ services:
       - KAFKA_MANAGER_USERNAME=admin
       - KAFKA_MANAGER_PASSWORD=admin
       - KAFKA_MANAGER_LDAP_ENABLED=false
-      - KAFKA_MANAGER_LDAP_SERVER=ldap.example.com
-      - KAFKA_MANAGER_LDAP_PORT=636
-      - KAFKA_MANAGER_LDAP_USERNAME=cn=rouser,dc=example,dc=com
-      - KAFKA_MANAGER_LDAP_PASSWORD=rouserpassword
-      - KAFKA_MANAGER_LDAP_SEARCH_BASE_DN=ou=users,dc=example,dc=com
+      #- KAFKA_MANAGER_LDAP_SERVER=ldap.example.com
+      #- KAFKA_MANAGER_LDAP_PORT=636
+      #- KAFKA_MANAGER_LDAP_USERNAME=cn=rouser,dc=example,dc=com
+      #- KAFKA_MANAGER_LDAP_PASSWORD=rouserpassword
+      #- KAFKA_MANAGER_LDAP_SEARCH_BASE_DN=ou=users,dc=example,dc=com
       #- KAFKA_MANAGER_LDAP_SEARCH_FILTER=(&(objectClass=inetOrgPerson)(&(uid=\$capturedLogin\$)(|(memberof=cn=Operations,ou=Groups,dc=example,dc=com)(memberof=cn=Development,ou=Groups,dc=example,dc=com))))
-      - KAFKA_MANAGER_LDAP_CONNECTION_POOL_SIZE=10
-      - KAFKA_MANAGER_LDAP_SSL=false
+      #- KAFKA_MANAGER_LDAP_CONNECTION_POOL_SIZE=10
+      #- KAFKA_MANAGER_LDAP_SSL=false
       - KAFKA_MANAGER_EXTRA_PLAY_OPTS=-Dhttp.port=9000 -Dhttps.port=9443
-      - APPLICATION_SECRET='abcdefghijklmnopqrstyvwxyz'
+      - APPLICATION_SECRET=abcdefghijklmnopqrstyvwxyz
       - JAVA_OPTS=-Djava.net.preferIPv4Stack=true -Xmx2G
     restart: unless-stopped
     networks:
@@ -307,11 +307,11 @@ services:
       - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/rengine
       - SPRING_REDIS_PASSWORD=bitnami
       - SPRING_REDIS_CLUSTER_NODES=redis-node-0:6379,redis-node-1:6379,redis-node-2:6379,redis-node-3:6379,redis-node-4:6379,redis-node-5:6379
-      - MINIO_ENDPOINT=http://minio:9000
+      - MINIO_ENDPOINT=http://${NODE_IP}:9000
       - MINIO_REGION=us-east-1
       - MINIO_BUCKET=rengine
       - MINIO_TENANT_ACCESS_KEY=rengine
-      - MINIO_TENANT_SECRET_KEY=123456
+      - MINIO_TENANT_SECRET_KEY=12345678
       - RENGINE_SERVICES_EXECUTOR_ENDPOINT=http://executor:28002
     restart: unless-stopped
     networks:

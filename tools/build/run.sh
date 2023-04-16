@@ -21,7 +21,7 @@ MAVEN_USERNAME=${MAVEN_USERNAME:-}
 MAVEN_PASSWORD=${MAVEN_PASSWORD:-}
 DOCKERHUB_USERNAME=${DOCKERHUB_USERNAME:-}
 DOCKERHUB_TOKEN=${DOCKERHUB_TOKEN:-}
-LOCAL_IP="$(ip a | grep -E '^[0-9]+: (em|eno|enp|ens|eth|wlp)+[0-9]' -A2 | grep inet | awk -F ' ' '{print $2}' | cut -f1 -d/ | xargs echo)"
+NODE_IP="$(ip a | grep -E '^[0-9]+: (em|eno|enp|ens|eth|wlp)+[0-9]' -A2 | grep inet | awk -F ' ' '{print $2}' | cut -f1 -d/ | xargs echo)"
 
 # eg1: log "error" "Failed to xxx"
 # eg2: log "xxx complete!"
@@ -260,7 +260,7 @@ function do_build_image_with_springboot() {
 
   log "Docker building for $app_name:$app_version ..."
   docker build --no-cache -t wl4g/rengine-${app_name}:${app_version} -f $BASE_DIR/tools/build/docker/$build_file \
-    --build-arg DL_URI="http://$LOCAL_IP:13337/${assets_file}" \
+    --build-arg DL_URI="http://$NODE_IP:13337/${assets_file}" \
     --build-arg APP_NAME=${app_name} \
     --build-arg APP_VERSION=${app_version} \
     --build-arg APP_MAINCLASS=${app_mainclass} .
@@ -312,6 +312,7 @@ function do_run_standalone() {
 
     ## Compose environment.
     echo "BASE_DIR=${BASE_DIR}" > /tmp/.env
+    echo "NODE_IP=${NODE_IP}" >> /tmp/.env
 
     ## Compose file.
     local compose_file="${BASE_DIR}/tools/deploy/compose/docker-compose.yml"
