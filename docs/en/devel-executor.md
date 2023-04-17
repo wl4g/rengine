@@ -175,7 +175,7 @@ clientId=JVqEpEwIaqkEkeD5\
 - Generate testing script to local path.
 
 ```bash
-curl -L -o /tmp/test.groovy 'https://raw.githubusercontent.com/wl4g/rengine/master/executor/testdata/scripts/test.groovy'
+curl -L -o /tmp/test.groovy 'https://raw.githubusercontent.com/wl4g/rengine/master/service/src/main/resources/example/rulescript/test.groovy'
 ```
 
 - Run native

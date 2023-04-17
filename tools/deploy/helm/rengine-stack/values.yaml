@@ -119,8 +119,8 @@ global:
 
       ## see:./executor/src/main/resources/application.yaml and ./service/src/main/resources/application-minio.yaml
       export MINIO_ENDPOINT="http://rengine-minio:9000"
-      export MINIO_TENANT_ACCESS_KEY="rengine"
-      export MINIO_TENANT_SECRET_KEY="12345678"
+      export MINIO_ACCESS_KEY="rengine"
+      export MINIO_SECRET_KEY="12345678"
 
       ## see:./executor/src/main/resources/application.yaml
       export QUARKUS_MONGODB_CONNECTION_STRING="${SPRING_DATA_MONGODB_URI}"

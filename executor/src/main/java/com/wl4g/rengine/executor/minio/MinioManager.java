@@ -101,7 +101,7 @@ public class MinioManager {
 
         MinioClient.Builder builder = MinioClient.builder()
                 .endpoint(config.endpoint())
-                .credentials(config.tenantAccessKey(), config.tenantSecretKey())
+                .credentials(config.accessKey(), config.secretKey())
                 .httpClient(new OkHttpClient().newBuilder()
                         .connectTimeout(httpClient.connectTimeout().toMillis(), TimeUnit.MILLISECONDS)
                         .writeTimeout(config.httpClient().readTimeout().toMillis(), TimeUnit.MILLISECONDS)

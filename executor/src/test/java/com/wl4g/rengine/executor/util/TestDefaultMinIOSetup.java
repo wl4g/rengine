@@ -36,12 +36,12 @@ public class TestDefaultMinIOSetup {
         return new MinioConfig() {
 
             @Override
-            public @NotBlank String tenantSecretKey() {
+            public @NotBlank String secretKey() {
                 return "rengine";
             }
 
             @Override
-            public @NotBlank String tenantAccessKey() {
+            public @NotBlank String accessKey() {
                 return "12345678";
             }
 

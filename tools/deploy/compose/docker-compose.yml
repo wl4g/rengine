@@ -1,4 +1,4 @@
-# Copyright (c) 2017 ~ 2025, the original author wangl.sir individual Inc,
+# Copyright (c) 2017 ~ 2025, the original author James Wong individual Inc,
 # All rights reserved. Contact us James Wrong James Wong<jamewong1376@gmail.com>
 #
 # Unless required by applicable law or agreed to in writing, software
@@ -280,29 +280,15 @@ services:
     ports:
       - "8888:80"
 
-  ## =============== Init (MinIO policy) ================
-
-  init_minio_policy:
-    image: wl4g/rengine-apiserver:1.0.0
-    ## see:docker run --rm --entrypoint /bin/bash wl4g/rengine-apiserver:1.0.0 -c 'cd $APP_HOME && java -cp .:lib/* com.wl4g.rengine.service.minio.RengineMinioTool --help'
-    entrypoint: "/bin/bash"
-    command: "-c 'cd /opt/apps/ecm/apiserver-package/apiserver-1.0.0-bin && java -cp .:lib/* com.wl4g.rengine.service.minio.RengineMinioTool \
-      --endpoint=http://minio:9000 \
-      --region=us-east-1 \
-      --tenantBucket=rengine \
-      --adminAccessKey=minioadmin \
-      --adminSecretKey=minioadmin \
-      --tenantAccessKey=rengine \
-      --tenantSecretKey=12345678'"
-    container_name: rengine_init_minio_policy
-    restart: "no"
-    networks:
-      - rengine_net
-    depends_on: # Links will be created automatically
-      - minio
-
   ## =============== Rengine (apiserver) ================
-
+  ## Init Minio policy and rulescript objects.
+  ## see:com.wl4g.rengine.service.deploy.MinioDeploymentInitializer
+  ## see:docker run --rm --entrypoint /bin/bash wl4g/rengine-apiserver:1.0.0 -c 'cd $APP_HOME && java -cp .:lib/* com.wl4g.rengine.service.minio.RengineMinioPolicyTool --help'
+  ## see:docker run --rm --entrypoint /bin/bash wl4g/rengine-apiserver:1.0.0 -c 'cd $APP_HOME && java -cp .:lib/* com.wl4g.rengine.service.minio.RengineMinioUploadTool --help'
+  ## see:docker run --rm --network host --entrypoint /bin/bash -v ${BASE_DIR}/service/src/main/resources/examples:/examples wl4g/rengine-apiserver:1.0.0 -c 'cd $APP_HOME && java -cp .:lib/* com.wl4g.rengine.service.minio.RengineMinioUploadTool -D /examples'
+  ## Or:
+  ## see:docker run --rm minio/mc mc admin --help
+  ## see:docker run --rm minio/mc mc mirror --help
   apiserver:
     image: wl4g/rengine-apiserver:1.0.0
     container_name: rengine_apiserver
@@ -314,9 +300,20 @@ services:
       - MINIO_ENDPOINT=http://${NODE_IP}:9000
       - MINIO_REGION=us-east-1
       - MINIO_BUCKET=rengine
-      - MINIO_TENANT_ACCESS_KEY=rengine
-      - MINIO_TENANT_SECRET_KEY=12345678
+      - MINIO_ACCESS_KEY=rengine
+      - MINIO_SECRET_KEY=12345678
       - RENGINE_SERVICES_EXECUTOR_ENDPOINT=http://executor:28002
+      ## see:com.wl4g.rengine.service.deploy.MinioDeploymentInitializer
+      - DEPLOY_MINIO_INIT_ENALBED=true
+      - DEPLOY_MINIO_INIT_ADMIN_ACCESS_KEY=minioadmin
+      - DEPLOY_MINIO_INIT_ADMIN_SECRET_KEY=minioadmin
+      - DEPLOY_MINIO_INIT_ACCESS_KEY=rengine
+      - DEPLOY_MINIO_INIT_SECRET_KEY=12345678
+      - DEPLOY_MINIO_INIT_ENDPOINT=http://minio:9000
+      - DEPLOY_MINIO_INIT_BUCKET=rengine
+      - DEPLOY_MINIO_INIT_LOCATION_PATTERNS=classpath*:/example/rulescript/0/*/*.*
+      - DEPLOY_MINIO_INIT_FROM_LOCATION_PATH=/example/rulescript/
+      - DEPLOY_MINIO_INIT_PREFIX=libjs
     restart: unless-stopped
     networks:
       - rengine_net
@@ -332,7 +329,6 @@ services:
       # for queries raw events from HBase
       #- zookeeper
       #- hbase
-      - init_minio_policy
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
@@ -356,8 +352,8 @@ services:
       - MINIO_ENDPOINT=http://minio:9000
       - MINIO_REGION=us-east-1
       - MINIO_BUCKET=rengine
-      - MINIO_TENANT_ACCESS_KEY=rengine
-      - MINIO_TENANT_SECRET_KEY=123456
+      - MINIO_ACCESS_KEY=rengine
+      - MINIO_SECRET_KEY=123456
       - RENGINE_CONTROLLER_ZOOKEEPER_SERVER_LISTS=zookeeper:2181
     restart: unless-stopped
     networks:
@@ -396,8 +392,8 @@ services:
       - MINIO_ENDPOINT=http://minio:9000
       - MINIO_REGION=us-east-1
       - MINIO_BUCKET=rengine
-      - MINIO_TENANT_ACCESS_KEY=rengine
-      - MINIO_TENANT_SECRET_KEY=123456
+      - MINIO_ACCESS_KEY=rengine
+      - MINIO_SECRET_KEY=123456
     restart: unless-stopped
     networks:
       - rengine_net

@@ -327,20 +327,22 @@ function do_run_standalone() {
         ## Remove the volumes only if it is the first deploy.
         if [ -z "$($compose_cmd -f $compose_file ls | grep rengine)" ]; then
             log "Removing the all rengine volumes ..."
-            docker volume rm rengine_hbase_data
-            docker volume rm rengine_kafka_data
-            docker volume rm rengine_minio_data
-            docker volume rm rengine_mongodb_data
-            docker volume rm rengine_redis_data_0
-            docker volume rm rengine_redis_data_1
-            docker volume rm rengine_redis_data_2
-            docker volume rm rengine_redis_data_3
-            docker volume rm rengine_redis_data_4
-            docker volume rm rengine_redis_data_5
-            docker volume rm rengine_script_log
-            docker volume rm rengine_script_rootfs
-            docker volume rm rengine_script_works
-            docker volume rm rengine_zookeeper_data
+            set +e
+            docker volume rm rengine_hbase_data 2>/dev/null
+            docker volume rm rengine_kafka_data 2>/dev/null
+            docker volume rm rengine_minio_data 2>/dev/null
+            docker volume rm rengine_mongodb_data 2>/dev/null
+            docker volume rm rengine_redis_data_0 2>/dev/null
+            docker volume rm rengine_redis_data_1 2>/dev/null
+            docker volume rm rengine_redis_data_2 2>/dev/null
+            docker volume rm rengine_redis_data_3 2>/dev/null
+            docker volume rm rengine_redis_data_4 2>/dev/null
+            docker volume rm rengine_redis_data_5 2>/dev/null
+            docker volume rm rengine_script_log 2>/dev/null
+            docker volume rm rengine_script_rootfs 2>/dev/null
+            docker volume rm rengine_script_works 2>/dev/null
+            docker volume rm rengine_zookeeper_data 2>/dev/null
+            set -e
         else
            logErr "Unable to remove data volumes, please shutdown all containers before!"
            exit 1

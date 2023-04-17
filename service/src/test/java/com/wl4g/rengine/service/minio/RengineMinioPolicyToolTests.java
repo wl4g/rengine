@@ -23,10 +23,10 @@ package com.wl4g.rengine.service.minio;
  * @since Copy of
  *        https://github.com/wl4g/infra/blob/master/common/src/test/java/com/wl4g/infra/common/minio/MinioAdminTool.java
  */
-public final class RengineMinioToolTests {
+public final class RengineMinioPolicyToolTests {
 
     public static void main(String[] args) throws Exception {
-        RengineMinioTool.main(args);
+        RengineMinioPolicyTool.main(args);
     }
 
 }

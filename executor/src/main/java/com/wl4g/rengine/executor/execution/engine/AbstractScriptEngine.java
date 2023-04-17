@@ -126,7 +126,7 @@ public abstract class AbstractScriptEngine implements IScriptEngine {
 
     protected void init() {
         this.defaultS3Client = new ScriptS3Client(minioConfig.endpoint(), minioConfig.region(), minioConfig.bucket(),
-                minioConfig.tenantAccessKey(), minioConfig.tenantSecretKey());
+                minioConfig.accessKey(), minioConfig.secretKey());
         this.defaultHttpClient = new ScriptHttpClient();
         this.defaultSSHClient = new ScriptSSHClient();
         this.defaultTCPClient = new ScriptTCPClient();

@@ -73,9 +73,9 @@ public class MinioClientProperties implements InitializingBean {
 
     private @Nullable String bucket = RengineConstants.DEFAULT_MINIO_BUCKET;
 
-    private @NotBlank String tenantAccessKey = "rengine";
+    private @NotBlank String accessKey = "rengine";
 
-    private @NotBlank String tenantSecretKey = "12345678";
+    private @NotBlank String secretKey = "12345678";
 
     private @NotNull UserUploadAssumeConfig userUpload = new UserUploadAssumeConfig();
 

@@ -59,7 +59,7 @@ public class MinioClientAutoConfiguration {
         io.minio.MinioClient.Builder builder = MinioClient.builder()
                 .endpoint(properties.getEndpoint())
                 // .credentialsProvider(provider)
-                .credentials(properties.getTenantAccessKey(), properties.getTenantSecretKey())
+                .credentials(properties.getAccessKey(), properties.getSecretKey())
                 .httpClient(httpClient);
         if (isBlank(properties.getRegion())) {
             builder.region(properties.getRegion());

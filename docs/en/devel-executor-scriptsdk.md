@@ -47,4 +47,4 @@
 
 ## More script SDKs using examples
 
-- [test-sdk-all-examples-v1.js](../../executor/testdata/scripts/examples/0/test-sdk-all-examples/test-sdk-all-examples-v1.js)
+- [test-sdk-all-examples-v1.js](../../service/src/main/resources/example/rulescript/0/test-sdk-all-examples/test-sdk-all-examples-v1.js)

@@ -272,7 +272,7 @@
                 <directory>src/main/resources</directory>
                 <filtering>false</filtering>
                 <includes>
-                    <include>static/**</include>
+                    <include>example/**</include>
                 </includes>
             </resource>
         </resources>

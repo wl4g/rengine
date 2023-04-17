@@ -21,8 +21,8 @@ minio:
   bucket: rengine
   ## The should manually create tenant accessKey and assign permission policies.
   ## Can use this tools: https://github.com/wl4g/rengine/tree/master/web/src/test/java/com/wl4g/rengine/minio/RengineMinioTool.java
-  tenantAccessKey: rengine
-  tenantSecretKey: 12345678
+  accessKey: rengine
+  secretKey: 12345678
   userUpload:
     #stsPolicyActions: {}
     ## The adjusting partSize will affect whether the pubObject() of the

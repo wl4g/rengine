@@ -59,11 +59,11 @@ public interface MinioConfig {
 
     @WithDefault("rengine")
     @NotBlank
-    String tenantAccessKey();
+    String accessKey();
 
     @WithDefault("12345678")
     @NotBlank
-    String tenantSecretKey();
+    String secretKey();
 
     @NotNull
     IOkHttpClientConfig httpClient();

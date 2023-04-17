@@ -331,8 +331,8 @@ minio:
   endpoint: http://localhost:9000
   region: us-east-1
   bucket: rengine
-  tenant-access-key: rengine
-  tenant-secret-key: 12345678
+  access-key: rengine
+  secret-key: 12345678
   http-client:
     connect-timeout: 10s
     write-timeout: 5m

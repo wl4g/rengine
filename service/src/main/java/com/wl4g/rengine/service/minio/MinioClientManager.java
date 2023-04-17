@@ -81,7 +81,7 @@ public class MinioClientManager implements ApplicationRunner {
         final UserUploadAssumeConfig uploadConfig = config.getUserUpload();
         final String roleSessionName = "rengine-" + currentTimeMillis();
 
-        return createSTSCredentialsWithAssumeRole(config.getEndpoint(), config.getTenantAccessKey(), config.getTenantSecretKey(),
+        return createSTSCredentialsWithAssumeRole(config.getEndpoint(), config.getAccessKey(), config.getSecretKey(),
                 config.getRegion(), stsRoleArn, safeLongToInt(uploadConfig.getExpiredDuration().getSeconds()), roleSessionName,
                 null);
     }
