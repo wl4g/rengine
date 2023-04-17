@@ -34,7 +34,7 @@ import com.wl4g.rengine.service.util.RuleScriptParser.ScriptASTInfo;
  * {@link RuleScriptScriptService}
  * 
  * @author James Wong
- * @version 2022-08-29
+ * @date 2022-08-29
  * @since v1.0.0
  */
 public interface RuleScriptService {

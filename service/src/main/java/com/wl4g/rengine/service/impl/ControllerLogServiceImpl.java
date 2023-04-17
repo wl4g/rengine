@@ -64,7 +64,7 @@ import lombok.CustomLog;
  * {@link ControllerLogServiceImpl}
  * 
  * @author James Wong
- * @version 2023-01-08
+ * @date 2023-01-08
  * @since v1.0.0
  */
 @CustomLog

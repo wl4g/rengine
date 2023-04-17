@@ -21,7 +21,7 @@ import com.wl4g.rengine.common.exception.RengineException;
  * {@link RengineControllerException}
  * 
  * @author James Wong
- * @version 2023-01-29
+ * @date 2023-01-29
  * @since v1.0.0
  */
 public class RengineControllerException extends RengineException {

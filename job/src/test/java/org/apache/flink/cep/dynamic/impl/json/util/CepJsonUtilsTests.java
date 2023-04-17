@@ -31,7 +31,7 @@ import com.wl4g.rengine.common.event.RengineEvent;
  * {@link CepJsonUtilsTests}
  * 
  * @author James Wong
- * @version 2023-02-25
+ * @date 2023-02-25
  * @since v1.0.0
  */
 @SuppressWarnings("serial")

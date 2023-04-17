@@ -76,7 +76,7 @@ import lombok.CustomLog;
  * {@link LifecycleExecutionService}
  * 
  * @author James Wong
- * @version 2022-09-17
+ * @date 2022-09-17
  * @since v1.0.0
  * @see https://github.com/google/guice/wiki/Motivation
  */

@@ -21,7 +21,7 @@ import com.wl4g.elasticjob.example.zookeeper.EmbedZookeeperServer;
  * {@link RengineCollectorTests}
  * 
  * @author James Wong
- * @version 2022-10-16
+ * @date 2022-10-16
  * @since v1.0.0
  */
 public class RengineCollectorTests {

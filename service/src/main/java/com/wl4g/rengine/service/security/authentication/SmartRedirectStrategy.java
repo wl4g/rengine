@@ -56,7 +56,7 @@ import lombok.CustomLog;
  * {@link SmartRedirectStrategy}
  * 
  * @author James Wong
- * @version 2023-02-24
+ * @date 2023-02-24
  * @since v1.0.0
  */
 @CustomLog

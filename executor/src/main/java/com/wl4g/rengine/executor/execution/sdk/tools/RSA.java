@@ -32,7 +32,7 @@ import com.wl4g.infra.common.crypto.asymmetric.spec.RSAKeyPairSpec;
  * {@link RSA}
  * 
  * @author James Wong
- * @version 2022-12-25
+ * @date 2022-12-25
  * @since v1.0.0
  */
 public class RSA {

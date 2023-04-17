@@ -15,11 +15,13 @@
  */
 package com.wl4g.rengine.service.minio;
 
+import com.wl4g.rengine.service.deploy.RengineMinioPolicyTool;
+
 /**
  * {@link MinioAdminTool}
  * 
  * @author James Wong
- * @version 2022-09-16
+ * @date 2022-09-16
  * @since Copy of
  *        https://github.com/wl4g/infra/blob/master/common/src/test/java/com/wl4g/infra/common/minio/MinioAdminTool.java
  */

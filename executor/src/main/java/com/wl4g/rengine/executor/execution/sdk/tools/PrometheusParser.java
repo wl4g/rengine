@@ -40,7 +40,7 @@ import lombok.experimental.SuperBuilder;
  * {@link PrometheusParser}
  * 
  * @author James Wong
- * @version 2022-12-15
+ * @date 2022-12-15
  * @since v1.0.0
  */
 public class PrometheusParser {

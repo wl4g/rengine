@@ -44,7 +44,7 @@ import com.wl4g.rengine.service.security.RengineWebSecurityProperties;
  * and therefore MUST be defined in the database schema.
  * 
  * @author James Wong
- * @version 2023-02-23
+ * @date 2023-02-23
  * @since v1.0.0
  * @see {@link org.springframework.security.oauth2.client.JdbcOAuth2AuthorizedClientService}
  */

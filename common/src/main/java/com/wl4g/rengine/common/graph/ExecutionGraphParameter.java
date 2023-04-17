@@ -22,7 +22,7 @@ import lombok.experimental.SuperBuilder;
  * {@link ExecutionGraphParameter}
  * 
  * @author James Wong
- * @version 2022-11-03
+ * @date 2022-11-03
  * @since v1.0.0
  */
 @Getter

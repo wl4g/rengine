@@ -26,7 +26,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder.BCryptVe
  * {@link MongoUserDetailsManagerTests}
  * 
  * @author James Wong
- * @version 2023-03-11
+ * @date 2023-03-11
  * @since v1.0.0
  */
 public class MongoUserDetailsManagerTests {

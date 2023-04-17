@@ -75,7 +75,7 @@ import lombok.CustomLog;
  * {@link GlobalDataSourceManager}
  * 
  * @author James Wong
- * @version 2022-12-14
+ * @date 2022-12-14
  * @since v1.0.0
  */
 @CustomLog

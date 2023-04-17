@@ -27,7 +27,7 @@ import com.wl4g.rengine.job.pulsar.util.RenginePulsarUtil;
  * {@link RenginePulsar2ES7Streaming}
  * 
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
- * @version 2022-06-02 v3.0.0
+ * @date 2022-06-02 v3.0.0
  * @since v1.0.0
  */
 public class RenginePulsar2ES7Streaming extends ES7FlinkStreamingSupport {

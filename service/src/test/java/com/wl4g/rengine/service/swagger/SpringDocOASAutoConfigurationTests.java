@@ -21,7 +21,7 @@ import org.junit.Test;
  * {@link SpringDocOASAutoConfigurationTests}
  * 
  * @author James Wong
- * @version 2023-01-13
+ * @date 2023-01-13
  * @since v1.0.0
  */
 public class SpringDocOASAutoConfigurationTests {

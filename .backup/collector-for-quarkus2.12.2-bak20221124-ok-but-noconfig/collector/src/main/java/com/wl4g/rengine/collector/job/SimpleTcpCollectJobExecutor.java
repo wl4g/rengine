@@ -36,7 +36,7 @@ import lombok.ToString;
  * {@link SimpleTcpCollectJobExecutor}
  * 
  * @author James Wong
- * @version 2022-10-26
+ * @date 2022-10-26
  * @since v3.0.0
  */
 @Singleton

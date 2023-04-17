@@ -12,18 +12,27 @@
 
 ## ---------------------------------------- APP Configuration. ----------------------------------------
 ## This is the spec definition of application instance deployed in Kubernetes.
-rengine-apiserver:
+apiserver:
   enabled: true
   image:
     repository: wl4g/rengine-apiserver
     baselineTag: 1.0.0
     #upgradeTag: latest
 
-  envConfigs: {}
+  command: []
 
-  agentConfigs: {}
+  preStartScript: ""
 
-  appConfigs: {}
+  envConfigs:
+    APP_DEBUG: yes
+
+  agentConfigs:
+    mountPath: ""
+    items: {}
+
+  appConfigs:
+    mountPath: ""
+    items: {}
 
   governance:
     istio:
@@ -31,18 +40,26 @@ rengine-apiserver:
         customHosts:
         - api.rengine.io
 
-rengine-controller:
-  enabled: true
+controller:
+  enabled: false
   image:
     repository: wl4g/rengine-controller
     baselineTag: 1.0.0
     #upgradeTag: latest
 
+  command: []
+
+  preStartScript: ""
+
   envConfigs: {}
 
-  agentConfigs: {}
+  agentConfigs:
+    mountPath: ""
+    items: {}
 
-  appConfigs: {}
+  appConfigs:
+    mountPath: ""
+    items: {}
 
   governance:
     istio:
@@ -50,19 +67,27 @@ rengine-controller:
         customHosts:
         - controller.rengine.io
 
-rengine-executor:
+executor:
   enabled: true
   image:
-    #repository: wl4g/rengine-executor
-    repository: wl4g/rengine-executor-native # Recommands
+    repository: wl4g/rengine-executor-native
     baselineTag: 1.0.0
     #upgradeTag: latest
 
+  #command: ["/work/application", "-Dquarkus.http.host=0.0.0.0"]
+  command: []
+
+  preStartScript: ""
+
   envConfigs: {}
 
-  agentConfigs: {}
+  agentConfigs:
+    mountPath: ""
+    items: {}
 
-  appConfigs: {}
+  appConfigs:
+    mountPath: ""
+    items: {}
 
   governance:
     istio:
@@ -70,18 +95,72 @@ rengine-executor:
         customHosts:
         - executor.rengine.io
 
-rengine-ui:
+ui:
   enabled: true
   image:
     repository: wl4g/rengine-ui
     baselineTag: 1.0.0
     #upgradeTag: latest
 
+  # command: ["sh", "-c", "ls -al /var/run/"]
+  command: []
+
   envConfigs: {}
 
-  agentConfigs: {}
+  agentConfigs:
+    mountPath: "/etc/nginx/"
+    items:
+      nginx.conf: |-
+        user  1001;
+        worker_processes  auto;
+        error_log  /var/log/nginx/error.log notice;
+        pid        /var/run/nginx.pid;
+        events {
+            worker_connections  1024;
+        }
+        http {
+            include       /etc/nginx/mime.types;
+            default_type  application/octet-stream;
+            log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                              '$status $body_bytes_sent "$http_referer" '
+                              '"$http_user_agent" "$http_x_forwarded_for"';
+            access_log  /var/log/nginx/access.log  main;
+            sendfile           on;
+            #tcp_nopush        on;
+            keepalive_timeout  65;
+            gzip  on;
+            include /etc/nginx/conf.d/*.conf;
+        }
 
-  appConfigs: {}
+  appConfigs:
+    mountPath: "/etc/nginx/conf.d/"
+    items:
+      rengine-ui.conf: |-
+        upstream apiserver_cluster {
+          server rengine-apiserver.rengine.svc.cluster.local:28001;
+        }
+        log_format  rengineuilog  '$remote_addr - $remote_user [$time_local] "$request" '
+                    '$status $bytes_sent $body_bytes_sent "$http_referer" '
+                    '"$http_user_agent" "$http_x_forwarded_for" '
+                    '$upstream_addr $host $sent_http_x_reqid $upstream_response_time $request_time';
+        server {
+          listen 8080;
+          server_name  console.rengine.io;
+          access_log  /var/log/nginx/access.log;
+          error_log   /var/log/nginx/error.log;
+          client_max_body_size 512m;
+          proxy_send_timeout 500s;
+          proxy_read_timeout 500s;
+          location ~ /api {
+            proxy_pass http://apiserver_cluster;
+            proxy_set_header Host $host;
+            proxy_set_header Referer $http_referer;
+          }
+          location / {
+            root /usr/share/nginx/html/rengine-ui;
+            index index.html index.htm;
+          }
+        }
 
   governance:
     istio:
@@ -92,6 +171,8 @@ rengine-ui:
 global:
   ## ------------------------------- Common Configuration. ----------------------------------------------
   commonConfigs:
+    command: []
+
     ##
     ## This is a script pre-start hook that is automatically executed before starting the container and
     ## can be used to customize the pre-launch actions (such as setup environments, etc.)
@@ -101,37 +182,88 @@ global:
     ## the order of exporting environment variables, that is, variable evaluation cannot be used,
     ## such as export A=123; export B="${A}"
     ##
-    preStartScript: |-
-      #!/bin/sh
+    #preStartScript: |-
+    #  #!/bin/sh
+    #  ## see:./service/src/main/resources/application-telemetry.yaml
+    #  export SPRING_SLEUTH_OTEL_EXPORTER_OTLP_ENDPOENT="http://otlp-collector.otlp.svc.cluster.local:4317"
+    #  export SPRING_SLEUTH_OTEL_EXPORTER_JAEGER_ENDPOENT="http://jaeger-collector.jaeger.svc.cluster.local:14250"
+    #  ##
+    #  ## see:./service/src/main/resources/application-mongo.yaml
+    #  export SPRING_DATA_MONGODB_URI="mongodb://rengine-mongodb:27017/rengine"
+    #  ##
+    #  ## see:./service/src/main/resources/application-redis.yaml
+    #  export SPRING_REDIS_CLUSTER_NODES="\
+    #    rengine-redis-cluster-0.rengine-redis-cluster-headless:6379,\
+    #    rengine-redis-cluster-1.rengine-redis-cluster-headless:6379,\
+    #    rengine-redis-cluster-2.rengine-redis-cluster-headless:6379,\
+    #    rengine-redis-cluster-3.rengine-redis-cluster-headless:6379,\
+    #    rengine-redis-cluster-4.rengine-redis-cluster-headless:6379,\
+    #    rengine-redis-cluster-5.rengine-redis-cluster-headless:6379"
+    #  export SPRING_REDIS_CLUSTER_USERNAME="default"
+    #  export SPRING_REDIS_CLUSTER_PASSWORD="changeme"
+    #  ##
+    #  ## see:./controller/src/main/resources/application-controller.yaml
+    #  export RENGINE_CONTROLLER_ZOOKEEPER_SERVER_LISTS="rengine-zookeeper:2181"
+    #  ##
+    #  ## see:./executor/src/main/resources/application.yaml and ./service/src/main/resources/application-minio.yaml
+    #  export MINIO_ENDPOINT="http://rengine-minio:9000"
+    #  export MINIO_ACCESS_KEY="rengine"
+    #  export MINIO_SECRET_KEY="changeme"
+    #  ##
+    #  ## see:./executor/src/main/resources/application.yaml
+    #  export QUARKUS_MONGODB_CONNECTION_STRING="${SPRING_DATA_MONGODB_URI}"
+    #  export QUARKUS_REDIS_PASSWORD="${SPRING_REDIS_CLUSTER_PASSWORD}"
+    #  export QUARKUS_REDIS_HOSTS="$(echo $SPRING_REDIS_CLUSTER_NODES | sed 's#,#,redis://#g')"
+    #  export QUARKUS_LOG_FILE_PATH="/tmp/executor.log"
+
+    envConfigs:
+      ##
       ## see:./service/src/main/resources/application-telemetry.yaml
-      export SPRING_SLEUTH_OTEL_EXPORTER_OTLP_ENDPOENT="http://otlp-collector.otlp.svc.cluster.local:4317"
-      export SPRING_SLEUTH_OTEL_EXPORTER_JAEGER_ENDPOENT="http://jaeger-collector.jaeger.svc.cluster.local:14250"
-
+      ##
+      SPRING_SLEUTH_OTEL_EXPORTER_OTLP_ENDPOENT: "http://otlp-collector.otlp.svc.cluster.local:4317"
+      SPRING_SLEUTH_OTEL_EXPORTER_JAEGER_ENDPOENT: "http://jaeger-collector.jaeger.svc.cluster.local:14250"
       ## see:./service/src/main/resources/application-mongo.yaml
-      export SPRING_DATA_MONGODB_URI="mongodb://rengine-mongodb:27017/rengine"
-
+      #SPRING_DATA_MONGODB_URI: "mongodb://root:changeme@rengine-mongodb:27017/rengine" # ???
+      SPRING_DATA_MONGODB_URI: "mongodb://rengine-mongodb:27017/rengine"
       ## see:./service/src/main/resources/application-redis.yaml
-      export SPRING_REDIS_CLUSTER_NODES="rengine-redis-cluster-0:6379,rengine-redis-cluster-1:6379,rengine-redis-cluster-2:6379,rengine-redis-cluster-3:6379,rengine-redis-cluster-4:6379,rengine-redis-cluster-5:6379"
-      export SPRING_REDIS_CLUSTER_PASSWORD='12345678'
-
+      #SPRING_REDIS_USERNAME: "default"
+      SPRING_REDIS_PASSWORD: "changeme"
+      SPRING_REDIS_CLUSTER_NODES: "\
+        rengine-redis-cluster-0.rengine-redis-cluster-headless:6379,\
+        rengine-redis-cluster-1.rengine-redis-cluster-headless:6379,\
+        rengine-redis-cluster-2.rengine-redis-cluster-headless:6379,\
+        rengine-redis-cluster-3.rengine-redis-cluster-headless:6379,\
+        rengine-redis-cluster-4.rengine-redis-cluster-headless:6379,\
+        rengine-redis-cluster-5.rengine-redis-cluster-headless:6379"
+      ##
       ## see:./controller/src/main/resources/application-controller.yaml
-      export RENGINE_CONTROLLER_ZOOKEEPER_SERVER_LISTS="rengine-zookeeper:2181"
-
-      ## see:./executor/src/main/resources/application.yaml and ./service/src/main/resources/application-minio.yaml
-      export MINIO_ENDPOINT="http://rengine-minio:9000"
-      export MINIO_ACCESS_KEY="rengine"
-      export MINIO_SECRET_KEY="12345678"
-
+      ##
+      RENGINE_CONTROLLER_ZOOKEEPER_SERVER_LISTS: "rengine-zookeeper:2181"
       ## see:./executor/src/main/resources/application.yaml
-      export QUARKUS_MONGODB_CONNECTION_STRING="${SPRING_DATA_MONGODB_URI}"
-      export QUARKUS_REDIS_PASSWORD="${SPRING_REDIS_CLUSTER_PASSWORD}"
-      export QUARKUS_REDIS_HOSTS="$(echo $SPRING_REDIS_CLUSTER_NODES | sed 's#,#,redis://#g')"
+      QUARKUS_MONGODB_CONNECTION_STRING: "mongodb://rengine-mongodb:27017/rengine"
+      QUARKUS_REDIS_PASSWORD: "changeme"
+      QUARKUS_REDIS_HOSTS: "\
+        redis://rengine-redis-cluster-0.rengine-redis-cluster-headless:6379,\
+        redis://rengine-redis-cluster-1.rengine-redis-cluster-headless:6379,\
+        redis://rengine-redis-cluster-2.rengine-redis-cluster-headless:6379,\
+        redis://rengine-redis-cluster-3.rengine-redis-cluster-headless:6379,\
+        redis://rengine-redis-cluster-4.rengine-redis-cluster-headless:6379,\
+        redis://rengine-redis-cluster-5.rengine-redis-cluster-headless:6379"
+      QUARKUS_LOG_FILE_PATH: "/tmp/executor.log"
+      ##
+      ## see:./executor/src/main/resources/application.yaml and ./service/src/main/resources/application-minio.yaml
+      ##
+      MINIO_ENDPOINT: "http://rengine-minio:9000"
+      MINIO_ACCESS_KEY: "rengine"
+      MINIO_SECRET_KEY: "changeme"
 
-    envConfigs: {}
+    agentConfigs:
+      mountPath: ""
+      items: {}
 
-    agentConfigs: {}
-
-    appConfigs: {}
+    appConfigs:
+      mountPath: ""
+      items: {}
 
   ## ------------------------------- Component Configuration. ----------------------------------------------
   ##
@@ -168,7 +300,7 @@ global:
     ## see:https://jaegertracing.github.io/helm-charts/
     jaeger:
       internal:
-        enabled: true
+        enabled: false
         # operatorEnabled: false
       external:
         enabled: false
@@ -575,14 +707,14 @@ jaeger:
   #       enabled: false
   #     user: admin
   #     usePassword: true
-  #     password: 12345678
+  #     password: changeme
   #   elasticsearch:
   #     scheme: http
   #     host: elasticsearch-master
   #     port: 9200
   #     user: elastic
   #     usePassword: true
-  #     password: 12345678
+  #     password: changeme
   #   kafka:
   #     brokers:
   #       - kafka:9092
@@ -592,8 +724,38 @@ jaeger:
 ## ------------------------------- (Internal) MongoDB Configuration. ----------------------------------
 ## see:https://github.com/bitnami/charts/tree/main/bitnami/mongodb
 mongodb:
+  initContainers:
+    ## Initializing rengine database scripts.
+    - name: rengine-init-mongodb
+      image: busybox:1.28
+      imagePullPolicy: IfNotPresent
+      command:
+        - wget
+        - "-O"
+        - "/docker-entrypoint-initdb.d/rengine_init.js"
+        - https://raw.githubusercontent.com/wl4g/rengine/master/tools/db/rengine_init.js?token=GHSAT0AAAAAAB4ATLINKSZ7RSHXRT6IJ674ZCCD6XA
+      volumeMounts:
+        - name: initdir
+          mountPath: "/docker-entrypoint-initdb.d/"
+
+  extraVolumeMounts:
+    - name: initdir
+      mountPath: "/docker-entrypoint-initdb.d/rengine_init.js"
+
+  extraVolumes:
+    - name: initdir
+      emptyDir: {}
+
   auth:
-    rootPassword: "12345678"
+    enabled: false
+    rootUser: root
+    rootPassword: "changeme"
+    # databases:
+    #   - "rengine"
+    # usernames:
+    #   - rengine
+    # passwords:
+    #   - "changeme"
 
 ## ------------------------------- (Internal) MongoDB sharded Configuration. ----------------------------------
 ## see:https://github.com/bitnami/charts/tree/main/bitnami/mongodb
@@ -615,7 +777,7 @@ mongodb-sharded:
   auth:
     enabled: true
     rootUser: root
-    rootPassword: "12345678"
+    rootPassword: "changeme"
 
 ## ------------------------------- (Internal) Redis Configuration. ----------------------------------
 ## see:https://github.com/bitnami/charts/tree/main/bitnami/redis
@@ -627,7 +789,7 @@ mongodb-sharded:
 #   auth:
 #     enabled: true
 #     sentinel: false
-#     rootPassword: "12345678"
+#     rootPassword: "changeme"
 #   master:
 #     count: 1
 #     disableCommands: ["FLUSHDB","FLUSHALL"]
@@ -645,7 +807,8 @@ mongodb-sharded:
 redis-cluster:
   diagnosticMode:
     enabled: false
-  password: "12345678"
+  usePassword: true
+  password: "changeme"
   redis:
     useAOFPersistence: "yes"
   cluster:
@@ -660,7 +823,16 @@ redis-cluster:
 ## see:https://github.com/bitnami/charts/tree/main/bitnami/minio
 minio:
   auth:
+    rootUser: "minioadmin"
     rootPassword: "minioadmin"
+  # gateway:
+  #   enabled: false
+  #   type: s3 ## gcs,nas,s3
+  #   replicaCount: 1
+  #   s3:
+  #     accessKey: ""
+  #     secretKey: ""
+  #     serviceEndpoint: ""
 
 ## ------------------------------- (Internal) Zookeeper Configuration. --------------------------------
 ## see:https://github.com/bitnami/charts/tree/main/bitnami/zookeeper

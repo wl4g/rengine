@@ -32,7 +32,7 @@ import com.wl4g.infra.common.crypto.symmetric.AES256ECBPKCS7;
  * {@link AES}
  * 
  * @author James Wong
- * @version 2022-12-25
+ * @date 2022-12-25
  * @since v1.0.0
  * @see https://github.com/open-dingtalk/dingtalk-callback-Crypto/blob/main/DingCallbackCrypto.java#L143
  */

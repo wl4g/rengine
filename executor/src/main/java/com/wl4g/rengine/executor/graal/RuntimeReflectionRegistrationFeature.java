@@ -28,7 +28,7 @@
 // * -Dquarkus.native.additional-build-args="--features=com.wl4g.rengine.executor.graal.RuntimeReflectionRegistrationFeature"
 // * 
 // * @author James Wong
-// * @version 2022-09-25
+// * @date 2022-09-25
 // * @since v1.0.0
 // * @see io.quarkus.runtime.graal.ResourcesFeature
 // */

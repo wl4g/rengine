@@ -50,7 +50,7 @@ import lombok.extern.slf4j.Slf4j;
  * {@link RoleController}
  * 
  * @author James Wong
- * @version 2022-08-28
+ * @date 2022-08-28
  * @since v1.0.0
  */
 @Tag(name = "RoleAPI", description = "The Role management API")

@@ -45,7 +45,7 @@ import com.wl4g.rengine.common.entity.graph.FlinkCepGraph.WithinType;
  * Refer to {@link com.wl4g.rengine.job.cep.pattern.PatternTests}
  * 
  * @author James Wong
- * @version 2023-03-13
+ * @date 2023-03-13
  * @since v1.0.0
  */
 public class FlinkCepGraphTests {

@@ -24,7 +24,7 @@ import com.wl4g.rengine.common.event.RengineEvent;
  * {@link EventRecorder}
  * 
  * @author James Wong
- * @version 2022-10-31
+ * @date 2022-10-31
  * @since v3.0.0
  */
 public interface EventRecorder {

@@ -32,7 +32,7 @@ import lombok.Getter;
  * {@link RedisEventRecorder}
  * 
  * @author James Wong
- * @version 2022-10-31
+ * @date 2022-10-31
  * @since v3.0.0
  */
 @Getter

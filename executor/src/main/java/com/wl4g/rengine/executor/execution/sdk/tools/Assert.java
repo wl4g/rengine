@@ -27,7 +27,7 @@ import com.wl4g.infra.common.lang.Assert2;
  * {@link Assert}
  * 
  * @author James Wong
- * @version 2023-01-29
+ * @date 2023-01-29
  * @since v1.0.0
  */
 public class Assert {

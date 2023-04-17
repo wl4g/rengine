@@ -34,7 +34,7 @@ import lombok.experimental.SuperBuilder;
  * {@link ClientEventBusConfig}
  * 
  * @author James Wong &lt;jameswong1376@gmail.com&gt;
- * @version 2022-05-30 v3.0.0
+ * @date 2022-05-30 v3.0.0
  * @since v1.0.0
  */
 @Getter

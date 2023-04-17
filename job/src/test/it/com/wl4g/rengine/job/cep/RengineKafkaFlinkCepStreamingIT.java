@@ -59,7 +59,7 @@ import io.opentelemetry.proto.logs.v1.ResourceLogs;
  * {@link com.wl4g.rengine.job.kafka.RengineKafkaFlinkCepStreamingTests}
  * 
  * @author James Wong
- * @version 2023-03-12
+ * @date 2023-03-12
  * @since v1.0.0
  */
 public class RengineKafkaFlinkCepStreamingIT {

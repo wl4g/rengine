@@ -61,7 +61,7 @@ import lombok.CustomLog;
  * {@link ReactiveDictServiceImpl}
  * 
  * @author James Wong
- * @version 2023-01-14
+ * @date 2023-01-14
  * @since v1.0.0
  * @see {@link com.wl4g.rengine.ReactiveDictServiceImpl.impl.DictServiceImpl}
  */

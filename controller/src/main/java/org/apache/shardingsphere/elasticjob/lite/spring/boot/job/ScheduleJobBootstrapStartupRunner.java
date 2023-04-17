@@ -27,7 +27,7 @@
 // * {@link ScheduleJobBootstrapStartupRunner}
 // * 
 // * @author James Wong
-// * @version 2022-10-16
+// * @date 2022-10-16
 // * @since v1.0.0
 // * @see {@link org.apache.shardingsphere.elasticjob.lite.spring.boot.job.ElasticJobBootstrapConfiguration}
 // * @see {@link org.apache.shardingsphere.elasticjob.lite.spring.boot.job.ElasticJobLiteAutoConfiguration}

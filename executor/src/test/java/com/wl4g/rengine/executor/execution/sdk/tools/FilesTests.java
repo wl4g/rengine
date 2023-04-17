@@ -21,7 +21,7 @@ import org.junit.Test;
  * {@link FilesTests}
  * 
  * @author James Wong
- * @version 2023-04-01
+ * @date 2023-04-01
  * @since v1.0.0
  */
 public class FilesTests {

@@ -40,7 +40,7 @@ import lombok.Getter;
  * {@link RengineConstants}
  * 
  * @author James Wong
- * @version 2022-09-08
+ * @date 2022-09-08
  * @since v1.0.0
  */
 public abstract class RengineConstants extends EnvironmentUtil {

@@ -55,7 +55,7 @@ import lombok.Getter;
  * {@link KafkaSourceFacade}
  *
  * @author James Wong
- * @version 2022-10-10
+ * @date 2022-10-10
  * @since v1.0.0
  */
 @Getter

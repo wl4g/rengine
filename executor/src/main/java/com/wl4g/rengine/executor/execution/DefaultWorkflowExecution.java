@@ -56,7 +56,7 @@ import lombok.CustomLog;
  * {@link DefaultWorkflowExecution}
  * 
  * @author James Wong
- * @version 2022-09-17
+ * @date 2022-09-17
  * @since v1.0.0
  */
 @CustomLog

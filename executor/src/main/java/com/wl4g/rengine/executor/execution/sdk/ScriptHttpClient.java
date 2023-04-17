@@ -64,7 +64,7 @@ import lombok.ToString;
  * {@link ScriptHttpClient}
  * 
  * @author James Wong
- * @version 2022-09-25
+ * @date 2022-09-25
  * @since v1.0.0
  */
 @ToString

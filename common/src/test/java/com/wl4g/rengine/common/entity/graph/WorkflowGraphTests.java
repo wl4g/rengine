@@ -40,7 +40,7 @@ import com.wl4g.rengine.common.util.BsonEntitySerializers;
  * {@link WorkflowGraphTests}
  * 
  * @author James Wong
- * @version 2022-10-20
+ * @date 2022-10-20
  * @since v3.0.0
  */
 public class WorkflowGraphTests {

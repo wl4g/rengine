@@ -28,7 +28,7 @@ import com.wl4g.rengine.service.mongo.CustomMongoClientConfiguration.RengineWrit
  * {@link RengineWriteConcernResolver}
  * 
  * @author James Wong
- * @version 2022-09-10
+ * @date 2022-09-10
  * @since v1.0.0
  */
 @Configuration

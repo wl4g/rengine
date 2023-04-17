@@ -30,7 +30,7 @@ import java.util.List;
  * {@link RootedPath}
  * 
  * @author James Wong
- * @version 2023-04-01
+ * @date 2023-04-01
  * @since v1.0.0
  * @see {@link org.apache.sshd.common.file.root.RootedPath}
  */

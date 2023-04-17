@@ -57,7 +57,7 @@ import lombok.experimental.SuperBuilder;
  * {@link ElasticJobBootstrapBuilder}
  * 
  * @author James Wong
- * @version 2022-10-26
+ * @date 2022-10-26
  * @since v1.0.0
  * @see {@link com.wl4g.rengine.controller.lifecycle.ElasticJobBootstrapBuilder}
  * @see {@link org.apache.shardingsphere.elasticjob.lite.spring.boot.job.ElasticJobLiteAutoConfiguration}

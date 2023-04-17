@@ -120,9 +120,9 @@ quarkus:
   ## see:https://quarkus.io/guides/smallrye-health
   smallrye-health:
     root-path: /healthz
-    liveness-path: ${quarkus.smallrye-health.root-path:healthz}/live
-    readiness-path: ${quarkus.smallrye-health.root-path:healthz}/ready
     startup-path: ${quarkus.smallrye-health.root-path:healthz}/started
+    readiness-path: ${quarkus.smallrye-health.root-path:healthz}/ready
+    liveness-path: ${quarkus.smallrye-health.root-path:healthz}/live
   micrometer:
     enabled: true
     registry-enabled-default: true

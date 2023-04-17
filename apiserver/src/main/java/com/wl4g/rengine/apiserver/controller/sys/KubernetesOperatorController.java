@@ -35,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
  * {@link KubernetesOperatorController}
  * 
  * @author James Wong
- * @version 2023-03-27
+ * @date 2023-03-27
  * @since v1.0.0
  */
 @Slf4j

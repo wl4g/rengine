@@ -23,7 +23,7 @@ import com.wl4g.infra.common.id.SnowflakeIdGenerator;
  * {@link IdGenUtils}
  * 
  * @author James Wong
- * @version 2022-09-16
+ * @date 2022-09-16
  * @since v1.0.0
  */
 public abstract class IdGenUtils {

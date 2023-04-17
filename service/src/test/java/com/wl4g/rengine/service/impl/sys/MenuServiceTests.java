@@ -36,7 +36,7 @@ import com.wl4g.rengine.service.util.TestDefaultMongoSetup;
  * {@link MenuServiceTests}
  * 
  * @author James Wong
- * @version 2023-02-14
+ * @date 2023-02-14
  * @since v1.0.0
  */
 public class MenuServiceTests {

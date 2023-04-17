@@ -23,7 +23,7 @@ import org.junit.Test;
  * {@link ControllerScheduleTests}
  * 
  * @author James Wong
- * @version 2023-01-20
+ * @date 2023-01-20
  * @since v1.0.0
  */
 public class ControllerScheduleTests {

@@ -30,7 +30,7 @@ import com.wl4g.rengine.common.event.RengineEvent.EventSource;
  * {@link EventToMutationConverterTests}
  * 
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
- * @version 2022-06-08 v3.0.0
+ * @date 2022-06-08 v3.0.0
  * @since v1.0.0
  */
 public class EventToMutationConverterTests {

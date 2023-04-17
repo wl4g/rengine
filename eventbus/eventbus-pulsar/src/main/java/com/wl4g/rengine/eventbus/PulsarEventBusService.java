@@ -50,7 +50,7 @@ import lombok.Getter;
  * {@link PulsarEventBusService}
  * 
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
- * @version 2022-05-30 v3.0.0
+ * @date 2022-05-30 v3.0.0
  * @since v1.0.0
  * @see https://pulsar.apache.org/docs/client-libraries-java#connection-urls
  * @see https://github.com/wl4g-collect/Pulsar-analysis/blob/master/pulsar-client.md

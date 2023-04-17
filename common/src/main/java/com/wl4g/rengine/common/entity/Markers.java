@@ -19,7 +19,7 @@ package com.wl4g.rengine.common.entity;
  * {@link Markers}
  * 
  * @author James Wong
- * @version 2023-03-24
+ * @date 2023-03-24
  * @since v1.0.0
  */
 public interface Markers {

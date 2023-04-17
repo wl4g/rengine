@@ -19,7 +19,7 @@ package com.wl4g.rengine.common.validation;
  * {@link ValidForRestMarker}
  * 
  * @author James Wong
- * @version 2022-09-27
+ * @date 2022-09-27
  * @since v1.0.0
  */
 public interface ValidForRestMarker {

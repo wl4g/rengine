@@ -27,7 +27,7 @@ import com.wl4g.rengine.collector.job.CollectJobExecutor.EventJobType;
  * {@link CollectorYamlConstructor}
  * 
  * @author James Wong
- * @version 2022-10-27
+ * @date 2022-10-27
  * @since v3.0.0
  */
 public class CollectorYamlConstructor extends Constructor {

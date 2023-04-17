@@ -51,7 +51,7 @@ import lombok.Getter;
  * {@link RedisDataSourceImpl}
  * 
  * @author James Wong
- * @version 2023-02-11
+ * @date 2023-02-11
  * @since v1.0.0
  */
 @Getter

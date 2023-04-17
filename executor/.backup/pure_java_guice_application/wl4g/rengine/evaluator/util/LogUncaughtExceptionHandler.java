@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * {@link LogUncaughtExceptionHandler}
  * 
  * @author James Wong
- * @version 2022-09-17
+ * @date 2022-09-17
  * @since v1.0.0
  */
 public class LogUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {

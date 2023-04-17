@@ -34,7 +34,7 @@ import com.wl4g.rengine.executor.util.TestDefaultRedisSetup;
  * {@link GraalPythonScriptEngineTests}
  * 
  * @author James Wong
- * @version 2022-09-23
+ * @date 2022-09-23
  * @since v1.0.0
  * @see https://github.com/wl4g/infra/blob/master/common-java11/src/test/java/com/wl4g/infra/common/graalvm/GraalPolyglotManagerTests.java#L97
  */

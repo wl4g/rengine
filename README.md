@@ -72,7 +72,7 @@ Unified and flexible rules engine platform, naturally suitable for scenarios whe
 
 - [Architecture](./docs/en/architecture.md)
 
-- [Examples for user](./docs/en/user-examples/user-examples.md)
+- [User examples](./docs/en/user-examples/user-examples.md)
 
 - [Deploy for standalone](./docs/en/deploy-standalone.md)
 

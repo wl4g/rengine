@@ -30,7 +30,7 @@ import io.quarkus.qute.TemplateExtension;
  * {@link ExpressionVariablesTests}
  * 
  * @author James Wong
- * @version 2022-11-25
+ * @date 2022-11-25
  * @since v1.0.0
  */
 public class ExpressionVariablesTests {

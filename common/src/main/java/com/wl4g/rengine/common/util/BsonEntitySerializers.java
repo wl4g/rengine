@@ -43,7 +43,7 @@ import com.wl4g.infra.common.serialize.JacksonUtils.PropertyTransformer;
  * {@link BsonEntitySerializers}
  * 
  * @author James Wong
- * @version 2023-01-07
+ * @date 2023-01-07
  * @since v1.0.0
  */
 public abstract class BsonEntitySerializers {

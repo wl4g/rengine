@@ -33,7 +33,7 @@ package com.wl4g.rengine.scheduler.util;
 // * {@link SpelVariablesTests}
 // * 
 // * @author James Wong
-// * @version 2022-10-22
+// * @date 2022-10-22
 // * @since v3.0.0
 // */
 //public class SpelVariablesTests {

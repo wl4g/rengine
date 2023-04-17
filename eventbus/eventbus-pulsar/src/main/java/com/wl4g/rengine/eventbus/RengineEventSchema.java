@@ -21,7 +21,7 @@ import com.wl4g.rengine.common.event.RengineEvent;
  * Schema definition for Strings encoded in UTF-8 format.
  * 
  * @author James Wong
- * @version 2022-11-02
+ * @date 2022-11-02
  * @since v1.0.0
  * @see {@link org.apache.pulsar.client.impl.schema.StringSchema}
  */

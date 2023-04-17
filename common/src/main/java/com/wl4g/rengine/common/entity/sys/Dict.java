@@ -35,7 +35,7 @@ import lombok.experimental.SuperBuilder;
  * {@link Dict}
  * 
  * @author James Wong
- * @version 2022-09-13
+ * @date 2022-09-13
  * @since v1.0.0
  */
 @Getter

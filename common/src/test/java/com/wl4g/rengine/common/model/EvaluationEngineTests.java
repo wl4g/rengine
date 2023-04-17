@@ -26,7 +26,7 @@ import com.wl4g.rengine.common.entity.Rule.RuleEngine;
  * {@link EvaluationEngine}
  * 
  * @author James Wong
- * @version 2022-10-10
+ * @date 2022-10-10
  * @since v1.0.0
  */
 public class EvaluationEngineTests {

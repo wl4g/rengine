@@ -50,7 +50,7 @@ import lombok.extern.slf4j.Slf4j;
  * {@link HelloGroovyEndpoint}
  * 
  * @author James Wong
- * @version 2022-09-18
+ * @date 2022-09-18
  * @since v1.0.0
  */
 @Slf4j

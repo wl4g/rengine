@@ -24,7 +24,7 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
  * {@link TestDefaultMeterSetup}
  * 
  * @author James Wong
- * @version 2022-12-31
+ * @date 2022-12-31
  * @since v1.0.0
  */
 public class TestDefaultMeterSetup {

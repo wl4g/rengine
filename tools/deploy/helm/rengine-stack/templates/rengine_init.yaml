@@ -1,0 +1,101 @@
+# Copyright (c) 2017 ~ 2025, the original author James Wong individual Inc,
+# All rights reserved. Contact us <jameswong1376@gmail.com>
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+## see:https://github.com/helm/helm-www/issues/1259
+{{- $secretName := printf "%s%s"  .Release.Name "-init-secret" -}}
+{{- $initRootPassword := randAlphaNum 32 -}}
+
+{{- if not (lookup "v1" "Secret" .Release.Namespace $secretName) }}
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $secretName }}
+  annotations:
+    helm.sh/resource-policy: "keep"
+type: Opaque
+stringData:
+  initRootPassword: {{ $initRootPassword }}
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ .Release.Name }}-init-update-rootpassword
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}-init-update-rootpassword
+    app.kubernetes.io/release: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    helm.sh/chart: {{ .Chart.Name }}
+spec:
+  restartPolicy: OnFailure
+  containers:
+    - name: {{ .Release.Name }}-init-update-rootpassword
+      image: "{{ .Values.apiserver.image.repository }}:{{ .Values.apiserver.image.baselineTag | default .Chart.AppVersion }}"
+      imagePullPolicy: IfNotPresent
+      command:
+      - "/bin/bash"
+      - "-c"
+      # Should using: mongodb://root:changeme@{{ .Release.Name }}-mongodb:27017/rengine ???
+      - "cd $APP_HOME && java -cp .:lib/* com.wl4g.rengine.service.deploy.RengineRootPasswordTool \
+        --connectionString mongodb://{{ .Release.Name }}-mongodb:27017/rengine \
+        --isClusterMode false \
+        --database rengine \
+        --rootPassword {{ $initRootPassword }}"
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ .Release.Name }}-init-minio
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}-init-minio
+    app.kubernetes.io/release: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    helm.sh/chart: {{ .Chart.Name }}
+spec:
+  restartPolicy: OnFailure
+  initContainers:
+    - name: {{ .Release.Name }}-init-minio-policy
+      image: "{{ .Values.apiserver.image.repository }}:{{ .Values.apiserver.image.baselineTag | default .Chart.AppVersion }}"
+      imagePullPolicy: IfNotPresent
+      command:
+        - "/bin/bash"
+        - "-c"
+        - "cd $APP_HOME && java -cp .:lib/* com.wl4g.rengine.service.deploy.RengineMinioPolicyTool \
+            --endpoint http://{{ .Release.Name }}-minio:9000 \
+            --region us-east-1 \
+            --adminAccessKey minioadmin \
+            --adminSecretKey minioadmin \
+            --accessKey rengine \
+            --secretKey changeme \
+            --bucket rengine"
+
+  containers:
+    - name: {{ .Release.Name }}-init-minio-objects
+      image: "{{ .Values.apiserver.image.repository }}:{{ .Values.apiserver.image.baselineTag | default .Chart.AppVersion }}"
+      imagePullPolicy: IfNotPresent
+      command:
+      - "/bin/bash"
+      - "-c"
+      - "cd $APP_HOME && java -cp .:lib/* com.wl4g.rengine.service.deploy.RengineMinioUploadTool \
+          --endpoint http://{{ .Release.Name }}-minio:9000 \
+          --region us-east-1 \
+          --accessKey rengine \
+          --secretKey changeme \
+          --bucket rengine \
+          --location classpath*:/example/rulescript/0/*/*.* \
+          --prefix libjs"
+
+{{- end }}

@@ -46,7 +46,7 @@ import lombok.CustomLog;
  * {@link SimpleKubernetesOperatorAuthenticationFilter}
  * 
  * @author James Wong
- * @version 2023-03-27
+ * @date 2023-03-27
  * @since v1.0.0
  * @see https://github.com/wl4g/rengine-operator/tree/master/tool/tenantservice/tenantservice.go
  */

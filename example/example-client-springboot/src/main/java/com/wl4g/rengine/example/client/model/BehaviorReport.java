@@ -27,7 +27,7 @@ import lombok.experimental.SuperBuilder;
  * {@link BehaviorReport}
  * 
  * @author James Wong
- * @version 2022-11-03
+ * @date 2022-11-03
  * @since v3.0.0
  */
 @Getter

@@ -68,7 +68,7 @@ import lombok.CustomLog;
  * {@link GlobalControllerJobManager}
  * 
  * @author James Wong
- * @version 2023-01-17
+ * @date 2023-01-17
  * @since v1.0.0
  */
 @CustomLog

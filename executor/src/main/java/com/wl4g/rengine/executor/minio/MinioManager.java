@@ -78,7 +78,7 @@ import okhttp3.Protocol;
  * {@link MinioManager}
  * 
  * @author James Wong
- * @version 2022-09-17
+ * @date 2022-09-17
  * @since v1.0.0
  */
 @Slf4j
@@ -193,7 +193,7 @@ public class MinioManager {
         hasTextOf(objectPrefix, "objectPrefix");
         hasTextOf(filename, "filename");
         try {
-            // UploadSnowballObjectsArgs
+            // UploadSnowballObjectsArgsSubstitute
             return minioClient.uploadObject(UploadObjectArgs.builder()
                     .bucket(config.bucket())
                     .region(config.region())

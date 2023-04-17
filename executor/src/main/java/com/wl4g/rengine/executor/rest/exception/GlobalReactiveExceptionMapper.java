@@ -38,7 +38,7 @@ package com.wl4g.rengine.executor.rest.exception;
 // * {@link GlobalReactiveExceptionMapper}
 // *
 // * @author James Wong
-// * @version 2022-09-19
+// * @date 2022-09-19
 // * @since v1.0.0
 // */
 // @Slf4j

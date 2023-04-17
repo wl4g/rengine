@@ -50,7 +50,7 @@ import lombok.ToString;
  * {@link BeanSensitiveTransforms}
  * 
  * @author James Wong
- * @version 2023-01-11
+ * @date 2023-01-11
  * @since v1.0.0
  */
 public abstract class BeanSensitiveTransforms {

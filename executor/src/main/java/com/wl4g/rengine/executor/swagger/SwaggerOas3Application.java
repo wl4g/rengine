@@ -29,7 +29,7 @@ package com.wl4g.rengine.executor.swagger;
 // * {@link SwaggerOas3Application}
 // *
 // * @author James Wong
-// * @version 2022-09-19
+// * @date 2022-09-19
 // * @since v1.0.0
 // */
 // @OpenAPIDefinition(tags = { @Tag(name = "component", description = "Rengine

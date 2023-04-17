@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
  * {@link LoggingJobErrorHandler}
  * 
  * @author James Wong
- * @version 2022-10-20
+ * @date 2022-10-20
  * @since v3.0.0
  */
 @Slf4j

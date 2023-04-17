@@ -29,7 +29,7 @@ import com.wl4g.infra.common.io.FileIOUtils.ReadTailFrame;
  * {@link ScriptEngineUtilTests}
  * 
  * @author James Wong
- * @version 2023-01-11
+ * @date 2023-01-11
  * @since v1.0.0
  */
 public class ScriptEngineUtilTests {

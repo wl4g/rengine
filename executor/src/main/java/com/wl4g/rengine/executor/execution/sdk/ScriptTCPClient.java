@@ -41,7 +41,7 @@ import lombok.ToString;
  * {@link ScriptTCPClient}
  * 
  * @author James Wong
- * @version 2022-09-25
+ * @date 2022-09-25
  * @since v1.0.0
  */
 @ToString

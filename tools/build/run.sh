@@ -92,10 +92,13 @@ Usage: ./$(basename $0) [OPTIONS] [arg1] [arg2] ...
                     -u,--ui                         Push image for UI.
                     -A,--all                        Push image for all components.
     build-push                                      Build with Maven and push images for all components.
+    prune-image                                     Prune unused all images. (tag=none)
     run-standalone                                  Run all services with docker standalone mode.
+                    -S,--status                     Display status for all services.
                     -U,--up                         Startup to all services.
                        --prune-all-volumes          Remove all data volumes before per initial deploy. Note: be careful!
                     -D,--down                       Shuwdown to all services.
+                       --prune-all-volumes          Remove all data volumes after per destory deploy. Note: be careful!
 "
 }
 
@@ -237,18 +240,25 @@ function do_build_deploy() {
 }
 
 function do_dl_serve_start() {
-  do_dl_serve_stop
-  set +e
-  nohup python3 -m http.server --directory ${BASE_DIR} 13337 >/dev/null 2>&1 &
-  [ $? -ne 0 ] && echo "Could't to start local DL serve." && exit -1 || echo
-  set -e
+    local python3_cmd=$(which python3)
+    [ -z "$python3_cmd" ] && logErr "The python3 not installed yet" && exit 1 || echo -n
+
+    do_dl_serve_stop
+
+    set +e
+    nohup $python3_cmd -m http.server --directory ${BASE_DIR} 13337 >/dev/null 2>&1 &
+    [ $? -ne 0 ] && echo "Could't to start local DL serve." && exit -1 || echo
+    set -e
 }
 
 function do_dl_serve_stop() {
-  set +e
-  ps -ef | grep python3 | grep ${BASE_DIR} | grep 13337 | cut -c 9-16 | xargs kill -9 >/dev/null 2>&1
-  #[ $? -ne 0 ] && echo "Failed to stop local DL serve." || echo
-  set -e
+    local python3_cmd=$(which python3)
+    [ -z "$python3_cmd" ] && logErr "The python3 not installed yet" && exit 1 || echo -n
+
+    set +e
+    ps -ef | grep $python3_cmd | grep ${BASE_DIR} | grep 13337 | cut -c 9-16 | xargs kill -9 >/dev/null 2>&1
+    #[ $? -ne 0 ] && echo "Failed to stop local DL serve." || echo
+    set -e
 }
 
 function do_build_image_with_springboot() {
@@ -279,9 +289,10 @@ function do_build_image_with_npm() {
 }
 
 function do_push_image() {
+    POM_VERSION=${POM_VERSION:-$(print_pom_version)}
     local image_registry="$DOCKERHUB_REGISTRY"
     local image_name="$2"
-    local image_tag="$3"
+    local image_tag="$POM_VERSION"
 
     if [ -z "$image_registry" ]; then
         image_registry="docker.io/wl4g"
@@ -300,6 +311,14 @@ function do_push_image() {
     logDebug "Pushing image to $image_registry/$image_name:$image_tag ..."
     docker tag wl4g/$image_name:$image_tag $image_registry/$image_name:$image_tag
     docker push $image_registry/$image_name:$image_tag
+}
+
+function do_prune_image() {
+    local prune_images=$(docker images | grep none | awk -F ' ' '{print $3}')
+    for pi in `echo $prune_images`; do
+        echo "Removing image for $pi "
+        docker rmi -f $pi
+    done
 }
 
 function do_run_standalone() {
@@ -322,34 +341,53 @@ function do_run_standalone() {
         curl -k -o $compose_file $remote_compose_file
     fi
 
-    ## Destroy before the startup volumes.
+    ## Before the initial deploy prune.
     if [[ "$compose_args" == up* && "$prune_args" == "--prune-all-volumes" ]]; then
-        ## Remove the volumes only if it is the first deploy.
-        if [ -z "$($compose_cmd -f $compose_file ls | grep rengine)" ]; then
-            log "Removing the all rengine volumes ..."
-            set +e
-            docker volume rm rengine_hbase_data 2>/dev/null
-            docker volume rm rengine_kafka_data 2>/dev/null
-            docker volume rm rengine_minio_data 2>/dev/null
-            docker volume rm rengine_mongodb_data 2>/dev/null
-            docker volume rm rengine_redis_data_0 2>/dev/null
-            docker volume rm rengine_redis_data_1 2>/dev/null
-            docker volume rm rengine_redis_data_2 2>/dev/null
-            docker volume rm rengine_redis_data_3 2>/dev/null
-            docker volume rm rengine_redis_data_4 2>/dev/null
-            docker volume rm rengine_redis_data_5 2>/dev/null
-            docker volume rm rengine_script_log 2>/dev/null
-            docker volume rm rengine_script_rootfs 2>/dev/null
-            docker volume rm rengine_script_works 2>/dev/null
-            docker volume rm rengine_zookeeper_data 2>/dev/null
-            set -e
-        else
-           logErr "Unable to remove data volumes, please shutdown all containers before!"
-           exit 1
-        fi
+        log "Pruning a previously deployed all volumes..."
+        do_prune_all_volumes_with_run_standalone $compose_cmd $compose_file
     fi
+
+    set +e
     $compose_cmd --env-file /tmp/.env -f ${compose_file} $compose_args
+    set -e
+
+    ## After the destory prune.
+    if [[ "$compose_args" == down* && "$prune_args" == "--prune-all-volumes" ]]; then
+        log "Pruning deployed all volumes..."
+        do_prune_all_volumes_with_run_standalone $compose_cmd $compose_file
+    fi
 }
+
+function do_prune_all_volumes_with_run_standalone() {
+    local compose_cmd="$1"
+    local compose_file="$2"
+    [ -z "$compose_cmd" ] && logErr "The docker-compose not installed yet" && exit 1 || echo -n
+    [ -z "$compose_file" ] && logErr "The docker-compose yaml is missing" && exit 1 || echo -n
+
+    ## Remove the volumes only if it is the first deploy.
+    if [ -z "$($compose_cmd -f $compose_file ls | grep rengine)" ]; then
+        set +e
+        docker volume rm rengine_zookeeper_data 2>/dev/null
+        docker volume rm rengine_kafka_data 2>/dev/null
+        docker volume rm rengine_minio_data 2>/dev/null
+        docker volume rm rengine_mongodb_data 2>/dev/null
+        docker volume rm rengine_redis_data_0 2>/dev/null
+        docker volume rm rengine_redis_data_1 2>/dev/null
+        docker volume rm rengine_redis_data_2 2>/dev/null
+        docker volume rm rengine_redis_data_3 2>/dev/null
+        docker volume rm rengine_redis_data_4 2>/dev/null
+        docker volume rm rengine_redis_data_5 2>/dev/null
+        docker volume rm rengine_script_log 2>/dev/null
+        docker volume rm rengine_script_rootfs 2>/dev/null
+        docker volume rm rengine_script_works 2>/dev/null
+        docker volume rm rengine_hbase_data 2>/dev/null
+        set -e
+    else
+        logErr "Unable to remove data volumes, please shutdown all containers before, Or remove the arg '--prune-all-volumes'"
+        exit 1
+    fi
+}
+
 
 # --- Main. ---
 case $1 in
@@ -475,33 +513,32 @@ case $1 in
     esac
     ;;
   push-image)
-    POM_VERSION=${POM_VERSION:-$(print_pom_version)}
     case $2 in
       -a|--apiserver)
-        do_push_image "$3" "rengine-apiserver" "$POM_VERSION"
+        do_push_image "$3" "rengine-apiserver"
         ;;
       -c|--controller)
-        do_push_image "$3" "rengine-controller" "$POM_VERSION"
+        do_push_image "$3" "rengine-controller"
         ;;
       -j|--job)
-        do_push_image "$3" "rengine-job" "$POM_VERSION"
+        do_push_image "$3" "rengine-job"
         ;;
       -e|--executor)
-        do_push_image "$3" "rengine-executor" "$POM_VERSION"
+        do_push_image "$3" "rengine-executor"
         ;;
       -E|--executor-native)
-        do_push_image "$3" "rengine-executor-native" "$POM_VERSION"
+        do_push_image "$3" "rengine-executor-native"
         ;;
       -u|--ui)
-        do_push_image "$3" "rengine-ui" "$POM_VERSION"
-        ;; 
+        do_push_image "$3" "rengine-ui"
+        ;;
       -A|--all)
-        do_push_image "$3" "rengine-apiserver" "$POM_VERSION" &
-        do_push_image "$3" "rengine-controller" "$POM_VERSION" &
-        do_push_image "$3" "rengine-job" "$POM_VERSION" &
-        do_push_image "$3" "rengine-executor" "$POM_VERSION" &
-        do_push_image "$3" "rengine-executor-native" "$POM_VERSION" &
-        do_push_image "$3" "rengine-ui" "$POM_VERSION" &
+        do_push_image "$3" "rengine-apiserver" &
+        do_push_image "$3" "rengine-controller" &
+        do_push_image "$3" "rengine-job" &
+        do_push_image "$3" "rengine-executor" &
+        do_push_image "$3" "rengine-executor-native" &
+        do_push_image "$3" "rengine-ui" &
         wait
         ;;
       *)
@@ -531,20 +568,26 @@ case $1 in
 
     do_build_image_with_npm ui ${POM_VERSION} "${BASE_DIR}/rengine-ui/tools/build/docker/Dockerfile.vue"
 
-    do_push_image "$2" "rengine-apiserver" "$POM_VERSION"
-    do_push_image "$2" "rengine-controller" "$POM_VERSION"
-    do_push_image "$2" "rengine-job" "$POM_VERSION"
-    do_push_image "$2" "rengine-executor" "$POM_VERSION"
-    do_push_image "$2" "rengine-executor-native" "$POM_VERSION"
-    do_push_image "$3" "rengine-ui" "$POM_VERSION"
+    do_push_image "$2" "rengine-apiserver"
+    do_push_image "$2" "rengine-controller"
+    do_push_image "$2" "rengine-job"
+    do_push_image "$2" "rengine-executor"
+    do_push_image "$2" "rengine-executor-native"
+    do_push_image "$3" "rengine-ui"
+    ;;
+  prune-image)
+    do_prune_image
     ;;
   run-standalone)
     case $2 in
+      -S|--status)
+        docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}" | grep rengine_
+        ;;
       -U|--up)
         do_run_standalone "up -d" "$3"
         ;;
       -D|--down)
-        do_run_standalone "down"
+        do_run_standalone "down" "$3"
         ;;
       *)
         usages; exit 1

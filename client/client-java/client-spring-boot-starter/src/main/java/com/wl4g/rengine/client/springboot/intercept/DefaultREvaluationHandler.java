@@ -68,7 +68,7 @@ import lombok.CustomLog;
  * {@link DefaultREvaluationHandler}
  * 
  * @author James Wong
- * @version 2022-11-02
+ * @date 2022-11-02
  * @since v1.0.0
  */
 @CustomLog

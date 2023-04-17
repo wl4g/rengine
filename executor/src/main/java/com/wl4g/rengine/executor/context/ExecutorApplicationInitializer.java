@@ -38,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
  * {@linkplain @Singleton}: Better performance because there is no client proxy.
  * 
  * @author James Wong
- * @version 2022-09-18
+ * @date 2022-09-18
  * @since v1.0.0
  * @see https://quarkus.io/guides/lifecycle#listening-for-startup-and-shutdown-events
  */

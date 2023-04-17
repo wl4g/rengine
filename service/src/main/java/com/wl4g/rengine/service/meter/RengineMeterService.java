@@ -29,7 +29,7 @@ import lombok.Getter;
  * {@link RengineMeterService}
  * 
  * @author James Wong
- * @version 2023-02-04
+ * @date 2023-02-04
  * @since v1.0.0
  */
 public class RengineMeterService extends PrometheusMeterFacade {

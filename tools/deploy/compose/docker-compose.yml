@@ -29,16 +29,24 @@ services:
     container_name: rengine_mongodb
     environment:
       - BITNAMI_DEBUG=true
-      - ALLOW_EMPTY_PASSWORD=yes
+      - ALLOW_EMPTY_PASSWORD=no
+      - MONGODB_PRIMARY_HOST=mongodb:27017
+      # - MONGODB_PRIMARY_ROOT_USER=default
+      - MONGODB_ADVERTISED_HOSTNAME=mongodb
       - MONGODB_REPLICA_SET_MODE=primary
-      - MONGODB_PRIMARY_HOST=127.0.0.1:27017
-      - MONGODB_SYSTEM_LOG_VERBOSITY=0
-      - MONGODB_DISABLE_SYSTEM_LOG=no
-      - MONGODB_DISABLE_JAVASCRIPT=no
+      - MONGODB_REPLICA_SET_KEY=defaultReplicaSet
       - MONGODB_ENABLE_JOURNAL=yes
       - MONGODB_ENABLE_IPV6=no
       - MONGODB_ENABLE_DIRECTORY_PER_DB=no
-      - MONGO_INITDB_DATABASE=rengine
+      - MONGODB_DISABLE_SYSTEM_LOG=no
+      - MONGODB_DISABLE_JAVASCRIPT=no
+      - MONGODB_SYSTEM_LOG_VERBOSITY=0
+      #- MONGODB_INITIAL_PRIMARY_ROOT_USER=mongo
+      #- MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD=changeme
+      - MONGODB_USERNAME=default
+      - MONGODB_PASSWORD=changeme
+      - MONGODB_ROOT_PASSWORD=changeme
+      - MONGODB_DATABASE=rengine
     restart: unless-stopped
     networks:
       - rengine_net
@@ -49,6 +57,8 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - ${BASE_DIR}/tools/db/rengine_init.js:/docker-entrypoint-initdb.d/rengine_init.js:ro
       - mongodb_data:/bitnami/mongodb/data:rw
+    ports:
+      - 27001:27001
 
   ## ===================== MongoDB Manager ======================
 
@@ -280,15 +290,66 @@ services:
     ports:
       - "8888:80"
 
-  ## =============== Rengine (apiserver) ================
+  ## =============== Init (mongodb) ================
+  init_mongodb:
+    image: wl4g/rengine-apiserver:1.0.0
+    entrypoint: "/bin/bash"
+    command: "-c \"cd /opt/apps/ecm/apiserver-package/apiserver-current && java -cp .:lib/* com.wl4g.rengine.service.deploy.RengineRootPasswordTool \
+            --connectionString mongodb://default:changeme@mongodb:27017/rengine \
+            --isClusterMode false \
+            --database rengine \
+            --rootPassword changeme\""
+    container_name: rengine_init_mongodb
+    restart: on-failure
+    networks:
+      - rengine_net
+    depends_on:
+      - mongodb
+
+  ## =============== Init (minio policy) ================
   ## Init Minio policy and rulescript objects.
-  ## see:com.wl4g.rengine.service.deploy.MinioDeploymentInitializer
-  ## see:docker run --rm --entrypoint /bin/bash wl4g/rengine-apiserver:1.0.0 -c 'cd $APP_HOME && java -cp .:lib/* com.wl4g.rengine.service.minio.RengineMinioPolicyTool --help'
-  ## see:docker run --rm --entrypoint /bin/bash wl4g/rengine-apiserver:1.0.0 -c 'cd $APP_HOME && java -cp .:lib/* com.wl4g.rengine.service.minio.RengineMinioUploadTool --help'
-  ## see:docker run --rm --network host --entrypoint /bin/bash -v ${BASE_DIR}/service/src/main/resources/examples:/examples wl4g/rengine-apiserver:1.0.0 -c 'cd $APP_HOME && java -cp .:lib/* com.wl4g.rengine.service.minio.RengineMinioUploadTool -D /examples'
+  ## see:docker run --rm --entrypoint bash wl4g/rengine-apiserver:1.0.0 -c 'cd $APP_HOME && java -cp .:lib/* com.wl4g.rengine.service.deploy.RengineMinioPolicyTool --help'
   ## Or:
   ## see:docker run --rm minio/mc mc admin --help
   ## see:docker run --rm minio/mc mc mirror --help
+  init_minio_policy:
+    image: wl4g/rengine-apiserver:1.0.0
+    entrypoint: "/bin/bash"
+    command: "-c \"cd /opt/apps/ecm/apiserver-package/apiserver-current && java -cp .:lib/* com.wl4g.rengine.service.deploy.RengineMinioPolicyTool \
+              --endpoint http://minio:9000 \
+              --region us-east-1 \
+              --adminAccessKey minioadmin \
+              --adminSecretKey minioadmin \
+              --accessKey rengine \
+              --secretKey changeme \
+              --bucket rengine\""
+    container_name: rengine_init_minio_policy
+    restart: on-failure
+    networks:
+      - rengine_net
+    depends_on:
+      - minio
+
+  ## =============== Init (minio objects) ================
+  init_minio_objects:
+    image: wl4g/rengine-apiserver:1.0.0
+    entrypoint: "/bin/bash"
+    command: "-c \"cd /opt/apps/ecm/apiserver-package/apiserver-current && java -cp .:lib/* com.wl4g.rengine.service.deploy.RengineMinioUploadTool \
+              --endpoint http://minio:9000 \
+              --region us-east-1 \
+              --accessKey rengine \
+              --secretKey changeme \
+              --bucket rengine \
+              --location classpath*:/example/rulescript/0/*/*.* \
+              --prefix libjs\""
+    container_name: rengine_init_minio_objects
+    restart: on-failure
+    networks:
+      - rengine_net
+    depends_on:
+      - minio
+
+  ## =============== Rengine (apiserver) ================
   apiserver:
     image: wl4g/rengine-apiserver:1.0.0
     container_name: rengine_apiserver
@@ -301,19 +362,8 @@ services:
       - MINIO_REGION=us-east-1
       - MINIO_BUCKET=rengine
       - MINIO_ACCESS_KEY=rengine
-      - MINIO_SECRET_KEY=12345678
+      - MINIO_SECRET_KEY=changeme
       - RENGINE_SERVICES_EXECUTOR_ENDPOINT=http://executor:28002
-      ## see:com.wl4g.rengine.service.deploy.MinioDeploymentInitializer
-      - DEPLOY_MINIO_INIT_ENALBED=true
-      - DEPLOY_MINIO_INIT_ADMIN_ACCESS_KEY=minioadmin
-      - DEPLOY_MINIO_INIT_ADMIN_SECRET_KEY=minioadmin
-      - DEPLOY_MINIO_INIT_ACCESS_KEY=rengine
-      - DEPLOY_MINIO_INIT_SECRET_KEY=12345678
-      - DEPLOY_MINIO_INIT_ENDPOINT=http://minio:9000
-      - DEPLOY_MINIO_INIT_BUCKET=rengine
-      - DEPLOY_MINIO_INIT_LOCATION_PATTERNS=classpath*:/example/rulescript/0/*/*.*
-      - DEPLOY_MINIO_INIT_FROM_LOCATION_PATH=/example/rulescript/
-      - DEPLOY_MINIO_INIT_PREFIX=libjs
     restart: unless-stopped
     networks:
       - rengine_net

@@ -25,7 +25,7 @@ import com.nextbreakpoint.flinkclient1_15.model.JarUploadResponseBody;
  * {@link DefaultApiTests}
  * 
  * @author James Wong
- * @version 2023-04-03
+ * @date 2023-04-03
  * @since v1.0.0
  */
 public class DefaultApiTests {

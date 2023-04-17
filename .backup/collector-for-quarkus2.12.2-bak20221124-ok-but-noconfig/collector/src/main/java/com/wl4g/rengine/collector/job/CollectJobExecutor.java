@@ -72,7 +72,7 @@ import lombok.ToString;
  * smart than prometheus.
  * 
  * @author James Wong
- * @version 2022-10-20
+ * @date 2022-10-20
  * @since v1.0.0
  */
 @Getter

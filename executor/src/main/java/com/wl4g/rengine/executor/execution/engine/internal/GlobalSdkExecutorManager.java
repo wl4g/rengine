@@ -40,7 +40,7 @@ import lombok.CustomLog;
  * {@link GlobalSdkExecutorManager}
  * 
  * @author James Wong
- * @version 2022-12-26
+ * @date 2022-12-26
  * @since v1.0.0
  */
 @CustomLog

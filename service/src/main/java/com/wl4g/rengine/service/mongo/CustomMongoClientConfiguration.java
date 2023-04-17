@@ -42,7 +42,7 @@ import lombok.Getter;
  * {@link CustomMongoClientConfiguration}
  * 
  * @author James Wong
- * @version 2022-12-08
+ * @date 2022-12-08
  * @since v1.0.0
  * @see https://github.com/spring-projects/spring-data-mongodb/blob/3.4.6/src/main/asciidoc/reference/mongo-custom-conversions.adoc
  */

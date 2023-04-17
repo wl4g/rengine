@@ -46,7 +46,7 @@ import com.wl4g.rengine.executor.util.TestDefaultBaseSetup;
  * {@link GlobalMessageNotifierManagerTests}
  * 
  * @author James Wong
- * @version 2022-09-27
+ * @date 2022-09-27
  * @since v1.0.0
  */
 public class GlobalDataSourceManagerTests {

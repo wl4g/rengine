@@ -41,7 +41,7 @@ import com.wl4g.rengine.common.event.RengineEvent;
  * {@link com.wl4g.rengine.job.kafka.RengineKafkaFlinkCepStreamingIT}
  * 
  * @author James Wong
- * @version 2023-03-16
+ * @date 2023-03-16
  * @since v1.0.0
  */
 public class RengineKafkaFlinkCepStreamingTests {

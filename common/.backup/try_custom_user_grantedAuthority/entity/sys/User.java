@@ -45,7 +45,7 @@ import lombok.experimental.SuperBuilder;
  * {@link User}
  * 
  * @author James Wong
- * @version 2022-09-13
+ * @date 2022-09-13
  * @since v1.0.0
  * @see {@link com.wl4g.rengine.common.entity.sys.springframework.security.core.userdetails.User}
  */

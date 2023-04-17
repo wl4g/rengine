@@ -32,7 +32,7 @@ import com.wl4g.rengine.common.entity.sys.Notification.DingtalkConfig.DingtalkUs
  * {@link NotificationTests}
  * 
  * @author James Wong
- * @version 2022-12-15
+ * @date 2022-12-15
  * @since v1.0.0
  */
 public class NotificationTests {

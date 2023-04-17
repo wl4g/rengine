@@ -63,7 +63,7 @@ import io.minio.credentials.Credentials;
  * {@link UploadServiceImpl}
  * 
  * @author James Wong
- * @version 2022-08-29
+ * @date 2022-08-29
  * @since v1.0.0
  */
 @Service

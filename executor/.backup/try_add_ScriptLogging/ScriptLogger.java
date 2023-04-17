@@ -34,7 +34,7 @@
 // * {@link ScriptLogger}
 // * 
 // * @author James Wong
-// * @version 2022-09-29
+// * @date 2022-09-29
 // * @since v1.0.0
 // */
 //@CustomLog

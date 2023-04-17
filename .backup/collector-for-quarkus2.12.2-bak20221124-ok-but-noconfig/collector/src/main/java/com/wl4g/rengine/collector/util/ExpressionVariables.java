@@ -38,7 +38,7 @@ import lombok.ToString;
  * {@link ExpressionVariablesTests}
  * 
  * @author James Wong
- * @version 2022-10-31
+ * @date 2022-10-31
  * @since v1.0.0
  */
 public class ExpressionVariables {

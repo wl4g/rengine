@@ -62,7 +62,7 @@ import lombok.Getter;
  * {@link MasterGlobalController}
  * 
  * @author James Wong
- * @version 2022-10-20
+ * @date 2022-10-20
  * @since v1.0.0
  * @see {@link org.apache.shardingsphere.elasticjob.http.executor.HttpJobExecutor}
  */

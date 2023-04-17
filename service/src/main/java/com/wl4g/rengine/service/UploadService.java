@@ -35,7 +35,7 @@ import com.wl4g.rengine.service.model.sys.UploadSaveResult;
  * {@link UploadService}
  * 
  * @author James Wong
- * @version 2022-08-29
+ * @date 2022-08-29
  * @since v1.0.0
  */
 public interface UploadService {

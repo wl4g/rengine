@@ -47,7 +47,7 @@ import lombok.experimental.SuperBuilder;
  * {@link RengineEventbusAutoConfiguration}
  * 
  * @author James Wong
- * @version 2022-10-17
+ * @date 2022-10-17
  * @since v3.0.0
  */
 @Configuration

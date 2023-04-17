@@ -37,7 +37,7 @@ import io.vertx.mutiny.redis.client.Response;
  * {@link ScriptRedisLockClientTests}
  * 
  * @author James Wong
- * @version 2022-12-30
+ * @date 2022-12-30
  * @since v1.0.0
  */
 public class ScriptRedisLockClientTests {

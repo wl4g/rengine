@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
  * {@link NothingFilter}
  * 
  * @author James Wong
- * @version 2022-09-19
+ * @date 2022-09-19
  * @since v1.0.0
  */
 @Slf4j

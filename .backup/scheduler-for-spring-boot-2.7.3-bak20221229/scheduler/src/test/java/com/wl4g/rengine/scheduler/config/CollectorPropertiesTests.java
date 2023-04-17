@@ -30,7 +30,7 @@ import com.wl4g.infra.context.utils.expression.SpelExpressions;
  * {@link CollectorPropertiesTests}
  * 
  * @author James Wong
- * @version 2022-10-21
+ * @date 2022-10-21
  * @since v3.0.0
  */
 public class CollectorPropertiesTests {

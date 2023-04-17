@@ -40,7 +40,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
  * {@link CustomMethodSecurityConfiguration}
  * 
  * @author James Wong
- * @version 2023-03-11
+ * @date 2023-03-11
  * @since v1.0.0
  */
 @Configuration

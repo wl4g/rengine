@@ -27,7 +27,7 @@ import io.quarkus.runtime.annotations.QuarkusMain;
  * {@link RengineColletor}
  * 
  * @author James Wong
- * @version 2022-10-16
+ * @date 2022-10-16
  * @since v1.0.0
  */
 @QuarkusMain

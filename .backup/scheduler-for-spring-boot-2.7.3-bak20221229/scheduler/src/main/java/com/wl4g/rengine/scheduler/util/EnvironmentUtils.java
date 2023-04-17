@@ -23,7 +23,7 @@ import org.springframework.core.env.Environment;
  * {@link EnvironmentUtils}
  * 
  * @author James Wong
- * @version 2022-10-30
+ * @date 2022-10-30
  * @since v3.0.0
  */
 public abstract class EnvironmentUtils {

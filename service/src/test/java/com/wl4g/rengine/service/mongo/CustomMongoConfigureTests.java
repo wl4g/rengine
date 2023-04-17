@@ -32,7 +32,7 @@ import com.wl4g.rengine.service.model.DataSourceSave;
  * {@link CustomMongoConfigureTests}
  * 
  * @author James Wong
- * @version 2022-12-28
+ * @date 2022-12-28
  * @since v1.0.0
  */
 public class CustomMongoConfigureTests {

@@ -10,7 +10,7 @@
 // * Usages: -Dquarkus.native.additional-build-args="--features=com.wl4g.rengine.collector.graal.QuartzSchedulerReinitFeature"
 // * 
 // * @author James Wong
-// * @version 2022-09-25
+// * @date 2022-09-25
 // * @since v1.0.0
 // * @see io.quarkus.runtime.graal.ResourcesFeature
 // * @see see:https://foivos.zakkak.net/tutorials/working-with-randoms-native-images/

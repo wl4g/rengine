@@ -60,7 +60,7 @@ import org.junit.Test;
  * End to end tests of both CEP operators and {@link NFA}.
  * 
  * @author James Wong
- * @version 2022-11-06
+ * @date 2022-11-06
  * @since v1.0.0
  * @see https://github1s.com/apache/flink/blob/release-1.14.4/flink-libraries/flink-cep/src/test/java/org/apache/flink/cep/pattern/PatternTest.java
  */

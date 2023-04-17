@@ -39,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
  * {@link HikariJdbcHelper}
  * 
  * @author James Wong
- * @version 2022-11-24
+ * @date 2022-11-24
  * @since v1.0.0
  */
 @Slf4j

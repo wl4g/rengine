@@ -294,8 +294,8 @@ RUN echo "http://mirrors.aliyun.com/alpine/v3.12/main" > /etc/apk/repositories \
 \
 ## Make control script.
 && touch /docker-entrypoint.sh \
-&& chown -R ${APP_NAME}:${APP_NAME} ${APP_HOME_PARENT} ${APP_DATA} ${APP_LOG} /etc/${APP_NAME} /docker-entrypoint.sh \
-&& chmod 755 ${APP_HOME_PARENT} /etc/${APP_NAME} /docker-entrypoint.sh \
+&& chown -R 1001:root ${APP_HOME_PARENT} ${APP_DATA} ${APP_LOG} /etc/${APP_NAME} /docker-entrypoint.sh \
+&& chmod -R 775 ${APP_HOME_PARENT} ${APP_DATA} ${APP_LOG} /etc/${APP_NAME} /docker-entrypoint.sh \
 && echo -e "#!/bin/bash" >>/docker-entrypoint.sh \
 && echo -e "\
 \
@@ -327,7 +327,7 @@ export JAVA_GC_OPTS=\${JAVA_GC_OPTS:-\${DEFAULT_JAVA_GC_OPTS}}\n\
 export JAVA_TOOL_OPTIONS=\${JAVA_TOOL_OPTIONS:-}\n\
 \
 [ -n \"\$APP_NOHUP\" ] && export CMD_NOHUP='nohup' \n\
-[ -n \"\$APP_DEBUG\" ] && export JVM_DEBUG_OPTS='-Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8000,suspend=n' \n\
+[ -n \"\$APP_DEBUG\" ] && export JVM_DEBUG_OPTS='-Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=0.0.0.0:8000,suspend=n' \n\
 \
 [[ \$APP_PORT != '' && \$APP_PORT != '<default>' ]] && export APP_PORT_OPTS='--server.port=\${APP_PORT}'\n\
 \
@@ -354,7 +354,8 @@ echo \"Started \${APP_NAME}:\${APP_VERSION}(\${APP_ACTIVE}) on \${APP_PORT}\"\n"
 ##
 ## ----- Using unroot user -----
 ##
-USER ${APP_NAME}
+# USER ${APP_NAME}
+USER 1001
 
 ##
 ## ----- [BUGFIX]: Notice that if you use bash or sh to start the program, graceful 

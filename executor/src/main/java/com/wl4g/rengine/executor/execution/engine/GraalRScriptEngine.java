@@ -29,7 +29,7 @@ import lombok.Getter;
  * {@link GraalRScriptEngine}
  * 
  * @author James Wong
- * @version 2022-09-22
+ * @date 2022-09-22
  * @since v1.0.0
  */
 @Getter

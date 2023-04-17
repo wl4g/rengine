@@ -23,7 +23,7 @@ import com.wl4g.rengine.common.graph.ExecutionGraphResult.ReturnState;
  * {@link ExecutionGraphResultTests}
  * 
  * @author James Wong
- * @version 2022-12-25
+ * @date 2022-12-25
  * @since v1.0.0
  */
 public class ExecutionGraphResultTests {

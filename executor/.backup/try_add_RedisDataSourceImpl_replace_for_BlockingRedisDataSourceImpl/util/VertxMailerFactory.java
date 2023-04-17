@@ -47,7 +47,7 @@ import lombok.Getter;
  * {@link VertxMailerFactory}
  * 
  * @author James Wong
- * @version 2023-02-07
+ * @date 2023-02-07
  * @since v1.0.0
  */
 @Getter

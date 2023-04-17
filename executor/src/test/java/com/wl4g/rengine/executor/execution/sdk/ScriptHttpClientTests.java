@@ -25,7 +25,7 @@ import com.wl4g.infra.common.remoting.exception.RestClientException;
  * {@link ScriptHttpClientTests}
  * 
  * @author James Wong
- * @version 2022-09-30
+ * @date 2022-09-30
  * @since v1.0.0
  */
 public class ScriptHttpClientTests {

@@ -44,7 +44,7 @@ import lombok.extern.slf4j.Slf4j;
  * {@link NotificationController}
  * 
  * @author James Wong
- * @version 2022-08-28
+ * @date 2022-08-28
  * @since v1.0.0
  */
 @Tag(name = "NotificationAPI", description = "The notification setting management API")

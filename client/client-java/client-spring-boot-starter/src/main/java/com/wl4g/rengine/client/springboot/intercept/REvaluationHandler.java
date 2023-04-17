@@ -23,7 +23,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
  * Aspect advice intercept processor
  * 
  * @author James Wong
- * @version 2022-11-02
+ * @date 2022-11-02
  * @since v1.0.0
  */
 public interface REvaluationHandler<A extends Annotation> {

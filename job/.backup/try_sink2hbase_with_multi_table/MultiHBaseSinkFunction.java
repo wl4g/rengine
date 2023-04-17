@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * The sink function for HBase multi tables.
  * 
  * @author James Wong
- * @version 2022-11-06
+ * @date 2022-11-06
  * @since v1.0.0
  * @see https://github.com/singgel/flink-kafka-hbase/blob/master/src/main/java/com/singgel/bigdata/flinksinkhbase/HbaseSink.java
  */

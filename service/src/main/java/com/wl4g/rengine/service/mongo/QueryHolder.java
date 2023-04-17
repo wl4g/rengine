@@ -44,7 +44,7 @@ import com.wl4g.rengine.service.model.BaseQuery;
  * {@link QueryHolder}
  * 
  * @author James Wong
- * @version 2022-12-27
+ * @date 2022-12-27
  * @since v1.0.0
  */
 public abstract class QueryHolder {

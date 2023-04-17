@@ -23,7 +23,7 @@ import com.wl4g.rengine.example.client.model.BehaviorReport;
  * {@link MyUserBehaviorService}
  * 
  * @author James Wong
- * @version 2022-11-01
+ * @date 2022-11-01
  * @since v1.0.0
  */
 public interface MyUserBehaviorService {

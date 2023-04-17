@@ -64,7 +64,7 @@ import lombok.extern.slf4j.Slf4j;
  * {@link HelloGraalJSEndpoint}
  * 
  * @author James Wong
- * @version 2022-09-18
+ * @date 2022-09-18
  * @since v1.0.0
  * @see https://github.com/graalvm/graal-js-jdk11-maven-demo
  * @see https://docs.oracle.com/javase/8/docs/technotes/guides/scripting/prog_guide/api.html

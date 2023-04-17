@@ -61,7 +61,7 @@ import lombok.extern.slf4j.Slf4j;
  * {@link AbstractFlinkStreamingBase}
  * 
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
- * @version 2022-06-07 v3.0.0
+ * @date 2022-06-07 v3.0.0
  * @since v1.0.0
  */
 @Getter

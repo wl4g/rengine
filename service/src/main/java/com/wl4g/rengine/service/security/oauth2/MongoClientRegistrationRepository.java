@@ -45,7 +45,7 @@ import lombok.Getter;
  * {@link MongoClientRegistrationRepository}
  * 
  * @author James Wong
- * @version 2023-02-23
+ * @date 2023-02-23
  * @since v1.0.0
  * @see {@link org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository}
  */

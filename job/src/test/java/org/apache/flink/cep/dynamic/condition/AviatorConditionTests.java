@@ -32,7 +32,7 @@ import com.wl4g.rengine.common.event.RengineEvent.EventSource;
  * {@link AviatorConditionTests}
  * 
  * @author James Wong
- * @version 2023-03-14
+ * @date 2023-03-14
  * @since v1.0.0
  */
 public class AviatorConditionTests {

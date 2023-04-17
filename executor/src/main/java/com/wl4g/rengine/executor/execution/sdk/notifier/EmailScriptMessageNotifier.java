@@ -57,7 +57,7 @@ import lombok.Setter;
  * {@link EmailScriptMessageNotifier}
  * 
  * @author James Wong
- * @version 2023-01-06
+ * @date 2023-01-06
  * @since v1.0.0
  * @see https://github.com/quarkusio/quarkus/issues/1840
  * @see https://quarkus.io/guides/mailer-reference

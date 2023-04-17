@@ -46,7 +46,7 @@
 // * {@link ElasticJobBootstrapConfiguration}
 // * 
 // * @author James Wong
-// * @version 2022-10-26
+// * @date 2022-10-26
 // * @since v1.0.0 // * @see
 // *        {@link org.apache.shardingsphere.elasticjob.lite.spring.boot.job.ElasticJobBootstrapConfiguration}
 // * @see {@link org.apache.shardingsphere.elasticjob.lite.spring.boot.job.ElasticJobLiteAutoConfiguration}

@@ -28,7 +28,7 @@ import io.smallrye.mutiny.Uni;
  * {@link DictService}
  * 
  * @author James Wong
- * @version 2023-01-14
+ * @date 2023-01-14
  * @since v1.0.0
  */
 public interface DictService {

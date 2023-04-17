@@ -25,7 +25,7 @@ import org.graalvm.polyglot.HostAccess;
  * {@link Hashing}
  * 
  * @author James Wong
- * @version 2022-12-25
+ * @date 2022-12-25
  * @since v1.0.0
  */
 @SuppressWarnings("deprecation")

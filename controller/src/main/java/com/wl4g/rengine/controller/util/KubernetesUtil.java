@@ -31,7 +31,7 @@ import lombok.CustomLog;
  * {@link KubernetesUtil}
  * 
  * @author James Wong
- * @version 2023-04-13
+ * @date 2023-04-13
  * @since v1.0.0
  * @see https://github.com/fabric8io/kubernetes-client/blob/v6.5.1/kubernetes-examples/src/main/java/io/fabric8/kubernetes/examples/CreatePod.java
  */

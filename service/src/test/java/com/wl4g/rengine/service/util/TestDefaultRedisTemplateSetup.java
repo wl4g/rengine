@@ -25,7 +25,7 @@ import org.springframework.data.redis.core.RedisTemplate;
  * {@link TestDefaultRedisTemplateSetup}
  * 
  * @author James Wong
- * @version 2023-02-04
+ * @date 2023-02-04
  * @since v1.0.0
  */
 public class TestDefaultRedisTemplateSetup {

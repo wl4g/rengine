@@ -43,21 +43,21 @@ maintainers:
 ## Global values see to: https://github.com/wl4g-k8s/helm-doc-zh-cn/blob/master/chart_template_guide/subcharts_and_globals-zh_cn.md#全局-chart-值
 ## Check version matching see to: https://github.com/Masterminds/semver#tilde-range-comparisons-patch
 dependencies:
-  - name: "rengine-apiserver"
-    condition: rengine-apiserver.enabled
-    repository: "file://charts/rengine-apiserver"
+  - name: "apiserver"
+    condition: apiserver.enabled
+    repository: "file://charts/apiserver"
     version: "~1.0.0"
-  - name: "rengine-executor"
-    condition: rengine-executor.enabled
-    repository: "file://charts/rengine-executor"
+  - name: "executor"
+    condition: executor.enabled
+    repository: "file://charts/executor"
     version: "~1.0.0"
-  - name: "rengine-controller"
-    condition: rengine-controller.enabled
-    repository: "file://charts/rengine-controller"
+  - name: "controller"
+    condition: controller.enabled
+    repository: "file://charts/controller"
     version: "~1.0.0"
-  - name: "rengine-ui"
-    condition: rengine-ui.enabled
-    repository: "file://charts/rengine-ui"
+  - name: "ui"
+    condition: ui.enabled
+    repository: "file://charts/ui"
     version: "~1.0.0"
   - name: "jaeger"
     condition: global.componentServices.jaeger.internal.enabled

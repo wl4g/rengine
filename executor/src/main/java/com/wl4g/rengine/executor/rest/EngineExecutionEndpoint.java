@@ -99,7 +99,7 @@ import lombok.extern.slf4j.Slf4j;
  * {@link EngineExecutionEndpoint}
  * 
  * @author James Wong
- * @version 2022-09-18
+ * @date 2022-09-18
  * @since v1.0.0
  * @see https://github.com/quarkusio/quarkus-quickstarts/blob/2.12.Final/jta-quickstart/src/main/java/org/acme/quickstart/TransactionalResource.java
  */

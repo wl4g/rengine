@@ -25,7 +25,7 @@ import com.wl4g.rengine.executor.execution.sdk.ScriptResult;
  * {@link IScriptEngine}
  * 
  * @author James Wong
- * @version 2022-09-22
+ * @date 2022-09-22
  * @since v1.0.0
  */
 public interface IScriptEngine {

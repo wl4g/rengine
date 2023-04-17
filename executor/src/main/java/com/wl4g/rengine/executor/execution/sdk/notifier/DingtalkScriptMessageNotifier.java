@@ -58,7 +58,7 @@ import lombok.Setter;
  * {@link DingtalkScriptMessageNotifier}
  * 
  * @author James Wong
- * @version 2023-01-06
+ * @date 2023-01-06
  * @since v1.0.0
  */
 @Getter

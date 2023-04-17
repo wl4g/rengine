@@ -23,7 +23,7 @@ import org.graalvm.polyglot.HostAccess;
  * {@link RandomHolder}
  * 
  * @author James Wong
- * @version 2023-01-29
+ * @date 2023-01-29
  * @since v1.0.0
  */
 public class RandomHolder {

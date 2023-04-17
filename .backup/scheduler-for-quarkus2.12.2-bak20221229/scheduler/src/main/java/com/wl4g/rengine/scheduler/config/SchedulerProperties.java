@@ -73,7 +73,7 @@ import lombok.extern.slf4j.Slf4j;
  * {@link SchedulerProperties}
  * 
  * @author James Wong
- * @version 2022-10-16
+ * @date 2022-10-16
  * @since v1.0.0
  * @see {@link org.apache.shardingsphere.elasticjob.lite.spring.boot.job.ElasticJobProperties}
  */

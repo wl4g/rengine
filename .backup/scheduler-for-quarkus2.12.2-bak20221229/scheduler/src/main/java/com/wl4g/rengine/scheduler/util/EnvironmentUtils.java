@@ -23,7 +23,7 @@ import org.eclipse.microprofile.config.ConfigProvider;
  * {@link EnvironmentUtils}
  * 
  * @author James Wong
- * @version 2022-10-30
+ * @date 2022-10-30
  * @since v3.0.0
  */
 public abstract class EnvironmentUtils {

@@ -54,7 +54,7 @@ import lombok.ToString;
  * {@link SimpleKafkaSourceTests}
  * 
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
- * @version 2022-06-01 v3.0.0
+ * @date 2022-06-01 v3.0.0
  * @since v1.0.0
  * @see https://github.com/apache/flink/blob/release-1.14.4/flink-connectors/flink-connector-kafka/src/test/java/org/apache/flink/connector/kafka/source/KafkaSourceITCase.java
  */

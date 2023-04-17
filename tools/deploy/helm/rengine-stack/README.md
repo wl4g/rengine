@@ -14,22 +14,22 @@ This chart bootstraps an Rengine all stack deployment on a Kubernetes cluster us
 
 ## 2. Prerequisites
 
-+ Kubernetes 1.6+
-+ Helm
++ Kubernetes 1.21+
++ Helm 3.9+
 + Istio 1.12+ (Optional and recommends)
 
 ## 3. Getting the Chart
 
-+ [helm charts global values.yaml](./values.yaml)
++ helm charts global [values.yaml](./values.yaml)
 
-+ From github
++ From source
 
 ```bash
 git clone https://github.com/wl4g/rengine.git
-cd rengine/deploy/helm/
+cd rengine/tools/deploy/helm/rengine-stack
 ```
 
-+ Or From chart repos
++ Or from chart repos
 
 ```bash
 helm repo add rengine https://registry.wl4g.io/repository/helm-release
@@ -38,97 +38,62 @@ helm repo add rengine https://registry.wl4g.io/repository/helm-release
 > If you want to install an unstable version, you need to add `--devel` when you execute the `helm install` command.
 > If you only want to test or simulate running, add the options `--dry-run --debug`
 
-## 4. Installing with Canary
+## 4. Initial deploy
 
-+ Step 1: Create and setup namespace
++ Initial deploy with baseline only
+
+```bash
+helm -n rengine upgrade -i --create-namespace rengine tools/deploy/helm/rengine-stack --set="\
+apiserver.image.baselineTag=1.0.0,\
+controller.image.baselineTag=1.0.0,\
+executor.image.baselineTag=1.0.0
+```
+
+## 5. Upgrade deploy with canary
+
++ 5.1 Inject istio labels for namespace
 
 ```bash
 kubectl label ns rengine istio-injection=enabled --overwrite
 ```
 
-+ Step 2: (Choose One) Create image repository secret. for example:
++ 5.2 Upgrade deploy with canary. (weighted by traffic)
 
 ```bash
-kubectl -n rengine create secret docker-registry ccr-tencentcloud-secret \
---docker-server='ccr.ccs.tencentyun.com/wl4g' \
---docker-username='<username>' \
---docker-password='<password>'
-
-# Or:
-#kubectl -n rengine create secret docker-registry cr-aliyun-secret \
-#--docker-server='registry.cn-shenzhen.aliyuncs.com/wl4g' \
-#--docker-username='<username>' \
-#--docker-password='<password>'
-
-# Or:
-#kubectl -n rengine create secret docker-registry cr-nexus3-secret \
-#--docker-server='cr.registry.wl4g.com/wl4g' \
-#--docker-username='<username>' \
-#--docker-password='<password>'
-
-# Or:
-#kubectl -n rengine create secret docker-registry hub-docker-secret \
-#--docker-server='docker.io/wl4g' \
-#--docker-username='<username>' \
-#--docker-password='<password>'
+helm -n rengine upgrade -i --create-namespace rengine tools/deploy/helm/rengine-stack --set="\
+apiserver.image.baselineTag=1.0.0,\
+apiserver.image.upgradeTag=1.0.1,\
+controller.image.baselineTag=1.0.0,\
+controller.image.upgradeTag=1.0.1,\
+executor.image.baselineTag=1.0.0,\
+executor.image.upgradeTag=1.0.1,\
+apiserver.governance.istio.ingress.http.canary.baseline.weight=80,\
+apiserver.governance.istio.ingress.http.canary.upgrade.weight=20,\
+controller.governance.istio.ingress.http.canary.baseline.weight=80,\
+controller.governance.istio.ingress.http.canary.upgrade.weight=20,\
+executor.governance.istio.ingress.http.canary.baseline.weight=80,\
+executor.governance.istio.ingress.http.canary.upgrade.weight=20"
 ```
 
-+ Step 3: Initial deploying. (baseline version only)
++ 5.3 After confirming that the upgrade is successful, use the new version as the benchmark, remove the old version, and switch all traffic to the new version
 
 ```bash
 helm -n rengine upgrade --install --create-namespace rengine rengine-stack --set="\
-rengine-apiserver.image.baselineTag=1.0.0,\
-rengine-controller.image.baselineTag=1.0.0,\
-rengine-executor.image.baselineTag=1.0.0
+apiserver.image.baselineTag=1.0.1,\
+apiserver.image.upgradeTag=,\
+controller.image.baselineTag=1.0.1,\
+controller.image.upgradeTag=,\
+executor.image.baselineTag=1.0.1,\
+executor.image.upgradeTag=,\
+apiserver.governance.istio.ingress.http.canary.baseline.weight=100,\
+apiserver.governance.istio.ingress.http.canary.upgrade.weight=0,\
+controller.governance.istio.ingress.http.canary.baseline.weight=100,\
+controller.governance.istio.ingress.http.canary.upgrade.weight=0,\
+executor.governance.istio.ingress.http.canary.baseline.weight=100,\
+executor.governance.istio.ingress.http.canary.upgrade.weight=0"
 ```
 
-+ Step 4: Upgrade deploying using canary mode. (weighted by traffic)
-
-```bash
-helm -n rengine upgrade --install --create-namespace rengine rengine-stack --set="\
-rengine-apiserver.image.baselineTag=1.0.0,\
-rengine-apiserver.image.upgradeTag=1.0.1,\
-rengine-controller.image.baselineTag=1.0.0,\
-rengine-controller.image.upgradeTag=1.0.1,\
-rengine-executor.image.baselineTag=1.0.0,\
-rengine-executor.image.upgradeTag=1.0.1,\
-rengine-apiserver.governance.istio.ingress.http.canary.baseline.weight=80,\
-rengine-apiserver.governance.istio.ingress.http.canary.upgrade.weight=20,\
-rengine-controller.governance.istio.ingress.http.canary.baseline.weight=80,\
-rengine-controller.governance.istio.ingress.http.canary.upgrade.weight=20,\
-rengine-executor.governance.istio.ingress.http.canary.baseline.weight=80,\
-rengine-executor.governance.istio.ingress.http.canary.upgrade.weight=20,\
-componentServices.jaeger.internal.enabled=true,\
-componentServices.redis.internal.enabled=true,\
-componentServices.zookeeper.internal.enabled=true,\
-componentServices.kafka.internal.enabled=true,\
-componentServices.mysql.internal.enabled=true"
-```
-
-+ Step 5: After confirming that the upgrade is successful, use the new version as the benchmark, remove the old version, and switch all traffic to the new version
-
-```bash
-helm -n rengine upgrade --install --create-namespace rengine rengine-stack --set="\
-rengine-apiserver.image.baselineTag=1.0.1,\
-rengine-apiserver.image.upgradeTag=,\
-rengine-controller.image.baselineTag=1.0.1,\
-rengine-controller.image.upgradeTag=,\
-rengine-executor.image.baselineTag=1.0.1,\
-rengine-executor.image.upgradeTag=,\
-rengine-apiserver.governance.istio.ingress.http.canary.baseline.weight=100,\
-rengine-apiserver.governance.istio.ingress.http.canary.upgrade.weight=0,\
-rengine-controller.governance.istio.ingress.http.canary.baseline.weight=100,\
-rengine-controller.governance.istio.ingress.http.canary.upgrade.weight=0,\
-rengine-executor.governance.istio.ingress.http.canary.baseline.weight=100,\
-rengine-executor.governance.istio.ingress.http.canary.upgrade.weight=0,\
-componentServices.jaeger.internal.enabled=true,\
-componentServices.redis.internal.enabled=true,\
-componentServices.zookeeper.internal.enabled=true,\
-componentServices.kafka.internal.enabled=true,\
-componentServices.mysql.internal.enabled=true"
-```
-
-## 5. Rebuild dependents
+## 6. Rebuild dependents
 
 - ***Notice:*** The following dependent third-party component charts are generated based on generic templates.
 In fact, Rengine's required dependencies are only a subset of them, which are enabled on demand, automatic deployment
@@ -141,20 +106,19 @@ helm dependency update
 
 helm dependency list
 NAME               VERSION     REPOSITORY                                  STATUS
-rengine-apiserver  ~1.0.0      file://charts/rengine-apiserver             ok
-rengine-controller ~1.0.0      file://charts/rengine-apiserver             ok
-rengine-executor   ~1.0.0      file://charts/rengine-executor              ok
-jaeger             ~0.57.1     https://jaegertracing.github.io/helm-charts ok    
-jaeger-operator    ~2.33.0     https://jaegertracing.github.io/helm-charts ok    
-kafka              ~18.0.3     https://charts.bitnami.com/bitnami          ok    
-redis              ~17.0.x     https://charts.bitnami.com/bitnami          ok    
-mysql              ~9.2.x      https://charts.bitnami.com/bitnami          ok    
+apiserver          ~1.0.0      file://charts/apiserver                     ok
+controller         ~1.0.0      file://charts/controller                    ok
+executor           ~1.0.0      file://charts/executor                      ok
+redis-cluster      ~17.0.x     https://charts.bitnami.com/bitnami          ok    
 mongodb            ~12.1.27    https://charts.bitnami.com/bitnami          ok    
 minio              ~11.7.13    https://charts.bitnami.com/bitnami          ok
+kafka              ~18.0.3     https://charts.bitnami.com/bitnami          ok    
+jaeger             ~0.57.1     https://jaegertracing.github.io/helm-charts ok    
+jaeger-operator    ~2.33.0     https://jaegertracing.github.io/helm-charts ok    
 ...
 ```
 
-## 6. Uninstalling the Chart
+## 7. Uninstalling the Chart
 
 To uninstall/delete the `rengine` deployment:
 
@@ -162,7 +126,7 @@ To uninstall/delete the `rengine` deployment:
 helm -n rengine del rengine
 ```
 
-## 7. Configurable
+## 8. Configurable
 
 The following table lists the configurable parameters of the SpringBoot APP(Rengine) chart and their default values.
 
@@ -203,7 +167,7 @@ The following table lists the configurable parameters of the SpringBoot APP(Reng
 | `<app>.affinity` | Map of node/pod affinities |`{}`|
 | `<app>.envConfigs` | SpringBoot APP startup environments. | JAVA_OPTS="-Djava.awt.headless=true"</br>APP_ACTIVE="pro"</br>SPRING_SERVER_PORT="8080" |
 | `<app>.agentConfig` | SpringBoot APP startup javaagent configuration.(Usually no configuration is required) |`{}`|
-| `<app>.appConfigs`  | for example Rengine manager configurations. see to: [github.com/wl4g/rengine/tree/master/manager/src/main/resources/](https://github.com/wl4g/rengine/tree/master/manager/src/main/resources/)|`{}`|
+| `<app>.appConfigs.items`  | for example Rengine manager configurations. see to: [github.com/wl4g/rengine/tree/master/manager/src/main/resources/](https://github.com/wl4g/rengine/tree/master/manager/src/main/resources/)|`{}`|
 | `<app>.service.provider`  | Kubernetes Service provider. | ClusterIP |
 | `<app>.service.apiPortPort`  | Port for api. |18080|
 | `<app>.service.prometheusPortPort`  | Port for prometheus. |10108|
@@ -256,8 +220,10 @@ The following table lists the configurable parameters of the SpringBoot APP(Reng
 | --- (Optional) Global Dependents Components. --- | | |
 | `global.commonConfigs.preStartScript` | Container pre-start hook scripts. | `nil` |
 | `global.commonConfigs.envConfigs` | Container start environments. | `{}` |
-| `global.commonConfigs.agentConfigs` | JVM start agent config. | `{}` |
-| `global.commonConfigs.appConfigs` | SpringBoot startup application configs. | `{}` |
+| `global.commonConfigs.agentConfigs.mountPath` | Agent agent config mount path. | `/opt/apps/ecm/{app.name}/{app.name}-package/{app.name}-current/ext-lib/` |
+| `global.commonConfigs.agentConfigs.items` | Agent agent configs. | `{}` |
+| `global.commonConfigs.appConfigs.mountPath` | Application config mount path. | `/opt/apps/ecm/{app.name}/{app.name}-package/{app.name}-current/conf/` |
+| `global.commonConfigs.appConfigs.items` | Application configs. | `{}` |
 | `global.componentServices.otlp.internal.enabled` | Enable internal service. | `false` |
 | `global.componentServices.otlp.external.enabled` | Enable external service. | `false` |
 | `global.componentServices.otlp.external.namespace` | External service namespace. | `nil` |
@@ -402,7 +368,7 @@ The following table lists the configurable parameters of the SpringBoot APP(Reng
 | `global.componentServices.datanode.external.location` | Mesh egess service entries location. | `MESH_EXTERNAL` |
 | `global.componentServices.datanode.external.resolution` | Mesh egess service entries resolution. | `NONE` |
 
-## 8. FAQ
+## 9. FAQ
 
 ### How to troubleshoot Pods that are missing os tools
 

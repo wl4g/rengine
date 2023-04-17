@@ -24,7 +24,7 @@
 // * {@link MyDistributeOnceJobListener}
 // * 
 // * @author James Wong
-// * @version 2023-02-05
+// * @date 2023-02-05
 // * @since v1.0.0
 // * @see https://shardingsphere.apache.org/elasticjob/current/en/user-manual/elasticjob-lite/usage/job-listener/listener-interface/
 // */

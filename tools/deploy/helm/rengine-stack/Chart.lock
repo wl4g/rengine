@@ -1,15 +1,15 @@
 dependencies:
-- name: rengine-apiserver
-  repository: file://charts/rengine-apiserver
+- name: apiserver
+  repository: file://charts/apiserver
   version: 1.0.0
-- name: rengine-executor
-  repository: file://charts/rengine-executor
+- name: executor
+  repository: file://charts/executor
   version: 1.0.0
-- name: rengine-controller
-  repository: file://charts/rengine-controller
+- name: controller
+  repository: file://charts/controller
   version: 1.0.0
-- name: rengine-ui
-  repository: file://charts/rengine-ui
+- name: ui
+  repository: file://charts/ui
   version: 1.0.0
 - name: jaeger
   repository: https://jaegertracing.github.io/helm-charts
@@ -22,7 +22,7 @@ dependencies:
   version: 18.0.8
 - name: redis-cluster
   repository: https://charts.bitnami.com/bitnami
-  version: 8.4.3
+  version: 8.4.4
 - name: mongodb
   repository: https://charts.bitnami.com/bitnami
   version: 12.1.31
@@ -32,5 +32,5 @@ dependencies:
 - name: minio
   repository: https://charts.bitnami.com/bitnami
   version: 11.7.19
-digest: sha256:1d4be5b6c4e9857f3486e3a0eb4fe1b8cfd2b752de0aabc4a4563710ef8a222b
-generated: "2023-04-17T00:20:10.455325243+08:00"
+digest: sha256:f7788016a3bd8863fd081377de7c934a537cc02dda4292192b0f84a07cfc803c
+generated: "2023-04-18T13:19:39.592625267+08:00"

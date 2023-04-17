@@ -38,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
  * {@link MyOrderServiceImpl}
  * 
  * @author James Wong
- * @version 2022-11-01
+ * @date 2022-11-01
  * @since v1.0.0
  */
 @Slf4j

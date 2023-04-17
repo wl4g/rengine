@@ -34,7 +34,7 @@ import com.wl4g.rengine.common.entity.DataSourceProperties.RedisDataSourceProper
  * {@link DataSourcePropertiesTests}
  * 
  * @author James Wong
- * @version 2022-12-15
+ * @date 2022-12-15
  * @since v1.0.0
  */
 public class DataSourcePropertiesTests {

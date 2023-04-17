@@ -34,7 +34,7 @@ package com.wl4g.rengine.executor.service.codec;
 // * {@link ScenesCodec}
 // * 
 // * @author James Wong
-// * @version 2022-09-29
+// * @date 2022-09-29
 // * @since v1.0.0
 // */
 //public class ScenesCodec implements CollectibleCodec<Scenes> {

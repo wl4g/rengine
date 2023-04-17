@@ -27,7 +27,7 @@ import com.wl4g.rengine.job.kafka.util.RengineKafkaUtil;
  * {@link RengineKafka2HiveStreaming}
  * 
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
- * @version 2022-05-31 v3.0.0
+ * @date 2022-05-31 v3.0.0
  * @since v1.0.0
  * @see https://stackoverflow.com/questions/69765972/migrating-from-flinkkafkaconsumer-to-kafkasource-no-windows-executed
  */

@@ -24,7 +24,7 @@ import org.springframework.util.Assert;
  * {@link SimplePermissionGrantedAuthority}
  * 
  * @author James Wong
- * @version 2023-03-11
+ * @date 2023-03-11
  * @since v1.0.0
  */
 public final class SimplePermissionGrantedAuthority

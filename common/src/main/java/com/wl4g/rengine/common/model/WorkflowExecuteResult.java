@@ -44,7 +44,7 @@ import lombok.experimental.SuperBuilder;
  * {@link WorkflowExecuteResult}
  * 
  * @author James Wong
- * @version 2022-09-21
+ * @date 2022-09-21
  * @since v1.0.0
  */
 @Getter

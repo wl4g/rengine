@@ -30,7 +30,7 @@ package com.wl4g.rengine.executor.meter.intercept;
 // * {@link CollectMetrics}
 // * 
 // * @author James Wong
-// * @version 2022-12-28
+// * @date 2022-12-28
 // * @since v1.0.0
 // */
 //@InterceptorBinding

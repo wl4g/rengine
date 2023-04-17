@@ -41,7 +41,7 @@ import lombok.extern.slf4j.Slf4j;
  * {@link RengineEventKafkaDeserializationSchema}
  * 
  * @author James Wong
- * @version 2022-06-03
+ * @date 2022-06-03
  * @since v1.0.0
  */
 @Slf4j

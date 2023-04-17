@@ -37,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
  * {@link GlobalExceptionMapper}
  * 
  * @author James Wong
- * @version 2022-09-19
+ * @date 2022-09-19
  * @since v1.0.0
  * @see https://developers.redhat.com/articles/2022/03/03/rest-api-error-modeling-quarkus-20#model_the_error_response
  * @see https://quarkus.io/guides/resteasy-reactive#accessing-request-parameters

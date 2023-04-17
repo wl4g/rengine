@@ -15,6 +15,7 @@
  */
 package com.wl4g.rengine.executor.health;
 
+import static com.wl4g.rengine.common.constants.RengineConstants.DEFAULT_MINIO_BUCKET;
 import static java.lang.String.format;
 
 import java.time.ZoneId;
@@ -28,7 +29,6 @@ import org.eclipse.microprofile.health.HealthCheckResponse;
 import org.eclipse.microprofile.health.HealthCheckResponseBuilder;
 import org.eclipse.microprofile.health.Readiness;
 
-import com.wl4g.rengine.common.constants.RengineConstants;
 import com.wl4g.rengine.executor.minio.MinioManager;
 
 import io.minio.BucketExistsArgs;
@@ -37,7 +37,7 @@ import io.minio.BucketExistsArgs;
  * {@link MinioReadyHealthCheck}
  * 
  * @author James Wong
- * @version 2022-09-18
+ * @date 2022-09-18
  * @since v1.0.0
  * @see https://quarkus.io/guides/smallrye-health
  */
@@ -57,19 +57,21 @@ public class MinioReadyHealthCheck implements HealthCheck {
 
     @Override
     public HealthCheckResponse call() {
-        HealthCheckResponseBuilder builder = HealthCheckResponse.named("Rengine evaluator MinIO connections health check").up();
+        HealthCheckResponseBuilder builder = HealthCheckResponse.named("MinIO connection and initialze health check").up();
         try {
             if (minioManager.getMinioClient()
                     .bucketExists(BucketExistsArgs.builder()
-                            // .extraHeaders(Collections.emptyMap())
-                            .bucket(RengineConstants.DEFAULT_MINIO_BUCKET)
+                            .region(minioManager.getConfig().region())
+                            .bucket(DEFAULT_MINIO_BUCKET)
                             .build())) {
                 builder.up();
             } else {
-                builder.down().withData("message", format("No found MinIO bucket: %s", RengineConstants.DEFAULT_MINIO_BUCKET));
+                builder.down().withData("message", format("No found MinIO bucket: %s", DEFAULT_MINIO_BUCKET));
             }
-        } catch (Exception e) {
-            builder.down().withData("message", format("Failed to found MinIO bucket: %s", RengineConstants.DEFAULT_MINIO_BUCKET));
+        } catch (Throwable ex) {
+            builder.down()
+                    .withData("message",
+                            format("Failed to found MinIO bucket: %s. cause: %s", DEFAULT_MINIO_BUCKET, ex.getMessage()));
         }
         return builder.build();
     }

@@ -30,7 +30,7 @@ import com.wl4g.rengine.executor.service.ServiceConfig;
  * {@link DataSourceFacade}
  * 
  * @author James Wong
- * @version 2022-12-14
+ * @date 2022-12-14
  * @since v1.0.0
  */
 public interface DataSourceFacade extends Closeable {

@@ -19,7 +19,7 @@ package com.wl4g.rengine.evaluator.executor;
  * {@link IExecutor}
  * 
  * @author James Wong
- * @version 2022-09-17
+ * @date 2022-09-17
  * @since v1.0.0
  */
 public interface IExecutor {

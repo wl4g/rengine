@@ -27,7 +27,7 @@ import com.wl4g.rengine.executor.util.TestDefaultMinIOSetup;
  * {@link MinioManagerIT}
  * 
  * @author James Wong
- * @version 2022-10-09
+ * @date 2022-10-09
  * @since v1.0.0
  */
 public class MinioManagerIT {

@@ -34,7 +34,7 @@
 // * {@linkplain @Singleton}: Better performance because there is no client proxy.
 // * 
 // * @author Wangl.sir &lt;James Wong <jameswong1376@gmail.com>&gt;
-// * @version 2022-07-12
+// * @date 2022-07-12
 // * @since v1.0.0
 // */
 //public class ClientMeterService extends PrometheusMeterFacade {

@@ -63,7 +63,7 @@ import com.wl4g.rengine.service.security.user.UsernamePasswordAuthenticationProv
  * {@link RengineWebSecurityConfiguration}
  * 
  * @author James Wong
- * @version 2022-08-29
+ * @date 2022-08-29
  * @since v1.0.0
  * @see https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter
  */
@@ -212,7 +212,7 @@ public class RengineWebSecurityConfiguration implements WebSecurityCustomizer {
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder(BCryptVersion.$2Y, 13);
+        return defaultBCryptEncoder;
     }
 
     @Bean
@@ -238,5 +238,7 @@ public class RengineWebSecurityConfiguration implements WebSecurityCustomizer {
             AuthenticationService authenticationService) {
         return new UsernamePasswordAuthenticationProvider(mongoUserDetailsManager, authenticationService);
     }
+
+    public static final BCryptPasswordEncoder defaultBCryptEncoder = new BCryptPasswordEncoder(BCryptVersion.$2Y, 13);
 
 }

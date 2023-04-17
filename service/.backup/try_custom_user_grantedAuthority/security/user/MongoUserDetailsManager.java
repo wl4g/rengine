@@ -49,7 +49,7 @@ import lombok.ToString;
  * {@link MongoUserDetailsManager}
  * 
  * @author James Wong
- * @version 2023-02-22
+ * @date 2023-02-22
  * @since v1.0.0
  * @see {@link org.springframework.security.provisioning.InMemoryUserDetailsManager}
  */

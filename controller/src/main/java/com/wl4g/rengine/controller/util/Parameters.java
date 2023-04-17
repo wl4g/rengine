@@ -32,7 +32,7 @@ import com.google.common.collect.Maps;
  * {@link Parameters}
  * 
  * @author James Wong
- * @version 2022-10-21
+ * @date 2022-10-21
  * @since v3.0.0
  */
 public abstract class Parameters {

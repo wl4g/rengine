@@ -1,8 +1,9 @@
-{{- $webApp := "rengine-apiserver" }}
+{{- $webApp := "apiserver" }}
+{{- $secretName := printf "%s%s" .Release.Name "-init-secret" -}}
 {{- $initUserName := "root" }}
 
-{{- $apiserverBaselineTag := index .Values "rengine-apiserver" "image" "baselineTag" }}
-{{- $firstCustomHost := index .Values "rengine-apiserver" "governance" "istio" "ingress" "customHosts" 0 }}
+{{- $apiserverBaselineTag := index .Values "apiserver" "image" "baselineTag" }}
+{{- $firstCustomHost := index .Values "apiserver" "governance" "istio" "ingress" "customHosts" 0 }}
 
 {{- if eq (index .Values $webApp "governance" "provider") "Istio" }}
     {{- $domain := index .Values $webApp "governance" "istio" "ingress" "domain" }}
@@ -29,22 +30,22 @@
 
 + Get your '{{ $initUserName }}' user password by running:
 
-    kubectl get secret -n {{ .Release.Namespace }} {{ $webApp }} -o jsonpath="{.data.init-password}" | base64 -d; echo
+    kubectl get secret -n {{ .Release.Namespace }} {{ $secretName }} -o jsonpath="{.data.initRootPassword}" | base64 -d; echo
 
 + Login with the password from step 4 and the username: '{{ $initUserName }}'
 
 + Here an example of what you should execution command-line on your next grayscale upgrade (canary):
 
     helm -n {{ .Release.Namespace }} upgrade -i rengine ./rengine-stack --set="\
-        rengine-apiserver.image.baselineTag={{ $apiserverBaselineTag }},\
-        rengine-apiserver.image.upgradeTag=latest,\
-        rengine-apiserver.governance.istio.ingress.http.canary.baseline.weight=80,\
-        rengine-apiserver.governance.istio.ingress.http.canary.upgrade.weight=20,
-        rengine-controller.image.baselineTag={{ $apiserverBaselineTag }},\
-        rengine-controller.image.upgradeTag=latest,\
-        rengine-controller.governance.istio.ingress.http.canary.baseline.weight=80,\
-        rengine-controller.governance.istio.ingress.http.canary.upgrade.weight=20,\
-        rengine-executor.image.baselineTag={{ $apiserverBaselineTag }},\
-        rengine-executor.image.upgradeTag=latest,\
-        rengine-executor.governance.istio.ingress.http.canary.baseline.weight=80,\
-        rengine-executor.governance.istio.ingress.http.canary.upgrade.weight=20"
+        apiserver.image.baselineTag={{ $apiserverBaselineTag }},\
+        apiserver.image.upgradeTag=latest,\
+        apiserver.governance.istio.ingress.http.canary.baseline.weight=80,\
+        apiserver.governance.istio.ingress.http.canary.upgrade.weight=20,
+        controller.image.baselineTag={{ $apiserverBaselineTag }},\
+        controller.image.upgradeTag=latest,\
+        controller.governance.istio.ingress.http.canary.baseline.weight=80,\
+        controller.governance.istio.ingress.http.canary.upgrade.weight=20,\
+        executor.image.baselineTag={{ $apiserverBaselineTag }},\
+        executor.image.upgradeTag=latest,\
+        executor.governance.istio.ingress.http.canary.baseline.weight=80,\
+        executor.governance.istio.ingress.http.canary.upgrade.weight=20"

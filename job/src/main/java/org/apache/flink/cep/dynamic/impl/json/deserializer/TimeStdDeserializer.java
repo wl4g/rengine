@@ -13,7 +13,7 @@ import org.apache.flink.streaming.api.windowing.time.Time;
  * {@link TimeStdDeserializer}
  * 
  * @author James Wong
- * @version 2022-12-07
+ * @date 2022-12-07
  * @since v1.0.0
  */
 public class TimeStdDeserializer extends StdDeserializer<Time> {

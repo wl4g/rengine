@@ -32,7 +32,7 @@ import com.wl4g.infra.common.lang.DateUtils2;
  * {@link SpelVariablesTests}
  * 
  * @author James Wong
- * @version 2022-10-22
+ * @date 2022-10-22
  * @since v3.0.0
  */
 public class SpelVariablesTests {

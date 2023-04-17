@@ -87,7 +87,7 @@ import lombok.Getter;
  * dolphinscheduler.
  * 
  * @author James Wong
- * @version 2023-01-11
+ * @date 2023-01-11
  * @since v1.0.0
  * @see https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/ops/rest_api/#jobmanager
  * @see https://nightlies.apache.org/flink/flink-docs-release-1.15/generated/rest_v1_dispatcher.yml

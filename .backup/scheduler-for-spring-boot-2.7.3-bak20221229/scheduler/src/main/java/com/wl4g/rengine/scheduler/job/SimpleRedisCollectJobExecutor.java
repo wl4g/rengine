@@ -49,7 +49,7 @@ import lombok.ToString;
  * {@link SimpleRedisCollectJobExecutor}
  * 
  * @author James Wong
- * @version 2022-10-26
+ * @date 2022-10-26
  * @since v3.0.0
  */
 public class SimpleRedisCollectJobExecutor extends CollectJobExecutor<SimpleRedisCollectJobExecutor.SimpleRedisJobParam>

@@ -39,7 +39,7 @@ import lombok.experimental.SuperBuilder;
  * {@link FlinkCepGraph}
  * 
  * @author James Wong
- * @version 2023-03-13
+ * @date 2023-03-13
  * @since v1.0.0
  */
 @Getter

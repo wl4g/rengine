@@ -41,7 +41,7 @@ import com.wl4g.rengine.service.security.user.AuthenticationService;
  * {@link BasicServiceImpl}
  * 
  * @author James Wong
- * @version 2022-08-29
+ * @date 2022-08-29
  * @since v1.0.0
  */
 @Service

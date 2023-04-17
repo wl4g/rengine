@@ -33,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
  * {@link MyUserBehaviorController}
  * 
  * @author James Wong
- * @version 2022-08-28
+ * @date 2022-08-28
  * @since v1.0.0
  */
 @Slf4j

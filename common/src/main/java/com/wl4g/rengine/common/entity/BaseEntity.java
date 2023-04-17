@@ -30,7 +30,7 @@ import lombok.experimental.SuperBuilder;
  * {@link BaseEntity}
  * 
  * @author James Wong
- * @version 2023-03-08
+ * @date 2023-03-08
  * @since v1.0.0
  */
 @Getter

@@ -73,7 +73,7 @@ import lombok.ToString;
  * rule process.
  * 
  * @author James Wong
- * @version 2022-10-20
+ * @date 2022-10-20
  * @since v1.0.0
  */
 @Getter

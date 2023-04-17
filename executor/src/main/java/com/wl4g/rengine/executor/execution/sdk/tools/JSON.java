@@ -26,7 +26,7 @@ import org.graalvm.polyglot.HostAccess;
  * {@link JSON}
  * 
  * @author James Wong
- * @version 2022-12-25
+ * @date 2022-12-25
  * @since v1.0.0
  */
 public class JSON {

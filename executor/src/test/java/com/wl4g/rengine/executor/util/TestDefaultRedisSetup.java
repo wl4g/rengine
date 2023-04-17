@@ -28,7 +28,7 @@ import io.vertx.redis.client.RedisOptions;
  * {@link TestDefaultRedisSetup}
  * 
  * @author James Wong
- * @version 2023-01-07
+ * @date 2023-01-07
  * @since v1.0.0
  */
 public class TestDefaultRedisSetup {

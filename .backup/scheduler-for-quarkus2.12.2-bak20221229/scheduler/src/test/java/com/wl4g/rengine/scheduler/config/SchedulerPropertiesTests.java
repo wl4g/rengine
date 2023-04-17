@@ -28,7 +28,7 @@ import org.yaml.snakeyaml.Yaml;
  * {@link SchedulerPropertiesTests}
  * 
  * @author James Wong
- * @version 2022-10-21
+ * @date 2022-10-21
  * @since v3.0.0
  */
 public class SchedulerPropertiesTests {

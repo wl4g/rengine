@@ -49,7 +49,7 @@ import lombok.experimental.SuperBuilder;
  * {@link RuleScriptParser}
  * 
  * @author James Wong
- * @version 2023-02-20
+ * @date 2023-02-20
  * @since v1.0.0
  */
 @CustomLog

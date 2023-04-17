@@ -46,7 +46,7 @@ import lombok.ToString;
  * {@link SimpleJdbcCollectJobExecutor}
  * 
  * @author James Wong
- * @version 2022-10-26
+ * @date 2022-10-26
  * @since v1.0.0
  * @see https://github1s.com/apache/commons-dbutils/tree/DBUTILS_1_7/src/test/java/org/apache/commons/dbutils
  */

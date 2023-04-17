@@ -43,7 +43,7 @@ import com.wl4g.rengine.common.model.WorkflowExecuteResult;
  * </pre>
  * 
  * @author James Wong
- * @version 2022-11-02
+ * @date 2022-11-02
  * @since v1.0.0
  */
 @Retention(RetentionPolicy.RUNTIME)

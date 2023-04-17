@@ -26,7 +26,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder.BCryptVe
  * {@link UsernamePasswordAuthenticationProviderTests}
  * 
  * @author James Wong
- * @version 2023-02-22
+ * @date 2023-02-22
  * @since v1.0.0
  */
 public class UsernamePasswordAuthenticationProviderTests {

@@ -34,7 +34,7 @@ import io.vertx.ext.mail.StartTLSOptions;
  * {@link EmailScriptMessageNotifierTests}
  * 
  * @author James Wong
- * @version 2023-02-07
+ * @date 2023-02-07
  * @since v1.0.0
  */
 public class EmailScriptMessageNotifierTests {
