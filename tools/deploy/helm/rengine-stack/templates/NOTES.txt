@@ -16,7 +16,7 @@
     openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -subj '/O=wl4g Inc./CN=*.{{ $domain }}' -keyout {{ $domain }}.key -out {{ $domain }}.crt
     kubectl create -n istio-system secret tls wl4g-credential --key={{ $domain }}.key --cert={{ $domain }}.crt
 
-+ The access requests routed through Istio-ingressgateway using NodePort:
++ Try testing access requests routed through Istio-ingressgateway using NodePort:
 
     export nodeIP=$(ip a | grep -E '^[0-9]+: (em|eno|enp|ens|eth|wlp)+[0-9]' -A2 | grep inet | awk -F ' ' '{print $2}' | cut -f1 -d/ | head -1)
     export nodePort=$(kubectl -n istio-system get svc istio-ingressgateway -ojson | jq -r '.spec.ports[] | select (.name == "http2") | .nodePort')
@@ -32,7 +32,21 @@
 
     kubectl get secret -n {{ .Release.Namespace }} {{ $secretName }} -o jsonpath="{.data.initRootPassword}" | base64 -d; echo
 
-+ Login with the password from step 4 and the username: '{{ $initUserName }}'
++ Generate local static DNS
+
+export UI_SVC_IP=$(kubectl -n rengine get svc/rengine-ui -o jsonpath="{.spec.clusterIP}")
+export API_SVC_IP=$(kubectl -n rengine get svc/rengine-apiserver -o jsonpath="{.spec.clusterIP}")
+export S3_SVC_IP=$(kubectl -n rengine get svc/rengine-minio -o jsonpath="{.spec.clusterIP}")
+
+sudo bash -c "cat << EOF >> /etc/hosts
+
+# Generate static dns to access the address of rengine.
+${UI_SVC_IP} console.rengine.io
+${API_SVC_IP} api.rengine.io
+${S3_SVC_IP} s3.rengine.io
+EOF"
+
++ Login access to http://console.rengine.io
 
 + Here an example of what you should execution command-line on your next grayscale upgrade (canary):
 

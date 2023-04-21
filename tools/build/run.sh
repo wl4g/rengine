@@ -81,6 +81,8 @@ Usage: ./$(basename $0) [OPTIONS] [arg1] [arg2] ...
                        --skip-build                 Skip recompile build before building image.
                     -u,--ui                         Build image for UI.
                        --skip-build                 Skip recompile build before building image.
+                    -d,--initdb                     Build image for initdb.
+                       --skip-build                 Skip recompile build before building image.
                     -A,--all                        Build image for all components (but excludes the executor-native).
                        --skip-build                 Skip recompile build before building image.
     push-image                                      Push component images.
@@ -90,6 +92,7 @@ Usage: ./$(basename $0) [OPTIONS] [arg1] [arg2] ...
                     -e,--executor                   Push image for executor.
                     -E,--executor-native            Push image for executor (native).
                     -u,--ui                         Push image for UI.
+                    -d,--initdb                     Push image for initdb.
                     -A,--all                        Push image for all components.
     build-push                                      Build with Maven and push images for all components.
     prune-image                                     Prune unused all images. (tag=none)
@@ -282,16 +285,29 @@ function do_build_image_with_npm() {
     local build_file=$3
     log "Docker building for $app_name:$app_version ..."
 
-    docker build -t wl4g/rengine-${app_name}:${app_version} -f $build_file \
+    docker build --no-cache -t wl4g/rengine-${app_name}:${app_version} -f $build_file \
       --build-arg REPO_NAME=rengine-${app_name} \
       --build-arg BUILD_TIME=$(date +'%Y%m%dT%H%M%S') \
-      --build-arg COMMIT_ID=$(git log | head -1 | awk -F ' ' '{print $2}' | cut -c 1-12) .
+      --build-arg COMMIT_ID=$(git log | head -1 | awk -F ' ' '{print $2}' | cut -c 1-12) \
+      ${BASE_DIR}/rengine-${app_name}
+}
+
+function do_build_initdb() {
+    POM_VERSION=${POM_VERSION:-$(print_pom_version)}
+    log "Building rengine initdb image for ${POM_VERSION}"
+
+    docker build --no-cache -t wl4g/rengine-initdb:${POM_VERSION} \
+        --build-arg REPO_NAME=$(print_pom_version) \
+        --build-arg BUILD_TIME=$(date +'%Y%m%dT%H%M%S') \
+        --build-arg COMMIT_ID=$(git log | head -1 | awk -F ' ' '{print $2}' | cut -c 1-12) \
+        --build-arg APP_VERSION=${POM_VERSION} \
+        -f ${BASE_DIR}/tools/build/docker/Dockerfile.initdb ${BASE_DIR}
 }
 
 function do_push_image() {
     POM_VERSION=${POM_VERSION:-$(print_pom_version)}
     local image_registry="$DOCKERHUB_REGISTRY"
-    local image_name="$2"
+    local image_name="$1"
     local image_tag="$POM_VERSION"
 
     if [ -z "$image_registry" ]; then
@@ -311,6 +327,7 @@ function do_push_image() {
     logDebug "Pushing image to $image_registry/$image_name:$image_tag ..."
     docker tag wl4g/$image_name:$image_tag $image_registry/$image_name:$image_tag
     docker push $image_registry/$image_name:$image_tag
+    
 }
 
 function do_prune_image() {
@@ -388,7 +405,6 @@ function do_prune_all_volumes_with_run_standalone() {
     fi
 }
 
-
 # --- Main. ---
 case $1 in
   version)
@@ -449,7 +465,7 @@ case $1 in
             do_build_maven "-T 4C clean install"
         fi
 
-        docker build -t wl4g/rengine-executor:$(print_pom_version) -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkustar .
+        docker build --no-cache -t wl4g/rengine-executor:$(print_pom_version) -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkustar .
         ;;
       -E|--executor-native)
         ## First of all, it should be built in full to prevent the dependent modules from being updated.
@@ -469,7 +485,7 @@ case $1 in
 
         log "Building executor native docker image ..."
         cd ${BASE_DIR}/executor
-        docker build -t wl4g/rengine-executor-native:$(print_pom_version) -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkusnative .
+        docker build --no-cache -t wl4g/rengine-executor-native:$(print_pom_version) -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkusnative .
         cd ..
         ;;
       -u|--ui)
@@ -478,6 +494,9 @@ case $1 in
             do_build_npm "${BASE_DIR}/rengine-ui"
         fi
         do_build_image_with_npm ui $(print_pom_version) "${BASE_DIR}/rengine-ui/tools/build/docker/Dockerfile.vue"
+        ;;
+      -d|--initdb)
+        do_build_initdb
         ;;
       -A|--all)
         POM_VERSION=${POM_VERSION:-$(print_pom_version)}
@@ -494,7 +513,7 @@ case $1 in
         wait
         do_dl_serve_stop
 
-        docker build -t wl4g/rengine-executor:${POM_VERSION} -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkustar
+        docker build --no-cache -t wl4g/rengine-executor:${POM_VERSION} -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkustar
 
         ### Not enabled for now, because it usually fails due to insufficient resources on the build machine. To build a native image, you should use the '-E' option alone.
         #${BASE_DIR}/mvnw install -f ${BASE_DIR}/executor/pom.xml \
@@ -504,9 +523,11 @@ case $1 in
         #    -Dquarkus.native.container-build=true \
         #    -Dquarkus.native.container-runtime=docker
         #
-        #docker build -t wl4g/rengine-executor-native:${POM_VERSION} -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkusnative
+        #docker build --no-cache -t wl4g/rengine-executor-native:${POM_VERSION} -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkusnative
 
         do_build_image_with_npm ui $(print_pom_version) "${BASE_DIR}/rengine-ui/tools/build/docker/Dockerfile.vue"
+
+        do_build_initdb
         ;;
       *)
         usages; exit 1
@@ -515,30 +536,34 @@ case $1 in
   push-image)
     case $2 in
       -a|--apiserver)
-        do_push_image "$3" "rengine-apiserver"
+        do_push_image "rengine-apiserver"
         ;;
       -c|--controller)
-        do_push_image "$3" "rengine-controller"
+        do_push_image "rengine-controller"
         ;;
       -j|--job)
-        do_push_image "$3" "rengine-job"
+        do_push_image "rengine-job"
         ;;
       -e|--executor)
-        do_push_image "$3" "rengine-executor"
+        do_push_image "rengine-executor"
         ;;
       -E|--executor-native)
-        do_push_image "$3" "rengine-executor-native"
+        do_push_image "rengine-executor-native"
         ;;
       -u|--ui)
-        do_push_image "$3" "rengine-ui"
+        do_push_image "rengine-ui"
+        ;;
+      -d|--initdb)
+        do_push_image "rengine-initdb"
         ;;
       -A|--all)
-        do_push_image "$3" "rengine-apiserver" &
-        do_push_image "$3" "rengine-controller" &
-        do_push_image "$3" "rengine-job" &
-        do_push_image "$3" "rengine-executor" &
-        do_push_image "$3" "rengine-executor-native" &
-        do_push_image "$3" "rengine-ui" &
+        do_push_image "rengine-apiserver" &
+        do_push_image "rengine-controller" &
+        do_push_image "rengine-job" &
+        do_push_image "rengine-executor" &
+        do_push_image "rengine-executor-native" &
+        do_push_image "rengine-ui" &
+        do_push_image "rengine-initdb" &
         wait
         ;;
       *)
@@ -553,7 +578,7 @@ case $1 in
     do_build_maven "install -f ${BASE_DIR}/apiserver/pom.xml -Pbuild:tar:docker" &
     do_build_maven "install -f ${BASE_DIR}/controller/pom.xml -Pbuild:tar:docker" &
     do_build_maven "install -f ${BASE_DIR}/job/pom.xml -Pbuild:docker" &
-    docker build -t wl4g/rengine-executor:${POM_VERSION} -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkustar &
+    docker build --no-cache -t wl4g/rengine-executor:${POM_VERSION} -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkustar &
     wait
 
     ### Not enabled for now, because it usually fails due to insufficient resources on the build machine. To build a native image, you should use the '-E' option alone.
@@ -564,16 +589,19 @@ case $1 in
     #    -Dquarkus.native.container-build=true \
     #    -Dquarkus.native.container-runtime=docker
     #
-    #docker build -t wl4g/rengine-executor-native:${POM_VERSION} -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkusnative
+    #docker build --no-cache -t wl4g/rengine-executor-native:${POM_VERSION} -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkusnative
 
     do_build_image_with_npm ui ${POM_VERSION} "${BASE_DIR}/rengine-ui/tools/build/docker/Dockerfile.vue"
 
-    do_push_image "$2" "rengine-apiserver"
-    do_push_image "$2" "rengine-controller"
-    do_push_image "$2" "rengine-job"
-    do_push_image "$2" "rengine-executor"
-    do_push_image "$2" "rengine-executor-native"
-    do_push_image "$3" "rengine-ui"
+    do_build_initdb
+
+    do_push_image "rengine-apiserver"
+    do_push_image "rengine-controller"
+    do_push_image "rengine-job"
+    do_push_image "rengine-executor"
+    do_push_image "rengine-executor-native"
+    do_push_image "rengine-ui"
+    do_push_image "rengine-initdb"
     ;;
   prune-image)
     do_prune_image

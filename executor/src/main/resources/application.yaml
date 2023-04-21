@@ -252,7 +252,8 @@ quarkus:
   #datasource: {}
   ## see:https://github.com/quarkusio/quarkus-quickstarts/blob/main/mongodb-quickstart/src/main/resources/application.properties
   mongodb:
-    connection-string: mongodb://localhost:27017
+    ## see:https://www.mongodb.com/community/forums/t/mongodb-authentication-failed-with-spring-data-uri/109256/13
+    connection-string: mongodb://localhost:27017/rengine?authSource=admin
     health:
       enabled: true
     metrics:

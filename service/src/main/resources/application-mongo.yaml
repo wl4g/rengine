@@ -31,6 +31,7 @@ spring:
     ## see:org.springframework.boot.autoconfigure.data.mongo.MongoDatabaseFactoryDependentConfiguration
     ## see:org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
     ## see:org.springframework.data.mongodb.config.AbstractMongoClientConfiguration#mongoTemplate
+    ## see:https://www.mongodb.com/community/forums/t/mongodb-authentication-failed-with-spring-data-uri/109256/13
     mongodb:
       #uri: ${RENGINE_DB_URI:mongodb+srv://rengine:123456@mongo.wl4g.io/rengine}
       uri: ${RENGINE_DB_URI:mongodb://localhost:27017/rengine}

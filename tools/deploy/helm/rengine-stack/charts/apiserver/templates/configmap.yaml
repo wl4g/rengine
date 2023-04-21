@@ -68,13 +68,16 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     helm.sh/chart: {{ template "app.chart" . }}
 data:
-{{- if not (empty .Values.agentConfigs.items)}}
-  {{- range $key, $value := .Values.agentConfigs.items}}
+## Note: Environment variables are special configurations, first import global variables,
+## then import local variables, local variables take precedence.
+{{- if not (empty .Values.global.commonConfigs.agentConfigs.items) }}
+  {{- range $key, $value := .Values.global.commonConfigs.agentConfigs.items }}
   {{ $key | nindent 2 }}.config: |-
     {{ $value | nindent 4 }}
   {{- end}}
-{{- else if not (empty .Values.global.commonConfigs.agentConfigs.items) }}
-  {{- range $key, $value := .Values.global.commonConfigs.agentConfigs.items}}
+{{- end}}
+{{- if not (empty .Values.agentConfigs.items) }}
+  {{- range $key, $value := .Values.agentConfigs.items}}
   {{ $key | nindent 2 }}.config: |-
     {{ $value | nindent 4 }}
   {{- end}}

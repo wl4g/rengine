@@ -113,6 +113,7 @@ spec:
     ## The primary business api routes.
     - route:
       {{- if not (empty .Values.image.baselineTag) }}
+      {{- $baselineTagPrefix := (splitList "@sha256:" .Values.image.baselineTag) | first }}
       - destination:
           host: {{ template "app.name" . }}.{{ .Release.Namespace }}.svc.cluster.local
           port:
@@ -125,9 +126,10 @@ spec:
         headers:
           response:
             add:
-              x-app-version: {{ .Values.image.baselineTag }}
+              x-app-version: {{ $baselineTagPrefix }}
       {{- end }}
       {{- if not (empty .Values.image.upgradeTag) }}
+      {{- $upgradeTagPrefix := (splitList "@sha256:" .Values.image.upgradeTag) | first }}
       - destination:
           host: {{ template "app.name" . }}.{{ .Release.Namespace }}.svc.cluster.local
           port:
@@ -140,7 +142,7 @@ spec:
         headers:
           response:
             add:
-              x-app-version: {{ .Values.image.upgradeTag }}
+              x-app-version: {{ $upgradeTagPrefix }}
       {{- end }}
       timeout: 10s
       ## Multiple matchers represent and operations.
@@ -179,7 +181,8 @@ spec:
         headers:
           response:
             add:
-              x-app-version: {{ .Values.image.baselineTag }}
+              {{- $baselineTagPrefix := (splitList "@sha256:" .Values.image.baselineTag) | first }}
+              x-app-version: {{ $baselineTagPrefix }}
   ## see:https://istio.io/v1.14/docs/reference/config/networking/virtual-service/#TCPRoute
   {{- if .Values.governance.istio.ingress.tcp.enabled }}
   tcp:
@@ -238,20 +241,22 @@ spec:
   ## see:https://istio.io/v1.14/docs/reference/config/networking/virtual-service/#Destination
   subsets:
     {{- if not (empty .Values.image.baselineTag) }}
+    {{- $baselineTagPrefix := (splitList "@sha256:" .Values.image.baselineTag) | first }}
     - name: baseline
       labels:
         ## for canary governance labels.
-        app.kubernetes.io/canaryVersion: {{ .Values.image.baselineTag | default "tips:please:check:baselineTag" }}
+        app.kubernetes.io/canaryVersion: {{ $baselineTagPrefix | default "tips:please:check:baselineTag" }}
       trafficPolicy:
         loadBalancer:
           ## see:https://istio.io/v1.14/zh/docs/reference/config/networking/destination-rule/#LoadBalancerSettings-SimpleLB
           simple: ROUND_ROBIN # UNSPECIFIED|RANDOM|PASSTHROUGH|LEAST_REQUEST|ROUND_ROBIN|LEAST_CONN
     {{- end }}
     {{- if not (empty .Values.image.upgradeTag) }}
+    {{- $upgradeTagPrefix := (splitList "@sha256:" .Values.image.upgradeTag) | first }}
     - name: upgrade
       labels:
         ## for canary governance labels.
-        app.kubernetes.io/canaryVersion: {{ .Values.image.upgradeTag | default "tips:please:check:upgradeTag" }}
+        app.kubernetes.io/canaryVersion: {{ $upgradeTagPrefix | default "tips:please:check:upgradeTag" }}
       trafficPolicy:
         loadBalancer:
           ## see:https://istio.io/v1.14/zh/docs/reference/config/networking/destination-rule/#LoadBalancerSettings-SimpleLB

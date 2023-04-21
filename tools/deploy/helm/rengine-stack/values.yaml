@@ -99,13 +99,14 @@ ui:
   enabled: true
   image:
     repository: wl4g/rengine-ui
-    baselineTag: 1.0.0
+    baselineTag: 1.0.1@sha256:e79b3c60b758d2c79ea78bafd30219bb2955bf9118b5b0f6990999983096391c
     #upgradeTag: latest
 
-  # command: ["sh", "-c", "ls -al /var/run/"]
-  command: []
+  command: ["sh", "-c", "ls -al /etc/nginx/conf.d/"]
+  # command: []
 
-  envConfigs: {}
+  envConfigs:
+    APISERVER: rengine-apiserver.rengine.svc.cluster.local
 
   agentConfigs:
     mountPath: "/etc/nginx/"
@@ -189,7 +190,7 @@ global:
     #  export SPRING_SLEUTH_OTEL_EXPORTER_JAEGER_ENDPOENT="http://jaeger-collector.jaeger.svc.cluster.local:14250"
     #  ##
     #  ## see:./service/src/main/resources/application-mongo.yaml
-    #  export SPRING_DATA_MONGODB_URI="mongodb://rengine-mongodb:27017/rengine"
+    #  export SPRING_DATA_MONGODB_URI="mongodb://root:changeme@rengine-mongodb:27017/rengine"
     #  ##
     #  ## see:./service/src/main/resources/application-redis.yaml
     #  export SPRING_REDIS_CLUSTER_NODES="\
@@ -223,8 +224,8 @@ global:
       SPRING_SLEUTH_OTEL_EXPORTER_OTLP_ENDPOENT: "http://otlp-collector.otlp.svc.cluster.local:4317"
       SPRING_SLEUTH_OTEL_EXPORTER_JAEGER_ENDPOENT: "http://jaeger-collector.jaeger.svc.cluster.local:14250"
       ## see:./service/src/main/resources/application-mongo.yaml
-      #SPRING_DATA_MONGODB_URI: "mongodb://root:changeme@rengine-mongodb:27017/rengine" # ???
-      SPRING_DATA_MONGODB_URI: "mongodb://rengine-mongodb:27017/rengine"
+      ## see:https://www.mongodb.com/community/forums/t/mongodb-authentication-failed-with-spring-data-uri/109256/13
+      SPRING_DATA_MONGODB_URI: "mongodb://root:changeme@rengine-mongodb:27017/rengine?authSource=admin"
       ## see:./service/src/main/resources/application-redis.yaml
       #SPRING_REDIS_USERNAME: "default"
       SPRING_REDIS_PASSWORD: "changeme"
@@ -240,7 +241,8 @@ global:
       ##
       RENGINE_CONTROLLER_ZOOKEEPER_SERVER_LISTS: "rengine-zookeeper:2181"
       ## see:./executor/src/main/resources/application.yaml
-      QUARKUS_MONGODB_CONNECTION_STRING: "mongodb://rengine-mongodb:27017/rengine"
+      ## see:https://www.mongodb.com/community/forums/t/mongodb-authentication-failed-with-spring-data-uri/109256/13
+      QUARKUS_MONGODB_CONNECTION_STRING: "mongodb://root:changeme@rengine-mongodb:27017/rengine?authSource=admin"
       QUARKUS_REDIS_PASSWORD: "changeme"
       QUARKUS_REDIS_HOSTS: "\
         redis://rengine-redis-cluster-0.rengine-redis-cluster-headless:6379,\
@@ -250,6 +252,10 @@ global:
         redis://rengine-redis-cluster-4.rengine-redis-cluster-headless:6379,\
         redis://rengine-redis-cluster-5.rengine-redis-cluster-headless:6379"
       QUARKUS_LOG_FILE_PATH: "/tmp/executor.log"
+      ##
+      ## see:./service/src/main/resources/application-services.yaml
+      ##
+      RENGINE_SERVICES_UPLOAD_MINIO_ENDPOINT: "http://s3.rengine.io:9000"
       ##
       ## see:./executor/src/main/resources/application.yaml and ./service/src/main/resources/application-minio.yaml
       ##
@@ -724,28 +730,63 @@ jaeger:
 ## ------------------------------- (Internal) MongoDB Configuration. ----------------------------------
 ## see:https://github.com/bitnami/charts/tree/main/bitnami/mongodb
 mongodb:
+  extraEnvVars:
+    - name: BITNAMI_DEBUG
+      value: "true"
+    - name: ALLOW_EMPTY_PASSWORD
+      value: "no"
+    # - name: MONGODB_PRIMARY_HOST
+    #   value: "rengine-mongodb:27017"
+    # - name: "MONGODB_PRIMARY_ROOT_USER
+    #   value: root
+    # - name: MONGODB_ADVERTISED_HOSTNAME
+    #   value: rengine-mongodb
+    - name: MONGODB_REPLICA_SET_MODE
+      value: primary
+    - name: MONGODB_REPLICA_SET_KEY
+      value: defaultReplicaSet
+    - name: MONGODB_ENABLE_JOURNAL
+      value: "yes"
+    - name: MONGODB_ENABLE_IPV6
+      value: "no"
+    - name: MONGODB_ENABLE_DIRECTORY_PER_DB
+      value: "no"
+    - name: MONGODB_DISABLE_SYSTEM_LOG
+      value: "no"
+    - name: MONGODB_DISABLE_JAVASCRIPT
+      value: "no"
+    - name: MONGODB_SYSTEM_LOG_VERBOSITY
+      value: "0"
+    # - name: MONGODB_INITIAL_PRIMARY_ROOT_USER
+    #   value: mongo
+    # - name: MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD
+    #   value: changeme
+    # - name: MONGODB_USERNAME
+    #   value: rengine
+    # - name: MONGODB_PASSWORD
+    #   value: changeme
+    # - name: MONGODB_DATABASE
+    #   value: rengine
+    - name: MONGODB_ROOT_PASSWORD
+      value: changeme
   initContainers:
-    ## Initializing rengine database scripts.
-    - name: rengine-init-mongodb
-      image: busybox:1.28
+    ## Rengine init DB. (Note: If the download fails, you can comment this init container, manually import the script)
+    - name: rengine-initdb
+      image: wl4g/rengine-initdb:1.0.0@sha256:949b31ba2891f45b3f7c1d45b3f778a5adc53f96787128d49cfaf435b4d2f56a
       imagePullPolicy: IfNotPresent
-      command:
-        - wget
-        - "-O"
-        - "/docker-entrypoint-initdb.d/rengine_init.js"
-        - https://raw.githubusercontent.com/wl4g/rengine/master/tools/db/rengine_init.js?token=GHSAT0AAAAAAB4ATLINKSZ7RSHXRT6IJ674ZCCD6XA
+      ## Note: Same problem with initializing rengine_init.js in docker compose yaml.
+      ## see:https://raw.githubusercontent.com/wl4g/rengine/master/tools/db/rengine_init.js?token=GHSAT0AAAAAAB4ATLINIBXFCKAGNEVCKZZAZCCEZDQ
+      ## see:https://gitee.com/wl4g/rengine/raw/master/tools/db/rengine_init.js
+      command: [ "cp", "/initdb/rengine_init.js", "/docker-entrypoint-initdb.d/" ]
       volumeMounts:
         - name: initdir
           mountPath: "/docker-entrypoint-initdb.d/"
-
   extraVolumeMounts:
     - name: initdir
-      mountPath: "/docker-entrypoint-initdb.d/rengine_init.js"
-
+      mountPath: "/docker-entrypoint-initdb.d/"
   extraVolumes:
     - name: initdir
       emptyDir: {}
-
   auth:
     enabled: false
     rootUser: root
@@ -753,7 +794,7 @@ mongodb:
     # databases:
     #   - "rengine"
     # usernames:
-    #   - rengine
+    #   - "rengine"
     # passwords:
     #   - "changeme"
 

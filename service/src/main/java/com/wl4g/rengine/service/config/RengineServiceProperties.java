@@ -45,10 +45,21 @@ public class RengineServiceProperties {
     URI executorEndpoint = URI.create("http://localhost:28002");
 
     @NotNull
+    UploadServiceProperties upload = new UploadServiceProperties();
+
+    @NotNull
     DictServiceProperties dict = new DictServiceProperties();
 
     @NotNull
     ControllerLogServiceProperties controllerLog = new ControllerLogServiceProperties();
+
+    @Getter
+    @Setter
+    @ToString
+    @NoArgsConstructor
+    public static class UploadServiceProperties {
+        String minioEndpoint = "http://localhost:9000";
+    }
 
     /**
      * @see {@link com.wl4g.rengine.executor.execution.ExecutionConfig.ServiceConfig}

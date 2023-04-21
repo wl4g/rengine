@@ -49,6 +49,8 @@ Usage: ./run.sh [OPTIONS] [arg1] [arg2] ...
                        --skip-build                 Skip recompile build before building image.
                     -u,--ui                         Build image for UI.
                        --skip-build                 Skip recompile build before building image.
+                    -d,--initdb                     Build image for initdb.
+                       --skip-build                 Skip recompile build before building image.
                     -A,--all                        Build image for all components (but excludes the executor-native).
                        --skip-build                 Skip recompile build before building image.
     push-image                                      Push component images.
@@ -58,6 +60,7 @@ Usage: ./run.sh [OPTIONS] [arg1] [arg2] ...
                     -e,--executor                   Push image for executor.
                     -E,--executor-native            Push image for executor (native).
                     -u,--ui                         Push image for UI.
+                    -d,--initdb                     Push image for initdb.
                     -A,--all                        Push image for all components.
     build-push                                      Build with Maven and push images for all components.
     prune-image                                     Prune unused all images. (tag=none)

@@ -45,9 +45,8 @@ spec:
       command:
       - "/bin/bash"
       - "-c"
-      # Should using: mongodb://root:changeme@{{ .Release.Name }}-mongodb:27017/rengine ???
       - "cd $APP_HOME && java -cp .:lib/* com.wl4g.rengine.service.deploy.RengineRootPasswordTool \
-        --connectionString mongodb://{{ .Release.Name }}-mongodb:27017/rengine \
+        --connectionString mongodb://root:changeme@{{ .Release.Name }}-mongodb:27017 \
         --isClusterMode false \
         --database rengine \
         --rootPassword {{ $initRootPassword }}"

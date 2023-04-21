@@ -93,17 +93,20 @@ public class UploadServiceImpl extends BasicServiceImpl implements UploadService
         // New create temporary STS credentials.
         try {
             final Credentials credentials = minioManager.createSTSCredentials(upload.getObjectPrefix());
-            final MinioClientProperties config = minioManager.getConfig();
+            final MinioClientProperties minioConfig = minioManager.getConfig();
             return UploadApplyResult.builder()
-                    .endpoint(config.getEndpoint())
-                    .region(minioManager.getConfig().getRegion())
-                    // .bucket(details.getBucket())
+                    // Note: An independent external endpoint should be used to
+                    // avoid the same address as the internal endpoint used by
+                    // apiserver and executor services.
+                    // .endpoint(config.getEndpoint())
+                    .endpoint(config.getUpload().getMinioEndpoint())
+                    .region(minioConfig.getRegion())
                     .bucket(RengineConstants.DEFAULT_MINIO_BUCKET)
                     .accessKey(credentials.accessKey())
                     .secretKey(credentials.secretKey())
                     .sessionToken(credentials.sessionToken())
-                    .partSize(minioManager.getConfig().getUserUpload().getLibraryPartSize().toBytes())
-                    .fileLimitSize(minioManager.getConfig().getUserUpload().getLibraryFileLimitSize().toBytes())
+                    .partSize(minioConfig.getUserUpload().getLibraryPartSize().toBytes())
+                    .fileLimitSize(minioConfig.getUserUpload().getLibraryFileLimitSize().toBytes())
                     .objectPrefix(upload.getObjectPrefix())
                     .extensions(safeList(UploadType.of(upload.getUploadType()).getExtensions()).stream()
                             .map(t -> t.getSuffix())
@@ -156,18 +159,21 @@ public class UploadServiceImpl extends BasicServiceImpl implements UploadService
         // with precise authorized write permissions.
         try {
             final Credentials credentials = minioManager.createSTSCredentials(upload.getObjectPrefix());
-            final MinioClientProperties config = minioManager.getConfig();
+            final MinioClientProperties minioConfig = minioManager.getConfig();
             return UploadSaveResult.builder()
                     .id(upload.getId())
-                    .endpoint(config.getEndpoint())
+                    // Note: An independent external endpoint should be used to
+                    // avoid the same address as the internal endpoint used by
+                    // apiserver and executor services.
+                    // .endpoint(config.getEndpoint())
+                    .endpoint(config.getUpload().getMinioEndpoint())
                     .region(minioManager.getConfig().getRegion())
-                    // .bucket(details.getBucket())
                     .bucket(RengineConstants.DEFAULT_MINIO_BUCKET)
                     .accessKey(credentials.accessKey())
                     .secretKey(credentials.secretKey())
                     .sessionToken(credentials.sessionToken())
-                    .partSize(minioManager.getConfig().getUserUpload().getLibraryPartSize().toBytes())
-                    .fileLimitSize(minioManager.getConfig().getUserUpload().getLibraryFileLimitSize().toBytes())
+                    .partSize(minioConfig.getUserUpload().getLibraryPartSize().toBytes())
+                    .fileLimitSize(minioConfig.getUserUpload().getLibraryFileLimitSize().toBytes())
                     .objectPrefix(upload.getObjectPrefix())
                     .extensions(safeList(uploadType.getExtensions()).stream().map(t -> t.getSuffix()).collect(toList()))
                     .build();

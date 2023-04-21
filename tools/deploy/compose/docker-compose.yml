@@ -25,13 +25,17 @@ services:
   ## see:https://github.com/bitnami/containers/blob/main/bitnami/mongodb-sharded/docker-compose-multiple-shards.yml
   mongodb:
     image: docker.io/bitnami/mongodb:4.4.6
-    command: ""
+    ## Note: Same problem with initializing rengine_init.js in helm values.yaml.
+    ## see:https://raw.githubusercontent.com/wl4g/rengine/master/tools/db/rengine_init.js?token=GHSAT0AAAAAAB4ATLINIBXFCKAGNEVCKZZAZCCEZDQ
+    ## see:https://gitee.com/wl4g/rengine/raw/master/tools/db/rengine_init.js
+    ## see:https://pkg.wl4g.com/public/rengine_init.js
+    #command: /opt/bitnami/scripts/mongodb/run.sh
     container_name: rengine_mongodb
     environment:
       - BITNAMI_DEBUG=true
       - ALLOW_EMPTY_PASSWORD=no
       - MONGODB_PRIMARY_HOST=mongodb:27017
-      # - MONGODB_PRIMARY_ROOT_USER=default
+      # - MONGODB_PRIMARY_ROOT_USER=root
       - MONGODB_ADVERTISED_HOSTNAME=mongodb
       - MONGODB_REPLICA_SET_MODE=primary
       - MONGODB_REPLICA_SET_KEY=defaultReplicaSet
@@ -41,12 +45,12 @@ services:
       - MONGODB_DISABLE_SYSTEM_LOG=no
       - MONGODB_DISABLE_JAVASCRIPT=no
       - MONGODB_SYSTEM_LOG_VERBOSITY=0
-      #- MONGODB_INITIAL_PRIMARY_ROOT_USER=mongo
-      #- MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD=changeme
-      - MONGODB_USERNAME=default
-      - MONGODB_PASSWORD=changeme
+      # - MONGODB_INITIAL_PRIMARY_ROOT_USER=mongo
+      # - MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD=changeme
+      # - MONGODB_USERNAME=rengine
+      # - MONGODB_PASSWORD=changeme
+      # - MONGODB_DATABASE=rengine
       - MONGODB_ROOT_PASSWORD=changeme
-      - MONGODB_DATABASE=rengine
     restart: unless-stopped
     networks:
       - rengine_net
@@ -73,7 +77,7 @@ services:
       - VCAP_APP_PORT=28081
       - ME_CONFIG_BASICAUTH_USERNAME=admin
       - ME_CONFIG_BASICAUTH_PASSWORD=admin
-      #- ME_CONFIG_MONGODB_URL=mongodb://mongodb:27017/rengine
+      #- ME_CONFIG_MONGODB_URL=mongodb://root:changeme@mongodb:27017
       - ME_CONFIG_MONGODB_SERVER=mongodb
       - ME_CONFIG_MONGODB_PORT=27017
       #- ME_CONFIG_MONGODB_ADMINUSERNAME=mongodb
@@ -278,7 +282,9 @@ services:
   ui:
     image: wl4g/rengine-ui:1.0.0
     container_name: rengine_ui
-    #environment:
+    environment:
+      ## eg: rengine-apiserver.rengine.svc.cluster.local
+      - APISERVER=apiserver
     restart: unless-stopped
     networks:
       - rengine_net
@@ -295,7 +301,7 @@ services:
     image: wl4g/rengine-apiserver:1.0.0
     entrypoint: "/bin/bash"
     command: "-c \"cd /opt/apps/ecm/apiserver-package/apiserver-current && java -cp .:lib/* com.wl4g.rengine.service.deploy.RengineRootPasswordTool \
-            --connectionString mongodb://default:changeme@mongodb:27017/rengine \
+            --connectionString mongodb://root:changeme@mongodb:27017 \
             --isClusterMode false \
             --database rengine \
             --rootPassword changeme\""
@@ -355,7 +361,7 @@ services:
     container_name: rengine_apiserver
     environment: # see:https://stackoverflow.com/questions/49767683/what-does-no-compatible-attachment-provider-is-available-mean
       - SPRING_ARTHAS_ENABLED=false
-      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/rengine
+      - SPRING_DATA_MONGODB_URI=mongodb://root:changeme@mongodb:27017
       - SPRING_REDIS_PASSWORD=bitnami
       - SPRING_REDIS_CLUSTER_NODES=redis-node-0:6379,redis-node-1:6379,redis-node-2:6379,redis-node-3:6379,redis-node-4:6379,redis-node-5:6379
       - MINIO_ENDPOINT=http://${NODE_IP}:9000
@@ -396,7 +402,7 @@ services:
     container_name: rengine_controller
     environment:
       - SPRING_ARTHAS_ENABLED=false
-      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/rengine
+      - SPRING_DATA_MONGODB_URI=mongodb://root:changeme@mongodb:27017
       - SPRING_REDIS_PASSWORD=bitnami
       - SPRING_REDIS_CLUSTER_NODES=redis-node-0:6379,redis-node-1:6379,redis-node-2:6379,redis-node-3:6379,redis-node-4:6379,redis-node-5:6379
       - MINIO_ENDPOINT=http://minio:9000
@@ -436,7 +442,7 @@ services:
     image: wl4g/rengine-executor-native:1.0.0
     container_name: rengine_executor
     environment:
-      - QUARKUS_MONGODB_CONNECTION_STRING=mongodb://mongodb:27017/rengine
+      - QUARKUS_MONGODB_CONNECTION_STRING=mongodb://root:changeme@mongodb:27017
       - QUARKUS_REDIS_PASSWORD=bitnami
       - QUARKUS_REDIS_HOSTS=redis://redis-node-0:6379,redis://redis-node-1:6379,redis://redis-node-2:6379,redis://redis-node-3:6379,redis://redis-node-4:6379,redis://redis-node-5:6379
       - MINIO_ENDPOINT=http://minio:9000

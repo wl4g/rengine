@@ -65,7 +65,8 @@ spec:
         app.kubernetes.io/name: {{ template "app.name" . }}
         app.kubernetes.io/release: {{ .Release.Name }}
         ## for canary governance labels.
-        app.kubernetes.io/canaryVersion: {{ .Values.image.baselineTag | default .Chart.AppVersion }}
+        {{- $baselineTagPrefix := (splitList "@sha256:" .Values.image.baselineTag) | first }}
+        app.kubernetes.io/canaryVersion: {{ $baselineTagPrefix | default .Chart.AppVersion }}
     spec:
       hostAliases:
       {{- range $name, $app := .Values.global.componentServices }}
@@ -232,7 +233,7 @@ spec:
             mountPath: /etc/{{ template "app.name" . }}/
           {{- end }}
 
-          {{- if or (not (empty .Values.agentConfigs.items.items)) (not (empty .Values.global.commonConfigs.agentConfigs.items.items)) }}
+          {{- if or (not (empty .Values.agentConfigs.items)) (not (empty .Values.global.commonConfigs.agentConfigs.items)) }}
           ## see:https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#add-configmap-data-to-a-specific-path-in-the-volume
           - name: agentconfig-volume
             {{- if not (empty .Values.agentConfigs.items.mountPath) }}

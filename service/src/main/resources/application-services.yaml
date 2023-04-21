@@ -14,6 +14,8 @@
 rengine:
   services:
     executor-endpoint: http://localhost:28002
+    upload:
+      minio-endpoint: http://localhost:9000
     dict:
       dict-cached-prefix: rengine:services:dict:cache
       dict-cached-expire: 86400_000
