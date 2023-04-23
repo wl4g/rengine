@@ -50,7 +50,8 @@ function logErr() {
 }
 
 function usages() {
-    echo $"
+    echo $"Rengine devel build tests and release & deploy chore Tools.
+
 # for examples
 export JAVA_HOME=/usr/local/jdk-11.0.10/ # Recommands
 export MAVEN_OPTS='-Xss64m -Xms1g -Xmx12g -XX:ReservedCodeCacheSize=1g -Dorg.slf4j.simpleLogger.defaultLogLevel=WARN' # Optional
@@ -69,39 +70,39 @@ Usage: ./$(basename $0) [OPTIONS] [arg1] [arg2] ...
     build-maven                                     Build with Maven.
     build-deploy                                    Build and deploy to Maven central.
     build-image                                     Build component images.
-                    -a,--apiserver                  Build image for apiserver.
-                       --skip-build                 Skip recompile build before building image.
-                    -c,--controller                 Build image for controller.
-                       --skip-build                 Skip recompile build before building image.
-                    -j,--job                        Build image for job.
-                       --skip-build                 Skip recompile build before building image.
-                    -e,--executor                   Build image for executor.
-                       --skip-build                 Skip recompile build before building image.
-                    -E,--executor-native            Build image for executor (native).
-                       --skip-build                 Skip recompile build before building image.
-                    -u,--ui                         Build image for UI.
-                       --skip-build                 Skip recompile build before building image.
-                    -d,--initdb                     Build image for initdb.
-                       --skip-build                 Skip recompile build before building image.
-                    -A,--all                        Build image for all components (but excludes the executor-native).
-                       --skip-build                 Skip recompile build before building image.
+                        -a,--apiserver              Build image for apiserver.
+                           --skip-build             Skip recompile build before building image.
+                        -c,--controller             Build image for controller.
+                           --skip-build             Skip recompile build before building image.
+                        -j,--job                    Build image for job.
+                           --skip-build             Skip recompile build before building image.
+                        -e,--executor               Build image for executor.
+                           --skip-build             Skip recompile build before building image.
+                        -E,--executor-native        Build image for executor (native).
+                           --skip-build             Skip recompile build before building image.
+                        -u,--ui                     Build image for UI.
+                           --skip-build             Skip recompile build before building image.
+                        -d,--initdb                 Build image for initdb.
+                           --skip-build             Skip recompile build before building image.
+                        -A,--all                    Build image for all components (but excludes the executor-native).
+                           --skip-build             Skip recompile build before building image.
     push-image                                      Push component images.
-                    -a,--apiserver                  Push image for apiserver.
-                    -c,--controller                 Push image for controller.
-                    -j,--job                        Push image for job.
-                    -e,--executor                   Push image for executor.
-                    -E,--executor-native            Push image for executor (native).
-                    -u,--ui                         Push image for UI.
-                    -d,--initdb                     Push image for initdb.
-                    -A,--all                        Push image for all components.
+                        -a,--apiserver              Push image for apiserver.
+                        -c,--controller             Push image for controller.
+                        -j,--job                    Push image for job.
+                        -e,--executor               Push image for executor.
+                        -E,--executor-native        Push image for executor (native).
+                        -u,--ui                     Push image for UI.
+                        -d,--initdb                 Push image for initdb.
+                        -A,--all                    Push image for all components.
     build-push                                      Build with Maven and push images for all components.
     prune-image                                     Prune unused all images. (tag=none)
-    run-standalone                                  Run all services with docker standalone mode.
-                    -S,--status                     Display status for all services.
-                    -U,--up                         Startup to all services.
-                       --prune-all-volumes          Remove all data volumes before per initial deploy. Note: be careful!
-                    -D,--down                       Shuwdown to all services.
-                       --prune-all-volumes          Remove all data volumes after per destory deploy. Note: be careful!
+    deploy-standalone                               Deploy all services with docker standalone mode.
+                        -S,--status                 Display status for all services.
+                        -U,--up                     Startup to all services.
+                           --prune-all-volumes      Remove all data volumes before per initial deploy. Note: be careful!
+                        -D,--down                   Shuwdown to all services.
+                           --prune-all-volumes      Remove all data volumes after per destory deploy. Note: be careful!
 "
 }
 
@@ -606,10 +607,10 @@ case $1 in
   prune-image)
     do_prune_image
     ;;
-  run-standalone)
+  deploy-standalone)
     case $2 in
       -S|--status)
-        docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}" | grep rengine_
+        docker ps --format "table {{.ID}} {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}" | grep rengine_
         ;;
       -U|--up)
         do_run_standalone "up -d" "$3"

@@ -41,7 +41,7 @@ apiserver:
         - api.rengine.io
 
 controller:
-  enabled: false
+  enabled: true
   image:
     repository: wl4g/rengine-controller
     baselineTag: 1.0.0
