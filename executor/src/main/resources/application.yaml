@@ -30,7 +30,7 @@ quarkus:
     ssl-port: 28012
     test-ssl-port: 28022
     root-path: /
-    insecure-requests: enabled ## enabled|redirect|disabled
+    insecure-requests: enabled # enabled|redirect|disabled
     cors: false
   tls:
     trust-all: false
@@ -93,7 +93,7 @@ quarkus:
       enable: true
       format: '%d{yyyy-dd-mm HH:mm:ss} %-5p [%c{2.}] (%t) %s%e%n'
       ## see: script/executor-env.sh#L71
-      path: /var/log/${quarkus.application.name}/${quarkus.application.name}.log
+      path: /tmp/log/${quarkus.application.name}/${quarkus.application.name}.log
       async: false
         #queue-length: 128
         #overflow: block # block,discard
@@ -279,10 +279,10 @@ quarkus:
       - redis://localhost:7380
       - redis://localhost:7381
     timeout: 10s
-    password: 'zzx!@#$%'
-    max-pool-size: 512 ## Default by 6
-    max-pool-waiting: 512 ## Default by 24
-    max-waiting-handlers: 2048 ## Default by 2048
+    password: 'bitnami'
+    max-pool-size: 512 # Default by 6
+    max-pool-waiting: 512 # Default by 24
+    max-waiting-handlers: 2048 # Default by 2048
     max-nested-arrays: 32
     pool-cleaner-interval: 30m
     pool-recycle-timeout: 15s
@@ -300,7 +300,7 @@ quarkus:
       lables: {}
       annotations: {}
 
-## Rengine evaluator configuration.
+## Rengine executor configuration.
 rengine:
   executor:
     services:
@@ -329,7 +329,7 @@ rengine:
         per-executor-thread-pools: 2
 
 minio:
-  endpoint: http://localhost:9000
+  endpoint: http://localhost:19000
   region: us-east-1
   bucket: rengine
   access-key: rengine

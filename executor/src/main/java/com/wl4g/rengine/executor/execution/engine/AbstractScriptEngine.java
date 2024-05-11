@@ -141,7 +141,7 @@ public abstract class AbstractScriptEngine implements IScriptEngine {
             boolean usingCache) {
         notNullOf(workflowId, "workflowId");
         notNullOf(rule, "rule");
-        log.debug("Loading script {} by workflowId: {}, ruleId: {}", workflowId, rule.getId());
+        log.debug("Loading script by workflowId: {}, ruleId: {}", workflowId, rule.getId());
 
         // Add upload object script dependencies all by scenes.workflow.rules
         final var ruleScript = rule.getEffectiveLatestScript();
@@ -164,7 +164,7 @@ public abstract class AbstractScriptEngine implements IScriptEngine {
         // Notice: According to the graal context eval mechanism, if there is a
         // function with the same name, the latter will overwrite the previous
         // eval function, so make sure that the main script is the last one.
-        Collections.sort(scriptObjects, (o1, o2) -> o1.getUploadId() == ruleScript.getEntrypointUploadId() ? 1 : -1);
+        scriptObjects.sort((o1, o2) -> o1.getUploadId() == ruleScript.getEntrypointUploadId() ? 1 : -1);
 
         return scriptObjects;
     }

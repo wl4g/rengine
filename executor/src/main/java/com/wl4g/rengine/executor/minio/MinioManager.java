@@ -40,6 +40,7 @@ import java.net.Proxy.Type;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.enterprise.event.Observes;
@@ -106,14 +107,14 @@ public class MinioManager {
                         .connectTimeout(httpClient.connectTimeout().toMillis(), TimeUnit.MILLISECONDS)
                         .writeTimeout(config.httpClient().readTimeout().toMillis(), TimeUnit.MILLISECONDS)
                         .readTimeout(config.httpClient().writeTimeout().toMillis(), TimeUnit.MILLISECONDS)
-                        .protocols(Arrays.asList(Protocol.HTTP_1_1))
+                        .protocols(List.of(Protocol.HTTP_1_1))
                         .proxy(proxy)
                         .build());
         if (isBlank(config.region())) {
             builder.region(config.region());
         }
         this.minioClient = builder.build();
-        log.info("Initializated Minio Client: {}", minioClient);
+        log.info("Initialized Minio Client: {}", minioClient);
     }
 
     public ObjectResource loadObject(
@@ -139,7 +140,7 @@ public class MinioManager {
             if ((currentTimeMillis() - localFile.lastModified()) < objectCacheExpireMs) {
                 return new ObjectResource(uploadId, objectPrefix, binary, localFile, safeLongToInt(localFile.length()));
             }
-            // Expired and clearup
+            // Expired and clear-up
             if (!localFile.delete()) {
                 log.warn("Unable to remove expired script cached of {}", localFile);
             }
@@ -234,9 +235,10 @@ public class MinioManager {
         private @NotNull File localFile;
         private int available;
 
+        @SuppressWarnings("all")
         public byte[] readToBytes() throws IOException {
-            isTrue(available <= DEFAULT_EXECUTOR_S3_OBJECT_MAX_LIMIT, "Maximum file object readable limit exceeded: %s",
-                    DEFAULT_EXECUTOR_S3_OBJECT_MAX_LIMIT);
+            isTrue(available <= DEFAULT_EXECUTOR_S3_OBJECT_MAX_LIMIT,
+                    "Maximum file object readable limit exceeded: %s", DEFAULT_EXECUTOR_S3_OBJECT_MAX_LIMIT);
             return Resources.toByteArray(localFile.toURI().toURL());
         }
 

@@ -59,7 +59,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * {@link AbstractFlinkStreamingBase}
- * 
+ *
  * @author James Wong &lt;wanglsir@gmail.com, 983708408@qq.com&gt;
  * @date 2022-06-07 v3.0.0
  * @since v1.0.0
@@ -161,7 +161,7 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
 
     /**
      * Parsing command arguments to {@link CommandLineFacade}.
-     * 
+     *
      * @param args
      * @return
      * @throws ParseException
@@ -204,7 +204,7 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
 
     /**
      * Configuring custom FLINK environment details.
-     * 
+     *
      * @return
      */
     protected void customProps(Map<String, String> props) {
@@ -212,14 +212,14 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
 
     /**
      * Create FLINK source.
-     * 
+     *
      * @return
      */
     protected abstract <T, S extends SourceSplit, E> Source<T, S, E> createSource();
 
     /**
      * Configuring custom FLINK data stream.
-     * 
+     *
      * @return
      */
     protected DataStream<?> customStream(DataStream<RengineEvent> dataStreamSource) {
@@ -232,14 +232,14 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
 
     /**
      * Create FLINK sink.
-     * 
+     *
      * @return
      */
     protected abstract Serializable createSink();
 
     /**
      * Handling job execution result.
-     * 
+     *
      * @param result
      */
     protected void handleJobExecutionResult(JobExecutionResult result) {
@@ -248,7 +248,7 @@ public abstract class AbstractFlinkStreamingBase implements Runnable {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public void run() {
-        notNull(line, errmsg -> new IllegalStateException(errmsg),
+        notNull(line, IllegalStateException::new,
                 "Parse arguments are not initialized, must call #parse() before");
 
         // Custom details.
