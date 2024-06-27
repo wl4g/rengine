@@ -435,7 +435,7 @@ case $1 in
         ## Method 2:
         ## Do not use the COPY command, open the local file service and use curl to download in the container to prevent new layers.
         do_dl_serve_start
-        do_build_image_with_springboot apiserver $(print_pom_version) com.wl4g.RengineApiServer Dockerfile.springtar apiserver/target/apiserver-1.0.0-bin.tar
+        do_build_image_with_springboot apiserver $(print_pom_version) com.wl4g.RengineApiServer Dockerfile.springtar ${BASE_DIR}/apiserver/target/apiserver-1.0.0-bin.tar
         do_dl_serve_stop
         ;;
       -c|--controller)
@@ -451,7 +451,7 @@ case $1 in
         ## Method 2:
         ## Do not use the COPY command, open the local file service and use curl to download in the container to prevent new layers.
         do_dl_serve_start
-        do_build_image_with_springboot controller $(print_pom_version) com.wl4g.RengineController Dockerfile.springtar controller/target/controller-1.0.0-bin.tar
+        do_build_image_with_springboot controller $(print_pom_version) com.wl4g.RengineController Dockerfile.springtar ${BASE_DIR}/controller/target/controller-1.0.0-bin.tar
         do_dl_serve_stop
         ;;
       -j|--job)
@@ -466,7 +466,7 @@ case $1 in
             do_build_maven "-T 4C clean install"
         fi
 
-        docker build --no-cache -t wl4g/rengine-executor:$(print_pom_version) -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkustar .
+        docker build --no-cache -t wl4g/rengine-executor:$(print_pom_version) -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkustar ${BASE_DIR}/executor/
         ;;
       -E|--executor-native)
         ## First of all, it should be built in full to prevent the dependent modules from being updated.
@@ -476,6 +476,22 @@ case $1 in
 
         if [ ! -f "${BASE_DIR}/executor/target/executor-native" ]; then
             log "Building executor native image ..."
+
+            ## Notice: 
+            ##  1. The following command will build the ELF executable file of the architecture(e.g:x84_64,aarch64/arm64) corresponding to the current 
+            ##     operating system by default. Even if the current operating system is MacOS, it will not be a Mach-O executable 
+            ##     file (ELF is a Linux executable file, which MacOS cannot recognize).
+            ##  2. For example, building on the current host MacOS M3 (aarch64), although 'objdump -T ./target/executor-native | head n2' 
+            ##     shows that the file format is elf64-littleaarch64, './target/executor-native' cannot be executed and an error 
+            ##     will be reported: zsh: exec format error. However, it can be executed in the OrbStack+alpine container on the 
+            ##     current MacOS, because the alpine container is aarch64 Linux.
+            ##  3. Similarly, this aarch64 ELF file cannot be executed on x86_64, and './executor-native' will report an 
+            ##     erro '-bash: ./application: cannot execute binary file.' This is because x86_64 cannot recognize aarch64 
+            ##     instructions, but the reason is different from the previous [2].
+            ##  4. Contrary to the previous [3], if the ELF file is built on x86_64 Linux, it can be executed on OrbStack+alpine on MacOS M3, because OrbStack 
+            ##     will call Apple official built-in Rosta instruction translator to translate x86_64 instructions into aarch64/arm64 instructions.
+            ##  5. Summary to see: https://www.notion.so/Mac-M3-native-image-ELF-bb221415fa254969a646281d26997d2e
+
             ${BASE_DIR}/mvnw install -f ${BASE_DIR}/executor/pom.xml \
                 -Dmaven.test.skip=true \
                 -DskipTests \
@@ -485,9 +501,7 @@ case $1 in
         fi
 
         log "Building executor native docker image ..."
-        cd ${BASE_DIR}/executor
-        docker build --no-cache -t wl4g/rengine-executor-native:$(print_pom_version) -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkusnative .
-        cd ..
+        docker build --no-cache -t wl4g/rengine-executor-native:$(print_pom_version) -f ${BASE_DIR}/tools/build/docker/Dockerfile.quarkusnative ${BASE_DIR}/executor/
         ;;
       -u|--ui)
         ## First of all, it should be built in full to prevent the dependent modules from being updated.
