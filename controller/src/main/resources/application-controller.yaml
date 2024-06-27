@@ -7,10 +7,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-# #### Collector Job configuration. ####
 #
-
+# #### Rengine controller configuration. ####
+#
 rengine:
   controller:
     zookeeper:
@@ -31,16 +30,17 @@ rengine:
       enabled: true
       port: 9888
     controller:
-      disabled: false ## Default by false
-      overwrite: true ## Default by true
+      disabled: false # Default by false
+      overwrite: true # Default by true
       monitorExecution: true ## Default by true
-      failover: false ## Default by false
-      misfire: false ## Default by false
+      failover: false # Default by false
+      misfire: false # Default by false
       cron: "0/5 * * * * ?"
       timeZone: GMT+08:00
       maxTimeDiffSeconds: -1
       reconcileIntervalMinutes: 0
-      ## When setup true, the shardingTotalCount will be ignored, and the will be automatically allocated according to the number of cluster nodes priority.
+      # When setup true, the shardingTotalCount will be ignored, and the will be automatically
+      # allocated according to the number of cluster nodes priority.
       autoShardingTotalCount: true
       shardingTotalCount: 1
       shardingItemParameters: 0=Beijing,1=Shanghai
@@ -50,7 +50,7 @@ rengine:
       jobListenerTypes: []
       description: The job engine execution schedule controller.
     purger:
-      logRetentionHour: 168 ## 7*24
+      logRetentionHour: 168 # 7*24
       logRetentionCount: 1_000_000
     client:
       concurrency: 10

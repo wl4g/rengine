@@ -327,7 +327,7 @@ public class RengineControllerProperties implements InitializingBean {
     @Setter
     @ToString
     public static class EnginePurgerProperties {
-        private @Min(1) Integer logRetentionHours = 7 * 24;
+        private @Min(1) Integer logRetentionHour = 7 * 24;
         private @Min(1) Long logRetentionCount = 1_000_000L;
     }
 

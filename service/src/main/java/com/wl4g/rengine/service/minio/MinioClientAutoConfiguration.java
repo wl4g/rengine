@@ -29,11 +29,10 @@ import okhttp3.OkHttpClient;
 
 /**
  * {@link MinioClientAutoConfiguration}
- * 
+ *
  * @author James Wong
- * @date 2022-08-28
  * @since v1.0.0
- * @see http://docs.minio.org.cn/docs/master/minio-sts-quickstart-guide
+ * @see <a href="https://docs.minio.org.cn/docs/master/minio-sts-quickstart-guide">...</a>
  */
 @Configuration
 @ConditionalOnClass({ MinioClient.class })

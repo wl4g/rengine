@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.wl4g.rengine.controller.job;
 
 import static com.wl4g.infra.common.collection.CollectionUtils2.safeList;
@@ -58,7 +59,7 @@ import com.nextbreakpoint.flinkclient1_15.model.JarUploadResponseBody;
 import com.nextbreakpoint.flinkclient1_15.model.JobDetailsInfo;
 import com.nextbreakpoint.flinkclient1_15.model.JobDetailsInfo.StateEnum;
 import com.nextbreakpoint.flinkclient1_15.model.JobIdsWithStatusOverview;
-import com.squareup.okhttp.OkHttpClient;
+import okhttp3.OkHttpClient;
 import com.wl4g.infra.common.codec.Encodes;
 import com.wl4g.infra.common.io.FileIOUtils;
 import com.wl4g.infra.common.lang.Assert2;
@@ -79,27 +80,27 @@ import io.minio.DownloadObjectArgs;
 import lombok.CustomLog;
 import lombok.Getter;
 
-// TODO 当前使用 restapi 提交 job 适用于 session 模式，后续应增加配置，并自动检测环境(rengine-controller)是 k8s 或 VM, 
+// TODO 当前使用 restapi 提交 job 适用于 session 模式，后续应增加配置，并自动检测环境(rengine-controller)是 k8s 或 VM,
 // 分别是启动 rengine-job pod 还是通过 ssh 远程命令行启动 rengine-job JVM进程 ?
+
 /**
  * Notice: The flink cep job can be automatically scheduled, but currently it is
  * recommended to use a professional scheduling platform such as Aws EMR or
- * dolphinscheduler.
- * 
+ * dolphin-scheduler.
+ *
  * @author James Wong
- * @date 2023-01-11
+ * @see <a href="https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/ops/rest_api/#jobmanager">...</a>
+ * @see <a href="https://nightlies.apache.org/flink/flink-docs-release-1.15/generated/rest_v1_dispatcher.yml">...</a>
+ * @see <a href="https://github1s.com/apache/flink/blob/release-1.14/flink-runtime/src/main/java/org/apache/flink/runtime/rest/RestServerEndpoint.java">...</a>
+ * @see <a href="https://github1s.com/wl4g-collect/flink-client/blob/master/src/test/java/com/nextbreakpoint/FlinkClientIT.java#L88-L89">...</a>
+ * @see <a href="https://mvnrepository.com/artifact/com.nextbreakpoint/com.nextbreakpoint.flinkclient">...</a>
  * @since v1.0.0
- * @see https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/ops/rest_api/#jobmanager
- * @see https://nightlies.apache.org/flink/flink-docs-release-1.15/generated/rest_v1_dispatcher.yml
- * @see https://github1s.com/apache/flink/blob/release-1.14/flink-runtime/src/main/java/org/apache/flink/runtime/rest/RestServerEndpoint.java
- * @see https://github1s.com/wl4g-collect/flink-client/blob/master/src/test/java/com/nextbreakpoint/FlinkClientIT.java#L88-L89
- * @see https://mvnrepository.com/artifact/com.nextbreakpoint/com.nextbreakpoint.flinkclient
  */
 @Getter
 @CustomLog
 public class FlinkSubmitController extends AbstractJobExecutor {
 
-    private DefaultApi flinkApi;
+    private volatile DefaultApi flinkApi;
 
     @Override
     public String getType() {
@@ -116,9 +117,8 @@ public class FlinkSubmitController extends AbstractJobExecutor {
                         apiClient.setDebugging(flinkConfig.getDebugging());
                     }
                     apiClient.setBasePath(flinkConfig.getEndpoint());
-                    apiClient.setHttpClient(new OkHttpClient());
                     apiClient.setUserAgent(FlinkSubmitController.class.getSimpleName()
-                            .concat(format("/%s/java", FlinkSubmitController.class.getPackage().getImplementationVersion())));
+                                                                      .concat(format("/%s/java", FlinkSubmitController.class.getPackage().getImplementationVersion())));
                     if (nonNull(flinkConfig.getConnTimeout())) {
                         apiClient.setConnectTimeout(flinkConfig.getConnTimeout());
                     }
@@ -151,7 +151,7 @@ public class FlinkSubmitController extends AbstractJobExecutor {
                     if (!isBlank(flinkConfig.getAccessToken())) {
                         apiClient.setAccessToken(flinkConfig.getAccessToken());
                     }
-                    this.flinkApi = new DefaultApi(apiClient);
+                    this.flinkApi = new DefaultApi(apiClient.build());
                     log.info("Initialized flinkApi of : {}", flinkConfig);
                 }
             }
@@ -160,7 +160,7 @@ public class FlinkSubmitController extends AbstractJobExecutor {
     }
 
     /**
-     * {@link com.wl4g.rengine.job.cep.RengineKafkaFlinkCepStreamingIT}
+     * @see com.wl4g.rengine.job.cep RengineKafkaFlinkCepStreamingIT
      */
     @Override
     protected void execute(
@@ -188,9 +188,9 @@ public class FlinkSubmitController extends AbstractJobExecutor {
             final var jars = uploadJars(fssc);
             final var jobArgs = buildFlinkJobArgs(fssc);
             final String jobArgsLine = jobArgs.entrySet()
-                    .stream()
-                    .map(e -> format("--%s %s", e.getKey(), e.getValue()))
-                    .collect(joining(","));
+                                              .stream()
+                                              .map(e -> format("--%s %s", e.getKey(), e.getValue()))
+                                              .collect(joining(","));
             log.info("Run flink job args line : {}", jobArgsLine);
 
             // TODO multi jars dependencies, The current flink rest run api does
@@ -208,19 +208,19 @@ public class FlinkSubmitController extends AbstractJobExecutor {
 
             upsertControllerLog(controllerId, controllerLog.getId(), false, true, true, _jobLog -> {
                 _jobLog.setDetails(FlinkSubmitControllerLog.builder()
-                        .jarId(jars.get(0).getId())
-                        .jobId(response.getJobid())
-                        .jobArgs(jobArgs)
-                        .name(jobDetails.getName())
-                        .isStoppable(jobDetails.isIsStoppable())
-                        .state(FlinkJobState.valueOf(jobDetails.getState().name()))
-                        .startTime(jobDetails.getStartTime())
-                        .endTime(jobDetails.getEndTime())
-                        .duration(jobDetails.getDuration())
-                        .now(jobDetails.getNow())
-                        .timestamps(jobDetails.getTimestamps())
-                        .statusCounts(jobDetails.getStatusCounts())
-                        .build());
+                                                           .jarId(jars.get(0).getId())
+                                                           .jobId(response.getJobid())
+                                                           .jobArgs(jobArgs)
+                                                           .name(jobDetails.getName())
+                                                           .isStoppable(jobDetails.isIsStoppable())
+                                                           .state(FlinkJobState.valueOf(jobDetails.getState().name()))
+                                                           .startTime(jobDetails.getStartTime())
+                                                           .endTime(jobDetails.getEndTime())
+                                                           .duration(jobDetails.getDuration())
+                                                           .now(jobDetails.getNow())
+                                                           .timestamps(jobDetails.getTimestamps())
+                                                           .statusCounts(jobDetails.getStatusCounts())
+                                                           .build());
             });
 
         } catch (Throwable ex) {
@@ -298,8 +298,8 @@ public class FlinkSubmitController extends AbstractJobExecutor {
                 throw new IllegalStateException(format("Unable to get flink upload jars."));
             }
             final List<JarFileInfo> jars = safeList(currentJars.getFiles()).stream()
-                    .filter(j -> matchUploads(uploadFilenames, j))
-                    .collect(toList());
+                                                                           .filter(j -> matchUploads(uploadFilenames, j))
+                                                                           .collect(toList());
             if (jars.isEmpty()) {
                 throw new IllegalStateException(format("Could't find jar of flink uploads : {}", uploadFilenames));
             }
@@ -316,11 +316,11 @@ public class FlinkSubmitController extends AbstractJobExecutor {
         Assert2.isTrue(resourcePath.contains("/"), "invalid resourcePath %s, missing is '/'", resourcePath);
         final File localTmpFile = new File(
                 DEFAULT_CONTROLLER_JAR_TMP_DIR.concat("/").concat(resourcePath.substring(resourcePath.lastIndexOf("/"))))
-        // .concat("-")
-        // .concat(valueOf(currentTimeMillis()))
-        // .concat(".")
-        // .concat(getFilenameExtension(resourcePath))
-        ;
+                // .concat("-")
+                // .concat(valueOf(currentTimeMillis()))
+                // .concat(".")
+                // .concat(getFilenameExtension(resourcePath))
+                ;
         if (localTmpFile.exists()) {
             return localTmpFile;
         }
@@ -334,7 +334,7 @@ public class FlinkSubmitController extends AbstractJobExecutor {
                 log.info("Downloading flink job jar file to '{}' from remote : '%s'", localTmpFile, resourcePath);
 
                 try (ReadableByteChannel channel = Channels.newChannel(jarUri.toURL().openStream());
-                        FileOutputStream fos = new FileOutputStream(localTmpFile, false);) {
+                     FileOutputStream fos = new FileOutputStream(localTmpFile, false);) {
                     fos.getChannel().transferFrom(channel, 0, Long.MAX_VALUE);
                 }
             }
@@ -347,12 +347,12 @@ public class FlinkSubmitController extends AbstractJobExecutor {
                 log.info("Downloading flink job jar file to '{}' from s3ref : '%s'", localTmpFile, objectPrefix);
 
                 getMinioManager().getMinioClient()
-                        .downloadObject(DownloadObjectArgs.builder()
-                                .bucket(config.getBucket())
-                                .region(config.getRegion())
-                                .object(objectPrefix)
-                                .filename(localTmpFile.getAbsolutePath())
-                                .build());
+                                 .downloadObject(DownloadObjectArgs.builder()
+                                                                   .bucket(config.getBucket())
+                                                                   .region(config.getRegion())
+                                                                   .object(objectPrefix)
+                                                                   .filename(localTmpFile.getAbsolutePath())
+                                                                   .build());
             }
             log.info("Downloaded flink job jar file '{}', length: {}", localTmpFile, localTmpFile.length());
 
@@ -433,9 +433,9 @@ public class FlinkSubmitController extends AbstractJobExecutor {
     @Override
     protected ControllerLog newDefaultControllerLog(Long controllerId) {
         return ControllerLog.builder()
-                .controllerId(controllerId)
-                .details(FlinkSubmitControllerLog.builder().type(ControllerType.FLINK_SUBMITTER.name()).build())
-                .build();
+                            .controllerId(controllerId)
+                            .details(FlinkSubmitControllerLog.builder().type(ControllerType.FLINK_SUBMITTER.name()).build())
+                            .build();
     }
 
 }

@@ -128,15 +128,15 @@ public class MinioClientProperties implements InitializingBean {
          * corresponding to s3:ListBucketMultipartUploads will be called, but
          * this interface must have read permission of the bucket root
          * directory? See the source codes:
-         * 
-         * @see https://github.com/minio/minio-js/blob/7.0.32/src/main/minio.js#L1212
-         * @see https://github.com/minio/minio-js/blob/7.0.32/src/main/object-uploader.js#L75
-         * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/router.go#L95
-         * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/object-handler.go#L345
-         * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/user-handler.go#L391
-         * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1754
-         * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1680
-         * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1723
+         *
+         * @see <a href="https://github.com/minio/minio-js/blob/7.0.32/src/main/minio.js#L1212">...</a>
+         * @see <a href="https://github.com/minio/minio-js/blob/7.0.32/src/main/object-uploader.js#L75">...</a>
+         * @see <a href="https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/router.go#L95">...</a>
+         * @see <a href="https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/object-handler.go#L345">...</a>
+         * @see <a href="https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/user-handler.go#L391">...</a>
+         * @see <a href="https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1754">...</a>
+         * @see <a href="https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1680">...</a>
+         * @see <a href="https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1723">...</a>
          */
         private DataSize libraryPartSize = ofMegabytes(10);
 
@@ -148,15 +148,15 @@ public class MinioClientProperties implements InitializingBean {
          * corresponding to s3:ListBucketMultipartUploads will be called, but
          * this interface must have read permission of the bucket root
          * directory? See the source codes:
-         * 
-         * @see https://github.com/minio/minio-js/blob/7.0.32/src/main/minio.js#L1212
-         * @see https://github.com/minio/minio-js/blob/7.0.32/src/main/object-uploader.js#L75
-         * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/router.go#L95
-         * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/object-handler.go#L345
-         * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/user-handler.go#L391
-         * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1754
-         * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1680
-         * @see https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1723
+         *
+         * @see <a href="https://github.com/minio/minio-js/blob/7.0.32/src/main/minio.js#L1212">...</a>
+         * @see <a href="https://github.com/minio/minio-js/blob/7.0.32/src/main/object-uploader.js#L75">...</a>
+         * @see <a href="https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/router.go#L95">...</a>
+         * @see <a href="https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/object-handler.go#L345">...</a>
+         * @see <a href="https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/user-handler.go#L391">...</a>
+         * @see <a href="https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1754">...</a>
+         * @see <a href="https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1680">...</a>
+         * @see <a href="https://github.com/minio/minio/blob/RELEASE.2022-08-26T19-53-15Z/cmd/iam.go#L1723">...</a>
          */
         private DataSize testsetPartSize = ofMegabytes(10);
 

@@ -247,7 +247,7 @@ public class MasterGlobalController extends AbstractJobExecutor {
                             // Purge past logs according to configuration,
                             // keeping only the most recent period of time.
                             final var purgeUpperTime = currentTimeMillis()
-                                    - Duration.ofHours(config.getPurger().getLogRetentionHours()).toMillis();
+                                    - Duration.ofHours(config.getPurger().getLogRetentionHour()).toMillis();
 
                             final var result = controllerLogService.delete(ControllerLogDelete.builder()
                                     .updateDateLower(new Date(1))

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.nextbreakpoint.flinkclient1_15.api.Pair;
-import com.squareup.okhttp.Credentials;
+import okhttp3.Credentials;
 
 public class HttpBasicAuth implements Authentication {
     private String username;

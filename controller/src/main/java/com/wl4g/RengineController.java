@@ -32,13 +32,13 @@ import lombok.extern.slf4j.Slf4j;
 public class RengineController {
 
     // Private are not accessible, can only be checked using the class-name.
-    public static final String SILENTEXITEXCEPTION_CLASS = "org.springframework.boot.devtools.restart.SilentExitExceptionHandler$SilentExitException";
+    public static final String SILENT_EXIT_EXCEPTION_CLASS = "org.springframework.boot.devtools.restart.SilentExitExceptionHandler$SilentExitException";
 
     public static void main(String[] args) {
         try {
             SpringApplication.run(RengineController.class, args);
         } catch (Exception e) {
-            if (e.getClass().getName().equals(SILENTEXITEXCEPTION_CLASS)) {
+            if (e.getClass().getName().equals(SILENT_EXIT_EXCEPTION_CLASS)) {
                 // issue-see:https://stackoverflow.com/questions/32770884/breakpoint-at-throw-new-silentexitexception-in-eclipse-spring-boot
                 // System.setProperty("spring.devtools.restart.enabled","false");
                 log.warn("SilentExitException exception occurred. This is a known issue that "

@@ -16,7 +16,7 @@ spring:
   ## see:org.springframework.data.redis.connection.RedisClusterConfiguration
   redis:
     #username: 
-    password: zzx!@#$%
+    password: 'bitnami'
     ssl: false
     database: 0
     timeout: 10s

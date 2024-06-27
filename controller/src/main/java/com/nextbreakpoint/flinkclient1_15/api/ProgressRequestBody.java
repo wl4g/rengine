@@ -14,8 +14,8 @@ package com.nextbreakpoint.flinkclient1_15.api;
 
 import java.io.IOException;
 
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.RequestBody;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 
 import okio.Buffer;
 import okio.BufferedSink;

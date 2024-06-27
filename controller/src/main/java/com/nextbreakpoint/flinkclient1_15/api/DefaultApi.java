@@ -64,7 +64,9 @@ import com.nextbreakpoint.flinkclient1_15.model.TaskManagerDetailsInfo;
 import com.nextbreakpoint.flinkclient1_15.model.TaskManagersInfo;
 import com.nextbreakpoint.flinkclient1_15.model.ThreadDumpInfo;
 import com.nextbreakpoint.flinkclient1_15.model.TriggerResponse;
+import lombok.Getter;
 
+@Getter
 public class DefaultApi {
     private ApiClient apiClient;
 
@@ -76,17 +78,13 @@ public class DefaultApi {
         this.apiClient = apiClient;
     }
 
-    public ApiClient getApiClient() {
-        return apiClient;
-    }
-
     public void setApiClient(ApiClient apiClient) {
         this.apiClient = apiClient;
     }
 
     /**
      * Build call for clusterDelete
-     * 
+     *
      * @param progressListener
      *            Progress listener
      * @param progressRequestListener
@@ -95,7 +93,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call clusterDeleteCall(
+    public okhttp3.Call clusterDeleteCall(
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         Object localVarPostBody = null;
@@ -124,10 +122,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -140,18 +138,18 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call clusterDeleteValidateBeforeCall(
+    private okhttp3.Call clusterDeleteValidateBeforeCall(
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
-        com.squareup.okhttp.Call call = clusterDeleteCall(progressListener, progressRequestListener);
+        okhttp3.Call call = clusterDeleteCall(progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Shuts down the cluster
-     * 
+     *
      * @throws ApiException
      *             If fail to call the API, e.g. server error or cannot
      *             deserialize the response body
@@ -161,22 +159,22 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Shuts down the cluster
-     * 
+     *
      * @return ApiResponse&lt;Void&gt;
      * @throws ApiException
      *             If fail to call the API, e.g. server error or cannot
      *             deserialize the response body
      */
     public ApiResponse<Void> clusterDeleteWithHttpInfo() throws ApiException {
-        com.squareup.okhttp.Call call = clusterDeleteValidateBeforeCall(null, null);
+        okhttp3.Call call = clusterDeleteValidateBeforeCall(null, null);
         return apiClient.execute(call);
     }
 
     /**
      * (asynchronously) Shuts down the cluster
-     * 
+     *
      * @param callback
      *            The callback to be executed when the API call finishes
      * @return The request call
@@ -184,7 +182,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call clusterDeleteAsync(final ApiCallback<Void> callback) throws ApiException {
+    public okhttp3.Call clusterDeleteAsync(final ApiCallback<Void> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -205,14 +203,14 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = clusterDeleteValidateBeforeCall(progressListener, progressRequestListener);
+        okhttp3.Call call = clusterDeleteValidateBeforeCall(progressListener, progressRequestListener);
         apiClient.executeAsync(call, callback);
         return call;
     }
 
     /**
      * Build call for configGet
-     * 
+     *
      * @param progressListener
      *            Progress listener
      * @param progressRequestListener
@@ -221,7 +219,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call configGetCall(
+    public okhttp3.Call configGetCall(
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         Object localVarPostBody = null;
@@ -248,10 +246,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -264,19 +262,19 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call configGetValidateBeforeCall(
+    private okhttp3.Call configGetValidateBeforeCall(
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
 
-        com.squareup.okhttp.Call call = configGetCall(progressListener, progressRequestListener);
+        okhttp3.Call call = configGetCall(progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns the configuration of the WebUI.
-     * 
+     *
      * @return DashboardConfiguration
      * @throws ApiException
      *             If fail to call the API, e.g. server error or cannot
@@ -288,16 +286,16 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns the configuration of the WebUI.
-     * 
+     *
      * @return ApiResponse&lt;DashboardConfiguration&gt;
      * @throws ApiException
      *             If fail to call the API, e.g. server error or cannot
      *             deserialize the response body
      */
     public ApiResponse<DashboardConfiguration> configGetWithHttpInfo() throws ApiException {
-        com.squareup.okhttp.Call call = configGetValidateBeforeCall(null, null);
+        okhttp3.Call call = configGetValidateBeforeCall(null, null);
         Type localVarReturnType = new TypeToken<DashboardConfiguration>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -305,7 +303,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Returns the configuration of the WebUI.
-     * 
+     *
      * @param callback
      *            The callback to be executed when the API call finishes
      * @return The request call
@@ -313,7 +311,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call configGetAsync(final ApiCallback<DashboardConfiguration> callback) throws ApiException {
+    public okhttp3.Call configGetAsync(final ApiCallback<DashboardConfiguration> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -334,7 +332,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = configGetValidateBeforeCall(progressListener, progressRequestListener);
+        okhttp3.Call call = configGetValidateBeforeCall(progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<DashboardConfiguration>() {
         }.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
@@ -343,7 +341,7 @@ public class DefaultApi {
 
     /**
      * Build call for datasetsDatasetidDelete
-     * 
+     *
      * @param datasetid
      *            32-character hexadecimal string value that identifies a
      *            cluster data set. (required)
@@ -355,7 +353,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call datasetsDatasetidDeleteCall(
+    public okhttp3.Call datasetsDatasetidDeleteCall(
             String datasetid,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -384,10 +382,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -400,7 +398,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call datasetsDatasetidDeleteValidateBeforeCall(
+    private okhttp3.Call datasetsDatasetidDeleteValidateBeforeCall(
             String datasetid,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -409,16 +407,16 @@ public class DefaultApi {
             throw new ApiException("Missing the required parameter 'datasetid' when calling datasetsDatasetidDelete(Async)");
         }
 
-        com.squareup.okhttp.Call call = datasetsDatasetidDeleteCall(datasetid, progressListener, progressRequestListener);
+        okhttp3.Call call = datasetsDatasetidDeleteCall(datasetid, progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Triggers the deletion of a cluster data set. This async operation would
      * return a &#x27;triggerid&#x27; for further query identifier.
-     * 
+     *
      * @param datasetid
      *            32-character hexadecimal string value that identifies a
      *            cluster data set. (required)
@@ -433,10 +431,10 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Triggers the deletion of a cluster data set. This async operation would
      * return a &#x27;triggerid&#x27; for further query identifier.
-     * 
+     *
      * @param datasetid
      *            32-character hexadecimal string value that identifies a
      *            cluster data set. (required)
@@ -446,7 +444,7 @@ public class DefaultApi {
      *             deserialize the response body
      */
     public ApiResponse<TriggerResponse> datasetsDatasetidDeleteWithHttpInfo(String datasetid) throws ApiException {
-        com.squareup.okhttp.Call call = datasetsDatasetidDeleteValidateBeforeCall(datasetid, null, null);
+        okhttp3.Call call = datasetsDatasetidDeleteValidateBeforeCall(datasetid, null, null);
         Type localVarReturnType = new TypeToken<TriggerResponse>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -456,7 +454,7 @@ public class DefaultApi {
      * (asynchronously) Triggers the deletion of a cluster data set. This async
      * operation would return a &#x27;triggerid&#x27; for further query
      * identifier.
-     * 
+     *
      * @param datasetid
      *            32-character hexadecimal string value that identifies a
      *            cluster data set. (required)
@@ -467,7 +465,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call datasetsDatasetidDeleteAsync(String datasetid, final ApiCallback<TriggerResponse> callback)
+    public okhttp3.Call datasetsDatasetidDeleteAsync(String datasetid, final ApiCallback<TriggerResponse> callback)
             throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
@@ -489,7 +487,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = datasetsDatasetidDeleteValidateBeforeCall(datasetid, progressListener,
+        okhttp3.Call call = datasetsDatasetidDeleteValidateBeforeCall(datasetid, progressListener,
                 progressRequestListener);
         Type localVarReturnType = new TypeToken<TriggerResponse>() {
         }.getType();
@@ -499,7 +497,7 @@ public class DefaultApi {
 
     /**
      * Build call for datasetsDeleteTriggeridGet
-     * 
+     *
      * @param triggerid
      *            32-character hexadecimal string that identifies an
      *            asynchronous operation trigger ID. The ID was returned then
@@ -512,7 +510,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call datasetsDeleteTriggeridGetCall(
+    public okhttp3.Call datasetsDeleteTriggeridGetCall(
             String triggerid,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -541,10 +539,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -557,7 +555,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call datasetsDeleteTriggeridGetValidateBeforeCall(
+    private okhttp3.Call datasetsDeleteTriggeridGetValidateBeforeCall(
             String triggerid,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -566,15 +564,15 @@ public class DefaultApi {
             throw new ApiException("Missing the required parameter 'triggerid' when calling datasetsDeleteTriggeridGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = datasetsDeleteTriggeridGetCall(triggerid, progressListener, progressRequestListener);
+        okhttp3.Call call = datasetsDeleteTriggeridGetCall(triggerid, progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns the status for the delete operation of a cluster data set.
-     * 
+     *
      * @param triggerid
      *            32-character hexadecimal string that identifies an
      *            asynchronous operation trigger ID. The ID was returned then
@@ -590,9 +588,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns the status for the delete operation of a cluster data set.
-     * 
+     *
      * @param triggerid
      *            32-character hexadecimal string that identifies an
      *            asynchronous operation trigger ID. The ID was returned then
@@ -603,7 +601,7 @@ public class DefaultApi {
      *             deserialize the response body
      */
     public ApiResponse<AsynchronousOperationResult> datasetsDeleteTriggeridGetWithHttpInfo(String triggerid) throws ApiException {
-        com.squareup.okhttp.Call call = datasetsDeleteTriggeridGetValidateBeforeCall(triggerid, null, null);
+        okhttp3.Call call = datasetsDeleteTriggeridGetValidateBeforeCall(triggerid, null, null);
         Type localVarReturnType = new TypeToken<AsynchronousOperationResult>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -612,7 +610,7 @@ public class DefaultApi {
     /**
      * (asynchronously) Returns the status for the delete operation of a cluster
      * data set.
-     * 
+     *
      * @param triggerid
      *            32-character hexadecimal string that identifies an
      *            asynchronous operation trigger ID. The ID was returned then
@@ -624,7 +622,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call datasetsDeleteTriggeridGetAsync(
+    public okhttp3.Call datasetsDeleteTriggeridGetAsync(
             String triggerid,
             final ApiCallback<AsynchronousOperationResult> callback) throws ApiException {
 
@@ -647,7 +645,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = datasetsDeleteTriggeridGetValidateBeforeCall(triggerid, progressListener,
+        okhttp3.Call call = datasetsDeleteTriggeridGetValidateBeforeCall(triggerid, progressListener,
                 progressRequestListener);
         Type localVarReturnType = new TypeToken<AsynchronousOperationResult>() {
         }.getType();
@@ -657,7 +655,7 @@ public class DefaultApi {
 
     /**
      * Build call for datasetsGet
-     * 
+     *
      * @param progressListener
      *            Progress listener
      * @param progressRequestListener
@@ -666,7 +664,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call datasetsGetCall(
+    public okhttp3.Call datasetsGetCall(
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         Object localVarPostBody = null;
@@ -693,10 +691,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -709,19 +707,19 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call datasetsGetValidateBeforeCall(
+    private okhttp3.Call datasetsGetValidateBeforeCall(
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
 
-        com.squareup.okhttp.Call call = datasetsGetCall(progressListener, progressRequestListener);
+        okhttp3.Call call = datasetsGetCall(progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns all cluster data sets.
-     * 
+     *
      * @return ClusterDataSetListResponseBody
      * @throws ApiException
      *             If fail to call the API, e.g. server error or cannot
@@ -733,16 +731,16 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns all cluster data sets.
-     * 
+     *
      * @return ApiResponse&lt;ClusterDataSetListResponseBody&gt;
      * @throws ApiException
      *             If fail to call the API, e.g. server error or cannot
      *             deserialize the response body
      */
     public ApiResponse<ClusterDataSetListResponseBody> datasetsGetWithHttpInfo() throws ApiException {
-        com.squareup.okhttp.Call call = datasetsGetValidateBeforeCall(null, null);
+        okhttp3.Call call = datasetsGetValidateBeforeCall(null, null);
         Type localVarReturnType = new TypeToken<ClusterDataSetListResponseBody>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -750,7 +748,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Returns all cluster data sets.
-     * 
+     *
      * @param callback
      *            The callback to be executed when the API call finishes
      * @return The request call
@@ -758,7 +756,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call datasetsGetAsync(final ApiCallback<ClusterDataSetListResponseBody> callback)
+    public okhttp3.Call datasetsGetAsync(final ApiCallback<ClusterDataSetListResponseBody> callback)
             throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
@@ -780,7 +778,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = datasetsGetValidateBeforeCall(progressListener, progressRequestListener);
+        okhttp3.Call call = datasetsGetValidateBeforeCall(progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<ClusterDataSetListResponseBody>() {
         }.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
@@ -789,7 +787,7 @@ public class DefaultApi {
 
     /**
      * Build call for jarsGet
-     * 
+     *
      * @param progressListener
      *            Progress listener
      * @param progressRequestListener
@@ -798,7 +796,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jarsGetCall(
+    public okhttp3.Call jarsGetCall(
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         Object localVarPostBody = null;
@@ -825,10 +823,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -841,20 +839,20 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jarsGetValidateBeforeCall(
+    private okhttp3.Call jarsGetValidateBeforeCall(
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
 
-        com.squareup.okhttp.Call call = jarsGetCall(progressListener, progressRequestListener);
+        okhttp3.Call call = jarsGetCall(progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns a list of all jars previously uploaded via
      * &#x27;/jars/upload&#x27;.
-     * 
+     *
      * @return JarListInfo
      * @throws ApiException
      *             If fail to call the API, e.g. server error or cannot
@@ -866,17 +864,17 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns a list of all jars previously uploaded via
      * &#x27;/jars/upload&#x27;.
-     * 
+     *
      * @return ApiResponse&lt;JarListInfo&gt;
      * @throws ApiException
      *             If fail to call the API, e.g. server error or cannot
      *             deserialize the response body
      */
     public ApiResponse<JarListInfo> jarsGetWithHttpInfo() throws ApiException {
-        com.squareup.okhttp.Call call = jarsGetValidateBeforeCall(null, null);
+        okhttp3.Call call = jarsGetValidateBeforeCall(null, null);
         Type localVarReturnType = new TypeToken<JarListInfo>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -885,7 +883,7 @@ public class DefaultApi {
     /**
      * (asynchronously) Returns a list of all jars previously uploaded via
      * &#x27;/jars/upload&#x27;.
-     * 
+     *
      * @param callback
      *            The callback to be executed when the API call finishes
      * @return The request call
@@ -893,7 +891,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jarsGetAsync(final ApiCallback<JarListInfo> callback) throws ApiException {
+    public okhttp3.Call jarsGetAsync(final ApiCallback<JarListInfo> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -914,7 +912,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jarsGetValidateBeforeCall(progressListener, progressRequestListener);
+        okhttp3.Call call = jarsGetValidateBeforeCall(progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<JarListInfo>() {
         }.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
@@ -923,7 +921,7 @@ public class DefaultApi {
 
     /**
      * Build call for jarsJaridDelete
-     * 
+     *
      * @param jarid
      *            String value that identifies a jar. When uploading the jar a
      *            path is returned, where the filename is the ID. This value is
@@ -937,7 +935,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jarsJaridDeleteCall(
+    public okhttp3.Call jarsJaridDeleteCall(
             String jarid,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -967,10 +965,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -983,7 +981,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jarsJaridDeleteValidateBeforeCall(
+    private okhttp3.Call jarsJaridDeleteValidateBeforeCall(
             String jarid,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -992,15 +990,15 @@ public class DefaultApi {
             throw new ApiException("Missing the required parameter 'jarid' when calling jarsJaridDelete(Async)");
         }
 
-        com.squareup.okhttp.Call call = jarsJaridDeleteCall(jarid, progressListener, progressRequestListener);
+        okhttp3.Call call = jarsJaridDeleteCall(jarid, progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Deletes a jar previously uploaded via &#x27;/jars/upload&#x27;.
-     * 
+     *
      * @param jarid
      *            String value that identifies a jar. When uploading the jar a
      *            path is returned, where the filename is the ID. This value is
@@ -1015,9 +1013,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Deletes a jar previously uploaded via &#x27;/jars/upload&#x27;.
-     * 
+     *
      * @param jarid
      *            String value that identifies a jar. When uploading the jar a
      *            path is returned, where the filename is the ID. This value is
@@ -1029,14 +1027,14 @@ public class DefaultApi {
      *             deserialize the response body
      */
     public ApiResponse<Void> jarsJaridDeleteWithHttpInfo(String jarid) throws ApiException {
-        com.squareup.okhttp.Call call = jarsJaridDeleteValidateBeforeCall(jarid, null, null);
+        okhttp3.Call call = jarsJaridDeleteValidateBeforeCall(jarid, null, null);
         return apiClient.execute(call);
     }
 
     /**
      * (asynchronously) Deletes a jar previously uploaded via
      * &#x27;/jars/upload&#x27;.
-     * 
+     *
      * @param jarid
      *            String value that identifies a jar. When uploading the jar a
      *            path is returned, where the filename is the ID. This value is
@@ -1049,7 +1047,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jarsJaridDeleteAsync(String jarid, final ApiCallback<Void> callback) throws ApiException {
+    public okhttp3.Call jarsJaridDeleteAsync(String jarid, final ApiCallback<Void> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -1070,14 +1068,14 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jarsJaridDeleteValidateBeforeCall(jarid, progressListener, progressRequestListener);
+        okhttp3.Call call = jarsJaridDeleteValidateBeforeCall(jarid, progressListener, progressRequestListener);
         apiClient.executeAsync(call, callback);
         return call;
     }
 
     /**
      * Build call for jarsJaridPlanGet
-     * 
+     *
      * @param jarid
      *            String value that identifies a jar. When uploading the jar a
      *            path is returned, where the filename is the ID. This value is
@@ -1104,7 +1102,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jarsJaridPlanGetCall(
+    public okhttp3.Call jarsJaridPlanGetCall(
             String jarid,
             String programArgs,
             String programArg,
@@ -1144,10 +1142,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -1160,7 +1158,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jarsJaridPlanGetValidateBeforeCall(
+    private okhttp3.Call jarsJaridPlanGetValidateBeforeCall(
             String jarid,
             String programArgs,
             String programArg,
@@ -1173,18 +1171,18 @@ public class DefaultApi {
             throw new ApiException("Missing the required parameter 'jarid' when calling jarsJaridPlanGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = jarsJaridPlanGetCall(jarid, programArgs, programArg, entryClass, parallelism,
+        okhttp3.Call call = jarsJaridPlanGetCall(jarid, programArgs, programArg, entryClass, parallelism,
                 progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns the dataflow plan of a job contained in a jar previously uploaded
      * via &#x27;/jars/upload&#x27;. Program arguments can be passed both via
      * the JSON request (recommended) or query parameters.
-     * 
+     *
      * @param jarid
      *            String value that identifies a jar. When uploading the jar a
      *            path is returned, where the filename is the ID. This value is
@@ -1219,11 +1217,11 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns the dataflow plan of a job contained in a jar previously uploaded
      * via &#x27;/jars/upload&#x27;. Program arguments can be passed both via
      * the JSON request (recommended) or query parameters.
-     * 
+     *
      * @param jarid
      *            String value that identifies a jar. When uploading the jar a
      *            path is returned, where the filename is the ID. This value is
@@ -1253,7 +1251,7 @@ public class DefaultApi {
             String programArg,
             String entryClass,
             Integer parallelism) throws ApiException {
-        com.squareup.okhttp.Call call = jarsJaridPlanGetValidateBeforeCall(jarid, programArgs, programArg, entryClass,
+        okhttp3.Call call = jarsJaridPlanGetValidateBeforeCall(jarid, programArgs, programArg, entryClass,
                 parallelism, null, null);
         Type localVarReturnType = new TypeToken<JobPlanInfo>() {
         }.getType();
@@ -1264,7 +1262,7 @@ public class DefaultApi {
      * (asynchronously) Returns the dataflow plan of a job contained in a jar
      * previously uploaded via &#x27;/jars/upload&#x27;. Program arguments can
      * be passed both via the JSON request (recommended) or query parameters.
-     * 
+     *
      * @param jarid
      *            String value that identifies a jar. When uploading the jar a
      *            path is returned, where the filename is the ID. This value is
@@ -1290,7 +1288,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jarsJaridPlanGetAsync(
+    public okhttp3.Call jarsJaridPlanGetAsync(
             String jarid,
             String programArgs,
             String programArg,
@@ -1317,7 +1315,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jarsJaridPlanGetValidateBeforeCall(jarid, programArgs, programArg, entryClass,
+        okhttp3.Call call = jarsJaridPlanGetValidateBeforeCall(jarid, programArgs, programArg, entryClass,
                 parallelism, progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<JobPlanInfo>() {
         }.getType();
@@ -1327,7 +1325,7 @@ public class DefaultApi {
 
     /**
      * Build call for jarsJaridPlanPost
-     * 
+     *
      * @param jarid
      *            String value that identifies a jar. When uploading the jar a
      *            path is returned, where the filename is the ID. This value is
@@ -1356,7 +1354,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jarsJaridPlanPostCall(
+    public okhttp3.Call jarsJaridPlanPostCall(
             String jarid,
             JarPlanRequestBody body,
             String programArgs,
@@ -1395,10 +1393,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -1411,7 +1409,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jarsJaridPlanPostValidateBeforeCall(
+    private okhttp3.Call jarsJaridPlanPostValidateBeforeCall(
             String jarid,
             JarPlanRequestBody body,
             String programArgs,
@@ -1425,18 +1423,18 @@ public class DefaultApi {
             throw new ApiException("Missing the required parameter 'jarid' when calling jarsJaridPlanPost(Async)");
         }
 
-        com.squareup.okhttp.Call call = jarsJaridPlanPostCall(jarid, body, programArgs, programArg, entryClass, parallelism,
+        okhttp3.Call call = jarsJaridPlanPostCall(jarid, body, programArgs, programArg, entryClass, parallelism,
                 progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns the dataflow plan of a job contained in a jar previously uploaded
      * via &#x27;/jars/upload&#x27;. Program arguments can be passed both via
      * the JSON request (recommended) or query parameters.
-     * 
+     *
      * @param jarid
      *            String value that identifies a jar. When uploading the jar a
      *            path is returned, where the filename is the ID. This value is
@@ -1475,11 +1473,11 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns the dataflow plan of a job contained in a jar previously uploaded
      * via &#x27;/jars/upload&#x27;. Program arguments can be passed both via
      * the JSON request (recommended) or query parameters.
-     * 
+     *
      * @param jarid
      *            String value that identifies a jar. When uploading the jar a
      *            path is returned, where the filename is the ID. This value is
@@ -1512,7 +1510,7 @@ public class DefaultApi {
             String programArg,
             String entryClass,
             Integer parallelism) throws ApiException {
-        com.squareup.okhttp.Call call = jarsJaridPlanPostValidateBeforeCall(jarid, body, programArgs, programArg, entryClass,
+        okhttp3.Call call = jarsJaridPlanPostValidateBeforeCall(jarid, body, programArgs, programArg, entryClass,
                 parallelism, null, null);
         Type localVarReturnType = new TypeToken<JobPlanInfo>() {
         }.getType();
@@ -1523,7 +1521,7 @@ public class DefaultApi {
      * (asynchronously) Returns the dataflow plan of a job contained in a jar
      * previously uploaded via &#x27;/jars/upload&#x27;. Program arguments can
      * be passed both via the JSON request (recommended) or query parameters.
-     * 
+     *
      * @param jarid
      *            String value that identifies a jar. When uploading the jar a
      *            path is returned, where the filename is the ID. This value is
@@ -1551,7 +1549,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jarsJaridPlanPostAsync(
+    public okhttp3.Call jarsJaridPlanPostAsync(
             String jarid,
             JarPlanRequestBody body,
             String programArgs,
@@ -1579,7 +1577,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jarsJaridPlanPostValidateBeforeCall(jarid, body, programArgs, programArg, entryClass,
+        okhttp3.Call call = jarsJaridPlanPostValidateBeforeCall(jarid, body, programArgs, programArg, entryClass,
                 parallelism, progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<JobPlanInfo>() {
         }.getType();
@@ -1589,7 +1587,7 @@ public class DefaultApi {
 
     /**
      * Build call for jarsJaridRunPost
-     * 
+     *
      * @param jarid
      *            String value that identifies a jar. When uploading the jar a
      *            path is returned, where the filename is the ID. This value is
@@ -1625,7 +1623,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jarsJaridRunPostCall(
+    public okhttp3.Call jarsJaridRunPostCall(
             String jarid,
             JarRunRequestBody body,
             Boolean allowNonRestoredState,
@@ -1670,10 +1668,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -1686,7 +1684,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jarsJaridRunPostValidateBeforeCall(
+    private okhttp3.Call jarsJaridRunPostValidateBeforeCall(
             String jarid,
             JarRunRequestBody body,
             Boolean allowNonRestoredState,
@@ -1702,18 +1700,18 @@ public class DefaultApi {
             throw new ApiException("Missing the required parameter 'jarid' when calling jarsJaridRunPost(Async)");
         }
 
-        com.squareup.okhttp.Call call = jarsJaridRunPostCall(jarid, body, allowNonRestoredState, savepointPath, programArgs,
+        okhttp3.Call call = jarsJaridRunPostCall(jarid, body, allowNonRestoredState, savepointPath, programArgs,
                 programArg, entryClass, parallelism, progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Submits a job by running a jar previously uploaded via
      * &#x27;/jars/upload&#x27;. Program arguments can be passed both via the
      * JSON request (recommended) or query parameters.
-     * 
+     *
      * @param jarid
      *            String value that identifies a jar. When uploading the jar a
      *            path is returned, where the filename is the ID. This value is
@@ -1761,11 +1759,11 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Submits a job by running a jar previously uploaded via
      * &#x27;/jars/upload&#x27;. Program arguments can be passed both via the
      * JSON request (recommended) or query parameters.
-     * 
+     *
      * @param jarid
      *            String value that identifies a jar. When uploading the jar a
      *            path is returned, where the filename is the ID. This value is
@@ -1807,7 +1805,7 @@ public class DefaultApi {
             String programArg,
             String entryClass,
             Integer parallelism) throws ApiException {
-        com.squareup.okhttp.Call call = jarsJaridRunPostValidateBeforeCall(jarid, body, allowNonRestoredState, savepointPath,
+        okhttp3.Call call = jarsJaridRunPostValidateBeforeCall(jarid, body, allowNonRestoredState, savepointPath,
                 programArgs, programArg, entryClass, parallelism, null, null);
         Type localVarReturnType = new TypeToken<JarRunResponseBody>() {
         }.getType();
@@ -1818,7 +1816,7 @@ public class DefaultApi {
      * (asynchronously) Submits a job by running a jar previously uploaded via
      * &#x27;/jars/upload&#x27;. Program arguments can be passed both via the
      * JSON request (recommended) or query parameters.
-     * 
+     *
      * @param jarid
      *            String value that identifies a jar. When uploading the jar a
      *            path is returned, where the filename is the ID. This value is
@@ -1853,7 +1851,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jarsJaridRunPostAsync(
+    public okhttp3.Call jarsJaridRunPostAsync(
             String jarid,
             JarRunRequestBody body,
             Boolean allowNonRestoredState,
@@ -1883,7 +1881,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jarsJaridRunPostValidateBeforeCall(jarid, body, allowNonRestoredState, savepointPath,
+        okhttp3.Call call = jarsJaridRunPostValidateBeforeCall(jarid, body, allowNonRestoredState, savepointPath,
                 programArgs, programArg, entryClass, parallelism, progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<JarRunResponseBody>() {
         }.getType();
@@ -1893,7 +1891,7 @@ public class DefaultApi {
 
     /**
      * Build call for jarsUploadPost
-     * 
+     *
      * @param body
      *            (required)
      * @param progressListener
@@ -1904,7 +1902,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jarsUploadPostCall(
+    public okhttp3.Call jarsUploadPostCall(
             Object body,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -1937,10 +1935,10 @@ public class DefaultApi {
         // [END]
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -1953,7 +1951,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jarsUploadPostValidateBeforeCall(
+    private okhttp3.Call jarsUploadPostValidateBeforeCall(
             Object body,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -1962,13 +1960,13 @@ public class DefaultApi {
             throw new ApiException("Missing the required parameter 'body' when calling jarsUploadPost(Async)");
         }
 
-        com.squareup.okhttp.Call call = jarsUploadPostCall(body, progressListener, progressRequestListener);
+        okhttp3.Call call = jarsUploadPostCall(body, progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Uploads a jar to the cluster. The jar must be sent as multi-part data.
      * Make sure that the \&quot;Content-Type\&quot; header is set to
      * \&quot;application/x-java-archive\&quot;, as some http libraries do not
@@ -1976,7 +1974,7 @@ public class DefaultApi {
      * via &#x27;curl -X POST -H \&quot;Expect:\&quot; -F
      * \&quot;jarfile&#x3D;@path/to/flink-job.jar\&quot;
      * http://hostname:port/jars/upload&#x27;.
-     * 
+     *
      * @param body
      *            (required)
      * @return JarUploadResponseBody
@@ -1990,7 +1988,7 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Uploads a jar to the cluster. The jar must be sent as multi-part data.
      * Make sure that the \&quot;Content-Type\&quot; header is set to
      * \&quot;application/x-java-archive\&quot;, as some http libraries do not
@@ -1998,7 +1996,7 @@ public class DefaultApi {
      * via &#x27;curl -X POST -H \&quot;Expect:\&quot; -F
      * \&quot;jarfile&#x3D;@path/to/flink-job.jar\&quot;
      * http://hostname:port/jars/upload&#x27;.
-     * 
+     *
      * @param body
      *            (required)
      * @return ApiResponse&lt;JarUploadResponseBody&gt;
@@ -2007,7 +2005,7 @@ public class DefaultApi {
      *             deserialize the response body
      */
     public ApiResponse<JarUploadResponseBody> jarsUploadPostWithHttpInfo(Object body) throws ApiException {
-        com.squareup.okhttp.Call call = jarsUploadPostValidateBeforeCall(body, null, null);
+        okhttp3.Call call = jarsUploadPostValidateBeforeCall(body, null, null);
         Type localVarReturnType = new TypeToken<JarUploadResponseBody>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -2021,7 +2019,7 @@ public class DefaultApi {
      * jar via &#x27;curl -X POST -H \&quot;Expect:\&quot; -F
      * \&quot;jarfile&#x3D;@path/to/flink-job.jar\&quot;
      * http://hostname:port/jars/upload&#x27;.
-     * 
+     *
      * @param body
      *            (required)
      * @param callback
@@ -2031,7 +2029,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jarsUploadPostAsync(Object body, final ApiCallback<JarUploadResponseBody> callback)
+    public okhttp3.Call jarsUploadPostAsync(Object body, final ApiCallback<JarUploadResponseBody> callback)
             throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
@@ -2053,7 +2051,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jarsUploadPostValidateBeforeCall(body, progressListener, progressRequestListener);
+        okhttp3.Call call = jarsUploadPostValidateBeforeCall(body, progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<JarUploadResponseBody>() {
         }.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
@@ -2062,7 +2060,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobmanagerConfigGet
-     * 
+     *
      * @param progressListener
      *            Progress listener
      * @param progressRequestListener
@@ -2071,7 +2069,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobmanagerConfigGetCall(
+    public okhttp3.Call jobmanagerConfigGetCall(
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         Object localVarPostBody = null;
@@ -2098,10 +2096,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -2114,19 +2112,19 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobmanagerConfigGetValidateBeforeCall(
+    private okhttp3.Call jobmanagerConfigGetValidateBeforeCall(
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
 
-        com.squareup.okhttp.Call call = jobmanagerConfigGetCall(progressListener, progressRequestListener);
+        okhttp3.Call call = jobmanagerConfigGetCall(progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns the cluster configuration.
-     * 
+     *
      * @return List&lt;ClusterConfigurationInfoEntry&gt;
      * @throws ApiException
      *             If fail to call the API, e.g. server error or cannot
@@ -2138,16 +2136,16 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns the cluster configuration.
-     * 
+     *
      * @return ApiResponse&lt;List&lt;ClusterConfigurationInfoEntry&gt;&gt;
      * @throws ApiException
      *             If fail to call the API, e.g. server error or cannot
      *             deserialize the response body
      */
     public ApiResponse<List<ClusterConfigurationInfoEntry>> jobmanagerConfigGetWithHttpInfo() throws ApiException {
-        com.squareup.okhttp.Call call = jobmanagerConfigGetValidateBeforeCall(null, null);
+        okhttp3.Call call = jobmanagerConfigGetValidateBeforeCall(null, null);
         Type localVarReturnType = new TypeToken<List<ClusterConfigurationInfoEntry>>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -2155,7 +2153,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Returns the cluster configuration.
-     * 
+     *
      * @param callback
      *            The callback to be executed when the API call finishes
      * @return The request call
@@ -2163,7 +2161,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobmanagerConfigGetAsync(final ApiCallback<List<ClusterConfigurationInfoEntry>> callback)
+    public okhttp3.Call jobmanagerConfigGetAsync(final ApiCallback<List<ClusterConfigurationInfoEntry>> callback)
             throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
@@ -2185,7 +2183,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobmanagerConfigGetValidateBeforeCall(progressListener, progressRequestListener);
+        okhttp3.Call call = jobmanagerConfigGetValidateBeforeCall(progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<List<ClusterConfigurationInfoEntry>>() {
         }.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
@@ -2194,7 +2192,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobmanagerLogsGet
-     * 
+     *
      * @param progressListener
      *            Progress listener
      * @param progressRequestListener
@@ -2203,7 +2201,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobmanagerLogsGetCall(
+    public okhttp3.Call jobmanagerLogsGetCall(
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         Object localVarPostBody = null;
@@ -2230,10 +2228,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -2246,19 +2244,19 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobmanagerLogsGetValidateBeforeCall(
+    private okhttp3.Call jobmanagerLogsGetValidateBeforeCall(
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
 
-        com.squareup.okhttp.Call call = jobmanagerLogsGetCall(progressListener, progressRequestListener);
+        okhttp3.Call call = jobmanagerLogsGetCall(progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns the list of log files on the JobManager.
-     * 
+     *
      * @return LogListInfo
      * @throws ApiException
      *             If fail to call the API, e.g. server error or cannot
@@ -2270,16 +2268,16 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns the list of log files on the JobManager.
-     * 
+     *
      * @return ApiResponse&lt;LogListInfo&gt;
      * @throws ApiException
      *             If fail to call the API, e.g. server error or cannot
      *             deserialize the response body
      */
     public ApiResponse<LogListInfo> jobmanagerLogsGetWithHttpInfo() throws ApiException {
-        com.squareup.okhttp.Call call = jobmanagerLogsGetValidateBeforeCall(null, null);
+        okhttp3.Call call = jobmanagerLogsGetValidateBeforeCall(null, null);
         Type localVarReturnType = new TypeToken<LogListInfo>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -2287,7 +2285,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Returns the list of log files on the JobManager.
-     * 
+     *
      * @param callback
      *            The callback to be executed when the API call finishes
      * @return The request call
@@ -2295,7 +2293,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobmanagerLogsGetAsync(final ApiCallback<LogListInfo> callback) throws ApiException {
+    public okhttp3.Call jobmanagerLogsGetAsync(final ApiCallback<LogListInfo> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -2316,7 +2314,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobmanagerLogsGetValidateBeforeCall(progressListener, progressRequestListener);
+        okhttp3.Call call = jobmanagerLogsGetValidateBeforeCall(progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<LogListInfo>() {
         }.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
@@ -2325,7 +2323,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobmanagerMetricsGet
-     * 
+     *
      * @param get
      *            Comma-separated list of string values to select specific
      *            metrics. (optional)
@@ -2337,7 +2335,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobmanagerMetricsGetCall(
+    public okhttp3.Call jobmanagerMetricsGetCall(
             String get,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -2367,10 +2365,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -2383,20 +2381,20 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobmanagerMetricsGetValidateBeforeCall(
+    private okhttp3.Call jobmanagerMetricsGetValidateBeforeCall(
             String get,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
 
-        com.squareup.okhttp.Call call = jobmanagerMetricsGetCall(get, progressListener, progressRequestListener);
+        okhttp3.Call call = jobmanagerMetricsGetCall(get, progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Provides access to job manager metrics.
-     * 
+     *
      * @param get
      *            Comma-separated list of string values to select specific
      *            metrics. (optional)
@@ -2411,9 +2409,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Provides access to job manager metrics.
-     * 
+     *
      * @param get
      *            Comma-separated list of string values to select specific
      *            metrics. (optional)
@@ -2423,7 +2421,7 @@ public class DefaultApi {
      *             deserialize the response body
      */
     public ApiResponse<MetricCollectionResponseBody> jobmanagerMetricsGetWithHttpInfo(String get) throws ApiException {
-        com.squareup.okhttp.Call call = jobmanagerMetricsGetValidateBeforeCall(get, null, null);
+        okhttp3.Call call = jobmanagerMetricsGetValidateBeforeCall(get, null, null);
         Type localVarReturnType = new TypeToken<MetricCollectionResponseBody>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -2431,7 +2429,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Provides access to job manager metrics.
-     * 
+     *
      * @param get
      *            Comma-separated list of string values to select specific
      *            metrics. (optional)
@@ -2442,7 +2440,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobmanagerMetricsGetAsync(
+    public okhttp3.Call jobmanagerMetricsGetAsync(
             String get,
             final ApiCallback<MetricCollectionResponseBody> callback) throws ApiException {
 
@@ -2465,7 +2463,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobmanagerMetricsGetValidateBeforeCall(get, progressListener, progressRequestListener);
+        okhttp3.Call call = jobmanagerMetricsGetValidateBeforeCall(get, progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<MetricCollectionResponseBody>() {
         }.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
@@ -2474,7 +2472,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobmanagerThreadDumpGet
-     * 
+     *
      * @param progressListener
      *            Progress listener
      * @param progressRequestListener
@@ -2483,7 +2481,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobmanagerThreadDumpGetCall(
+    public okhttp3.Call jobmanagerThreadDumpGetCall(
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         Object localVarPostBody = null;
@@ -2510,10 +2508,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -2526,19 +2524,19 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobmanagerThreadDumpGetValidateBeforeCall(
+    private okhttp3.Call jobmanagerThreadDumpGetValidateBeforeCall(
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
 
-        com.squareup.okhttp.Call call = jobmanagerThreadDumpGetCall(progressListener, progressRequestListener);
+        okhttp3.Call call = jobmanagerThreadDumpGetCall(progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns the thread dump of the JobManager.
-     * 
+     *
      * @return ThreadDumpInfo
      * @throws ApiException
      *             If fail to call the API, e.g. server error or cannot
@@ -2550,16 +2548,16 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns the thread dump of the JobManager.
-     * 
+     *
      * @return ApiResponse&lt;ThreadDumpInfo&gt;
      * @throws ApiException
      *             If fail to call the API, e.g. server error or cannot
      *             deserialize the response body
      */
     public ApiResponse<ThreadDumpInfo> jobmanagerThreadDumpGetWithHttpInfo() throws ApiException {
-        com.squareup.okhttp.Call call = jobmanagerThreadDumpGetValidateBeforeCall(null, null);
+        okhttp3.Call call = jobmanagerThreadDumpGetValidateBeforeCall(null, null);
         Type localVarReturnType = new TypeToken<ThreadDumpInfo>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -2567,7 +2565,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Returns the thread dump of the JobManager.
-     * 
+     *
      * @param callback
      *            The callback to be executed when the API call finishes
      * @return The request call
@@ -2575,7 +2573,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobmanagerThreadDumpGetAsync(final ApiCallback<ThreadDumpInfo> callback) throws ApiException {
+    public okhttp3.Call jobmanagerThreadDumpGetAsync(final ApiCallback<ThreadDumpInfo> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -2596,7 +2594,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobmanagerThreadDumpGetValidateBeforeCall(progressListener, progressRequestListener);
+        okhttp3.Call call = jobmanagerThreadDumpGetValidateBeforeCall(progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<ThreadDumpInfo>() {
         }.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
@@ -2605,7 +2603,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsGet
-     * 
+     *
      * @param progressListener
      *            Progress listener
      * @param progressRequestListener
@@ -2614,7 +2612,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsGetCall(
+    public okhttp3.Call jobsGetCall(
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         Object localVarPostBody = null;
@@ -2641,10 +2639,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -2657,19 +2655,19 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsGetValidateBeforeCall(
+    private okhttp3.Call jobsGetValidateBeforeCall(
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
 
-        com.squareup.okhttp.Call call = jobsGetCall(progressListener, progressRequestListener);
+        okhttp3.Call call = jobsGetCall(progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns an overview over all jobs and their current state.
-     * 
+     *
      * @return JobIdsWithStatusOverview
      * @throws ApiException
      *             If fail to call the API, e.g. server error or cannot
@@ -2681,16 +2679,16 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns an overview over all jobs and their current state.
-     * 
+     *
      * @return ApiResponse&lt;JobIdsWithStatusOverview&gt;
      * @throws ApiException
      *             If fail to call the API, e.g. server error or cannot
      *             deserialize the response body
      */
     public ApiResponse<JobIdsWithStatusOverview> jobsGetWithHttpInfo() throws ApiException {
-        com.squareup.okhttp.Call call = jobsGetValidateBeforeCall(null, null);
+        okhttp3.Call call = jobsGetValidateBeforeCall(null, null);
         Type localVarReturnType = new TypeToken<JobIdsWithStatusOverview>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -2699,7 +2697,7 @@ public class DefaultApi {
     /**
      * (asynchronously) Returns an overview over all jobs and their current
      * state.
-     * 
+     *
      * @param callback
      *            The callback to be executed when the API call finishes
      * @return The request call
@@ -2707,7 +2705,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsGetAsync(final ApiCallback<JobIdsWithStatusOverview> callback) throws ApiException {
+    public okhttp3.Call jobsGetAsync(final ApiCallback<JobIdsWithStatusOverview> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -2728,7 +2726,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsGetValidateBeforeCall(progressListener, progressRequestListener);
+        okhttp3.Call call = jobsGetValidateBeforeCall(progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<JobIdsWithStatusOverview>() {
         }.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
@@ -2737,7 +2735,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsJobidAccumulatorsGet
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -2752,7 +2750,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidAccumulatorsGetCall(
+    public okhttp3.Call jobsJobidAccumulatorsGetCall(
             String jobid,
             Boolean includeSerializedValue,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -2784,10 +2782,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -2800,7 +2798,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidAccumulatorsGetValidateBeforeCall(
+    private okhttp3.Call jobsJobidAccumulatorsGetValidateBeforeCall(
             String jobid,
             Boolean includeSerializedValue,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -2810,17 +2808,17 @@ public class DefaultApi {
             throw new ApiException("Missing the required parameter 'jobid' when calling jobsJobidAccumulatorsGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidAccumulatorsGetCall(jobid, includeSerializedValue, progressListener,
+        okhttp3.Call call = jobsJobidAccumulatorsGetCall(jobid, includeSerializedValue, progressListener,
                 progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns the accumulators for all tasks of a job, aggregated across the
      * respective subtasks.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -2838,10 +2836,10 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns the accumulators for all tasks of a job, aggregated across the
      * respective subtasks.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -2855,7 +2853,7 @@ public class DefaultApi {
      */
     public ApiResponse<JobAccumulatorsInfo> jobsJobidAccumulatorsGetWithHttpInfo(String jobid, Boolean includeSerializedValue)
             throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidAccumulatorsGetValidateBeforeCall(jobid, includeSerializedValue, null, null);
+        okhttp3.Call call = jobsJobidAccumulatorsGetValidateBeforeCall(jobid, includeSerializedValue, null, null);
         Type localVarReturnType = new TypeToken<JobAccumulatorsInfo>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -2864,7 +2862,7 @@ public class DefaultApi {
     /**
      * (asynchronously) Returns the accumulators for all tasks of a job,
      * aggregated across the respective subtasks.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -2878,7 +2876,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidAccumulatorsGetAsync(
+    public okhttp3.Call jobsJobidAccumulatorsGetAsync(
             String jobid,
             Boolean includeSerializedValue,
             final ApiCallback<JobAccumulatorsInfo> callback) throws ApiException {
@@ -2902,7 +2900,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidAccumulatorsGetValidateBeforeCall(jobid, includeSerializedValue,
+        okhttp3.Call call = jobsJobidAccumulatorsGetValidateBeforeCall(jobid, includeSerializedValue,
                 progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<JobAccumulatorsInfo>() {
         }.getType();
@@ -2912,7 +2910,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsJobidCheckpointsConfigGet
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -2924,7 +2922,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidCheckpointsConfigGetCall(
+    public okhttp3.Call jobsJobidCheckpointsConfigGetCall(
             String jobid,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -2953,10 +2951,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -2969,7 +2967,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidCheckpointsConfigGetValidateBeforeCall(
+    private okhttp3.Call jobsJobidCheckpointsConfigGetValidateBeforeCall(
             String jobid,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -2978,15 +2976,15 @@ public class DefaultApi {
             throw new ApiException("Missing the required parameter 'jobid' when calling jobsJobidCheckpointsConfigGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidCheckpointsConfigGetCall(jobid, progressListener, progressRequestListener);
+        okhttp3.Call call = jobsJobidCheckpointsConfigGetCall(jobid, progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns the checkpointing configuration.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -3001,9 +2999,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns the checkpointing configuration.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -3013,7 +3011,7 @@ public class DefaultApi {
      *             deserialize the response body
      */
     public ApiResponse<CheckpointConfigInfo> jobsJobidCheckpointsConfigGetWithHttpInfo(String jobid) throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidCheckpointsConfigGetValidateBeforeCall(jobid, null, null);
+        okhttp3.Call call = jobsJobidCheckpointsConfigGetValidateBeforeCall(jobid, null, null);
         Type localVarReturnType = new TypeToken<CheckpointConfigInfo>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -3021,7 +3019,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Returns the checkpointing configuration.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -3032,7 +3030,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidCheckpointsConfigGetAsync(
+    public okhttp3.Call jobsJobidCheckpointsConfigGetAsync(
             String jobid,
             final ApiCallback<CheckpointConfigInfo> callback) throws ApiException {
 
@@ -3055,7 +3053,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidCheckpointsConfigGetValidateBeforeCall(jobid, progressListener,
+        okhttp3.Call call = jobsJobidCheckpointsConfigGetValidateBeforeCall(jobid, progressListener,
                 progressRequestListener);
         Type localVarReturnType = new TypeToken<CheckpointConfigInfo>() {
         }.getType();
@@ -3065,7 +3063,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsJobidCheckpointsDetailsCheckpointidGet
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -3079,7 +3077,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidCheckpointsDetailsCheckpointidGetCall(
+    public okhttp3.Call jobsJobidCheckpointsDetailsCheckpointidGetCall(
             String jobid,
             Long checkpointid,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -3110,10 +3108,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -3126,7 +3124,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidCheckpointsDetailsCheckpointidGetValidateBeforeCall(
+    private okhttp3.Call jobsJobidCheckpointsDetailsCheckpointidGetValidateBeforeCall(
             String jobid,
             Long checkpointid,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -3142,16 +3140,16 @@ public class DefaultApi {
                     "Missing the required parameter 'checkpointid' when calling jobsJobidCheckpointsDetailsCheckpointidGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidCheckpointsDetailsCheckpointidGetCall(jobid, checkpointid, progressListener,
+        okhttp3.Call call = jobsJobidCheckpointsDetailsCheckpointidGetCall(jobid, checkpointid, progressListener,
                 progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns details for a checkpoint.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -3168,9 +3166,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns details for a checkpoint.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -3184,7 +3182,7 @@ public class DefaultApi {
     public ApiResponse<CheckpointStatistics> jobsJobidCheckpointsDetailsCheckpointidGetWithHttpInfo(
             String jobid,
             Long checkpointid) throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidCheckpointsDetailsCheckpointidGetValidateBeforeCall(jobid, checkpointid, null,
+        okhttp3.Call call = jobsJobidCheckpointsDetailsCheckpointidGetValidateBeforeCall(jobid, checkpointid, null,
                 null);
         Type localVarReturnType = new TypeToken<CheckpointStatistics>() {
         }.getType();
@@ -3193,7 +3191,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Returns details for a checkpoint.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -3206,7 +3204,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidCheckpointsDetailsCheckpointidGetAsync(
+    public okhttp3.Call jobsJobidCheckpointsDetailsCheckpointidGetAsync(
             String jobid,
             Long checkpointid,
             final ApiCallback<CheckpointStatistics> callback) throws ApiException {
@@ -3230,7 +3228,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidCheckpointsDetailsCheckpointidGetValidateBeforeCall(jobid, checkpointid,
+        okhttp3.Call call = jobsJobidCheckpointsDetailsCheckpointidGetValidateBeforeCall(jobid, checkpointid,
                 progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<CheckpointStatistics>() {
         }.getType();
@@ -3240,7 +3238,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsJobidCheckpointsDetailsCheckpointidSubtasksVertexidGet
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -3257,7 +3255,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidCheckpointsDetailsCheckpointidSubtasksVertexidGetCall(
+    public okhttp3.Call jobsJobidCheckpointsDetailsCheckpointidSubtasksVertexidGetCall(
             String jobid,
             Long checkpointid,
             String vertexid,
@@ -3290,10 +3288,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -3306,7 +3304,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidCheckpointsDetailsCheckpointidSubtasksVertexidGetValidateBeforeCall(
+    private okhttp3.Call jobsJobidCheckpointsDetailsCheckpointidSubtasksVertexidGetValidateBeforeCall(
             String jobid,
             Long checkpointid,
             String vertexid,
@@ -3328,16 +3326,16 @@ public class DefaultApi {
                     "Missing the required parameter 'vertexid' when calling jobsJobidCheckpointsDetailsCheckpointidSubtasksVertexidGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidCheckpointsDetailsCheckpointidSubtasksVertexidGetCall(jobid, checkpointid,
+        okhttp3.Call call = jobsJobidCheckpointsDetailsCheckpointidSubtasksVertexidGetCall(jobid, checkpointid,
                 vertexid, progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns checkpoint statistics for a task and its subtasks.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -3361,9 +3359,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns checkpoint statistics for a task and its subtasks.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -3381,7 +3379,7 @@ public class DefaultApi {
             String jobid,
             Long checkpointid,
             String vertexid) throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidCheckpointsDetailsCheckpointidSubtasksVertexidGetValidateBeforeCall(jobid,
+        okhttp3.Call call = jobsJobidCheckpointsDetailsCheckpointidSubtasksVertexidGetValidateBeforeCall(jobid,
                 checkpointid, vertexid, null, null);
         Type localVarReturnType = new TypeToken<TaskCheckpointStatisticsWithSubtaskDetails>() {
         }.getType();
@@ -3391,7 +3389,7 @@ public class DefaultApi {
     /**
      * (asynchronously) Returns checkpoint statistics for a task and its
      * subtasks.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -3407,7 +3405,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidCheckpointsDetailsCheckpointidSubtasksVertexidGetAsync(
+    public okhttp3.Call jobsJobidCheckpointsDetailsCheckpointidSubtasksVertexidGetAsync(
             String jobid,
             Long checkpointid,
             String vertexid,
@@ -3432,7 +3430,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidCheckpointsDetailsCheckpointidSubtasksVertexidGetValidateBeforeCall(jobid,
+        okhttp3.Call call = jobsJobidCheckpointsDetailsCheckpointidSubtasksVertexidGetValidateBeforeCall(jobid,
                 checkpointid, vertexid, progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<TaskCheckpointStatisticsWithSubtaskDetails>() {
         }.getType();
@@ -3442,7 +3440,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsJobidCheckpointsGet
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -3454,7 +3452,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidCheckpointsGetCall(
+    public okhttp3.Call jobsJobidCheckpointsGetCall(
             String jobid,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -3483,10 +3481,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -3499,7 +3497,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidCheckpointsGetValidateBeforeCall(
+    private okhttp3.Call jobsJobidCheckpointsGetValidateBeforeCall(
             String jobid,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -3508,15 +3506,15 @@ public class DefaultApi {
             throw new ApiException("Missing the required parameter 'jobid' when calling jobsJobidCheckpointsGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidCheckpointsGetCall(jobid, progressListener, progressRequestListener);
+        okhttp3.Call call = jobsJobidCheckpointsGetCall(jobid, progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns checkpointing statistics for a job.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -3531,9 +3529,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns checkpointing statistics for a job.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -3543,7 +3541,7 @@ public class DefaultApi {
      *             deserialize the response body
      */
     public ApiResponse<CheckpointingStatistics> jobsJobidCheckpointsGetWithHttpInfo(String jobid) throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidCheckpointsGetValidateBeforeCall(jobid, null, null);
+        okhttp3.Call call = jobsJobidCheckpointsGetValidateBeforeCall(jobid, null, null);
         Type localVarReturnType = new TypeToken<CheckpointingStatistics>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -3551,7 +3549,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Returns checkpointing statistics for a job.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -3562,7 +3560,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidCheckpointsGetAsync(
+    public okhttp3.Call jobsJobidCheckpointsGetAsync(
             String jobid,
             final ApiCallback<CheckpointingStatistics> callback) throws ApiException {
 
@@ -3585,7 +3583,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidCheckpointsGetValidateBeforeCall(jobid, progressListener,
+        okhttp3.Call call = jobsJobidCheckpointsGetValidateBeforeCall(jobid, progressListener,
                 progressRequestListener);
         Type localVarReturnType = new TypeToken<CheckpointingStatistics>() {
         }.getType();
@@ -3595,7 +3593,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsJobidConfigGet
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -3607,7 +3605,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidConfigGetCall(
+    public okhttp3.Call jobsJobidConfigGetCall(
             String jobid,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -3636,10 +3634,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -3652,7 +3650,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidConfigGetValidateBeforeCall(
+    private okhttp3.Call jobsJobidConfigGetValidateBeforeCall(
             String jobid,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -3661,15 +3659,15 @@ public class DefaultApi {
             throw new ApiException("Missing the required parameter 'jobid' when calling jobsJobidConfigGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidConfigGetCall(jobid, progressListener, progressRequestListener);
+        okhttp3.Call call = jobsJobidConfigGetCall(jobid, progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns the configuration of a job.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -3684,9 +3682,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns the configuration of a job.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -3696,7 +3694,7 @@ public class DefaultApi {
      *             deserialize the response body
      */
     public ApiResponse<JobConfigInfo> jobsJobidConfigGetWithHttpInfo(String jobid) throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidConfigGetValidateBeforeCall(jobid, null, null);
+        okhttp3.Call call = jobsJobidConfigGetValidateBeforeCall(jobid, null, null);
         Type localVarReturnType = new TypeToken<JobConfigInfo>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -3704,7 +3702,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Returns the configuration of a job.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -3715,7 +3713,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidConfigGetAsync(String jobid, final ApiCallback<JobConfigInfo> callback)
+    public okhttp3.Call jobsJobidConfigGetAsync(String jobid, final ApiCallback<JobConfigInfo> callback)
             throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
@@ -3737,7 +3735,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidConfigGetValidateBeforeCall(jobid, progressListener, progressRequestListener);
+        okhttp3.Call call = jobsJobidConfigGetValidateBeforeCall(jobid, progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<JobConfigInfo>() {
         }.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
@@ -3746,7 +3744,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsJobidExceptionsGet
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -3761,7 +3759,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidExceptionsGetCall(
+    public okhttp3.Call jobsJobidExceptionsGetCall(
             String jobid,
             Integer maxExceptions,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -3793,10 +3791,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -3809,7 +3807,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidExceptionsGetValidateBeforeCall(
+    private okhttp3.Call jobsJobidExceptionsGetValidateBeforeCall(
             String jobid,
             Integer maxExceptions,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -3819,14 +3817,14 @@ public class DefaultApi {
             throw new ApiException("Missing the required parameter 'jobid' when calling jobsJobidExceptionsGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidExceptionsGetCall(jobid, maxExceptions, progressListener,
+        okhttp3.Call call = jobsJobidExceptionsGetCall(jobid, maxExceptions, progressListener,
                 progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns the most recent exceptions that have been handled by Flink for
      * this job. The &#x27;exceptionHistory.truncated&#x27; flag defines whether
      * exceptions were filtered out through the GET parameter. The backend
@@ -3836,7 +3834,7 @@ public class DefaultApi {
      * &#x27;root-exception&#x27;, &#x27;timestamp&#x27;,
      * &#x27;all-exceptions&#x27;, and &#x27;truncated&#x27;. Use the data
      * provided through &#x27;exceptionHistory&#x27;, instead.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -3854,7 +3852,7 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns the most recent exceptions that have been handled by Flink for
      * this job. The &#x27;exceptionHistory.truncated&#x27; flag defines whether
      * exceptions were filtered out through the GET parameter. The backend
@@ -3864,7 +3862,7 @@ public class DefaultApi {
      * &#x27;root-exception&#x27;, &#x27;timestamp&#x27;,
      * &#x27;all-exceptions&#x27;, and &#x27;truncated&#x27;. Use the data
      * provided through &#x27;exceptionHistory&#x27;, instead.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -3878,7 +3876,7 @@ public class DefaultApi {
      */
     public ApiResponse<JobExceptionsInfoWithHistory> jobsJobidExceptionsGetWithHttpInfo(String jobid, Integer maxExceptions)
             throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidExceptionsGetValidateBeforeCall(jobid, maxExceptions, null, null);
+        okhttp3.Call call = jobsJobidExceptionsGetValidateBeforeCall(jobid, maxExceptions, null, null);
         Type localVarReturnType = new TypeToken<JobExceptionsInfoWithHistory>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -3895,7 +3893,7 @@ public class DefaultApi {
      * &#x27;timestamp&#x27;, &#x27;all-exceptions&#x27;, and
      * &#x27;truncated&#x27;. Use the data provided through
      * &#x27;exceptionHistory&#x27;, instead.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -3909,7 +3907,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidExceptionsGetAsync(
+    public okhttp3.Call jobsJobidExceptionsGetAsync(
             String jobid,
             Integer maxExceptions,
             final ApiCallback<JobExceptionsInfoWithHistory> callback) throws ApiException {
@@ -3933,7 +3931,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidExceptionsGetValidateBeforeCall(jobid, maxExceptions, progressListener,
+        okhttp3.Call call = jobsJobidExceptionsGetValidateBeforeCall(jobid, maxExceptions, progressListener,
                 progressRequestListener);
         Type localVarReturnType = new TypeToken<JobExceptionsInfoWithHistory>() {
         }.getType();
@@ -3943,7 +3941,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsJobidExecutionResultGet
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -3955,7 +3953,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidExecutionResultGetCall(
+    public okhttp3.Call jobsJobidExecutionResultGetCall(
             String jobid,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -3984,10 +3982,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -4000,7 +3998,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidExecutionResultGetValidateBeforeCall(
+    private okhttp3.Call jobsJobidExecutionResultGetValidateBeforeCall(
             String jobid,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -4009,16 +4007,16 @@ public class DefaultApi {
             throw new ApiException("Missing the required parameter 'jobid' when calling jobsJobidExecutionResultGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidExecutionResultGetCall(jobid, progressListener, progressRequestListener);
+        okhttp3.Call call = jobsJobidExecutionResultGetCall(jobid, progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns the result of a job execution. Gives access to the execution time
      * of the job and to all accumulators created by this job.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -4033,10 +4031,10 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns the result of a job execution. Gives access to the execution time
      * of the job and to all accumulators created by this job.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -4046,7 +4044,7 @@ public class DefaultApi {
      *             deserialize the response body
      */
     public ApiResponse<JobExecutionResultResponseBody> jobsJobidExecutionResultGetWithHttpInfo(String jobid) throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidExecutionResultGetValidateBeforeCall(jobid, null, null);
+        okhttp3.Call call = jobsJobidExecutionResultGetValidateBeforeCall(jobid, null, null);
         Type localVarReturnType = new TypeToken<JobExecutionResultResponseBody>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -4056,7 +4054,7 @@ public class DefaultApi {
      * (asynchronously) Returns the result of a job execution. Gives access to
      * the execution time of the job and to all accumulators created by this
      * job.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -4067,7 +4065,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidExecutionResultGetAsync(
+    public okhttp3.Call jobsJobidExecutionResultGetAsync(
             String jobid,
             final ApiCallback<JobExecutionResultResponseBody> callback) throws ApiException {
 
@@ -4090,7 +4088,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidExecutionResultGetValidateBeforeCall(jobid, progressListener,
+        okhttp3.Call call = jobsJobidExecutionResultGetValidateBeforeCall(jobid, progressListener,
                 progressRequestListener);
         Type localVarReturnType = new TypeToken<JobExecutionResultResponseBody>() {
         }.getType();
@@ -4100,7 +4098,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsJobidGet
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -4112,7 +4110,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidGetCall(
+    public okhttp3.Call jobsJobidGetCall(
             String jobid,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -4140,10 +4138,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -4156,7 +4154,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidGetValidateBeforeCall(
+    private okhttp3.Call jobsJobidGetValidateBeforeCall(
             String jobid,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -4165,15 +4163,15 @@ public class DefaultApi {
             throw new ApiException("Missing the required parameter 'jobid' when calling jobsJobidGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidGetCall(jobid, progressListener, progressRequestListener);
+        okhttp3.Call call = jobsJobidGetCall(jobid, progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns details of a job.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -4188,9 +4186,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns details of a job.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -4200,7 +4198,7 @@ public class DefaultApi {
      *             deserialize the response body
      */
     public ApiResponse<JobDetailsInfo> jobsJobidGetWithHttpInfo(String jobid) throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidGetValidateBeforeCall(jobid, null, null);
+        okhttp3.Call call = jobsJobidGetValidateBeforeCall(jobid, null, null);
         Type localVarReturnType = new TypeToken<JobDetailsInfo>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -4208,7 +4206,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Returns details of a job.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -4219,7 +4217,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidGetAsync(String jobid, final ApiCallback<JobDetailsInfo> callback)
+    public okhttp3.Call jobsJobidGetAsync(String jobid, final ApiCallback<JobDetailsInfo> callback)
             throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
@@ -4241,7 +4239,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidGetValidateBeforeCall(jobid, progressListener, progressRequestListener);
+        okhttp3.Call call = jobsJobidGetValidateBeforeCall(jobid, progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<JobDetailsInfo>() {
         }.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
@@ -4250,7 +4248,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsJobidMetricsGet
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -4265,7 +4263,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidMetricsGetCall(
+    public okhttp3.Call jobsJobidMetricsGetCall(
             String jobid,
             String get,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -4297,10 +4295,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -4313,7 +4311,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidMetricsGetValidateBeforeCall(
+    private okhttp3.Call jobsJobidMetricsGetValidateBeforeCall(
             String jobid,
             String get,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -4323,15 +4321,15 @@ public class DefaultApi {
             throw new ApiException("Missing the required parameter 'jobid' when calling jobsJobidMetricsGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidMetricsGetCall(jobid, get, progressListener, progressRequestListener);
+        okhttp3.Call call = jobsJobidMetricsGetCall(jobid, get, progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Provides access to job metrics.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -4349,9 +4347,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Provides access to job metrics.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -4365,7 +4363,7 @@ public class DefaultApi {
      */
     public ApiResponse<MetricCollectionResponseBody> jobsJobidMetricsGetWithHttpInfo(String jobid, String get)
             throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidMetricsGetValidateBeforeCall(jobid, get, null, null);
+        okhttp3.Call call = jobsJobidMetricsGetValidateBeforeCall(jobid, get, null, null);
         Type localVarReturnType = new TypeToken<MetricCollectionResponseBody>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -4373,7 +4371,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Provides access to job metrics.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -4387,7 +4385,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidMetricsGetAsync(
+    public okhttp3.Call jobsJobidMetricsGetAsync(
             String jobid,
             String get,
             final ApiCallback<MetricCollectionResponseBody> callback) throws ApiException {
@@ -4411,7 +4409,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidMetricsGetValidateBeforeCall(jobid, get, progressListener,
+        okhttp3.Call call = jobsJobidMetricsGetValidateBeforeCall(jobid, get, progressListener,
                 progressRequestListener);
         Type localVarReturnType = new TypeToken<MetricCollectionResponseBody>() {
         }.getType();
@@ -4421,7 +4419,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsJobidPatch
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -4436,7 +4434,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidPatchCall(
+    public okhttp3.Call jobsJobidPatchCall(
             String jobid,
             String mode,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -4469,10 +4467,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -4485,7 +4483,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidPatchValidateBeforeCall(
+    private okhttp3.Call jobsJobidPatchValidateBeforeCall(
             String jobid,
             String mode,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -4495,15 +4493,15 @@ public class DefaultApi {
             throw new ApiException("Missing the required parameter 'jobid' when calling jobsJobidPatch(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidPatchCall(jobid, mode, progressListener, progressRequestListener);
+        okhttp3.Call call = jobsJobidPatchCall(jobid, mode, progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Terminates a job.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -4519,9 +4517,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Terminates a job.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -4534,13 +4532,13 @@ public class DefaultApi {
      *             deserialize the response body
      */
     public ApiResponse<Void> jobsJobidPatchWithHttpInfo(String jobid, String mode) throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidPatchValidateBeforeCall(jobid, mode, null, null);
+        okhttp3.Call call = jobsJobidPatchValidateBeforeCall(jobid, mode, null, null);
         return apiClient.execute(call);
     }
 
     /**
      * (asynchronously) Terminates a job.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -4554,7 +4552,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidPatchAsync(String jobid, String mode, final ApiCallback<Void> callback)
+    public okhttp3.Call jobsJobidPatchAsync(String jobid, String mode, final ApiCallback<Void> callback)
             throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
@@ -4576,14 +4574,14 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidPatchValidateBeforeCall(jobid, mode, progressListener, progressRequestListener);
+        okhttp3.Call call = jobsJobidPatchValidateBeforeCall(jobid, mode, progressListener, progressRequestListener);
         apiClient.executeAsync(call, callback);
         return call;
     }
 
     /**
      * Build call for jobsJobidPlanGet
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -4595,7 +4593,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidPlanGetCall(
+    public okhttp3.Call jobsJobidPlanGetCall(
             String jobid,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -4623,10 +4621,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -4639,7 +4637,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidPlanGetValidateBeforeCall(
+    private okhttp3.Call jobsJobidPlanGetValidateBeforeCall(
             String jobid,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -4648,15 +4646,15 @@ public class DefaultApi {
             throw new ApiException("Missing the required parameter 'jobid' when calling jobsJobidPlanGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidPlanGetCall(jobid, progressListener, progressRequestListener);
+        okhttp3.Call call = jobsJobidPlanGetCall(jobid, progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns the dataflow plan of a job.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -4671,9 +4669,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns the dataflow plan of a job.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -4683,7 +4681,7 @@ public class DefaultApi {
      *             deserialize the response body
      */
     public ApiResponse<JobPlanInfo> jobsJobidPlanGetWithHttpInfo(String jobid) throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidPlanGetValidateBeforeCall(jobid, null, null);
+        okhttp3.Call call = jobsJobidPlanGetValidateBeforeCall(jobid, null, null);
         Type localVarReturnType = new TypeToken<JobPlanInfo>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -4691,7 +4689,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Returns the dataflow plan of a job.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -4702,7 +4700,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidPlanGetAsync(String jobid, final ApiCallback<JobPlanInfo> callback)
+    public okhttp3.Call jobsJobidPlanGetAsync(String jobid, final ApiCallback<JobPlanInfo> callback)
             throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
@@ -4724,7 +4722,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidPlanGetValidateBeforeCall(jobid, progressListener, progressRequestListener);
+        okhttp3.Call call = jobsJobidPlanGetValidateBeforeCall(jobid, progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<JobPlanInfo>() {
         }.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
@@ -4733,7 +4731,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsJobidRescalingPatch
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -4748,7 +4746,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidRescalingPatchCall(
+    public okhttp3.Call jobsJobidRescalingPatchCall(
             String jobid,
             Integer parallelism,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -4780,10 +4778,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -4796,7 +4794,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidRescalingPatchValidateBeforeCall(
+    private okhttp3.Call jobsJobidRescalingPatchValidateBeforeCall(
             String jobid,
             Integer parallelism,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -4810,17 +4808,17 @@ public class DefaultApi {
             throw new ApiException("Missing the required parameter 'parallelism' when calling jobsJobidRescalingPatch(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidRescalingPatchCall(jobid, parallelism, progressListener,
+        okhttp3.Call call = jobsJobidRescalingPatchCall(jobid, parallelism, progressListener,
                 progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Triggers the rescaling of a job. This async operation would return a
      * &#x27;triggerid&#x27; for further query identifier.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -4838,10 +4836,10 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Triggers the rescaling of a job. This async operation would return a
      * &#x27;triggerid&#x27; for further query identifier.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -4855,7 +4853,7 @@ public class DefaultApi {
      */
     public ApiResponse<TriggerResponse> jobsJobidRescalingPatchWithHttpInfo(String jobid, Integer parallelism)
             throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidRescalingPatchValidateBeforeCall(jobid, parallelism, null, null);
+        okhttp3.Call call = jobsJobidRescalingPatchValidateBeforeCall(jobid, parallelism, null, null);
         Type localVarReturnType = new TypeToken<TriggerResponse>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -4864,7 +4862,7 @@ public class DefaultApi {
     /**
      * (asynchronously) Triggers the rescaling of a job. This async operation
      * would return a &#x27;triggerid&#x27; for further query identifier.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -4878,7 +4876,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidRescalingPatchAsync(
+    public okhttp3.Call jobsJobidRescalingPatchAsync(
             String jobid,
             Integer parallelism,
             final ApiCallback<TriggerResponse> callback) throws ApiException {
@@ -4902,7 +4900,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidRescalingPatchValidateBeforeCall(jobid, parallelism, progressListener,
+        okhttp3.Call call = jobsJobidRescalingPatchValidateBeforeCall(jobid, parallelism, progressListener,
                 progressRequestListener);
         Type localVarReturnType = new TypeToken<TriggerResponse>() {
         }.getType();
@@ -4912,7 +4910,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsJobidRescalingTriggeridGet
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -4928,7 +4926,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidRescalingTriggeridGetCall(
+    public okhttp3.Call jobsJobidRescalingTriggeridGetCall(
             String jobid,
             String triggerid,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -4959,10 +4957,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -4975,7 +4973,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidRescalingTriggeridGetValidateBeforeCall(
+    private okhttp3.Call jobsJobidRescalingTriggeridGetValidateBeforeCall(
             String jobid,
             String triggerid,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -4990,16 +4988,16 @@ public class DefaultApi {
                     "Missing the required parameter 'triggerid' when calling jobsJobidRescalingTriggeridGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidRescalingTriggeridGetCall(jobid, triggerid, progressListener,
+        okhttp3.Call call = jobsJobidRescalingTriggeridGetCall(jobid, triggerid, progressListener,
                 progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns the status of a rescaling operation.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -5018,9 +5016,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns the status of a rescaling operation.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -5035,7 +5033,7 @@ public class DefaultApi {
      */
     public ApiResponse<AsynchronousOperationResult> jobsJobidRescalingTriggeridGetWithHttpInfo(String jobid, String triggerid)
             throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidRescalingTriggeridGetValidateBeforeCall(jobid, triggerid, null, null);
+        okhttp3.Call call = jobsJobidRescalingTriggeridGetValidateBeforeCall(jobid, triggerid, null, null);
         Type localVarReturnType = new TypeToken<AsynchronousOperationResult>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -5043,7 +5041,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Returns the status of a rescaling operation.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -5058,7 +5056,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidRescalingTriggeridGetAsync(
+    public okhttp3.Call jobsJobidRescalingTriggeridGetAsync(
             String jobid,
             String triggerid,
             final ApiCallback<AsynchronousOperationResult> callback) throws ApiException {
@@ -5082,7 +5080,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidRescalingTriggeridGetValidateBeforeCall(jobid, triggerid, progressListener,
+        okhttp3.Call call = jobsJobidRescalingTriggeridGetValidateBeforeCall(jobid, triggerid, progressListener,
                 progressRequestListener);
         Type localVarReturnType = new TypeToken<AsynchronousOperationResult>() {
         }.getType();
@@ -5092,7 +5090,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsJobidSavepointsPost
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -5106,7 +5104,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidSavepointsPostCall(
+    public okhttp3.Call jobsJobidSavepointsPostCall(
             String jobid,
             SavepointTriggerRequestBody body,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -5134,10 +5132,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -5150,7 +5148,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidSavepointsPostValidateBeforeCall(
+    private okhttp3.Call jobsJobidSavepointsPostValidateBeforeCall(
             String jobid,
             SavepointTriggerRequestBody body,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -5160,17 +5158,17 @@ public class DefaultApi {
             throw new ApiException("Missing the required parameter 'jobid' when calling jobsJobidSavepointsPost(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidSavepointsPostCall(jobid, body, progressListener, progressRequestListener);
+        okhttp3.Call call = jobsJobidSavepointsPostCall(jobid, body, progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Triggers a savepoint, and optionally cancels the job afterwards. This
      * async operation would return a &#x27;triggerid&#x27; for further query
      * identifier.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -5187,11 +5185,11 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Triggers a savepoint, and optionally cancels the job afterwards. This
      * async operation would return a &#x27;triggerid&#x27; for further query
      * identifier.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -5204,7 +5202,7 @@ public class DefaultApi {
      */
     public ApiResponse<TriggerResponse> jobsJobidSavepointsPostWithHttpInfo(String jobid, SavepointTriggerRequestBody body)
             throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidSavepointsPostValidateBeforeCall(jobid, body, null, null);
+        okhttp3.Call call = jobsJobidSavepointsPostValidateBeforeCall(jobid, body, null, null);
         Type localVarReturnType = new TypeToken<TriggerResponse>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -5214,7 +5212,7 @@ public class DefaultApi {
      * (asynchronously) Triggers a savepoint, and optionally cancels the job
      * afterwards. This async operation would return a &#x27;triggerid&#x27; for
      * further query identifier.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -5227,7 +5225,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidSavepointsPostAsync(
+    public okhttp3.Call jobsJobidSavepointsPostAsync(
             String jobid,
             SavepointTriggerRequestBody body,
             final ApiCallback<TriggerResponse> callback) throws ApiException {
@@ -5251,7 +5249,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidSavepointsPostValidateBeforeCall(jobid, body, progressListener,
+        okhttp3.Call call = jobsJobidSavepointsPostValidateBeforeCall(jobid, body, progressListener,
                 progressRequestListener);
         Type localVarReturnType = new TypeToken<TriggerResponse>() {
         }.getType();
@@ -5261,7 +5259,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsJobidSavepointsTriggeridGet
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -5277,7 +5275,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidSavepointsTriggeridGetCall(
+    public okhttp3.Call jobsJobidSavepointsTriggeridGetCall(
             String jobid,
             String triggerid,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -5308,10 +5306,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -5324,7 +5322,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidSavepointsTriggeridGetValidateBeforeCall(
+    private okhttp3.Call jobsJobidSavepointsTriggeridGetValidateBeforeCall(
             String jobid,
             String triggerid,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -5339,16 +5337,16 @@ public class DefaultApi {
                     "Missing the required parameter 'triggerid' when calling jobsJobidSavepointsTriggeridGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidSavepointsTriggeridGetCall(jobid, triggerid, progressListener,
+        okhttp3.Call call = jobsJobidSavepointsTriggeridGetCall(jobid, triggerid, progressListener,
                 progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns the status of a savepoint operation.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -5367,9 +5365,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns the status of a savepoint operation.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -5384,7 +5382,7 @@ public class DefaultApi {
      */
     public ApiResponse<AsynchronousOperationResult> jobsJobidSavepointsTriggeridGetWithHttpInfo(String jobid, String triggerid)
             throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidSavepointsTriggeridGetValidateBeforeCall(jobid, triggerid, null, null);
+        okhttp3.Call call = jobsJobidSavepointsTriggeridGetValidateBeforeCall(jobid, triggerid, null, null);
         Type localVarReturnType = new TypeToken<AsynchronousOperationResult>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -5392,7 +5390,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Returns the status of a savepoint operation.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -5407,7 +5405,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidSavepointsTriggeridGetAsync(
+    public okhttp3.Call jobsJobidSavepointsTriggeridGetAsync(
             String jobid,
             String triggerid,
             final ApiCallback<AsynchronousOperationResult> callback) throws ApiException {
@@ -5431,7 +5429,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidSavepointsTriggeridGetValidateBeforeCall(jobid, triggerid, progressListener,
+        okhttp3.Call call = jobsJobidSavepointsTriggeridGetValidateBeforeCall(jobid, triggerid, progressListener,
                 progressRequestListener);
         Type localVarReturnType = new TypeToken<AsynchronousOperationResult>() {
         }.getType();
@@ -5441,7 +5439,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsJobidStopPost
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -5455,7 +5453,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidStopPostCall(
+    public okhttp3.Call jobsJobidStopPostCall(
             String jobid,
             StopWithSavepointRequestBody body,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -5482,10 +5480,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -5498,7 +5496,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidStopPostValidateBeforeCall(
+    private okhttp3.Call jobsJobidStopPostValidateBeforeCall(
             String jobid,
             StopWithSavepointRequestBody body,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -5508,18 +5506,18 @@ public class DefaultApi {
             throw new ApiException("Missing the required parameter 'jobid' when calling jobsJobidStopPost(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidStopPostCall(jobid, body, progressListener, progressRequestListener);
+        okhttp3.Call call = jobsJobidStopPostCall(jobid, body, progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Stops a job with a savepoint. Optionally, it can also emit a
      * MAX_WATERMARK before taking the savepoint to flush out any state waiting
      * for timers to fire. This async operation would return a
      * &#x27;triggerid&#x27; for further query identifier.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -5536,12 +5534,12 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Stops a job with a savepoint. Optionally, it can also emit a
      * MAX_WATERMARK before taking the savepoint to flush out any state waiting
      * for timers to fire. This async operation would return a
      * &#x27;triggerid&#x27; for further query identifier.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -5554,7 +5552,7 @@ public class DefaultApi {
      */
     public ApiResponse<TriggerResponse> jobsJobidStopPostWithHttpInfo(String jobid, StopWithSavepointRequestBody body)
             throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidStopPostValidateBeforeCall(jobid, body, null, null);
+        okhttp3.Call call = jobsJobidStopPostValidateBeforeCall(jobid, body, null, null);
         Type localVarReturnType = new TypeToken<TriggerResponse>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -5565,7 +5563,7 @@ public class DefaultApi {
      * emit a MAX_WATERMARK before taking the savepoint to flush out any state
      * waiting for timers to fire. This async operation would return a
      * &#x27;triggerid&#x27; for further query identifier.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -5578,7 +5576,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidStopPostAsync(
+    public okhttp3.Call jobsJobidStopPostAsync(
             String jobid,
             StopWithSavepointRequestBody body,
             final ApiCallback<TriggerResponse> callback) throws ApiException {
@@ -5602,7 +5600,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidStopPostValidateBeforeCall(jobid, body, progressListener,
+        okhttp3.Call call = jobsJobidStopPostValidateBeforeCall(jobid, body, progressListener,
                 progressRequestListener);
         Type localVarReturnType = new TypeToken<TriggerResponse>() {
         }.getType();
@@ -5612,7 +5610,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsJobidVerticesVertexidAccumulatorsGet
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -5627,7 +5625,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidVerticesVertexidAccumulatorsGetCall(
+    public okhttp3.Call jobsJobidVerticesVertexidAccumulatorsGetCall(
             String jobid,
             String vertexid,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -5658,10 +5656,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -5674,7 +5672,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidVerticesVertexidAccumulatorsGetValidateBeforeCall(
+    private okhttp3.Call jobsJobidVerticesVertexidAccumulatorsGetValidateBeforeCall(
             String jobid,
             String vertexid,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -5690,17 +5688,17 @@ public class DefaultApi {
                     "Missing the required parameter 'vertexid' when calling jobsJobidVerticesVertexidAccumulatorsGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidAccumulatorsGetCall(jobid, vertexid, progressListener,
+        okhttp3.Call call = jobsJobidVerticesVertexidAccumulatorsGetCall(jobid, vertexid, progressListener,
                 progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns user-defined accumulators of a task, aggregated across all
      * subtasks.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -5718,10 +5716,10 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns user-defined accumulators of a task, aggregated across all
      * subtasks.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -5736,7 +5734,7 @@ public class DefaultApi {
     public ApiResponse<JobVertexAccumulatorsInfo> jobsJobidVerticesVertexidAccumulatorsGetWithHttpInfo(
             String jobid,
             String vertexid) throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidAccumulatorsGetValidateBeforeCall(jobid, vertexid, null, null);
+        okhttp3.Call call = jobsJobidVerticesVertexidAccumulatorsGetValidateBeforeCall(jobid, vertexid, null, null);
         Type localVarReturnType = new TypeToken<JobVertexAccumulatorsInfo>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -5745,7 +5743,7 @@ public class DefaultApi {
     /**
      * (asynchronously) Returns user-defined accumulators of a task, aggregated
      * across all subtasks.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -5759,7 +5757,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidVerticesVertexidAccumulatorsGetAsync(
+    public okhttp3.Call jobsJobidVerticesVertexidAccumulatorsGetAsync(
             String jobid,
             String vertexid,
             final ApiCallback<JobVertexAccumulatorsInfo> callback) throws ApiException {
@@ -5783,7 +5781,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidAccumulatorsGetValidateBeforeCall(jobid, vertexid,
+        okhttp3.Call call = jobsJobidVerticesVertexidAccumulatorsGetValidateBeforeCall(jobid, vertexid,
                 progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<JobVertexAccumulatorsInfo>() {
         }.getType();
@@ -5793,7 +5791,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsJobidVerticesVertexidBackpressureGet
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -5808,7 +5806,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidVerticesVertexidBackpressureGetCall(
+    public okhttp3.Call jobsJobidVerticesVertexidBackpressureGetCall(
             String jobid,
             String vertexid,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -5839,10 +5837,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -5855,7 +5853,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidVerticesVertexidBackpressureGetValidateBeforeCall(
+    private okhttp3.Call jobsJobidVerticesVertexidBackpressureGetValidateBeforeCall(
             String jobid,
             String vertexid,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -5871,17 +5869,17 @@ public class DefaultApi {
                     "Missing the required parameter 'vertexid' when calling jobsJobidVerticesVertexidBackpressureGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidBackpressureGetCall(jobid, vertexid, progressListener,
+        okhttp3.Call call = jobsJobidVerticesVertexidBackpressureGetCall(jobid, vertexid, progressListener,
                 progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns back-pressure information for a job, and may initiate
      * back-pressure sampling if necessary.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -5899,10 +5897,10 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns back-pressure information for a job, and may initiate
      * back-pressure sampling if necessary.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -5917,7 +5915,7 @@ public class DefaultApi {
     public ApiResponse<JobVertexBackPressureInfo> jobsJobidVerticesVertexidBackpressureGetWithHttpInfo(
             String jobid,
             String vertexid) throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidBackpressureGetValidateBeforeCall(jobid, vertexid, null, null);
+        okhttp3.Call call = jobsJobidVerticesVertexidBackpressureGetValidateBeforeCall(jobid, vertexid, null, null);
         Type localVarReturnType = new TypeToken<JobVertexBackPressureInfo>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -5926,7 +5924,7 @@ public class DefaultApi {
     /**
      * (asynchronously) Returns back-pressure information for a job, and may
      * initiate back-pressure sampling if necessary.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -5940,7 +5938,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidVerticesVertexidBackpressureGetAsync(
+    public okhttp3.Call jobsJobidVerticesVertexidBackpressureGetAsync(
             String jobid,
             String vertexid,
             final ApiCallback<JobVertexBackPressureInfo> callback) throws ApiException {
@@ -5964,7 +5962,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidBackpressureGetValidateBeforeCall(jobid, vertexid,
+        okhttp3.Call call = jobsJobidVerticesVertexidBackpressureGetValidateBeforeCall(jobid, vertexid,
                 progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<JobVertexBackPressureInfo>() {
         }.getType();
@@ -5974,7 +5972,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsJobidVerticesVertexidFlamegraphGet
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -5992,7 +5990,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidVerticesVertexidFlamegraphGetCall(
+    public okhttp3.Call jobsJobidVerticesVertexidFlamegraphGetCall(
             String jobid,
             String vertexid,
             String type,
@@ -6026,10 +6024,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -6042,7 +6040,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidVerticesVertexidFlamegraphGetValidateBeforeCall(
+    private okhttp3.Call jobsJobidVerticesVertexidFlamegraphGetValidateBeforeCall(
             String jobid,
             String vertexid,
             String type,
@@ -6059,17 +6057,17 @@ public class DefaultApi {
                     "Missing the required parameter 'vertexid' when calling jobsJobidVerticesVertexidFlamegraphGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidFlamegraphGetCall(jobid, vertexid, type, progressListener,
+        okhttp3.Call call = jobsJobidVerticesVertexidFlamegraphGetCall(jobid, vertexid, type, progressListener,
                 progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns flame graph information for a vertex, and may initiate flame
      * graph sampling if necessary.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -6091,10 +6089,10 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns flame graph information for a vertex, and may initiate flame
      * graph sampling if necessary.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -6113,7 +6111,7 @@ public class DefaultApi {
             String jobid,
             String vertexid,
             String type) throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidFlamegraphGetValidateBeforeCall(jobid, vertexid, type, null,
+        okhttp3.Call call = jobsJobidVerticesVertexidFlamegraphGetValidateBeforeCall(jobid, vertexid, type, null,
                 null);
         Type localVarReturnType = new TypeToken<JobVertexFlameGraph>() {
         }.getType();
@@ -6123,7 +6121,7 @@ public class DefaultApi {
     /**
      * (asynchronously) Returns flame graph information for a vertex, and may
      * initiate flame graph sampling if necessary.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -6140,7 +6138,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidVerticesVertexidFlamegraphGetAsync(
+    public okhttp3.Call jobsJobidVerticesVertexidFlamegraphGetAsync(
             String jobid,
             String vertexid,
             String type,
@@ -6165,7 +6163,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidFlamegraphGetValidateBeforeCall(jobid, vertexid, type,
+        okhttp3.Call call = jobsJobidVerticesVertexidFlamegraphGetValidateBeforeCall(jobid, vertexid, type,
                 progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<JobVertexFlameGraph>() {
         }.getType();
@@ -6175,7 +6173,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsJobidVerticesVertexidGet
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -6190,7 +6188,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidVerticesVertexidGetCall(
+    public okhttp3.Call jobsJobidVerticesVertexidGetCall(
             String jobid,
             String vertexid,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -6221,10 +6219,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -6237,7 +6235,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidVerticesVertexidGetValidateBeforeCall(
+    private okhttp3.Call jobsJobidVerticesVertexidGetValidateBeforeCall(
             String jobid,
             String vertexid,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -6251,16 +6249,16 @@ public class DefaultApi {
             throw new ApiException("Missing the required parameter 'vertexid' when calling jobsJobidVerticesVertexidGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidGetCall(jobid, vertexid, progressListener,
+        okhttp3.Call call = jobsJobidVerticesVertexidGetCall(jobid, vertexid, progressListener,
                 progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns details for a task, with a summary for each of its subtasks.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -6278,9 +6276,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns details for a task, with a summary for each of its subtasks.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -6294,7 +6292,7 @@ public class DefaultApi {
      */
     public ApiResponse<JobVertexDetailsInfo> jobsJobidVerticesVertexidGetWithHttpInfo(String jobid, String vertexid)
             throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidGetValidateBeforeCall(jobid, vertexid, null, null);
+        okhttp3.Call call = jobsJobidVerticesVertexidGetValidateBeforeCall(jobid, vertexid, null, null);
         Type localVarReturnType = new TypeToken<JobVertexDetailsInfo>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -6303,7 +6301,7 @@ public class DefaultApi {
     /**
      * (asynchronously) Returns details for a task, with a summary for each of
      * its subtasks.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -6317,7 +6315,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidVerticesVertexidGetAsync(
+    public okhttp3.Call jobsJobidVerticesVertexidGetAsync(
             String jobid,
             String vertexid,
             final ApiCallback<JobVertexDetailsInfo> callback) throws ApiException {
@@ -6341,7 +6339,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidGetValidateBeforeCall(jobid, vertexid, progressListener,
+        okhttp3.Call call = jobsJobidVerticesVertexidGetValidateBeforeCall(jobid, vertexid, progressListener,
                 progressRequestListener);
         Type localVarReturnType = new TypeToken<JobVertexDetailsInfo>() {
         }.getType();
@@ -6351,7 +6349,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsJobidVerticesVertexidMetricsGet
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -6369,7 +6367,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidVerticesVertexidMetricsGetCall(
+    public okhttp3.Call jobsJobidVerticesVertexidMetricsGetCall(
             String jobid,
             String vertexid,
             String get,
@@ -6403,10 +6401,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -6419,7 +6417,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidVerticesVertexidMetricsGetValidateBeforeCall(
+    private okhttp3.Call jobsJobidVerticesVertexidMetricsGetValidateBeforeCall(
             String jobid,
             String vertexid,
             String get,
@@ -6436,16 +6434,16 @@ public class DefaultApi {
                     "Missing the required parameter 'vertexid' when calling jobsJobidVerticesVertexidMetricsGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidMetricsGetCall(jobid, vertexid, get, progressListener,
+        okhttp3.Call call = jobsJobidVerticesVertexidMetricsGetCall(jobid, vertexid, get, progressListener,
                 progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Provides access to task metrics.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -6467,9 +6465,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Provides access to task metrics.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -6488,7 +6486,7 @@ public class DefaultApi {
             String jobid,
             String vertexid,
             String get) throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidMetricsGetValidateBeforeCall(jobid, vertexid, get, null, null);
+        okhttp3.Call call = jobsJobidVerticesVertexidMetricsGetValidateBeforeCall(jobid, vertexid, get, null, null);
         Type localVarReturnType = new TypeToken<MetricCollectionResponseBody>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -6496,7 +6494,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Provides access to task metrics.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -6513,7 +6511,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidVerticesVertexidMetricsGetAsync(
+    public okhttp3.Call jobsJobidVerticesVertexidMetricsGetAsync(
             String jobid,
             String vertexid,
             String get,
@@ -6538,7 +6536,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidMetricsGetValidateBeforeCall(jobid, vertexid, get,
+        okhttp3.Call call = jobsJobidVerticesVertexidMetricsGetValidateBeforeCall(jobid, vertexid, get,
                 progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<MetricCollectionResponseBody>() {
         }.getType();
@@ -6548,7 +6546,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsJobidVerticesVertexidSubtasksAccumulatorsGet
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -6563,7 +6561,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidVerticesVertexidSubtasksAccumulatorsGetCall(
+    public okhttp3.Call jobsJobidVerticesVertexidSubtasksAccumulatorsGetCall(
             String jobid,
             String vertexid,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -6594,10 +6592,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -6610,7 +6608,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidVerticesVertexidSubtasksAccumulatorsGetValidateBeforeCall(
+    private okhttp3.Call jobsJobidVerticesVertexidSubtasksAccumulatorsGetValidateBeforeCall(
             String jobid,
             String vertexid,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -6626,16 +6624,16 @@ public class DefaultApi {
                     "Missing the required parameter 'vertexid' when calling jobsJobidVerticesVertexidSubtasksAccumulatorsGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidSubtasksAccumulatorsGetCall(jobid, vertexid, progressListener,
+        okhttp3.Call call = jobsJobidVerticesVertexidSubtasksAccumulatorsGetCall(jobid, vertexid, progressListener,
                 progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns all user-defined accumulators for all subtasks of a task.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -6655,9 +6653,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns all user-defined accumulators for all subtasks of a task.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -6672,7 +6670,7 @@ public class DefaultApi {
     public ApiResponse<SubtasksAllAccumulatorsInfo> jobsJobidVerticesVertexidSubtasksAccumulatorsGetWithHttpInfo(
             String jobid,
             String vertexid) throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidSubtasksAccumulatorsGetValidateBeforeCall(jobid, vertexid, null,
+        okhttp3.Call call = jobsJobidVerticesVertexidSubtasksAccumulatorsGetValidateBeforeCall(jobid, vertexid, null,
                 null);
         Type localVarReturnType = new TypeToken<SubtasksAllAccumulatorsInfo>() {
         }.getType();
@@ -6682,7 +6680,7 @@ public class DefaultApi {
     /**
      * (asynchronously) Returns all user-defined accumulators for all subtasks
      * of a task.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -6696,7 +6694,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidVerticesVertexidSubtasksAccumulatorsGetAsync(
+    public okhttp3.Call jobsJobidVerticesVertexidSubtasksAccumulatorsGetAsync(
             String jobid,
             String vertexid,
             final ApiCallback<SubtasksAllAccumulatorsInfo> callback) throws ApiException {
@@ -6720,7 +6718,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidSubtasksAccumulatorsGetValidateBeforeCall(jobid, vertexid,
+        okhttp3.Call call = jobsJobidVerticesVertexidSubtasksAccumulatorsGetValidateBeforeCall(jobid, vertexid,
                 progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<SubtasksAllAccumulatorsInfo>() {
         }.getType();
@@ -6730,7 +6728,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsJobidVerticesVertexidSubtasksMetricsGet
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -6755,7 +6753,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidVerticesVertexidSubtasksMetricsGetCall(
+    public okhttp3.Call jobsJobidVerticesVertexidSubtasksMetricsGetCall(
             String jobid,
             String vertexid,
             String get,
@@ -6795,10 +6793,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -6811,7 +6809,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidVerticesVertexidSubtasksMetricsGetValidateBeforeCall(
+    private okhttp3.Call jobsJobidVerticesVertexidSubtasksMetricsGetValidateBeforeCall(
             String jobid,
             String vertexid,
             String get,
@@ -6830,16 +6828,16 @@ public class DefaultApi {
                     "Missing the required parameter 'vertexid' when calling jobsJobidVerticesVertexidSubtasksMetricsGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidSubtasksMetricsGetCall(jobid, vertexid, get, agg, subtasks,
+        okhttp3.Call call = jobsJobidVerticesVertexidSubtasksMetricsGetCall(jobid, vertexid, get, agg, subtasks,
                 progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Provides access to aggregated subtask metrics.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -6873,9 +6871,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Provides access to aggregated subtask metrics.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -6903,7 +6901,7 @@ public class DefaultApi {
             String get,
             String agg,
             String subtasks) throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidSubtasksMetricsGetValidateBeforeCall(jobid, vertexid, get, agg,
+        okhttp3.Call call = jobsJobidVerticesVertexidSubtasksMetricsGetValidateBeforeCall(jobid, vertexid, get, agg,
                 subtasks, null, null);
         Type localVarReturnType = new TypeToken<AggregatedMetricsResponseBody>() {
         }.getType();
@@ -6912,7 +6910,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Provides access to aggregated subtask metrics.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -6936,7 +6934,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidVerticesVertexidSubtasksMetricsGetAsync(
+    public okhttp3.Call jobsJobidVerticesVertexidSubtasksMetricsGetAsync(
             String jobid,
             String vertexid,
             String get,
@@ -6963,7 +6961,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidSubtasksMetricsGetValidateBeforeCall(jobid, vertexid, get, agg,
+        okhttp3.Call call = jobsJobidVerticesVertexidSubtasksMetricsGetValidateBeforeCall(jobid, vertexid, get, agg,
                 subtasks, progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<AggregatedMetricsResponseBody>() {
         }.getType();
@@ -6974,7 +6972,7 @@ public class DefaultApi {
     /**
      * Build call for
      * jobsJobidVerticesVertexidSubtasksSubtaskindexAttemptsAttemptAccumulatorsGet
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -6994,7 +6992,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidVerticesVertexidSubtasksSubtaskindexAttemptsAttemptAccumulatorsGetCall(
+    public okhttp3.Call jobsJobidVerticesVertexidSubtasksSubtaskindexAttemptsAttemptAccumulatorsGetCall(
             String jobid,
             String vertexid,
             Integer subtaskindex,
@@ -7029,10 +7027,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -7045,7 +7043,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidVerticesVertexidSubtasksSubtaskindexAttemptsAttemptAccumulatorsGetValidateBeforeCall(
+    private okhttp3.Call jobsJobidVerticesVertexidSubtasksSubtaskindexAttemptsAttemptAccumulatorsGetValidateBeforeCall(
             String jobid,
             String vertexid,
             Integer subtaskindex,
@@ -7073,17 +7071,17 @@ public class DefaultApi {
                     "Missing the required parameter 'attempt' when calling jobsJobidVerticesVertexidSubtasksSubtaskindexAttemptsAttemptAccumulatorsGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidSubtasksSubtaskindexAttemptsAttemptAccumulatorsGetCall(jobid,
+        okhttp3.Call call = jobsJobidVerticesVertexidSubtasksSubtaskindexAttemptsAttemptAccumulatorsGetCall(jobid,
                 vertexid, subtaskindex, attempt, progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns the accumulators of an execution attempt of a subtask. Multiple
      * execution attempts happen in case of failure/recovery.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -7111,10 +7109,10 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns the accumulators of an execution attempt of a subtask. Multiple
      * execution attempts happen in case of failure/recovery.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -7136,7 +7134,7 @@ public class DefaultApi {
             String vertexid,
             Integer subtaskindex,
             Integer attempt) throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidSubtasksSubtaskindexAttemptsAttemptAccumulatorsGetValidateBeforeCall(
+        okhttp3.Call call = jobsJobidVerticesVertexidSubtasksSubtaskindexAttemptsAttemptAccumulatorsGetValidateBeforeCall(
                 jobid, vertexid, subtaskindex, attempt, null, null);
         Type localVarReturnType = new TypeToken<SubtaskExecutionAttemptAccumulatorsInfo>() {
         }.getType();
@@ -7146,7 +7144,7 @@ public class DefaultApi {
     /**
      * (asynchronously) Returns the accumulators of an execution attempt of a
      * subtask. Multiple execution attempts happen in case of failure/recovery.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -7165,7 +7163,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidVerticesVertexidSubtasksSubtaskindexAttemptsAttemptAccumulatorsGetAsync(
+    public okhttp3.Call jobsJobidVerticesVertexidSubtasksSubtaskindexAttemptsAttemptAccumulatorsGetAsync(
             String jobid,
             String vertexid,
             Integer subtaskindex,
@@ -7191,7 +7189,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidSubtasksSubtaskindexAttemptsAttemptAccumulatorsGetValidateBeforeCall(
+        okhttp3.Call call = jobsJobidVerticesVertexidSubtasksSubtaskindexAttemptsAttemptAccumulatorsGetValidateBeforeCall(
                 jobid, vertexid, subtaskindex, attempt, progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<SubtaskExecutionAttemptAccumulatorsInfo>() {
         }.getType();
@@ -7202,7 +7200,7 @@ public class DefaultApi {
     /**
      * Build call for
      * jobsJobidVerticesVertexidSubtasksSubtaskindexAttemptsAttemptGet
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -7222,7 +7220,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidVerticesVertexidSubtasksSubtaskindexAttemptsAttemptGetCall(
+    public okhttp3.Call jobsJobidVerticesVertexidSubtasksSubtaskindexAttemptsAttemptGetCall(
             String jobid,
             String vertexid,
             Integer subtaskindex,
@@ -7257,10 +7255,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -7273,7 +7271,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidVerticesVertexidSubtasksSubtaskindexAttemptsAttemptGetValidateBeforeCall(
+    private okhttp3.Call jobsJobidVerticesVertexidSubtasksSubtaskindexAttemptsAttemptGetValidateBeforeCall(
             String jobid,
             String vertexid,
             Integer subtaskindex,
@@ -7301,17 +7299,17 @@ public class DefaultApi {
                     "Missing the required parameter 'attempt' when calling jobsJobidVerticesVertexidSubtasksSubtaskindexAttemptsAttemptGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidSubtasksSubtaskindexAttemptsAttemptGetCall(jobid, vertexid,
+        okhttp3.Call call = jobsJobidVerticesVertexidSubtasksSubtaskindexAttemptsAttemptGetCall(jobid, vertexid,
                 subtaskindex, attempt, progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns details of an execution attempt of a subtask. Multiple execution
      * attempts happen in case of failure/recovery.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -7339,10 +7337,10 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns details of an execution attempt of a subtask. Multiple execution
      * attempts happen in case of failure/recovery.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -7364,7 +7362,7 @@ public class DefaultApi {
             String vertexid,
             Integer subtaskindex,
             Integer attempt) throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidSubtasksSubtaskindexAttemptsAttemptGetValidateBeforeCall(jobid,
+        okhttp3.Call call = jobsJobidVerticesVertexidSubtasksSubtaskindexAttemptsAttemptGetValidateBeforeCall(jobid,
                 vertexid, subtaskindex, attempt, null, null);
         Type localVarReturnType = new TypeToken<SubtaskExecutionAttemptDetailsInfo>() {
         }.getType();
@@ -7374,7 +7372,7 @@ public class DefaultApi {
     /**
      * (asynchronously) Returns details of an execution attempt of a subtask.
      * Multiple execution attempts happen in case of failure/recovery.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -7393,7 +7391,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidVerticesVertexidSubtasksSubtaskindexAttemptsAttemptGetAsync(
+    public okhttp3.Call jobsJobidVerticesVertexidSubtasksSubtaskindexAttemptsAttemptGetAsync(
             String jobid,
             String vertexid,
             Integer subtaskindex,
@@ -7419,7 +7417,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidSubtasksSubtaskindexAttemptsAttemptGetValidateBeforeCall(jobid,
+        okhttp3.Call call = jobsJobidVerticesVertexidSubtasksSubtaskindexAttemptsAttemptGetValidateBeforeCall(jobid,
                 vertexid, subtaskindex, attempt, progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<SubtaskExecutionAttemptDetailsInfo>() {
         }.getType();
@@ -7429,7 +7427,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsJobidVerticesVertexidSubtasksSubtaskindexGet
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -7446,7 +7444,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidVerticesVertexidSubtasksSubtaskindexGetCall(
+    public okhttp3.Call jobsJobidVerticesVertexidSubtasksSubtaskindexGetCall(
             String jobid,
             String vertexid,
             Integer subtaskindex,
@@ -7479,10 +7477,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -7495,7 +7493,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidVerticesVertexidSubtasksSubtaskindexGetValidateBeforeCall(
+    private okhttp3.Call jobsJobidVerticesVertexidSubtasksSubtaskindexGetValidateBeforeCall(
             String jobid,
             String vertexid,
             Integer subtaskindex,
@@ -7517,16 +7515,16 @@ public class DefaultApi {
                     "Missing the required parameter 'subtaskindex' when calling jobsJobidVerticesVertexidSubtasksSubtaskindexGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidSubtasksSubtaskindexGetCall(jobid, vertexid, subtaskindex,
+        okhttp3.Call call = jobsJobidVerticesVertexidSubtasksSubtaskindexGetCall(jobid, vertexid, subtaskindex,
                 progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns details of the current or latest execution attempt of a subtask.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -7550,9 +7548,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns details of the current or latest execution attempt of a subtask.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -7570,7 +7568,7 @@ public class DefaultApi {
             String jobid,
             String vertexid,
             Integer subtaskindex) throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidSubtasksSubtaskindexGetValidateBeforeCall(jobid, vertexid,
+        okhttp3.Call call = jobsJobidVerticesVertexidSubtasksSubtaskindexGetValidateBeforeCall(jobid, vertexid,
                 subtaskindex, null, null);
         Type localVarReturnType = new TypeToken<SubtaskExecutionAttemptDetailsInfo>() {
         }.getType();
@@ -7580,7 +7578,7 @@ public class DefaultApi {
     /**
      * (asynchronously) Returns details of the current or latest execution
      * attempt of a subtask.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -7596,7 +7594,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidVerticesVertexidSubtasksSubtaskindexGetAsync(
+    public okhttp3.Call jobsJobidVerticesVertexidSubtasksSubtaskindexGetAsync(
             String jobid,
             String vertexid,
             Integer subtaskindex,
@@ -7621,7 +7619,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidSubtasksSubtaskindexGetValidateBeforeCall(jobid, vertexid,
+        okhttp3.Call call = jobsJobidVerticesVertexidSubtasksSubtaskindexGetValidateBeforeCall(jobid, vertexid,
                 subtaskindex, progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<SubtaskExecutionAttemptDetailsInfo>() {
         }.getType();
@@ -7631,7 +7629,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsJobidVerticesVertexidSubtasksSubtaskindexMetricsGet
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -7651,7 +7649,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidVerticesVertexidSubtasksSubtaskindexMetricsGetCall(
+    public okhttp3.Call jobsJobidVerticesVertexidSubtasksSubtaskindexMetricsGetCall(
             String jobid,
             String vertexid,
             Integer subtaskindex,
@@ -7687,10 +7685,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -7703,7 +7701,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidVerticesVertexidSubtasksSubtaskindexMetricsGetValidateBeforeCall(
+    private okhttp3.Call jobsJobidVerticesVertexidSubtasksSubtaskindexMetricsGetValidateBeforeCall(
             String jobid,
             String vertexid,
             Integer subtaskindex,
@@ -7726,16 +7724,16 @@ public class DefaultApi {
                     "Missing the required parameter 'subtaskindex' when calling jobsJobidVerticesVertexidSubtasksSubtaskindexMetricsGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidSubtasksSubtaskindexMetricsGetCall(jobid, vertexid, subtaskindex,
+        okhttp3.Call call = jobsJobidVerticesVertexidSubtasksSubtaskindexMetricsGetCall(jobid, vertexid, subtaskindex,
                 get, progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Provides access to subtask metrics.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -7763,9 +7761,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Provides access to subtask metrics.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -7787,7 +7785,7 @@ public class DefaultApi {
             String vertexid,
             Integer subtaskindex,
             String get) throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidSubtasksSubtaskindexMetricsGetValidateBeforeCall(jobid, vertexid,
+        okhttp3.Call call = jobsJobidVerticesVertexidSubtasksSubtaskindexMetricsGetValidateBeforeCall(jobid, vertexid,
                 subtaskindex, get, null, null);
         Type localVarReturnType = new TypeToken<MetricCollectionResponseBody>() {
         }.getType();
@@ -7796,7 +7794,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Provides access to subtask metrics.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -7815,7 +7813,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidVerticesVertexidSubtasksSubtaskindexMetricsGetAsync(
+    public okhttp3.Call jobsJobidVerticesVertexidSubtasksSubtaskindexMetricsGetAsync(
             String jobid,
             String vertexid,
             Integer subtaskindex,
@@ -7841,7 +7839,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidSubtasksSubtaskindexMetricsGetValidateBeforeCall(jobid, vertexid,
+        okhttp3.Call call = jobsJobidVerticesVertexidSubtasksSubtaskindexMetricsGetValidateBeforeCall(jobid, vertexid,
                 subtaskindex, get, progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<MetricCollectionResponseBody>() {
         }.getType();
@@ -7851,7 +7849,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsJobidVerticesVertexidSubtasktimesGet
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -7866,7 +7864,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidVerticesVertexidSubtasktimesGetCall(
+    public okhttp3.Call jobsJobidVerticesVertexidSubtasktimesGetCall(
             String jobid,
             String vertexid,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -7897,10 +7895,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -7913,7 +7911,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidVerticesVertexidSubtasktimesGetValidateBeforeCall(
+    private okhttp3.Call jobsJobidVerticesVertexidSubtasktimesGetValidateBeforeCall(
             String jobid,
             String vertexid,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -7929,16 +7927,16 @@ public class DefaultApi {
                     "Missing the required parameter 'vertexid' when calling jobsJobidVerticesVertexidSubtasktimesGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidSubtasktimesGetCall(jobid, vertexid, progressListener,
+        okhttp3.Call call = jobsJobidVerticesVertexidSubtasktimesGetCall(jobid, vertexid, progressListener,
                 progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns time-related information for all subtasks of a task.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -7956,9 +7954,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns time-related information for all subtasks of a task.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -7972,7 +7970,7 @@ public class DefaultApi {
      */
     public ApiResponse<SubtasksTimesInfo> jobsJobidVerticesVertexidSubtasktimesGetWithHttpInfo(String jobid, String vertexid)
             throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidSubtasktimesGetValidateBeforeCall(jobid, vertexid, null, null);
+        okhttp3.Call call = jobsJobidVerticesVertexidSubtasktimesGetValidateBeforeCall(jobid, vertexid, null, null);
         Type localVarReturnType = new TypeToken<SubtasksTimesInfo>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -7981,7 +7979,7 @@ public class DefaultApi {
     /**
      * (asynchronously) Returns time-related information for all subtasks of a
      * task.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -7995,7 +7993,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidVerticesVertexidSubtasktimesGetAsync(
+    public okhttp3.Call jobsJobidVerticesVertexidSubtasktimesGetAsync(
             String jobid,
             String vertexid,
             final ApiCallback<SubtasksTimesInfo> callback) throws ApiException {
@@ -8019,7 +8017,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidSubtasktimesGetValidateBeforeCall(jobid, vertexid,
+        okhttp3.Call call = jobsJobidVerticesVertexidSubtasktimesGetValidateBeforeCall(jobid, vertexid,
                 progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<SubtasksTimesInfo>() {
         }.getType();
@@ -8029,7 +8027,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsJobidVerticesVertexidTaskmanagersGet
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -8044,7 +8042,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidVerticesVertexidTaskmanagersGetCall(
+    public okhttp3.Call jobsJobidVerticesVertexidTaskmanagersGetCall(
             String jobid,
             String vertexid,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -8075,10 +8073,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -8091,7 +8089,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidVerticesVertexidTaskmanagersGetValidateBeforeCall(
+    private okhttp3.Call jobsJobidVerticesVertexidTaskmanagersGetValidateBeforeCall(
             String jobid,
             String vertexid,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -8107,16 +8105,16 @@ public class DefaultApi {
                     "Missing the required parameter 'vertexid' when calling jobsJobidVerticesVertexidTaskmanagersGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidTaskmanagersGetCall(jobid, vertexid, progressListener,
+        okhttp3.Call call = jobsJobidVerticesVertexidTaskmanagersGetCall(jobid, vertexid, progressListener,
                 progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns task information aggregated by task manager.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -8134,9 +8132,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns task information aggregated by task manager.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -8151,7 +8149,7 @@ public class DefaultApi {
     public ApiResponse<JobVertexTaskManagersInfo> jobsJobidVerticesVertexidTaskmanagersGetWithHttpInfo(
             String jobid,
             String vertexid) throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidTaskmanagersGetValidateBeforeCall(jobid, vertexid, null, null);
+        okhttp3.Call call = jobsJobidVerticesVertexidTaskmanagersGetValidateBeforeCall(jobid, vertexid, null, null);
         Type localVarReturnType = new TypeToken<JobVertexTaskManagersInfo>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -8159,7 +8157,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Returns task information aggregated by task manager.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -8173,7 +8171,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidVerticesVertexidTaskmanagersGetAsync(
+    public okhttp3.Call jobsJobidVerticesVertexidTaskmanagersGetAsync(
             String jobid,
             String vertexid,
             final ApiCallback<JobVertexTaskManagersInfo> callback) throws ApiException {
@@ -8197,7 +8195,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidTaskmanagersGetValidateBeforeCall(jobid, vertexid,
+        okhttp3.Call call = jobsJobidVerticesVertexidTaskmanagersGetValidateBeforeCall(jobid, vertexid,
                 progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<JobVertexTaskManagersInfo>() {
         }.getType();
@@ -8207,7 +8205,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsJobidVerticesVertexidWatermarksGet
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -8222,7 +8220,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsJobidVerticesVertexidWatermarksGetCall(
+    public okhttp3.Call jobsJobidVerticesVertexidWatermarksGetCall(
             String jobid,
             String vertexid,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -8253,10 +8251,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -8269,7 +8267,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsJobidVerticesVertexidWatermarksGetValidateBeforeCall(
+    private okhttp3.Call jobsJobidVerticesVertexidWatermarksGetValidateBeforeCall(
             String jobid,
             String vertexid,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -8285,16 +8283,16 @@ public class DefaultApi {
                     "Missing the required parameter 'vertexid' when calling jobsJobidVerticesVertexidWatermarksGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidWatermarksGetCall(jobid, vertexid, progressListener,
+        okhttp3.Call call = jobsJobidVerticesVertexidWatermarksGetCall(jobid, vertexid, progressListener,
                 progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns the watermarks for all subtasks of a task.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -8313,9 +8311,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns the watermarks for all subtasks of a task.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -8330,7 +8328,7 @@ public class DefaultApi {
     public ApiResponse<MetricCollectionResponseBody> jobsJobidVerticesVertexidWatermarksGetWithHttpInfo(
             String jobid,
             String vertexid) throws ApiException {
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidWatermarksGetValidateBeforeCall(jobid, vertexid, null, null);
+        okhttp3.Call call = jobsJobidVerticesVertexidWatermarksGetValidateBeforeCall(jobid, vertexid, null, null);
         Type localVarReturnType = new TypeToken<MetricCollectionResponseBody>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -8338,7 +8336,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Returns the watermarks for all subtasks of a task.
-     * 
+     *
      * @param jobid
      *            32-character hexadecimal string value that identifies a job.
      *            (required)
@@ -8352,7 +8350,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsJobidVerticesVertexidWatermarksGetAsync(
+    public okhttp3.Call jobsJobidVerticesVertexidWatermarksGetAsync(
             String jobid,
             String vertexid,
             final ApiCallback<MetricCollectionResponseBody> callback) throws ApiException {
@@ -8376,7 +8374,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsJobidVerticesVertexidWatermarksGetValidateBeforeCall(jobid, vertexid,
+        okhttp3.Call call = jobsJobidVerticesVertexidWatermarksGetValidateBeforeCall(jobid, vertexid,
                 progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<MetricCollectionResponseBody>() {
         }.getType();
@@ -8386,7 +8384,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsMetricsGet
-     * 
+     *
      * @param get
      *            Comma-separated list of string values to select specific
      *            metrics. (optional)
@@ -8405,7 +8403,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsMetricsGetCall(
+    public okhttp3.Call jobsMetricsGetCall(
             String get,
             String agg,
             String jobs,
@@ -8441,10 +8439,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -8457,22 +8455,22 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsMetricsGetValidateBeforeCall(
+    private okhttp3.Call jobsMetricsGetValidateBeforeCall(
             String get,
             String agg,
             String jobs,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
 
-        com.squareup.okhttp.Call call = jobsMetricsGetCall(get, agg, jobs, progressListener, progressRequestListener);
+        okhttp3.Call call = jobsMetricsGetCall(get, agg, jobs, progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Provides access to aggregated job metrics.
-     * 
+     *
      * @param get
      *            Comma-separated list of string values to select specific
      *            metrics. (optional)
@@ -8494,9 +8492,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Provides access to aggregated job metrics.
-     * 
+     *
      * @param get
      *            Comma-separated list of string values to select specific
      *            metrics. (optional)
@@ -8514,7 +8512,7 @@ public class DefaultApi {
      */
     public ApiResponse<AggregatedMetricsResponseBody> jobsMetricsGetWithHttpInfo(String get, String agg, String jobs)
             throws ApiException {
-        com.squareup.okhttp.Call call = jobsMetricsGetValidateBeforeCall(get, agg, jobs, null, null);
+        okhttp3.Call call = jobsMetricsGetValidateBeforeCall(get, agg, jobs, null, null);
         Type localVarReturnType = new TypeToken<AggregatedMetricsResponseBody>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -8522,7 +8520,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Provides access to aggregated job metrics.
-     * 
+     *
      * @param get
      *            Comma-separated list of string values to select specific
      *            metrics. (optional)
@@ -8540,7 +8538,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsMetricsGetAsync(
+    public okhttp3.Call jobsMetricsGetAsync(
             String get,
             String agg,
             String jobs,
@@ -8565,7 +8563,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsMetricsGetValidateBeforeCall(get, agg, jobs, progressListener,
+        okhttp3.Call call = jobsMetricsGetValidateBeforeCall(get, agg, jobs, progressListener,
                 progressRequestListener);
         Type localVarReturnType = new TypeToken<AggregatedMetricsResponseBody>() {
         }.getType();
@@ -8575,7 +8573,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsOverviewGet
-     * 
+     *
      * @param progressListener
      *            Progress listener
      * @param progressRequestListener
@@ -8584,7 +8582,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsOverviewGetCall(
+    public okhttp3.Call jobsOverviewGetCall(
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         Object localVarPostBody = null;
@@ -8611,10 +8609,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -8627,19 +8625,19 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsOverviewGetValidateBeforeCall(
+    private okhttp3.Call jobsOverviewGetValidateBeforeCall(
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
 
-        com.squareup.okhttp.Call call = jobsOverviewGetCall(progressListener, progressRequestListener);
+        okhttp3.Call call = jobsOverviewGetCall(progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns an overview over all jobs.
-     * 
+     *
      * @return MultipleJobsDetails
      * @throws ApiException
      *             If fail to call the API, e.g. server error or cannot
@@ -8651,16 +8649,16 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns an overview over all jobs.
-     * 
+     *
      * @return ApiResponse&lt;MultipleJobsDetails&gt;
      * @throws ApiException
      *             If fail to call the API, e.g. server error or cannot
      *             deserialize the response body
      */
     public ApiResponse<MultipleJobsDetails> jobsOverviewGetWithHttpInfo() throws ApiException {
-        com.squareup.okhttp.Call call = jobsOverviewGetValidateBeforeCall(null, null);
+        okhttp3.Call call = jobsOverviewGetValidateBeforeCall(null, null);
         Type localVarReturnType = new TypeToken<MultipleJobsDetails>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -8668,7 +8666,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Returns an overview over all jobs.
-     * 
+     *
      * @param callback
      *            The callback to be executed when the API call finishes
      * @return The request call
@@ -8676,7 +8674,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsOverviewGetAsync(final ApiCallback<MultipleJobsDetails> callback) throws ApiException {
+    public okhttp3.Call jobsOverviewGetAsync(final ApiCallback<MultipleJobsDetails> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -8697,7 +8695,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsOverviewGetValidateBeforeCall(progressListener, progressRequestListener);
+        okhttp3.Call call = jobsOverviewGetValidateBeforeCall(progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<MultipleJobsDetails>() {
         }.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
@@ -8706,7 +8704,7 @@ public class DefaultApi {
 
     /**
      * Build call for jobsPost
-     * 
+     *
      * @param request
      *            (required)
      * @param filename
@@ -8719,7 +8717,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call jobsPostCall(
+    public okhttp3.Call jobsPostCall(
             JobSubmitRequestBody request,
             List<File> filename,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -8750,10 +8748,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -8766,7 +8764,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call jobsPostValidateBeforeCall(
+    private okhttp3.Call jobsPostValidateBeforeCall(
             JobSubmitRequestBody request,
             List<File> filename,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -8780,19 +8778,19 @@ public class DefaultApi {
             throw new ApiException("Missing the required parameter 'filename' when calling jobsPost(Async)");
         }
 
-        com.squareup.okhttp.Call call = jobsPostCall(request, filename, progressListener, progressRequestListener);
+        okhttp3.Call call = jobsPostCall(request, filename, progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Submits a job. This call is primarily intended to be used by the Flink
      * client. This call expects a multipart/form-data request that consists of
      * file uploads for the serialized JobGraph, jars and distributed cache
      * artifacts and an attribute named \&quot;request\&quot; for the JSON
      * payload.
-     * 
+     *
      * @param request
      *            (required)
      * @param filename
@@ -8808,13 +8806,13 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Submits a job. This call is primarily intended to be used by the Flink
      * client. This call expects a multipart/form-data request that consists of
      * file uploads for the serialized JobGraph, jars and distributed cache
      * artifacts and an attribute named \&quot;request\&quot; for the JSON
      * payload.
-     * 
+     *
      * @param request
      *            (required)
      * @param filename
@@ -8826,7 +8824,7 @@ public class DefaultApi {
      */
     public ApiResponse<JobSubmitResponseBody> jobsPostWithHttpInfo(JobSubmitRequestBody request, List<File> filename)
             throws ApiException {
-        com.squareup.okhttp.Call call = jobsPostValidateBeforeCall(request, filename, null, null);
+        okhttp3.Call call = jobsPostValidateBeforeCall(request, filename, null, null);
         Type localVarReturnType = new TypeToken<JobSubmitResponseBody>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -8838,7 +8836,7 @@ public class DefaultApi {
      * that consists of file uploads for the serialized JobGraph, jars and
      * distributed cache artifacts and an attribute named \&quot;request\&quot;
      * for the JSON payload.
-     * 
+     *
      * @param request
      *            (required)
      * @param filename
@@ -8850,7 +8848,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call jobsPostAsync(
+    public okhttp3.Call jobsPostAsync(
             JobSubmitRequestBody request,
             List<File> filename,
             final ApiCallback<JobSubmitResponseBody> callback) throws ApiException {
@@ -8874,7 +8872,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = jobsPostValidateBeforeCall(request, filename, progressListener, progressRequestListener);
+        okhttp3.Call call = jobsPostValidateBeforeCall(request, filename, progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<JobSubmitResponseBody>() {
         }.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
@@ -8883,7 +8881,7 @@ public class DefaultApi {
 
     /**
      * Build call for overviewGet
-     * 
+     *
      * @param progressListener
      *            Progress listener
      * @param progressRequestListener
@@ -8892,7 +8890,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call overviewGetCall(
+    public okhttp3.Call overviewGetCall(
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         Object localVarPostBody = null;
@@ -8919,10 +8917,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -8935,19 +8933,19 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call overviewGetValidateBeforeCall(
+    private okhttp3.Call overviewGetValidateBeforeCall(
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
 
-        com.squareup.okhttp.Call call = overviewGetCall(progressListener, progressRequestListener);
+        okhttp3.Call call = overviewGetCall(progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns an overview over the Flink cluster.
-     * 
+     *
      * @return ClusterOverviewWithVersion
      * @throws ApiException
      *             If fail to call the API, e.g. server error or cannot
@@ -8959,16 +8957,16 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns an overview over the Flink cluster.
-     * 
+     *
      * @return ApiResponse&lt;ClusterOverviewWithVersion&gt;
      * @throws ApiException
      *             If fail to call the API, e.g. server error or cannot
      *             deserialize the response body
      */
     public ApiResponse<ClusterOverviewWithVersion> overviewGetWithHttpInfo() throws ApiException {
-        com.squareup.okhttp.Call call = overviewGetValidateBeforeCall(null, null);
+        okhttp3.Call call = overviewGetValidateBeforeCall(null, null);
         Type localVarReturnType = new TypeToken<ClusterOverviewWithVersion>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -8976,7 +8974,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Returns an overview over the Flink cluster.
-     * 
+     *
      * @param callback
      *            The callback to be executed when the API call finishes
      * @return The request call
@@ -8984,7 +8982,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call overviewGetAsync(final ApiCallback<ClusterOverviewWithVersion> callback) throws ApiException {
+    public okhttp3.Call overviewGetAsync(final ApiCallback<ClusterOverviewWithVersion> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -9005,7 +9003,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = overviewGetValidateBeforeCall(progressListener, progressRequestListener);
+        okhttp3.Call call = overviewGetValidateBeforeCall(progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<ClusterOverviewWithVersion>() {
         }.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
@@ -9014,7 +9012,7 @@ public class DefaultApi {
 
     /**
      * Build call for savepointDisposalPost
-     * 
+     *
      * @param body
      *            (optional)
      * @param progressListener
@@ -9025,7 +9023,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call savepointDisposalPostCall(
+    public okhttp3.Call savepointDisposalPostCall(
             SavepointDisposalRequest body,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -9051,10 +9049,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -9067,21 +9065,21 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call savepointDisposalPostValidateBeforeCall(
+    private okhttp3.Call savepointDisposalPostValidateBeforeCall(
             SavepointDisposalRequest body,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
 
-        com.squareup.okhttp.Call call = savepointDisposalPostCall(body, progressListener, progressRequestListener);
+        okhttp3.Call call = savepointDisposalPostCall(body, progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Triggers the desposal of a savepoint. This async operation would return a
      * &#x27;triggerid&#x27; for further query identifier.
-     * 
+     *
      * @param body
      *            (optional)
      * @return TriggerResponse
@@ -9095,10 +9093,10 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Triggers the desposal of a savepoint. This async operation would return a
      * &#x27;triggerid&#x27; for further query identifier.
-     * 
+     *
      * @param body
      *            (optional)
      * @return ApiResponse&lt;TriggerResponse&gt;
@@ -9107,7 +9105,7 @@ public class DefaultApi {
      *             deserialize the response body
      */
     public ApiResponse<TriggerResponse> savepointDisposalPostWithHttpInfo(SavepointDisposalRequest body) throws ApiException {
-        com.squareup.okhttp.Call call = savepointDisposalPostValidateBeforeCall(body, null, null);
+        okhttp3.Call call = savepointDisposalPostValidateBeforeCall(body, null, null);
         Type localVarReturnType = new TypeToken<TriggerResponse>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -9117,7 +9115,7 @@ public class DefaultApi {
      * (asynchronously) Triggers the desposal of a savepoint. This async
      * operation would return a &#x27;triggerid&#x27; for further query
      * identifier.
-     * 
+     *
      * @param body
      *            (optional)
      * @param callback
@@ -9127,7 +9125,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call savepointDisposalPostAsync(
+    public okhttp3.Call savepointDisposalPostAsync(
             SavepointDisposalRequest body,
             final ApiCallback<TriggerResponse> callback) throws ApiException {
 
@@ -9150,7 +9148,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = savepointDisposalPostValidateBeforeCall(body, progressListener, progressRequestListener);
+        okhttp3.Call call = savepointDisposalPostValidateBeforeCall(body, progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<TriggerResponse>() {
         }.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
@@ -9159,7 +9157,7 @@ public class DefaultApi {
 
     /**
      * Build call for savepointDisposalTriggeridGet
-     * 
+     *
      * @param triggerid
      *            32-character hexadecimal string that identifies an
      *            asynchronous operation trigger ID. The ID was returned then
@@ -9172,7 +9170,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call savepointDisposalTriggeridGetCall(
+    public okhttp3.Call savepointDisposalTriggeridGetCall(
             String triggerid,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -9201,10 +9199,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -9217,7 +9215,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call savepointDisposalTriggeridGetValidateBeforeCall(
+    private okhttp3.Call savepointDisposalTriggeridGetValidateBeforeCall(
             String triggerid,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -9227,15 +9225,15 @@ public class DefaultApi {
                     "Missing the required parameter 'triggerid' when calling savepointDisposalTriggeridGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = savepointDisposalTriggeridGetCall(triggerid, progressListener, progressRequestListener);
+        okhttp3.Call call = savepointDisposalTriggeridGetCall(triggerid, progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns the status of a savepoint disposal operation.
-     * 
+     *
      * @param triggerid
      *            32-character hexadecimal string that identifies an
      *            asynchronous operation trigger ID. The ID was returned then
@@ -9251,9 +9249,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns the status of a savepoint disposal operation.
-     * 
+     *
      * @param triggerid
      *            32-character hexadecimal string that identifies an
      *            asynchronous operation trigger ID. The ID was returned then
@@ -9265,7 +9263,7 @@ public class DefaultApi {
      */
     public ApiResponse<AsynchronousOperationResult> savepointDisposalTriggeridGetWithHttpInfo(String triggerid)
             throws ApiException {
-        com.squareup.okhttp.Call call = savepointDisposalTriggeridGetValidateBeforeCall(triggerid, null, null);
+        okhttp3.Call call = savepointDisposalTriggeridGetValidateBeforeCall(triggerid, null, null);
         Type localVarReturnType = new TypeToken<AsynchronousOperationResult>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -9273,7 +9271,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Returns the status of a savepoint disposal operation.
-     * 
+     *
      * @param triggerid
      *            32-character hexadecimal string that identifies an
      *            asynchronous operation trigger ID. The ID was returned then
@@ -9285,7 +9283,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call savepointDisposalTriggeridGetAsync(
+    public okhttp3.Call savepointDisposalTriggeridGetAsync(
             String triggerid,
             final ApiCallback<AsynchronousOperationResult> callback) throws ApiException {
 
@@ -9308,7 +9306,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = savepointDisposalTriggeridGetValidateBeforeCall(triggerid, progressListener,
+        okhttp3.Call call = savepointDisposalTriggeridGetValidateBeforeCall(triggerid, progressListener,
                 progressRequestListener);
         Type localVarReturnType = new TypeToken<AsynchronousOperationResult>() {
         }.getType();
@@ -9318,7 +9316,7 @@ public class DefaultApi {
 
     /**
      * Build call for taskmanagersGet
-     * 
+     *
      * @param progressListener
      *            Progress listener
      * @param progressRequestListener
@@ -9327,7 +9325,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call taskmanagersGetCall(
+    public okhttp3.Call taskmanagersGetCall(
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         Object localVarPostBody = null;
@@ -9354,10 +9352,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -9370,19 +9368,19 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call taskmanagersGetValidateBeforeCall(
+    private okhttp3.Call taskmanagersGetValidateBeforeCall(
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
 
-        com.squareup.okhttp.Call call = taskmanagersGetCall(progressListener, progressRequestListener);
+        okhttp3.Call call = taskmanagersGetCall(progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns an overview over all task managers.
-     * 
+     *
      * @return TaskManagersInfo
      * @throws ApiException
      *             If fail to call the API, e.g. server error or cannot
@@ -9394,16 +9392,16 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns an overview over all task managers.
-     * 
+     *
      * @return ApiResponse&lt;TaskManagersInfo&gt;
      * @throws ApiException
      *             If fail to call the API, e.g. server error or cannot
      *             deserialize the response body
      */
     public ApiResponse<TaskManagersInfo> taskmanagersGetWithHttpInfo() throws ApiException {
-        com.squareup.okhttp.Call call = taskmanagersGetValidateBeforeCall(null, null);
+        okhttp3.Call call = taskmanagersGetValidateBeforeCall(null, null);
         Type localVarReturnType = new TypeToken<TaskManagersInfo>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -9411,7 +9409,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Returns an overview over all task managers.
-     * 
+     *
      * @param callback
      *            The callback to be executed when the API call finishes
      * @return The request call
@@ -9419,7 +9417,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call taskmanagersGetAsync(final ApiCallback<TaskManagersInfo> callback) throws ApiException {
+    public okhttp3.Call taskmanagersGetAsync(final ApiCallback<TaskManagersInfo> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -9440,7 +9438,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = taskmanagersGetValidateBeforeCall(progressListener, progressRequestListener);
+        okhttp3.Call call = taskmanagersGetValidateBeforeCall(progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<TaskManagersInfo>() {
         }.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
@@ -9449,7 +9447,7 @@ public class DefaultApi {
 
     /**
      * Build call for taskmanagersMetricsGet
-     * 
+     *
      * @param get
      *            Comma-separated list of string values to select specific
      *            metrics. (optional)
@@ -9468,7 +9466,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call taskmanagersMetricsGetCall(
+    public okhttp3.Call taskmanagersMetricsGetCall(
             String get,
             String agg,
             String taskmanagers,
@@ -9504,10 +9502,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -9520,23 +9518,23 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call taskmanagersMetricsGetValidateBeforeCall(
+    private okhttp3.Call taskmanagersMetricsGetValidateBeforeCall(
             String get,
             String agg,
             String taskmanagers,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
 
-        com.squareup.okhttp.Call call = taskmanagersMetricsGetCall(get, agg, taskmanagers, progressListener,
+        okhttp3.Call call = taskmanagersMetricsGetCall(get, agg, taskmanagers, progressListener,
                 progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Provides access to aggregated task manager metrics.
-     * 
+     *
      * @param get
      *            Comma-separated list of string values to select specific
      *            metrics. (optional)
@@ -9558,9 +9556,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Provides access to aggregated task manager metrics.
-     * 
+     *
      * @param get
      *            Comma-separated list of string values to select specific
      *            metrics. (optional)
@@ -9580,7 +9578,7 @@ public class DefaultApi {
             String get,
             String agg,
             String taskmanagers) throws ApiException {
-        com.squareup.okhttp.Call call = taskmanagersMetricsGetValidateBeforeCall(get, agg, taskmanagers, null, null);
+        okhttp3.Call call = taskmanagersMetricsGetValidateBeforeCall(get, agg, taskmanagers, null, null);
         Type localVarReturnType = new TypeToken<AggregatedMetricsResponseBody>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -9588,7 +9586,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Provides access to aggregated task manager metrics.
-     * 
+     *
      * @param get
      *            Comma-separated list of string values to select specific
      *            metrics. (optional)
@@ -9606,7 +9604,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call taskmanagersMetricsGetAsync(
+    public okhttp3.Call taskmanagersMetricsGetAsync(
             String get,
             String agg,
             String taskmanagers,
@@ -9631,7 +9629,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = taskmanagersMetricsGetValidateBeforeCall(get, agg, taskmanagers, progressListener,
+        okhttp3.Call call = taskmanagersMetricsGetValidateBeforeCall(get, agg, taskmanagers, progressListener,
                 progressRequestListener);
         Type localVarReturnType = new TypeToken<AggregatedMetricsResponseBody>() {
         }.getType();
@@ -9641,7 +9639,7 @@ public class DefaultApi {
 
     /**
      * Build call for taskmanagersTaskmanageridGet
-     * 
+     *
      * @param taskmanagerid
      *            32-character hexadecimal string that identifies a task
      *            manager. (required)
@@ -9653,7 +9651,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call taskmanagersTaskmanageridGetCall(
+    public okhttp3.Call taskmanagersTaskmanageridGetCall(
             String taskmanagerid,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -9682,10 +9680,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -9698,7 +9696,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call taskmanagersTaskmanageridGetValidateBeforeCall(
+    private okhttp3.Call taskmanagersTaskmanageridGetValidateBeforeCall(
             String taskmanagerid,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -9708,20 +9706,20 @@ public class DefaultApi {
                     "Missing the required parameter 'taskmanagerid' when calling taskmanagersTaskmanageridGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = taskmanagersTaskmanageridGetCall(taskmanagerid, progressListener,
+        okhttp3.Call call = taskmanagersTaskmanageridGetCall(taskmanagerid, progressListener,
                 progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns details for a task manager.
      * \&quot;metrics.memorySegmentsAvailable\&quot; and
      * \&quot;metrics.memorySegmentsTotal\&quot; are deprecated. Please use
      * \&quot;metrics.nettyShuffleMemorySegmentsAvailable\&quot; and
      * \&quot;metrics.nettyShuffleMemorySegmentsTotal\&quot; instead.
-     * 
+     *
      * @param taskmanagerid
      *            32-character hexadecimal string that identifies a task
      *            manager. (required)
@@ -9736,13 +9734,13 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns details for a task manager.
      * \&quot;metrics.memorySegmentsAvailable\&quot; and
      * \&quot;metrics.memorySegmentsTotal\&quot; are deprecated. Please use
      * \&quot;metrics.nettyShuffleMemorySegmentsAvailable\&quot; and
      * \&quot;metrics.nettyShuffleMemorySegmentsTotal\&quot; instead.
-     * 
+     *
      * @param taskmanagerid
      *            32-character hexadecimal string that identifies a task
      *            manager. (required)
@@ -9753,7 +9751,7 @@ public class DefaultApi {
      */
     public ApiResponse<TaskManagerDetailsInfo> taskmanagersTaskmanageridGetWithHttpInfo(String taskmanagerid)
             throws ApiException {
-        com.squareup.okhttp.Call call = taskmanagersTaskmanageridGetValidateBeforeCall(taskmanagerid, null, null);
+        okhttp3.Call call = taskmanagersTaskmanageridGetValidateBeforeCall(taskmanagerid, null, null);
         Type localVarReturnType = new TypeToken<TaskManagerDetailsInfo>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -9765,7 +9763,7 @@ public class DefaultApi {
      * \&quot;metrics.memorySegmentsTotal\&quot; are deprecated. Please use
      * \&quot;metrics.nettyShuffleMemorySegmentsAvailable\&quot; and
      * \&quot;metrics.nettyShuffleMemorySegmentsTotal\&quot; instead.
-     * 
+     *
      * @param taskmanagerid
      *            32-character hexadecimal string that identifies a task
      *            manager. (required)
@@ -9776,7 +9774,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call taskmanagersTaskmanageridGetAsync(
+    public okhttp3.Call taskmanagersTaskmanageridGetAsync(
             String taskmanagerid,
             final ApiCallback<TaskManagerDetailsInfo> callback) throws ApiException {
 
@@ -9799,7 +9797,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = taskmanagersTaskmanageridGetValidateBeforeCall(taskmanagerid, progressListener,
+        okhttp3.Call call = taskmanagersTaskmanageridGetValidateBeforeCall(taskmanagerid, progressListener,
                 progressRequestListener);
         Type localVarReturnType = new TypeToken<TaskManagerDetailsInfo>() {
         }.getType();
@@ -9809,7 +9807,7 @@ public class DefaultApi {
 
     /**
      * Build call for taskmanagersTaskmanageridLogsGet
-     * 
+     *
      * @param taskmanagerid
      *            32-character hexadecimal string that identifies a task
      *            manager. (required)
@@ -9821,7 +9819,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call taskmanagersTaskmanageridLogsGetCall(
+    public okhttp3.Call taskmanagersTaskmanageridLogsGetCall(
             String taskmanagerid,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -9850,10 +9848,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -9866,7 +9864,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call taskmanagersTaskmanageridLogsGetValidateBeforeCall(
+    private okhttp3.Call taskmanagersTaskmanageridLogsGetValidateBeforeCall(
             String taskmanagerid,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -9876,16 +9874,16 @@ public class DefaultApi {
                     "Missing the required parameter 'taskmanagerid' when calling taskmanagersTaskmanageridLogsGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = taskmanagersTaskmanageridLogsGetCall(taskmanagerid, progressListener,
+        okhttp3.Call call = taskmanagersTaskmanageridLogsGetCall(taskmanagerid, progressListener,
                 progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Returns the list of log files on a TaskManager.
-     * 
+     *
      * @param taskmanagerid
      *            32-character hexadecimal string that identifies a task
      *            manager. (required)
@@ -9900,9 +9898,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns the list of log files on a TaskManager.
-     * 
+     *
      * @param taskmanagerid
      *            32-character hexadecimal string that identifies a task
      *            manager. (required)
@@ -9912,7 +9910,7 @@ public class DefaultApi {
      *             deserialize the response body
      */
     public ApiResponse<LogListInfo> taskmanagersTaskmanageridLogsGetWithHttpInfo(String taskmanagerid) throws ApiException {
-        com.squareup.okhttp.Call call = taskmanagersTaskmanageridLogsGetValidateBeforeCall(taskmanagerid, null, null);
+        okhttp3.Call call = taskmanagersTaskmanageridLogsGetValidateBeforeCall(taskmanagerid, null, null);
         Type localVarReturnType = new TypeToken<LogListInfo>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -9920,7 +9918,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Returns the list of log files on a TaskManager.
-     * 
+     *
      * @param taskmanagerid
      *            32-character hexadecimal string that identifies a task
      *            manager. (required)
@@ -9931,7 +9929,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call taskmanagersTaskmanageridLogsGetAsync(
+    public okhttp3.Call taskmanagersTaskmanageridLogsGetAsync(
             String taskmanagerid,
             final ApiCallback<LogListInfo> callback) throws ApiException {
 
@@ -9954,7 +9952,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = taskmanagersTaskmanageridLogsGetValidateBeforeCall(taskmanagerid, progressListener,
+        okhttp3.Call call = taskmanagersTaskmanageridLogsGetValidateBeforeCall(taskmanagerid, progressListener,
                 progressRequestListener);
         Type localVarReturnType = new TypeToken<LogListInfo>() {
         }.getType();
@@ -9964,7 +9962,7 @@ public class DefaultApi {
 
     /**
      * Build call for taskmanagersTaskmanageridMetricsGet
-     * 
+     *
      * @param taskmanagerid
      *            32-character hexadecimal string that identifies a task
      *            manager. (required)
@@ -9979,7 +9977,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call taskmanagersTaskmanageridMetricsGetCall(
+    public okhttp3.Call taskmanagersTaskmanageridMetricsGetCall(
             String taskmanagerid,
             String get,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -10011,10 +10009,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -10027,7 +10025,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call taskmanagersTaskmanageridMetricsGetValidateBeforeCall(
+    private okhttp3.Call taskmanagersTaskmanageridMetricsGetValidateBeforeCall(
             String taskmanagerid,
             String get,
             final ProgressResponseBody.ProgressListener progressListener,
@@ -10038,16 +10036,16 @@ public class DefaultApi {
                     "Missing the required parameter 'taskmanagerid' when calling taskmanagersTaskmanageridMetricsGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = taskmanagersTaskmanageridMetricsGetCall(taskmanagerid, get, progressListener,
+        okhttp3.Call call = taskmanagersTaskmanageridMetricsGetCall(taskmanagerid, get, progressListener,
                 progressRequestListener);
         return call;
 
     }
 
     /**
-     * 
+     *
      * Provides access to task manager metrics.
-     * 
+     *
      * @param taskmanagerid
      *            32-character hexadecimal string that identifies a task
      *            manager. (required)
@@ -10066,9 +10064,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Provides access to task manager metrics.
-     * 
+     *
      * @param taskmanagerid
      *            32-character hexadecimal string that identifies a task
      *            manager. (required)
@@ -10083,7 +10081,7 @@ public class DefaultApi {
     public ApiResponse<MetricCollectionResponseBody> taskmanagersTaskmanageridMetricsGetWithHttpInfo(
             String taskmanagerid,
             String get) throws ApiException {
-        com.squareup.okhttp.Call call = taskmanagersTaskmanageridMetricsGetValidateBeforeCall(taskmanagerid, get, null, null);
+        okhttp3.Call call = taskmanagersTaskmanageridMetricsGetValidateBeforeCall(taskmanagerid, get, null, null);
         Type localVarReturnType = new TypeToken<MetricCollectionResponseBody>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -10091,7 +10089,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Provides access to task manager metrics.
-     * 
+     *
      * @param taskmanagerid
      *            32-character hexadecimal string that identifies a task
      *            manager. (required)
@@ -10105,7 +10103,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call taskmanagersTaskmanageridMetricsGetAsync(
+    public okhttp3.Call taskmanagersTaskmanageridMetricsGetAsync(
             String taskmanagerid,
             String get,
             final ApiCallback<MetricCollectionResponseBody> callback) throws ApiException {
@@ -10129,7 +10127,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = taskmanagersTaskmanageridMetricsGetValidateBeforeCall(taskmanagerid, get,
+        okhttp3.Call call = taskmanagersTaskmanageridMetricsGetValidateBeforeCall(taskmanagerid, get,
                 progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<MetricCollectionResponseBody>() {
         }.getType();
@@ -10139,7 +10137,7 @@ public class DefaultApi {
 
     /**
      * Build call for taskmanagersTaskmanageridThreadDumpGet
-     * 
+     *
      * @param taskmanagerid
      *            32-character hexadecimal string that identifies a task
      *            manager. (required)
@@ -10151,7 +10149,7 @@ public class DefaultApi {
      * @throws ApiException
      *             If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call taskmanagersTaskmanageridThreadDumpGetCall(
+    public okhttp3.Call taskmanagersTaskmanageridThreadDumpGetCall(
             String taskmanagerid,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -10180,10 +10178,10 @@ public class DefaultApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         if (progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+            apiClient.getHttpClient().networkInterceptors().add(new okhttp3.Interceptor() {
                 @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                public okhttp3.Response intercept(okhttp3.Interceptor.Chain chain) throws IOException {
+                    okhttp3.Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
                             .build();
@@ -10196,7 +10194,7 @@ public class DefaultApi {
                 localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
 
-    private com.squareup.okhttp.Call taskmanagersTaskmanageridThreadDumpGetValidateBeforeCall(
+    private okhttp3.Call taskmanagersTaskmanageridThreadDumpGetValidateBeforeCall(
             String taskmanagerid,
             final ProgressResponseBody.ProgressListener progressListener,
             final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
@@ -10206,15 +10204,15 @@ public class DefaultApi {
                     "Missing the required parameter 'taskmanagerid' when calling taskmanagersTaskmanageridThreadDumpGet(Async)");
         }
 
-        com.squareup.okhttp.Call call = taskmanagersTaskmanageridThreadDumpGetCall(taskmanagerid, progressListener,
+        okhttp3.Call call = taskmanagersTaskmanageridThreadDumpGetCall(taskmanagerid, progressListener,
                 progressRequestListener);
         return call;
     }
 
     /**
-     * 
+     *
      * Returns the thread dump of the requested TaskManager.
-     * 
+     *
      * @param taskmanagerid
      *            32-character hexadecimal string that identifies a task
      *            manager. (required)
@@ -10229,9 +10227,9 @@ public class DefaultApi {
     }
 
     /**
-     * 
+     *
      * Returns the thread dump of the requested TaskManager.
-     * 
+     *
      * @param taskmanagerid
      *            32-character hexadecimal string that identifies a task
      *            manager. (required)
@@ -10242,7 +10240,7 @@ public class DefaultApi {
      */
     public ApiResponse<ThreadDumpInfo> taskmanagersTaskmanageridThreadDumpGetWithHttpInfo(String taskmanagerid)
             throws ApiException {
-        com.squareup.okhttp.Call call = taskmanagersTaskmanageridThreadDumpGetValidateBeforeCall(taskmanagerid, null, null);
+        okhttp3.Call call = taskmanagersTaskmanageridThreadDumpGetValidateBeforeCall(taskmanagerid, null, null);
         Type localVarReturnType = new TypeToken<ThreadDumpInfo>() {
         }.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -10250,7 +10248,7 @@ public class DefaultApi {
 
     /**
      * (asynchronously) Returns the thread dump of the requested TaskManager.
-     * 
+     *
      * @param taskmanagerid
      *            32-character hexadecimal string that identifies a task
      *            manager. (required)
@@ -10261,7 +10259,7 @@ public class DefaultApi {
      *             If fail to process the API call, e.g. serializing the request
      *             body object
      */
-    public com.squareup.okhttp.Call taskmanagersTaskmanageridThreadDumpGetAsync(
+    public okhttp3.Call taskmanagersTaskmanageridThreadDumpGetAsync(
             String taskmanagerid,
             final ApiCallback<ThreadDumpInfo> callback) throws ApiException {
 
@@ -10284,7 +10282,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = taskmanagersTaskmanageridThreadDumpGetValidateBeforeCall(taskmanagerid, progressListener,
+        okhttp3.Call call = taskmanagersTaskmanageridThreadDumpGetValidateBeforeCall(taskmanagerid, progressListener,
                 progressRequestListener);
         Type localVarReturnType = new TypeToken<ThreadDumpInfo>() {
         }.getType();
