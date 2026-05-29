@@ -1,0 +1,44 @@
+name: "Push Main: Test + SonarQube Full Scan"
+
+on:
+  push:
+    branches: [main, master]
+
+jobs:
+  test-and-sonar:
+    name: Test & SonarQube Full Analysis
+    runs-on: ubuntu-latest
+    if: github.repository == 'wl4g/rengine'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 11
+          cache: maven
+
+      - name: Build & Test with JaCoCo
+        run: |
+          ./tools/build/run.sh build-maven \
+            -DskipTests=false \
+            -Djacoco.skip=false
+        env:
+          MAVEN_OPTS: "-Xmx2g -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
+
+      - name: SonarQube Scan (Full)
+        run: |
+          mvn sonar:sonar \
+            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.java.binaries="common/target/classes,apiserver/target/classes,controller/target/classes,service/target/classes" \
+            -Dsonar.coverage.jacoco.xmlReportPaths="**/target/site/jacoco/jacoco.xml" \
+            -Dsonar.exclusions="**/test/**,**/target/**,**/docs/**,**/example/**,**/rengine-operator/**,**/rengine-ui/**"
+        env:
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
