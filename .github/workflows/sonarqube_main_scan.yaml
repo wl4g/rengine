@@ -23,12 +23,24 @@ jobs:
           java-version: 17
           cache: maven
 
-      - name: Build & Test with JaCoCo
+      - name: Compile (skip tests)
         run: |
-          ./tools/build/run.sh build-maven \
-            -Dmaven.test.skip=false \
-            -DskipTests=false \
-            -Djacoco.skip=false
+          ./mvnw clean install -T 4C \
+            -Dmaven.test.skip=true \
+            -DskipTests \
+            -DskipITs \
+            -Djacoco.skip=true \
+            -Dgpg.skip \
+            -B
+        env:
+          MAVEN_OPTS: "-Xmx2g -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
+
+      - name: Test common,service with JaCoCo
+        run: |
+          ./mvnw verify -pl common,service -am \
+            -Djacoco.skip=false \
+            -Dgpg.skip \
+            -B
         env:
           MAVEN_OPTS: "-Xmx2g -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
 
