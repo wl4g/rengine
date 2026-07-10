@@ -29,6 +29,7 @@ jobs:
       - name: Build & Test with JaCoCo
         run: |
           ./tools/build/run.sh build-maven \
+            -Dmaven.test.skip=false \
             -DskipTests=false \
             -Djacoco.skip=false
         env:
