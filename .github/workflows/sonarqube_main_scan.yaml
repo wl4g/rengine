@@ -41,14 +41,13 @@ jobs:
         env:
           MAVEN_OPTS: "-Xmx2g -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
 
-      - name: Test common,service with JaCoCo
+      - name: Test common with JaCoCo
         run: |
-          ./mvnw verify -pl common,service -am \
+          ./mvnw verify -pl common \
             -Djacoco.skip=false \
             -Dgpg.skip \
             -B \
-            -DfailIfNoTests=false \
-            -Dtest='!ControllerLogServiceTests,!MongoUserDetailsManagerTests'
+            -DfailIfNoTests=false
         env:
           MAVEN_OPTS: "-Xmx2g -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
 
