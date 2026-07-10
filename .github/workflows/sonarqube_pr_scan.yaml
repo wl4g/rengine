@@ -43,7 +43,8 @@ jobs:
           ./mvnw verify -pl common,service -am \
             -Djacoco.skip=false \
             -Dgpg.skip \
-            -B
+            -B \
+            -DargLine="--add-opens java.base/java.util=ALL-UNNAMED"
         env:
           MAVEN_OPTS: "-Xmx2g -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
 
