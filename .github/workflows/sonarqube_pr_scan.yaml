@@ -50,6 +50,7 @@ jobs:
             -Djacoco.skip=false \
             -Dgpg.skip \
             -B \
+            -DfailIfNoTests=false \
             -Dtest='!ControllerLogServiceTests,!MongoUserDetailsManagerTests' \
             -DargLine="--add-opens java.base/java.util=ALL-UNNAMED"
         env:
