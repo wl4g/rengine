@@ -50,13 +50,12 @@ jobs:
 
       - name: SonarQube Scan (Scanner CLI)
         run: |
-          # Debug: verify secrets are set (shows length only, not value)
-          echo "SONAR_HOST_URL length=${#SONAR_HOST_URL}"
-          echo "SONAR_TOKEN length=${#SONAR_TOKEN}"
-          # Write host+token to sonar-project.properties so scanner picks them up
-          echo "sonar.host.url=${SONAR_HOST_URL}" >> sonar-project.properties
-          echo "sonar.token=${SONAR_TOKEN}" >> sonar-project.properties
+          echo "DEBUG SONAR_HOST_URL=[${SONAR_HOST_URL}]"
+          echo "DEBUG SONAR_HOST_URL len=${#SONAR_HOST_URL}"
+          echo "DEBUG SONAR_TOKEN len=${#SONAR_TOKEN}"
           sonar-scanner \
+            -Dsonar.host.url="${SONAR_HOST_URL}" \
+            -Dsonar.token="${SONAR_TOKEN}" \
             -Dsonar.pullrequest.key=${{ github.event.pull_request.number }} \
             -Dsonar.pullrequest.branch=${{ github.head_ref }} \
             -Dsonar.pullrequest.base=${{ github.base_ref }}

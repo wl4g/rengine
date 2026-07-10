@@ -47,9 +47,11 @@ jobs:
 
       - name: SonarQube Scan (Scanner CLI)
         run: |
-          echo "sonar.host.url=${SONAR_HOST_URL}" >> sonar-project.properties
-          echo "sonar.token=${SONAR_TOKEN}" >> sonar-project.properties
-          sonar-scanner
+          echo "DEBUG SONAR_HOST_URL len=${#SONAR_HOST_URL}"
+          echo "DEBUG SONAR_TOKEN len=${#SONAR_TOKEN}"
+          sonar-scanner \
+            -D"sonar.host.url=${SONAR_HOST_URL}" \
+            -D"sonar.token=${SONAR_TOKEN}"
         env:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
