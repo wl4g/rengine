@@ -27,7 +27,7 @@ on:
       runs-on:
         required: false
         type: string
-        default: ubuntu-20.04
+        default: ubuntu-latest
       java:
         required: false
         type: string
