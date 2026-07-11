@@ -27,4 +27,4 @@ jobs:
       enable-build-image-executor-native: false
       enable-push-image-dockerhub: false
     secrets:
-      PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      PERSONAL_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
