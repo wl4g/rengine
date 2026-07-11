@@ -1,20 +1,14 @@
-name: "Push Main: Test + SonarQube Full Scan"
+name: "Daily: Build + SonarQube Full Scan"
 
 on:
-  push:
-    branches: [main, master]
+  schedule:
+    - cron: '0 2 * * *'
 
 jobs:
   test-and-sonar:
-    name: Test & SonarQube Full Analysis
+    name: Build, Test & SonarQube Full Analysis
     runs-on: ubuntu-latest
     if: github.repository == 'wl4g/rengine'
-
-    services:
-      mongodb:
-        image: mongo:4.4
-        ports:
-          - 27017:27017
 
     steps:
       - name: Checkout
@@ -65,7 +59,7 @@ jobs:
           "${SCANNER_HOME}/bin/sonar-scanner" --version
           echo "${SCANNER_HOME}/bin" >> "$GITHUB_PATH"
 
-      - name: SonarQube Scan (Scanner CLI)
+      - name: SonarQube Scan
         run: |
           sonar-scanner \
             -Dsonar.host.url="${SONAR_HOST_URL}" \

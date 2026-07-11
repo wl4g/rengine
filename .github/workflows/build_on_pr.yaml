@@ -1,0 +1,30 @@
+name: "PR: Build"
+
+on:
+  pull_request:
+    branches:
+      - master
+      - main
+      - 'feature**'
+      - 'dev**'
+      - 'hotfix**'
+
+jobs:
+  build:
+    name: Build
+    permissions:
+      packages: write
+    uses: './.github/workflows/run.yaml'
+    if: github.repository == 'wl4g/rengine'
+    with:
+      enable-build: true
+      enable-deploy: false
+      enable-build-image-apiserver-tar: false
+      enable-build-image-apiserver-springjar: false
+      enable-build-image-controller-tar: false
+      enable-build-image-controller-springjar: false
+      enable-build-image-executor-tar: false
+      enable-build-image-executor-native: false
+      enable-push-image-dockerhub: false
+    secrets:
+      PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}

@@ -1,4 +1,4 @@
-name: "PR: Test + SonarQube Incremental Scan"
+name: "PR: Build + SonarQube Scan"
 
 on:
   pull_request:
@@ -6,18 +6,9 @@ on:
 
 jobs:
   test-and-sonar:
-    name: Test & SonarQube PR Analysis
+    name: Build, Test & SonarQube Analysis
     runs-on: ubuntu-latest
     if: github.repository == 'wl4g/rengine'
-    permissions:
-      contents: read
-      pull-requests: write
-
-    services:
-      mongodb:
-        image: mongo:4.4
-        ports:
-          - 27017:27017
 
     steps:
       - name: Checkout
@@ -68,7 +59,7 @@ jobs:
           "${SCANNER_HOME}/bin/sonar-scanner" --version
           echo "${SCANNER_HOME}/bin" >> "$GITHUB_PATH"
 
-      - name: SonarQube Scan (Scanner CLI)
+      - name: SonarQube Scan
         run: |
           sonar-scanner \
             -Dsonar.host.url="${SONAR_HOST_URL}" \
