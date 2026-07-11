@@ -17,6 +17,7 @@ jobs:
     uses: './.github/workflows/run.yaml'
     if: github.repository == 'wl4g/rengine'
     with:
+      java: 17
       enable-build: true
       enable-deploy: false
       enable-build-image-apiserver-tar: false
