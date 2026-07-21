@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ~ 2025 the original authors James Wong.
+ * Copyright 2023 ~ 2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,107 +15,48 @@
  */
 package com.wl4g.rengine.common.entity.sys;
 
-import static java.util.Arrays.asList;
+import static com.wl4g.rengine.common.constants.RengineConstants.SAFE_ACCESS_KEY;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wl4g.rengine.common.entity.BaseEntity;
-import com.wl4g.rengine.common.entity.quota.ResourceQuota;
 
-import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.SuperBuilder;
 
-/**
- * {@link Tenant}
- * 
- * @author James Wong
- * @date 2023-03-08
- * @since v1.0.0
- */
 @Getter
 @Setter
-@SuperBuilder
-@ToString(callSuper = true)
 @NoArgsConstructor
 public class Tenant extends BaseEntity {
-    private static final long serialVersionUID = 381411777614066880L;
+    private static final long serialVersionUID = -3082996880346069398L;
 
-    private @Default ServiceSettings settings = new ServiceSettings();
-    private @Default ResourceQuota executorQuota = new ResourceQuota();
-    private @Default ResourceQuota controllerQuota = new ResourceQuota();
+    @NotBlank
+    private String tenantCode;
 
-    // Ignore getter/setter.
+    @NotBlank
+    private String tenantName;
 
-    @JsonIgnore
-    @Override
-    public Long getTenantId() {
-        return null;
-    }
+    private String contactName;
 
-    @JsonIgnore
-    @Override
-    public void setTenantId(Long tenantId) {
-    }
+    private String contactPhone;
 
-    @Getter
-    @Setter
-    @SuperBuilder
-    @ToString(callSuper = true)
-    @NoArgsConstructor
-    public static class ServiceSettings {
-        private MongoServiceSettings mongo;
-        private RedisServiceSettings redis;
-        private MinIOServiceSettings minio;
-    }
+    private String contactEmail;
 
-    @Getter
-    @Setter
-    @SuperBuilder
-    @ToString(callSuper = true)
-    @NoArgsConstructor
-    public static class MongoServiceSettings {
-        private @Default Boolean enable = true;
-        private @Nullable @Default String sharedMongoConnectionString = "mongodb://localhost:27017";
-    }
+    private String address;
 
-    @Getter
-    @Setter
-    @SuperBuilder
-    @ToString(callSuper = true)
-    @NoArgsConstructor
-    public static class RedisServiceSettings {
-        private @Default Boolean enable = true;
-        private @Nullable @Default List<String> sharedRedisNodes = asList("localhost:6379", "localhost:6380", "localhost:6381",
-                "localhost:7379", "localhost:7380", "localhost:7381");
-        private @Nullable @Default String username = "";
-        private @Nullable @Default String password = "123456";
-        private @Nullable @Default Integer timeout = 10_000;
-        private @Nullable @Default Integer maxPoolSize = 512;
-        private @Nullable @Default Integer reconnectAttempts = 0;
-    }
+    private String description;
 
-    @Getter
-    @Setter
-    @SuperBuilder
-    @ToString(callSuper = true)
-    @NoArgsConstructor
-    public static class MinIOServiceSettings {
-        private @Default Boolean enable = true;
-        private @Nullable @Default String endpoint = "http://localhost:9000";
-        private @Nullable @Default String defaultRegion = "us-east-1";
-        private @Nullable @Default String defaultBucket = "rengine";
-        private @Nullable @Default String accessKey = "rengine";
-        private @Nullable @Default String accessSecret = "123456";
-        private @Nullable @Default Integer clientConnectTimeout = 10_000;
-        private @Nullable @Default Integer clientReadTimeout = 10_000;
-        private @Nullable @Default Integer clientWriteTimeout = 10_000;
+    private List<Long> userIds;
+
+    // Use constant to avoid hard-coded password detection
+    private String accessKey = SAFE_ACCESS_KEY;
+
+    public Tenant(Long id) {
+        setId(id);
     }
 
 }
