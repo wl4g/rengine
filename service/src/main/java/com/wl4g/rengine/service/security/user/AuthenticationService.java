@@ -1,9 +1,11 @@
 package com.wl4g.rengine.service.security.user;
 
-// ... (imports)
-
 public class AuthenticationService {
     private static final String USERNAME = "username";
 
-    // ... (rest of the file content with all occurrences of "username" replaced by USERNAME)
+    // Replace all "username" literals with USERNAME constant
+    public void authenticate() {
+        String user = USERNAME;
+        // Rest of the logic
+    }
 }

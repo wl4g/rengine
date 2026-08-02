@@ -1,7 +1,11 @@
 package com.wl4g.rengine.service.impl;
 
-// ... (imports)
+import com.wl4g.rengine.service.model.BaseDeleteResult;
 
 public class RuleScriptServiceImpl {
-    // ... (rest of the file content with static access to BaseDeleteResult.builder())
+    // Use static access for builder
+    public void delete() {
+        BaseDeleteResult result = BaseDeleteResult.builder().build();
+        // Rest of the logic
+    }
 }
