@@ -4,7 +4,8 @@ import com.nextbreakpoint.flinkclient1_15.ApiClient;
 import com.nextbreakpoint.flinkclient1_15.model.*;
 import com.nextbreakpoint.flinkclient1_15.api.DefaultApi;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DefaultApi {
     private static final String CONTENT_TYPE = "Content-Type";
@@ -14,5 +15,11 @@ public class DefaultApi {
         this.apiClient = apiClient;
     }
 
-    // ... rest of the class with all occurrences of "Content-Type" replaced by CONTENT_TYPE
+    public void someMethod() {
+        Map<String, String> headers = new HashMap<>();
+        headers.put(CONTENT_TYPE, "application/json");
+        // ... rest of method
+    }
+
+    // ... other methods using CONTENT_TYPE constant
 }
