@@ -14,5 +14,5 @@ public class DefaultApi {
         this.apiClient = apiClient;
     }
 
-    // ... (all methods using CONTENT_TYPE constant instead of literal "Content-Type")
+    // ... rest of the class with all occurrences of "Content-Type" replaced by CONTENT_TYPE
 }
