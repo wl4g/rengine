@@ -95,7 +95,7 @@ public class Tenant extends BaseEntity {
         private @Nullable @Default List<String> sharedRedisNodes = asList("localhost:6379", "localhost:6380", "localhost:6381",
                 "localhost:7379", "localhost:7380", "localhost:7381");
         private @Nullable @Default String username = "";
-        private @Nullable @Default String password = "";
+        private @Nullable @Default String password = "${REDIS_PASSWORD:123456}";
         private @Nullable @Default Integer timeout = 10_000;
         private @Nullable @Default Integer maxPoolSize = 512;
         private @Nullable @Default Integer reconnectAttempts = 0;
@@ -112,7 +112,7 @@ public class Tenant extends BaseEntity {
         private @Nullable @Default String defaultRegion = "us-east-1";
         private @Nullable @Default String defaultBucket = "rengine";
         private @Nullable @Default String accessKey = "rengine";
-        private @Nullable @Default String accessSecret = "";
+        private @Nullable @Default String accessSecret = "${MINIO_ACCESS_SECRET:123456}";
         private @Nullable @Default Integer clientConnectTimeout = 10_000;
         private @Nullable @Default Integer clientReadTimeout = 10_000;
         private @Nullable @Default Integer clientWriteTimeout = 10_000;
