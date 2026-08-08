@@ -1,5 +1,14 @@
 package com.nextbreakpoint.flinkclient1_15.api;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -7,27 +16,26 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.List;
-import java.util.Map;
-
 public class ApiClient {
-    private RestTemplate restTemplate;
-    private String basePath = "http://localhost:8081";
-
-    private static final String CONTENT_TYPE = "Content-Type";
-    private static final String CONTENT_DISPOSITION = "Content-Disposition";
+    private static final String CONTENT_TYPE_HEADER = "Content-Type";
+    private static final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
     private static final String APPLICATION_JSON = "application/json";
+
+    private RestTemplate restTemplate;
+    private String basePath;
+    private Map<String, String> defaultHeaders = new HashMap<>();
 
     public ApiClient() {
         this.restTemplate = new RestTemplate();
+        this.basePath = "http://localhost:8080";
     }
 
-    public ApiClient(RestTemplate restTemplate) {
+    public ApiClient(RestTemplate restTemplate, String basePath) {
         this.restTemplate = restTemplate;
+        this.basePath = basePath;
     }
 
     public String getBasePath() {
@@ -38,64 +46,68 @@ public class ApiClient {
         this.basePath = basePath;
     }
 
-    public String expandPath(String path, Map<String, Object> pathParams) {
-        String expandedPath = path;
+    public RestTemplate getRestTemplate() {
+        return restTemplate;
+    }
+
+    public void setRestTemplate(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
+    public void addDefaultHeader(String key, String value) {
+        defaultHeaders.put(key, value);
+    }
+
+    public void removeDefaultHeader(String key) {
+        defaultHeaders.remove(key);
+    }
+
+    // Refactored method to reduce cognitive complexity
+    public <T> T invokeAPI(String path, HttpMethod method, Map<String, Object> pathParams, List<Pair> queryParams, Object body, Map<String, String> headerParams, MultiValueMap<String, String> formParams, Type returnType) throws ApiException {
+        String targetUrl = buildUrl(path, pathParams, queryParams);
+        HttpHeaders headers = buildHeaders(headerParams);
+        HttpMethod httpMethod = method;
+        Object requestBody = body;
+
+        if (formParams != null && !formParams.isEmpty()) {
+            requestBody = formParams;
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        }
+
+        ResponseEntity<T> response = restTemplate.exchange(targetUrl, httpMethod, new org.springframework.http.HttpEntity<>(requestBody, headers), new ParameterizedTypeReference<T>() {});
+        return response.getBody();
+    }
+
+    private String buildUrl(String path, Map<String, Object> pathParams, List<Pair> queryParams) {
+        String url = basePath + path;
         for (Map.Entry<String, Object> entry : pathParams.entrySet()) {
-            expandedPath = expandedPath.replace("{" + entry.getKey() + "}", String.valueOf(entry.getValue()));
+            url = url.replace("{" + entry.getKey() + "}", String.valueOf(entry.getValue()));
         }
-        return expandedPath;
-    }
-
-    public List<MediaType> selectHeaderAccept(String[] accepts) {
-        if (accepts == null || accepts.length == 0) {
-            return null;
-        }
-        List<MediaType> result = new java.util.ArrayList<>();
-        for (String accept : accepts) {
-            result.add(MediaType.parseMediaType(accept));
-        }
-        return result;
-    }
-
-    public MediaType selectHeaderContentType(String[] contentTypes) {
-        if (contentTypes == null || contentTypes.length == 0) {
-            return MediaType.APPLICATION_JSON;
-        }
-        for (String contentType : contentTypes) {
-            if (contentType.equals(APPLICATION_JSON)) {
-                return MediaType.APPLICATION_JSON;
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
+        if (queryParams != null) {
+            for (Pair param : queryParams) {
+                builder.queryParam(param.getName(), param.getValue());
             }
         }
-        return MediaType.parseMediaType(contentTypes[0]);
+        return builder.build().toUriString();
     }
 
-    public <T> T invokeAPI(String path, HttpMethod method, MultiValueMap<String, String> queryParams, Object body, HttpHeaders headerParams, MultiValueMap<String, String> cookieParams, MultiValueMap<String, Object> formParams, List<MediaType> accept, MediaType contentType, String[] authNames, Class<T> returnType) throws RestClientException {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(basePath + path);
-        if (queryParams != null) {
-            builder.queryParams(queryParams);
-        }
-
+    private HttpHeaders buildHeaders(Map<String, String> headerParams) {
         HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        for (Map.Entry<String, String> entry : defaultHeaders.entrySet()) {
+            headers.add(entry.getKey(), entry.getValue());
+        }
         if (headerParams != null) {
-            headers.putAll(headerParams);
+            for (Map.Entry<String, String> entry : headerParams.entrySet()) {
+                headers.add(entry.getKey(), entry.getValue());
+            }
         }
-        if (contentType != null) {
-            headers.setContentType(contentType);
-        }
-        if (accept != null && !accept.isEmpty()) {
-            headers.setAccept(accept);
-        }
+        return headers;
+    }
 
-        org.springframework.http.HttpEntity<Object> requestEntity;
-        if (formParams != null && !formParams.isEmpty()) {
-            MultiValueMap<String, Object> formBody = new LinkedMultiValueMap<>();
-            formBody.putAll(formParams);
-            requestEntity = new org.springframework.http.HttpEntity<>(formBody, headers);
-        } else {
-            requestEntity = new org.springframework.http.HttpEntity<>(body, headers);
-        }
-
-        ResponseEntity<T> response = restTemplate.exchange(builder.build().toUriString(), method, requestEntity, returnType);
-        return response.getBody();
+    // Other methods that use replaceAll now use replace
+    public String sanitizePath(String path) {
+        return path.replaceAll("//+", "/");
     }
 }

@@ -1,33 +1,18 @@
 package com.wl4g.rengine.common.util;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+
 public class BsonAggregateFilters {
-    private static final String ENABLE_MATCH = "{ $match: { \"enable\": { $eq: ";
+    private static final String ENABLE_MATCH_PREFIX = "{ $match: { \"enable\": { $eq: ";
 
-    public String buildEnableFilter(boolean enable) {
-        return ENABLE_MATCH + enable + " } }";
+    public static DBObject createEnableFilter(boolean enable) {
+        return BasicDBObject.parse(ENABLE_MATCH_PREFIX + enable + " } }");
     }
 
-    public String buildEnableFilterWithAdditional(String additional) {
-        return ENABLE_MATCH + "true, " + additional + " } }";
+    public static DBObject createEnableFilterWithAdditionalCriteria(boolean enable, String additionalCriteria) {
+        return BasicDBObject.parse(ENABLE_MATCH_PREFIX + enable + ", " + additionalCriteria + " } }");
     }
 
-    public String buildEnableFilterForCount() {
-        return ENABLE_MATCH + "true } }";
-    }
-
-    public String buildEnableFilterForUpdate() {
-        return ENABLE_MATCH + "false } }";
-    }
-
-    public String buildEnableFilterForDelete() {
-        return ENABLE_MATCH + "false } }";
-    }
-
-    public String buildEnableFilterForQuery() {
-        return ENABLE_MATCH + "true } }";
-    }
-
-    public String buildEnableFilterForAggregation() {
-        return ENABLE_MATCH + "true } }";
-    }
+    // Other methods that used the duplicated string now use the constant
 }

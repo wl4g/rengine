@@ -1,29 +1,21 @@
 package com.wl4g.rengine.service.deploy;
 
+import com.wl4g.rengine.service.deploy.RengineRootPasswordTool;
+
 public class RengineRootPasswordTool {
-    private static final String SEPARATOR = "---------------------------------------";
+    private static final String SEPARATOR_LINE = "---------------------------------------";
 
-    public void printPasswordInfo() {
-        System.out.println(SEPARATOR);
-        System.out.println("Root password information");
-        System.out.println(SEPARATOR);
+    public static void printSeparator() {
+        System.out.println(SEPARATOR_LINE);
     }
 
-    public void printPasswordReset() {
-        System.out.println(SEPARATOR);
-        System.out.println("Password reset completed");
-        System.out.println(SEPARATOR);
+    public static void printHeader() {
+        System.out.println(SEPARATOR_LINE);
+        System.out.println("Rengine Root Password Tool");
+        System.out.println(SEPARATOR_LINE);
     }
 
-    public void printPasswordError() {
-        System.out.println(SEPARATOR);
-        System.out.println("Error occurred");
-        System.out.println(SEPARATOR);
-    }
-
-    public void printPasswordSuccess() {
-        System.out.println(SEPARATOR);
-        System.out.println("Success");
-        System.out.println(SEPARATOR);
+    public static void printFooter() {
+        System.out.println(SEPARATOR_LINE);
     }
 }

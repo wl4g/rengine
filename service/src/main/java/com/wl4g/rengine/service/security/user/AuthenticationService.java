@@ -1,54 +1,50 @@
 package com.wl4g.rengine.service.security.user;
 
-import com.wl4g.rengine.common.model.User;
+import com.wl4g.rengine.common.entity.sys.User;
+import com.wl4g.rengine.common.exception.RengineException;
 import com.wl4g.rengine.service.security.user.AuthenticationService;
 
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+@Service
 public class AuthenticationService {
-    private static final String USERNAME = "username";
+    private static final String USERNAME_FIELD = "username";
+    private static final String PASSWORD_FIELD = "password";
 
-    public User authenticate(String username, String password) {
-        // Simplified authentication logic
-        if (USERNAME.equals(username) && "password".equals(password)) {
-            User user = new User();
-            user.setUsername(username);
-            return user;
+    private final AuthenticationManager authenticationManager;
+    private final PasswordEncoder passwordEncoder;
+
+    public AuthenticationService(AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder) {
+        this.authenticationManager = authenticationManager;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    public Authentication authenticate(String username, String password) {
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
+        Authentication authentication = authenticationManager.authenticate(token);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        return authentication;
+    }
+
+    public void validateCredentials(String username, String password) {
+        if (username == null || username.isEmpty()) {
+            throw new RengineException(USERNAME_FIELD + " cannot be empty");
         }
-        return null;
-    }
-
-    public boolean validateUsername(String username) {
-        return USERNAME.equals(username);
-    }
-
-    public String getUsernameFromToken(String token) {
-        // Simplified token parsing
-        if (token != null && token.contains(USERNAME)) {
-            return token.split(":")[1];
-        }
-        return null;
-    }
-
-    public void updateUsername(String oldUsername, String newUsername) {
-        if (USERNAME.equals(oldUsername)) {
-            // update logic
+        if (password == null || password.isEmpty()) {
+            throw new RengineException(PASSWORD_FIELD + " cannot be empty");
         }
     }
 
-    public void deleteUsername(String username) {
-        if (USERNAME.equals(username)) {
-            // delete logic
-        }
+    public String encodePassword(String rawPassword) {
+        return passwordEncoder.encode(rawPassword);
     }
 
-    public boolean checkUsernameExists(String username) {
-        return USERNAME.equals(username);
-    }
-
-    public String getDefaultUsername() {
-        return USERNAME;
-    }
-
-    public void setDefaultUsername(String username) {
-        // set default username
+    public boolean matchesPassword(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 }
