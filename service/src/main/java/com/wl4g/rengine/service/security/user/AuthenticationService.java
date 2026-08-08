@@ -1,12 +1,17 @@
 package com.wl4g.rengine.service.security.user;
 
-public class AuthenticationService {
-    private static final String USERNAME = "username";
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
-    // Use USERNAME constant instead of literal "username"
-    public void authenticate(String username) {
-        if (USERNAME.equals(username)) {
-            // logic
-        }
+@Service
+public class AuthenticationService implements UserDetailsService {
+    private static final String USERNAME_FIELD = "username";
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        // ... implementation using USERNAME_FIELD constant ...
+        return null;
     }
 }

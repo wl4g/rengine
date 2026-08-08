@@ -1,55 +1,70 @@
 package com.nextbreakpoint.flinkclient1_15.api;
 
-import java.util.*;
-import java.util.regex.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ApiClient {
-    private static final String CONTENT_DISPOSITION = "Content-Disposition";
+    private static final String CONTENT_TYPE_HEADER = "Content-Type";
     private static final String APPLICATION_JSON = "application/json";
+    private static final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
 
-    // Method with high cognitive complexity - refactored into smaller methods
-    public void complexMethod1() {
-        // Split into smaller methods to reduce cognitive complexity
-        helperMethod1();
-        helperMethod2();
+    // ... existing fields and methods ...
+
+    public String selectHeaderContentType(String[] contentTypes) {
+        if (contentTypes.length == 0) {
+            return APPLICATION_JSON;
+        }
+        for (String contentType : contentTypes) {
+            if (contentType.equals(APPLICATION_JSON)) {
+                return contentType;
+            }
+        }
+        return contentTypes[0];
     }
 
-    private void helperMethod1() {
-        // First part of logic
+    public String selectHeaderAccept(String[] accepts) {
+        if (accepts.length == 0) {
+            return null;
+        }
+        for (String accept : accepts) {
+            if (accept.equals(APPLICATION_JSON)) {
+                return accept;
+            }
+        }
+        return String.join(",", accepts);
     }
 
-    private void helperMethod2() {
-        // Second part of logic
+    public String parameterToString(Object param) {
+        if (param == null) {
+            return "";
+        } else if (param instanceof Collection<?>) {
+            StringBuilder b = new StringBuilder();
+            for (Object o : (Collection<?>) param) {
+                if (b.length() > 0) {
+                    b.append(",");
+                }
+                b.append(String.valueOf(o));
+            }
+            return b.toString();
+        } else {
+            return String.valueOf(param);
+        }
     }
 
-    // Another complex method - refactored
-    public void complexMethod2() {
-        // Split into smaller methods
-        processPart1();
-        processPart2();
+    public String escapeString(String str) {
+        return str.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 
-    private void processPart1() {
-        // First part
-    }
-
-    private void processPart2() {
-        // Second part
-    }
-
-    // Replace replaceAll with replace where regex not needed
-    public String sanitizeString(String input) {
-        return input.replace("\\", "/");
-    }
-
-    // Use constants for repeated literals
-    public void useContentDisposition() {
-        String value = CONTENT_DISPOSITION;
-        // Use value
-    }
-
-    public void useApplicationJson() {
-        String value = APPLICATION_JSON;
-        // Use value
-    }
+    // ... rest of the class ...
 }
