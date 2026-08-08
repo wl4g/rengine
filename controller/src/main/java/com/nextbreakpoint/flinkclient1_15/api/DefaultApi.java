@@ -1,19 +1,16 @@
 package com.nextbreakpoint.flinkclient1_15.api;
 
-import com.nextbreakpoint.flinkclient1_15.ApiClient;
-import com.nextbreakpoint.flinkclient1_15.model.*;
-import com.nextbreakpoint.flinkclient1_15.api.DefaultApi;
+import java.util.List;
+import java.util.Map;
 
 public class DefaultApi {
-    private final ApiClient apiClient;
-    private static final String CONTENT_TYPE = "Content-Type";
-
-    public DefaultApi(ApiClient apiClient) {
-        this.apiClient = apiClient;
-    }
+    private static final String CONTENT_TYPE_HEADER = "Content-Type";
 
     public void someMethod() {
-        // Example usage of the constant
-        String contentType = CONTENT_TYPE;
+        // Example usage
+        Map<String, String> headers = Map.of(CONTENT_TYPE_HEADER, "application/json");
+        // ... rest of the method
     }
+
+    // ... other methods using CONTENT_TYPE_HEADER constant
 }

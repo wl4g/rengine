@@ -1,18 +1,15 @@
 package com.wl4g.rengine.common.entity.sys;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
 public class Tenant {
-    private Long id;
+    private String id;
     private String name;
-    private String code;
     private String description;
-    private String status;
-    private String rootPassword;
-    private String rootPasswordSalt;
-    private Long createTime;
-    private Long updateTime;
+    private String defaultPassword;
 }
