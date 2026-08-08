@@ -1,18 +1,76 @@
 package com.nextbreakpoint.flinkclient1_15.api;
 
-import com.nextbreakpoint.flinkclient1_15.ApiClient;
-import com.nextbreakpoint.flinkclient1_15.model.*;
-import com.nextbreakpoint.flinkclient1_15.api.DefaultApi;
-
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DefaultApi {
     private static final String CONTENT_TYPE = "Content-Type";
-    private final ApiClient apiClient;
 
-    public DefaultApi(ApiClient apiClient) {
-        this.apiClient = apiClient;
+    // ... existing code ...
+
+    private Map<String, String> createHeaders() {
+        Map<String, String> headers = new HashMap<>();
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        headers.put(CONTENT_TYPE, "application/json");
+        return headers;
     }
 
-    // ... (all methods remain the same, but replace "Content-Type" with CONTENT_TYPE)
+    // ... existing code ...
 }
