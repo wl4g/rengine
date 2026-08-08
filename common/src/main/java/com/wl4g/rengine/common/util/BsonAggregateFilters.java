@@ -3,31 +3,31 @@ package com.wl4g.rengine.common.util;
 public class BsonAggregateFilters {
     private static final String ENABLE_MATCH = "{ $match: { \"enable\": { $eq: ";
 
-    public static String filter1() {
+    public String buildEnableFilter(boolean enable) {
+        return ENABLE_MATCH + enable + " } }";
+    }
+
+    public String buildEnableFilterWithAdditional(String additional) {
+        return ENABLE_MATCH + "true, " + additional + " } }";
+    }
+
+    public String buildEnableFilterForCount() {
         return ENABLE_MATCH + "true } }";
     }
 
-    public static String filter2() {
+    public String buildEnableFilterForUpdate() {
         return ENABLE_MATCH + "false } }";
     }
 
-    public static String filter3() {
-        return ENABLE_MATCH + "1 } }";
+    public String buildEnableFilterForDelete() {
+        return ENABLE_MATCH + "false } }";
     }
 
-    public static String filter4() {
-        return ENABLE_MATCH + "0 } }";
+    public String buildEnableFilterForQuery() {
+        return ENABLE_MATCH + "true } }";
     }
 
-    public static String filter5() {
-        return ENABLE_MATCH + "\"true\" } }";
-    }
-
-    public static String filter6() {
-        return ENABLE_MATCH + "\"false\" } }";
-    }
-
-    public static String filter7() {
-        return ENABLE_MATCH + "null } }";
+    public String buildEnableFilterForAggregation() {
+        return ENABLE_MATCH + "true } }";
     }
 }
