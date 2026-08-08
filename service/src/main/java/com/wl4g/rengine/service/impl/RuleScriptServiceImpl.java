@@ -3,5 +3,5 @@ package com.wl4g.rengine.service.impl;
 import com.wl4g.rengine.service.model.BaseDeleteResult;
 
 public class RuleScriptServiceImpl {
-    // ... (rest of the class, with builder accessed statically: BaseDeleteResult.builder())
+    // ... (all methods remain the same, but use BaseDeleteResult.builder() instead of instance builder)
 }
