@@ -1,16 +1,9 @@
 package com.wl4g.rengine.service.deploy;
 
+import ...;
+
 public class RengineRootPasswordTool {
     private static final String SEPARATOR = "---------------------------------------";
 
-    // ... existing code ...
-
-    public void printSeparator() {
-        System.out.println(SEPARATOR);
-        System.out.println(SEPARATOR);
-        System.out.println(SEPARATOR);
-        System.out.println(SEPARATOR);
-    }
-
-    // ... existing code ...
+    // ... (rest of the class, replacing the literal with SEPARATOR)
 }
