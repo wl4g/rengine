@@ -1,11 +1,7 @@
 package com.wl4g.rengine.common.util;
 
 public class BsonAggregateFilters {
-    private static final String ENABLE_MATCH_PREFIX = "{ $match: { \"enable\": { $eq: ";
+    private static final String ENABLE_MATCH = "{ $match: { \"enable\": { $eq: ";
 
-    public static String buildEnableFilter(boolean enable) {
-        return ENABLE_MATCH_PREFIX + enable + " } }";
-    }
-
-    // ... other methods ...
+    // ... (rest of the class, with all occurrences of the literal replaced by ENABLE_MATCH)
 }
