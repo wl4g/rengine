@@ -1,33 +1,33 @@
 package com.wl4g.rengine.common.util;
 
 public class BsonAggregateFilters {
-    private static final String ENABLE_MATCH = "{ $match: { \"enable\": { $eq: ";
+    private static final String MATCH_ENABLE = "{ $match: { \"enable\": { $eq: ";
 
-    public String buildEnableFilter(boolean enable) {
-        return ENABLE_MATCH + enable + " } }";
+    public void method1() {
+        String query = MATCH_ENABLE;
     }
 
-    public String buildEnableFilterWithAdditional(String additional) {
-        return ENABLE_MATCH + "true, " + additional + " } }";
+    public void method2() {
+        String query = MATCH_ENABLE;
     }
 
-    public String buildEnableFilterForCount() {
-        return ENABLE_MATCH + "true } }";
+    public void method3() {
+        String query = MATCH_ENABLE;
     }
 
-    public String buildEnableFilterForUpdate() {
-        return ENABLE_MATCH + "false } }";
+    public void method4() {
+        String query = MATCH_ENABLE;
     }
 
-    public String buildEnableFilterForDelete() {
-        return ENABLE_MATCH + "false } }";
+    public void method5() {
+        String query = MATCH_ENABLE;
     }
 
-    public String buildEnableFilterForQuery() {
-        return ENABLE_MATCH + "true } }";
+    public void method6() {
+        String query = MATCH_ENABLE;
     }
 
-    public String buildEnableFilterForAggregation() {
-        return ENABLE_MATCH + "true } }";
+    public void method7() {
+        String query = MATCH_ENABLE;
     }
 }

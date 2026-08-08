@@ -3,27 +3,19 @@ package com.wl4g.rengine.service.deploy;
 public class RengineRootPasswordTool {
     private static final String SEPARATOR = "---------------------------------------";
 
-    public void printPasswordInfo() {
-        System.out.println(SEPARATOR);
-        System.out.println("Root password information");
+    public void method1() {
         System.out.println(SEPARATOR);
     }
 
-    public void printPasswordReset() {
-        System.out.println(SEPARATOR);
-        System.out.println("Password reset completed");
+    public void method2() {
         System.out.println(SEPARATOR);
     }
 
-    public void printPasswordError() {
-        System.out.println(SEPARATOR);
-        System.out.println("Error occurred");
+    public void method3() {
         System.out.println(SEPARATOR);
     }
 
-    public void printPasswordSuccess() {
-        System.out.println(SEPARATOR);
-        System.out.println("Success");
+    public void method4() {
         System.out.println(SEPARATOR);
     }
 }

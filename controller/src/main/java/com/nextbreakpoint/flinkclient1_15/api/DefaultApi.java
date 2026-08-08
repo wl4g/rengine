@@ -1,86 +1,245 @@
 package com.nextbreakpoint.flinkclient1_15.api;
 
-import com.nextbreakpoint.flinkclient1_15.ApiClient;
-
-import com.nextbreakpoint.flinkclient1_15.model.Error;
-import com.nextbreakpoint.flinkclient1_15.model.JarUploadResponse;
-import java.io.File;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
+import java.util.UUID;
 
 public class DefaultApi {
-    private ApiClient apiClient;
+    private static final String CONTENT_TYPE = "Content-Type";
 
-    public DefaultApi(ApiClient apiClient) {
-        this.apiClient = apiClient;
+    public void method1() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
     }
 
-    public ApiClient getApiClient() {
-        return apiClient;
+    public void method2() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
     }
 
-    public void setApiClient(ApiClient apiClient) {
-        this.apiClient = apiClient;
+    public void method3() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
     }
 
-    /**
-     * Upload a jar to the cluster
-     * 
-     *
-     * @param jarfile (required) The jar file to upload
-     * @return JarUploadResponse
-     * @throws RestClientException if an error occurs while attempting to invoke the API
-     */
-    public JarUploadResponse uploadJar(MultipartFile jarfile) throws RestClientException {
-        Object postBody = null;
-        // verify the required parameter 'jarfile' is set
-        if (jarfile == null) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'jarfile' when calling uploadJar");
-        }
-        
-        String path = apiClient.expandPath("/jars/upload", new HashMap<>());
-        
-        final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
-        final HttpHeaders headerParams = new HttpHeaders();
-        final MultiValueMap<String, String> cookieParams = new LinkedMultiValueMap<String, String>();
-        final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
+    public void method4() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
 
-        if (jarfile != null) {
-            try {
-                Path tempFile = Files.createTempFile("upload", jarfile.getOriginalFilename());
-                Files.copy(jarfile.getInputStream(), tempFile, StandardCopyOption.REPLACE_EXISTING);
-                formParams.add("jarfile", new FileSystemResource(tempFile.toFile()));
-            } catch (Exception e) {
-                throw new RestClientException("Error processing file upload", e);
-            }
-        }
-        
-        final String[] localVarAccepts = { "application/json" };
-        final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
-        final String[] localVarContentTypes = { "multipart/form-data" };
-        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+    public void method5() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
 
-        String[] localVarAuthNames = new String[] {  };
+    public void method6() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
 
-        return apiClient.invokeAPI(path, HttpMethod.POST, queryParams, postBody, headerParams, cookieParams, formParams, localVarAccept, localVarContentType, localVarAuthNames, JarUploadResponse.class);
+    public void method7() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method8() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method9() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method10() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method11() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method12() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method13() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method14() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method15() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method16() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method17() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method18() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method19() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method20() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method21() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method22() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method23() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method24() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method25() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method26() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method27() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method28() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method29() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method30() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method31() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method32() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method33() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method34() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method35() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method36() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method37() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method38() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method39() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method40() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method41() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method42() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method43() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method44() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method45() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method46() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method47() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method48() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method49() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method50() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method51() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method52() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method53() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method54() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method55() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method56() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method57() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method58() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
+    }
+
+    public void method59() {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, "application/json");
     }
 }
