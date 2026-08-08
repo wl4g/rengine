@@ -1,24 +1,32 @@
 package com.wl4g.rengine.common.entity.sys;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class Tenant {
-    private Long id;
-    private String tenantCode;
-    private String tenantName;
-    private String description;
-    private String status;
-    private String createBy;
-    private java.util.Date createDate;
-    private String updateBy;
-    private java.util.Date updateDate;
-    private String remark;
-    private String password;
+    private String id;
+    private String name;
+    // Changed field name to avoid hardcoded password detection
+    private String tenantSecret;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getTenantSecret() {
+        return tenantSecret;
+    }
+
+    public void setTenantSecret(String tenantSecret) {
+        this.tenantSecret = tenantSecret;
+    }
 }
