@@ -60,7 +60,6 @@ import com.wl4g.rengine.service.security.RengineWebSecurityConfiguration;
 public final class RengineRootPasswordTool {
 
     public static final String DEFAULT_CONNECTION_STRING = "mongodb://localhost:27017/rengine";
-
     private static final String SEPARATOR_LINE = "---------------------------------------";
 
     public static void main(String[] args) throws Exception {
