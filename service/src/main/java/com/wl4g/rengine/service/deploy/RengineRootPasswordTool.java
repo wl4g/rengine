@@ -60,6 +60,7 @@ import com.wl4g.rengine.service.security.RengineWebSecurityConfiguration;
 public final class RengineRootPasswordTool {
 
     public static final String DEFAULT_CONNECTION_STRING = "mongodb://localhost:27017/rengine";
+    private static final String SEPARATOR_LINE = "---------------------------------------";
 
     public static void main(String[] args) throws Exception {
         try {
@@ -76,12 +77,12 @@ public final class RengineRootPasswordTool {
             rootPassword = isBlank(rootPassword) ? RandomStringUtils.randomAlphabetic(32) : rootPassword;
 
             out.println("Using configuration arguments:");
-            out.println("---------------------------------------");
+            out.println(SEPARATOR_LINE);
             out.println(" connectionString: " + connectionString);
             out.println("    isClusterMode: " + isClusterMode);
             out.println("         database: " + database);
             out.println("     rootPassword: " + rootPassword);
-            out.println("---------------------------------------");
+            out.println(SEPARATOR_LINE);
             out.println("\nCall to Mongo Server ...\n");
 
             final var mongoClient = createMongoClient(connectionString, isClusterMode);
@@ -155,9 +156,9 @@ public final class RengineRootPasswordTool {
             userCollection.insertOne(BsonEntitySerializers.toDocument(firstRootUser), options);
         }
 
-        out.println("---------------------------------------");
+        out.println(SEPARATOR_LINE);
         out.println(format("INITIALIZED ROOT PASSWORD: %s", rootPassword));
-        out.println("---------------------------------------");
+        out.println(SEPARATOR_LINE);
     }
 
 }
