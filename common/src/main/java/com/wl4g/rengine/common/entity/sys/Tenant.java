@@ -112,7 +112,7 @@ public class Tenant extends BaseEntity {
         private @Nullable @Default String defaultRegion = "us-east-1";
         private @Nullable @Default String defaultBucket = "rengine";
         private @Nullable @Default String accessKey = "rengine";
-        private @Nullable @Default String accessSecret = "123456";
+        private @Nullable @Default String accessSecret = "";
         private @Nullable @Default Integer clientConnectTimeout = 10_000;
         private @Nullable @Default Integer clientReadTimeout = 10_000;
         private @Nullable @Default Integer clientWriteTimeout = 10_000;
