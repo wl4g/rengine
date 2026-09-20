@@ -44,13 +44,13 @@ public class RengineMeterService extends PrometheusMeterFacade {
 
         // Global master controller metrics.
 
-        global_master_controller("global_master_controller_total", "The stats of schedule controller total"),
+        GLOBAL_MASTER_CONTROLLER("global_master_controller_total", "The stats of schedule controller total"),
 
-        global_master_controller_success("global_master_controller_success", "The stats of schedule controller success"),
+        GLOBAL_MASTER_CONTROLLER_SUCCESS("global_master_controller_success", "The stats of schedule controller success"),
 
-        global_master_controller_failure("global_master_controller_failure", "The stats of schedule controller failure"),
+        GLOBAL_MASTER_CONTROLLER_FAILURE("global_master_controller_failure", "The stats of schedule controller failure"),
 
-        global_master_controller_time("global_master_controller_time", "The stats of schedule controller time");
+        GLOBAL_MASTER_CONTROLLER_TIME("global_master_controller_time", "The stats of schedule controller time");
 
         private final String name;
         private final String help;
