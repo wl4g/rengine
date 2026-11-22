@@ -2,7 +2,7 @@ var N = 2000;
 var EXPECTED = 17393;
 
 function Natural() {
-    x = 2;
+    var x = 2;
     return {
         'next' : function() { return x++; }
     };

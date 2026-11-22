@@ -1,0 +1,111 @@
+name: "PR: Build + SonarQube Scan + Check"
+
+on:
+  pull_request:
+    branches: ['**']
+
+jobs:
+  test-and-sonar:
+    name: Build, Test & SonarQube Analysis
+    runs-on: ubuntu-latest
+    if: github.repository == 'wl4g/rengine'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+
+      - name: Compile (skip tests)
+        run: |
+          ./mvnw clean install -T 4C \
+            -Dmaven.test.skip=true \
+            -DskipTests \
+            -DskipITs \
+            -Djacoco.skip=true \
+            -Dgpg.skip \
+            -B
+        env:
+          MAVEN_OPTS: "-Xmx2g -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
+
+      - name: Test common with JaCoCo
+        run: |
+          ./mvnw verify -pl common \
+            -Djacoco.skip=false \
+            -Dgpg.skip \
+            -B \
+            -DfailIfNoTests=false
+        env:
+          MAVEN_OPTS: "-Xmx2g -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
+
+      - name: Set up SonarScanner CLI
+        run: |
+          set -eo pipefail
+          SONAR_SCANNER_VERSION=5.0.1.3006
+          SCANNER_HOME="/tmp/sonar-scanner-${SONAR_SCANNER_VERSION}-linux"
+          if [ ! -f "${SCANNER_HOME}/bin/sonar-scanner" ]; then
+            curl -sSL --retry 3 --retry-delay 5 \
+              -o /tmp/sonar-scanner.zip \
+              "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux.zip"
+            unzip -qo /tmp/sonar-scanner.zip -d /tmp
+          fi
+          "${SCANNER_HOME}/bin/sonar-scanner" --version
+          echo "${SCANNER_HOME}/bin" >> "$GITHUB_PATH"
+
+      - name: SonarQube Scan
+        run: |
+          sonar-scanner \
+            -Dsonar.host.url="${SONAR_HOST_URL}" \
+            -Dsonar.token="${SONAR_TOKEN}"
+        env:
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: SonarQube Quality Gate Check
+        run: |
+          set -eo pipefail
+
+          REPORT_TASK=".scannerwork/report-task.txt"
+          CE_TASK_URL=$(grep -oP 'ceTaskUrl=\K.*' "$REPORT_TASK")
+          echo "CE Task URL: $CE_TASK_URL"
+
+          echo "Polling CE task until completion (timeout 300s)..."
+          for i in $(seq 1 60); do
+            TASK_STATUS=$(curl -sS -u "${SONAR_TOKEN}:" "${CE_TASK_URL}" | jq -r '.task.status')
+            echo "[$i] CE Task status: $TASK_STATUS"
+            case "$TASK_STATUS" in
+              SUCCESS) break ;;
+              FAILED|CANCELED)
+                echo "CE task ended with: $TASK_STATUS"
+                exit 1
+                ;;
+            esac
+            sleep 5
+          done
+
+          if [ "$TASK_STATUS" != "SUCCESS" ]; then
+            echo "Timed out waiting for CE task"
+            exit 1
+          fi
+
+          QG_STATUS=$(curl -sS -u "${SONAR_TOKEN}:" \
+            "${SONAR_HOST_URL}/api/qualitygates/project_status?projectKey=${SONAR_PROJECT_KEY}" \
+            | jq -r '.projectStatus.status')
+          echo "Quality Gate status: $QG_STATUS"
+
+          if [ "$QG_STATUS" != "OK" ]; then
+            echo "Quality Gate FAILED — merge blocked"
+            exit 1
+          fi
+          echo "Quality Gate PASSED"
+        env:
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_PROJECT_KEY: rengine
